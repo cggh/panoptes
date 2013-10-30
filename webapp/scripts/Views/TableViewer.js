@@ -1,15 +1,6 @@
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Wizards/EditQuery"],
     function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, EditQuery) {
 
-        //A helper function, turning a fraction into a 3 digit text string
-        var createFuncVal2Text = function(digits) {
-            return function(vl) {
-                if (vl==null)
-                    return '-';
-                else
-                    return parseFloat(vl).toFixed(digits);
-            }
-        }
 
         //A helper function, turning a fraction into a color string
         var funcFraction2Color = function (vl) {

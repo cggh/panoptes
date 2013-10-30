@@ -35,6 +35,17 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
     function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Intro, GenomeBrowser, TableViewer, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet) {
         $(function () {
 
+            //A helper function, turning a fraction into a 3 digit text string
+            var createFuncVal2Text = function(digits) {
+                return function(vl) {
+                    if (vl==null)
+                        return '-';
+                    else
+                        return parseFloat(vl).toFixed(digits);
+                }
+            }
+
+
             function Start_Part1() {
                 PromptDataSet.execute(function() {
                     var getter = DataFetchers.ServerDataGetter();
@@ -186,7 +197,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                         prop.settings = settings;
                                         prop.toDisplayString = function(vl) { return vl; }
                                         if (prop.isFloat)
-                                            prop.toDisplayString = function(vl) { return parseFloat(vl).toFixed(prop.settings.decimDigits); }
+                                            prop.toDisplayString = createFuncVal2Text(prop.settings.decimDigits);
                                         if (prop.isBoolean)
                                             prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
                                         prop.category2Color = DQX.PersistentAssociator(DQX.standardColors.length);
