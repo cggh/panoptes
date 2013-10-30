@@ -147,11 +147,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','property_setinfo', data, function(resp) {
                     DQX.stopProcessing();
-                    Msg.send({ type: 'ReloadChannelInfo' });
-                    if ('Error' in resp) {
-                        alert(resp.Error);
-                        return;
-                    }
+                    setTimeout(function() {
+                        Msg.send({ type: 'ReloadChannelInfo' });
+                        if ('Error' in resp) {
+                            alert(resp.Error);
+                        }
+                    }, 200);
                 });
 
             }
