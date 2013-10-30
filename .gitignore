@@ -1,3 +1,12 @@
+*.pyc
+*.py~
+.idea
+webapp/scripts/DQX
+servermodule/uploadtracks/VTTable.py
+importscripts/TableUtils
+
+
+
 *.py[cod]
 
 # C extensions
