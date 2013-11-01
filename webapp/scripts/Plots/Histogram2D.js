@@ -4,6 +4,32 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         var Histogram2D = {};
 
 
+        var paletteList = ['Gray', 'Gray (inverted)', 'Rainbow 1', 'Rainbow 2', 'Heath'];
+
+        function getPaletteColor(name,fr) {
+            if (fr<0) fr=0;
+            if (fr>1) fr=1;
+            if (name=='Gray (inverted)')
+                return DQX.Color(fr,fr,fr);
+
+            if (name=='Rainbow 1') {
+                var cl = DQX.HSL2Color(0.5-fr*0.75,1,0.5);
+                return cl;
+            }
+
+            if (name=='Rainbow 2') {
+                var cl = DQX.HSL2Color(0.5-fr*0.75,1,0.5);
+                if (fr<0.2)
+                    cl=cl.lighten(1-fr/0.2);
+                return cl;
+            }
+
+            if (name=='Heath')
+                return DQX.Color(1-Math.pow(fr,1.5),1-Math.pow(fr,0.8),1-Math.pow(fr,0.4));
+
+
+            return DQX.Color(1-fr,1-fr,1-fr);
+        }
 
 
 
@@ -81,23 +107,34 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 });
 
                 that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setOnChanged(function() {
-                    that.ctrl_binsizeValue.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
+                    that.ctrl_binsizeValueX.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
+                    that.ctrl_binsizeValueY.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     that.ctrl_binsizeUpdate.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     if (that.ctrl_binsizeAutomatic.getValue())
                         that.fetchData();
                 });
 
-                that.ctrl_binsizeValue = Controls.Edit(null,{size:18}).setOnChanged(function() {
-
-                });
-                that.ctrl_binsizeValue.modifyEnabled(false);
+                that.ctrl_binsizeValueX = Controls.Edit(null,{size:12, label:'X:'}).modifyEnabled(false);
+                that.ctrl_binsizeValueY = Controls.Edit(null,{size:12, label:'Y:'}).modifyEnabled(false);
 
                 that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update'}).setOnChanged(function() {
                     that.fetchData();
                 });
                 that.ctrl_binsizeUpdate.modifyEnabled(false);
 
-                var binsizeGroup = Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValue, that.ctrl_binsizeUpdate]).setLegend('Bin size');
+                var binsizeGroup = Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValueX, that.ctrl_binsizeValueY, that.ctrl_binsizeUpdate]).setLegend('Bin size');
+
+                var colormaplist = [];
+                $.each(paletteList, function(idx,name) {
+                    colormaplist.push({id:name, name:name});
+                });
+                that.ctrlPalette = Controls.Combo(null,{label:'Colors', states:colormaplist, value:'Gray'}).setOnChanged(function() {
+                    that.reDraw();
+                });
+
+                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}], value:'linear'}).setOnChanged(function() {
+                    that.reDraw();
+                });
 
                 that.panelButtons.addControl(Controls.CompoundVert([
                     buttonDefineQuery,
@@ -107,7 +144,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     Controls.VerticalSeparator(5),
                     that.ctrlValueYProperty,
                     Controls.VerticalSeparator(20),
-                    binsizeGroup
+                    binsizeGroup,
+                    Controls.VerticalSeparator(20),
+                    that.ctrlPalette,
+                    Controls.VerticalSeparator(20),
+                    that.ctrlMappingStyle
                 ]));
 
             };
@@ -117,7 +158,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.propidValueX = that.ctrlValueXProperty.getValue();
                 that.propidValueY = that.ctrlValueYProperty.getValue();
 
-                that.bucketCounts = null;
+                that.bucketDens = null;
                 if ((!that.propidValueX)||(!that.propidValueY)) {
                     that.reDraw();
                     return;
@@ -131,8 +172,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
                 data.qry = SQL.WhereClause.encode(that.query);
-                if (!that.ctrl_binsizeAutomatic.getValue())
-                    data.binsize = that.ctrl_binsizeValue.getValue();
+                if (!that.ctrl_binsizeAutomatic.getValue()) {
+                    data.binsizex = that.ctrl_binsizeValueX.getValue();
+                    data.binsizey = that.ctrl_binsizeValueY.getValue();
+                }
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','histogram2d', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
@@ -166,20 +209,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                     that.bucketDens=[];
                     for (var i=0; i<that.bucketCountX; i++) {
-                        for (var j=0; i<that.bucketCountY; j++) {
-                        }
+                        var ar = [];
+                        for (var j=0; j<that.bucketCountY; j++)
+                            ar.push(0);
+                        that.bucketDens.push(ar);
                     }
-                    that.maxCount = 1;
-                    for (var i=bucketMin; i<bucketMax; i++)
-                        that.bucketCounts.push(0);
-                    for (var i=0; i<buckets.length; i++) {
-                        that.bucketCounts[buckets[i]-bucketMin] = counts[i];
-                        if (that.maxCount<counts[i])
-                            that.maxCount=counts[i]
+                    that.maxDens = 1;
+                    for (var i=0; i<densities.length; i++) {
+                        that.bucketDens[bucketsX[i]-bucketXMin][bucketsY[i]-bucketYMin] = densities[i];
+                        that.maxDens = Math.max(that.maxDens,densities[i]);
                     }
 
-                    //if (that.ctrl_binsizeAutomatic.getValue())
-                    //    that.ctrl_binsizeValue.modifyValue(that.bucketSize);
+                    if (that.ctrl_binsizeAutomatic.getValue()) {
+                        that.ctrl_binsizeValueX.modifyValue(that.bucketSizeX);
+                        that.ctrl_binsizeValueY.modifyValue(that.bucketSizeY);
+                    }
 
 
                     that.reDraw();
@@ -204,9 +248,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.drawImpl = function(drawInfo) {
 
-
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
+
+                var paletteName=that.ctrlPalette.getValue();
 
                 var marginX = 40;
                 var marginY = 40;
@@ -214,22 +259,47 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 ctx.fillRect(0,0,marginX,drawInfo.sizeY);
                 ctx.fillRect(0,drawInfo.sizeY-marginY,drawInfo.sizeX,marginY);
 
-                if (!that.bucketCounts)
+                if (!that.bucketDens)
                     return;
 
-                var XMin = that.bucketNrOffset*that.bucketSize;
-                var XMax = (that.bucketNrOffset+that.bucketCounts.length)*that.bucketSize;
+                var XMin = that.bucketNrOffsetX*that.bucketSizeX;
+                var XMax = (that.bucketNrOffsetX+that.bucketCountX)*that.bucketSizeX;
                 var XRange = XMax - XMin;
-                XMin -= 0.1*XRange;
-                XMax += 0.1*XRange;
-                var YMin = 0;
-                var YMax = that.maxCount*1.1;
+                XMin -= 0.02*XRange;
+                XMax += 0.02*XRange;
+                var YMin = that.bucketNrOffsetY*that.bucketSizeY;
+                var YMax = (that.bucketNrOffsetY+that.bucketCountY)*that.bucketSizeY;
+                var YRange = YMax - YMin;
+                YMin -= 0.02*YRange;
+                YMax += 0.02*YRange;
                 var scaleX = (drawInfo.sizeX-marginX) / (XMax - XMin);
                 var offsetX = marginX - XMin*scaleX;
                 var scaleY = - (drawInfo.sizeY-marginY) / (YMax - YMin);
                 var offsetY = (drawInfo.sizeY-marginY) - YMin*scaleY;
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;
+
+                for (var ix=0; ix<that.bucketCountX; ix++) {
+                    var x1 = (that.bucketNrOffsetX+ix+0)*that.bucketSizeX;
+                    var x2 = (that.bucketNrOffsetX+ix+1)*that.bucketSizeX;
+                    var px1 = Math.round(x1 * scaleX + offsetX);
+                    var px2 = Math.round(x2 * scaleX + offsetX);
+                    for (var iy=0; iy<that.bucketCountY; iy++) {
+                        var y1 = (that.bucketNrOffsetY+iy+0)*that.bucketSizeY;
+                        var y2 = (that.bucketNrOffsetY+iy+1)*that.bucketSizeY;
+                        var py1 = Math.round(y1 * scaleY + offsetY);
+                        var py2 = Math.round(y2 * scaleY + offsetY);
+                        var fr = that.bucketDens[ix][iy]*1.0/that.maxDens;
+                        if (that.ctrlMappingStyle.getValue()=='log1')
+                            fr=Math.log(1+20*fr)/Math.log(21);
+                        if (that.ctrlMappingStyle.getValue()=='log2')
+                            fr=Math.log(1+500*fr)/Math.log(501);
+                        var cl = getPaletteColor(paletteName, fr);
+                        ctx.fillStyle=cl.toString();
+                        ctx.fillRect(px1,py2,px2-px1,py1-py2);
+                    }
+                }
+
 
                 // Draw x scale
                 ctx.save();
@@ -240,9 +310,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 for (var i=Math.ceil(XMin/scale.Jump1); i<=Math.floor(XMax/scale.Jump1); i++) {
                     var vl = i*scale.Jump1;
                     var px = Math.round(vl * scaleX + offsetX)-0.5;
-                    ctx.strokeStyle = "rgb(230,230,230)";
+                    ctx.strokeStyle = "rgba(128,128,128,0.15)";
                     if (i%scale.JumpReduc==0)
-                        ctx.strokeStyle = "rgb(190,190,190)";
+                        ctx.strokeStyle = "rgba(0,0,0,0.25)";
                     ctx.beginPath();
                     ctx.moveTo(px,0);
                     ctx.lineTo(px,drawInfo.sizeY-marginY);
@@ -262,9 +332,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
                     var vl = i*scale.Jump1;
                     var py = Math.round(vl * scaleY + offsetY)-0.5;
-                    ctx.strokeStyle = "rgb(230,230,230)";
+                    ctx.strokeStyle = "rgba(128,128,128,0.15)";
                     if (i%scale.JumpReduc==0)
-                        ctx.strokeStyle = "rgb(190,190,190)";
+                        ctx.strokeStyle = "rgba(0,0,0,0.25)";
                     ctx.beginPath();
                     ctx.moveTo(marginX,py);
                     ctx.lineTo(drawInfo.sizeX,py);
@@ -279,138 +349,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 }
                 ctx.restore();
 
-                ctx.fillStyle="rgb(190,190,190)";
-                $.each(that.bucketCounts, function(bidx, val) {
-                    var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
-                    var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
-                    var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
-                    var px2 = Math.round(x2 * scaleX + offsetX)-0.5;
-                    var py1 = Math.round(0 * scaleY + offsetY)-0.5;
-                    var py2 = Math.round(val * scaleY + offsetY)-0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(px1, py2);
-                    ctx.lineTo(px1, py1);
-                    ctx.lineTo(px2, py1);
-                    ctx.lineTo(px2, py2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-                });
-
-/*
-                var ctx = drawInfo.ctx;
-                if (!that.categories) {
-                    return;
-                }
-                var propInfo1 = MetaData.findProperty(that.tableInfo.id,that.catpropid1);
-                if (that.catpropid2)
-                    var propInfo2 = MetaData.findProperty(that.tableInfo.id,that.catpropid2);
-
-                that.plotH = drawInfo.sizeY - that.textH - 60;
-
-                that.hoverItems = [];
-
-                var totcount  = 0;
-                $.each(that.categories, function(idx, cat) {
-                    totcount += cat.count;
-                });
-
-                ctx.font="12px Arial";
-                $.each(that.categories, function(idx, cat) {
-                    var sumcount = that.maxcount;
-                    if (that.showRelative && (that.catpropid2) )
-                        sumcount = cat.count;
-                    sumcount = Math.max(1,sumcount);
-
-                    ctx.fillStyle="rgb(220,220,220)";
-                    var h = cat.count*1.0/sumcount * that.plotH;
-                    var px1 = that.scaleW + idx * that.barW + 0.5;
-                    var px2 = that.scaleW + (idx+1) * that.barW + 0.5;
-                    var py1 = drawInfo.sizeY-that.textH + 0.5;
-                    var py2 = drawInfo.sizeY-that.textH -Math.round(h) + 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(px1, py2);
-                    ctx.lineTo(px1, py1);
-                    ctx.lineTo(px2, py1);
-                    ctx.lineTo(px2, py2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-                    //Draw label
-                    ctx.fillStyle="black";
-                    ctx.textAlign = 'right';
-                    ctx.textBaseline = 'middle';
-                    ctx.save();
-                    ctx.translate((px1+px2)/2,py1+5);
-                    ctx.rotate(-Math.PI/2);
-                    ctx.fillText(propInfo1.toDisplayString(cat.name),0,0);
-                    ctx.restore();
-                    //Draw count
-                    ctx.fillStyle="rgb(150,150,150)";
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.save();
-                    ctx.translate((px1+px2)/2,py2-2);
-                    ctx.rotate(-Math.PI/2);
-                    ctx.fillText(cat.count,0,0);
-                    ctx.restore();
-
-                    var label = propInfo1.name+': '+propInfo1.toDisplayString(cat.name);
-                    label += '<br>Count: {ct} ({fr}%)'.DQXformat({ ct:cat.count, fr:(cat.count/totcount*100).toFixed(2)});
-                    that.hoverItems.push({
-                        //itemid: ids[bestidx],
-                        ID: 'i'+DQX.getNextUniqueID(),
-                        px: (px1+px2)/2,
-                        py: (py1+py2)/2,
-                        //showPointer:true,
-                        content: label,
-                        px1:px1, px2:px2, py1:py1, py2:py2
-                    });
-
-                    if (that.catpropid2) {
-                        var colorMapper = MetaData.findProperty(that.tableInfo.id,that.catpropid2).category2Color;
-                        var cumulcount = 0;
-                        $.each(cat.subcats, function(idx, subcat) {
-                            var h1 = cumulcount*1.0/sumcount * that.plotH;
-                            var h2 = (cumulcount+subcat.count)*1.0/sumcount * that.plotH;
-                            var py1 = drawInfo.sizeY-that.textH - Math.round(h1) + 0.5;
-                            var py2 = drawInfo.sizeY-that.textH - Math.round(h2) + 0.5;
-                            var colNr = colorMapper.get(subcat.name);
-                            if (colNr>=0)
-                                ctx.fillStyle=DQX.standardColors[colNr].toStringCanvas();
-                            else
-                                ctx.fillStyle='rgb(100,100,100)';
-                            ctx.beginPath();
-                            ctx.moveTo(px1, py2);
-                            ctx.lineTo(px1, py1);
-                            ctx.lineTo(px2, py1);
-                            ctx.lineTo(px2, py2);
-                            ctx.closePath();
-                            ctx.fill();
-                            ctx.stroke();
-                            cumulcount += subcat.count;
-
-                            var label = propInfo1.name+': '+propInfo1.toDisplayString(cat.name);
-                            label += '<br>'+propInfo2.name+': '+propInfo2.toDisplayString(subcat.name);
-                            label += '<br>Count: {ct} (of class: {fr1}%, of total: {fr2}%)'.DQXformat({
-                                ct:subcat.count,
-                                fr1:(subcat.count/sumcount*100).toFixed(2),
-                                fr2:(subcat.count/totcount*100).toFixed(2)
-                            });
-                            that.hoverItems.push({
-                                //itemid: ids[bestidx],
-                                ID: 'i'+DQX.getNextUniqueID(),
-                                px: (px1+px2)/2,
-                                py: (py1+py2)/2,
-                                //showPointer:true,
-                                content: label,
-                                px1:px1, px2:px2, py1:py1, py2:py2
-                            });
-
-                        });
-                    }
-                });
-*/
 
                 that.plotPresent = true;
             };
