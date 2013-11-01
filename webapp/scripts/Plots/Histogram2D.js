@@ -24,8 +24,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 return cl;
             }
 
-            if (name=='Heath')
-                return DQX.Color(1-Math.pow(fr,1.5),1-Math.pow(fr,0.8),1-Math.pow(fr,0.4));
+            if (name=='Heath') {
+                return DQX.Color(1-Math.pow(Math.max(fr-0.66,0)/(1-0.66),2),1-Math.pow(Math.max(fr-0.33,0)/(1-0.33),0.8),1-Math.pow(fr,0.6));
+            }
 
 
             return DQX.Color(1-fr,1-fr,1-fr);
@@ -132,7 +133,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.reDraw();
                 });
 
-                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}], value:'linear'}).setOnChanged(function() {
+                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}, {id:'loglog',name:'Log log'}], value:'linear'}).setOnChanged(function() {
                     that.reDraw();
                 });
 
@@ -225,7 +226,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.ctrl_binsizeValueY.modifyValue(that.bucketSizeY);
                     }
 
-
+                    that.panelPlot.setDirectDedraw(that.bucketCountX*that.bucketCountY<2000);
                     that.reDraw();
                 });
 
@@ -243,7 +244,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.draw = function(drawInfo) {
-                that.drawImpl(drawInfo);
+                if (that.panelPlot._directRedraw)
+                    that.drawImpl(drawInfo);
+                else
+                    DQX.executeProcessing(function() { that.drawImpl(drawInfo); });
             }
 
             that.drawImpl = function(drawInfo) {
@@ -294,6 +298,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             fr=Math.log(1+20*fr)/Math.log(21);
                         if (that.ctrlMappingStyle.getValue()=='log2')
                             fr=Math.log(1+500*fr)/Math.log(501);
+                        if (that.ctrlMappingStyle.getValue()=='loglog') {
+                            fr=Math.log(1+500*fr)/Math.log(501);
+                            fr=Math.log(1+500*fr)/Math.log(501);
+                        }
                         var cl = getPaletteColor(paletteName, fr);
                         ctx.fillStyle=cl.toString();
                         ctx.fillRect(px1,py2,px2-px1,py1-py2);

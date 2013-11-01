@@ -44,7 +44,7 @@ def response(returndata):
             jumpPrototypes = [1, 2, 5]
             optimalbincount = int(0.75*math.pow(count, 0.5))
             optimalbincount = max(optimalbincount, 2)
-            optimalbincount = min(optimalbincount, 100)
+            optimalbincount = min(optimalbincount, 50)
             optimalbinsize = (maxval-minval)/optimalbincount
             mindist = 1.0e99
             binsize = 1
