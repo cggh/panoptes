@@ -1,5 +1,5 @@
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Wizards/EditQuery"],
-    function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, EditQuery) {
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery"],
+    function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery) {
 
 
         //A helper function, turning a fraction into a color string
@@ -143,6 +143,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         BarGraph.Create(that.tableid);
                     });
 
+                    var cmdHistogram2d = Controls.Button(null, { content: '2D Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
+                    cmdHistogram2d.setOnChanged(function() {
+                        Histogram2D.Create(that.tableid);
+                    });
+
                     var cmdScatterPlot = Controls.Button(null, { content: 'Scatter plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdScatterPlot.setOnChanged(function() {
                         ItemScatterPlot.Create(that.tableid);
@@ -154,6 +159,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         Controls.VerticalSeparator(15),
                         cmdHistogram,
                         cmdBarGraph,
+                        cmdHistogram2d,
                         cmdScatterPlot
                     ]));
                 }

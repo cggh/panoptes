@@ -1,15 +1,15 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
     function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
 
-        var Histogram = {};
+        var Histogram2D = {};
 
 
 
 
 
-        Histogram.Create = function(tableid) {
+        Histogram2D.Create = function(tableid) {
             var tableInfo = MetaData.mapTableCatalog[tableid];
-            var that = PopupFrame.PopupFrame(tableInfo.name + ' Histogram', {title:'Histogram', blocking:false, sizeX:700, sizeY:550 });
+            var that = PopupFrame.PopupFrame(tableInfo.name + ' Histogram2D', {title:'2D Histogram', blocking:false, sizeX:700, sizeY:550 });
             that.tableInfo = tableInfo;
             that.query = SQL.WhereClause.Trivial();
             if (tableInfo.currentQuery)
@@ -71,8 +71,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Value') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: propList })
-                that.ctrlValueProperty.setOnChanged(function() {
+                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:', states: propList })
+                that.ctrlValueXProperty.setOnChanged(function() {
+                    that.fetchData();
+                });
+                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:', states: propList })
+                that.ctrlValueYProperty.setOnChanged(function() {
                     that.fetchData();
                 });
 
@@ -99,7 +103,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     buttonDefineQuery,
                     that.ctrlQueryString,
                     Controls.VerticalSeparator(20),
-                    that.ctrlValueProperty,
+                    that.ctrlValueXProperty,
+                    Controls.VerticalSeparator(5),
+                    that.ctrlValueYProperty,
                     Controls.VerticalSeparator(20),
                     binsizeGroup
                 ]));
@@ -108,9 +114,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.fetchData = function() {
-                that.propidValue = that.ctrlValueProperty.getValue();
+                that.propidValueX = that.ctrlValueXProperty.getValue();
+                that.propidValueY = that.ctrlValueYProperty.getValue();
+
                 that.bucketCounts = null;
-                if (!that.propidValue) {
+                if ((!that.propidValueX)||(!that.propidValueY)) {
                     that.reDraw();
                     return;
                 }
@@ -120,11 +128,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
-                data.propid = that.propidValue;
+                data.propidx = that.propidValueX;
+                data.propidy = that.propidValueY;
                 data.qry = SQL.WhereClause.encode(that.query);
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','histogram', data, function(resp) {
+                DQX.customRequest(MetaData.serverUrl,'uploadtracks','histogram2d', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);
@@ -138,24 +147,30 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
 
                     var decoder = DataDecoders.ValueListDecoder();
-                    var buckets = decoder.doDecode(resp.buckets);
-                    var counts = decoder.doDecode(resp.counts);
-                    that.bucketSize = resp.binsize;
+                    var bucketsX = decoder.doDecode(resp.bucketsx);
+                    var bucketsY = decoder.doDecode(resp.bucketsy);
+                    var densities = decoder.doDecode(resp.densities);
+                    that.bucketSizeX = resp.binsizex;
+                    that.bucketSizeY = resp.binsizey;
 
 
-                    var bucketMin = 1.0e99;
-                    var bucketMax = -1.0e99;
-                    $.each(buckets,function(idx,vl) {
-                        if (vl<bucketMin)
-                            bucketMin=vl;
-                        if (vl>bucketMax)
-                            bucketMax=vl;
-                    });
+                    var bucketXMin = Math.min.apply(Math, bucketsX);
+                    var bucketXMax = Math.max.apply(Math, bucketsX);
+                    var bucketYMin = Math.min.apply(Math, bucketsY);
+                    var bucketYMax = Math.max.apply(Math, bucketsY);
 
-                    that.bucketNrOffset = bucketMin;
-                    that.bucketCounts=[];
+                    that.bucketNrOffsetX = bucketXMin;
+                    that.bucketCountX = bucketXMax-bucketXMin+1;
+                    that.bucketNrOffsetY = bucketYMin;
+                    that.bucketCountY = bucketYMax-bucketYMin+1;
+
+                    that.bucketDens=[];
+                    for (var i=0; i<that.bucketCountX; i++) {
+                        for (var j=0; i<that.bucketCountY; j++) {
+                        }
+                    }
                     that.maxCount = 1;
-                    for (var i=bucketMin; i<=bucketMax; i++)
+                    for (var i=bucketMin; i<bucketMax; i++)
                         that.bucketCounts.push(0);
                     for (var i=0; i<buckets.length; i++) {
                         that.bucketCounts[buckets[i]-bucketMin] = counts[i];
@@ -163,8 +178,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             that.maxCount=counts[i]
                     }
 
-                    if (that.ctrl_binsizeAutomatic.getValue())
-                        that.ctrl_binsizeValue.modifyValue(that.bucketSize);
+                    //if (that.ctrl_binsizeAutomatic.getValue())
+                    //    that.ctrl_binsizeValue.modifyValue(that.bucketSize);
 
 
                     that.reDraw();
@@ -419,7 +434,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
 
-        return Histogram;
+        return Histogram2D;
     });
 
 
