@@ -19,6 +19,12 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
+def MaypSynColName(colname):
+    if colname == 'SnpName':
+        return 'snpid'
+    return colname
+
+
 def ResponseExecute(data, calculationObject):
 
     if not(updateLock.acquire(0)):
@@ -64,6 +70,12 @@ def ResponseExecute(data, calculationObject):
             tb.LoadFile(filename)#!!!should be no limitation
         except Exception as e:
             raise Exception('Error while reading file: '+str(e))
+
+        # Rename some columns if they are known synonyms
+        for colname in tb.GetColList():
+            syncolname = MaypSynColName(colname)
+            if syncolname != colname:
+                tb.RenameCol(colname, syncolname)
 
         # Remove all unneeded columns
         colNr = 0

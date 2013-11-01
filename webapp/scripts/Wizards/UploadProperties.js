@@ -1,6 +1,13 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
 
+        function mapSynColName(colname) {
+            if (colname=='SnpName')
+                return 'snpid';
+            return colname;
+        }
+
+
         var UploadProperties = {};
 
         UploadProperties.init = function() {
@@ -57,6 +64,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 reportValidationError: function() {
                     var uploadingProperty = false;
                     $.each(UploadProperties.columns,function(idx,colname) {
+                        colname=mapSynColName(colname);
                         if (colname!=UploadProperties.primkey) {
                             var propChoice=UploadProperties.propControls.findControl('propchoice_'+colname).getValue();
                             if (propChoice) uploadingProperty = true;
@@ -107,6 +115,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var hasPrimKey = false;
                 UploadProperties.propControls.clear();
                 $.each(UploadProperties.columns,function(idx,colname) {
+                    colname=mapSynColName(colname);
                     if (colname==UploadProperties.primkey)
                         hasPrimKey = true;
                     else {
