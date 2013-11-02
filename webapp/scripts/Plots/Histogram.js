@@ -334,7 +334,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 }
             }
 
-
+            that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
+                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                    var tableView = Application.getView('table_'+that.tableInfo.id);
+                    var qry= SQL.WhereClause.AND([]);
+                    if (!that.query.isTrivial)
+                        qry.addComponent(that.query);
+                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'>=',rangeMin));
+                        qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'<',rangeMax));
+                    tableView.activateWithQuery(qry);
+                    Popup.closeIfNeeded(popupid);
+                });
+                var rangeMin = (minX-that.offsetX)/that.scaleX;
+                var rangeMax = (maxX-that.offsetX)/that.scaleX;
+                var content = 'Range: '+rangeMin+' - '+rangeMax+'<br>';
+                content +=  bt.renderHtml();
+                var popupid = Popup.create('Histogram area', content);
+            }
 
 
             that.create();
