@@ -15,8 +15,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 MetaData.database,
                 function() {
                     PromptWorkspace.workspaces = getter.getTableRecords('workspaces');
-                    if (MetaData.quickLoad) {// Quick and dirty pick first, for development
-                        MetaData.workspaceid  = PromptWorkspace.workspaces[0].id;
+                    if (DQX.getUrlSearchString('workspace')) {
+                        MetaData.workspaceid  = DQX.getUrlSearchString('workspace');
                         Application.getChannelInfo(proceedFunction);
                     }
                     else

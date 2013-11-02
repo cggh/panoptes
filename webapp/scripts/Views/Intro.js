@@ -90,6 +90,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelButtons.addControl(Controls.CompoundHor([
                         Controls.CompoundVert(tableButtons).setTreatAsBlock(),
                         Controls.CompoundVert([browserButton, bt_addprops, bt_refresh]).setTreatAsBlock(),
+                        Controls.VerticalSeparator(20),
+                        Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
                         //Controls.ColorPicker(null, {label: 'Color', value: DQX.Color(1,1,0)})
                     ]));
 

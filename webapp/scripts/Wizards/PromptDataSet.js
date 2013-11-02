@@ -13,8 +13,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             getter.execute(MetaData.serverUrl,'datasetindex',
                 function() {
                     PromptDataSet.datasets = getter.getTableRecords('datasetindex');
-                    if (MetaData.quickLoad) { // Quick & dirty pick one, for development purposes
-                        MetaData.database = 'pf30viewtracks';
+                    if (DQX.getUrlSearchString('dataset')) {
+                        MetaData.database = DQX.getUrlSearchString('dataset');
                         PromptDataSet.proceedFunction();
                     }
                     else
