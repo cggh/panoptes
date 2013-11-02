@@ -282,134 +282,58 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     ctx.stroke();
                 });
 
-/*
-                var ctx = drawInfo.ctx;
-                if (!that.categories) {
-                    return;
-                }
-                var propInfo1 = MetaData.findProperty(that.tableInfo.id,that.catpropid1);
-                if (that.catpropid2)
-                    var propInfo2 = MetaData.findProperty(that.tableInfo.id,that.catpropid2);
-
-                that.plotH = drawInfo.sizeY - that.textH - 60;
-
-                that.hoverItems = [];
-
-                var totcount  = 0;
-                $.each(that.categories, function(idx, cat) {
-                    totcount += cat.count;
-                });
-
-                ctx.font="12px Arial";
-                $.each(that.categories, function(idx, cat) {
-                    var sumcount = that.maxcount;
-                    if (that.showRelative && (that.catpropid2) )
-                        sumcount = cat.count;
-                    sumcount = Math.max(1,sumcount);
-
-                    ctx.fillStyle="rgb(220,220,220)";
-                    var h = cat.count*1.0/sumcount * that.plotH;
-                    var px1 = that.scaleW + idx * that.barW + 0.5;
-                    var px2 = that.scaleW + (idx+1) * that.barW + 0.5;
-                    var py1 = drawInfo.sizeY-that.textH + 0.5;
-                    var py2 = drawInfo.sizeY-that.textH -Math.round(h) + 0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(px1, py2);
-                    ctx.lineTo(px1, py1);
-                    ctx.lineTo(px2, py1);
-                    ctx.lineTo(px2, py2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-                    //Draw label
-                    ctx.fillStyle="black";
-                    ctx.textAlign = 'right';
-                    ctx.textBaseline = 'middle';
-                    ctx.save();
-                    ctx.translate((px1+px2)/2,py1+5);
-                    ctx.rotate(-Math.PI/2);
-                    ctx.fillText(propInfo1.toDisplayString(cat.name),0,0);
-                    ctx.restore();
-                    //Draw count
-                    ctx.fillStyle="rgb(150,150,150)";
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.save();
-                    ctx.translate((px1+px2)/2,py2-2);
-                    ctx.rotate(-Math.PI/2);
-                    ctx.fillText(cat.count,0,0);
-                    ctx.restore();
-
-                    var label = propInfo1.name+': '+propInfo1.toDisplayString(cat.name);
-                    label += '<br>Count: {ct} ({fr}%)'.DQXformat({ ct:cat.count, fr:(cat.count/totcount*100).toFixed(2)});
-                    that.hoverItems.push({
-                        //itemid: ids[bestidx],
-                        ID: 'i'+DQX.getNextUniqueID(),
-                        px: (px1+px2)/2,
-                        py: (py1+py2)/2,
-                        //showPointer:true,
-                        content: label,
-                        px1:px1, px2:px2, py1:py1, py2:py2
-                    });
-
-                    if (that.catpropid2) {
-                        var colorMapper = MetaData.findProperty(that.tableInfo.id,that.catpropid2).category2Color;
-                        var cumulcount = 0;
-                        $.each(cat.subcats, function(idx, subcat) {
-                            var h1 = cumulcount*1.0/sumcount * that.plotH;
-                            var h2 = (cumulcount+subcat.count)*1.0/sumcount * that.plotH;
-                            var py1 = drawInfo.sizeY-that.textH - Math.round(h1) + 0.5;
-                            var py2 = drawInfo.sizeY-that.textH - Math.round(h2) + 0.5;
-                            var colNr = colorMapper.get(subcat.name);
-                            if (colNr>=0)
-                                ctx.fillStyle=DQX.standardColors[colNr].toStringCanvas();
-                            else
-                                ctx.fillStyle='rgb(100,100,100)';
-                            ctx.beginPath();
-                            ctx.moveTo(px1, py2);
-                            ctx.lineTo(px1, py1);
-                            ctx.lineTo(px2, py1);
-                            ctx.lineTo(px2, py2);
-                            ctx.closePath();
-                            ctx.fill();
-                            ctx.stroke();
-                            cumulcount += subcat.count;
-
-                            var label = propInfo1.name+': '+propInfo1.toDisplayString(cat.name);
-                            label += '<br>'+propInfo2.name+': '+propInfo2.toDisplayString(subcat.name);
-                            label += '<br>Count: {ct} (of class: {fr1}%, of total: {fr2}%)'.DQXformat({
-                                ct:subcat.count,
-                                fr1:(subcat.count/sumcount*100).toFixed(2),
-                                fr2:(subcat.count/totcount*100).toFixed(2)
-                            });
-                            that.hoverItems.push({
-                                //itemid: ids[bestidx],
-                                ID: 'i'+DQX.getNextUniqueID(),
-                                px: (px1+px2)/2,
-                                py: (py1+py2)/2,
-                                //showPointer:true,
-                                content: label,
-                                px1:px1, px2:px2, py1:py1, py2:py2
-                            });
-
-                        });
-                    }
-                });
-*/
 
                 that.plotPresent = true;
             };
 
             that.getToolTipInfo = function(px0 ,py0) {
-                if (!that.plotPresent) return;
-                return null;
-/*                var hoverItem = null;
-                $.each(that.hoverItems, function(idx, item) {
-                    if ( (px0>=item.px1) && (px0<=item.px2) && (py0>=item.py2) && (py0<=item.py1) )
-                        hoverItem = item;
+                if (!that.plotPresent) return null;
+                var tooltip = null;
+                $.each(that.bucketCounts, function(bidx, val) {
+                    var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
+                    var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
+                    var px1 = Math.round(x1 * that.scaleX + that.offsetX)-0.5;
+                    var px2 = Math.round(x2 * that.scaleX + that.offsetX)-0.5;
+                    var py1 = Math.round(0 * that.scaleY + that.offsetY)-0.5;
+                    var py2 = Math.round(val * that.scaleY + that.offsetY)-0.5;
+                    if ( (px0>=px1) && (px0<=px2) && (val>0) ) {
+                        var str = '';
+                        str += 'Count: '+val;
+                        tooltip = {
+                            ID: 'IDX'+bidx,
+                            px: (px1+px2)/2,
+                            py: py2,
+                            showPointer:true,
+                            content: str,
+                            count: val,
+                            minval:x1,
+                            maxval:x2
+                        };
+                    }
                 });
-                return $.extend({},hoverItem);*/
+                return tooltip;
             };
+
+            that.onMouseClick = function(ev, info) {
+                var tooltip = that.getToolTipInfo(info.x, info.y);
+                if (tooltip) {
+                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table",  width:120, height:30 }).setOnChanged(function() {
+                        var tableView = Application.getView('table_'+that.tableInfo.id);
+                        var qry= SQL.WhereClause.AND([
+                            SQL.WhereClause.CompareFixed(that.propidValue,'>=',tooltip.minval),
+                            SQL.WhereClause.CompareFixed(that.propidValue,'<',tooltip.maxval)
+                        ]);
+                        if (!that.query.isTrivial)
+                            qry.addComponent(that.query);
+                        tableView.activateWithQuery(qry);
+                        Popup.closeIfNeeded(popupid);
+                    });
+                    var content = 'Number of items: '+tooltip.count;
+                    content += '<br/>' + bt.renderHtml();
+                    var popupid = Popup.create('Histogram bar', content);
+                }
+            }
+
 
 
 

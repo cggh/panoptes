@@ -53,6 +53,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 }
 
+                that.activateWithQuery = function(qry) {
+                    that.activateState();
+                    that.updateQuery(qry);
+                }
+
 
                 //This function is called during the initialisation. Create the frame structure of the view here
                 that.createFrames = function(rootFrame) {

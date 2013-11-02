@@ -365,7 +365,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (!that.plotPresent) return;
                 var iX = Math.floor(((px0-that.offsetX)/that.scaleX)/that.bucketSizeX) - that.bucketNrOffsetX;
                 var iY = Math.floor(((py0-that.offsetY)/that.scaleY)/that.bucketSizeY) - that.bucketNrOffsetY;
-                if ( (iX>=0) && (iX<that.bucketCountX) && (iY>=0) && (iY<that.bucketCountY) ) {
+                if ( (iX>=0) && (iX<that.bucketCountX) && (iY>=0) && (iY<that.bucketCountY) && (that.bucketDens[iX][iY]>0) ) {
                     var str = '';
 //                    str += that.propidx+': '+(iX+that.bucketNrOffsetX)*that.bucketSizeX+' - '+(iX+1+that.bucketNrOffsetX)*that.bucketSizeX+'<br>';
                     str += 'Count: '+that.bucketDens[iX][iY];
