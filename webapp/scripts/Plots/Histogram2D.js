@@ -363,13 +363,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.getToolTipInfo = function(px0 ,py0) {
                 if (!that.plotPresent) return;
+                var iX = Math.floor(((px0-that.offsetX)/that.scaleX)/that.bucketSizeX) - that.bucketNrOffsetX;
+                var iY = Math.floor(((py0-that.offsetY)/that.scaleY)/that.bucketSizeY) - that.bucketNrOffsetY;
+                if ( (iX>=0) && (iX<that.bucketCountX) && (iY>=0) && (iY<that.bucketCountY) ) {
+                    var str = '';
+//                    str += that.propidx+': '+(iX+that.bucketNrOffsetX)*that.bucketSizeX+' - '+(iX+1+that.bucketNrOffsetX)*that.bucketSizeX+'<br>';
+                    str += 'Count: '+that.bucketDens[iX][iY];
+                    return {
+                        ID: 'IDX'+iX+'_'+iY,
+                        px: (iX+0.5+that.bucketNrOffsetX)*that.bucketSizeX*that.scaleX+that.offsetX,
+                        py: (iY+0.5+that.bucketNrOffsetY)*that.bucketSizeY*that.scaleY+that.offsetY,
+                        showPointer:true,
+                        content: str
+                    };
+                }
                 return null;
-/*                var hoverItem = null;
-                $.each(that.hoverItems, function(idx, item) {
-                    if ( (px0>=item.px1) && (px0<=item.px2) && (py0>=item.py2) && (py0<=item.py1) )
-                        hoverItem = item;
-                });
-                return $.extend({},hoverItem);*/
             };
 
 

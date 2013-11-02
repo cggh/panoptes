@@ -2,7 +2,7 @@ define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
     function (DQX, Controls, Msg, Popup) {
         var MetaData = {};
 
-        MetaData.quickLoad = false;
+        MetaData.quickLoad = true;
         MetaData.updateCalculationInfo = false;
 
 
