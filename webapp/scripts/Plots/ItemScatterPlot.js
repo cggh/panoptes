@@ -67,9 +67,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.query = query;
-                        that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
-                        that.reloadAll();
+                        that.setActiveQuery(query);
                     });
                 });
 
@@ -109,6 +107,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.fetchData('id');
             };
+
+
+            that.setActiveQuery = function(query) {
+                that.query = query;
+                that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
+                that.reloadAll();
+            }
 
 
             that.reloadAll = function() {
@@ -507,6 +512,38 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                 }
                 Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+
+                if ((!shiftPressed)&&(!controlPressed)) {
+                    var rangeXMin = (minX-that.offsetX)/that.scaleX;
+                    var rangeXMax = (maxX-that.offsetX)/that.scaleX;
+                    var rangeYMin = (maxY-that.offsetY)/that.scaleY;
+                    var rangeYMax = (minY-that.offsetY)/that.scaleY;
+                    var qry= SQL.WhereClause.AND([]);
+                    if (!that.query.isTrivial)
+                        qry.addComponent(that.query);
+                    var propidValueX = that.mapPlotAspects['xaxis'].propid;
+                    var propidValueY = that.mapPlotAspects['yaxis'].propid;
+                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueX,'>=',rangeXMin));
+                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueX,'<',rangeXMax));
+                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueY,'>=',rangeYMin));
+                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueY,'<',rangeYMax));
+
+                    var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                        var tableView = Application.getView('table_'+that.tableInfo.id);
+                        tableView.activateWithQuery(qry);
+                        Popup.closeIfNeeded(popupid);
+                    });
+
+                    var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                        that.setActiveQuery(qry);
+                        Popup.closeIfNeeded(popupid);
+                    });
+
+                    var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
+                    content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
+                    content +=  bt1.renderHtml() + bt2.renderHtml();
+                    var popupid = Popup.create('2D Histogram area', content);
+                }
             }
 
 
