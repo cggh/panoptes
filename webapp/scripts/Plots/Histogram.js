@@ -57,9 +57,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.query = query;
-                        that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
-                        that.fetchData();
+                        that.setActiveQuery(query);
                     });
                 });
 
@@ -105,6 +103,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 ]));
 
             };
+
+            that.setActiveQuery = function(qry) {
+                that.query = qry;
+                that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(qry));
+                that.fetchData();
+            }
 
 
             that.fetchData = function() {
@@ -335,7 +339,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
-                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
                     var qry= SQL.WhereClause.AND([]);
                     if (!that.query.isTrivial)
@@ -345,10 +349,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     tableView.activateWithQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
+                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                    var qry= SQL.WhereClause.AND([]);
+                    if (!that.query.isTrivial)
+                        qry.addComponent(that.query);
+                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'>=',rangeMin));
+                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'<',rangeMax));
+                    that.setActiveQuery(qry);
+                    Popup.closeIfNeeded(popupid);
+                });
                 var rangeMin = (minX-that.offsetX)/that.scaleX;
                 var rangeMax = (maxX-that.offsetX)/that.scaleX;
                 var content = 'Range: '+rangeMin+' - '+rangeMax+'<br>';
-                content +=  bt.renderHtml();
+                content +=  bt1.renderHtml() + bt2.renderHtml();
                 var popupid = Popup.create('Histogram area', content);
             }
 
