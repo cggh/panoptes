@@ -497,53 +497,69 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var aspectY = that.mapPlotAspects['yaxis'];
                 var valX = aspectX.data;
                 var valY = aspectY.data;
-                if ((!shiftPressed)&&(!controlPressed))
-                    that.tableInfo.currentSelection = {};
-                for (var i=0; i<valX.length; i++) {
-                    if ( (valX[i]!=null) && (valY[i]!=null) ) {
-                        var px = valX[i] * scaleX + offsetX;
-                        var py = valY[i] * scaleY + offsetY;
-                        if ((px>=minX) && (px<=maxX) && (py>minY) && (py<=maxY)) {
-                            if (!controlPressed)
-                                that.tableInfo.currentSelection[ids[i]] = true;
-                            else
-                                delete that.tableInfo.currentSelection[ids[i]];
+
+                var rangeXMin = (minX-that.offsetX)/that.scaleX;
+                var rangeXMax = (maxX-that.offsetX)/that.scaleX;
+                var rangeYMin = (maxY-that.offsetY)/that.scaleY;
+                var rangeYMax = (minY-that.offsetY)/that.scaleY;
+                var qry= SQL.WhereClause.AND([]);
+                if (!that.query.isTrivial)
+                    qry.addComponent(that.query);
+                qry.addComponent(SQL.WhereClause.CompareFixed(aspectX.propid,'>=',rangeXMin));
+                qry.addComponent(SQL.WhereClause.CompareFixed(aspectX.propid,'<',rangeXMax));
+                qry.addComponent(SQL.WhereClause.CompareFixed(aspectY.propid,'>=',rangeYMin));
+                qry.addComponent(SQL.WhereClause.CompareFixed(aspectY.propid,'<',rangeYMax));
+
+                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                    var tableView = Application.getView('table_'+that.tableInfo.id);
+                    tableView.activateWithQuery(qry);
+                    Popup.closeIfNeeded(popupid);
+                });
+
+                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                    that.setActiveQuery(qry);
+                    Popup.closeIfNeeded(popupid);
+                });
+
+                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select (replace)",  width:120, height:30 }).setOnChanged(function() {
+                    doSelect(0);
+                    Popup.closeIfNeeded(popupid);
+                });
+
+                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select (add)",  width:120, height:30 }).setOnChanged(function() {
+                    doSelect(2);
+                    Popup.closeIfNeeded(popupid);
+                });
+
+                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unselect",  width:120, height:30 }).setOnChanged(function() {
+                    doSelect(3);
+                    Popup.closeIfNeeded(popupid);
+                });
+
+                var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
+                content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
+                content +=  bt1.renderHtml() + bt2.renderHtml()+'<br>';
+                content +=  bt3.renderHtml() + bt4.renderHtml() + bt5.renderHtml();
+                var popupid = Popup.create('2D Histogram area', content);
+
+                var doSelect = function(tpe) {
+                    if (tpe==0)
+                        that.tableInfo.currentSelection = {};
+                    for (var i=0; i<valX.length; i++) {
+                        if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                            var px = valX[i] * scaleX + offsetX;
+                            var py = valY[i] * scaleY + offsetY;
+                            if ((px>=minX) && (px<=maxX) && (py>minY) && (py<=maxY)) {
+                                if (tpe!=3)
+                                    that.tableInfo.currentSelection[ids[i]] = true;
+                                else
+                                    delete that.tableInfo.currentSelection[ids[i]];
+                            }
                         }
                     }
+                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
                 }
-                Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
 
-                if ((!shiftPressed)&&(!controlPressed)) {
-                    var rangeXMin = (minX-that.offsetX)/that.scaleX;
-                    var rangeXMax = (maxX-that.offsetX)/that.scaleX;
-                    var rangeYMin = (maxY-that.offsetY)/that.scaleY;
-                    var rangeYMax = (minY-that.offsetY)/that.scaleY;
-                    var qry= SQL.WhereClause.AND([]);
-                    if (!that.query.isTrivial)
-                        qry.addComponent(that.query);
-                    var propidValueX = that.mapPlotAspects['xaxis'].propid;
-                    var propidValueY = that.mapPlotAspects['yaxis'].propid;
-                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueX,'>=',rangeXMin));
-                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueX,'<',rangeXMax));
-                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueY,'>=',rangeYMin));
-                    qry.addComponent(SQL.WhereClause.CompareFixed(propidValueY,'<',rangeYMax));
-
-                    var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
-                        var tableView = Application.getView('table_'+that.tableInfo.id);
-                        tableView.activateWithQuery(qry);
-                        Popup.closeIfNeeded(popupid);
-                    });
-
-                    var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
-                        that.setActiveQuery(qry);
-                        Popup.closeIfNeeded(popupid);
-                    });
-
-                    var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
-                    content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
-                    content +=  bt1.renderHtml() + bt2.renderHtml();
-                    var popupid = Popup.create('2D Histogram area', content);
-                }
             }
 
 
