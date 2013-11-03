@@ -510,28 +510,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 qry.addComponent(SQL.WhereClause.CompareFixed(aspectY.propid,'>=',rangeYMin));
                 qry.addComponent(SQL.WhereClause.CompareFixed(aspectY.propid,'<',rangeYMax));
 
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
                     tableView.activateWithQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
                     that.setActiveQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select (replace)",  width:120, height:30 }).setOnChanged(function() {
+                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select items in range (replace)",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(0);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select (add)",  width:120, height:30 }).setOnChanged(function() {
+                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select items in range (add)",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(2);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unselect",  width:120, height:30 }).setOnChanged(function() {
+                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unselect items in range",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(3);
                     Popup.closeIfNeeded(popupid);
                 });

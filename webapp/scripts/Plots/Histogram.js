@@ -339,7 +339,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
                     var qry= SQL.WhereClause.AND([]);
                     if (!that.query.isTrivial)
@@ -349,7 +349,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     tableView.activateWithQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dateset to range",  width:120, height:30 }).setOnChanged(function() {
                     var qry= SQL.WhereClause.AND([]);
                     if (!that.query.isTrivial)
                         qry.addComponent(that.query);

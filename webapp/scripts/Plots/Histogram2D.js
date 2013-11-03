@@ -429,13 +429,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueY,'>=',rangeYMin));
                 qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueY,'<',rangeYMax));
 
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show selected items in table",  width:120, height:30 }).setOnChanged(function() {
+                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
                     tableView.activateWithQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot to range",  width:120, height:30 }).setOnChanged(function() {
+                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
                     that.setActiveQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
