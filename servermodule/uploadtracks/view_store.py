@@ -15,12 +15,8 @@ def response(returndata):
     therow = cur.fetchone()
     settings = therow[0]
     #todo: remove that record
-    db.close()
 
-
-    db = DQXDbTools.OpenDatabase(databaseName)
-    cur = db.cursor()
-    sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}")'.format(workspaceid, id, settings)
+    sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}", "{3}")'.format(databaseName, workspaceid, id, settings)
     print('=========== STATEMENT '+sql)
     cur.execute(sql)
     db.commit()

@@ -135,12 +135,17 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                              'name'
                              );*/
 
+                            var appProceedFunction = function() {
+                                proceedFunction();
+                                Serialise.checkLoadView();
+                            };
+
                             // Execute the fetching
                             getter.execute(
                                 MetaData.serverUrl,
                                 MetaData.database,
                                 function() {
-                                    PromptWorkspace.execute(proceedFunction);
+                                    PromptWorkspace.execute(appProceedFunction);
                                     //MetaData.tracks = getter.getTableRecords('customtracks');
                                 }
                             );
