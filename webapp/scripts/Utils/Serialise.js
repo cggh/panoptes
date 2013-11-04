@@ -19,7 +19,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             id:id,
                             hash:window.location.hash
                         });
-                        alert(url);
+                        var str='';
+                        var edt = Controls.Edit('', { size:80, value: url}).setHasDefaultFocus();
+                        str += 'Permanent url to this view:<p>';
+                        str += edt.renderHtml();
+                        str += '<p>Press Ctrl+C to copy the url to the clipboard';
+                        Popup.create('Permanent link to view',str);
+                        //alert(url);
                     });
             });
         };
