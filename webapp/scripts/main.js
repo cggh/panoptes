@@ -38,7 +38,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
             //A helper function, turning a fraction into a 3 digit text string
             var createFuncVal2Text = function(digits) {
                 return function(vl) {
-                    if (vl==null)
+                    if ( (vl==null) || (vl=='None') )
                         return '-';
                     else
                         return parseFloat(vl).toFixed(digits);
