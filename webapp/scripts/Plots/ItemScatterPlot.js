@@ -167,7 +167,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.processAspectData = function(plotAspectID) {
                 var aspectInfo = that.mapPlotAspects[plotAspectID];
-                var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
+                if (aspectInfo.propid)
+                    var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
                 var values = aspectInfo.data;
                 if ((aspectInfo.datatype == 'Value')&&(values)) {
                     var minval=1.0e99;
