@@ -1,5 +1,5 @@
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery"],
-    function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery) {
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery", "Utils/QueryTool"],
+    function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery, QueryTool) {
 
 
         //A helper function, turning a fraction into a color string
@@ -33,6 +33,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.tableid = tableid;
 
+                that.theQuery = QueryTool.Create(tableid);
+
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if (that.tableid==tableid) {
                         if (that.myTable)
@@ -48,14 +50,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             SQL.WhereClause.CompareFixed('pos','>=',info.start),
                             SQL.WhereClause.CompareFixed('pos','<=',info.stop)
                             ]);
-                        that.updateQuery(qry);
+                        that.theQuery.modify(qry);
                     });
 
                 }
 
                 that.activateWithQuery = function(qry) {
                     that.activateState();
-                    that.updateQuery(qry);
+                    that.theQuery.modify(qry);
                 }
 
 
@@ -129,14 +131,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createPanelControls = function () {
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(10);
-                    that.ctrlQueryString = Controls.Html(null,'');
-                    var queryButton = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
-                    queryButton .setOnChanged(function() {
-                        var tableInfo = MetaData.mapTableCatalog[that.tableid];
-                        EditQuery.CreateDialogBox(tableInfo.id, tableInfo.currentQuery, function(query) {
-                            that.updateQuery(query);
-                        });
-                    })
+
+                    var ctrlQuery = that.theQuery.createControl();
 
                     var cmdHistogram = Controls.Button(null, { content: 'Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdHistogram.setOnChanged(function() {
@@ -159,8 +155,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     });
 
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
-                        queryButton,
-                        that.ctrlQueryString,
+                        ctrlQuery,
                         Controls.VerticalSeparator(15),
                         cmdHistogram,
                         cmdBarGraph,
@@ -187,14 +182,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 }
 
 
-                that.updateQuery = function(qry) {
-                    that.myTable.setQuery(qry);
+                that.updateQuery2 = function() {
+                    that.myTable.setQuery(that.theQuery.get());
                     that.myTable.reLoadTable();
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
-                    tableInfo.currentQuery = qry;
+                    tableInfo.currentQuery = that.theQuery.get();
                     Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
-                    that.ctrlQueryString.modifyValue(that.getQueryDescription(qry));
                 }
+
 
                 that.reLoad = function() {
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
@@ -274,6 +269,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
 
+                that.theQuery.notifyQueryUpdated = that.updateQuery2;
                 return that;
             }
 

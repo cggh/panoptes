@@ -146,7 +146,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.setActiveQuery = function(qry) {
                 that.theQuery.modify(qry);
-                that.updateQuery();
             }
 
             that.updateQuery = function() {

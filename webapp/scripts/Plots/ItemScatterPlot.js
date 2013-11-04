@@ -102,7 +102,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.setActiveQuery = function(qry) {
                 that.theQuery.modify(qry);
-                that.updateQuery();
             }
 
             that.updateQuery = function() {

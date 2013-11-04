@@ -24,6 +24,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.query = qry;
                 that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(qry));
                 that.buttonPrevQuery.modifyEnabled(true);
+                that.notifyQueryUpdated();
             }
 
 
@@ -32,7 +33,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
                         that.modify(query);
-                        that.notifyQueryUpdated();
                     });
                 });
 
