@@ -10,6 +10,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     'Genome browser'    // View title
                 );
 
+                that.storeSettings = function() {
+                    var obj= {};
+                    if (that.panelBrowser) {
+                        obj.chromoid = that.panelBrowser.getCurrentChromoID();
+                        obj.range = that.panelBrowser.getVisibleRange();
+                    }
+                    return obj;
+                };
+
+                that.recallSettings = function(settObj) {
+                    if ( (settObj.chromoid) && (that.panelBrowser) ) {
+                        that.panelBrowser.setChromosome(settObj.chromoid, true, false);
+                        that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
+                    }
+                };
+
+
                 that.fetchers={};
 
 

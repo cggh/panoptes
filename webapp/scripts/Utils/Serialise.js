@@ -39,11 +39,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         Serialise._store = function() {
             var obj = {};
-            obj.tableViewData = {};
-            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                var tableView = Application.getView(tableInfo.tableViewId);
-                obj.tableViewData[tableInfo.id] = tableView.storeSettings();
-            })
+            obj.viewData = {};
+            $.each(Application.getViewList(), function(idx,view) {
+                if (view.storeSettings)
+                    obj.viewData[view.getStateID()] = view.storeSettings();
+            });
             var st = JSON.stringify(obj);
             return Base64.encode(st);
 
@@ -52,11 +52,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         Serialise._recall = function(settingsStr) {
             var st = Base64.decode(settingsStr);
             var obj = JSON.parse(st);
-            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                var tableView = Application.getView(tableInfo.tableViewId);
-                if (obj.tableViewData[tableInfo.id])
-                    tableView.recallSettings(obj.tableViewData[tableInfo.id]);
-            })
+
+            $.each(Application.getViewList(), function(idx,view) {
+                if ( (view.recallSettings) && (obj.viewData[view.getStateID()]) )
+                    view.recallSettings(obj.viewData[view.getStateID()]);
+            });
         }
 
 
