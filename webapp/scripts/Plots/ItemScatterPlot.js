@@ -214,26 +214,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     aspectInfo.catData = null;
                     var legendStr = '';
                     if (values) {
+
                         var maxCatCount = DQX.standardColors.length-1;
                         var catMap = {};
-                        var catData = [];
-                        var catCount = 0;
+                        var cats = []
                         for (var i=0; i<values.length; i++) {
-                            if (values[i] in catMap)
-                                catData.push(catMap[values[i]])
-                            else {
-                                if (catCount<maxCatCount) {
-                                    catMap[values[i]] = catCount;
-                                    catData.push(catCount);
-                                    catCount++;
-                                }
-                                else
-                                    catData.push(maxCatCount);
+                            if (!catMap[values[i]]) {
+                                catMap[values[i]] = true;
+                                cats.push(values[i]);
                             }
                         }
+
+                        var colormapper = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid).category2Color;
+                        colormapper.map(cats);
+                        var catData = [];
+                        for (var i=0; i<values.length; i++) {
+                            var idx = colormapper.get(values[i]);
+                            if (idx<0)
+                                idx = colormapper.itemCount-1;
+                            catData.push(idx);
+                        }
+
                         aspectInfo.catData = catData;
-                        $.each(catMap,function(key,value) {
-                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[value].toString(), name:key});
+                        $.each(cats,function(idx,value) {
+                            if ((colormapper.get(value)>=0)&&(colormapper.get(value)<colormapper.itemCount-1))
+                                legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
                         });
                     }
                     that.colorLegend.modifyValue(legendStr);
@@ -379,6 +384,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var px = /*Math.round*/(valX[ii] * scaleX + offsetX);
                             var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
                             if (valColorCat) {
+//                                if (!valColorCat[ii])
+//                                    var q=0;
                                 ctx.fillStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
                                 ctx.strokeStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
                             }
