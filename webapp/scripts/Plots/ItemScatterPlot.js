@@ -313,7 +313,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     ctx.lineTo(px,drawInfo.sizeY-marginY);
                     ctx.stroke();
                     if (i%scale.JumpReduc==0) {
-                        ctx.fillText(vl.toFixed(scale.textDecimalCount),px,drawInfo.sizeY-marginY+13);
+                        ctx.fillText(scale.value2String(vl),px,drawInfo.sizeY-marginY+13);
                     }
                 }
                 ctx.restore();
@@ -338,7 +338,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         ctx.save();
                         ctx.translate(marginX-5,py);
                         ctx.rotate(-Math.PI/2);
-                        ctx.fillText(vl.toFixed(scale.textDecimalCount),0,0);
+                        ctx.fillText(scale.value2String(vl),0,0);
                         ctx.restore();
                     }
                 }
