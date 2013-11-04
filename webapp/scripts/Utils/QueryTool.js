@@ -22,9 +22,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.modify = function(qry) {
                 that.prevQueries.push(SQL.WhereClause.encode(that.query));
                 that.query = qry;
-                that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(qry));
-                that.buttonPrevQuery.modifyEnabled(true);
-                that.notifyQueryUpdated();
+                if (that.ctrlQueryString) {
+                    that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(qry));
+                    that.buttonPrevQuery.modifyEnabled(true);
+                }
+                if (that.notifyQueryUpdated)
+                    that.notifyQueryUpdated();
             }
 
 
@@ -44,7 +47,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
                     }
                 });
-                that.buttonPrevQuery.modifyEnabled(false);
+                that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
 
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 

@@ -55,10 +55,25 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 }
 
+
+                that.storeSettings = function() {
+                    var obj= {};
+                    obj.query = SQL.WhereClause.encode(that.theQuery.get());
+                    return obj;
+                };
+
+                that.recallSettings = function(settObj) {
+                    var qry = SQL.WhereClause.decode(settObj.query);
+                    that.theQuery.modify(qry);
+                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    tableInfo.currentQuery = qry;
+
+                };
+
                 that.activateWithQuery = function(qry) {
                     that.activateState();
                     that.theQuery.modify(qry);
-                }
+                };
 
 
                 //This function is called during the initialisation. Create the frame structure of the view here
@@ -70,12 +85,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         .setAllowScrollBars(false,true);
                 }
 
+                MetaData.mapTableCatalog[that.tableid].tableViewer = that;
 
 
                 //This function is called during the initialisation. Create the panels that will populate the frames here
                 that.createPanels = function() {
 
-                    MetaData.mapTableCatalog[that.tableid].tableViewer = that;
 
                     //Initialise the data fetcher that will download the data for the table
                     this.theTableFetcher = DataFetchers.Table(
@@ -110,6 +125,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.myTable = this.panelTable.getTable();// A shortcut variable
                     this.myTable.fetchBuffer = 300;
                     this.myTable.immediateFetchRecordCount = false;
+                    that.myTable.setQuery(that.theQuery.get());
 
                     // Add a column for chromosome
                     var comp = that.myTable.createTableColumn(
@@ -183,13 +199,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
                 that.updateQuery2 = function() {
-                    that.myTable.setQuery(that.theQuery.get());
-                    that.myTable.reLoadTable();
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
-                    tableInfo.currentQuery = that.theQuery.get();
-                    Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
+                    if (that.myTable) {
+                        that.myTable.setQuery(that.theQuery.get());
+                        that.myTable.reLoadTable();
+                        var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                        tableInfo.currentQuery = that.theQuery.get();
+                        Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
+                    }
                 }
-
 
                 that.reLoad = function() {
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
@@ -262,9 +279,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         }
                     });
 
-                    //we start by defining a query that returns everything
-                    that.myTable.queryAll();
-
+                    that.myTable.reLoadTable();
                 }
 
 
