@@ -31,8 +31,8 @@ require.config({
 
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet" ],
-    function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Intro, GenomeBrowser, TableViewer, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
+    function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Intro, GenomeBrowser, TableViewer, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet, Serialise) {
         $(function () {
 
             //A helper function, turning a fraction into a 3 digit text string
@@ -109,6 +109,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
                             alert('Navigation button clicked');
+                        });
+
+                        // Create a custom 'navigation button' that will appear in the right part of the app header
+                        Application.addNavigationButton('Get link',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
+                            Serialise.createLink();
                         });
 
 
