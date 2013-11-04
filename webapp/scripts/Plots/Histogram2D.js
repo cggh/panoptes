@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
+    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
 
         var Histogram2D = {};
 
@@ -38,9 +38,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var that = PopupFrame.PopupFrame(tableInfo.name + ' Histogram2D', {title:'2D Histogram', blocking:false, sizeX:700, sizeY:550 });
             that.tableInfo = tableInfo;
-            that.query = SQL.WhereClause.Trivial();
-            if (tableInfo.currentQuery)
-                that.query = tableInfo.currentQuery;
+            that.theQuery = QueryTool.Create(tableid);
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -81,14 +80,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.panelPlot.onSelected = that.onSelected;
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
-                buttonDefineQuery.setOnChanged(function() {
-                    EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.setActiveQuery(query);
-                    });
-                });
-
-                that.ctrlQueryString = Controls.Html(null,tableInfo.tableViewer.getQueryDescription(that.query));
+                var ctrl_Query = that.theQuery.createControl();
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -136,8 +128,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 });
 
                 that.panelButtons.addControl(Controls.CompoundVert([
-                    buttonDefineQuery,
-                    that.ctrlQueryString,
+                    ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlValueXProperty,
                     Controls.VerticalSeparator(5),
@@ -153,12 +144,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             };
 
 
-            that.setActiveQuery = function(query) {
-                that.query = query;
-                that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
-                that.fetchData();
+            that.setActiveQuery = function(qry) {
+                that.theQuery.modify(qry);
+                that.updateQuery();
             }
 
+            that.updateQuery = function() {
+                that.fetchData();
+            }
 
             that.fetchData = function() {
                 that.propidValueX = that.ctrlValueXProperty.getValue();
@@ -177,7 +170,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
-                data.qry = SQL.WhereClause.encode(that.query);
+                data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue()) {
                     data.binsizex = that.ctrl_binsizeValueX.getValue();
                     data.binsizey = that.ctrl_binsizeValueY.getValue();
@@ -402,8 +395,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             SQL.WhereClause.CompareFixed(that.propidValueY,'>=',tooltip.minvalY),
                             SQL.WhereClause.CompareFixed(that.propidValueY,'<',tooltip.maxvalY)
                         ]);
-                        if (!that.query.isTrivial)
-                            qry.addComponent(that.query);
+                        if (!that.theQuery.get().isTrivial)
+                            qry.addComponent(that.theQuery.get());
                         tableView.activateWithQuery(qry);
                         Popup.closeIfNeeded(popupid);
                     });
@@ -422,8 +415,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var rangeYMin = (maxY-that.offsetY)/that.scaleY;
                 var rangeYMax = (minY-that.offsetY)/that.scaleY;
                 var qry= SQL.WhereClause.AND([]);
-                if (!that.query.isTrivial)
-                    qry.addComponent(that.query);
+                if (!that.theQuery.get().isTrivial)
+                    qry.addComponent(that.theQuery.get());
                 qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueX,'>=',rangeXMin));
                 qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueX,'<',rangeXMax));
                 qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueY,'>=',rangeYMin));
@@ -447,6 +440,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

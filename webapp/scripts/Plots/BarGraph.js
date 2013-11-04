@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
+    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
 
         var BarGraph = {};
 
@@ -11,9 +11,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var that = PopupFrame.PopupFrame(tableInfo.name + ' bargraph', {title:'Bar graph', blocking:false, sizeX:700, sizeY:550 });
             that.tableInfo = tableInfo;
-            that.query = SQL.WhereClause.Trivial();
-            if (tableInfo.currentQuery)
-                that.query = tableInfo.currentQuery;
+            that.theQuery = QueryTool.Create(tableid);
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -54,16 +53,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.panelPlot.onSelected = that.onSelected;
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
-                buttonDefineQuery.setOnChanged(function() {
-                    EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.query = query;
-                        that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
-                        that.fetchData();
-                    });
-                });
-
-                that.ctrlQueryString = Controls.Html(null,tableInfo.tableViewer.getQueryDescription(that.query));
+                var ctrl_Query = that.theQuery.createControl();
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -97,8 +87,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.colorLegend = Controls.Html(null,'');
 
                 that.panelButtons.addControl(Controls.CompoundVert([
-                    buttonDefineQuery,
-                    that.ctrlQueryString,
+                    ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlCatProperty1,
                     that.ctrlCatSort1,
@@ -125,7 +114,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 data.propid1 = that.catpropid1;
                 if (that.catpropid2)
                     data.propid2 = that.catpropid2;
-                data.qry = SQL.WhereClause.encode(that.query);
+                data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','categorycounts', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
@@ -227,6 +216,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
+            that.updateQuery = function() {
+                that.fetchData();
+            }
 
             that.draw = function(drawInfo) {
                 that.drawImpl(drawInfo);
@@ -370,6 +362,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
 
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

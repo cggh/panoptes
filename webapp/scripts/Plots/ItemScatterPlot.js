@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
 
         var ItemScatterPlot = {};
 
@@ -11,9 +11,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var that = PopupFrame.PopupFrame(tableInfo.name + ' scatterplot', {title:'Scatter plot', blocking:false, sizeX:700, sizeY:550 });
             that.tableInfo = tableInfo;
-            that.query = SQL.WhereClause.Trivial();
-            if (tableInfo.currentQuery)
-                that.query = tableInfo.currentQuery;
+            that.theQuery = QueryTool.Create(tableid);
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.fetchCount = 0;
             that.propDataMap = {};
 
@@ -64,14 +63,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelPlot.onSelected = that.onSelected;
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
-                buttonDefineQuery.setOnChanged(function() {
-                    EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.setActiveQuery(query);
-                    });
-                });
-
-                that.ctrlQueryString = Controls.Html(null,tableInfo.tableViewer.getQueryDescription(that.query));
+                var ctrl_Query = that.theQuery.createControl();
 
                 var pickControls = Controls.CompoundGrid();
                 $.each(that.plotAspects,function(aspectIdx, plotAspect) {
@@ -98,8 +90,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.colorLegend = Controls.Html(null,'');
 
                 that.panelButtons.addControl(Controls.CompoundVert([
-                    buttonDefineQuery,
-                    that.ctrlQueryString,
+                    ctrl_Query,
                     Controls.VerticalSeparator(20),
                     pickControls,
                     that.colorLegend
@@ -109,9 +100,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
 
-            that.setActiveQuery = function(query) {
-                that.query = query;
-                that.ctrlQueryString.modifyValue(tableInfo.tableViewer.getQueryDescription(query));
+            that.setActiveQuery = function(qry) {
+                that.theQuery.modify(qry);
+                that.updateQuery();
+            }
+
+            that.updateQuery = function() {
                 that.reloadAll();
             }
 
@@ -154,7 +148,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.panelPlot.invalidate();
                         var requestID = DQX.getNextUniqueID();
                         aspectInfo.requestID = requestID;
-                        fetcher.getData(that.query, that.tableInfo.primkey, function (data) {
+                        fetcher.getData(that.theQuery.get(), that.tableInfo.primkey, function (data) {
                             that.fetchCount -= 1;
                             if (aspectInfo.requestID != requestID) {//request must be outdated, so we don't handle it
                                 return;
@@ -503,8 +497,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var rangeYMin = (maxY-that.offsetY)/that.scaleY;
                 var rangeYMax = (minY-that.offsetY)/that.scaleY;
                 var qry= SQL.WhereClause.AND([]);
-                if (!that.query.isTrivial)
-                    qry.addComponent(that.query);
+                if (!that.theQuery.get().isTrivial)
+                    qry.addComponent(that.theQuery.get());
                 qry.addComponent(SQL.WhereClause.CompareFixed(aspectX.propid,'>=',rangeXMin));
                 qry.addComponent(SQL.WhereClause.CompareFixed(aspectX.propid,'<',rangeXMax));
                 qry.addComponent(SQL.WhereClause.CompareFixed(aspectY.propid,'>=',rangeYMin));
@@ -566,6 +560,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
+            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }
