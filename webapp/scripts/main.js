@@ -100,11 +100,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
 
                         // Initialise all the views in the application
                         Intro.init();
-                        GenomeBrowser.init();
                         $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                             TableViewer.init(tableInfo.id);
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
+                        GenomeBrowser.init();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
