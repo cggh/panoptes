@@ -1,3 +1,4 @@
+#!/bin/bash
 #Find out where this script is
 SCRIPT_PATH="${BASH_SOURCE[0]}";
 if ([ -h "${SCRIPT_PATH}" ]) then
