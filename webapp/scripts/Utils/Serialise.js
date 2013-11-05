@@ -9,11 +9,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         Serialise.createLink = function() {
             var content =Serialise._store();
+            var hostname=window.location.hostname;
+            var pathname=window.location.pathname;
+            var protocol=window.location.protocol;
             DQX.serverDataStore(MetaData.serverUrl,content,function(id) {
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','view_store',
                     { database: MetaData.database, workspaceid:MetaData.workspaceid, id: id },
                     function(resp) {
-                        url='file:///Users/pvaut/Documents/SourceCode/WebApps/panoptes/webapp/main.html?dataset={ds}&workspace={ws}&view={id}{hash}'.DQXformat({
+                        url='{protocol}//{hostname}{pathname}?dataset={ds}&workspace={ws}&view={id}{hash}'.DQXformat({
+                            protocol:protocol,
+                            hostname:hostname,
+                            pathname:pathname,
                             ds:MetaData.database,
                             ws:MetaData.workspaceid,
                             id:id,
