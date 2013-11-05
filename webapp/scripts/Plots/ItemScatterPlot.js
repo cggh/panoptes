@@ -190,8 +190,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     aspectInfo.minval = minval;
                     aspectInfo.maxval = maxval;
                     var range = aspectInfo.maxval-aspectInfo.minval;
+                    if (range <= 0)
+                        range=1;
                     aspectInfo.maxval += range/20;
                     aspectInfo.minval -= range/20;
+                    aspectInfo.safeRange = aspectInfo.maxval - aspectInfo.minval;
                 }
 
                 if ( (aspectInfo.datatype == 'Category') && (values) ) {
@@ -296,9 +299,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var valY = aspectY.data;
                 var valColorCat = that.mapPlotAspects['color'].catData;
                 var valSize = that.mapPlotAspects['size'].data;
-                var scaleX = (drawInfo.sizeX-marginX) / (aspectX.maxval - aspectX.minval);
+                var scaleX = (drawInfo.sizeX-marginX) / aspectX.safeRange;
                 var offsetX = marginX - aspectX.minval*scaleX;
-                var scaleY = - (drawInfo.sizeY-marginY) / (aspectY.maxval - aspectY.minval);
+                var scaleY = - (drawInfo.sizeY-marginY) / aspectY.safeRange;
                 var offsetY = (drawInfo.sizeY-marginY) - aspectY.minval*scaleY;
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;
