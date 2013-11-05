@@ -15,6 +15,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (that.panelBrowser) {
                         obj.chromoid = that.panelBrowser.getCurrentChromoID();
                         obj.range = that.panelBrowser.getVisibleRange();
+
+                        obj.settings = Controls.storeSettings(that.visibilityControlsGroup);
                     }
                     return obj;
                 };
@@ -24,6 +26,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
                     }
+                    if (settObj.settings)
+                        Controls.recallSettings(that.visibilityControlsGroup,settObj.settings,true);
                 };
 
 
