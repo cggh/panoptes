@@ -188,6 +188,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
                                     $.each(MetaData.customProperties, function(idx, prop) {
                                         prop.isCustom = (prop.source=='custom');
+                                        if (prop.datatype=='Text')
+                                            prop.isText = true;
                                         if (prop.datatype=='Value')
                                             prop.isFloat = true;
                                         if (prop.datatype=='Boolean')
