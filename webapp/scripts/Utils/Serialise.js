@@ -26,7 +26,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             hash:window.location.hash
                         });
                         var str='';
-                        var edt = Controls.Edit('', { size:80, value: url}).setHasDefaultFocus();
+                        var edt = Controls.Textarea('', { size:80, linecount:4, value: url}).setHasDefaultFocus();
                         str += 'Permanent url to this view:<p>';
                         str += edt.renderHtml();
                         str += '<p>Press Ctrl+C to copy the url to the clipboard';
