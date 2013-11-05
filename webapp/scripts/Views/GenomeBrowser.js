@@ -26,8 +26,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
                     }
-                    if (settObj.settings)
-                        Controls.recallSettings(that.visibilityControlsGroup,settObj.settings,true);
+                    if ((settObj.settings) && (that.visibilityControlsGroup) )
+                        Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
                 };
 
 
@@ -398,7 +398,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
 
-                            var ctrl_filtertype = Controls.Combo('', { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setOnChanged(function() {
+                            var ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.filterByQuery = (ctrl_filtertype.getValue()=='query');
                                 if (tableInfo.genomeBrowserInfo.filterByQuery)
                                     tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);

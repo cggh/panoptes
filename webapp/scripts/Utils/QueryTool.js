@@ -19,6 +19,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return that.query;
             }
 
+            that.store = function() {
+                return SQL.WhereClause.encode(that.query);
+            }
+
+            that.recall = function(settObj) {
+                that.query = SQL.WhereClause.decode(settObj);
+            }
+
             that.modify = function(qry) {
                 that.prevQueries.push(SQL.WhereClause.encode(that.query));
                 that.query = qry;

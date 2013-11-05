@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
+    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
 
         var Histogram2D = {};
 
@@ -33,17 +33,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         }
 
 
+        GenericPlot.registerPlotType('histogram2d', Histogram2D);
 
         Histogram2D.Create = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
-            var that = PopupFrame.PopupFrame(tableInfo.name + ' Histogram2D', {title:'2D Histogram', blocking:false, sizeX:700, sizeY:550 });
-            that.tableInfo = tableInfo;
-            that.theQuery = QueryTool.Create(tableid);
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
+            var that = GenericPlot.Create(tableid,'histogram2d', {title:'2D Histogram' });
             that.fetchCount = 0;
             that.showRelative = false;
 
-            that.eventids = [];
 
             that.barW = 16;
             that.scaleW = 100;
@@ -55,13 +51,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (that.tableInfo.id==tableid)
                     that.reDraw();
             } );
-
-            that.onClose = function() {
-                $.each(that.eventids,function(idx,eventid) {
-                    Msg.delListener(eventid);
-                });
-            };
-
 
 
             that.createFrames = function() {
@@ -88,16 +77,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Value') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:', states: propList })
+                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:', states: propList }).setClassID('xvalue');
                 that.ctrlValueXProperty.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:', states: propList })
+                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:', states: propList }).setClassID('yvalue');
                 that.ctrlValueYProperty.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setOnChanged(function() {
+                that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setClassID('autobinsize').setOnChanged(function() {
                     that.ctrl_binsizeValueX.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     that.ctrl_binsizeValueY.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     that.ctrl_binsizeUpdate.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
@@ -105,8 +94,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.fetchData();
                 });
 
-                that.ctrl_binsizeValueX = Controls.Edit(null,{size:12, label:'X:'}).modifyEnabled(false);
-                that.ctrl_binsizeValueY = Controls.Edit(null,{size:12, label:'Y:'}).modifyEnabled(false);
+                that.ctrl_binsizeValueX = Controls.Edit(null,{size:12, label:'X:'}).setClassID('binsizex').modifyEnabled(false);
+                that.ctrl_binsizeValueY = Controls.Edit(null,{size:12, label:'Y:'}).setClassID('binsizey').modifyEnabled(false);
 
                 that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update'}).setOnChanged(function() {
                     that.fetchData();
@@ -119,15 +108,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 $.each(paletteList, function(idx,name) {
                     colormaplist.push({id:name, name:name});
                 });
-                that.ctrlPalette = Controls.Combo(null,{label:'Colors', states:colormaplist, value:'Gray'}).setOnChanged(function() {
+                that.ctrlPalette = Controls.Combo(null,{label:'Colors', states:colormaplist, value:'Gray'}).setClassID('color').setOnChanged(function() {
                     that.reDraw();
                 });
 
-                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}, {id:'loglog',name:'Log log'}], value:'linear'}).setOnChanged(function() {
+                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}, {id:'loglog',name:'Log log'}], value:'linear'}).setClassID('mapping').setOnChanged(function() {
                     that.reDraw();
                 });
 
-                that.panelButtons.addControl(Controls.CompoundVert([
+                var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlValueXProperty,
@@ -139,7 +128,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrlPalette,
                     Controls.VerticalSeparator(20),
                     that.ctrlMappingStyle
-                ]));
+                ]);
+                that.addPlotSettingsControl('controls',controlsGroup);
+                that.panelButtons.addControl(controlsGroup);
 
             };
 
@@ -152,9 +143,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.fetchData();
             }
 
+            that.reloadAll = function() {
+                that.fetchData();
+            }
+
             that.fetchData = function() {
                 that.propidValueX = that.ctrlValueXProperty.getValue();
                 that.propidValueY = that.ctrlValueYProperty.getValue();
+                if (that.staging)
+                    return;
 
                 that.bucketDens = null;
                 if ((!that.propidValueX)||(!that.propidValueY)) {
@@ -232,6 +229,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.reloadAll = function() {
+                that.fetchData();
             }
 
             that.reDraw = function() {
