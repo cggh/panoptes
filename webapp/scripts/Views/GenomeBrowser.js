@@ -15,7 +15,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (that.panelBrowser) {
                         obj.chromoid = that.panelBrowser.getCurrentChromoID();
                         obj.range = that.panelBrowser.getVisibleRange();
-
+                        var markInfo = that.panelBrowser.getMark();
+                        if (markInfo)
+                            obj.mark = markInfo;
                         obj.settings = Controls.storeSettings(that.visibilityControlsGroup);
                     }
                     return obj;
@@ -25,6 +27,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if ( (settObj.chromoid) && (that.panelBrowser) ) {
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
+                        if (settObj.mark)
+                            that.panelBrowser.setMark(settObj.mark.min, settObj.mark.max);
                     }
                     if ((settObj.settings) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
