@@ -253,13 +253,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         .setTitle(tableInfo.name)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
-                    if (propInfo.settings.categoryField) {
+                    if (propInfo.settings.categoryColors) {
                         var mapping = {};
                         $.each(propInfo.settings.categoryColors, function(key, val) {
                             mapping[key] = DQX.parseColorString(val);
                         });
                         theChannel.makeCategoricalColors(
-                            'MutType',
+                            propInfo.propid,
                             mapping
                         );
                     }
