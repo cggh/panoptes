@@ -30,6 +30,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         str += 'Permanent url to this view:<p>';
                         str += edt.renderHtml();
                         str += '<p>Press Ctrl+C to copy the url to the clipboard';
+
+                        var btOpen = Controls.Button(null, {  content: 'Open in browser' }).setOnChanged(function() {
+                            window.open(url,'_blank');
+                        });
+
+                        str += btOpen.renderHtml()+'<p></p>';
+
                         Popup.create('Permanent link to view',str);
                         //alert(url);
                     });
