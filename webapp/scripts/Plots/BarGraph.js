@@ -1,22 +1,17 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
+    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
 
         var BarGraph = {};
 
 
 
 
+        GenericPlot.registerPlotType('bargraph', BarGraph);
 
         BarGraph.Create = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
-            var that = PopupFrame.PopupFrame(tableInfo.name + ' bargraph', {title:'Bar graph', blocking:false, sizeX:700, sizeY:550 });
-            that.tableInfo = tableInfo;
-            that.theQuery = QueryTool.Create(tableid);
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
+            var that = GenericPlot.Create(tableid,'bargraph', {title:'Bar graph' });
             that.fetchCount = 0;
             that.showRelative = false;
-
-            that.eventids = [];
 
             that.barW = 16;
             that.scaleW = 100;
@@ -29,11 +24,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.reDraw();
             } );
 
-            that.onClose = function() {
-                $.each(that.eventids,function(idx,eventid) {
-                    Msg.delListener(eventid);
-                });
-            };
 
 
 
@@ -61,23 +51,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:', states: propList })
+                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:', states: propList }).setClassID('groupby');
                 that.ctrlCatProperty1.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrlCatSort1 = Controls.Combo(null,{ label:'Sort by:', states: [{id:'cat', name:'Category'}, {id:'count', name:'Count'}] })
+                that.ctrlCatSort1 = Controls.Combo(null,{ label:'Sort by:', states: [{id:'cat', name:'Category'}, {id:'count', name:'Count'}] }).setClassID('sortby');
                 that.ctrlCatSort1.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrlCatProperty2 = Controls.Combo(null,{ label:'Secondary group:', states: propList })
+                that.ctrlCatProperty2 = Controls.Combo(null, { label:'Secondary group:', states: propList }).setClassID('secgroup');
                 that.ctrlCatProperty2.setOnChanged(function() {
                     that.ctrlCatType.modifyEnabled(that.ctrlCatProperty2.getValue()!='');
                     that.fetchData();
                 });
 
-                that.ctrlCatType = Controls.Check(null,{ label:'Sum to 100%'  })
+                that.ctrlCatType = Controls.Check(null, { label:'Sum to 100%'  }).setClassID('sumto100');
                 that.ctrlCatType.setOnChanged(function() {
                     that.showRelative = that.ctrlCatType.getValue();
                     that.reDraw();
@@ -86,7 +76,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.colorLegend = Controls.Html(null,'');
 
-                that.panelButtons.addControl(Controls.CompoundVert([
+                var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlCatProperty1,
@@ -96,15 +86,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrlCatType,
                     Controls.VerticalSeparator(10),
                     that.colorLegend
-                ]));
+                ]);
+                that.addPlotSettingsControl('controls',controlsGroup);
+                that.panelButtons.addControl(controlsGroup);
 
             };
 
+            that.reloadAll = function() {
+                that.fetchData();
+            }
 
             that.fetchData = function() {
                 that.catpropid1 = that.ctrlCatProperty1.getValue();
                 that.catpropid2 = that.ctrlCatProperty2.getValue();
                 if (!that.catpropid1)
+                    return;
+                if (that.staging)
                     return;
                 DQX.setProcessing();
                 var data ={};
@@ -209,6 +206,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.reloadAll = function() {
+                that.fetchData();
             }
 
             that.reDraw = function() {

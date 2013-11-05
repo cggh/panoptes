@@ -1,18 +1,15 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
 
         var ItemScatterPlot = {};
 
 
 
 
+        GenericPlot.registerPlotType('scatterplot', ItemScatterPlot);
 
         ItemScatterPlot.Create = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
-            var that = PopupFrame.PopupFrame(tableInfo.name + ' scatterplot', {title:'Scatter plot', blocking:false, sizeX:700, sizeY:550 });
-            that.tableInfo = tableInfo;
-            that.theQuery = QueryTool.Create(tableid);
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
+            var that = GenericPlot.Create(tableid,'scatterplot', {title:'Scatter plot' });
             that.fetchCount = 0;
             that.propDataMap = {};
 
@@ -31,20 +28,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.mapPlotAspects[aspect.id] = aspect;
             });
 
-            that.eventids = [];
-
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
             Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
                 if (that.tableInfo.id==tableid)
                     that.reDraw();
             } );
-
-            that.onClose = function() {
-                $.each(that.eventids,function(idx,eventid) {
-                    Msg.delListener(eventid);
-                });
-            };
-
 
 
             that.createFrames = function() {
@@ -80,7 +68,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             if (included)
                                 propList.push({ id:prop.propid, name:prop.name });
                         });
-                        plotAspect.picker = Controls.Combo(null,{ label:'', states: propList }).setOnChanged( function() { that.fetchData(plotAspect.id)} );
+                        plotAspect.picker = Controls.Combo(null, { label:'', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
                         pickControls.setItem(aspectIdx, 0, Controls.Static(plotAspect.name+':'));
                         pickControls.setItem(aspectIdx, 1, plotAspect.picker);
                         //controls.push(Controls.VerticalSeparator(7));
@@ -89,14 +77,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.colorLegend = Controls.Html(null,'');
 
-                that.panelButtons.addControl(Controls.CompoundVert([
+                var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     pickControls,
                     that.colorLegend
-                ]));
+                ]);
+                that.addPlotSettingsControl('controls',controlsGroup);
+                that.panelButtons.addControl(controlsGroup);
 
-                that.fetchData('id');
+                //that.fetchData('id');
             };
 
 
@@ -123,10 +113,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.fetchData = function(plotAspectID) {
+
+                //If ID is missing, silently fetch this as well
+                if (plotAspectID!='id')
+                    if (!that.mapPlotAspects['id'].data)
+                        setTimeout(function(){
+                                that.fetchData('id');
+                            },
+                            150);
+
                 var aspectInfo = that.mapPlotAspects[plotAspectID];
                 aspectInfo.data = null;
                 if (aspectInfo.visible)
                     aspectInfo.propid = aspectInfo.picker.getValue();
+                if (that.staging)
+                    return;
                 if (aspectInfo.propid) {
                     var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
                     if (that.propDataMap[aspectInfo.propid]) {
@@ -143,20 +144,27 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (propInfo.datatype=='Boolean')
                             encoding = 'GN';
                         fetcher.addColumn(aspectInfo.propid, encoding);
-                        that.fetchCount += 1;
                         that.panelPlot.invalidate();
                         var requestID = DQX.getNextUniqueID();
                         aspectInfo.requestID = requestID;
-                        fetcher.getData(that.theQuery.get(), that.tableInfo.primkey, function (data) {
-                            that.fetchCount -= 1;
-                            if (aspectInfo.requestID != requestID) {//request must be outdated, so we don't handle it
-                                return;
+                        that.fetchCount += 1;
+                        fetcher.getData(that.theQuery.get(), that.tableInfo.primkey,
+                            function (data) { //success
+                                that.fetchCount -= 1;
+                                if (aspectInfo.requestID != requestID) {//request must be outdated, so we don't handle it
+                                    that.panelPlot.invalidate();
+                                    return;
+                                }
+                                aspectInfo.data = data[aspectInfo.propid];
+                                that.propDataMap[aspectInfo.propid] = aspectInfo.data;
+                                that.processAspectData(plotAspectID);
+                                that.panelPlot.invalidate();
+                            },
+                            function (data) { //error
+                                that.fetchCount -= 1;
                             }
-                            aspectInfo.data = data[aspectInfo.propid];
-                            that.propDataMap[aspectInfo.propid] = aspectInfo.data;
-                            that.processAspectData(plotAspectID);
-                            that.panelPlot.invalidate();
-                        });
+
+                        );
                     }
                 }
                 else {
@@ -182,8 +190,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     aspectInfo.minval = minval;
                     aspectInfo.maxval = maxval;
                     var range = aspectInfo.maxval-aspectInfo.minval;
+                    if (range <= 0)
+                        range=1;
                     aspectInfo.maxval += range/20;
                     aspectInfo.minval -= range/20;
+                    aspectInfo.safeRange = aspectInfo.maxval - aspectInfo.minval;
                 }
 
                 if ( (aspectInfo.datatype == 'Category') && (values) ) {
@@ -259,7 +270,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (that.fetchCount > 0) {
                     ctx.font="20px Arial";
                     ctx.fillStyle="rgb(140,140,140)";
-                    ctx.fillText("Fetching data ...",10,50);
+                    ctx.fillText("Fetching data ... "+that.fetchCount,10,50);
                     return;
                 }
 
@@ -288,9 +299,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var valY = aspectY.data;
                 var valColorCat = that.mapPlotAspects['color'].catData;
                 var valSize = that.mapPlotAspects['size'].data;
-                var scaleX = (drawInfo.sizeX-marginX) / (aspectX.maxval - aspectX.minval);
+                var scaleX = (drawInfo.sizeX-marginX) / aspectX.safeRange;
                 var offsetX = marginX - aspectX.minval*scaleX;
-                var scaleY = - (drawInfo.sizeY-marginY) / (aspectY.maxval - aspectY.minval);
+                var scaleY = - (drawInfo.sizeY-marginY) / aspectY.safeRange;
                 var offsetY = (drawInfo.sizeY-marginY) - aspectY.minval*scaleY;
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;

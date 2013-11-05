@@ -1,22 +1,17 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
+    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
 
         var Histogram = {};
 
 
 
-
+        GenericPlot.registerPlotType('histogram', Histogram);
 
         Histogram.Create = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
-            var that = PopupFrame.PopupFrame(tableInfo.name + ' Histogram', {title:'Histogram', blocking:false, sizeX:700, sizeY:550 });
-            that.tableInfo = tableInfo;
-            that.theQuery = QueryTool.Create(tableid);
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
+            var that = GenericPlot.Create(tableid,'histogram', {title:'Histogram' });
             that.fetchCount = 0;
             that.showRelative = false;
 
-            that.eventids = [];
 
             that.barW = 16;
             that.scaleW = 100;
@@ -28,13 +23,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (that.tableInfo.id==tableid)
                     that.reDraw();
             } );
-
-            that.onClose = function() {
-                $.each(that.eventids,function(idx,eventid) {
-                    Msg.delListener(eventid);
-                });
-            };
-
 
 
             that.createFrames = function() {
@@ -62,19 +50,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Value') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: propList })
+                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: propList }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setOnChanged(function() {
+                that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setClassID('binsizeautomatic').setOnChanged(function() {
                     that.ctrl_binsizeValue.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     that.ctrl_binsizeUpdate.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
                     if (that.ctrl_binsizeAutomatic.getValue())
                         that.fetchData();
                 });
 
-                that.ctrl_binsizeValue = Controls.Edit(null,{size:18}).setOnChanged(function() {
+                that.ctrl_binsizeValue = Controls.Edit(null,{size:18}).setClassID('binsizevalue').setOnChanged(function() {
 
                 });
                 that.ctrl_binsizeValue.modifyEnabled(false);
@@ -86,13 +74,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var binsizeGroup = Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValue, that.ctrl_binsizeUpdate]).setLegend('Bin size');
 
-                that.panelButtons.addControl(Controls.CompoundVert([
+                var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlValueProperty,
                     Controls.VerticalSeparator(20),
                     binsizeGroup
-                ]));
+                ]);
+                that.addPlotSettingsControl('controls',controlsGroup);
+                that.panelButtons.addControl(controlsGroup);
 
             };
 
@@ -105,8 +95,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
+            that.reloadAll = function() {
+                that.fetchData();
+            }
+
             that.fetchData = function() {
                 that.propidValue = that.ctrlValueProperty.getValue();
+                if (that.staging)
+                    return;
                 that.bucketCounts = null;
                 if (!that.propidValue) {
                     that.reDraw();
@@ -173,6 +169,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.reloadAll = function() {
+                that.fetchData();
             }
 
             that.reDraw = function() {

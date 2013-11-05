@@ -15,7 +15,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (that.panelBrowser) {
                         obj.chromoid = that.panelBrowser.getCurrentChromoID();
                         obj.range = that.panelBrowser.getVisibleRange();
-
+                        var markInfo = that.panelBrowser.getMark();
+                        if (markInfo)
+                            obj.mark = markInfo;
                         obj.settings = Controls.storeSettings(that.visibilityControlsGroup);
                     }
                     return obj;
@@ -25,9 +27,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if ( (settObj.chromoid) && (that.panelBrowser) ) {
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
+                        if (settObj.mark)
+                            that.panelBrowser.setMark(settObj.mark.min, settObj.mark.max);
                     }
-                    if (settObj.settings)
-                        Controls.recallSettings(that.visibilityControlsGroup,settObj.settings,true);
+                    if ((settObj.settings) && (that.visibilityControlsGroup) )
+                        Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
                 };
 
 
@@ -119,8 +123,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     ]));
 
 
-                    that.createSnpPositionChannel();
-
                     that.reLoad();
 
                 };
@@ -160,44 +162,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                //Creates a channel that shows the SNP positions
-                that.createSnpPositionChannel = function() {
-
-                    that.dataFetcherSNPs = new DataFetchers.Curve(
-                        MetaData.serverUrl,
-                        MetaData.database,
-                        'SNP'
-                    );
-
-                    var tableInfo = MetaData.mapTableCatalog['SNP'];
-
-                    var theChannel = ChannelPositions.Channel(null,
-                        that.dataFetcherSNPs,   // The datafetcher containing the positions of the snps
-                        'snpid'                 // Name of the column containing a unique identifier for each snp
-                    );
-                    theChannel
-                        .setTitle("SNP positions")
-                        .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
-
-
-                    if (MetaData.hasProperty('SNP','MutType')) {
-                        theChannel.makeCategoricalColors(//Assign a different color to silent/nonsilent snps
-                            'MutType',               // Name of the column containing a categorical string value that determines the color of the snp
-                            { 'S' :  DQX.Color(1,1,0) , 'N' : DQX.Color(1,0.4,0) }   //Map of value-color pairs
-                        );
-                    }
-
-
-                    //Define a custom tooltip
-                    theChannel.setToolTipHandler(function(snpid) {
-                        return 'SNP: '+snpid;
-                    })
-                    //Define a function tht will be called when the user clicks a snp
-                    theChannel.setClickHandler(function(snpid) {
-                        Msg.send({ type: 'ItemPopup' }, { tableid:'SNP', itemid:snpid } );//Send a message that should trigger showing the snp popup
-                    })
-                    that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
-                }
 
 
                 that.getSummaryFetcher =function(minblocksize) {
@@ -277,7 +241,49 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 }
 
+                //Map a categorical property to position indicators, color coding a categorical property
+                that.createPositionChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
+                    var trackid =tableInfo.id+'_'+propInfo.propid;
+                    tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
+                    var theChannel = ChannelPositions.Channel(trackid,
+                        dataFetcher,
+                        tableInfo.primkey
+                    );
+                    theChannel
+                        .setTitle(tableInfo.name)
+                        .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
+                    if (propInfo.settings.categoryColors) {
+                        var mapping = {};
+                        $.each(propInfo.settings.categoryColors, function(key, val) {
+                            mapping[key] = DQX.parseColorString(val);
+                        });
+                        theChannel.makeCategoricalColors(
+                            propInfo.propid,
+                            mapping
+                        );
+                    }
+
+/*                    if (MetaData.hasProperty('SNP','MutType')) {
+                        theChannel.makeCategoricalColors(//Assign a different color to silent/nonsilent snps
+                            'MutType',               // Name of the column containing a categorical string value that determines the color of the snp
+                            { 'S' :  DQX.Color(1,1,0) , 'N' : DQX.Color(1,0.4,0) }   //Map of value-color pairs
+                        );
+                    } */
+
+
+                    //Define a custom tooltip
+                    theChannel.setToolTipHandler(function(id) {
+                        return id;
+                    })
+                    //Define a function tht will be called when the user clicks a snp
+                    theChannel.setClickHandler(function(id) {
+                        Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
+                    })
+                    that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
+                }
+
+                //Map a numerical property
                 that.createPropertyChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
                     var trackid =tableInfo.id+'_'+propInfo.propid;
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
@@ -398,7 +404,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
 
-                            var ctrl_filtertype = Controls.Combo('', { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setOnChanged(function() {
+                            var ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.filterByQuery = (ctrl_filtertype.getValue()=='query');
                                 if (tableInfo.genomeBrowserInfo.filterByQuery)
                                     tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
@@ -430,6 +436,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             $.each(MetaData.customProperties,function(idx,propInfo) {
                                 if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
                                     that.createPropertyChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
+                                }
+                                if ((propInfo.tableid==tableInfo.id) && (propInfo.isText) && (propInfo.settings.showInBrowser)) {
+                                    that.createPositionChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
                                 }
                             });
                         }

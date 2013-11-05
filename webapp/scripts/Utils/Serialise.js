@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Plots/GenericPlot"],
+    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, GenericPlot) {
 
         var Serialise = {};
 
@@ -30,6 +30,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         str += 'Permanent url to this view:<p>';
                         str += edt.renderHtml();
                         str += '<p>Press Ctrl+C to copy the url to the clipboard';
+
+                        var btOpen = Controls.Button(null, {  content: 'Open in browser' }).setOnChanged(function() {
+                            window.open(url,'_blank');
+                        });
+
+                        str += btOpen.renderHtml()+'<p></p>';
+
                         Popup.create('Permanent link to view',str);
                         //alert(url);
                     });
@@ -56,6 +63,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (view.storeSettings)
                     obj.viewData[view.getStateID()] = view.storeSettings();
             });
+            obj.plotData = GenericPlot.store();
             var st = JSON.stringify(obj);
             return Base64.encode(st);
 
@@ -69,6 +77,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if ( (view.recallSettings) && (obj.viewData[view.getStateID()]) )
                     view.recallSettings(obj.viewData[view.getStateID()]);
             });
+            if (obj.plotData)
+                GenericPlot.recall(obj.plotData);
         }
 
 
