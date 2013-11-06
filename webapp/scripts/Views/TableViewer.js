@@ -59,6 +59,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.storeSettings = function() {
                     var obj= {};
                     obj.query = SQL.WhereClause.encode(that.theQuery.get());
+                    if (that.visibilityControlsGroup)
+                        obj.activecolumns = Controls.storeSettings(that.visibilityControlsGroup);
                     return obj;
                 };
 
@@ -67,6 +69,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     that.theQuery.modify(qry);
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
                     tableInfo.currentQuery = qry;
+                    if ((settObj.activecolumns) && (that.visibilityControlsGroup) )
+                        Controls.recallSettings(that.visibilityControlsGroup, settObj.activecolumns, false);
 
                 };
 
@@ -282,7 +286,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
                             }
 
-                            var chk = Controls.Check(null,{label:propInfo.name, value:true }).setOnChanged(function() {
+                            var chk = Controls.Check(null,{label:propInfo.name, value:true }).setClassID(propInfo.propid).setOnChanged(function() {
                                 col.setVisible(chk.getValue());
                                 that.myTable.render();
                             });
