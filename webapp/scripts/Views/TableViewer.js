@@ -84,8 +84,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();//Declare the root frame as a horizontally divided set of subframes
                     //this.frameQueriesContainer = rootFrame.addMemberFrame(Framework.FrameGroupVert('', 0.4));//Create frame that will contain the query panels
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.4)).setFixedSize(Framework.dimX,250)
-                    this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.6))//Create frame that will contain the table viewer
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250)
+                    this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,true);
                 }
 
