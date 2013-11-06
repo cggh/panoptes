@@ -314,12 +314,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (tooltip) {
                     var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table",  width:120, height:30 }).setOnChanged(function() {
                         var tableView = Application.getView('table_'+that.tableInfo.id);
-                        var qry= SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed(that.propidValue,'>=',tooltip.minval),
-                            SQL.WhereClause.CompareFixed(that.propidValue,'<',tooltip.maxval)
-                        ]);
-                        if (!that.theQuery.get().isTrivial)
-                            qry.addComponent(that.theQuery.get());
+                        var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, tooltip.minval, tooltip.maxval);
                         tableView.activateWithQuery(qry);
                         Popup.closeIfNeeded(popupid);
                     });
@@ -332,20 +327,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
                 var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
-                    var qry= SQL.WhereClause.AND([]);
-                    if (!that.theQuery.get().isTrivial)
-                        qry.addComponent(that.theQuery.get());
-                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'>=',rangeMin));
-                        qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'<',rangeMax));
+                    var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
                     tableView.activateWithQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });
                 var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
-                    var qry= SQL.WhereClause.AND([]);
-                    if (!that.theQuery.get().isTrivial)
-                        qry.addComponent(that.theQuery.get());
-                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'>=',rangeMin));
-                    qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValue,'<',rangeMax));
+                    var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
                     that.setActiveQuery(qry);
                     Popup.closeIfNeeded(popupid);
                 });

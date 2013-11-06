@@ -384,16 +384,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.onMouseClick = function(ev, info) {
                 var tooltip = that.getToolTipInfo(info.x, info.y);
                 if (tooltip) {
+
+                    var qry = that.theQuery.get();
+                    qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueX, tooltip.minvalX, tooltip.maxvalX);
+                    qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueY, tooltip.minvalY, tooltip.maxvalY);
+
                     var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table",  width:120, height:30 }).setOnChanged(function() {
                         var tableView = Application.getView('table_'+that.tableInfo.id);
-                        var qry= SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed(that.propidValueX,'>=',tooltip.minvalX),
-                            SQL.WhereClause.CompareFixed(that.propidValueX,'<',tooltip.maxvalX),
-                            SQL.WhereClause.CompareFixed(that.propidValueY,'>=',tooltip.minvalY),
-                            SQL.WhereClause.CompareFixed(that.propidValueY,'<',tooltip.maxvalY)
-                        ]);
-                        if (!that.theQuery.get().isTrivial)
-                            qry.addComponent(that.theQuery.get());
                         tableView.activateWithQuery(qry);
                         Popup.closeIfNeeded(popupid);
                     });
@@ -411,13 +408,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var rangeXMax = (maxX-that.offsetX)/that.scaleX;
                 var rangeYMin = (maxY-that.offsetY)/that.scaleY;
                 var rangeYMax = (minY-that.offsetY)/that.scaleY;
-                var qry= SQL.WhereClause.AND([]);
-                if (!that.theQuery.get().isTrivial)
-                    qry.addComponent(that.theQuery.get());
-                qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueX,'>=',rangeXMin));
-                qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueX,'<',rangeXMax));
-                qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueY,'>=',rangeYMin));
-                qry.addComponent(SQL.WhereClause.CompareFixed(that.propidValueY,'<',rangeYMax));
+
+                var qry = that.theQuery.get();
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueX, rangeXMin, rangeXMax);
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueY, rangeYMin, rangeYMax);
 
                 var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
