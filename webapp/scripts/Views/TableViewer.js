@@ -45,11 +45,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 if (tableid == 'SNP') {
                     Msg.listen('',{type: 'ShowSNPsInRange'}, function(scope, info) {
                         that.activateState();
-                        var qry= SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed('chrom','=',info.chrom),
-                            SQL.WhereClause.CompareFixed('pos','>=',info.start),
-                            SQL.WhereClause.CompareFixed('pos','<=',info.stop)
-                            ]);
+                        if (info.preservecurrentquery)
+                            var qry =that.theQuery.get();
+                        else
+                            var qry = SQL.WhereClause.Trivial();
+                        qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', info.chrom);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', info.start, info.stop, true);
                         that.theQuery.modify(qry);
                     });
 
