@@ -80,7 +80,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();//Declare the root frame as a horizontally divided set of subframes
                     //this.frameQueriesContainer = rootFrame.addMemberFrame(Framework.FrameGroupVert('', 0.4));//Create frame that will contain the query panels
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.4)).setFixedSize(Framework.dimX,200)
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.4)).setFixedSize(Framework.dimX,250)
                     this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.6))//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,true);
                 }
@@ -102,11 +102,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     this.createPanelTableViewer();
 
+                    // Create the "simple query" panel
+                    this.createPanelControls();
 
                     this.reLoad();
 
-                    // Create the "simple query" panel
-                    this.createPanelControls();
 
                 };
 
@@ -170,13 +170,17 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         ItemScatterPlot.Create(that.tableid);
                     });
 
+                    that.visibilityControlsGroup = Controls.CompoundVert([]);
+
+
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
                         Controls.VerticalSeparator(15),
                         cmdHistogram,
                         cmdBarGraph,
                         cmdHistogram2d,
-                        cmdScatterPlot
+                        cmdScatterPlot,
+                        that.visibilityControlsGroup
                     ]));
                 }
 
@@ -220,6 +224,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     that.myTable.createSelectionColumn(tableInfo.id, tableInfo.primkey, tableInfo);
 
+                    that.visibilityControlsGroup.clear();
 
 
                     //Create a column for each population frequency
@@ -276,6 +281,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             if (propInfo.isBoolean) {
                                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
                             }
+
+                            var chk = Controls.Check(null,{label:propInfo.name, value:true }).setOnChanged(function() {
+                                col.setVisible(chk.getValue());
+                                that.myTable.render();
+                            });
+                            that.visibilityControlsGroup.addControl(chk);
                         }
                     });
 
