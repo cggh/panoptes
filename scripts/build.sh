@@ -34,7 +34,6 @@ virtualenv DQXServer
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 source bin/activate
-
 pip install -q -r REQUIREMENTS
 pip install -q gunicorn #For testing, not a strict requirement of DQXServer
 
@@ -50,6 +49,14 @@ mkdir -p build/dependencies/DQXServer/customresponders
 touch build/dependencies/DQXServer/customresponders/__init__.py
 cd build/dependencies/DQXServer/customresponders
 ln -s $PROJECT_ROOT/servermodule/* .
+
+echo "Grabbing Pauls Table Util files (HACKY!)"
+cd $PROJECT_ROOT/build/dependencies/DQXServer/customresponders/uploadtracks
+wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
+cd $PROJECT_ROOT/build/dependencies/DQXServer/Convertors
+wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/IntervalTools.py
+wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/__init__.py
+wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
 
 echo "Linking static content into DQXServer"
 cd $PROJECT_ROOT/build/dependencies/DQXServer
