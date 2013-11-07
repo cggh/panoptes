@@ -282,14 +282,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                     var label = propInfo1.name+': '+propInfo1.toDisplayString(cat.name);
                     label += '<br>Count: {ct} ({fr}%)'.DQXformat({ ct:cat.count, fr:(cat.count/totcount*100).toFixed(2)});
+                    var selectors = {};selectors[that.catpropid1] = cat.name;
                     that.hoverItems.push({
-                         //itemid: ids[bestidx],
-                         ID: 'i'+DQX.getNextUniqueID(),
-                         px: (px1+px2)/2,
-                         py: (py1+py2)/2,
-                         //showPointer:true,
-                         content: label,
-                         px1:px1, px2:px2, py1:py1, py2:py2
+                        ID: 'i'+DQX.getNextUniqueID(),
+                        px: (px1+px2)/2,
+                        py: (py1+py2)/2,
+                        //showPointer:true,
+                        content: label,
+                        px1:px1, px2:px2, py1:py1+5, py2:py2-5,
+                        selectors: selectors
                      });
 
                     if (that.catpropid2) {
@@ -322,14 +323,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                                 fr1:(subcat.count/sumcount*100).toFixed(2),
                                 fr2:(subcat.count/totcount*100).toFixed(2)
                             });
+                            var selectors = {};selectors[that.catpropid1] = cat.name;selectors[that.catpropid2] = subcat.name;
                             that.hoverItems.push({
-                                //itemid: ids[bestidx],
                                 ID: 'i'+DQX.getNextUniqueID(),
                                 px: (px1+px2)/2,
                                 py: (py1+py2)/2,
-                                //showPointer:true,
                                 content: label,
-                                px1:px1, px2:px2, py1:py1, py2:py2
+                                px1:px1, px2:px2, py1:py1, py2:py2,
+                                selectors: selectors
                             });
 
                         });
@@ -347,16 +348,45 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (px0>=item.px1) && (px0<=item.px2) && (py0>=item.py2) && (py0<=item.py1) )
                         hoverItem = item;
                 });
-                return $.extend({},hoverItem);
-/*                return {
-                    itemid: ids[bestidx],
-                    ID: 'IDX'+bestidx,
-                    px: valX[bestidx] * scaleX + offsetX,
-                    py: valY[bestidx] * scaleY + offsetY,
-                    showPointer:true,
-                    content: str
-                };    */
+                if (hoverItem!=null) {
+                    var tooltip = $.extend({},hoverItem);
+                    tooltip.showPointer = true;
+                    return tooltip;
+                }
+                return null;
             };
+
+            that.onMouseClick = function(ev, info) {
+                var tooltip = that.getToolTipInfo(info.x, info.y);
+                if (tooltip) {
+                    var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table (replace)",  width:120, height:30 }).setOnChanged(function() {
+                        var tableView = Application.getView('table_'+that.tableInfo.id);
+                        var qry= SQL.WhereClause.AND([]);
+                        if (!that.theQuery.get().isTrivial)
+                            qry.addComponent(that.theQuery.get());
+                        $.each(tooltip.selectors, function(key, value) {
+                            qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
+                        });
+                        tableView.activateWithQuery(qry);
+                        Popup.closeIfNeeded(popupid);
+                    });
+                    var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table (add)",  width:120, height:30 }).setOnChanged(function() {
+                        var tableView = Application.getView('table_'+that.tableInfo.id);
+                        var qry= SQL.WhereClause.AND([]);
+                        if (!that.theQuery.get().isTrivial)
+                            qry.addComponent(that.theQuery.get());
+                        $.each(tooltip.selectors, function(key, value) {
+                            qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
+                        });
+                        var currentQuery = tableView.theQuery.get();
+                        tableView.activateWithQuery(SQL.WhereClause.OR([currentQuery,qry]));
+                        Popup.closeIfNeeded(popupid);
+                    });
+                    var content = tooltip.content;
+                    content += '<br/>' + bt1.renderHtml() + bt2.renderHtml();
+                    var popupid = Popup.create('Bargraph bar', content);
+                }
+            }
 
 
 

@@ -31,19 +31,10 @@ require.config({
 
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
-    function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Intro, GenomeBrowser, TableViewer, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet, Serialise) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
+    function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Initialise, Intro, GenomeBrowser, TableViewer, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet, Serialise) {
         $(function () {
 
-            //A helper function, turning a fraction into a 3 digit text string
-            var createFuncVal2Text = function(digits) {
-                return function(vl) {
-                    if ( (vl==null) || (vl=='None') )
-                        return '-';
-                    else
-                        return parseFloat(vl).toFixed(digits);
-                }
-            }
 
 
             function Start_Part1() {
@@ -123,17 +114,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
 
                         //Provide a hook to fetch some data upfront from the server. Upon completion, 'proceedFunction' should be called;
                         Application.customInitFunction = function(proceedFunction) {
-                            // Here, we will fetch the full data of a couple of tables on the servers proactively
                             var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
-                            // Declare a first table for fetching
-                            /*                getter.addTable(
-                             'customtracks',
-                             [
-                             'id',
-                             'name'
-                             ],
-                             'name'
-                             );*/
 
                             var appProceedFunction = function() {
                                 proceedFunction();
@@ -146,15 +127,12 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                 MetaData.database,
                                 function() {
                                     PromptWorkspace.execute(appProceedFunction);
-                                    //MetaData.tracks = getter.getTableRecords('customtracks');
                                 }
                             );
                         }
 
-
                         //Initialise the application
                         Application.init('Panoptes');
-
 
                         Application.getChannelInfo = function(proceedFunction) {
                             var getter = DataFetchers.ServerDataGetter();
@@ -169,51 +147,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                 function() { // Upon completion of data fetching
                                     MetaData.externalLinks = getter.getTableRecords('externallinks');
                                     MetaData.summaryValues = getter.getTableRecords('summaryvalues');
-                                    $.each(MetaData.summaryValues, function(idx, summaryValue) {
-                                        if (summaryValue.minval)
-                                            summaryValue.minval = parseFloat(summaryValue.minval);
-                                        else
-                                            summaryValue.minval = 0;
-                                        if (summaryValue.maxval)
-                                            summaryValue.maxval = parseFloat(summaryValue.maxval);
-                                        else
-                                            summaryValue.maxval = 0;
-                                        summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
-                                        summaryValue.isCustom = true;
-                                        var settings = { channelColor:'rgb(0,0,180)' };
-                                        if (summaryValue.settings)
-                                            settings = $.extend(settings,JSON.parse(summaryValue.settings));
-                                        summaryValue.settings = settings;
-                                    });
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
-                                    $.each(MetaData.customProperties, function(idx, prop) {
-                                        prop.isCustom = (prop.source=='custom');
-                                        if (prop.datatype=='Text')
-                                            prop.isText = true;
-                                        if (prop.datatype=='Value')
-                                            prop.isFloat = true;
-                                        if (prop.datatype=='Boolean')
-                                            prop.isBoolean = true;
-                                        if (!prop.name) prop.name = prop.propid;
-                                        var settings = { showInTable: true, showInBrowser: false, channelName: '', channelColor:'rgb(0,0,0)', connectLines: false };
-                                        if (prop.isFloat) {
-                                            settings.showInBrowser = true;
-                                            settings.minval = 0;
-                                            settings.maxval = 1;
-                                            settings.decimDigits = 2;
-                                        };
-                                        if (prop.propid == MetaData.mapTableCatalog[prop.tableid].primkey)
-                                            prop.isPrimKey = true;
-                                        if (prop.settings)
-                                            settings = $.extend(settings,JSON.parse(prop.settings));
-                                        prop.settings = settings;
-                                        prop.toDisplayString = function(vl) { return vl; }
-                                        if (prop.isFloat)
-                                            prop.toDisplayString = createFuncVal2Text(prop.settings.decimDigits);
-                                        if (prop.isBoolean)
-                                            prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
-                                        prop.category2Color = DQX.PersistentAssociator(DQX.standardColors.length);
-                                    });
+                                    Initialise.parseSummaryValues();
+                                    Initialise.parseCustomProperties();
                                     if (proceedFunction) proceedFunction();
                                 }
                             );

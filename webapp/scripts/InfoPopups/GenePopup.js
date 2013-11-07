@@ -41,7 +41,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show SNPs in this gene', width:120, height:50 }).setOnChanged(function() {
 //                Application.activateView('table_SNP');
-                Msg.send({type: 'ShowSNPsInRange'}, { chrom:data.chromid, start:data.fstart, stop:data.fstop });
+                Msg.send({type: 'ShowSNPsInRange'}, { preservecurrentquery:true, chrom:data.chromid, start:data.fstart, stop:data.fstop });
                 Popup.closeIfNeeded(popupid);
             });
             content += button_snps.renderHtml();

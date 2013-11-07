@@ -61,7 +61,7 @@ def response(returndata):
     maxbincount = 5000
     buckets = []
     counts = []
-    sql = 'select truncate({0}/{2},0) as bucket, count(*) as _cnt from {1}'.format(propid, tableid, binsize)
+    sql = 'select floor({0}/{2}) as bucket, count(*) as _cnt from {1}'.format(propid, tableid, binsize)
     sql += " WHERE {0}".format(querystring)
     sql += ' group by bucket'
     sql += ' limit {0}'.format(maxbincount)

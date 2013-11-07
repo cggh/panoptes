@@ -75,7 +75,7 @@ def response(returndata):
     bucketsx = []
     bucketsy = []
     counts = []
-    sql = 'select truncate({1}/{2},0) as bucketx, truncate({3}/{4},0) as buckety, count(*) as _cnt from {0}'.format(tableid, propidx, binsizex, propidy, binsizey)
+    sql = 'select floor({1}/{2}) as bucketx, floor({3}/{4}) as buckety, count(*) as _cnt from {0}'.format(tableid, propidx, binsizex, propidy, binsizey)
     sql += " WHERE {0}".format(querystring)
     sql += ' group by bucketx, buckety'
     sql += ' limit {0}'.format(maxbincount)

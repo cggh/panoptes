@@ -113,7 +113,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible variants in table",  width:120, height:30 }).setOnChanged(function() {
                         var chromoid = that.panelBrowser.getCurrentChromoID();
                         var range = that.panelBrowser.getVisibleRange();
-                        Msg.send({type: 'ShowSNPsInRange'}, { chrom:chromoid, start:range.min, stop:range.max });
+                        Msg.send({type: 'ShowSNPsInRange'}, {
+                            preservecurrentquery:(that.ctrl_filtertype.getValue()=='query'),
+                            chrom:chromoid, start:range.min, stop:range.max
+                        });
                     });
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
@@ -264,13 +267,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         );
                     }
 
-/*                    if (MetaData.hasProperty('SNP','MutType')) {
-                        theChannel.makeCategoricalColors(//Assign a different color to silent/nonsilent snps
-                            'MutType',               // Name of the column containing a categorical string value that determines the color of the snp
-                            { 'S' :  DQX.Color(1,1,0) , 'N' : DQX.Color(1,0.4,0) }   //Map of value-color pairs
-                        );
-                    } */
-
 
                     //Define a custom tooltip
                     theChannel.setToolTipHandler(function(id) {
@@ -404,15 +400,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
 
-                            var ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
-                                tableInfo.genomeBrowserInfo.filterByQuery = (ctrl_filtertype.getValue()=='query');
+                            that.ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
+                                tableInfo.genomeBrowserInfo.filterByQuery = (that.ctrl_filtertype.getValue()=='query');
                                 if (tableInfo.genomeBrowserInfo.filterByQuery)
                                     tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
                                 else
                                     tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(null);
                                 that.panelBrowser.render();
                             });
-                            controlsGroup.addControl(ctrl_filtertype);
+                            controlsGroup.addControl(that.ctrl_filtertype);
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
 
 

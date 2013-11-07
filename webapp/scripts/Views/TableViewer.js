@@ -45,11 +45,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 if (tableid == 'SNP') {
                     Msg.listen('',{type: 'ShowSNPsInRange'}, function(scope, info) {
                         that.activateState();
-                        var qry= SQL.WhereClause.AND([
-                            SQL.WhereClause.CompareFixed('chrom','=',info.chrom),
-                            SQL.WhereClause.CompareFixed('pos','>=',info.start),
-                            SQL.WhereClause.CompareFixed('pos','<=',info.stop)
-                            ]);
+                        if (info.preservecurrentquery)
+                            var qry =that.theQuery.get();
+                        else
+                            var qry = SQL.WhereClause.Trivial();
+                        qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', info.chrom);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', info.start, info.stop, true);
                         that.theQuery.modify(qry);
                     });
 
@@ -59,6 +60,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.storeSettings = function() {
                     var obj= {};
                     obj.query = SQL.WhereClause.encode(that.theQuery.get());
+                    if (that.visibilityControlsGroup)
+                        obj.activecolumns = Controls.storeSettings(that.visibilityControlsGroup);
                     return obj;
                 };
 
@@ -67,6 +70,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     that.theQuery.modify(qry);
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
                     tableInfo.currentQuery = qry;
+                    if ((settObj.activecolumns) && (that.visibilityControlsGroup) )
+                        Controls.recallSettings(that.visibilityControlsGroup, settObj.activecolumns, false);
 
                 };
 
@@ -80,8 +85,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();//Declare the root frame as a horizontally divided set of subframes
                     //this.frameQueriesContainer = rootFrame.addMemberFrame(Framework.FrameGroupVert('', 0.4));//Create frame that will contain the query panels
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.4)).setFixedSize(Framework.dimX,200)
-                    this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.6))//Create frame that will contain the table viewer
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250)
+                    this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,true);
                 }
 
@@ -102,11 +107,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     this.createPanelTableViewer();
 
+                    // Create the "simple query" panel
+                    this.createPanelControls();
 
                     this.reLoad();
 
-                    // Create the "simple query" panel
-                    this.createPanelControls();
 
                 };
 
@@ -170,13 +175,17 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         ItemScatterPlot.Create(that.tableid);
                     });
 
+                    that.visibilityControlsGroup = Controls.CompoundVert([]);
+
+
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
                         Controls.VerticalSeparator(15),
                         cmdHistogram,
                         cmdBarGraph,
                         cmdHistogram2d,
-                        cmdScatterPlot
+                        cmdScatterPlot,
+                        that.visibilityControlsGroup
                     ]));
                 }
 
@@ -218,8 +227,28 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.theTableFetcher.resetAll();
                     that.myTable.clearTableColumns();
 
-                    that.myTable.createSelectionColumn(tableInfo.id, tableInfo.primkey, tableInfo);
+                    that.myTable.createSelectionColumn("sel","Sel",tableInfo.id, tableInfo.primkey, tableInfo, function() {
+                        Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
+                    });
 
+
+                    //Test implementation for an extra selection column
+                    var selmanager = {
+                        mem: {},
+                        isItemSelected : function(id) {
+                            return (this.mem[id]==true);
+                        },
+                        selectItem : function(id, newstate) {
+                            this.mem[id]=newstate;
+                        }
+                    };
+                    that.myTable.createSelectionColumn("Cov","Coverage",tableInfo.id, tableInfo.primkey, selmanager, function() {
+                        that.myTable.render();
+                    });
+
+
+
+                    that.visibilityControlsGroup.clear();
 
 
                     //Create a column for each population frequency
@@ -255,6 +284,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 col.setDataType_MultipleChoiceString(MetaData.chromosomes);
                             }
 
+                            if (propInfo.propCategories) {
+                                var cats = [];
+                                $.each(propInfo.propCategories, function(idx, cat) {
+                                    cats.push({id:cat, name:cat});
+                                });
+                                col.setDataType_MultipleChoiceString(cats);
+                            }
+
                             //col.setToolTip(pop.name); //Provide a tool tip for the column
                             //Define a callback when the user clicks on a column
                             col.setHeaderClickHandler(function(id) {
@@ -276,6 +313,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             if (propInfo.isBoolean) {
                                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
                             }
+
+                            var chk = Controls.Check(null,{label:propInfo.name, value:true }).setClassID(propInfo.propid).setOnChanged(function() {
+                                col.setVisible(chk.getValue());
+                                that.myTable.render();
+                            });
+                            that.visibilityControlsGroup.addControl(chk);
                         }
                     });
 
