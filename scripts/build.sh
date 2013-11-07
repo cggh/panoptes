@@ -52,11 +52,10 @@ ln -s $PROJECT_ROOT/servermodule/* .
 
 echo "Grabbing Pauls Table Util files (HACKY!)"
 cd $PROJECT_ROOT/build/dependencies/DQXServer/customresponders/uploadtracks
-wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
+wget -nv https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
 cd $PROJECT_ROOT/build/dependencies/DQXServer/Convertors
-wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/IntervalTools.py
-wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/__init__.py
-wget https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
+wget -nv https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/IntervalTools.py
+wget -nv https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTable.py
 
 echo "Linking static content into DQXServer"
 cd $PROJECT_ROOT/build/dependencies/DQXServer
