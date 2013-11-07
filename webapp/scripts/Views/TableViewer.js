@@ -265,6 +265,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 col.setDataType_MultipleChoiceString(MetaData.chromosomes);
                             }
 
+                            if (propInfo.propCategories) {
+                                var cats = [];
+                                $.each(propInfo.propCategories, function(idx, cat) {
+                                    cats.push({id:cat, name:cat});
+                                });
+                                col.setDataType_MultipleChoiceString(cats);
+                            }
+
                             //col.setToolTip(pop.name); //Provide a tool tip for the column
                             //Define a callback when the user clicks on a column
                             col.setHeaderClickHandler(function(id) {

@@ -62,6 +62,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (prop.isBoolean)
                     prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
                 prop.category2Color = DQX.PersistentAssociator(DQX.standardColors.length);
+
+                if (prop.settings.isCategorical) {
+                    var getter = DataFetchers.ServerDataGetter();
+                    getter.addTable(prop.tableid,[prop.propid],prop.propid,
+                        SQL.WhereClause.Trivial(), { distinct:true }
+                    );
+                    prop.propCategories = [];
+                    getter.execute(MetaData.serverUrl,MetaData.database,
+                        function() {
+                            $.each(getter.getTableRecords(prop.tableid), function(idx, rec) {
+                                prop.propCategories.push(rec[prop.propid]);
+                            });
+                            var q=0;
+                        }
+                    );
+                }
+
             });
         }
 
