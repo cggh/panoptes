@@ -227,7 +227,26 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.theTableFetcher.resetAll();
                     that.myTable.clearTableColumns();
 
-                    that.myTable.createSelectionColumn(tableInfo.id, tableInfo.primkey, tableInfo);
+                    that.myTable.createSelectionColumn("sel","Sel",tableInfo.id, tableInfo.primkey, tableInfo, function() {
+                        Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
+                    });
+
+
+                    //Test implementation for an extra selection column
+                    var selmanager = {
+                        mem: {},
+                        isItemSelected : function(id) {
+                            return (this.mem[id]==true);
+                        },
+                        selectItem : function(id, newstate) {
+                            this.mem[id]=newstate;
+                        }
+                    };
+                    that.myTable.createSelectionColumn("Cov","Coverage",tableInfo.id, tableInfo.primkey, selmanager, function() {
+                        that.myTable.render();
+                    });
+
+
 
                     that.visibilityControlsGroup.clear();
 
