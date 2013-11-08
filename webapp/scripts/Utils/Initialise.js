@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "Utils/TableRecordSelectionManager", "MetaData"],
+    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, TableRecordSelectionManager, MetaData) {
 
         var Initialise = {};
 
@@ -93,6 +93,38 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             });
         }
+
+
+        Initialise.parseTableBasedSummaryValues = function() {
+
+            $.each(MetaData.tableCatalog, function(idx, table) {
+                table.tableBasedSummaryValues = [];
+                table.mapTableBasedSummaryValues = {};
+            });
+
+            $.each(MetaData.tableBasedSummaryValues, function(idx, tableSummaryValue) {
+                var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
+                tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
+                tableSummaryValue.selectionManager = TableRecordSelectionManager.Create(tableSummaryValue.tableid+'_'+tableSummaryValue.trackid, tableInfo);
+                tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
+                var q=0;
+/*                if (summaryValue.minval)
+                    summaryValue.minval = parseFloat(summaryValue.minval);
+                else
+                    summaryValue.minval = 0;
+                if (summaryValue.maxval)
+                    summaryValue.maxval = parseFloat(summaryValue.maxval);
+                else
+                    summaryValue.maxval = 0;
+                summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
+                summaryValue.isCustom = true;
+                var settings = { channelColor:'rgb(0,0,180)' };
+                if (summaryValue.settings)
+                    settings = $.extend(settings,JSON.parse(summaryValue.settings));
+                summaryValue.settings = settings;*/
+            });
+        };
+
 
 
 

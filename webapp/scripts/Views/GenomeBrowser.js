@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "Wizards/EditTableBasedSummaryValues", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, EditTableBasedSummaryValues, MetaData) {
 
         var GenomeBrowserModule = {
 
@@ -120,9 +120,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
+
+                    //Create buttons for each table that has genome summary tracks defined
+                    var buttonsGroup = Controls.CompoundVert([]);
+                    $.each(MetaData.tableCatalog,function(idx,tableInfo) {
+                        if (tableInfo.tableBasedSummaryValues.length>0) {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select <b>"+tableInfo.name+'</b> tracks',  width:120, height:30 }).setOnChanged(function() {
+                                EditTableBasedSummaryValues.CreateDialogBox(tableInfo.id);
+                            });
+                            buttonsGroup.addControl(bt);
+                        }
+                    });
+
+
                     this.panelControls.addControl(Controls.CompoundVert([
                         bt,
-                        that.visibilityControlsGroup
+                        that.visibilityControlsGroup,
+                        buttonsGroup
                     ]));
 
 

@@ -232,22 +232,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     });
 
 
-                    //Test implementation for an extra selection column
-                    var selmanager = {
-                        mem: {},
-                        isItemSelected : function(id) {
-                            return (this.mem[id]==true);
-                        },
-                        selectItem : function(id, newstate) {
-                            this.mem[id]=newstate;
-                        }
-                    };
-                    that.myTable.createSelectionColumn("Cov","Coverage",tableInfo.id, tableInfo.primkey, selmanager, function() {
-                        that.myTable.render();
-                    });
-
-
-
                     that.visibilityControlsGroup.clear();
 
 

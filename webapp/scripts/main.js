@@ -142,14 +142,20 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             getter.addTable('summaryvalues',['propid','name','minval','maxval','minblocksize','tableid','settings'],'ordr',
                                 SQL.WhereClause.OR([SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),SQL.WhereClause.CompareFixed('workspaceid','=','')])
                             );
+                            getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'trackid',
+                                SQL.WhereClause.Trivial()
+                            );
+
                             getter.addTable('externallinks',['linktype','linkname','linkurl'],'linkname');
                             getter.execute(MetaData.serverUrl,MetaData.database,
                                 function() { // Upon completion of data fetching
                                     MetaData.externalLinks = getter.getTableRecords('externallinks');
                                     MetaData.summaryValues = getter.getTableRecords('summaryvalues');
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
+                                    MetaData.tableBasedSummaryValues = getter.getTableRecords('tablebasedsummaryvalues');
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
+                                    Initialise.parseTableBasedSummaryValues();
                                     if (proceedFunction) proceedFunction();
                                 }
                             );
