@@ -32,6 +32,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     if ((settObj.settings) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
+
+                    //Initialise all the table based summary values
+                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                        $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryInfo) {
+                            $.each(summaryInfo.selectionManager.getSelectedList(), function(idx2, recordid) {
+                                that.tableBasedSummaryValue_Add(tableInfo.id, summaryInfo.trackid, recordid);
+                            });
+                        });
+                    });
+
                 };
 
 
@@ -74,7 +84,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.panelControls.setPadding(10);
 
                     this.createPanelBrowser();
-
                 };
 
 
@@ -521,6 +530,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var channelid=trackid+'_'+recordid;
                         that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
                     }
+
 
 
                     that.createSummaryChannels();

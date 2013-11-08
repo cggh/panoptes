@@ -21,19 +21,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelButtons = Framework.Form(that.frameButtons);
 
 
-                var bt_cancel = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Cancel', bitmap: DQX.BMP('cancel.png'), width:80, height:25 }).setOnChanged(function() {
+                var bt_close = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Close', bitmap: DQX.BMP('ok.png'), width:80, height:25 }).setOnChanged(function() {
                     that.close();
                 });
-                var bt_apply = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Apply', bitmap: DQX.BMP('apply.png'), width:80, height:25 }).setOnChanged(function() {
-                    var query = that.builder.getQuery();
-                    proceedFunction(query);
-                });
-                var bt_ok = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'OK', bitmap: DQX.BMP('ok.png'), width:80, height:25 }).setOnChanged(that.onOK);
                 that.panelButtons.addControl(Controls.AlignRight(Controls.CompoundHor([
-                    bt_cancel,
-                    Controls.HorizontalSeparator(10),
-                    bt_apply,
-                    bt_ok,
+                    bt_close,
                     Controls.HorizontalSeparator(7)
                 ])));
 

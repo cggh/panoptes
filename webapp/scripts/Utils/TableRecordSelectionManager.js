@@ -25,6 +25,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.onChangedHandler(id);
             };
 
+            that.getSelectedList = function() {
+                var activeList = [];
+                $.each(that.mem, function(key, val) {
+                    if (val)
+                        activeList.push(key);
+                });
+                return activeList;
+            }
+
+            that.storeSettings = function() {
+                return JSON.stringify(that.getSelectedList());
+            };
+
+            that.recallSettings = function(settObj) {
+                var activeList = JSON.parse(settObj);
+                that.mem = {};
+                $.each(activeList, function(idx, key) {
+                    that.mem[key] = true;
+                });
+            };
 
             return that;
         };

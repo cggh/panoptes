@@ -14,6 +14,48 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
         }
 
+        Initialise.augmentTableInfo = function(table) {
+            table.hasGenomePositions = table.IsPositionOnGenome=='1';
+            table.currentQuery = SQL.WhereClause.Trivial();
+            table.currentSelection = {};
+            if (table.hasGenomePositions)
+                table.genomeBrowserInfo = {};
+
+            var settings = { GenomeMaxViewportSizeX:50000 };
+            if (table.settings)
+                settings = $.extend(settings,JSON.parse(table.settings));
+            table.settings = settings;
+
+            table.isItemSelected = function(id) { return table.currentSelection[id]; }
+            table.selectItem = function(id, newState) {
+                if (newState)
+                    table.currentSelection[id] = true;
+                else
+                    delete table.currentSelection[id];
+            }
+
+            table.storeSettings = function() {
+                var settObj = {};
+                settObj.tableBasedSummaryValues = {}
+                $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                    settObj.tableBasedSummaryValues[summaryInfo.trackid] = summaryInfo.selectionManager.storeSettings();
+                });
+                return settObj;
+            }
+
+            table.recallSettings = function(settObj) {
+                if (settObj.tableBasedSummaryValues) {
+                    $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                        if (settObj.tableBasedSummaryValues[summaryInfo.trackid]) {
+                            summaryInfo.selectionManager.recallSettings(settObj.tableBasedSummaryValues[summaryInfo.trackid]);
+                        }
+                    });
+                }
+            }
+        }
+
+
+
         Initialise.parseSummaryValues = function() {
             $.each(MetaData.summaryValues, function(idx, summaryValue) {
                 if (summaryValue.minval)

@@ -65,24 +65,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         });
                         MetaData.mapTableCatalog = {};
                         $.each(MetaData.tableCatalog, function(idx, table) {
-                            table.hasGenomePositions = table.IsPositionOnGenome=='1';
-                            table.currentQuery = SQL.WhereClause.Trivial();
-                            table.currentSelection = {};
-                            if (table.hasGenomePositions)
-                                table.genomeBrowserInfo = {};
-
-                            var settings = { GenomeMaxViewportSizeX:50000 };
-                            if (table.settings)
-                                settings = $.extend(settings,JSON.parse(table.settings));
-                            table.settings = settings;
-
-                            table.isItemSelected = function(id) { return table.currentSelection[id]; }
-                            table.selectItem = function(id, newState) {
-                                if (newState)
-                                    table.currentSelection[id] = true;
-                                else
-                                    delete table.currentSelection[id];
-                            }
+                            Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
                         });
 
