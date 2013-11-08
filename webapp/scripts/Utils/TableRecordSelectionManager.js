@@ -20,10 +20,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.selectItem = function(id, newstate) {
-                that.mem[id]=newstate;
-                if (that.onChangedHandler)
-                    that.onChangedHandler(id);
+                if (that.mem[id]!=newstate) {
+                    that.mem[id]=newstate;
+                    if (that.onChangedHandler)
+                        that.onChangedHandler(id);
+                }
             };
+
+            that.clearAll = function() {
+                $.each(that.getSelectedList(), function(idx, key) {
+                    that.selectItem(key,false);
+                });
+            }
 
             that.getSelectedList = function() {
                 var activeList = [];

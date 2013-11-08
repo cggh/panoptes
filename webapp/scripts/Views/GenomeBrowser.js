@@ -165,7 +165,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 that.onBecomeVisible = function() {
-                    that.reLoad();
+                    if (that.visibilityControlsGroup)
+                        that.reLoad();
                 }
 
 
@@ -397,7 +398,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     that.uptodate = true;
 
-                    that.visibilityControlsGroup.clear();
+                    if (that.visibilityControlsGroup)
+                        that.visibilityControlsGroup.clear();
 
                     that.channelMap = {};
 
@@ -526,7 +528,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.panelBrowser.handleResize();
                             that.panelBrowser.render();
                         }
-                        //!!! todo: automatically sort the tablesummary tracks according to a meaningfull criterion
+                        //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
                     }
 
                     that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {

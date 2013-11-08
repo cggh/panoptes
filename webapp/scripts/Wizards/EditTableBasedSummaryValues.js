@@ -20,10 +20,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 //that.panelBody = Framework.Form(that.frameBody).setPadding(10);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
+                var bt_clearall = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Clear all' }).setOnChanged(function() {
+                    $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
+                        summaryValue.selectionManager.clearAll();
+                    });
+                    that.myTable.render();
+                });
 
                 var bt_close = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Close', bitmap: DQX.BMP('ok.png'), width:80, height:25 }).setOnChanged(function() {
                     that.close();
                 });
+
+                that.panelButtons.addControl(Controls.CompoundHor([
+                    Controls.HorizontalSeparator(7),
+                    bt_clearall
+                ]));
                 that.panelButtons.addControl(Controls.AlignRight(Controls.CompoundHor([
                     bt_close,
                     Controls.HorizontalSeparator(7)
