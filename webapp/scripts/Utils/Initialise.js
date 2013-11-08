@@ -53,8 +53,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
                 if (prop.propid == MetaData.mapTableCatalog[prop.tableid].primkey)
                     prop.isPrimKey = true;
-                if (prop.settings)
-                    settings = $.extend(settings,JSON.parse(prop.settings));
+                if (prop.settings) {
+                    try {
+                        var settingsObj = JSON.parse(prop.settings);
+                    }
+                    catch(e) {
+                        alert('Invalid settings string for {table}.{propid}: {sett}\n{msg}'.DQXformat({
+                            table:prop.tableid,
+                            propid:prop.propid,
+                            sett:prop.settings,
+                            msg:e
+                        }));
+                    }
+                    settings = $.extend(settings,settingsObj);
+                }
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
                 if (prop.isFloat)
