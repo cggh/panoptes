@@ -9,6 +9,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     'genomebrowser',    // View ID
                     'Genome browser'    // View title
                 );
+                that.setEarlyInitialisation();
+
 
                 that.storeSettings = function() {
                     var obj= {};
@@ -524,6 +526,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.panelBrowser.handleResize();
                             that.panelBrowser.render();
                         }
+                        //!!! todo: automatically sort the tablesummary tracks according to a meaningfull criterion
                     }
 
                     that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {

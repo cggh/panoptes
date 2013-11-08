@@ -148,7 +148,6 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                     });
             } // End Start_Part2
 
-
             Start_Part1();
 
 
