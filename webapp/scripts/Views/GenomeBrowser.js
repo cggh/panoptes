@@ -56,6 +56,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     });
 
+
+                    Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
+                        if (params.manager.isItemSelected(params.recordid))
+                            that.tableBasedSummaryValue_Add(params.tableid, params.trackid, params.recordid);
+                        else
+                            that.tableBasedSummaryValue_Del(params.tableid, params.trackid, params.recordid);
+                    });
+
                 }
 
 
@@ -135,8 +143,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     this.panelControls.addControl(Controls.CompoundVert([
                         bt,
-                        that.visibilityControlsGroup,
-                        buttonsGroup
+                        buttonsGroup,
+                        that.visibilityControlsGroup
                     ]));
 
 
@@ -454,6 +462,66 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
 
                     });
+
+
+                    that.tableBasedSummaryValue_Add = function(tableid, trackid, recordid) {
+                        var summaryValue = MetaData.mapTableCatalog[tableid].mapTableBasedSummaryValues[trackid];
+                        var channelid=trackid+'_'+recordid;
+                        if (that.panelBrowser.findChannel(channelid)) {
+                            //Already exists - simply make visible
+                            that.panelBrowser.findChannelRequired(channelid).modifyVisibility(true);
+                        }
+                        else {
+                            //Does not exist - create
+                            var theFetcher = that.getSummaryFetcher(summaryValue.minblocksize);
+
+                            var folder=that.summaryFolder+'/TableTracks/'+tableid+'/'+trackid+'/'+recordid;
+
+                            var SummChannel = that.channelMap[channelid];
+                            if (!SummChannel) {
+                                var SummChannel = ChannelYVals.Channel(channelid, { minVal: summaryValue.minval, maxVal: summaryValue.maxval });//Create the channel
+                                SummChannel
+                                    .setTitle(channelid).setHeight(120, true)
+                                    .setChangeYScale(true,true);//makes the scale adjustable by dragging it
+                                SummChannel.controls = Controls.CompoundVert([]);
+                                that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
+                                that.channelMap[channelid] = SummChannel;
+                            }
+
+                            //that.listSummaryChannels.push(channelid);
+
+                            var theColor = DQX.parseColorString(summaryValue.settings.channelColor);;
+
+                            //Create the min-max range
+                            var colinfo_min = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_min");//get the min value from the fetcher
+                            var colinfo_max = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_max");//get the max value from the fetcher
+                            var comp_minmax = SummChannel.addComponent(ChannelYVals.YRange(null,//Define the range component
+                                theFetcher,               // data fetcher containing the profile information
+                                colinfo_min.myID,                       // fetcher column id for the min value
+                                colinfo_max.myID,                       // fetcher column id for the max value
+                                theColor.changeOpacity(0.25)
+                            ), true );
+
+                            //Create the average value profile
+                            var colinfo_avg = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_avg");//get the avg value from the fetcher
+                            var comp_avg = SummChannel.addComponent(ChannelYVals.Comp(null,//Add the profile to the channel
+                                theFetcher,               // data fetcher containing the profile information
+                                colinfo_avg.myID                        // fetcher column id containing the average profile
+                            ), true);
+                            comp_avg.setColor(theColor);//set the color of the profile
+                            comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
+                            comp_avg.myPlotHints.interruptLineAtAbsent = true;
+                            comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
+                            that.panelBrowser.handleResize();
+                            that.panelBrowser.render();
+                        }
+                    }
+
+                    that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {
+                        var channelid=trackid+'_'+recordid;
+                        that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
+                    }
+
 
                     that.createSummaryChannels();
 

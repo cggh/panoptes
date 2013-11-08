@@ -7,10 +7,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-        TableRecordSelectionManager.Create = function(id, tableInfo) {
+        TableRecordSelectionManager.Create = function(id, tableInfo, onChangedHandler) {
             var that = {};
             that.id = id;
             that.tableInfo = tableInfo;
+            that.onChangedHandler = onChangedHandler;
 
             that.mem = {};
 
@@ -20,6 +21,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.selectItem = function(id, newstate) {
                 that.mem[id]=newstate;
+                if (that.onChangedHandler)
+                    that.onChangedHandler(id);
             };
 
 

@@ -103,9 +103,36 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
             $.each(MetaData.tableBasedSummaryValues, function(idx, tableSummaryValue) {
+                var settings = { channelColor:'rgb(0,0,180)' };
+                if (tableSummaryValue.settings) {
+                    try{
+                        var settObj = JSON.parse(tableSummaryValue.settings);
+                        settings = $.extend(settings,settObj);
+                    }
+                    catch(e) {
+                        DQX.reportError('Invalid settings string "{str}" for tablebasedsummaryvalues {tableid},{trackid}:\n{error}'.DQXformat({
+                            str:tableSummaryValue.settings,
+                            tableid:tableSummaryValue.tableid,
+                            trackid:tableSummaryValue.trackid,
+                            error:e
+                        }));
+                    }
+                }
+                tableSummaryValue.settings = settings;
+
                 var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
                 tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
-                tableSummaryValue.selectionManager = TableRecordSelectionManager.Create(tableSummaryValue.tableid+'_'+tableSummaryValue.trackid, tableInfo);
+                tableSummaryValue.selectionManager = TableRecordSelectionManager.Create(
+                    tableSummaryValue.tableid+'_'+tableSummaryValue.trackid,
+                    tableInfo, function(id) {
+                        Msg.broadcast({ type: 'TableBasedSummaryValueSelectionChanged' }, {
+                            tableid:tableInfo.id,
+                            trackid:tableSummaryValue.trackid,
+                            recordid:id,
+                            manager:tableSummaryValue.selectionManager
+                        });
+
+                    });
                 tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
                 var q=0;
 /*                if (summaryValue.minval)

@@ -69,7 +69,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                 });
 
-                var propids = ['sampleid', 'Country', 'Study'];
+                var propids = ['ox_code', 'src_code', 'country'];
 
                 $.each(propids, function(idx,propid) {
                     var propInfo = MetaData.findProperty(that.tableInfo.id,propid);
