@@ -10,6 +10,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
+                that.frameQuery = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    .setFixedSize(Framework.dimY, 60).setFrameClassClient('DQXGrayClient');
                 that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
@@ -17,6 +19,35 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
+
+                that.panelQuery = Framework.Form(that.frameQuery);
+                var queries = [];
+                that.queryControls = {};
+                $.each(that.tableInfo.quickFindFields, function(idx, propid) {
+                    var propInfo = MetaData.findProperty(that.tableInfo.id, propid);
+
+
+                    if (!propInfo.propCategories) {
+                        var ctrl = Controls.Edit(null,{size:18});
+                    }
+                    else {
+                        var cats = [{id:'', name:'[All]'}];
+                        $.each(propInfo.propCategories, function(idx, cat) {
+                            cats.push({id:cat, name:cat});
+                        });
+                        var ctrl = Controls.Combo(null,{size:18, label:'', states:cats});
+                    }
+
+                    ctrl.setOnChanged(DQX.debounce(that.updateQuery,200));
+                    that.queryControls[propid] = ctrl;
+                    queries.push(Controls.HorizontalSeparator(5));
+                    queries.push(Controls.CompoundVert([
+                        Controls.Static(propInfo.name+':'),
+                        ctrl
+                    ]).setTreatAsBlock());
+                });
+                that.panelQuery.addControl(Controls.CompoundHor(queries));
+
                 //that.panelBody = Framework.Form(that.frameBody).setPadding(10);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
@@ -72,9 +103,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                 });
 
-                var propids = ['ox_code', 'src_code', 'country'];
-
-                $.each(propids, function(idx,propid) {
+                $.each(that.tableInfo.quickFindFields, function(idx, propid) {
                     var propInfo = MetaData.findProperty(that.tableInfo.id,propid);
                     var col = that.myTable.createTableColumn(
                         QueryTable.Column(
@@ -89,6 +118,27 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTable.onResize();
 
             };
+
+            that.updateQuery = function() {
+                var qryList = [];
+                $.each(that.tableInfo.quickFindFields, function(idx, propid) {
+                    var propInfo = MetaData.findProperty(that.tableInfo.id, propid);
+                    var value = that.queryControls[propid].getValue();
+                    if (value) {
+                        if (!propInfo.propCategories)
+                            qryList.push(SQL.WhereClause.CompareFixed(propid, 'LIKE', '%'+value+'%'));
+                        else
+                            qryList.push(SQL.WhereClause.CompareFixed(propid, '=', value));
+                    }
+                });
+                if (qryList.length>0)
+                    var whc = SQL.WhereClause.AND(qryList);
+                else
+                    var whc = SQL.WhereClause.Trivial();
+                that.myTable.setQuery(whc);
+                that.myTable.reLoadTable();
+
+            }
 
             that.onOK = function() {
                 var query = that.builder.getQuery();

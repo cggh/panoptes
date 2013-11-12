@@ -26,6 +26,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 settings = $.extend(settings,JSON.parse(table.settings));
             table.settings = settings;
 
+            table.quickFindFields = [table.primkey];
+            if ('QuickFindFields' in table.settings)
+                table.quickFindFields = table.settings.QuickFindFields.split(',');
+
             table.isItemSelected = function(id) { return table.currentSelection[id]; }
             table.selectItem = function(id, newState) {
                 if (newState)
