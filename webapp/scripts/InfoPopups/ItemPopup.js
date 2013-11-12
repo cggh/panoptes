@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
 
         var ItemPopup = {};
 
@@ -43,16 +43,44 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += DQX.CreateKeyValueTable(propertyMap);
 
-            if (('pos' in data) && ('chrom' in data)) {
-                var bt = Controls.Button(null, { content: 'Show on genome'}).setOnChanged(function() {
-                    Popup.closeIfNeeded(popupid);
-                    Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.chrom, position:parseInt(data.pos) });
-                })
+/*            if (('pos' in data) && ('chrom' in data)) {
                 content += bt.renderHtml();
+            }*/
+
+            var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid, {title:itemInfo.itemid, blocking:true, sizeX:700, sizeY:500 });
+            that.tableInfo = MetaData.mapTableCatalog[itemInfo.tableid];
+
+            that.createFrames = function() {
+                that.frameRoot.makeGroupVert();
+                that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
+                    .setAllowScrollBars(true,true);
+                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
+            };
+
+            that.createPanels = function() {
+                that.frameBody.setContentHtml(content);
+                that.panelButtons = Framework.Form(that.frameButtons);
+
+                var buttons = [];
+
+                if (that.tableInfo.hasGenomePositions) {
+                    buttons.push(Controls.HorizontalSeparator(7));
+                    var bt = Controls.Button(null, { content: 'Show on genome'}).setOnChanged(function() {
+                        that.close();//!!!todo: only when blocking
+                        //Popup.closeIfNeeded(popupid);
+                        Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.chrom, position:parseInt(data.pos) });
+                    })
+                    buttons.push(bt)
+                }
+
+                that.panelButtons.addControl(Controls.CompoundHor(buttons));
             }
 
+            that.create();
 
-            var popupid = Popup.create(MetaData.mapTableCatalog[itemInfo.tableid].name+' '+itemInfo.itemid, content);
+
+            //var popupid = Popup.create(MetaData.mapTableCatalog[itemInfo.tableid].name+' '+itemInfo.itemid, content);
         }
 
 
