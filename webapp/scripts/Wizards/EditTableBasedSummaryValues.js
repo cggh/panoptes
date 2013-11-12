@@ -3,6 +3,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var EditTableBasedSummaryValues = {};
 
+        EditTableBasedSummaryValues.storedValues = {};
+
 
         EditTableBasedSummaryValues.CreateDialogBox = function(tableid) {
             var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Genome tracks', blocking:true, sizeX:700, sizeY:500 });
@@ -37,6 +39,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                         var ctrl = Controls.Combo(null,{size:18, label:'', states:cats});
                     }
+                    if (propid in EditTableBasedSummaryValues.storedValues)
+                        ctrl.modifyValue(EditTableBasedSummaryValues.storedValues[propid])
 
                     ctrl.setOnChanged(DQX.debounce(that.updateQuery,200));
                     that.queryControls[propid] = ctrl;
@@ -114,7 +118,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
 
-                that.myTable.reLoadTable();
+                that.updateQuery();
                 that.panelTable.onResize();
 
             };
@@ -125,10 +129,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var propInfo = MetaData.findProperty(that.tableInfo.id, propid);
                     var value = that.queryControls[propid].getValue();
                     if (value) {
+                        EditTableBasedSummaryValues.storedValues[propid] = value;
                         if (!propInfo.propCategories)
                             qryList.push(SQL.WhereClause.CompareFixed(propid, 'LIKE', '%'+value+'%'));
                         else
                             qryList.push(SQL.WhereClause.CompareFixed(propid, '=', value));
+                    }
+                    else {
+                        delete EditTableBasedSummaryValues.storedValues[propid];
                     }
                 });
                 if (qryList.length>0)
