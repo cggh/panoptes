@@ -47,7 +47,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += bt.renderHtml();
             }*/
 
-            var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid, {title:itemInfo.itemid, blocking:true, sizeX:700, sizeY:500 });
+            var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid, {title:itemInfo.itemid, blocking:false, sizeX:700, sizeY:500 });
+            that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.mapTableCatalog[itemInfo.tableid];
 
             that.createFrames = function() {
@@ -67,15 +68,42 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (that.tableInfo.hasGenomePositions) {
                     buttons.push(Controls.HorizontalSeparator(7));
                     var bt = Controls.Button(null, { content: 'Show on genome'}).setOnChanged(function() {
-                        that.close();//!!!todo: only when blocking
-                        //Popup.closeIfNeeded(popupid);
+                        //that.close();//!!!todo: only when blocking
                         Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.chrom, position:parseInt(data.pos) });
+                    })
+                    buttons.push(bt)
+                }
+
+                if (that.tableInfo.tableBasedSummaryValues.length>0) {
+                    buttons.push(Controls.HorizontalSeparator(7));
+                    var bt = Controls.Button(null, { content: 'Genome tracks...'}).setOnChanged(function() {
+                        //that.close();//!!!todo: only when blocking
+                        that.editGenomeTracks();
+                        //Popup.closeIfNeeded(popupid);
                     })
                     buttons.push(bt)
                 }
 
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
             }
+
+            that.editGenomeTracks = function() {
+                var str ='';
+                $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
+                    var chk = Controls.Check(null, {label:summaryValue.trackname, value:summaryValue.selectionManager.isItemSelected(that.itemid)});
+                    chk.setOnChanged(function() {
+                        summaryValue.selectionManager.selectItem(that.itemid, chk.getValue());
+                    });
+                    str += chk.renderHtml()+'<br>';
+                });
+                var bt = Controls.Button(null, { content: 'Show'}).setOnChanged(function() {
+                    Application.getView('genomebrowser').activateState();
+                    Popup.closeIfNeeded(popupid);
+                })
+                str += bt.renderHtml();
+                var popupid = Popup.create('Genome tracks',str);
+            }
+
 
             that.create();
 
