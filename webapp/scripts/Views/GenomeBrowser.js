@@ -12,6 +12,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.setEarlyInitialisation();
 
 
+
+
+
                 that.storeSettings = function() {
                     var obj= {};
                     if (that.panelBrowser) {
@@ -86,6 +89,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.panelControls.setPadding(10);
 
                     this.createPanelBrowser();
+
+                    Msg.listen('', {type:'TableFieldCacheModified'}, function() {
+                        that.updateTableBasedSummaryValueHeaders();
+                    });
+
                 };
 
 
@@ -147,7 +155,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select...",  width:120 }).setOnChanged(function() {
                                 EditTableBasedSummaryValues.CreateDialogBox(tableInfo.id);
                             });
-                            buttonsGroup.addControl(Controls.CompoundVert([bt]).setLegend('<h3>'+tableInfo.name+' tracks</h3>'));
+                            states = [];
+                            $.each(tableInfo.quickFindFields, function(idx, propid) {
+                                states.push({id: propid, name: MetaData.findProperty(tableInfo.id,propid).name});
+                            });
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Displayed field', states: states});
+                            tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
+                                that.updateTableBasedSummaryValueHeaders();
+                            });
+                            buttonsGroup.addControl(Controls.CompoundVert([
+                                bt,
+                                tableInfo.genomeBrowserFieldChoice
+                            ]).setLegend('<h3>'+tableInfo.name+' tracks</h3>'));
                         }
                     });
 
@@ -162,6 +181,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.reLoad();
 
                 };
+
+
 
 
                 that.onBecomeVisible = function() {
@@ -497,6 +518,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                     .setTitle(channelid).setHeight(120, true)
                                     .setChangeYScale(true,true);//makes the scale adjustable by dragging it
                                 SummChannel.controls = Controls.CompoundVert([]);
+                                SummChannel.fromTable_tableid = tableid;
+                                SummChannel.fromTable_trackid = trackid;
+                                SummChannel.fromTable_recordid = recordid;
+                                SummChannel.setSubTitle(summaryValue.trackname);
+
                                 that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
                                 that.channelMap[channelid] = SummChannel;
                             }
@@ -526,7 +552,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
                             that.panelBrowser.handleResize();
-                            that.panelBrowser.render();
+                            that.updateTableBasedSummaryValueHeaders();
                         }
                         //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
                     }
@@ -535,6 +561,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var channelid=trackid+'_'+recordid;
                         that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
                     }
+
+                    that.updateTableBasedSummaryValueHeaders = function() {
+                        $.each(that.panelBrowser.getChannelList(), function(idx,channel) {
+                             if (channel.fromTable_tableid) {
+                                 var tableInfo = MetaData.mapTableCatalog[channel.fromTable_tableid];
+                                 var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();
+                                 var value = tableInfo.fieldCache.getField(channel.fromTable_recordid, activePropID);
+                                 channel.setTitle(value);
+                             }
+                        });
+                        that.panelBrowser.render();
+                    }
+
 
 
 

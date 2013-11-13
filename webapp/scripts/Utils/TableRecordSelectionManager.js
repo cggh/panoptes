@@ -5,8 +5,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-
-
         TableRecordSelectionManager.Create = function(id, tableInfo, onChangedHandler) {
             var that = {};
             that.id = id;
@@ -14,14 +12,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.onChangedHandler = onChangedHandler;
 
             that.mem = {};
+            that.fieldCache = tableInfo.fieldCache;
+
 
             that.isItemSelected = function(id) {
-                return (that.mem[id]==true);
+                return (that.mem[id]);
             };
 
             that.selectItem = function(id, newstate) {
                 if (that.mem[id]!=newstate) {
                     that.mem[id]=newstate;
+                    if (newstate)
+                        that.fieldCache.add(id);
                     if (that.onChangedHandler)
                         that.onChangedHandler(id);
                 }
@@ -51,11 +53,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.mem = {};
                 $.each(activeList, function(idx, key) {
                     that.mem[key] = true;
+                    that.fieldCache.add(key);
                 });
             };
 
             return that;
         };
+
 
 
 
