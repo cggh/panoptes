@@ -80,6 +80,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         })
                         GenomeBrowser.init();
 
+                        Application.showViewsAsTabs();
+
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
                             alert('Navigation button clicked');
