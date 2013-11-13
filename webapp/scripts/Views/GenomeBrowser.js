@@ -522,6 +522,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 SummChannel.fromTable_trackid = trackid;
                                 SummChannel.fromTable_recordid = recordid;
                                 SummChannel.setSubTitle(summaryValue.trackname);
+                                SummChannel.setOnClickHandler(function() {
+                                    Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: recordid } );
+                                });
 
                                 that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
                                 that.channelMap[channelid] = SummChannel;
