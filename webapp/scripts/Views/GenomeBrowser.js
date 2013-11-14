@@ -572,6 +572,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                  var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();
                                  var value = tableInfo.fieldCache.getField(channel.fromTable_recordid, activePropID);
                                  channel.setTitle(value);
+                                 var tooltip = '';
+                                 $.each(tableInfo.quickFindFields, function(idx, propid) {
+                                     tooltip += '<b>'+MetaData.findProperty(tableInfo.id,propid).name+': </b>';
+                                     tooltip += tableInfo.fieldCache.getField(channel.fromTable_recordid, propid);
+                                     tooltip += '<br/>';
+                                 });
+
+                                 channel.setHeaderTooltip(tooltip);
                              }
                         });
                         that.panelBrowser.render();
