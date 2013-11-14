@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #Find out where this script is
 SCRIPT_PATH="${BASH_SOURCE[0]}";
 if ([ -h "${SCRIPT_PATH}" ]) then
@@ -14,13 +14,24 @@ if [ -z "$CONFIG" ]; then
     CONFIG=default
 fi
 
+if [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$DBPASS" ] || [ -z "$DBNAME" ]; then
+	echo \$DBHOST, \$DBUSER, \$DBPASS, \$DBNAME all need to be set
+	exit 1
+fi
+
+
 echo "Building PANOPTES with configuration: $CONFIG"
 cd $PROJECT_ROOT
 rm -rf build
 mkdir -p build
 cd build
 
+echo "Running build for config $CONFIG"
+cd $PROJECT_ROOT/configs/$CONFIG
+bash -e load.sh
+
 echo "Fetching dependancies"
+cd $PROJECT_ROOT/build
 rm -rf dependencies
 mkdir -p dependencies
 cd dependencies
