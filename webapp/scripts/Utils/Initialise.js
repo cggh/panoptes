@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "Utils/TableRecordSelectionManager", "Utils/TableFieldCache", "MetaData"],
+    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, TableRecordSelectionManager, TableFieldCache, MetaData) {
 
         var Initialise = {};
 
@@ -13,6 +13,54 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     return parseFloat(vl).toFixed(digits);
             }
         }
+
+        Initialise.augmentTableInfo = function(table) {
+            table.hasGenomePositions = table.IsPositionOnGenome=='1';
+            table.currentQuery = SQL.WhereClause.Trivial();
+            table.currentSelection = {};
+            if (table.hasGenomePositions)
+                table.genomeBrowserInfo = {};
+
+            var settings = { GenomeMaxViewportSizeX:50000 };
+            if (table.settings)
+                settings = $.extend(settings,JSON.parse(table.settings));
+            table.settings = settings;
+
+            table.fieldCache = TableFieldCache.Create(table);
+
+            table.quickFindFields = [table.primkey];
+            if ('QuickFindFields' in table.settings)
+                table.quickFindFields = table.settings.QuickFindFields.split(',');
+
+            table.isItemSelected = function(id) { return table.currentSelection[id]; }
+            table.selectItem = function(id, newState) {
+                if (newState)
+                    table.currentSelection[id] = true;
+                else
+                    delete table.currentSelection[id];
+            }
+
+            table.storeSettings = function() {
+                var settObj = {};
+                settObj.tableBasedSummaryValues = {}
+                $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                    settObj.tableBasedSummaryValues[summaryInfo.trackid] = summaryInfo.selectionManager.storeSettings();
+                });
+                return settObj;
+            }
+
+            table.recallSettings = function(settObj) {
+                if (settObj.tableBasedSummaryValues) {
+                    $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                        if (settObj.tableBasedSummaryValues[summaryInfo.trackid]) {
+                            summaryInfo.selectionManager.recallSettings(settObj.tableBasedSummaryValues[summaryInfo.trackid]);
+                        }
+                    });
+                }
+            }
+        }
+
+
 
         Initialise.parseSummaryValues = function() {
             $.each(MetaData.summaryValues, function(idx, summaryValue) {
@@ -53,8 +101,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
                 if (prop.propid == MetaData.mapTableCatalog[prop.tableid].primkey)
                     prop.isPrimKey = true;
-                if (prop.settings)
-                    settings = $.extend(settings,JSON.parse(prop.settings));
+                if (prop.settings) {
+                    try {
+                        var settingsObj = JSON.parse(prop.settings);
+                    }
+                    catch(e) {
+                        alert('Invalid settings string for {table}.{propid}: {sett}\n{msg}'.DQXformat({
+                            table:prop.tableid,
+                            propid:prop.propid,
+                            sett:prop.settings,
+                            msg:e
+                        }));
+                    }
+                    settings = $.extend(settings,settingsObj);
+                }
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
                 if (prop.isFloat)
@@ -81,6 +141,65 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             });
         }
+
+
+        Initialise.parseTableBasedSummaryValues = function() {
+
+            $.each(MetaData.tableCatalog, function(idx, table) {
+                table.tableBasedSummaryValues = [];
+                table.mapTableBasedSummaryValues = {};
+            });
+
+            $.each(MetaData.tableBasedSummaryValues, function(idx, tableSummaryValue) {
+                var settings = { channelColor:'rgb(0,0,180)' };
+                if (tableSummaryValue.settings) {
+                    try{
+                        var settObj = JSON.parse(tableSummaryValue.settings);
+                        settings = $.extend(settings,settObj);
+                    }
+                    catch(e) {
+                        DQX.reportError('Invalid settings string "{str}" for tablebasedsummaryvalues {tableid},{trackid}:\n{error}'.DQXformat({
+                            str:tableSummaryValue.settings,
+                            tableid:tableSummaryValue.tableid,
+                            trackid:tableSummaryValue.trackid,
+                            error:e
+                        }));
+                    }
+                }
+                tableSummaryValue.settings = settings;
+
+                var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
+                tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
+                tableSummaryValue.selectionManager = TableRecordSelectionManager.Create(
+                    tableSummaryValue.tableid+'_'+tableSummaryValue.trackid,
+                    tableInfo, function(id) {
+                        Msg.broadcast({ type: 'TableBasedSummaryValueSelectionChanged' }, {
+                            tableid:tableInfo.id,
+                            trackid:tableSummaryValue.trackid,
+                            recordid:id,
+                            manager:tableSummaryValue.selectionManager
+                        });
+
+                    });
+                tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
+                var q=0;
+/*                if (summaryValue.minval)
+                    summaryValue.minval = parseFloat(summaryValue.minval);
+                else
+                    summaryValue.minval = 0;
+                if (summaryValue.maxval)
+                    summaryValue.maxval = parseFloat(summaryValue.maxval);
+                else
+                    summaryValue.maxval = 0;
+                summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
+                summaryValue.isCustom = true;
+                var settings = { channelColor:'rgb(0,0,180)' };
+                if (summaryValue.settings)
+                    settings = $.extend(settings,JSON.parse(summaryValue.settings));
+                summaryValue.settings = settings;*/
+            });
+        };
+
 
 
 

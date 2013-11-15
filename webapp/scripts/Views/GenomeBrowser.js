@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "Wizards/EditTableBasedSummaryValues", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, EditTableBasedSummaryValues, MetaData) {
 
         var GenomeBrowserModule = {
 
@@ -9,6 +9,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     'genomebrowser',    // View ID
                     'Genome browser'    // View title
                 );
+                that.setEarlyInitialisation();
+
+
+
+
 
                 that.storeSettings = function() {
                     var obj= {};
@@ -32,6 +37,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     if ((settObj.settings) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
+
+                    //Initialise all the table based summary values
+                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                        $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryInfo) {
+                            $.each(summaryInfo.selectionManager.getSelectedList(), function(idx2, recordid) {
+                                that.tableBasedSummaryValue_Add(tableInfo.id, summaryInfo.trackid, recordid);
+                            });
+                        });
+                    });
+
                 };
 
 
@@ -56,6 +71,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     });
 
+
+                    Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
+                        if (params.manager.isItemSelected(params.recordid))
+                            that.tableBasedSummaryValue_Add(params.tableid, params.trackid, params.recordid);
+                        else
+                            that.tableBasedSummaryValue_Del(params.tableid, params.trackid, params.recordid);
+                    });
+
                 }
 
 
@@ -66,6 +89,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.panelControls.setPadding(10);
 
                     this.createPanelBrowser();
+
+                    Msg.listen('', {type:'TableFieldCacheModified'}, function() {
+                        that.updateTableBasedSummaryValueHeaders();
+                    });
 
                 };
 
@@ -120,8 +147,33 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
+
+                    //Create controls for each table that has genome summary tracks defined
+                    var buttonsGroup = Controls.CompoundVert([]);
+                    $.each(MetaData.tableCatalog,function(idx,tableInfo) {
+                        if (tableInfo.tableBasedSummaryValues.length>0) {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select...",  width:120 }).setOnChanged(function() {
+                                EditTableBasedSummaryValues.CreateDialogBox(tableInfo.id);
+                            });
+                            states = [];
+                            $.each(tableInfo.quickFindFields, function(idx, propid) {
+                                states.push({id: propid, name: MetaData.findProperty(tableInfo.id,propid).name});
+                            });
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Displayed field', states: states});
+                            tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
+                                that.updateTableBasedSummaryValueHeaders();
+                            });
+                            buttonsGroup.addControl(Controls.CompoundVert([
+                                bt,
+                                tableInfo.genomeBrowserFieldChoice
+                            ]).setLegend('<h3>'+tableInfo.name+' tracks</h3>'));
+                        }
+                    });
+
+
                     this.panelControls.addControl(Controls.CompoundVert([
                         bt,
+                        buttonsGroup,
                         that.visibilityControlsGroup
                     ]));
 
@@ -131,8 +183,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
 
 
+
+
                 that.onBecomeVisible = function() {
-                    that.reLoad();
+                    if (that.visibilityControlsGroup)
+                        that.reLoad();
                 }
 
 
@@ -364,7 +419,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     that.uptodate = true;
 
-                    that.visibilityControlsGroup.clear();
+                    if (that.visibilityControlsGroup)
+                        that.visibilityControlsGroup.clear();
 
                     that.channelMap = {};
 
@@ -440,6 +496,97 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
 
                     });
+
+
+                    that.tableBasedSummaryValue_Add = function(tableid, trackid, recordid) {
+                        var summaryValue = MetaData.mapTableCatalog[tableid].mapTableBasedSummaryValues[trackid];
+                        var channelid=trackid+'_'+recordid;
+                        if (that.panelBrowser.findChannel(channelid)) {
+                            //Already exists - simply make visible
+                            that.panelBrowser.findChannelRequired(channelid).modifyVisibility(true);
+                        }
+                        else {
+                            //Does not exist - create
+                            var theFetcher = that.getSummaryFetcher(summaryValue.minblocksize);
+
+                            var folder=that.summaryFolder+'/TableTracks/'+tableid+'/'+trackid+'/'+recordid;
+
+                            var SummChannel = that.channelMap[channelid];
+                            if (!SummChannel) {
+                                var SummChannel = ChannelYVals.Channel(channelid, { minVal: summaryValue.minval, maxVal: summaryValue.maxval });//Create the channel
+                                SummChannel
+                                    .setTitle(channelid).setHeight(120, true)
+                                    .setChangeYScale(true,true);//makes the scale adjustable by dragging it
+                                SummChannel.controls = Controls.CompoundVert([]);
+                                SummChannel.fromTable_tableid = tableid;
+                                SummChannel.fromTable_trackid = trackid;
+                                SummChannel.fromTable_recordid = recordid;
+                                SummChannel.setSubTitle(summaryValue.trackname);
+                                SummChannel.setOnClickHandler(function() {
+                                    Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: recordid } );
+                                });
+
+                                that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
+                                that.channelMap[channelid] = SummChannel;
+                            }
+
+                            //that.listSummaryChannels.push(channelid);
+
+                            var theColor = DQX.parseColorString(summaryValue.settings.channelColor);;
+
+                            //Create the min-max range
+                            var colinfo_min = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_min");//get the min value from the fetcher
+                            var colinfo_max = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_max");//get the max value from the fetcher
+                            var comp_minmax = SummChannel.addComponent(ChannelYVals.YRange(null,//Define the range component
+                                theFetcher,               // data fetcher containing the profile information
+                                colinfo_min.myID,                       // fetcher column id for the min value
+                                colinfo_max.myID,                       // fetcher column id for the max value
+                                theColor.changeOpacity(0.25)
+                            ), true );
+
+                            //Create the average value profile
+                            var colinfo_avg = theFetcher.addFetchColumn(folder, 'Summ', channelid + "_avg");//get the avg value from the fetcher
+                            var comp_avg = SummChannel.addComponent(ChannelYVals.Comp(null,//Add the profile to the channel
+                                theFetcher,               // data fetcher containing the profile information
+                                colinfo_avg.myID                        // fetcher column id containing the average profile
+                            ), true);
+                            comp_avg.setColor(theColor);//set the color of the profile
+                            comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
+                            comp_avg.myPlotHints.interruptLineAtAbsent = true;
+                            comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
+                            that.panelBrowser.handleResize();
+                            that.updateTableBasedSummaryValueHeaders();
+                        }
+                        //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
+                    }
+
+                    that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {
+                        var channelid=trackid+'_'+recordid;
+                        that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
+                    }
+
+                    that.updateTableBasedSummaryValueHeaders = function() {
+                        $.each(that.panelBrowser.getChannelList(), function(idx,channel) {
+                             if (channel.fromTable_tableid) {
+                                 var tableInfo = MetaData.mapTableCatalog[channel.fromTable_tableid];
+                                 var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();
+                                 var value = tableInfo.fieldCache.getField(channel.fromTable_recordid, activePropID);
+                                 channel.setTitle(value);
+                                 var tooltip = '';
+                                 $.each(tableInfo.quickFindFields, function(idx, propid) {
+                                     tooltip += '<b>'+MetaData.findProperty(tableInfo.id,propid).name+': </b>';
+                                     tooltip += tableInfo.fieldCache.getField(channel.fromTable_recordid, propid);
+                                     tooltip += '<br/>';
+                                 });
+
+                                 channel.setHeaderTooltip(tooltip);
+                             }
+                        });
+                        that.panelBrowser.render();
+                    }
+
+
+
 
                     that.createSummaryChannels();
 

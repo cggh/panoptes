@@ -65,24 +65,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         });
                         MetaData.mapTableCatalog = {};
                         $.each(MetaData.tableCatalog, function(idx, table) {
-                            table.hasGenomePositions = table.IsPositionOnGenome=='1';
-                            table.currentQuery = SQL.WhereClause.Trivial();
-                            table.currentSelection = {};
-                            if (table.hasGenomePositions)
-                                table.genomeBrowserInfo = {};
-
-                            var settings = { GenomeMaxViewportSizeX:50000 };
-                            if (table.settings)
-                                settings = $.extend(settings,JSON.parse(table.settings));
-                            table.settings = settings;
-
-                            table.isItemSelected = function(id) { return table.currentSelection[id]; }
-                            table.selectItem = function(id, newState) {
-                                if (newState)
-                                    table.currentSelection[id] = true;
-                                else
-                                    delete table.currentSelection[id];
-                            }
+                            Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
                         });
 
@@ -96,6 +79,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
                         GenomeBrowser.init();
+
+                        Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
@@ -142,14 +127,20 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             getter.addTable('summaryvalues',['propid','name','minval','maxval','minblocksize','tableid','settings'],'ordr',
                                 SQL.WhereClause.OR([SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),SQL.WhereClause.CompareFixed('workspaceid','=','')])
                             );
+                            getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'trackid',
+                                SQL.WhereClause.Trivial()
+                            );
+
                             getter.addTable('externallinks',['linktype','linkname','linkurl'],'linkname');
                             getter.execute(MetaData.serverUrl,MetaData.database,
                                 function() { // Upon completion of data fetching
                                     MetaData.externalLinks = getter.getTableRecords('externallinks');
                                     MetaData.summaryValues = getter.getTableRecords('summaryvalues');
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
+                                    MetaData.tableBasedSummaryValues = getter.getTableRecords('tablebasedsummaryvalues');
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
+                                    Initialise.parseTableBasedSummaryValues();
                                     if (proceedFunction) proceedFunction();
                                 }
                             );
@@ -158,7 +149,6 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
 
                     });
             } // End Start_Part2
-
 
             Start_Part1();
 
