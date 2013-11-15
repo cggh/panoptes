@@ -14,14 +14,15 @@ if [ -z "$CONFIG" ]; then
     CONFIG=default
 fi
 
-if [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$DBPASS" ] || [ -z "$DBNAME" ]; then
-	echo \$DBHOST, \$DBUSER, \$DBPASS, \$DBNAME all need to be set
+if [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$DBPASS" ] ; then
+	echo \$DBHOST, \$DBUSER, \$DBPASS, all need to be set
 	exit 1
 fi
 
 
 echo "Building PANOPTES with configuration: $CONFIG"
 cd $PROJECT_ROOT
+mkdir -p webapp/scripts/Local
 cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
 rm -rf build
 mkdir -p build
