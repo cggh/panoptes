@@ -14,7 +14,8 @@ PROJECT_ROOT=`pwd`;
 ./scripts/run.sh &
 sleep 1
 
-#DO INTEGRATION TESTS HERE
+cd ${PROJECT_ROOT}/tests
+casperjs test simple.js
 
 PID=`cat ${PROJECT_ROOT}/scripts/gunicorn.pid`
 kill ${PID}
