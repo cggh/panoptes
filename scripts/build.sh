@@ -22,6 +22,7 @@ fi
 
 echo "Building PANOPTES with configuration: $CONFIG"
 cd $PROJECT_ROOT
+mkdir -p webapp/scripts/Local
 cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
 rm -rf build
 mkdir -p build
