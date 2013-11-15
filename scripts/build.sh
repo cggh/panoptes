@@ -26,10 +26,6 @@ rm -rf build
 mkdir -p build
 cd build
 
-echo "Running build for config $CONFIG"
-cd $PROJECT_ROOT/configs/$CONFIG
-bash -e load.sh
-
 echo "Fetching dependancies"
 cd $PROJECT_ROOT/build
 rm -rf dependencies
@@ -44,8 +40,11 @@ git clone git@github.com:malariagen/DQXServer.git
 virtualenv DQXServer
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
+echo "Installing python dependancies"
 source bin/activate
 pip install -q -r REQUIREMENTS
+#Extra ones for custom responder
+pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
 pip install -q gunicorn #For testing, not a strict requirement of DQXServer
 
 echo "Linking DQX"
@@ -71,6 +70,10 @@ wget -nv https://raw.github.com/pvaut/MiscPythonUtils/master/Src/TableUtils/VTTa
 echo "Linking static content into DQXServer"
 cd $PROJECT_ROOT/build/dependencies/DQXServer
 ln -s $PROJECT_ROOT/webapp static
+
+echo "Running data-load for config $CONFIG"
+cd $PROJECT_ROOT/configs/$CONFIG
+bash -e load.sh
 
 #if [ -z "$WSGI_FOLDER" ]; then
 #	echo "WSGI_FOLDER not set, you need to manually serve dependencies/DQXServer/app.wsgi"
