@@ -1,7 +1,9 @@
 *.pyc
 *.py~
 .idea
+.DS_Store
 webapp/scripts/DQX
+webapp/scripts/Local
 servermodule/uploadtracks/VTTable.py
 importscripts/TableUtils
 
