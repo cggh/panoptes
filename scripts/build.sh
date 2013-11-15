@@ -14,8 +14,8 @@ if [ -z "$CONFIG" ]; then
     CONFIG=default
 fi
 
-if [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$DBPASS" ] || [ -z "$DBNAME" ]; then
-	echo \$DBHOST, \$DBUSER, \$DBPASS, \$DBNAME all need to be set
+if [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$DBPASS" ] ; then
+	echo \$DBHOST, \$DBUSER, \$DBPASS, all need to be set
 	exit 1
 fi
 
