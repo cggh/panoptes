@@ -76,34 +76,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.tableBasedSummaryValues.length>0) {
                     buttons.push(Controls.HorizontalSeparator(7));
-                    var bt = Controls.Button(null, { content: 'Genome tracks...'}).setOnChanged(function() {
-                        //that.close();//!!!todo: only when blocking
-                        that.editGenomeTracks();
-                        //Popup.closeIfNeeded(popupid);
+                    var chk = Controls.Check(null, {
+                            label: 'Show Genome tracks',
+                            value:that.tableInfo.genomeTrackSelectionManager.isItemSelected(that.itemid)
+                        }).setOnChanged(function() {
+                        that.tableInfo.genomeTrackSelectionManager.selectItem(that.itemid,chk.getValue())
                     })
-                    buttons.push(bt)
+                    buttons.push(chk)
                 }
 
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
-            }
-
-            that.editGenomeTracks = function() {
-                alert('todo!!!');
-                debugger;
-/*                var str ='';
-                $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                    var chk = Controls.Check(null, {label:summaryValue.trackname, value:summaryValue.selection___Manager.isItemSelected(that.itemid)});
-                    chk.setOnChanged(function() {
-                        summaryValue.selection___Manager.selectItem(that.itemid, chk.getValue());
-                    });
-                    str += chk.renderHtml()+'<br>';
-                });
-                var bt = Controls.Button(null, { content: 'Show'}).setOnChanged(function() {
-                    Application.getView('genomebrowser').activateState();
-                    Popup.closeIfNeeded(popupid);
-                })
-                str += bt.renderHtml();
-                var popupid = Popup.create('Genome tracks',str);*/
             }
 
 
