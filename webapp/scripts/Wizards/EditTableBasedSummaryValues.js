@@ -6,21 +6,34 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         EditTableBasedSummaryValues.storedValues = {};
 
         EditTableBasedSummaryValues.prompt = function(tableid) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
             var content = '';
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Pick samples...' }).setOnChanged(function() {
+                Popup.closeIfNeeded(popupid);
+                EditTableBasedSummaryValues.CreateDialogBox(tableid);
+            });
+            content += bt.renderHtml();
+
             var str = 'Use current query';
             var recordCount  = Application.getView('table_'+tableid).getRecordCount();
             if (recordCount!=null)
                 str += '<br>('+recordCount+' items)';
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
-                EditTableBasedSummaryValues.loadCurrentQuery(tableid);
+                DQX.executeProcessing(function() {
+                    EditTableBasedSummaryValues.loadCurrentQuery(tableid);
+                });
             });
             content += bt.renderHtml();
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Pick samples...' }).setOnChanged(function() {
-                Popup.closeIfNeeded(popupid);
-                EditTableBasedSummaryValues.CreateDialogBox(tableid);
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Clear all' }).setOnChanged(function() {
+                DQX.executeProcessing(function() {
+                    tableInfo.genomeTrackSelectionManager.clearAll();
+                });
             });
             content += bt.renderHtml();
+
             var popupid = Popup.create('Genome tracks', content);
         };
 
@@ -34,7 +47,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var sortcolumn = tableInfo.primkey;
 
-            var maxlength = 100;
+            var maxlength = 200;
             var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableid);
             fetcher.setMaxResultCount(maxlength);
             fetcher.addColumn(tableInfo.primkey, 'GN');

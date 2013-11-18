@@ -509,7 +509,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var channelid=trackid+'_'+recordid;
                         if (that.panelBrowser.findChannel(channelid)) {
                             //Already exists - simply make visible
-                            that.panelBrowser.findChannelRequired(channelid).modifyVisibility(true);
+                            that.panelBrowser.findChannelRequired(channelid).modifyVisibility(true, true);
                         }
                         else {
                             //Does not exist - create
@@ -574,7 +574,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 if (channel.getVisible()) {
                                     if ( (!tableInfo.mapTableBasedSummaryValues[channel.fromTable_trackid].isVisible) ||
                                          (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) )
-                                        channel.modifyVisibility(false);
+                                        channel.modifyVisibility(false, true);
                                 }
                                 presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=channel.getVisible();
                             }
