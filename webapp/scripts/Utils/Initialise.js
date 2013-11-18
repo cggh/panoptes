@@ -43,23 +43,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.storeSettings = function() {
                 var settObj = {};
                 settObj.tableBasedSummaryValues = {}
-                alert('todo!!!');
-                debugger;
-/*                $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
-                    settObj.tableBasedSummaryValues[summaryInfo.trackid] = summaryInfo.selection___Manager.storeSettings();
-                });*/
+                settObj.tableBasedSummaryValues.selection = table.genomeTrackSelectionManager.storeSettings();
                 return settObj;
             }
 
             table.recallSettings = function(settObj) {
                 if (settObj.tableBasedSummaryValues) {
-                    alert('todo!!!');
-                    debugger;
-/*                    $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
-                        if (settObj.tableBasedSummaryValues[summaryInfo.trackid]) {
-                            summaryInfo.selection___Manager.recallSettings(settObj.tableBasedSummaryValues[summaryInfo.trackid]);
-                        }
-                    });*/
+                    if (settObj.tableBasedSummaryValues.selection)
+                        table.genomeTrackSelectionManager.recallSettings(settObj.tableBasedSummaryValues.selection);
                 }
             }
         }

@@ -24,6 +24,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (markInfo)
                             obj.mark = markInfo;
                         obj.settings = Controls.storeSettings(that.visibilityControlsGroup);
+                        obj.settingsButtons = Controls.storeSettings(that.buttonsGroup);
                     }
                     return obj;
                 };
@@ -38,17 +39,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if ((settObj.settings) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
 
-                    //Initialise all the table based summary values
-                    alert('todo!!!');
-                    debugger;
-/*                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
-                        $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryInfo) {
-                            $.each(summaryInfo.selection___Manager.getSelectedList(), function(idx2, recordid) {
-                                that.tableBasedSummaryValue_Add(tableInfo.id, summaryInfo.trackid, recordid);
-                            });
-                        });
-                    });*/
+                    if ((settObj.settingsButtons) && (that.buttonsGroup) )
+                        Controls.recallSettings(that.buttonsGroup, settObj.settingsButtons, false);
 
+                    //Initialise all the table based summary values
+                    $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                        that.rebuildTableBasedSummaryValues(tableInfo.id);
+                    });
                 };
 
 
@@ -152,7 +149,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
                     //Create controls for each table that has genome summary tracks defined
-                    var buttonsGroup = Controls.CompoundVert([]);
+                    that.buttonsGroup = Controls.CompoundVert([]);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select...",  width:120 }).setOnChanged(function() {
@@ -162,20 +159,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             $.each(tableInfo.quickFindFields, function(idx, propid) {
                                 states.push({id: propid, name: MetaData.findProperty(tableInfo.id,propid).name});
                             });
-                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Displayed field', states: states});
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Displayed field', states: states}).setClassID('genometrack_displayedfields_'+tableInfo.id);
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 that.updateTableBasedSummaryValueHeaders();
                             });
                             var activeTrackList = [];
                             $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                                var chk = Controls.Check(null,{label:summaryValue.trackname, value:summaryValue.settings.defaultVisible}).setOnChanged(function() {
+                                var chk = Controls.Check(null, {label:summaryValue.trackname, value:summaryValue.settings.defaultVisible}).setClassID('trackactive_'+tableInfo.id+'_'+summaryValue.trackid).setOnChanged(function() {
                                     tableInfo.mapTableBasedSummaryValues[chk.trackid].isVisible = chk.getValue();
                                     that.rebuildTableBasedSummaryValues(tableInfo.id);
                                 });
                                 chk.trackid = summaryValue.trackid;
                                 activeTrackList.push(chk);
                             });
-                            buttonsGroup.addControl(Controls.CompoundVert([
+                            that.buttonsGroup.addControl(Controls.CompoundVert([
                                 bt,
                                 tableInfo.genomeBrowserFieldChoice,
                                 Controls.CompoundVert(activeTrackList)
@@ -186,7 +183,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     this.panelControls.addControl(Controls.CompoundVert([
                         bt,
-                        buttonsGroup,
+                        that.buttonsGroup,
                         that.visibilityControlsGroup
                     ]));
 
