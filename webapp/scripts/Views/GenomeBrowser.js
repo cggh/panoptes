@@ -39,13 +39,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
 
                     //Initialise all the table based summary values
-                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                    alert('todo!!!');
+                    debugger;
+/*                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryInfo) {
-                            $.each(summaryInfo.selectionManager.getSelectedList(), function(idx2, recordid) {
+                            $.each(summaryInfo.selection___Manager.getSelectedList(), function(idx2, recordid) {
                                 that.tableBasedSummaryValue_Add(tableInfo.id, summaryInfo.trackid, recordid);
                             });
                         });
-                    });
+                    });*/
 
                 };
 
@@ -73,10 +75,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
-                        if (params.manager.isItemSelected(params.recordid))
+                        that.rebuildTableBasedSummaryValues(params.tableid);
+/*                        if (params.manager.isItemSelected(params.recordid))
                             that.tableBasedSummaryValue_Add(params.tableid, params.trackid, params.recordid);
                         else
-                            that.tableBasedSummaryValue_Del(params.tableid, params.trackid, params.recordid);
+                            that.tableBasedSummaryValue_Del(params.tableid, params.trackid, params.recordid);*/
                     });
 
                 }
@@ -153,7 +156,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select...",  width:120 }).setOnChanged(function() {
-                                EditTableBasedSummaryValues.CreateDialogBox(tableInfo.id);
+                                EditTableBasedSummaryValues.prompt(tableInfo.id);
                             });
                             states = [];
                             $.each(tableInfo.quickFindFields, function(idx, propid) {
@@ -163,9 +166,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 that.updateTableBasedSummaryValueHeaders();
                             });
+                            var activeTrackList = [];
+                            $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
+                                var chk = Controls.Check(null,{label:summaryValue.trackname, value:summaryValue.settings.defaultVisible}).setOnChanged(function() {
+                                    tableInfo.mapTableBasedSummaryValues[chk.trackid].isVisible = chk.getValue();
+                                    that.rebuildTableBasedSummaryValues(tableInfo.id);
+                                });
+                                chk.trackid = summaryValue.trackid;
+                                activeTrackList.push(chk);
+                            });
                             buttonsGroup.addControl(Controls.CompoundVert([
                                 bt,
-                                tableInfo.genomeBrowserFieldChoice
+                                tableInfo.genomeBrowserFieldChoice,
+                                Controls.CompoundVert(activeTrackList)
                             ]).setLegend('<h3>'+tableInfo.name+' tracks</h3>'));
                         }
                     });
@@ -554,16 +567,45 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
-                            that.panelBrowser.handleResize();
-                            that.updateTableBasedSummaryValueHeaders();
                         }
-                        //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
-                    }
+                    };
 
                     that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {
                         var channelid=trackid+'_'+recordid;
                         that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
-                    }
+                    };
+
+                    that.rebuildTableBasedSummaryValues = function(tableid) {
+                        var tableInfo=MetaData.mapTableCatalog[tableid];
+
+                        //remove tracks that are not visible anymore
+                        var presentMap = {};
+                        $.each(that.panelBrowser.getChannelList(), function(idx, channel) {
+                            if (channel.fromTable_tableid==tableid) {
+                                if ( (!tableInfo.mapTableBasedSummaryValues[channel.fromTable_trackid].isVisible) ||
+                                     (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) )
+                                    that.tableBasedSummaryValue_Del(channel.fromTable_tableid, channel.fromTable_trackid, channel.fromTable_recordid);
+                            }
+                            else
+                                presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=true;
+                        });
+
+                        //Add new tracks
+                        $.each(tableInfo.genomeTrackSelectionManager.getSelectedList(), function(idx, recordid) {
+                            $.each(tableInfo.tableBasedSummaryValues, function(idx2, summaryValue) {
+                                if (summaryValue.isVisible) {
+                                    if (!presentMap[summaryValue.trackid+'_'+recordid])
+                                        that.tableBasedSummaryValue_Add(tableid, summaryValue.trackid, recordid);
+                                }
+                            });
+                        });
+
+                        //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
+
+                        that.panelBrowser.handleResize();
+                        that.updateTableBasedSummaryValueHeaders();
+                    };
+
 
                     that.updateTableBasedSummaryValueHeaders = function() {
                         $.each(that.panelBrowser.getChannelList(), function(idx,channel) {

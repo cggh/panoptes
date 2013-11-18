@@ -43,19 +43,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.storeSettings = function() {
                 var settObj = {};
                 settObj.tableBasedSummaryValues = {}
-                $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
-                    settObj.tableBasedSummaryValues[summaryInfo.trackid] = summaryInfo.selectionManager.storeSettings();
-                });
+                alert('todo!!!');
+                debugger;
+/*                $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                    settObj.tableBasedSummaryValues[summaryInfo.trackid] = summaryInfo.selection___Manager.storeSettings();
+                });*/
                 return settObj;
             }
 
             table.recallSettings = function(settObj) {
                 if (settObj.tableBasedSummaryValues) {
-                    $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
+                    alert('todo!!!');
+                    debugger;
+/*                    $.each(table.tableBasedSummaryValues, function(idx, summaryInfo) {
                         if (settObj.tableBasedSummaryValues[summaryInfo.trackid]) {
-                            summaryInfo.selectionManager.recallSettings(settObj.tableBasedSummaryValues[summaryInfo.trackid]);
+                            summaryInfo.selection___Manager.recallSettings(settObj.tableBasedSummaryValues[summaryInfo.trackid]);
                         }
-                    });
+                    });*/
                 }
             }
         }
@@ -145,9 +149,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         Initialise.parseTableBasedSummaryValues = function() {
 
+
             $.each(MetaData.tableCatalog, function(idx, table) {
                 table.tableBasedSummaryValues = [];
                 table.mapTableBasedSummaryValues = {};
+                table.genomeTrackSelectionManager = TableRecordSelectionManager.Create(
+                    table.id+'_genometracks',
+                    table, function(id) {
+                        Msg.broadcast({ type: 'TableBasedSummaryValueSelectionChanged' }, {
+                            tableid:table.id,
+                            recordid:id
+                        });
+                    });
             });
 
             $.each(MetaData.tableBasedSummaryValues, function(idx, tableSummaryValue) {
@@ -167,36 +180,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                 }
                 tableSummaryValue.settings = settings;
+                tableSummaryValue.isVisible = tableSummaryValue.settings.defaultVisible;
 
                 var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
                 tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
-                tableSummaryValue.selectionManager = TableRecordSelectionManager.Create(
-                    tableSummaryValue.tableid+'_'+tableSummaryValue.trackid,
-                    tableInfo, function(id) {
-                        Msg.broadcast({ type: 'TableBasedSummaryValueSelectionChanged' }, {
-                            tableid:tableInfo.id,
-                            trackid:tableSummaryValue.trackid,
-                            recordid:id,
-                            manager:tableSummaryValue.selectionManager
-                        });
-
-                    });
                 tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
-                var q=0;
-/*                if (summaryValue.minval)
-                    summaryValue.minval = parseFloat(summaryValue.minval);
-                else
-                    summaryValue.minval = 0;
-                if (summaryValue.maxval)
-                    summaryValue.maxval = parseFloat(summaryValue.maxval);
-                else
-                    summaryValue.maxval = 0;
-                summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
-                summaryValue.isCustom = true;
-                var settings = { channelColor:'rgb(0,0,180)' };
-                if (summaryValue.settings)
-                    settings = $.extend(settings,JSON.parse(summaryValue.settings));
-                summaryValue.settings = settings;*/
             });
         };
 

@@ -5,6 +5,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         EditTableBasedSummaryValues.storedValues = {};
 
+        EditTableBasedSummaryValues.prompt = function(tableid) {
+            var content = '';
+            var str = 'Use current query';
+            var recordCount  = Application.getView('table_'+tableid).getRecordCount();
+            if (recordCount!=null)
+                str += '<br>('+recordCount+' items)';
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: str }).setOnChanged(function() {
+                Popup.closeIfNeeded(popupid);
+            });
+            content += bt.renderHtml();
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Pick samples...' }).setOnChanged(function() {
+                Popup.closeIfNeeded(popupid);
+                EditTableBasedSummaryValues.CreateDialogBox(tableid);
+            });
+            content += bt.renderHtml();
+            var popupid = Popup.create('Genome tracks', content);
+        };
 
         EditTableBasedSummaryValues.CreateDialogBox = function(tableid) {
             var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Genome tracks', blocking:true, sizeX:700, sizeY:500 });
@@ -30,7 +47,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     if (!propInfo.propCategories) {
-                        var ctrl = Controls.Edit(null,{size:18});
+                        var ctrl = Controls.Edit(null,{size:12});
                     }
                     else {
                         var cats = [{id:'', name:'[All]'}];
@@ -56,9 +73,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelButtons = Framework.Form(that.frameButtons);
 
                 var bt_clearall = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Clear all' }).setOnChanged(function() {
-                    $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                        summaryValue.selectionManager.clearAll();
-                    });
+                    that.tableInfo.genomeTrackSelectionManager.clearAll();
                     that.myTable.render();
                 });
 
@@ -96,16 +111,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.myTable.setQuery(SQL.WhereClause.Trivial());
 
 
-                //Create the selection columns for all genome tracks that are associated with records in this table
-                $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                    that.myTable.createSelectionColumn(
-                        summaryValue.trackid,
-                        summaryValue.trackname,that.tableInfo.id, that.tableInfo.primkey,
-                        summaryValue.selectionManager,
-                        function() {
-                            that.myTable.render();
-                        });
-                });
+                //Create the selection column
+                that.myTable.createSelectionColumn(
+                    'selection',
+                    'Active',that.tableInfo.id, that.tableInfo.primkey,
+                    that.tableInfo.genomeTrackSelectionManager,
+                    function() {
+                        that.myTable.render();
+                    });
 
                 $.each(that.tableInfo.quickFindFields, function(idx, propid) {
                     var propInfo = MetaData.findProperty(that.tableInfo.id,propid);

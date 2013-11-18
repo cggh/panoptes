@@ -206,6 +206,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     return str;
                 }
 
+                that.getRecordCount = function() {
+                    if (!that.myTable)
+                        return null;
+                    return that.myTable.getRecordCount();
+                }
+
 
                 that.updateQuery2 = function() {
                     if (that.myTable) {

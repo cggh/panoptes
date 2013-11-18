@@ -88,11 +88,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             that.editGenomeTracks = function() {
-                var str ='';
+                alert('todo!!!');
+                debugger;
+/*                var str ='';
                 $.each(that.tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                    var chk = Controls.Check(null, {label:summaryValue.trackname, value:summaryValue.selectionManager.isItemSelected(that.itemid)});
+                    var chk = Controls.Check(null, {label:summaryValue.trackname, value:summaryValue.selection___Manager.isItemSelected(that.itemid)});
                     chk.setOnChanged(function() {
-                        summaryValue.selectionManager.selectItem(that.itemid, chk.getValue());
+                        summaryValue.selection___Manager.selectItem(that.itemid, chk.getValue());
                     });
                     str += chk.renderHtml()+'<br>';
                 });
@@ -101,7 +103,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Popup.closeIfNeeded(popupid);
                 })
                 str += bt.renderHtml();
-                var popupid = Popup.create('Genome tracks',str);
+                var popupid = Popup.create('Genome tracks',str);*/
             }
 
 
