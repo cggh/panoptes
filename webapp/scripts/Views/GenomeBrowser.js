@@ -517,26 +517,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                             var folder=that.summaryFolder+'/TableTracks/'+tableid+'/'+trackid+'/'+recordid;
 
-                            var SummChannel = that.channelMap[channelid];
-                            if (!SummChannel) {
-                                var SummChannel = ChannelYVals.Channel(channelid, { minVal: summaryValue.minval, maxVal: summaryValue.maxval });//Create the channel
-                                SummChannel
-                                    .setTitle(channelid).setHeight(120, true)
-                                    .setChangeYScale(true,true);//makes the scale adjustable by dragging it
-                                SummChannel.controls = Controls.CompoundVert([]);
-                                SummChannel.fromTable_tableid = tableid;
-                                SummChannel.fromTable_trackid = trackid;
-                                SummChannel.fromTable_recordid = recordid;
-                                SummChannel.setSubTitle(summaryValue.trackname);
-                                SummChannel.setOnClickHandler(function() {
-                                    Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: recordid } );
-                                });
+                            var SummChannel = ChannelYVals.Channel(channelid, { minVal: summaryValue.minval, maxVal: summaryValue.maxval });//Create the channel
+                            SummChannel
+                                .setTitle(channelid).setHeight(120, true)
+                                .setChangeYScale(true,true);//makes the scale adjustable by dragging it
+                            SummChannel.controls = Controls.CompoundVert([]);
+                            SummChannel.fromTable_tableid = tableid;
+                            SummChannel.fromTable_trackid = trackid;
+                            SummChannel.fromTable_recordid = recordid;
+                            SummChannel.setSubTitle(summaryValue.trackname);
+                            SummChannel.setOnClickHandler(function() {
+                                Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: recordid } );
+                            });
 
-                                that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
-                                that.channelMap[channelid] = SummChannel;
-                            }
-
-                            //that.listSummaryChannels.push(channelid);
+                            that.panelBrowser.addChannel(SummChannel);//Add the channel to the browser
+                            that.channelMap[channelid] = SummChannel;
 
                             var theColor = DQX.parseColorString(summaryValue.settings.channelColor);;
 
@@ -569,16 +564,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         //remove tracks that are not visible anymore
 
                         var presentMap = {};
+                        var toDeleteList = [];
                         $.each(that.panelBrowser.getChannelList(), function(idx, channel) {
                             if (channel.fromTable_tableid==tableid) {
                                 if (channel.getVisible()) {
                                     if ( (!tableInfo.mapTableBasedSummaryValues[channel.fromTable_trackid].isVisible) ||
-                                         (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) )
+                                         (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) ) {
                                         channel.modifyVisibility(false, true);
+                                        toDeleteList.push(channel.getID());
+                                    }
                                 }
                                 presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=channel.getVisible();
                             }
                         });
+
+                        $.each(toDeleteList, function(idx,channelid) {
+                            that.panelBrowser.delChannel(channelid);
+                        });
+
 
                         //Add new tracks
                         $.each(tableInfo.genomeTrackSelectionManager.getSelectedList(), function(idx, recordid) {

@@ -45,7 +45,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (!currentQuery)
                 currentQuery = SQL.WhereClause.Trivial();
 
-            var sortcolumn = tableInfo.primkey;
+            var sortcolumn = tableView.getSortColumn();
 
             var maxlength = 200;
             var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableid);

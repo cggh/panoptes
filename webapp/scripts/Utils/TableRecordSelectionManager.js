@@ -35,9 +35,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             that.clearAll = function() {
-                $.each(that.getSelectedList(), function(idx, key) {
-                    that.selectItem(key,false, true);
-                });
+                that.mem = {};
                 that.notifyChanged();
             }
 

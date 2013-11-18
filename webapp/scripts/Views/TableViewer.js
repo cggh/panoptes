@@ -204,13 +204,19 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                     str += '</div>';
                     return str;
-                }
+                };
 
                 that.getRecordCount = function() {
                     if (!that.myTable)
                         return null;
                     return that.myTable.getRecordCount();
-                }
+                };
+
+                that.getSortColumn = function() {
+                    if (!that.myTable)
+                        return MetaData.mapTableCatalog[that.tableid].primkey;
+                    return that.myTable.getSortColumn();
+                };
 
 
                 that.updateQuery2 = function() {
@@ -221,7 +227,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableInfo.currentQuery = that.theQuery.get();
                         Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
                     }
-                }
+                };
 
                 that.reLoad = function() {
                     var tableInfo = MetaData.mapTableCatalog[that.tableid];
