@@ -42,6 +42,8 @@ git clone git@github.com:malariagen/DQXServer.git
 virtualenv DQXServer
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
+sed -i -e "s/localhost/${DBHOST}/" -e "s/root/${DBUSER}/" -e "s/1234/${DBPASS}/" -e "s/pf21/NA/" -e 's#C:/Data/Test/Genome#/srv/NA#' config.py
+
 echo "Installing python dependancies"
 source bin/activate
 pip install -q -r REQUIREMENTS
