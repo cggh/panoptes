@@ -73,10 +73,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
                         that.rebuildTableBasedSummaryValues(params.tableid);
-/*                        if (params.manager.isItemSelected(params.recordid))
-                            that.tableBasedSummaryValue_Add(params.tableid, params.trackid, params.recordid);
-                        else
-                            that.tableBasedSummaryValue_Del(params.tableid, params.trackid, params.recordid);*/
                     });
 
                 }
@@ -567,24 +563,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     };
 
-                    that.tableBasedSummaryValue_Del = function(tableid, trackid, recordid) {
-                        var channelid=trackid+'_'+recordid;
-                        that.panelBrowser.findChannelRequired(channelid).modifyVisibility(false);
-                    };
-
                     that.rebuildTableBasedSummaryValues = function(tableid) {
                         var tableInfo=MetaData.mapTableCatalog[tableid];
 
                         //remove tracks that are not visible anymore
+
                         var presentMap = {};
                         $.each(that.panelBrowser.getChannelList(), function(idx, channel) {
                             if (channel.fromTable_tableid==tableid) {
-                                if ( (!tableInfo.mapTableBasedSummaryValues[channel.fromTable_trackid].isVisible) ||
-                                     (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) )
-                                    that.tableBasedSummaryValue_Del(channel.fromTable_tableid, channel.fromTable_trackid, channel.fromTable_recordid);
+                                if (channel.getVisible()) {
+                                    if ( (!tableInfo.mapTableBasedSummaryValues[channel.fromTable_trackid].isVisible) ||
+                                         (!tableInfo.genomeTrackSelectionManager.isItemSelected(channel.fromTable_recordid)) )
+                                        channel.modifyVisibility(false);
+                                }
+                                presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=channel.getVisible();
                             }
-                            else
-                                presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=true;
                         });
 
                         //Add new tracks

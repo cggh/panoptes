@@ -13,6 +13,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 str += '<br>('+recordCount+' items)';
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
+                EditTableBasedSummaryValues.loadCurrentQuery(tableid);
             });
             content += bt.renderHtml();
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Pick samples...' }).setOnChanged(function() {
@@ -22,6 +23,37 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += bt.renderHtml();
             var popupid = Popup.create('Genome tracks', content);
         };
+
+
+        EditTableBasedSummaryValues.loadCurrentQuery = function(tableid) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableView = Application.getView('table_'+tableid);
+            var currentQuery = tableView.theQuery.get();
+            if (!currentQuery)
+                currentQuery = SQL.WhereClause.Trivial();
+
+            var sortcolumn = tableInfo.primkey;
+
+            var maxlength = 100;
+            var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableid);
+            fetcher.setMaxResultCount(maxlength);
+            fetcher.addColumn(tableInfo.primkey, 'GN');
+            fetcher.getData(currentQuery, sortcolumn, function (data) {
+                    var list = data[tableInfo.primkey];
+                    if (list.length>=maxlength)
+                        alert('WARNING: set will be truncated to '+maxlength);
+                    var cnt = 0;
+                    $.each(list, function(idx, key) {
+                        cnt += 1;
+                        if (cnt<=maxlength) {
+                            tableInfo.genomeTrackSelectionManager.selectItem(key,true, true);
+                        }
+                    });
+                    tableInfo.genomeTrackSelectionManager.notifyChanged();
+                }
+            );
+        };
+
 
         EditTableBasedSummaryValues.CreateDialogBox = function(tableid) {
             var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Genome tracks', blocking:true, sizeX:700, sizeY:500 });

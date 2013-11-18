@@ -19,20 +19,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return (that.mem[id]);
             };
 
-            that.selectItem = function(id, newstate) {
+            that.selectItem = function(id, newstate, preventNotify) {
                 if (that.mem[id]!=newstate) {
                     that.mem[id]=newstate;
                     if (newstate)
                         that.fieldCache.add(id);
-                    if (that.onChangedHandler)
-                        that.onChangedHandler(id);
+                    if ((that.onChangedHandler)&&(!preventNotify))
+                            that.onChangedHandler(id);
                 }
             };
 
+            that.notifyChanged = function() {
+                if (that.onChangedHandler)
+                    that.onChangedHandler(id);
+            }
+
             that.clearAll = function() {
                 $.each(that.getSelectedList(), function(idx, key) {
-                    that.selectItem(key,false);
+                    that.selectItem(key,false, true);
                 });
+                that.notifyChanged();
             }
 
             that.getSelectedList = function() {
