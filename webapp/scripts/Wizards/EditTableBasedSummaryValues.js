@@ -69,7 +69,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var sortcolumn = tableView.getSortColumn();
 
             var maxlength = 200;
-            var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableid);
+            var fetcher = DataFetchers.RecordsetFetcher(
+                MetaData.serverUrl,
+                MetaData.database,
+                tableid + 'CMB_' + MetaData.workspaceid
+            );
             fetcher.setMaxResultCount(maxlength);
             fetcher.addColumn(tableInfo.primkey, 'GN');
             fetcher.getData(currentQuery, sortcolumn, function (data) {
