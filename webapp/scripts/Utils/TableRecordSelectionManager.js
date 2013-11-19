@@ -48,6 +48,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return activeList;
             }
 
+            that.getSelectedCount = function() {
+                var cnt = 0;
+                $.each(that.mem, function(key, val) {
+                    if (val)
+                        cnt += 1;
+                });
+                return cnt;
+            }
+
             that.storeSettings = function() {
                 return JSON.stringify(that.getSelectedList());
             };

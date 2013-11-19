@@ -32,13 +32,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if ('QuickFindFields' in table.settings)
                 table.quickFindFields = table.settings.QuickFindFields.split(',');
 
+
+
+
             table.isItemSelected = function(id) { return table.currentSelection[id]; }
+
             table.selectItem = function(id, newState) {
                 if (newState)
                     table.currentSelection[id] = true;
                 else
                     delete table.currentSelection[id];
             }
+
+            table.getSelectedList = function() {
+                var activeList = [];
+                $.each(table.currentSelection, function(key, val) {
+                    if (val)
+                        activeList.push(key);
+                });
+                return activeList;
+            }
+
+
+
 
             table.storeSettings = function() {
                 var settObj = {};

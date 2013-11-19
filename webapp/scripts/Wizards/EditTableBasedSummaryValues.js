@@ -9,7 +9,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var content = '';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Pick samples...' }).setOnChanged(function() {
+            var countInfo = Controls.Html(null,'');
+            content += countInfo.renderHtml()+'<p>';
+            var updateCountInfo = function() {
+                countInfo.modifyValue('Currently visible: '+tableInfo.genomeTrackSelectionManager.getSelectedCount());
+            }
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Pick samples...' }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 EditTableBasedSummaryValues.CreateDialogBox(tableid);
             });
@@ -19,7 +25,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var recordCount  = Application.getView('table_'+tableid).getRecordCount();
             if (recordCount!=null)
                 str += '<br>('+recordCount+' items)';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: str }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 DQX.executeProcessing(function() {
                     EditTableBasedSummaryValues.loadCurrentQuery(tableid);
@@ -27,14 +33,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += bt.renderHtml();
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Clear all' }).setOnChanged(function() {
+
+            var str = 'Use current selection';
+            var recordCount  = tableInfo.getSelectedList().length;
+            str += '<br>('+recordCount+' items)';
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: str }).setOnChanged(function() {
+                Popup.closeIfNeeded(popupid);
                 DQX.executeProcessing(function() {
-                    tableInfo.genomeTrackSelectionManager.clearAll();
+                    EditTableBasedSummaryValues.loadCurrentSelection(tableid);
                 });
             });
             content += bt.renderHtml();
 
-            var popupid = Popup.create('Genome tracks', content);
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Clear all' }).setOnChanged(function() {
+                DQX.executeProcessing(function() {
+                    tableInfo.genomeTrackSelectionManager.clearAll();
+                    updateCountInfo();
+                });
+            });
+            content += bt.renderHtml();
+
+            var popupid = Popup.create(tableInfo.name+' genome tracks', content);
+            updateCountInfo();
         };
 
 
@@ -65,6 +86,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     tableInfo.genomeTrackSelectionManager.notifyChanged();
                 }
             );
+        };
+
+
+        EditTableBasedSummaryValues.loadCurrentSelection = function(tableid) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
+            $.each(tableInfo.getSelectedList(), function(idx, key) {
+                tableInfo.genomeTrackSelectionManager.selectItem(key,true, true);
+            });
+            tableInfo.genomeTrackSelectionManager.notifyChanged();
         };
 
 
