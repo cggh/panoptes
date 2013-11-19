@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "Wizards/ManageStoredEntities", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, ManageStoredEntities, MetaData) {
 
         var QueryTool = {};
 
@@ -39,6 +39,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.notifyQueryUpdated();
             }
 
+            that.createPickSortedQueryStates = function() {
+                var states = [];
+                states.push({id:'', name:'- Pick stored query -'})
+                states.push({id:'_manage_', name:'- Manage queries... -'})
+                return states;
+            }
+
 
             that.createControl = function() {
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
@@ -47,6 +54,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.modify(query);
                     });
                 });
+
+                that.ctrlPick = Controls.Combo(null, { label:'', states:that.createPickSortedQueryStates()}).setOnChanged(that.handlePickQuery);
 
                 that.buttonPrevQuery = Controls.Button(null, { content: 'Previous'}).setOnChanged(function() {
                     if (that.prevQueries.length>0) {
@@ -62,6 +71,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 var group = Controls.CompoundVert([
                     buttonDefineQuery,
+                    that.ctrlPick,
                     that.buttonPrevQuery,
                     that.ctrlQueryString
                 ]);
@@ -69,6 +79,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 group.setLegend("Active "+that.tableInfo.name);
 
                 return group;
+            }
+
+
+            that.handlePickQuery = function() {
+                var state = that.ctrlPick.getValue();
+                that.ctrlPick.modifyValue('');
+
+                if (state=='_manage_') {
+                    newValue = null;
+                    if (that.query)
+                        newValue = that.store();
+                    ManageStoredEntities.manage('storedqueries', 'stored query', 'stored queries', newValue);
+                }
             }
 
             return that;
