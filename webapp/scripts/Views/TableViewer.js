@@ -239,7 +239,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.theTableFetcher.resetAll();
                     that.myTable.clearTableColumns();
 
-                    that.myTable.createSelectionColumn("sel","Sel",tableInfo.id, tableInfo.primkey, tableInfo, function() {
+                    that.myTable.createSelectionColumn("sel", "Sel", tableInfo.id, tableInfo.primkey, tableInfo, DQX.Color(1,0,0), function() {
                         Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
                     });
 

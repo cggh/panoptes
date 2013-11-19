@@ -66,7 +66,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.ctrlQueryString
                 ]);
 
-                group.setLegend("Restricting query");
+                group.setLegend("Active "+that.tableInfo.name);
 
                 return group;
             }

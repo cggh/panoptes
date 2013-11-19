@@ -12,7 +12,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var countInfo = Controls.Html(null,'');
             content += countInfo.renderHtml()+'<p>';
             var updateCountInfo = function() {
-                countInfo.modifyValue('Currently visible: '+tableInfo.genomeTrackSelectionManager.getSelectedCount());
+                countInfo.modifyValue('Currently active: '+tableInfo.genomeTrackSelectionManager.getSelectedCount());
             }
 
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Pick samples...' }).setOnChanged(function() {
@@ -54,7 +54,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += bt.renderHtml();
 
-            var popupid = Popup.create(tableInfo.name+' genome tracks', content);
+            var popupid = Popup.create(tableInfo.name+' active genome tracks', content);
             updateCountInfo();
         };
 
@@ -99,7 +99,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         EditTableBasedSummaryValues.CreateDialogBox = function(tableid) {
-            var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Genome tracks', blocking:true, sizeX:700, sizeY:500 });
+            var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Active genome tracks', blocking:true, sizeX:700, sizeY:500 });
             that.tableInfo = MetaData.mapTableCatalog[tableid];
 
             that.createFrames = function() {
@@ -191,6 +191,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     'selection',
                     'Active',that.tableInfo.id, that.tableInfo.primkey,
                     that.tableInfo.genomeTrackSelectionManager,
+                    DQX.Color(0,0.5,0),
                     function() {
                         that.myTable.render();
                     });

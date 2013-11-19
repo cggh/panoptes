@@ -148,7 +148,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.buttonsGroup = Controls.CompoundVert([]);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select...",  width:120 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active...",  width:120 }).setOnChanged(function() {
                                 EditTableBasedSummaryValues.prompt(tableInfo.id);
                             });
                             states = [];
@@ -523,6 +523,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 .setChangeYScale(true,true);//makes the scale adjustable by dragging it
                             SummChannel.controls = Controls.CompoundVert([]);
                             SummChannel.fromTable_tableid = tableid;
+                            SummChannel.fromTable_trackid = trackid;
                             SummChannel.fromTable_trackid = trackid;
                             SummChannel.fromTable_recordid = recordid;
                             SummChannel.setSubTitle(summaryValue.trackname);
