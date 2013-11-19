@@ -141,7 +141,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
                                     Initialise.parseTableBasedSummaryValues();
-                                    if (proceedFunction) proceedFunction();
+                                    if (proceedFunction)
+                                        Initialise.waitForCompletion(proceedFunction);
                                 }
                             );
                         }

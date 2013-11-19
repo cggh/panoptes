@@ -14,6 +14,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
         }
 
+        Initialise._waitcount = 0;
+        Initialise.incrWait = function() { Initialise._waitcount+=1; }
+        Initialise.decrWait = function() { Initialise._waitcount-=1; }
+
+        Initialise.waitForCompletion = function(proceedFunction) {
+            function dowait() {
+                if (Initialise._waitcount<=0)
+                    proceedFunction();
+                else
+                    setTimeout(dowait, 50);
+            }
+            dowait();
+        }
+
         Initialise.augmentTableInfo = function(table) {
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
@@ -140,12 +154,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         SQL.WhereClause.Trivial(), { distinct:true }
                     );
                     prop.propCategories = [];
+                    Initialise.incrWait();
                     getter.execute(MetaData.serverUrl,MetaData.database,
                         function() {
-                            $.each(getter.getTableRecords(prop.tableid), function(idx, rec) {
+                            var records = getter.getTableRecords(prop.tableid);
+                            $.each(records, function(idx, rec) {
                                 prop.propCategories.push(rec[prop.propid]);
                             });
-                            var q=0;
+                            Initialise.decrWait();
                         }
                     );
                 }
