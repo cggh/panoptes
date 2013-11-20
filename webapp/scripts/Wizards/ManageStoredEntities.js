@@ -83,7 +83,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                             }
                             , function() {
                                 that.reload();
-                                //Msg.broadcast({ type: 'StoredQueriesModified'}, {})
+                                Msg.broadcast({ type: 'StoredQueriesModified'}, { tableid: that.tableid});
                             });
                     }
                 }
@@ -104,7 +104,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                             content: newValue
                         }
                         , function(resp) {
-                        that.reload();
+                            that.reload();
+                            Msg.broadcast({ type: 'StoredQueriesModified'}, { tableid: that.tableid});
                     });
                 }
             }

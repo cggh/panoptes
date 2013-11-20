@@ -49,7 +49,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 });
 
-                var states = [ {id:'', name:'- Stored queries -'}, {id:'_manage_', name:'- Manage... -'} ];
+                var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
                 that.ctrlPick = Controls.Combo(null, { label:'', states:states }).setOnChanged(that.handlePickQuery);
 
                 that.buttonPrevQuery = Controls.Button(null, { content: 'Previous'}).setOnChanged(function() {
@@ -75,6 +75,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 group.setLegend("Active "+that.tableInfo.name);
 
+                Msg.listen('', { type: 'StoredQueriesModified'}, function(scope, content) {
+                    if (content.tableid == that.tableInfo.id)
+                        that.updateStoredQueries();
+                });
+
+
                 return group;
             }
 
@@ -91,6 +97,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var data = getter.getTableRecords('storedqueries');
                     var states = [];
                     states.push({id:'', name:'[ Stored queries ]'})
+                    states.push({id:'_all_', name:'All '+that.tableInfo.name})
                     $.each(data, function(idx, record) {
                         states.push({id:record.id, name:record.name});
                     });
@@ -109,6 +116,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (that.query)
                         newValue = that.store();
                     ManageStoredEntities.manage('storedqueries', that.tableInfo.id, 'stored query', 'stored queries', newValue);
+                    return;
+                }
+
+                if (state=='_all_') {
+                    that.modify(SQL.WhereClause.Trivial());
                     return;
                 }
 
