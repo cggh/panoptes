@@ -55,14 +55,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += bt.renderHtml();
 
-            content += '<p>';
+            content += '<p/>';
 
             var picker = QueryTool.CreateStoredQueryPicker(tableid, function(query) {
                 EditTableBasedSummaryValues.loadQuery(tableid, query);
                 Popup.closeIfNeeded(popupid);
             });
-            content += picker.renderHtml();
-            content += '<p>';
+            content += 'Load a query: '+picker.renderHtml();
+            content += '<p/>';
 
             var popupid = Popup.create(tableInfo.name+' active genome tracks', content);
             updateCountInfo();
