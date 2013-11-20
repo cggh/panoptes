@@ -7,8 +7,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
 
 
 
-        ManageStoredEntities.manage = function(tablename, nameSingle, namePlural, newValue) {
+        ManageStoredEntities.manage = function(tablename, tableid, nameSingle, namePlural, newValue) {
             var that = PopupFrame.PopupFrame('ManageEntity_'+tablename, {title:'Manage '+namePlural, blocking:true, sizeX:400, sizeY:350 });
+            that.tablename = tablename;
+            that.tableid = tableid;
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
@@ -49,13 +51,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
             that.reload = function() {
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable(
-                    'storedqueries',
+                    tablename,
                     ['id','name'],
                     'name',
-                    SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid)
+                    SQL.WhereClause.AND([
+                        SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),
+                        SQL.WhereClause.CompareFixed('tableid','=',that.tableid)
+                    ])
                 );
                 getter.execute(MetaData.serverUrl, MetaData.database, function() {
-                    var data = getter.getTableRecords('storedqueries');
+                    var data = getter.getTableRecords(tablename);
                     var items = [];
                     $.each(data, function(idx, record) {
                         items.push({id:record.id, content:record.name});
@@ -78,6 +83,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                             }
                             , function() {
                                 that.reload();
+                                //Msg.broadcast({ type: 'StoredQueriesModified'}, {})
                             });
                     }
                 }
@@ -92,6 +98,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                         {
                             database: MetaData.database,
                             tablename: tablename,
+                            tableid: that.tableid,
                             workspaceid: MetaData.workspaceid,
                             name: name,
                             content: newValue

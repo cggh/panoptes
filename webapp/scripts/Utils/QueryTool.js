@@ -39,12 +39,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.notifyQueryUpdated();
             }
 
-            that.createPickSortedQueryStates = function() {
-                var states = [];
-                states.push({id:'', name:'- Pick stored query -'})
-                states.push({id:'_manage_', name:'- Manage queries... -'})
-                return states;
-            }
 
 
             that.createControl = function() {
@@ -55,7 +49,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 });
 
-                that.ctrlPick = Controls.Combo(null, { label:'', states:that.createPickSortedQueryStates()}).setOnChanged(that.handlePickQuery);
+                var states = [ {id:'', name:'- Stored queries -'}, {id:'_manage_', name:'- Manage... -'} ];
+                that.ctrlPick = Controls.Combo(null, { label:'', states:states }).setOnChanged(that.handlePickQuery);
 
                 that.buttonPrevQuery = Controls.Button(null, { content: 'Previous'}).setOnChanged(function() {
                     if (that.prevQueries.length>0) {
@@ -76,11 +71,34 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.ctrlQueryString
                 ]);
 
+                that.updateStoredQueries();
+
                 group.setLegend("Active "+that.tableInfo.name);
 
                 return group;
             }
 
+            that.updateStoredQueries = function() {
+                var getter = DataFetchers.ServerDataGetter();
+                getter.addTable(
+                    'storedqueries',['id','name'],'name',
+                    SQL.WhereClause.AND([
+                        SQL.WhereClause.CompareFixed('workspaceid', '=', MetaData.workspaceid),
+                        SQL.WhereClause.CompareFixed('tableid', '=', that.tableInfo.id)
+                    ])
+                );
+                getter.execute(MetaData.serverUrl, MetaData.database, function() {
+                    var data = getter.getTableRecords('storedqueries');
+                    var states = [];
+                    states.push({id:'', name:'[ Stored queries ]'})
+                    $.each(data, function(idx, record) {
+                        states.push({id:record.id, name:record.name});
+                    });
+                    states.push({id:'_manage_', name:'[ Manage... ]'})
+                    that.ctrlPick.setItems(states,'');
+                    //debugger;
+                });
+            };
 
             that.handlePickQuery = function() {
                 var state = that.ctrlPick.getValue();
@@ -90,7 +108,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     newValue = null;
                     if (that.query)
                         newValue = that.store();
-                    ManageStoredEntities.manage('storedqueries', 'stored query', 'stored queries', newValue);
+                    ManageStoredEntities.manage('storedqueries', that.tableInfo.id, 'stored query', 'stored queries', newValue);
+                    return;
+                }
+
+                if (state) {
+                    DataFetchers.fetchSingleRecord(MetaData.serverUrl, MetaData.database, 'storedqueries', 'id', state, function(rsp) {
+                        that.modify(SQL.WhereClause.decode(rsp.content));
+                    });
+
                 }
             }
 

@@ -11,6 +11,7 @@ def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tablename = DQXDbTools.ToSafeIdentifier(returndata['tablename'])
+    tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     name = DQXDbTools.ToSafeIdentifier(returndata['name'])
     content = returndata['content']
 
@@ -22,7 +23,7 @@ def response(returndata):
     cur = db.cursor()
 
 
-    sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', %s)".format(tablename, uid, name, workspaceid)
+    sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(tablename, uid, name, tableid, workspaceid)
     #print(sql)
     cur.execute(sql, (content) )
 
