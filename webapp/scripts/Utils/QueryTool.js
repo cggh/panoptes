@@ -42,6 +42,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.createControl = function() {
+
+                var theControl = Controls.BaseCustom();
+
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
@@ -50,9 +53,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
-                that.ctrlPick = Controls.Combo(null, { label:'', states:states }).setOnChanged(that.handlePickQuery);
+                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:130 }).setOnChanged(that.handlePickQuery);
 
-                that.buttonPrevQuery = Controls.Button(null, { content: 'Previous'}).setOnChanged(function() {
+                that.buttonPrevQuery = Controls.Button(null, { content: 'Previous', hint:'Back to previous query', buttonClass: 'DQXToolButton2', bitmap: DQX.BMP('link2.png'), width:120, height:20}).setOnChanged(function() {
                     if (that.prevQueries.length>0) {
                         that.query = SQL.WhereClause.decode(that.prevQueries.pop());
                         that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
@@ -62,6 +65,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
                 that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
 
+
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 
                 var group = Controls.CompoundVert([
@@ -69,19 +73,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.ctrlPick,
                     that.buttonPrevQuery,
                     that.ctrlQueryString
-                ]);
+
+                ]).setLegend("Active "+that.tableInfo.name);
 
                 that.updateStoredQueries();
-
-                group.setLegend("Active "+that.tableInfo.name);
 
                 Msg.listen('', { type: 'StoredQueriesModified'}, function(scope, content) {
                     if (content.tableid == that.tableInfo.id)
                         that.updateStoredQueries();
                 });
 
+                theControl.addControl(group);
 
-                return group;
+                return theControl;
+                //return group;
             }
 
             that.updateStoredQueries = function() {
@@ -101,7 +106,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     $.each(data, function(idx, record) {
                         states.push({id:record.id, name:record.name});
                     });
-                    states.push({id:'_manage_', name:'[ Manage... ]'})
+                    states.push({id:'_manage_', name:'---- EDIT LIST ----'})
                     that.ctrlPick.setItems(states,'');
                     //debugger;
                 });

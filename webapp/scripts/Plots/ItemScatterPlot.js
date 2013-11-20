@@ -530,17 +530,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select items in range (replace)",  width:120, height:30 }).setOnChanged(function() {
+                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Highlight items in range (replace)",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(0);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select items in range (add)",  width:120, height:30 }).setOnChanged(function() {
+                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Highlight items in range (add)",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(2);
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unselect items in range",  width:120, height:30 }).setOnChanged(function() {
+                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unhighlight items in range",  width:120, height:30 }).setOnChanged(function() {
                     doSelect(3);
                     Popup.closeIfNeeded(popupid);
                 });

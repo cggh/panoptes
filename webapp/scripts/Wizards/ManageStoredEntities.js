@@ -26,12 +26,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
 
                 that.reload();
 
-                var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Add current...' }).setOnChanged(that.onAdd);
-                var bt_del = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Delete selected' }).setOnChanged(that.onDel);
+                var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Add current...', bitmap: DQX.BMP('morelines.png'), width:100, height:28 }).setOnChanged(that.onAdd);
+                var bt_del = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Delete selected...', bitmap: DQX.BMP('lesslines.png'), width:100, height:28 }).setOnChanged(that.onDel);
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
-                var bt_close = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Close', bitmap: DQX.BMP('ok.png'), width:80, height:25 }).setOnChanged(function() {
+                var bt_close = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Close', /*width:80,*/ height:25 }).setOnChanged(function() {
                     that.close();
                 });
 

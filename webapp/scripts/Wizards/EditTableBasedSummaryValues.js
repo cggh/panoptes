@@ -15,7 +15,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 countInfo.modifyValue('Currently active: '+tableInfo.genomeTrackSelectionManager.getSelectedCount());
             }
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Pick samples...' }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Pick '+tableInfo.name+'...' }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 EditTableBasedSummaryValues.CreateDialogBox(tableid);
             });
@@ -34,7 +34,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += bt.renderHtml();
 
 
-            var str = 'Use current selection';
+            var str = 'Use currently highlighted';
             var recordCount  = tableInfo.getSelectedList().length;
             str += '<br>('+recordCount+' items)';
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: str }).setOnChanged(function() {
