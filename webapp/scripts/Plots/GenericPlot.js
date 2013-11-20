@@ -20,7 +20,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.plotTypeID = plotTypeID;
             that.tableInfo = MetaData.mapTableCatalog[tableid];
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
-            that.theQuery = QueryTool.Create(tableid);
+            that.theQuery = QueryTool.Create(tableid, {includeCurrentQuery:true});
 
             that.onClose = function() {
                 $.each(that.eventids,function(idx,eventid) {

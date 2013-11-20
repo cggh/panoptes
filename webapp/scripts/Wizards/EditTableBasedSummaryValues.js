@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, QueryTable, QueryBuilder, DataFetchers, DocEl, DQX, Wizard, Popup, PopupFrame, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "Utils/QueryTool", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, QueryTable, QueryBuilder, DataFetchers, DocEl, DQX, Wizard, Popup, PopupFrame, QueryTool, MetaData) {
 
         var EditTableBasedSummaryValues = {};
 
@@ -48,11 +48,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Clear all' }).setOnChanged(function() {
                 DQX.executeProcessing(function() {
+                    Popup.closeIfNeeded(popupid);
                     tableInfo.genomeTrackSelectionManager.clearAll();
-                    updateCountInfo();
+//                    updateCountInfo();
                 });
             });
             content += bt.renderHtml();
+
+            content += '<p>';
+
+            var picker = QueryTool.CreateStoredQueryPicker(tableid, function(query) {
+                EditTableBasedSummaryValues.loadQuery(tableid, query);
+                Popup.closeIfNeeded(popupid);
+            });
+            content += picker.renderHtml();
+            content += '<p>';
 
             var popupid = Popup.create(tableInfo.name+' active genome tracks', content);
             updateCountInfo();
@@ -62,12 +72,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         EditTableBasedSummaryValues.loadCurrentQuery = function(tableid) {
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var tableView = Application.getView('table_'+tableid);
+
+
             var currentQuery = tableView.theQuery.get();
             if (!currentQuery)
                 currentQuery = SQL.WhereClause.Trivial();
+            currentQuery.sortColumn = tableView.getSortColumn();
 
-            var sortcolumn = tableView.getSortColumn();
+            EditTableBasedSummaryValues.loadQuery(tableid,currentQuery);
+        };
 
+        EditTableBasedSummaryValues.loadQuery = function(tableid, query) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableView = Application.getView('table_'+tableid);
+
+            tableInfo.genomeTrackSelectionManager.clearAll();
+
+            var sortColumn = query.sortColumn;
+            if (!sortColumn)
+                sortColumn = tableInfo.primkey;
             var maxlength = 200;
             var fetcher = DataFetchers.RecordsetFetcher(
                 MetaData.serverUrl,
@@ -76,7 +99,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             fetcher.setMaxResultCount(maxlength);
             fetcher.addColumn(tableInfo.primkey, 'GN');
-            fetcher.getData(currentQuery, sortcolumn, function (data) {
+            fetcher.getData(query, sortColumn, function (data) {
                     var list = data[tableInfo.primkey];
                     if (list.length>=maxlength)
                         alert('WARNING: set will be truncated to '+maxlength);
@@ -95,6 +118,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         EditTableBasedSummaryValues.loadCurrentSelection = function(tableid) {
             var tableInfo = MetaData.mapTableCatalog[tableid];
+            tableInfo.genomeTrackSelectionManager.clearAll();
             $.each(tableInfo.getSelectedList(), function(idx, key) {
                 tableInfo.genomeTrackSelectionManager.selectItem(key,true, true);
             });
