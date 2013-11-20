@@ -31,6 +31,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     MetaData.mapTableCatalog[tableid].name+' table'  // View title
                 );
 
+                that.setEarlyInitialisation();
+
                 that.tableid = tableid;
 
                 that.theQuery = QueryTool.Create(tableid);

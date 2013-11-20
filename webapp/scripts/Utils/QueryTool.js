@@ -47,7 +47,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createControl = function() {
 
-                var theControl = Controls.BaseCustom();
+                var theControl = Controls.BaseCustom(true);
+                theControl.setLegend("Active "+that.tableInfo.name).setAutoFillX(true);
 
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
@@ -72,13 +73,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 
-                var group = Controls.CompoundVert([
-                    buttonDefineQuery,
-                    that.ctrlPick,
-                    that.buttonPrevQuery,
-                    that.ctrlQueryString
+                theControl.addControl(buttonDefineQuery);
+                theControl.addControl(that.ctrlPick);
+                theControl.addControl(that.buttonPrevQuery);
+                theControl.addControl(that.ctrlQueryString);
 
-                ]).setLegend("Active "+that.tableInfo.name);
 
                 that.updateStoredQueries();
 
@@ -86,8 +85,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (content.tableid == that.tableInfo.id)
                         that.updateStoredQueries();
                 });
-
-                theControl.addControl(group);
 
                 return theControl;
                 //return group;
