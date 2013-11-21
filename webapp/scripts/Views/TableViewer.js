@@ -142,6 +142,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 //Create the table viwer panel
                 that.createPanelTableViewer = function () {
                     //Initialise the panel that will contain the table
+                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
                     this.panelTable = QueryTable.Panel(
                         this.frameTable,
                         this.theTableFetcher,
@@ -149,7 +150,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     );
                     this.myTable = this.panelTable.getTable();// A shortcut variable
                     this.myTable.fetchBuffer = 300;
-                    this.myTable.immediateFetchRecordCount = false;
+                    this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.NONE;
+                    if (tableInfo.settings.FetchRecordCount)
+                        this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
                     this.myTable.preventFetch = true;
                     that.myTable.setQuery(that.theQuery.get());
 

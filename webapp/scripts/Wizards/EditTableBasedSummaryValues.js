@@ -210,7 +210,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 );
                 that.myTable = that.panelTable.getTable();// A shortcut variable
                 that.myTable.fetchBuffer = 300;
-                that.myTable.immediateFetchRecordCount = false;
+                that.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
                 that.myTable.setQuery(SQL.WhereClause.Trivial());
 
 
