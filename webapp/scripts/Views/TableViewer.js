@@ -199,6 +199,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
+                    var cmdHideAllColumns = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2' }).setOnChanged(function() {
+                        if (that.columnVisibilityChecks) {
+                            $.each(that.columnVisibilityChecks, function(idx, chk) {
+                                if (chk.getValue())
+                                    chk.modifyValue(false);
+                            });
+                        }
+                    });
 
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
@@ -207,7 +215,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         cmdBarGraph,
                         cmdHistogram2d,
                         cmdScatterPlot,
-                        that.visibilityControlsGroup
+                        Controls.CompoundVert([
+                            cmdHideAllColumns,
+                            that.visibilityControlsGroup
+                        ]).setLegend('Visible columns')
+
                     ]));
                 }
 
@@ -265,6 +277,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
                     });
 
+
+                    //Temporarily store the column visibility status
+                    var colIsHidden = {};
+                    if (that.columnVisibilityChecks) {
+                        $.each(that.columnVisibilityChecks, function(idx, chk) {
+                            if (!chk.getValue())
+                                colIsHidden[chk.colID] = true;
+                        });
+                    }
+                    that.columnVisibilityChecks = [];
 
                     that.visibilityControlsGroup.clear();
 
@@ -332,15 +354,21 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
                             }
 
-                            var chk = Controls.Check(null,{label:propInfo.name, value:true }).setClassID(propInfo.propid).setOnChanged(function() {
-                                col.setVisible(chk.getValue());
+                            var chk = Controls.Check(null,{label:propInfo.name, value:(!colIsHidden[col.myCompID]) }).setClassID(propInfo.propid).setOnChanged(function() {
+                                that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
                                 that.myTable.render();
                             });
+                            chk.colID = col.myCompID;
+                            if (colIsHidden[col.myCompID])
+                                col.setVisible(false);
                             that.visibilityControlsGroup.addControl(chk);
+                            that.columnVisibilityChecks.push(chk);
                         }
                     });
 
                     that.myTable.reLoadTable();
+                    //that.visibilityControlsGroup.render();
+                    this.panelSimpleQuery.render();
                 }
 
 
