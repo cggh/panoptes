@@ -121,7 +121,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     var rootSummary = br.addItem(FrameTree.Branch(null,'<span class="DQXLarge">Filterbank summarised</span>')).setCanSelect(false);
 
 
-                    Application.getChannelInfo(function() {
+                    /*Application.getChannelInfo(function()*/ {
 
                         $.each(MetaData.customProperties, function(idx, prop) {
                             str = '<b><span style="color:{col}">'.DQXformat({col:(prop.isCustom?'black':'rgb(128,0,0)')})+prop.name+'</span></b><span style="color:rgb(150,150,150)"> ';
@@ -163,7 +163,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         that.panelChannels.render();
                         that.panelChannels.setScrollPosVert(scrollpos);
                         if (proceedFunction) proceedFunction();
-                    });
+                    }/*)*/;
 
 
                 }
