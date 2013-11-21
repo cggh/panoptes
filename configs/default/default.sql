@@ -145,6 +145,13 @@ CREATE TABLE `externallinks` (
   `linkurl` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `storedqueries` (
+  `id` varchar(50) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `tableid` varchar(50) DEFAULT NULL,
+  `workspaceid` varchar(50) DEFAULT NULL,
+  `content` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
