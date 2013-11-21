@@ -105,7 +105,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         MetaData.database,
                         that.tableid + 'CMB_' + MetaData.workspaceid
                     );
-                    this.theTableFetcher.showDownload=true; //Allows the user to download the data in the table
+                    //this.theTableFetcher.showDownload=true; //Allows the user to download the data in the table
 
                     this.createPanelTableViewer();
 
@@ -113,12 +113,30 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.createPanelControls();
 
                     this.reLoad();
-
+                    that.panelsCreated = true;
 
                 };
 
+
+                that.postLoadAction = function() {
+                    if (that.hasBecomeVisible) {
+                        that.myTable.preventFetch = false;
+                        that.uptodate = false;
+                        that.reLoad();
+                    }
+                };
+
                 that.onBecomeVisible = function() {
-                    that.reLoad();
+                    if (!that.hasBecomeVisible) {
+                        if (that.panelsCreated) {
+                            if (that.viewIsLoaded) {
+                                that.myTable.preventFetch = false;
+                                that.uptodate = false;
+                                that.reLoad();
+                            }
+                        }
+                        that.hasBecomeVisible = true;
+                    }
                 }
 
                 //Create the table viwer panel
@@ -132,7 +150,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.myTable = this.panelTable.getTable();// A shortcut variable
                     this.myTable.fetchBuffer = 300;
                     this.myTable.immediateFetchRecordCount = false;
+                    this.myTable.preventFetch = true;
                     that.myTable.setQuery(that.theQuery.get());
+
 
                     // Add a column for chromosome
                     var comp = that.myTable.createTableColumn(

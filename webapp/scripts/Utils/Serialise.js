@@ -44,15 +44,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
 
-        Serialise.checkLoadView = function() {
+        Serialise.checkLoadView = function(proceedFunction) {
             var viewid  = DQX.getUrlSearchString('view');
             if (viewid) {
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','view_get',
                     { id: viewid },
                     function(resp) {
                         Serialise._recall(resp.settings);
+                        proceedFunction();
                     });
             }
+            else
+                proceedFunction();
         };
 
 

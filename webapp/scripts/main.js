@@ -105,7 +105,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
 
                             var appProceedFunction = function() {
                                 proceedFunction();
-                                Serialise.checkLoadView();
+                                Serialise.checkLoadView(Application.postLoadAction);
                             };
 
                             // Execute the fetching
@@ -152,6 +152,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
 
                     });
             } // End Start_Part2
+
+
+            Application.postLoadAction = function() {
+                $.each(Application.getViewList(), function(idx, view) {
+                    view.viewIsLoaded = true;
+                    if (view.postLoadAction)
+                        view.postLoadAction();
+                });
+            }
 
             Start_Part1();
 
