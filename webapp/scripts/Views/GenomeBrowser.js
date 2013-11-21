@@ -179,8 +179,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     this.panelControls.addControl(Controls.CompoundVert([
                         bt,
-                        that.buttonsGroup,
-                        that.visibilityControlsGroup
+                        that.visibilityControlsGroup,
+                        that.buttonsGroup
                     ]));
 
 
