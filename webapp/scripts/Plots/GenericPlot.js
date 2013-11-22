@@ -18,7 +18,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             GenericPlot.activePlotList.push(that);
 
             that.plotTypeID = plotTypeID;
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
             that.theQuery = QueryTool.Create(tableid, {includeCurrentQuery:true});
 

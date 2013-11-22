@@ -46,7 +46,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var that = PopupFrame.PopupFrame('propedit', {title:'Edit property', blocking:true, sizeX:550, sizeY:550 });
 
             that.propInfo = MetaData.findProperty(tableid, propid);
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();

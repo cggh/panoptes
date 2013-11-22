@@ -59,7 +59,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Msg.listen("", { type: 'JumpgenomePosition' }, that.onJumpGenomePosition);
 
                     Msg.listen("", {type: 'QueryChanged'}, function(scope, tableid) {
-                        var tableInfo = MetaData.mapTableCatalog[tableid];
+                        var tableInfo = MetaData.getTableInfo(tableid);
                         if (tableInfo.hasGenomePositions) {
                             if ( (tableInfo.genomeBrowserInfo.dataFetcher) && (tableInfo.genomeBrowserInfo.filterByQuery) )
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
@@ -482,7 +482,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     that.tableBasedSummaryValue_Add = function(tableid, trackid, recordid) {
-                        var summaryValue = MetaData.mapTableCatalog[tableid].mapTableBasedSummaryValues[trackid];
+                        var summaryValue = MetaData.getTableInfo(tableid).mapTableBasedSummaryValues[trackid];
                         var channelid=trackid+'_'+recordid;
                         if (that.panelBrowser.findChannel(channelid)) {
                             //Already exists - simply make visible
@@ -538,7 +538,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     // For a specific datatable, (re)builds all the tracks that correspond to that datatable records
                     that.rebuildTableBasedSummaryValues = function(tableid) {
-                        var tableInfo=MetaData.mapTableCatalog[tableid];
+                        var tableInfo=MetaData.getTableInfo(tableid);
 
                         //remove tracks that are not visible anymore
                         var presentMap = {};
@@ -579,7 +579,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.updateTableBasedSummaryValueHeaders = function() {
                         $.each(that.panelBrowser.getChannelList(), function(idx,channel) {
                              if (channel.fromTable_tableid) {
-                                 var tableInfo = MetaData.mapTableCatalog[channel.fromTable_tableid];
+                                 var tableInfo = MetaData.getTableInfo(channel.fromTable_tableid);
                                  var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();//obtain the property id that is currently used to create the header line
                                  var value = tableInfo.fieldCache.getField(channel.fromTable_recordid, activePropID);
                                  channel.setTitle(value);

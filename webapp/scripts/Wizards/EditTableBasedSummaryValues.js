@@ -6,7 +6,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         EditTableBasedSummaryValues.storedValues = {};
 
         EditTableBasedSummaryValues.prompt = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableInfo = MetaData.getTableInfo(tableid);
             var content = '';
 
             var countInfo = Controls.Html(null,'');
@@ -70,7 +70,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         EditTableBasedSummaryValues.loadCurrentQuery = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableInfo = MetaData.getTableInfo(tableid);
             var tableView = Application.getView('table_'+tableid);
 
 
@@ -83,7 +83,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
         EditTableBasedSummaryValues.loadQuery = function(tableid, query) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableInfo = MetaData.getTableInfo(tableid);
             var tableView = Application.getView('table_'+tableid);
 
             tableInfo.genomeTrackSelectionManager.clearAll();
@@ -117,7 +117,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         EditTableBasedSummaryValues.loadCurrentSelection = function(tableid) {
-            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var tableInfo = MetaData.getTableInfo(tableid);
             tableInfo.genomeTrackSelectionManager.clearAll();
             $.each(tableInfo.getSelectedList(), function(idx, key) {
                 tableInfo.genomeTrackSelectionManager.selectItem(key,true, true);
@@ -128,7 +128,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         EditTableBasedSummaryValues.CreateDialogBox = function(tableid) {
             var that = PopupFrame.PopupFrame('EditTableBasedSummaryValues', {title:'Active genome tracks', blocking:true, sizeX:700, sizeY:500 });
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();

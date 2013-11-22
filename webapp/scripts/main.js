@@ -85,7 +85,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         })
                         GenomeBrowser.init();
 
-                        if (MetaData.mapTableCatalog['SMP'] && MetaData.mapTableCatalog['SNP'])
+                        if (MetaData.hasTable('SMP') && MetaData.hasTable('SNP'))
                           Genotypes.init();
 
                         Application.showViewsAsTabs();

@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 form: controls,
                 onStart: function() {
                     UploadProperties.tableid = wiz.getResultValue(UploadProperties.ctrl_table.getID());
-                    UploadProperties.primkey = MetaData.mapTableCatalog[UploadProperties.tableid].primkey;
+                    UploadProperties.primkey = MetaData.getTableInfo(UploadProperties.tableid).primkey;
                 },
                 reportValidationError: function() {
                     if (!ctrl_trackFile.getValue())

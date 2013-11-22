@@ -124,7 +124,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings.maxval = 1;
                     settings.decimDigits = 2;
                 };
-                if (prop.propid == MetaData.mapTableCatalog[prop.tableid].primkey)
+                if (prop.propid == MetaData.getTableInfo(prop.tableid).primkey)
                     prop.isPrimKey = true;
                 if (prop.settings) {
                     try {
@@ -207,7 +207,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableSummaryValue.settings = settings;
                 tableSummaryValue.isVisible = tableSummaryValue.settings.defaultVisible;
 
-                var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
+                var tableInfo = MetaData.getTableInfo(tableSummaryValue.tableid);
                 tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
                 tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
             });

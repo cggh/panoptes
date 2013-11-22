@@ -34,13 +34,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 // Instantiate the view object
                 var that = Application.View(
                     'table_'+tableid,  // View ID
-                    MetaData.mapTableCatalog[tableid].name+' table'  // View title
+                    MetaData.getTableInfo(tableid).name  // View title
                 );
 
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
                 that.theQuery = QueryTool.Create(tableid);
-                MetaData.mapTableCatalog[that.tableid].tableViewer = that;
+                MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if (that.tableid==tableid) {
@@ -75,7 +75,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.recallSettings = function(settObj) {
                     var qry = SQL.WhereClause.decode(settObj.query);
                     that.theQuery.modify(qry);
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
                     tableInfo.currentQuery = qry;
                     if ((settObj.activecolumns) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.activecolumns, false);
@@ -139,7 +139,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 //Create the table viewer panel
                 that.createPanelTableViewer = function () {
                     //Initialise the panel that will contain the table
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
                     this.panelTable = QueryTable.Panel(
                         this.frameTable,
                         this.theTableFetcher,
@@ -234,7 +234,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.getSortColumn = function() {
                     if (!that.myTable)
-                        return MetaData.mapTableCatalog[that.tableid].primkey;
+                        return MetaData.getTableInfo(that.tableid).primkey;
                     return that.myTable.getSortColumn();
                 };
 
@@ -243,7 +243,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     if (that.myTable) {
                         that.myTable.setQuery(that.theQuery.get());
                         that.myTable.reLoadTable();
-                        var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                        var tableInfo = MetaData.getTableInfo(that.tableid);
                         tableInfo.currentQuery = that.theQuery.get();
                         Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
                     }
@@ -251,7 +251,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 // Initialise the table viewer columns
                 that.reLoad = function() {
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
 
                     if (that.uptodate)
                         return;
