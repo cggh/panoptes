@@ -31,7 +31,7 @@ require.config({
 
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
     function (_, $, Application, Framework, Msg, DQX, SQL, DataFetchers, MetaData, Initialise, Intro, GenomeBrowser, TableViewer, Genotypes, GenePopup, ItemPopup, PromptWorkspace, PromptDataSet, Serialise) {
         $(function () {
 
@@ -80,7 +80,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         })
                         GenomeBrowser.init();
 
-                        if (MetaData.tableCatalog['SMP'] && MetaData.tableCatalog['SNP'])
+                        if (MetaData.mapTableCatalog['SMP'] && MetaData.mapTableCatalog['SNP'])
                           Genotypes.init();
 
                         Application.showViewsAsTabs();
