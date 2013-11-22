@@ -3,7 +3,7 @@ define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
         var MetaData = {};
 
         MetaData.quickLoad = true;
-        MetaData.updateCalculationInfo = false;
+        MetaData.updateCalculationInfo = true;
 
 
         //MetaData.serverUrl="http://localhost:8000/app01";

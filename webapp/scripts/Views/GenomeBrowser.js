@@ -12,9 +12,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.setEarlyInitialisation();
 
 
-
-
-
                 that.storeSettings = function() {
                     var obj= {};
                     if (that.panelBrowser) {
@@ -52,10 +49,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.fetchers={};
 
 
-                //This function is called during the initialisation. Create the frame structure of the view here
                 that.createFrames = function(rootFrame) {
                     that.filterByQuery = false;
-                    rootFrame.makeGroupHor();//Declare the root frame as a horizontally divided set of subframes
+                    rootFrame.makeGroupHor();
                     this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3));//Create frame that will contain the controls panel
                     this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
 
@@ -70,7 +66,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     });
 
-
                     Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
                         that.rebuildTableBasedSummaryValues(params.tableid);
                     });
@@ -79,29 +74,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                //This function is called during the initialisation. Create the panels that will populate the frames here
                 that.createPanels = function() {
-                    this.panelControls = Framework.Form(this.frameControls);//This panel will contain controls for switching on/off channels on the genome browser
+                    this.panelControls = Framework.Form(this.frameControls);
                     this.panelControls.setPadding(10);
 
-                    this.createPanelBrowser();
-
-                    Msg.listen('', {type:'TableFieldCacheModified'}, function() {
-                        that.updateTableBasedSummaryValueHeaders();
-                    });
-
-                };
-
-
-                //Create the genome browser panel
-                that.createPanelBrowser = function() {
                     //Browser configuration settings
                     var browserConfig = {
                         serverURL: MetaData.serverUrl,              //Url of the DQXServer instance used
                         database: MetaData.database,                //Database name
                         annotTableName: MetaData.tableAnnotation,   //Name of the table containing the annotation
                         chromoIdField: 'chrom',                      //Specifies that chromosomes are identifier by *numbers* in the field 'chrom'
-                                                                    //*NOTE*: chromosome identifiers can be used by specifying chromoIdField: 'chromid'
+                        //*NOTE*: chromosome identifiers can be used by specifying chromoIdField: 'chromid'
                         viewID: '',
                         canZoomVert: true                           //Viewer contains buttons to alter the vertical size of the channels
                     };
@@ -116,7 +99,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
 
                     this.panelBrowser.getAnnotationFetcher().setFeatureType('gene', 'CDS');
-
                     this.panelBrowser.getAnnotationChannel().setMinDrawZoomFactX(1.0/99999999);
 
                     if (MetaData.generalSettings.AnnotMaxViewportSize)
@@ -183,8 +165,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.buttonsGroup
                     ]));
 
-
                     that.reLoad();
+
+                    Msg.listen('', {type:'TableFieldCacheModified'}, function() {
+                        that.updateTableBasedSummaryValueHeaders();
+                    });
 
                 };
 
@@ -197,8 +182,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
 
-
                 //Call this function to jump to & highlight a specific region on the genome
+                // need args.chromoID, args.start, args.end
                 that.onJumpGenomeRegion = function (context, args) {
                     if ('chromoID' in args)
                         var chromoID = args.chromoID;
@@ -211,7 +196,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.panelBrowser.highlightRegion(chromoID, (args.start + args.end) / 2, args.end - args.start);
                 };
 
-                //Call this function to jump to & highlight a specific region on the genome
+                //Call this function to jump to & highlight a specific position on the genome
+                // need args.chromoID, args.position
                 that.onJumpGenomePosition = function (context, args) {
                     if ('chromoID' in args)
                         var chromoID = args.chromoID;
@@ -225,9 +211,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
 
 
-
-
-
+                // Returns a summary fetcher compatible with a track with a given minimum block size
+                // For efficiency, fetchers automatically pool tracks up to a given maximum count
                 that.getSummaryFetcher =function(minblocksize) {
                     //Try to find suitable existing fetcher
                     var theFetcher = null;
@@ -251,10 +236,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (MetaData.summaryValues.length==0)
                         return;
 
-
                     //Iterate over all summary profiles shown by the app
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
-                        if (!summaryValue.isDisplayed) {
+                        if (!summaryValue.isDisplayed) {//Notr: this flag is set if that summary value was associated with a datatable property
                             var trackid ='smm'+summaryValue.tableid+'_'+summaryValue.propid;
                             var theFetcher = that.getSummaryFetcher(summaryValue.minblocksize);
                             var channelid=trackid;
@@ -296,7 +280,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
 
-
                             var ctrl_onoff = SummChannel.createVisibilityControl(true);
                             that.visibilityControlsGroup.addControl(ctrl_onoff);
 
@@ -328,12 +311,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         );
                     }
 
-
                     //Define a custom tooltip
-                    theChannel.setToolTipHandler(function(id) {
-                        return id;
-                    })
-                    //Define a function tht will be called when the user clicks a snp
+                    theChannel.setToolTipHandler(function(id) { return id; })
+                    //Define a function that will be called when the user clicks a snp
                     theChannel.setClickHandler(function(id) {
                         Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
                     })
@@ -344,17 +324,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.createPropertyChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
                     var trackid =tableInfo.id+'_'+propInfo.propid;
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
-                    //Create the channel in the browser that will contain the frequency values
-                    var channelId = propInfo.settings.channelName;
-                    var channelName = propInfo.settings.channelName;
-                    var inSeparateChannel = false;
-                    if (!channelId) {
-                        channelId = trackid;
-                        channelName = propInfo.name;
-                        inSeparateChannel = true;
+                    if (propInfo.settings.channelName) { // Channel specified -> add to this channel
+                        var channelId = propInfo.settings.channelName;
+                        var channelName = propInfo.settings.channelName;
+                        var inSeparateChannel = false;
+                    } else { // No channel specified -> auto create new one
+                        var channelId = trackid;
+                        var channelName = propInfo.name;
+                        var inSeparateChannel = true;
                     }
+
                     var theChannel = that.channelMap[channelId];
-                    if (!theChannel) {
+                    if (!theChannel) { // Channel does not yet exist -> create
                         theChannel = ChannelYVals.Channel(trackid,
                             { minVal: propInfo.settings.minval, maxVal: propInfo.settings.maxval } // range
                         );
@@ -382,8 +363,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
 
                     if ((inSeparateChannel) && (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid))) {
+                        // There is a summary value associated to this datatable property, and we add it to this channel
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
-                        summInfo.isDisplayed = true;
+                        summInfo.isDisplayed = true; // Set this flag so that it does not get added twice
                         var theColor = DQX.parseColorString(summInfo.settings.channelColor);;
                         var theFetcher = that.getSummaryFetcher(summInfo.minblocksize);
                         var summFolder = that.summaryFolder+'/'+propInfo.propid;
@@ -404,7 +386,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     plotcomp.myPlotHints.pointStyle = 1;//chose a sensible way of plotting the points
                     plotcomp.myPlotHints.color = DQX.parseColorString(propInfo.settings.channelColor);
                     plotcomp.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
-                        if (propInfo.settings.connectLines)
+                    if (propInfo.settings.connectLines)
                         plotcomp.myPlotHints.makeDrawLines(1.0e99);
                     var label = propInfo.name;
                     if (!plotcomp.myPlotHints.color.isBlack())
@@ -416,7 +398,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var ctrl_onoff = theChannel.createComponentVisibilityControl(propInfo.propid, label, false, true);
                     }
                     theChannel.controls.addControl(ctrl_onoff);
-
                 }
 
 
@@ -442,13 +423,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         })
                     }
 
-
                     that.listDataFetcherProfiles = [];
                     that.listSummaryChannels = [];
 
                     that.summaryFolder = 'SummaryTracks/' + MetaData.database;
 
-
+                    // Loop over all datatables that contain genomic positions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomePositions) {
                             if (tableInfo.genomeBrowserInfo.dataFetcher) {//Remove any existing channels
@@ -461,7 +441,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.name+'</h3>');
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
-
                             that.ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.filterByQuery = (that.ctrl_filtertype.getValue()=='query');
                                 if (tableInfo.genomeBrowserInfo.filterByQuery)
@@ -473,7 +452,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             controlsGroup.addControl(that.ctrl_filtertype);
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
 
-
                             //Initialise the data fetcher that will download the data for the table
                             var dataFetcher = new DataFetchers.Curve(
                                 MetaData.serverUrl,
@@ -483,13 +461,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
                             tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
-
-                            //add id column to the datafetcher, not plotted but needed for the tooltip & click actions
-                            dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");
+                            dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");//add id column to the datafetcher, not plotted but needed for the tooltip & click actions
 
                             if (tableInfo.genomeBrowserInfo.filterByQuery)
                                 dataFetcher.setUserQuery2(tableInfo.currentQuery);
 
+                            //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
                             tableInfo.genomeBrowserInfo.currentCustomProperties = [];
                             $.each(MetaData.customProperties,function(idx,propInfo) {
                                 if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
@@ -559,11 +536,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     };
 
+                    // For a specific datatable, (re)builds all the tracks that correspond to that datatable records
                     that.rebuildTableBasedSummaryValues = function(tableid) {
                         var tableInfo=MetaData.mapTableCatalog[tableid];
 
                         //remove tracks that are not visible anymore
-
                         var presentMap = {};
                         var toDeleteList = [];
                         $.each(that.panelBrowser.getChannelList(), function(idx, channel) {
@@ -578,11 +555,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 presentMap[channel.fromTable_trackid+'_'+channel.fromTable_recordid]=channel.getVisible();
                             }
                         });
-
                         $.each(toDeleteList, function(idx,channelid) {
                             that.panelBrowser.delChannel(channelid);
                         });
-
 
                         //Add new tracks
                         $.each(tableInfo.genomeTrackSelectionManager.getSelectedList(), function(idx, recordid) {
@@ -600,12 +575,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.updateTableBasedSummaryValueHeaders();
                     };
 
-
+                    // Updates the header information for datatable-related genome tracks
                     that.updateTableBasedSummaryValueHeaders = function() {
                         $.each(that.panelBrowser.getChannelList(), function(idx,channel) {
                              if (channel.fromTable_tableid) {
                                  var tableInfo = MetaData.mapTableCatalog[channel.fromTable_tableid];
-                                 var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();
+                                 var activePropID = tableInfo.genomeBrowserFieldChoice.getValue();//obtain the property id that is currently used to create the header line
                                  var value = tableInfo.fieldCache.getField(channel.fromTable_recordid, activePropID);
                                  channel.setTitle(value);
                                  var tooltip = '';
@@ -623,10 +598,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-
                     that.createSummaryChannels();
-
-
 
                     this.panelControls.render();
 
