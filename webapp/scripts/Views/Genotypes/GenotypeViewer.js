@@ -1,12 +1,12 @@
-﻿define(["lodash", "clusterfck", "easel", "d3", "tween", "require", "DQX/Utils", "DQX/Model",
+﻿define(["_", "easel", "d3", "tween", "require", "DQX/Utils", "DQX/Model",
   "DQX/SVG",
-  "DQX/FramePanel", "MetaData", "Views/GenotypeViewer/ColumnHeader", "Views/GenotypeViewer/RowHeader",
-  "Views/GenotypeViewer/GeneMap", "Views/GenotypeViewer/GenotypesTable",
-  "Views/GenotypeViewer/TouchEvents", "Views/GenotypeViewer/Controls", "Views/GenotypeViewer/Scale",
-  "Views/GenotypeViewer/IntervalCache", "Views/GenotypeViewer/SNPCache", "Views/GenotypeViewer/TabContainer",
-  "Views/GenotypeViewer/Container",  "Views/GenotypeViewer/Bifurcation", "Views/GenotypeViewer/LDMap",
-  "Views/GenotypeViewer/Network", "Views/GenotypeViewer/ColourAllocator"],
-  function (_, cluster, easel, d3, tween, require, DQX, Model,
+  "DQX/FramePanel", "MetaData", "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/RowHeader",
+  "Views/Genotypes/Components/GeneMap", "Views/Genotypes/Components/GenotypesTable",
+  "Views/Genotypes/TouchEvents", "Views/Genotypes/Components/Controls", "Views/Genotypes/Scale",
+  "Views/Genotypes/IntervalCache", "Views/Genotypes/SNPCache", "Views/Genotypes/Components/TabContainer",
+  "Views/Genotypes/Components/Container",  "Views/Genotypes/Components/Bifurcation", "Views/Genotypes/Components/LDMap",
+  "Views/Genotypes/Components/Network", "Views/Genotypes/ColourAllocator"],
+  function (_, easel, d3, tween, require, DQX, Model,
             SVG,
             FramePanel, MetaData, ColumnHeader, RowHeader,
             GeneMap, Genotypes,
@@ -78,6 +78,9 @@
         that.data.snp_cache.set_samples(sample_set);
         that.sortSamples();
       };
+      that.setVariantQuery = function (variant_query) {
+        console.log(variant_query);
+      }
 
       that.sortSamples = function () {
         var sample_set = that.data.samples;

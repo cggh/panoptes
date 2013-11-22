@@ -1,4 +1,4 @@
-define(["lodash"],
+define(["_"],
     function (_) {
         return function TouchEvents(element, callbacks) {
             var that = {};

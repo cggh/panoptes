@@ -1,4 +1,4 @@
-define(["lodash", "d3", "MetaData", "DQX/SVG"],
+define(["_", "d3", "MetaData", "DQX/SVG"],
   function (_, d3, MetaData, SVG) {
     return function SNPCache(providers, update_callback, position_update_callback, samples) {
 

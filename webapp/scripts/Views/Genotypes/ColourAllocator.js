@@ -1,4 +1,4 @@
-define(["lodash"],
+define(["_"],
   function (_) {
     return function ColourAllocator() {
       var that = {};

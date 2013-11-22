@@ -1,4 +1,4 @@
-define(["lodash", "tween", "DQX/Utils"],
+define(["_", "tween", "DQX/Utils"],
   function (_, tween, DQX) {
     return function Genotypes(data, view) {
       var that = {};
