@@ -129,6 +129,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (prop.settings) {
                     try {
                         var settingsObj = JSON.parse(prop.settings);
+                        if ('maxval' in settingsObj)
+                            settingsObj.hasValueRange = true;
                     }
                     catch(e) {
                         alert('Invalid settings string for {table}.{propid}: {sett}\n{msg}'.DQXformat({

@@ -3,21 +3,27 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
         //A helper function, turning a fraction into a color string
-        var funcFraction2Color = function (vl) {
-            if (vl == null)
-                return "white";
-            else {
-                vl=parseFloat(vl);
-                var vl = Math.abs(vl);
-                vl = Math.min(1, vl);
-                if (vl > 0) vl = 0.05 + vl * 0.95;
-                vl = Math.sqrt(vl);
-                var b = 255 ;
-                var g = 255 * (1 - 0.3*vl * vl);
-                var r = 255 * (1 - 0.6*vl);
-                return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
-            }
-        };
+        var createFuncFraction2Color = function(minval, maxval) {
+            var range = maxval-minval;
+            if (!range)
+                range = 1;
+            return function (vl) {
+                if (vl == null)
+                    return "white";
+                else {
+                    vl=parseFloat(vl);
+                    vl = (vl-minval) / range;
+                    vl = Math.max(0, vl);
+                    vl = Math.min(1, vl);
+                    if (vl > 0) vl = 0.05 + vl * 0.95;
+                    vl = Math.sqrt(vl);
+                    var b = 255 ;
+                    var g = 255 * (1 - 0.3*vl * vl);
+                    var r = 255 * (1 - 0.6*vl);
+                    return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
+                }
+            };
+        }
 
 
 
@@ -320,8 +326,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                             col.CellToText = propInfo.toDisplayString;
 
-                            if (propInfo.isFloat)
-                                col.CellToColor = funcFraction2Color; //Create a background color that reflects the value
+                            if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
+                                col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
 
                             if (propInfo.isBoolean)
                                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
