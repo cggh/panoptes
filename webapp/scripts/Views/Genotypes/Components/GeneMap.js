@@ -1,4 +1,4 @@
-define(["lodash", "tween", "DQX/Utils"],
+define(["_", "tween", "DQX/Utils"],
   function (_, tween, DQX) {
     return function GeneMap(data, view) {
       var that = {};

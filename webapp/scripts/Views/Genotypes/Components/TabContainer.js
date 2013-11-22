@@ -1,4 +1,4 @@
-define(["lodash", "DQX/Utils"],
+define(["_", "DQX/Utils"],
   function (_, DQX) {
     return function TabContainer(contents) {
       var that = {};

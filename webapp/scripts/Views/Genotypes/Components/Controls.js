@@ -1,4 +1,4 @@
-define(["lodash", "DQX/Utils"],
+define(["_", "DQX/Utils"],
   function (_, DQX) {
     return function Controls(data, view, size) {
       var that = {};

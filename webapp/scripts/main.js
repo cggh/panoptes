@@ -13,7 +13,9 @@ require.config({
         handlebars: "DQX/Externals/handlebars",
         markdown: "DQX/Externals/markdown",
         DQX: "DQX",
-        _:"DQX/Externals/lodash"
+        _:"DQX/Externals/lodash",
+        easel: "Externals/createjs-2013.05.14.min",
+        tween: "Externals/Tween"
     },
     shim: {
         d3: {
@@ -21,14 +23,17 @@ require.config({
         },
         handlebars: {
             exports: 'Handlebars'
+        },
+        easel: {
+          exports: 'createjs'
+        },
+        tween: {
+          exports: 'TWEEN'
         }
     },
     waitSeconds: 15,
     urlArgs: "version="+versionString
 });
-
-
-
 
 
 require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise" ],
