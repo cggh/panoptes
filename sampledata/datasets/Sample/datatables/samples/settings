@@ -1,7 +1,7 @@
-NameSingle=sample
-NamePlural=samples
-PrimKey=Sample
-IsPositionOnGenome=false
-FetchRecordCount=true
-QuickFindFields=Sample,Study,Country
+NameSingle: sample
+NamePlural: samples
+PrimKey: ID
+IsPositionOnGenome: false
+FetchRecordCount: true
+QuickFindFields: ID,Country
 

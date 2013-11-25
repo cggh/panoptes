@@ -1,4 +1,4 @@
-Name=In use
-DataType=Boolean
-Order=6
-ShowInTable=true
+Name: In use
+DataType: Boolean
+Order: 6
+ShowInTable: true

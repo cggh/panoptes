@@ -3,6 +3,7 @@ import DQXDbTools
 #import MySQLdb
 import yaml
 import config
+import simplejson
 
 
 
@@ -16,11 +17,30 @@ class SettingsLoader:
 
     def Load(self):
         with open(self.fileName, 'r') as configfile:
-            st = yaml.load(configfile.read())
+            self.settings = yaml.load(configfile.read())
         for token in self.knownTokens:
-            if token not in st:
+            if token not in self.settings:
                 raise Exception('Missing token "{0}" in file "{1}"'.format(token, self.fileName))
-        return st
+        return self.settings
+
+    def _CheckLoaded(self):
+        if self.settings is None:
+            raise Exception('Settings not loaded')
+
+    def __getitem__(self, item):
+        self._CheckLoaded()
+        return self.settings[item]
+
+    def Get(self):
+        self._CheckLoaded()
+        return self.settings
+
+    def ToJSON(self):
+        self._CheckLoaded()
+        return simplejson.dumps(self.settings)
+
+
+
 
 def ExecuteSQL(database, command):
     db = DQXDbTools.OpenDatabase(database)
@@ -32,6 +52,59 @@ def ExecuteSQL(database, command):
 
 
 
+def ImportDataTable(datasetId, tableid, folder):
+    print('==================================================================')
+    print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
+    print('==================================================================')
+
+
+    settings = SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
+    settings.AddRequired('NameSingle')
+    settings.AddRequired('NamePlural')
+    settings.AddRequired('PrimKey')
+    settings.AddRequired('IsPositionOnGenome')
+    settings.Load()
+
+    # Add to tablecatalog
+    settingsString = settings.ToJSON()
+    sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
+        tableid,
+        settings['NamePlural'],
+        settings['PrimKey'],
+        settings['IsPositionOnGenome'],
+        settingsString
+    )
+    ExecuteSQL(datasetId, sql)
+
+
+    # Load & create properties
+    properties = []
+    for fle in os.listdir(os.path.join(folder, 'properties')):
+        if os.path.isfile(os.path.join(folder, 'properties', fle)):
+            properties.append(fle)
+    print('Properties: '+str(properties))
+
+    for propid in properties:
+        settings = SettingsLoader(os.path.join(os.path.join(folder, 'properties', propid)))
+        settings.AddRequired('Name')
+        settings.AddRequired('DataType')
+        settings.Load()
+        #settings.AddIfMissing('Order',999)
+        settingsString = settings.ToJSON()
+        sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
+            settings['DataType'],
+            propid,
+            tableid,
+            settings['Name'],
+            settings['Order'],
+            settingsString
+        )
+        ExecuteSQL(datasetId, sql)
+
+
+
+
+
 def ImportDataSet(baseFolder, datasetId):
     print('==================================================================')
     print('IMPORTING DATASET {0}'.format(datasetId))
@@ -39,10 +112,10 @@ def ImportDataSet(baseFolder, datasetId):
     datasetFolder = os.path.join(baseFolder, datasetId)
     indexDb = 'datasetindex'
 
-    loader = SettingsLoader(os.path.join(datasetFolder, 'settings'))
-    loader.AddRequired('Name')
-    globalSettings = loader.Load()
-    print('Global settings: '+str(globalSettings))
+    globalSettings = SettingsLoader(os.path.join(datasetFolder, 'settings'))
+    globalSettings.AddRequired('Name')
+    globalSettings.Load()
+    print('Global settings: '+str(globalSettings.Get()))
 
 
     # Dropping existing database
@@ -56,13 +129,24 @@ def ImportDataSet(baseFolder, datasetId):
 
 
     # Creating new database
+    print('Creating new database')
     with open('createdataset.sql', 'r') as content_file:
         sqlCreateCommands = content_file.read()
     ExecuteSQL(datasetId, sqlCreateCommands)
 
-    ExecuteSQL(datasetId, 'INSERT INTO workspaces VALUES ("a1", "b1")')#!!! temporary test. todo: remove
+    #ExecuteSQL(datasetId, 'INSERT INTO workspaces VALUES ("a1", "b1")')#!!! temporary test. todo: remove
+
+    datatables = []
+    for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
+        if os.path.isdir(os.path.join(datasetFolder, 'datatables', dir)):
+            datatables.append(dir)
+    print('Data tables: '+str(datatables))
+    for datatable in datatables:
+        ImportDataTable(datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable))
+
 
     # Finalise: register dataset
+    print('Registering data set')
     ExecuteSQL(indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}")'.format(datasetId, globalSettings['Name']))
 
 

@@ -1,4 +1,4 @@
-Name=Sample ID
-DataType=Text
-Order=1
-ShowInTable=true
+Name: Sample ID
+DataType: Text
+Order: 1
+ShowInTable: true
