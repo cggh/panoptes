@@ -23,6 +23,12 @@ class SettingsLoader:
                 raise Exception('Missing token "{0}" in file "{1}"'.format(token, self.fileName))
         return self.settings
 
+    def AddIfMissing(self, token, value):
+        self._CheckLoaded()
+        if token not in self.settings:
+            self.settings[token] = value
+
+
     def _CheckLoaded(self):
         if self.settings is None:
             raise Exception('Settings not loaded')
@@ -89,7 +95,7 @@ def ImportDataTable(datasetId, tableid, folder):
         settings.AddRequired('Name')
         settings.AddRequired('DataType')
         settings.Load()
-        #settings.AddIfMissing('Order',999)
+        settings.AddIfMissing('Order', 99999)
         settingsString = settings.ToJSON()
         sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
             settings['DataType'],
