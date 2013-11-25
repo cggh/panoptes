@@ -1,0 +1,8 @@
+Name=Lab sample
+DataType=Value
+Order=6
+MinVal=0
+MaxVal=1
+DecimDigits=3
+ShowInTable=true
+ShowInTable=true

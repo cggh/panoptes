@@ -1,0 +1,5 @@
+Name=Study ID
+DataType=Text
+Order=2
+IsCategorical=true
+ShowInTable=true

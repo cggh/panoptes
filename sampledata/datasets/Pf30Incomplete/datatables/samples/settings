@@ -1,0 +1,7 @@
+NameSingle=sample
+NamePlural=samples
+PrimKey=Sample
+IsPositionOnGenome=false
+FetchRecordCount=true
+QuickFindFields=Sample,Study,Country
+
