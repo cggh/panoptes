@@ -1,8 +1,7 @@
-Name=Lab sample
+Name=Value 1
 DataType=Value
 Order=6
 MinVal=0
 MaxVal=1
 DecimDigits=3
-ShowInTable=true
 ShowInTable=true
