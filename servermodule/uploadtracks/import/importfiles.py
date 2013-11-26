@@ -6,7 +6,8 @@ import config
 import VTTable
 import SettingsLoader
 import uuid
-import csv
+import sys
+import shutil
 
 
 def convertToBooleanInt(vl):
@@ -54,13 +55,30 @@ def ExecuteSQL(database, command):
     cur.close()
     db.close()
 
+path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
 
-
+def RunConvertor(name, runpath, arguments):
+    os.chdir(runpath)
+    scriptPath = os.path.join(path_DQXServer, 'Convertors')
+    cmd = config.pythoncommand + ' ' + scriptPath + '/' + name + '.py '+' '.join(arguments)
+    print('EXECUTING COMMAND '+cmd)
+    os.system(cmd)
 
 
 
 def ImportRefGenome(datasetId, folder):
 
+    # Import reference genome
+    print('Converting reference genome')
+    destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
+    if not os.path.exists(destfolder):
+        os.makedirs(destfolder)
+    tempfastafile = destfolder + '/refsequence.fa'
+    shutil.copyfile(os.path.join(folder, 'refsequence.fa'), tempfastafile)
+    RunConvertor('Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+
+
+    # Import chromosomes
     print('Loading chromosomes')
     tb = VTTable.VTTable()
     tb.allColumnsText = True
@@ -77,6 +95,20 @@ def ImportRefGenome(datasetId, folder):
     tb.SaveSQLDump(sqlfile, 'chromosomes')
     ExecuteSQLScript(sqlfile, datasetId)
     os.remove(sqlfile)
+
+    # Import annotation
+    print('Converting annotation')
+    tempgfffile = GetTempFileName()
+    temppath = os.path.dirname(tempgfffile)
+    shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
+    RunConvertor('ParseGFF', temppath, [os.path.basename(tempgfffile)])
+    print('Importing annotation')
+    ExecuteSQLScript(os.path.join(temppath, 'annotation_dump.sql'), datasetId)
+    os.remove(tempgfffile)
+    os.remove(os.path.join(temppath, 'annotation.txt'))
+    os.remove(os.path.join(temppath, 'annotation_dump.sql'))
+    os.remove(os.path.join(temppath, 'annotation_create.sql'))
+
 
 
 
@@ -248,7 +280,10 @@ def ImportDataSet(baseFolder, datasetId):
         sqlCreateCommands = content_file.read()
     ExecuteSQL(datasetId, sqlCreateCommands)
 
-
+    # Global settings
+    print('Defining global settings')
+    for token in globalSettings.GetTokenList():
+        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, globalSettings[token]))
 
     ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
 
@@ -281,4 +316,4 @@ def ImportFileSet(baseFolder):
 
 
 
-ImportFileSet('/home/pvaut/WebstormProjects/panoptes/sampledata/datasets')
+ImportFileSet(config.SOURCEDATADIR + '/datasets')

@@ -109,7 +109,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         Msg.send({type:'GenePopup'}, geneID);
                     }
 
-                    if (MetaData.generalSettings.RefSequenceSumm=='Yes') {
+                    if (MetaData.generalSettings.RefSequenceSumm) {
                         SeqChannel = ChannelSequence.Channel(MetaData.serverUrl, 'SummaryTracks/' + MetaData.database+'/Sequence', 'Summ');
                         this.panelBrowser.addChannel(SeqChannel, true);
 
@@ -603,8 +603,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.panelControls.render();
 
                     that.panelBrowser.handleResize();
-                    if (MetaData.chromosomes.length>0)
-                        that.panelBrowser.setChromosome(MetaData.chromosomes[0].id,true,true);
+                    //if (MetaData.chromosomes.length>0)
+                    that.panelBrowser.setChromosome(MetaData.chromosomes[0].id,true,true);
 
                 }
 

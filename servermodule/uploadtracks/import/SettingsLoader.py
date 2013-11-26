@@ -76,6 +76,9 @@ class SettingsLoader:
         self._CheckLoaded()
         return self.settings
 
+    def GetTokenList(self):
+        return [token for token in self.settings]
+
     def ToJSON(self):
         self._CheckLoaded()
         return simplejson.dumps(self.settings)
