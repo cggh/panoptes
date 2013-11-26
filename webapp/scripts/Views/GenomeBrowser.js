@@ -603,7 +603,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.panelControls.render();
 
                     that.panelBrowser.handleResize();
-                    that.panelBrowser.setChromosome(MetaData.chromosomes[0].id,true,true);
+                    if (MetaData.chromosomes.length>0)
+                        that.panelBrowser.setChromosome(MetaData.chromosomes[0].id,true,true);
 
                 }
 

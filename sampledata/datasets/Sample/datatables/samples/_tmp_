@@ -1,0 +1,5 @@
+SET SQL_SAFE_UPDATES=0;
+LOCK TABLES `samples` WRITE;
+DELETE FROM `samples`;
+INSERT INTO `samples` (`ID`, `Value1`, `InUse`, `Country`, `Comment`) VALUES ('S0001',0.75,1.0,'UK','This is a very long comment, taking up a rather large space in the record. Ideally, the import routine should automatically reserve the right space for this!'),('S0002',0.85,1.0,'UK','-'),('S0003',0.23,0.0,'UK','-'),('S0004',0.61,1.0,'BE','-'),('S0005',0.12,0.0,'BE','-');
+UNLOCK TABLES;

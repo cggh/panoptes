@@ -1,62 +1,46 @@
 import os
 import DQXDbTools
-#import MySQLdb
-import yaml
 import config
-import simplejson
-import copy
+#import simplejson
+#import copy
+import VTTable
+import SettingsLoader
+import uuid
 
 
-
-class SettingsLoader:
-    def __init__(self, fileName = None):
-        if fileName is not None:
-            self.fileName = fileName
-            with open(self.fileName, 'r') as configfile:
-                self.settings = yaml.load(configfile.read())
-        else:
-            self.fileName = ''
-
-    def RequireTokens(self, tokensList):
-        self._CheckLoaded()
-        for token in tokensList:
-            if token not in self.settings:
-                raise Exception('Missing token "{0}" in file "{1}"'.format(token, self.fileName))
-
-    def AddTokenIfMissing(self, token, value):
-        self._CheckLoaded()
-        if token not in self.settings:
-            self.settings[token] = value
-
-    def DropTokens(self, tokensList):
-        self._CheckLoaded()
-        for token in tokensList:
-            if token in self.settings:
-                del self.settings[token]
+def convertToBooleanInt(vl):
+    if vl is None:
+        return None
+    if (vl.lower() == 'true') or (vl.lower() == 'yes') or (vl.lower() == 'y') or (vl == '1') or (vl == '1.0'):
+        return 1
+    if (vl.lower() == 'false') or (vl.lower() == 'no') or (vl.lower() == 'n') or (vl == '0') or (vl == '0.0'):
+        return 0
+    return None
 
 
-    def Clone(self):
-        self._CheckLoaded()
-        cpy = SettingsLoader()
-        cpy.settings = copy.deepcopy(self.settings)
-        return cpy
+def GetTempFileName():
+    return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))
 
 
-    def _CheckLoaded(self):
-        if self.settings is None:
-            raise Exception('Settings not loaded')
+def ExecuteSQLScript(filename, databaseName):
+    cmd = config.mysqlcommand + " -u {0} -p{1} {2} < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
+    os.system(cmd)
 
-    def __getitem__(self, item):
-        self._CheckLoaded()
-        return self.settings[item]
+class SQLScript:
+    def __init__(self):
+        self.commands = []
 
-    def Get(self):
-        self._CheckLoaded()
-        return self.settings
+    def AddCommand(self, cmd):
+        self.commands.append(cmd)
 
-    def ToJSON(self):
-        self._CheckLoaded()
-        return simplejson.dumps(self.settings)
+    def Execute(self, databaseName):
+        filename = GetTempFileName()
+        fp = open(filename, 'w')
+        for cmd in self.commands:
+            fp.write(cmd+';\n')
+        fp.close()
+        ExecuteSQLScript(filename, databaseName)
+        os.remove(filename)
 
 
 
@@ -76,17 +60,17 @@ def ImportDataTable(datasetId, tableid, folder):
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
 
-    settings = SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-    settings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'IsPositionOnGenome'])
-    extraSettings = settings.Clone()
+    tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
+    tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'IsPositionOnGenome'])
+    extraSettings = tableSettings.Clone()
     extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome'])
 
     # Add to tablecatalog
     sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
         tableid,
-        settings['NamePlural'],
-        settings['PrimKey'],
-        settings['IsPositionOnGenome'],
+        tableSettings['NamePlural'],
+        tableSettings['PrimKey'],
+        tableSettings['IsPositionOnGenome'],
         extraSettings.ToJSON()
     )
     ExecuteSQL(datasetId, sql)
@@ -95,13 +79,18 @@ def ImportDataTable(datasetId, tableid, folder):
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
         if os.path.isfile(os.path.join(folder, 'properties', fle)):
-            properties.append(fle)
+            properties.append({'propid':fle})
     print('Properties: '+str(properties))
 
-    for propid in properties:
-        settings = SettingsLoader(os.path.join(os.path.join(folder, 'properties', propid)))
+    for property in properties:
+        propid = property['propid']
+        settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'properties', propid))
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits'])
+        settings.ConvertToken_Boolean('isCategorical')
         settings.RequireTokens(['Name', 'DataType'])
         settings.AddTokenIfMissing('Order', 99999)
+        property['DataType'] = settings['DataType']
+        property['Order'] = settings['Order']
         extraSettings = settings.Clone()
         extraSettings.DropTokens(['Name', 'DataType', 'Order'])
         sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
@@ -114,6 +103,84 @@ def ImportDataTable(datasetId, tableid, folder):
         )
         ExecuteSQL(datasetId, sql)
 
+    properties = sorted(properties, key=lambda k: k['Order'])
+    propidList = []
+    propDict = {}
+    for property in properties:
+        propDict[property['propid']] = property
+        propidList.append(property['propid'])
+
+    if tableSettings['IsPositionOnGenome']:
+        if 'chrom' not in propDict:
+            raise Exception('Genome-related datatable {0} is missing property "chrom"'.format(tableid))
+        if 'pos' not in propDict:
+            raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
+
+    # Load datatable
+    print('Loading data table')
+    tb = VTTable.VTTable()
+    tb.allColumnsText = True
+    try:
+        tb.LoadFile(os.path.join(folder, 'data'))
+    except Exception as e:
+        raise Exception('Error while reading file: '+str(e))
+    print('---- ORIG TABLE ----')
+    tb.PrintRows(0, 9)
+
+    for property in properties:
+        if not tb.IsColumnPresent(property['propid']):
+            raise Exception('Missing property "{0}" in datatable "{1}"'.format(property['propid'], tableid))
+
+
+    for col in tb.GetColList():
+        if col not in propDict:
+            tb.DropCol(col)
+    tb.ArrangeColumns(propidList)
+    for property in properties:
+        propid = property['propid']
+        if property['DataType'] == 'Value':
+            tb.ConvertColToValue(propid)
+        if property['DataType'] == 'Boolean':
+            tb.MapCol(propid, convertToBooleanInt)
+            tb.ConvertColToValue(propid)
+    print('---- PROCESSED TABLE ----')
+    tb.PrintRows(0, 9)
+
+    createcmd = 'CREATE TABLE {0} ('.format(tableid)
+    frst = True
+    for property in properties:
+        if not frst:
+            createcmd += ', '
+        propid = property['propid']
+        colnr = tb.GetColNr(propid)
+        datatypestr = ''
+        if property['DataType'] == 'Text':
+            maxlength = 1
+            for rownr in tb.GetRowNrRange():
+                maxlength = max(maxlength, len(tb.GetValue(rownr, colnr)))
+            datatypestr = 'varchar({0})'.format(maxlength)
+        if property['DataType'] == 'Value':
+            datatypestr = 'float'
+        if property['DataType'] == 'Boolean':
+            datatypestr = 'int'
+        createcmd += propid + ' ' + datatypestr
+        frst = False
+    createcmd += ')'
+
+    print('Creating datatable')
+    scr = SQLScript()
+    scr.AddCommand('drop table if exists {0}'.format(tableid))
+    scr.AddCommand(createcmd)
+    scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, tableSettings['PrimKey']))
+    scr.Execute(datasetId)
+
+    print('Loading datatable values')
+    sqlfile = GetTempFileName()
+    tb.SaveSQLDump(sqlfile, tableid)
+    ExecuteSQLScript(sqlfile, datasetId)
+    os.remove(sqlfile)
+
+
 
 
 
@@ -125,7 +192,7 @@ def ImportDataSet(baseFolder, datasetId):
     datasetFolder = os.path.join(baseFolder, datasetId)
     indexDb = 'datasetindex'
 
-    globalSettings = SettingsLoader(os.path.join(datasetFolder, 'settings'))
+    globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
     globalSettings.RequireTokens(['Name'])
     print('Global settings: '+str(globalSettings.Get()))
 

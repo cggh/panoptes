@@ -5,6 +5,7 @@
 webapp/scripts/DQX
 webapp/scripts/Local
 servermodule/uploadtracks/VTTable.py
+servermodule/uploadtracks/import/VTTable.py
 importscripts/TableUtils
 
 
