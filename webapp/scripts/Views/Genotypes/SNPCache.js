@@ -56,9 +56,10 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
 
 
 
-      that.set_samples = function(samples) {
-        //Clear out everything
+      that.set_samples = function(samples, query) {
+        //Clear out everything //TODO Make more clever by not thrwing away samples that are still in active view
         that.samples = samples;
+        that.sample_query = query;
         that.genotypes_by_chrom = {};
         _(that.fetch_state_by_chrom).forEach(function (fetch_state, chrom){
           that.fetch_state_by_chrom[chrom] = new Uint8Array(fetch_state.length);
@@ -67,6 +68,23 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         //Then call set chrom to set the data we expose
         that.set_chrom(that.chrom);
       };
+
+      that.set_variant_query = function(query) {
+        that.variant_query = query;
+        //Clear everything out
+        that.snp_positions_by_chrom = {};
+        that.snp_positions = [];
+        that.snps_by_chrom = {};
+        that.snps = [];
+        //Genotypes by chrom then sample then call type
+        that.genotypes_by_chrom = {};
+        that.genotypes = undefined;
+        //Fetch state by chrom
+        that.fetch_state_by_chrom = {};
+        that.fetch_state = [];
+        //Call set chrom to do the fetch
+        that.set_chrom(that.chrom);
+      }
 
       that.set_chrom = function(chrom) {
         that.chrom = chrom;
@@ -81,11 +99,17 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         that.genotypes = that.genotypes_by_chrom[chrom];
         that.fetch_state = that.fetch_state_by_chrom[chrom];
 
+        if (that.variant_query == undefined || that.variant_query == null) {
+          that.update_callback();
+          return;
+        }
+
+
         if (that.snp_positions.length == 0 && !that.fetching_positions) {
           //Request the snp index
           that.fetching_positions = true;
           that.current_provider_requests += 1;
-          that.position_provider(chrom, function(positions) {
+          that.position_provider(this.variant_query, chrom, function(positions) {
             if (positions) {
               that.snp_positions_by_chrom[chrom] = positions;
               that.fetch_state_by_chrom[chrom] = new Uint8Array(Math.ceil(positions.length / CHUNK_SIZE));
@@ -134,8 +158,8 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           return _(that.snp_positions).last();
       };
 
-      that._insert_received_data = function (chunk, samples, buffer) {
-        if (samples && !_.isEqual(samples, that.samples)) return;
+      that._insert_received_data = function (chunk, variant_query, sample_query, buffer) {
+        if (!_.isEqual(sample_query, that.sample_query) || !_.isEqual(variant_query, that.variant_query)) return;
         var chrom = chunk.chrom;
         chunk = chunk.chunk;
         var start_index = chunk * CHUNK_SIZE;
@@ -151,7 +175,6 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           var snps = that.snps_by_chrom[chrom];
           that.genotypes_by_chrom[chrom] || (that.genotypes_by_chrom[chrom] = []);
           var genotypes = that.genotypes_by_chrom[chrom];
-
           _(that.samples).forEach(function (sample,i) {
             genotypes[i] || (genotypes[i] = {});
             var sample_gt = genotypes[i];
@@ -163,21 +186,26 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           });
           var data = new Uint8Array(buffer);
           var d = 0;
-          for (var i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
-            snps.ref[i] = data[d];
-          for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
-            snps.alt[i] = data[d];
+          //TODO Fix snp totals
+          var i, ref
+//          for (var i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
+//            snps.ref[i] = data[d];
+//          for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
+//            snps.alt[i] = data[d];
           data = new Uint16Array(buffer, d);
-          d = 0;
           _(that.samples).forEach(function (sample,j) {
             var sample_gt = genotypes[j];
             //COMMENTED OUT AS OUR VCFs HAVE NO GENOTYPES!!!
 //              for (var i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
 //                sample_gt.gt[i] = data[d];
-            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
-              sample_gt.ref[i] = data[d];
-            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
-              sample_gt.alt[i] = data[d];
+//            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
+//              sample_gt.ref[i] = data[d];
+//            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
+//              sample_gt.alt[i] = data[d];
+            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++) {
+              sample_gt.ref[i] = data[d];d++;
+              sample_gt.alt[i] = data[d];d++;
+            }
             for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++) {
               var r = sample_gt.ref[i];
               var a = sample_gt.alt[i];
@@ -227,14 +255,16 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           var start = chunk.chunk * CHUNK_SIZE;
           var end = Math.min(that.snp_positions_by_chrom[chunk.chrom].length-1, (chunk.chunk + 1) * CHUNK_SIZE);
           console.log('fetch ' + start +':'+ end + ' ' + that.snp_positions_by_chrom[chunk.chrom][start] + ':' + that.snp_positions_by_chrom[chunk.chrom][end]);
-          that.genotype_provider(chunk.chrom,
+          that.genotype_provider(
+            that.variant_query,
+            that.sample_query,
+            chunk.chrom,
             that.snp_positions_by_chrom[chunk.chrom][start],
             that.snp_positions_by_chrom[chunk.chrom][end],
-            _.map(that.samples, DQX.attr('ID')),
             function (data) {
               that.current_provider_requests -= 1;
               //Clone as otherwise these can change
-              that._insert_received_data(_.clone(chunk), _.clone(that.samples), data);
+              that._insert_received_data(_.clone(chunk), _.clone(that.variant_query), _.clone(that.sample_query), data);
             });
           that.current_provider_requests += 1;
         }

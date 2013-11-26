@@ -199,7 +199,9 @@ define(["_", "tween", "DQX/Utils"],
           if (pos.x < clip.l || pos.x > clip.r || pos.y < clip.t || pos.y > 75)
             return false;
           var delta = DQX.getMouseWheelDelta(ev);
-          that.view.rescaleGenomic(that.view.genome_scale.scale_clamp(that.view.genome_scale.zoom(delta, pos.x), 0, _.last(data.snp_cache.snp_positions)));
+          //TODO FIX MAX/MIN
+          //that.view.rescaleGenomic(that.view.genome_scale.scale_clamp(that.view.genome_scale.zoom(delta, pos.x), 0, _.last(data.snp_cache.snp_positions)));
+          that.view.rescaleGenomic(that.view.genome_scale.scale_clamp(that.view.genome_scale.zoom(delta, pos.x), 0, 50000000));
           return true;
         }
       };

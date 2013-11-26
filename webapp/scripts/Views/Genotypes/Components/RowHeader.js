@@ -19,7 +19,7 @@ define(["tween", "DQX/Utils"],
         var y_off = view.scroll_pos;
 
         that.data.samples.forEach(function(sample) {
-          ctx.fillStyle = DQX.getRGB(view.colours.get(sample.SampleContext.Site.Name), 0.75);
+          ctx.fillStyle = DQX.getRGB(view.colours.get(sample.region), 0.75);
           ctx.fillRect(sample.depth * 5, sample.vert + y_off, 5, row_height);
         });
 

@@ -114,7 +114,7 @@ define(["d3"],
         }).left;
         //Request small regions at a time to give a sense of progress...
         var resized_missing_intervals = [];
-        var threshold = 200000;
+        var threshold = 2000000;
         for (i = 0, ref = missing_intervals.length; i < ref; i++) {
           interval = missing_intervals[i];
           if (interval.end - interval.start < threshold)

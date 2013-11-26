@@ -58,7 +58,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           fetcher.addColumn('dna_quant_method', 'ST');
           fetcher.addColumn('Genotyped', 'IN');
           fetcher.getData(query, sortColumn, function (data) {
-              that.genotypeViewer.setSamples(that.transposeQueryResult(data));
+              that.genotypeViewer.setSamples(that.transposeQueryResult(data), query);
             }
           );
         };
@@ -170,9 +170,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           );
         };
 
-        that.snpIndexProvider = function (chrom, callback) {
+        that.snpIndexProvider = function (query, chrom, callback) {
+          query = SQL.WhereClause.AND([query, SQL.WhereClause.CompareFixed('chrom', '=', chrom)]);
+          var myurl = DQX.Url(MetaData.serverUrl);
+          myurl.addUrlQueryItem("datatype", "custom");
+          myurl.addUrlQueryItem("respmodule", "2d_server");
+          myurl.addUrlQueryItem("respid", "dim_index");
+          myurl.addUrlQueryItem('database', MetaData.database);
+          myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(query));
+          myurl.addUrlQueryItem("tbname", 'SNP');
           var xhr = new XMLHttpRequest();
-          xhr.open('GET', serverUrl + "?datatype=custom&respmodule=vcf_server&respid=chromosome_index&chrom="+chrom, true);
+          xhr.open('GET', myurl.toString(), true);
           xhr.responseType = 'arraybuffer';
           xhr.onreadystatechange = function handler() {
             if(this.readyState == this.DONE) {
@@ -188,16 +196,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           xhr.send();
         };
 
-        that.genotypeProvider = function (chrom, start, end, sample_ids, callback) {
+        that.genotypeProvider = function (variant_query, sample_query, chrom, start, end, callback) {
+          variant_query = SQL.WhereClause.AND([variant_query,
+            SQL.WhereClause.CompareFixed('chrom', '=', chrom),
+            SQL.WhereClause.CompareFixed('pos', '>=', start),
+            SQL.WhereClause.CompareFixed('pos', '<', end),
+          ]);
+          var myurl = DQX.Url(MetaData.serverUrl);
+          myurl.addUrlQueryItem("datatype", "custom");
+          myurl.addUrlQueryItem("respmodule", "2d_server");
+          myurl.addUrlQueryItem("respid", "2d_query");
+          myurl.addUrlQueryItem('database', MetaData.database);
+          myurl.addUrlQueryItem("var_qry", SQL.WhereClause.encode(variant_query));
+          myurl.addUrlQueryItem("samp_qry", SQL.WhereClause.encode(sample_query));
+          myurl.addUrlQueryItem("var_tbname", 'SNP');
+          myurl.addUrlQueryItem("samp_tbname", 'SMP' + 'CMB_' + MetaData.workspaceid);
           var xhr = new XMLHttpRequest();
-          var seqids = '';
-          for (var i = 0; i < sample_ids.length-1; i++) {
-            seqids += sample_ids[i];
-            seqids += '~';
-          }
-          if (sample_ids.length > 1)
-            seqids += sample_ids[sample_ids.length-1];
-          xhr.open('GET', serverUrl + "?datatype=custom&respmodule=vcf_server&respid=genotypes&chrom="+chrom+"&start="+start+"&end="+end+"&samples="+seqids, true);
+          xhr.open('GET', myurl.toString(), true);
           xhr.responseType = 'arraybuffer';
           xhr.onreadystatechange = function handler() {
             if(this.readyState == this.DONE) {

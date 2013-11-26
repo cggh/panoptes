@@ -69,18 +69,18 @@
       that.height = function () {
         return that.parent_element.height();
       };
-      that.setSamples = function (sample_set) {
+      that.setSamples = function (sample_set, query) {
         that.data.samples = sample_set;
         sample_set.forEach(function (sample) {
           sample.genotypes_canvas = document.createElement('canvas');
           sample.genotypes_canvas.height = 1;
         });
-        that.data.snp_cache.set_samples(sample_set);
+        that.data.snp_cache.set_samples(sample_set, query);
         that.sortSamples();
       };
       that.setVariantQuery = function (variant_query) {
-        console.log(variant_query);
-      }
+        that.data.snp_cache.set_variant_query(variant_query);
+      };
 
       that.sortSamples = function () {
         var sample_set = that.data.samples;
@@ -133,29 +133,20 @@
           that.view.sample_heirachy = [
             {
               key: function (sample) {
-                return sample.Classifications.subcont[0].Name;
+                return sample.country;
               },
               comparator: d3.descending,
               display_name: DQX.return_arg(0)
             },
             {
               key: function (sample) {
-                return sample.Classifications.region[0].Name;
+                return sample.region;
               },
               comparator: d3.descending,
               display_name: DQX.return_arg(0)
             },
-            //Commented out on request of DK
-            {
-                key: function (sample) {
-                    return sample.SampleContext.Site.Name;
-                },
-                comparator: d3.descending,
-                display_name: DQX.return_arg(0)
-            }
-
           ];
-          that.sample_leaf_sort = DQX.comp_attr('ID', d3.descending);
+          that.sample_leaf_sort = DQX.comp_attr('ox_code', d3.descending);
         }
 
         var nest = d3.nest();
@@ -168,9 +159,9 @@
         var vert = 0;
         var set_count = function (nest, depth) {
           if (nest.key == undefined)
-            nest.key = nest.ID;
-          nest.is_sample = (nest.ID != undefined);
-          nest.display_name = nest.is_sample ? nest.ID : depth > 0 ? that.view.sample_heirachy[depth - 1].display_name(nest.key, nest.values) : 'Samples';
+            nest.key = nest.ox_code;
+          nest.is_sample = (nest.ox_code != undefined);
+          nest.display_name = nest.is_sample ? nest.ox_code : depth > 0 ? that.view.sample_heirachy[depth - 1].display_name(nest.key, nest.values) : 'Samples';
           nest.depth = depth;
           if (!nest.vert)
             nest.vert = vert;
@@ -394,7 +385,7 @@
         compress: false,
         row_height: that.row_height,
         scroll_pos: 0,
-        chrom: 'MAL13',
+        chrom: '2L',
         selected_snps: [],
         row_header_width: 150,
         //Rescale the SNPs based on a genomic range
@@ -451,7 +442,7 @@
           {w:that.view.row_header_width, h:that.gene_map_height})
         },
       ]);
-      that.data.snp_cache.set_chrom('MAL13');
+      that.data.snp_cache.set_chrom('2L');
       that.last_view_change = 'genome';
 
 
@@ -478,9 +469,12 @@
 //                    }
 
       ];
-      that.sample_leaf_sort = DQX.comp_attr('ID', d3.descending);
+      that.sample_leaf_sort = DQX.comp_attr('ox_code', d3.descending);
       that.sample_nest = [];
       that.setSamples([]);
+
+      //TODO Auto-fix this
+      //that.view.snp_scale.domain([2358158, 2431617]);
 
       that.resize();
 
