@@ -55,6 +55,11 @@ def ExecuteSQL(database, command):
     cur.close()
     db.close()
 
+def ImportGlobalSettings(datasetId, settings):
+    for token in settings.GetTokenList():
+        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+
+
 path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
 
 def RunConvertor(name, runpath, arguments):
@@ -67,6 +72,11 @@ def RunConvertor(name, runpath, arguments):
 
 
 def ImportRefGenome(datasetId, folder):
+
+    settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
+    settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])
+    print('Settings: '+str(settings.Get()))
+    ImportGlobalSettings(datasetId, settings)
 
     # Import reference genome
     print('Converting reference genome')
@@ -282,8 +292,7 @@ def ImportDataSet(baseFolder, datasetId):
 
     # Global settings
     print('Defining global settings')
-    for token in globalSettings.GetTokenList():
-        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, globalSettings[token]))
+    ImportGlobalSettings(datasetId, globalSettings)
 
     ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
 
