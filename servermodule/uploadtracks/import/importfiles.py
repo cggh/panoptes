@@ -4,29 +4,42 @@ import DQXDbTools
 import yaml
 import config
 import simplejson
+import copy
 
 
 
 class SettingsLoader:
-    def __init__(self, fileName):
-        self.fileName = fileName
-        self.knownTokens = []
+    def __init__(self, fileName = None):
+        if fileName is not None:
+            self.fileName = fileName
+            with open(self.fileName, 'r') as configfile:
+                self.settings = yaml.load(configfile.read())
+        else:
+            self.fileName = ''
 
-    def AddRequired(self, token):
-        self.knownTokens.append(token)
-
-    def Load(self):
-        with open(self.fileName, 'r') as configfile:
-            self.settings = yaml.load(configfile.read())
-        for token in self.knownTokens:
+    def RequireTokens(self, tokensList):
+        self._CheckLoaded()
+        for token in tokensList:
             if token not in self.settings:
                 raise Exception('Missing token "{0}" in file "{1}"'.format(token, self.fileName))
-        return self.settings
 
-    def AddIfMissing(self, token, value):
+    def AddTokenIfMissing(self, token, value):
         self._CheckLoaded()
         if token not in self.settings:
             self.settings[token] = value
+
+    def DropTokens(self, tokensList):
+        self._CheckLoaded()
+        for token in tokensList:
+            if token in self.settings:
+                del self.settings[token]
+
+
+    def Clone(self):
+        self._CheckLoaded()
+        cpy = SettingsLoader()
+        cpy.settings = copy.deepcopy(self.settings)
+        return cpy
 
 
     def _CheckLoaded(self):
@@ -63,25 +76,20 @@ def ImportDataTable(datasetId, tableid, folder):
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
 
-
     settings = SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-    settings.AddRequired('NameSingle')
-    settings.AddRequired('NamePlural')
-    settings.AddRequired('PrimKey')
-    settings.AddRequired('IsPositionOnGenome')
-    settings.Load()
+    settings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'IsPositionOnGenome'])
+    extraSettings = settings.Clone()
+    extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome'])
 
     # Add to tablecatalog
-    settingsString = settings.ToJSON()
     sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
         tableid,
         settings['NamePlural'],
         settings['PrimKey'],
         settings['IsPositionOnGenome'],
-        settingsString
+        extraSettings.ToJSON()
     )
     ExecuteSQL(datasetId, sql)
-
 
     # Load & create properties
     properties = []
@@ -92,18 +100,17 @@ def ImportDataTable(datasetId, tableid, folder):
 
     for propid in properties:
         settings = SettingsLoader(os.path.join(os.path.join(folder, 'properties', propid)))
-        settings.AddRequired('Name')
-        settings.AddRequired('DataType')
-        settings.Load()
-        settings.AddIfMissing('Order', 99999)
-        settingsString = settings.ToJSON()
+        settings.RequireTokens(['Name', 'DataType'])
+        settings.AddTokenIfMissing('Order', 99999)
+        extraSettings = settings.Clone()
+        extraSettings.DropTokens(['Name', 'DataType', 'Order'])
         sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
             settings['DataType'],
             propid,
             tableid,
             settings['Name'],
             settings['Order'],
-            settingsString
+            extraSettings.ToJSON()
         )
         ExecuteSQL(datasetId, sql)
 
@@ -119,8 +126,7 @@ def ImportDataSet(baseFolder, datasetId):
     indexDb = 'datasetindex'
 
     globalSettings = SettingsLoader(os.path.join(datasetFolder, 'settings'))
-    globalSettings.AddRequired('Name')
-    globalSettings.Load()
+    globalSettings.RequireTokens(['Name'])
     print('Global settings: '+str(globalSettings.Get()))
 
 
