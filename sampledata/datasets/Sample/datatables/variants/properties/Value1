@@ -2,6 +2,7 @@ Name: Value 1
 DataType: Value
 Order: 2
 ShowInTable: true
+ShowInBrowser: true
 MinVal: 0
 MaxVal: 2
 DecimDigits: 2

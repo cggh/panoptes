@@ -6,6 +6,7 @@ import config
 import VTTable
 import SettingsLoader
 import uuid
+import csv
 
 
 def convertToBooleanInt(vl):
@@ -55,6 +56,31 @@ def ExecuteSQL(database, command):
 
 
 
+
+
+
+def ImportRefGenome(datasetId, folder):
+
+    print('Loading chromosomes')
+    tb = VTTable.VTTable()
+    tb.allColumnsText = True
+    try:
+        tb.LoadFile(os.path.join(folder, 'chromosomes'))
+    except Exception as e:
+        raise Exception('Error while reading chromosomes file: '+str(e))
+    tb.RequireColumnSet(['chrom', 'length'])
+    tb.RenameCol('chrom','id')
+    tb.RenameCol('length','len')
+    tb.ConvertColToValue('len')
+    tb.PrintRows(0, 99)
+    sqlfile = GetTempFileName()
+    tb.SaveSQLDump(sqlfile, 'chromosomes')
+    ExecuteSQLScript(sqlfile, datasetId)
+    os.remove(sqlfile)
+
+
+
+
 def ImportDataTable(datasetId, tableid, folder):
     print('==================================================================')
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
@@ -85,7 +111,7 @@ def ImportDataTable(datasetId, tableid, folder):
     for property in properties:
         propid = property['propid']
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'properties', propid))
-        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits'])
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
         settings.ConvertToken_Boolean('isCategorical')
         settings.RequireTokens(['Name', 'DataType'])
         settings.AddTokenIfMissing('Order', 99999)
@@ -129,8 +155,10 @@ def ImportDataTable(datasetId, tableid, folder):
 
     for property in properties:
         if not tb.IsColumnPresent(property['propid']):
-            raise Exception('Missing property "{0}" in datatable "{1}"'.format(property['propid'], tableid))
+            raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
 
+    if tableSettings['PrimKey'] not in propDict:
+        raise Exception('Missing primary key property "{0}" in datatable "{1}"'.format(tableSettings['PrimKey'], tableid))
 
     for col in tb.GetColList():
         if col not in propDict:
@@ -172,6 +200,8 @@ def ImportDataTable(datasetId, tableid, folder):
     scr.AddCommand('drop table if exists {0}'.format(tableid))
     scr.AddCommand(createcmd)
     scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, tableSettings['PrimKey']))
+    if tableSettings['IsPositionOnGenome']:
+        scr.AddCommand('create index {0}_chrompos ON {0}(chrom,pos)'.format(tableid))
     scr.Execute(datasetId)
 
     print('Loading datatable values')
@@ -179,6 +209,11 @@ def ImportDataTable(datasetId, tableid, folder):
     tb.SaveSQLDump(sqlfile, tableid)
     ExecuteSQLScript(sqlfile, datasetId)
     os.remove(sqlfile)
+
+
+
+
+
 
 
 
@@ -213,7 +248,10 @@ def ImportDataSet(baseFolder, datasetId):
         sqlCreateCommands = content_file.read()
     ExecuteSQL(datasetId, sqlCreateCommands)
 
-    #ExecuteSQL(datasetId, 'INSERT INTO workspaces VALUES ("a1", "b1")')#!!! temporary test. todo: remove
+
+
+    ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
+
 
     datatables = []
     for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
