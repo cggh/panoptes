@@ -253,14 +253,18 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         if (that.current_provider_requests < 4 && that.provider_queue.length > 0) {
           var chunk = that.provider_queue.pop();
           var start = chunk.chunk * CHUNK_SIZE;
+          start = that.snp_positions_by_chrom[chunk.chrom][start]
           var end = Math.min(that.snp_positions_by_chrom[chunk.chrom].length-1, (chunk.chunk + 1) * CHUNK_SIZE);
-          console.log('fetch ' + start +':'+ end + ' ' + that.snp_positions_by_chrom[chunk.chrom][start] + ':' + that.snp_positions_by_chrom[chunk.chrom][end]);
+          if (end == that.snp_positions_by_chrom[chunk.chrom].length-1)
+            end = that.snp_positions_by_chrom[chunk.chrom][end] + 1;
+          else
+            end = that.snp_positions_by_chrom[chunk.chrom][end];
           that.genotype_provider(
             that.variant_query,
             that.sample_query,
             chunk.chrom,
-            that.snp_positions_by_chrom[chunk.chrom][start],
-            that.snp_positions_by_chrom[chunk.chrom][end],
+            start,
+            end,
             function (data) {
               that.current_provider_requests -= 1;
               //Clone as otherwise these can change

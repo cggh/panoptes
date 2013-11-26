@@ -55,6 +55,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           fetcher.addColumn('country', 'ST');
           fetcher.addColumn('region', 'ST');
           fetcher.addColumn('sex', 'ST');
+          fetcher.addColumn('m_s', 'ST');
           fetcher.addColumn('dna_quant_method', 'ST');
           fetcher.addColumn('Genotyped', 'IN');
           fetcher.getData(query, sortColumn, function (data) {

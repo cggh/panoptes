@@ -17,6 +17,9 @@ callset_fn = '/home/benj/data/ag/gatk_ug-subset_A.h5'
 callset = h5py.File(callset_fn, 'r')
 allele_depth = callset['2L']['calldata_2d']['AD']
 
+import collections
+import functools
+
 def gzip(data):
     out = StringIO.StringIO()
     f = GzipFile(fileobj=out, mode='w')
@@ -29,7 +32,7 @@ def pack_bytes(fmt, seq):
         for char in pack(fmt, num):
             yield char
 
-def index_from_query(database, table, query):
+def index_from_query(database, table, query, order=None):
     db = DQXDbTools.OpenDatabase(database)
     cur = db.cursor()
 
@@ -42,6 +45,8 @@ def index_from_query(database, table, query):
     sqlquery += "idx FROM {0}".format(table)
     if len(whc.querystring_params)>0:
         sqlquery += " WHERE {0}".format(whc.querystring_params)
+    if order:
+        sqlquery += " ORDER BY {0}".format(order)
     print('################################################')
     print('###QRY:'+sqlquery)
     print('###PARAMS:'+str(whc.queryparams))
@@ -91,32 +96,21 @@ def read_count_stream(coord_groups):
 def handler(start_response, request_data):
     var_idx = index_from_query(request_data['database'], 
     	                           request_data['var_tbname'],
-                                   request_data['var_qry'])
-    samp_idx = index_from_query(request_data['database'], 
-    	                           request_data['samp_tbname'],
-                                   request_data['samp_qry'])
+                                   request_data['var_qry'],
+                                   'pos')
 
+    samp_idx = index_from_query(request_data['database'],
+    	                           request_data['samp_tbname'],
+                                   request_data['samp_qry'],
+                                   'ox_code')
+
+    #SQL interface can't cope with con-current queries...
     samp_idx = list(samp_idx)
-    # print samp_idx
     var_idx = list(var_idx)
-    # print var_idx
-    print len(samp_idx), len(var_idx), '=', (len(samp_idx)*len(var_idx))/160
     coord_groups = split(160, ((var, samp) for samp in samp_idx for var in var_idx))
     coord_groups = list(coord_groups)
-    print len(coord_groups), 'groups'
     # print coord_groups
     genotypes = read_count_stream(coord_groups)
-    genotypes = list(genotypes)
-    print len(samp_idx)*len(var_idx) * 2
-    print len(genotypes)
-
-#key = hashlib.sha224((request_data['database'] + 
-     #                     request_data['tbname'] +
-      #                    request_data['qry'] + '_pos')).hexdigest()
-    #try:
-    #    data = cache[key]
-    #except KeyError:
-    #TODO Streaming zip
 
     #genotypes = list(genotypes)
     #print genotypes

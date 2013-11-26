@@ -35,7 +35,7 @@ def positions_from_query(database, table, query):
     sqlquery = "SELECT "
     sqlquery += "pos FROM {0}".format(table)
     if len(whc.querystring_params)>0:
-        sqlquery += " WHERE {0}".format(whc.querystring_params)
+        sqlquery += " WHERE {0} ORDER BY pos".format(whc.querystring_params)
     print('################################################')
     print('###QRY:'+sqlquery)
     print('###PARAMS:'+str(whc.queryparams))
