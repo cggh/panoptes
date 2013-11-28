@@ -60,8 +60,8 @@ def ImportGlobalSettings(datasetId, settings):
         ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
 
-path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
-#path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
+#path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
+path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
 
 def RunConvertor(name, runpath, arguments):
     os.chdir(runpath)
@@ -76,8 +76,8 @@ def ExecuteFilterbankSummary(destFolder, id, settings):
                      id,
                      settings['MinVal'],
                      settings['MaxVal'],
-                     settings['BlockSizeStart'],
-                     settings['BlockSizeIncrFactor'],
+                     settings['BlockSizeMin'],
+                     2,
                      settings['BlockSizeMax']
                 ]
     )
@@ -98,15 +98,26 @@ def ImportRefGenomeSummaryData(datasetId, folder):
 
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
         settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
-        settings.AddTokenIfMissing('BlockSizeIncrFactor', 2)
         settings.AddTokenIfMissing('MinVal', 0)
-        settings.AddTokenIfMissing('BlockSizeStart', 1)
+        settings.AddTokenIfMissing('BlockSizeMin', 1)
         settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
         settings.AddTokenIfMissing('Order', 99999)
         print('SETTINGS: '+settings.ToJSON())
+        print('Executing filter bank')
         ExecuteFilterbankSummary(destFolder, summaryid, settings)
+        extraSettings = settings.Clone()
+        extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+        sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
+            summaryid,
+            settings['Name'],
+            settings['Order'],
+            extraSettings.ToJSON(),
+            settings['MinVal'],
+            settings['MaxVal'],
+            settings['BlockSizeMin']
+        )
+        ExecuteSQL(datasetId, sql)
 
-    sys.exit()
 
 
 def ImportRefGenome(datasetId, folder):

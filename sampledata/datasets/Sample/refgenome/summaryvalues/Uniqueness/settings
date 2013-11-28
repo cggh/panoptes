@@ -3,6 +3,5 @@ Order: 1
 ChannelColor: rgb(255,0,0)
 MinVal: 0
 MaxVal: 100
-BlockSizeStart: 100
-BlockSizeIncrFactor: 2
+BlockSizeMin: 20
 BlockSizeMax: 50000
