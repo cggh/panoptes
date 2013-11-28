@@ -13,7 +13,13 @@
 
     <!-- Introduce a version number to avoid cache problems between versions-->
     <script type="text/javascript">
-        versionString = "61";
+        function generateUIDNotMoreThan1million() {
+            return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).substr(-4)
+        }
+        if (window.location.href.indexOf("cachebust") !== -1)
+            versionString = generateUIDNotMoreThan1million();
+        else
+            versionString = "61";
         _debug_ = true;
     </script>
 
