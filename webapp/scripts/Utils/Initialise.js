@@ -152,14 +152,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (prop.settings.isCategorical) {
                     var getter = DataFetchers.ServerDataGetter();
-                    getter.addTable(prop.tableid,[prop.propid],prop.propid,
+                    getter.addTable(prop.tableid + 'CMB_' + MetaData.workspaceid,
+                        [prop.propid],
+                        prop.propid,
                         SQL.WhereClause.Trivial(), { distinct:true }
                     );
                     prop.propCategories = [];
                     Initialise.incrWait();
                     getter.execute(MetaData.serverUrl,MetaData.database,
                         function() {
-                            var records = getter.getTableRecords(prop.tableid);
+                            var records = getter.getTableRecords(prop.tableid + 'CMB_' + MetaData.workspaceid);
                             $.each(records, function(idx, rec) {
                                 prop.propCategories.push(rec[prop.propid]);
                             });

@@ -446,7 +446,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 if (tableInfo.genomeBrowserInfo.filterByQuery)
                                     tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
                                 else
-                                    tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(null);
+                                    tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(SQL.WhereClause.Trivial());
                                 that.panelBrowser.render();
                             });
                             controlsGroup.addControl(that.ctrl_filtertype);

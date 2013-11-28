@@ -1,63 +1,21 @@
 import os
 import DQXDbTools
 import config
-#import simplejson
-#import copy
-import VTTable
+import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
+import ImportUtils
 import uuid
 import sys
 import shutil
+import customresponders.uploadtracks.Utils as Utils
+
+import importworkspaces
 
 
-def convertToBooleanInt(vl):
-    if vl is None:
-        return None
-    if (vl.lower() == 'true') or (vl.lower() == 'yes') or (vl.lower() == 'y') or (vl == '1') or (vl == '1.0'):
-        return 1
-    if (vl.lower() == 'false') or (vl.lower() == 'no') or (vl.lower() == 'n') or (vl == '0') or (vl == '0.0'):
-        return 0
-    return None
-
-
-def GetTempFileName():
-    return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))
-
-
-def ExecuteSQLScript(filename, databaseName):
-    cmd = config.mysqlcommand + " -u {0} -p{1} {2} < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
-    os.system(cmd)
-
-class SQLScript:
-    def __init__(self):
-        self.commands = []
-
-    def AddCommand(self, cmd):
-        self.commands.append(cmd)
-
-    def Execute(self, databaseName):
-        filename = GetTempFileName()
-        fp = open(filename, 'w')
-        for cmd in self.commands:
-            fp.write(cmd+';\n')
-        fp.close()
-        ExecuteSQLScript(filename, databaseName)
-        os.remove(filename)
-
-
-
-
-def ExecuteSQL(database, command):
-    db = DQXDbTools.OpenDatabase(database)
-    db.autocommit(True)
-    cur = db.cursor()
-    cur.execute(command)
-    cur.close()
-    db.close()
 
 def ImportGlobalSettings(datasetId, settings):
     for token in settings.GetTokenList():
-        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+        ImportUtils.ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
 
 #path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
@@ -117,7 +75,7 @@ def ImportRefGenomeSummaryData(datasetId, folder):
             settings['MaxVal'],
             settings['BlockSizeMin']
         )
-        ExecuteSQL(datasetId, sql)
+        ImportUtils.ExecuteSQL(datasetId, sql)
 
 
 
@@ -153,19 +111,19 @@ def ImportRefGenome(datasetId, folder):
     tb.RenameCol('length','len')
     tb.ConvertColToValue('len')
     tb.PrintRows(0, 99)
-    sqlfile = GetTempFileName()
+    sqlfile = ImportUtils.GetTempFileName()
     tb.SaveSQLDump(sqlfile, 'chromosomes')
-    ExecuteSQLScript(sqlfile, datasetId)
+    ImportUtils.ExecuteSQLScript(sqlfile, datasetId)
     os.remove(sqlfile)
 
     # Import annotation
     print('Converting annotation')
-    tempgfffile = GetTempFileName()
+    tempgfffile = ImportUtils.GetTempFileName()
     temppath = os.path.dirname(tempgfffile)
     shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
     RunConvertor('ParseGFF', temppath, [os.path.basename(tempgfffile)])
     print('Importing annotation')
-    ExecuteSQLScript(os.path.join(temppath, 'annotation_dump.sql'), datasetId)
+    ImportUtils.ExecuteSQLScript(os.path.join(temppath, 'annotation_dump.sql'), datasetId)
     os.remove(tempgfffile)
     os.remove(os.path.join(temppath, 'annotation.txt'))
     os.remove(os.path.join(temppath, 'annotation_dump.sql'))
@@ -193,13 +151,13 @@ def ImportDataTable(datasetId, tableid, folder):
         tableSettings['IsPositionOnGenome'],
         extraSettings.ToJSON()
     )
-    ExecuteSQL(datasetId, sql)
+    ImportUtils.ExecuteSQL(datasetId, sql)
 
     # Load & create properties
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
         if os.path.isfile(os.path.join(folder, 'properties', fle)):
-            if fle.find('~')<0:
+            if fle.find('~') < 0:
                 properties.append({'propid':fle})
     print('Properties: '+str(properties))
 
@@ -222,7 +180,7 @@ def ImportDataTable(datasetId, tableid, folder):
             settings['Order'],
             extraSettings.ToJSON()
         )
-        ExecuteSQL(datasetId, sql)
+        ImportUtils.ExecuteSQL(datasetId, sql)
         property['settings'] = settings
 
 
@@ -271,7 +229,7 @@ def ImportDataTable(datasetId, tableid, folder):
         if property['DataType'] == 'Value':
             tb.ConvertColToValue(propid)
         if property['DataType'] == 'Boolean':
-            tb.MapCol(propid, convertToBooleanInt)
+            tb.MapCol(propid, ImportUtils.convertToBooleanInt)
             tb.ConvertColToValue(propid)
     print('---- PROCESSED TABLE ----')
     tb.PrintRows(0, 9)
@@ -298,7 +256,7 @@ def ImportDataTable(datasetId, tableid, folder):
     createcmd += ')'
 
     print('Creating datatable')
-    scr = SQLScript()
+    scr = ImportUtils.SQLScript()
     scr.AddCommand('drop table if exists {0}'.format(tableid))
     scr.AddCommand(createcmd)
     scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, tableSettings['PrimKey']))
@@ -307,9 +265,9 @@ def ImportDataTable(datasetId, tableid, folder):
     scr.Execute(datasetId)
 
     print('Loading datatable values')
-    sqlfile = GetTempFileName()
+    sqlfile = ImportUtils.GetTempFileName()
     tb.SaveSQLDump(sqlfile, tableid)
-    ExecuteSQLScript(sqlfile, datasetId)
+    ImportUtils.ExecuteSQLScript(sqlfile, datasetId)
     os.remove(sqlfile)
 
 
@@ -356,9 +314,7 @@ def ImportDataTable(datasetId, tableid, folder):
                 summSettings['MaxVal'],
                 summSettings['BlockSizeMin']
             )
-            ExecuteSQL(datasetId, sql)
-
-
+            ImportUtils.ExecuteSQL(datasetId, sql)
 
 
 
@@ -379,19 +335,19 @@ def ImportDataSet(baseFolder, datasetId):
 
     # Dropping existing database
     print('Dropping database')
-    ExecuteSQL(indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
+    ImportUtils.ExecuteSQL(indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
     try:
-        ExecuteSQL(indexDb, 'DROP DATABASE IF EXISTS {0}'.format(datasetId))
+        ImportUtils.ExecuteSQL(indexDb, 'DROP DATABASE IF EXISTS {0}'.format(datasetId))
     except:
         pass
-    ExecuteSQL(indexDb, 'CREATE DATABASE {0}'.format(datasetId))
+    ImportUtils.ExecuteSQL(indexDb, 'CREATE DATABASE {0}'.format(datasetId))
 
 
     # Creating new database
     print('Creating new database')
     with open('createdataset.sql', 'r') as content_file:
         sqlCreateCommands = content_file.read()
-    ExecuteSQL(datasetId, sqlCreateCommands)
+    ImportUtils.ExecuteSQL(datasetId, sqlCreateCommands)
 
     # Global settings
     print('Defining global settings')
@@ -409,9 +365,11 @@ def ImportDataSet(baseFolder, datasetId):
 
     ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
 
+    importworkspaces.ImportWorkspaces(datasetFolder, datasetId)
+
     # Finalise: register dataset
     print('Registering data set')
-    ExecuteSQL(indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}")'.format(datasetId, globalSettings['Name']))
+    ImportUtils.ExecuteSQL(indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}")'.format(datasetId, globalSettings['Name']))
 
 
 
