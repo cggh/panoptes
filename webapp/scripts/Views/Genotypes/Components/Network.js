@@ -47,7 +47,7 @@ define(["d3", "DQX/Utils"],
         var end_snp = Math.ceil(x_scale.domain()[1]);
 
         //TODO Fix as first sample is stringged as "Object"
-        var samp_list = _(samples).sortBy().reduce(function(sum, samp) { return sum + samp.ID;});
+        var samp_list = _(samples).sortBy().reduce(function(sum, samp) { return sum + samp.ox_code;});
         var selected_list = _(view.selected_snps).sortBy().reduce(function(sum, num) { return '' + sum + num;});
         if (samp_list != that.last_samples || selected_list != that.last_selection) {
           that.nodes = data.samples;
@@ -150,7 +150,7 @@ define(["d3", "DQX/Utils"],
 
           var link = that.svg.selectAll(".link"),
           // Update the links…
-          link = link.data(that.links, function(d) { return d.source.ID + d.target.ID; });
+          link = link.data(that.links, function(d) { return d.source.ox_code + d.target.ox_code; });
           // Exit any old links.
           link.exit().remove();
           // Enter any new links.
@@ -163,7 +163,7 @@ define(["d3", "DQX/Utils"],
 
           var link_text = that.svg.selectAll(".link_text"),
           // Update the links…
-          link_text = link_text.data(that.links, function(d) { return d.source.ID + d.target.ID; });
+          link_text = link_text.data(that.links, function(d) { return d.source.ox_code + d.target.ox_code; });
           // Exit any old links.
           link_text.exit().remove();
           // Enter any new links.
@@ -184,7 +184,7 @@ define(["d3", "DQX/Utils"],
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; })
             .attr("r", "10")//function(d) { return Math.sqrt(d.size) / 10 || 4.5; })
-            .style("fill", function(d) { return DQX.getRGB(view.colours.get(d.SampleContext.Site.Name), 0.75)})
+            .style("fill", function(d) { return DQX.getRGB(view.colours.get(d.country), 0.75)})
             //.on("click", click)
             .call(that.force.drag);
 
