@@ -60,7 +60,8 @@ def ImportGlobalSettings(datasetId, settings):
         ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
 
-path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
+#path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
+path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
 
 def RunConvertor(name, runpath, arguments):
     os.chdir(runpath)
