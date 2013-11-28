@@ -2,6 +2,7 @@ import os
 import config
 import uuid
 import DQXDbTools
+import DQXUtils
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -48,13 +49,9 @@ def ExecuteSQL(database, command):
     cur.close()
     db.close()
 
-
-
-#path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
-path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
-
 def RunConvertor(name, runpath, arguments):
     os.chdir(runpath)
+    path_DQXServer = DQXUtils.GetDQXServerPath()
     scriptPath = os.path.join(path_DQXServer, 'Convertors')
     cmd = config.pythoncommand + ' ' + scriptPath + '/' + name + '.py '+' '.join([str(a) for a in arguments])
     print('EXECUTING COMMAND '+cmd)
@@ -71,3 +68,9 @@ def ExecuteFilterbankSummary(destFolder, id, settings):
                      settings['BlockSizeMax']
                 ]
     )
+
+def ImportGlobalSettings(datasetId, settings):
+    for token in settings.GetTokenList():
+        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+
+

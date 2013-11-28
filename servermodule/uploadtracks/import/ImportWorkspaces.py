@@ -3,7 +3,7 @@ import DQXDbTools
 import config
 import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
-import ImportUtils
+import ImpUtils
 import uuid
 import sys
 import shutil
@@ -53,7 +53,7 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
             extraSettings.ToJSON()
         )
         print('SQL command: '+sql)
-        ImportUtils.ExecuteSQL(datasetId, sql)
+        ImpUtils.ExecuteSQL(datasetId, sql)
         property['settings'] = settings
 
     properties = sorted(properties, key=lambda k: k['Order'])
@@ -90,19 +90,19 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
         if property['DataType'] == 'Value':
             tb.ConvertColToValue(propid)
         if property['DataType'] == 'Boolean':
-            tb.MapCol(propid, ImportUtils.convertToBooleanInt)
+            tb.MapCol(propid, ImpUtils.convertToBooleanInt)
             tb.ConvertColToValue(propid)
     print('---- PROCESSED TABLE ----')
     tb.PrintRows(0, 9)
 
 
     tmptable = Utils.GetTempID()
-    tmpfile_create = ImportUtils.GetTempFileName()
-    tmpfile_dump = ImportUtils.GetTempFileName()
+    tmpfile_create = ImpUtils.GetTempFileName()
+    tmpfile_dump = ImpUtils.GetTempFileName()
     tb.SaveSQLCreation(tmpfile_create, tmptable)
     tb.SaveSQLDump(tmpfile_dump, tmptable)
-    ImportUtils.ExecuteSQLScript(tmpfile_create, datasetId)
-    ImportUtils.ExecuteSQLScript(tmpfile_dump, datasetId)
+    ImpUtils.ExecuteSQLScript(tmpfile_create, datasetId)
+    ImpUtils.ExecuteSQLScript(tmpfile_dump, datasetId)
     os.remove(tmpfile_create)
     os.remove(tmpfile_dump)
 
