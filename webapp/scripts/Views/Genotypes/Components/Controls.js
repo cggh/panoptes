@@ -58,9 +58,11 @@ define(["_", "DQX/Utils"],
             }
             //TODO FIX MAX/MIN
             if (pos.x > 60 && pos.x < 90) {
-              that.view.snp_scale.tweenTo({left: 0, right: that.data.snp_cache.snp_positions.length});
+             // that.view.snp_scale.tweenTo({left: 0, right: that.data.snp_cache.snp_positions.length});
               //that.view.genome_scale.tweenTo({left: 0, right: _.last(that.data.snp_cache.snp_positions)});
-              that.view.genome_scale.tweenTo({left: 0, right: 50000000});
+             that.view.genome_scale.tweenTo({left: 2367890, right: 2368326});
+              that.view.rescaleGenomic({left: 2367890, right:2368326})
+
               return true;
             }
           }

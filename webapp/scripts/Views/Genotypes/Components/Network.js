@@ -175,7 +175,7 @@ define(["d3", "DQX/Utils"],
 
           // Update the nodes…
           var node = that.svg.selectAll(".node");
-          node = node.data(that.nodes, function(d) { return d.ID; })//.style("fill", color);
+          node = node.data(that.nodes, function(d) { return d.ox_code; })//.style("fill", color);
           // Exit any old nodes.
           node.exit().remove();
           // Enter any new nodes.

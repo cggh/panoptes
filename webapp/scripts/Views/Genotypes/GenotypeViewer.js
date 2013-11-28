@@ -128,7 +128,7 @@
               }
             },
           ]
-          that.sample_leaf_sort = function(a,b) {return d3.descending(a.selected_haplotype+ a.SampleContext.Site.Name, b.selected_haplotype+ b.SampleContext.Site.Name);};
+          that.sample_leaf_sort = function(a,b) {return d3.descending(a.selected_haplotype+ a.country, b.selected_haplotype+ b.country);};
         } else {
           that.view.sample_heirachy = [
             {
@@ -304,8 +304,7 @@
         that.throttledUpdateSNPs();
         var ctx = that.canvas.get(0).getContext('2d');
         var tweens = tween.getAll().length;
-        tween.update();
-
+        
         if (tweens || that.needUpdate) {
           //Clear by change of size
           that.canvas.attr('width', that.width());
@@ -341,6 +340,7 @@
           ctx.lineTo(30, 10+(10*Math.sin(((30*Math.PI*4)/100)+that.load_indicator)));
           ctx.stroke();
         }
+	tween.update();
       };
 
       //Mouse and Touch events
@@ -357,7 +357,7 @@
       that.gene_map_height = 100;
       that.col_header_height = 100;
       that.row_height = 15;
-      that.compressed_row_height = 2;
+      that.compressed_row_height = 5;
       that.cluster = 0;
 
       //Bounding boxes set on resize
@@ -474,8 +474,8 @@
       that.setSamples([]);
 
       //TODO Auto-fix this
-      //that.view.snp_scale.domain([2358158, 2431617]);
-
+      that.view.genome_scale.tweenTo({left: 2367890, right: 2368326});
+              
       that.resize();
 
       easel.Ticker.useRAF = true;
