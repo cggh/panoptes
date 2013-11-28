@@ -60,19 +60,58 @@ def ImportGlobalSettings(datasetId, settings):
         ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
 
-#path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
-path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
+path_DQXServer = '/Users/pvaut/Documents/SourceCode/DQXServer' #!!! todo: make this generic
+#path_DQXServer = '/home/pvaut/PycharmProjects/DQXServer' #!!! todo: make this generic
 
 def RunConvertor(name, runpath, arguments):
     os.chdir(runpath)
     scriptPath = os.path.join(path_DQXServer, 'Convertors')
-    cmd = config.pythoncommand + ' ' + scriptPath + '/' + name + '.py '+' '.join(arguments)
+    cmd = config.pythoncommand + ' ' + scriptPath + '/' + name + '.py '+' '.join([str(a) for a in arguments])
     print('EXECUTING COMMAND '+cmd)
     os.system(cmd)
 
+def ExecuteFilterbankSummary(destFolder, id, settings):
+    RunConvertor('_CreateSimpleFilterBankData', destFolder,
+                 [
+                     id,
+                     settings['MinVal'],
+                     settings['MaxVal'],
+                     settings['BlockSizeStart'],
+                     settings['BlockSizeIncrFactor'],
+                     settings['BlockSizeMax']
+                ]
+    )
+
+
+def ImportRefGenomeSummaryData(datasetId, folder):
+    summaryids = []
+    for dir in os.listdir(os.path.join(folder, 'summaryvalues')):
+        if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):
+            summaryids.append(dir)
+    for summaryid in summaryids:
+        print('### IMPORTING REF GENOME SUMMARY DATA '+summaryid)
+        destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, summaryid)
+        if not os.path.exists(destFolder):
+            os.makedirs(destFolder)
+        dataFileName = os.path.join(destFolder, summaryid)
+        shutil.copyfile(os.path.join(folder, 'summaryvalues', summaryid, 'values'), dataFileName)
+
+        settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
+        settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
+        settings.AddTokenIfMissing('BlockSizeIncrFactor', 2)
+        settings.AddTokenIfMissing('MinVal', 0)
+        settings.AddTokenIfMissing('BlockSizeStart', 1)
+        settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
+        settings.AddTokenIfMissing('Order', 99999)
+        print('SETTINGS: '+settings.ToJSON())
+        ExecuteFilterbankSummary(destFolder, summaryid, settings)
+
+    sys.exit()
 
 
 def ImportRefGenome(datasetId, folder):
+
+    ImportRefGenomeSummaryData(datasetId, folder)
 
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
     settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])
