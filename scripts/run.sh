@@ -11,5 +11,5 @@ cd ..
 PROJECT_ROOT=`pwd`;
 cd build/dependencies/DQXServer
 source bin/activate
-bin/gunicorn -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 4 wsgi_static:application
+bin/gunicorn -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 20 wsgi_static:application
 
