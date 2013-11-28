@@ -15,6 +15,15 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
     primkey = tableInfo['primkey']
     print('#### IMPORTING CUSTOM DATA into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
 
+    #Get list of existing properties
+    db = DQXDbTools.OpenDatabase(datasetId)
+    cur = db.cursor()
+    cur.execute('SELECT propid FROM propertycatalog WHERE (workspaceid="{0}") and (source="custom") and (tableid="{1}")'.format(workspaceid, tableid))
+    existingProperties = [row[0] for row in cur.fetchall()]
+    print('Existing properties: '+str(existingProperties))
+    db.close()
+
+
     # Load & create properties
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
@@ -106,23 +115,21 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
     cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
 
     # Dropping columns that will be replaced
-    #cur.execute('SELECT propid FROM propertycatalog WHERE (workspaceid="{0}") and (source="custom") and (tableid="{1}")'.format(workspaceid, tableid))
-    #existingProperties = []
-    #for row in cur.fetchall():
-    #    existProperty= row[0]
-    #    if existProperty in propidList:
-    #        existingProperties.append(row[0])
-    #if len(existingProperties) > 0:
-    #    print('Removing outdated information')
-    #    for prop in existingProperties:
-    #        cur.execute('DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid))
-    #    sql = "ALTER TABLE {0} ".format(sourcetable)
-    #    for prop in propidList:
-    #        if prop != propidList[0]:
-    #            sql += " ,"
-    #        sql += "DROP COLUMN {0}".format(prop)
-    #    print('=========== STATEMENT '+sql)
-    #    cur.execute(sql)
+    toRemoveExistingProperties = []
+    for existProperty in existingProperties:
+        if existProperty in propidList:
+            toRemoveExistingProperties.append(row[0])
+    if len(toRemoveExistingProperties) > 0:
+        print('Removing outdated information')
+        for prop in toRemoveExistingProperties:
+            cur.execute('DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid))
+        sql = "ALTER TABLE {0} ".format(sourcetable)
+        for prop in propidList:
+            if prop != propidList[0]:
+                sql += " ,"
+            sql += "DROP COLUMN {0}".format(prop)
+        print('=========== STATEMENT '+sql)
+        cur.execute(sql)
 
 
 
