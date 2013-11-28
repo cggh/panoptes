@@ -94,28 +94,37 @@ def read_count_stream(coord_groups):
 
 
 def handler(start_response, request_data):
-    var_idx = index_from_query(request_data['database'], 
-    	                           request_data['var_tbname'],
-                                   request_data['var_qry'],
-                                   'pos')
+    key = hashlib.sha224((request_data['database'] + 
+                          request_data['var_tbname'] +
+                          request_data['var_qry'] + 
+                          request_data['samp_tbname'] +
+                          request_data['samp_qry'] + 
+                          '_2d')).hexdigest()
+    try:
+        data = cache[key]
+    except KeyError:
+        var_idx = index_from_query(request_data['database'], 
+        	                           request_data['var_tbname'],
+                                       request_data['var_qry'],
+                                       'pos')
 
-    samp_idx = index_from_query(request_data['database'],
-    	                           request_data['samp_tbname'],
-                                   request_data['samp_qry'],
-                                   'ox_code')
+        samp_idx = index_from_query(request_data['database'],
+        	                           request_data['samp_tbname'],
+                                       request_data['samp_qry'],
+                                       'ox_code')
 
-    #SQL interface can't cope with con-current queries...
-    samp_idx = list(samp_idx)
-    var_idx = list(var_idx)
-    coord_groups = split(160, ((var, samp) for samp in samp_idx for var in var_idx))
-    coord_groups = list(coord_groups)
-    # print coord_groups
-    genotypes = read_count_stream(coord_groups)
+        #SQL interface can't cope with con-current queries...
+        samp_idx = list(samp_idx)
+        var_idx = list(var_idx)
+        coord_groups = split(160, ((var, samp) for samp in samp_idx for var in var_idx))
+        coord_groups = list(coord_groups)
+        # print coord_groups
+        genotypes = read_count_stream(coord_groups)
 
-    #genotypes = list(genotypes)
-    #print genotypes
-    data = gzip(bytes(bytearray(pack_bytes('<H', genotypes))))
-    #    cache[key] = data
+        #genotypes = list(genotypes)
+        #print genotypes
+        data = gzip(bytes(bytearray(pack_bytes('<H', genotypes))))
+        cache[key] = data
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
