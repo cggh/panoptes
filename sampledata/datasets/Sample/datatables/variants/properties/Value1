@@ -6,3 +6,7 @@ ShowInBrowser: true
 MinVal: 0
 MaxVal: 2
 DecimDigits: 2
+SummaryValues:
+   BlockSizeMin: 20
+   BlockSizeMax: 50000
+   ChannelColor: "rgb(0,100,0)"

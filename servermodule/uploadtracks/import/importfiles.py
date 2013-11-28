@@ -102,6 +102,7 @@ def ImportRefGenomeSummaryData(datasetId, folder):
         settings.AddTokenIfMissing('BlockSizeMin', 1)
         settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
         settings.AddTokenIfMissing('Order', 99999)
+        settings.DefineKnownTokens(['channelColor'])
         print('SETTINGS: '+settings.ToJSON())
         print('Executing filter bank')
         ExecuteFilterbankSummary(destFolder, summaryid, settings)
@@ -198,7 +199,8 @@ def ImportDataTable(datasetId, tableid, folder):
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
         if os.path.isfile(os.path.join(folder, 'properties', fle)):
-            properties.append({'propid':fle})
+            if fle.find('~')<0:
+                properties.append({'propid':fle})
     print('Properties: '+str(properties))
 
     for property in properties:
@@ -211,7 +213,7 @@ def ImportDataTable(datasetId, tableid, folder):
         property['DataType'] = settings['DataType']
         property['Order'] = settings['Order']
         extraSettings = settings.Clone()
-        extraSettings.DropTokens(['Name', 'DataType', 'Order'])
+        extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
         sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
             settings['DataType'],
             propid,
@@ -221,6 +223,13 @@ def ImportDataTable(datasetId, tableid, folder):
             extraSettings.ToJSON()
         )
         ExecuteSQL(datasetId, sql)
+        property['settings'] = settings
+
+
+
+
+
+
 
     properties = sorted(properties, key=lambda k: k['Order'])
     propidList = []
@@ -305,6 +314,49 @@ def ImportDataTable(datasetId, tableid, folder):
 
 
 
+    print('Creating summary values')
+    for property in properties:
+        propid = property['propid']
+        settings = property['settings']
+        if settings.HasToken('SummaryValues'):
+            summSettings = settings.GetSubSettings('SummaryValues')
+            if settings.HasToken('minval'):
+                summSettings.AddTokenIfMissing('MinVal', settings['minval'])
+            summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
+            summSettings.RequireTokens(['BlockSizeMax'])
+            summSettings.AddTokenIfMissing('MinVal', 0)
+            summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+            summSettings.DefineKnownTokens(['channelColor'])
+            print('Executing filter bank')
+            destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
+            if not os.path.exists(destFolder):
+                os.makedirs(destFolder)
+            dataFileName = os.path.join(destFolder, propid)
+            fp = open(dataFileName, 'w')
+            colnr_chrom = tb.GetColNr('chrom')
+            colnr_pos = tb.GetColNr('pos')
+            colnr_val = tb.GetColNr(propid)
+            for rownr in tb.GetRowNrRange():
+                fp.write("{0}\t{1}\t{2}\n".format(
+                    tb.GetValue(rownr, colnr_chrom),
+                    int(tb.GetValue(rownr, colnr_pos)),
+                    tb.GetValue(rownr, colnr_val)
+                ))
+            fp.close()
+            ExecuteFilterbankSummary(destFolder, propid, summSettings)
+            extraSummSettings = summSettings.Clone()
+            extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+            sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '{1}', '{2}', {3}, '{4}', {5}, {6}, {7})".format(
+                propid,
+                tableid,
+                settings['Name'],
+                -1,
+                extraSummSettings.ToJSON(),
+                summSettings['MinVal'],
+                summSettings['MaxVal'],
+                summSettings['BlockSizeMin']
+            )
+            ExecuteSQL(datasetId, sql)
 
 
 
@@ -345,8 +397,6 @@ def ImportDataSet(baseFolder, datasetId):
     print('Defining global settings')
     ImportGlobalSettings(datasetId, globalSettings)
 
-    ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
-
 
     datatables = []
     for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
@@ -356,6 +406,8 @@ def ImportDataSet(baseFolder, datasetId):
     for datatable in datatables:
         ImportDataTable(datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable))
 
+
+    ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
 
     # Finalise: register dataset
     print('Registering data set')

@@ -22,6 +22,11 @@ class SettingsLoader:
         else:
             self.fileName = ''
 
+    def LoadDict(self, st):
+        self.settings = copy.deepcopy(st)
+
+
+
     def RequireTokens(self, tokensList):
         self._CheckLoaded()
         self.DefineKnownTokens(tokensList)
@@ -75,6 +80,20 @@ class SettingsLoader:
     def Get(self):
         self._CheckLoaded()
         return self.settings
+
+    def GetSubSettings(self, token):
+        self._CheckLoaded()
+        if not self.HasToken(token):
+            raise Exception('Missing settings token '+token)
+        if type(self.settings[token]) is not dict:
+            raise Exception('Not a subtoken: '+token)
+        st = SettingsLoader()
+        st.LoadDict(self.settings[token])
+        return st
+
+    def HasToken(self, token):
+        self._CheckLoaded()
+        return token in self.settings
 
     def GetTokenList(self):
         return [token for token in self.settings]
