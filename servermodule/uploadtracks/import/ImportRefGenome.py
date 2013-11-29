@@ -1,5 +1,6 @@
 import os
 import DQXDbTools
+import DQXUtils
 import config
 import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
@@ -17,6 +18,7 @@ def ImportRefGenomeSummaryData(datasetId, folder):
             summaryids.append(dir)
     for summaryid in summaryids:
         print('### IMPORTING REF GENOME SUMMARY DATA '+summaryid)
+        DQXUtils.CheckValidIdentifier(summaryid)
         destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, summaryid)
         if not os.path.exists(destFolder):
             os.makedirs(destFolder)

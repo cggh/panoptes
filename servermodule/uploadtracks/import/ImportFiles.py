@@ -19,6 +19,7 @@ def ImportDataSet(baseFolder, datasetId):
     print('==================================================================')
     print('IMPORTING DATASET {0}'.format(datasetId))
     print('==================================================================')
+    DQXUtils.CheckValidIdentifier(datasetId)
     datasetFolder = os.path.join(baseFolder, datasetId)
     indexDb = 'datasetindex'
 

@@ -17,6 +17,7 @@ def ImportDataTable(datasetId, tableid, folder):
     print('==================================================================')
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
+    DQXUtils.CheckValidIdentifier(tableid)
 
     tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
     tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'IsPositionOnGenome'])
