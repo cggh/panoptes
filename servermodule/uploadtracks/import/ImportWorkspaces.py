@@ -1,5 +1,6 @@
 import os
 import DQXDbTools
+import DQXUtils
 import config
 import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
@@ -34,6 +35,7 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
 
     for property in properties:
         propid = property['propid']
+        DQXUtils.CheckValidIdentifier(propid)
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'properties', propid))
         settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
         settings.ConvertToken_Boolean('isCategorical')

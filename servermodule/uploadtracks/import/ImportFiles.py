@@ -1,11 +1,11 @@
 import os
 import DQXDbTools
 import config
+import sys
 import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
 import ImpUtils
 import uuid
-import sys
 import shutil
 import customresponders.uploadtracks.Utils as Utils
 
