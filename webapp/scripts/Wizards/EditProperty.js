@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/ServerIO", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "MetaData"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, ServerIO, Wizard, Popup, PopupFrame, MetaData) {
 
         var EditProperty = {};
 
@@ -29,7 +29,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 data.workspaceid = MetaData.workspaceid;
                 data.propid = propid;
                 data.tableid = tableid;
-                asyncRequest("property_del", data, function() {
+                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", "property_del", data, function() {
                     Msg.send({ type: 'ReloadChannelInfo' });
                 });
             }

@@ -1,5 +1,6 @@
 import os
 import DQXDbTools
+import DQXUtils
 import config
 import sys
 import customresponders.uploadtracks.VTTable as VTTable
@@ -80,4 +81,5 @@ def ImportFileSet(baseFolder):
 
 
 
-ImportFileSet(config.SOURCEDATADIR + '/datasets')
+#ImportFileSet(config.SOURCEDATADIR + '/datasets')
+ImportDataSet(config.SOURCEDATADIR + '/datasets', 'Sample')
