@@ -11,7 +11,7 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-def ImportRefGenomeSummaryData(datasetId, folder):
+def ImportRefGenomeSummaryData(calculationObject, datasetId, folder):
     summaryids = []
     for dir in os.listdir(os.path.join(folder, 'summaryvalues')):
         if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):
@@ -34,7 +34,7 @@ def ImportRefGenomeSummaryData(datasetId, folder):
         settings.DefineKnownTokens(['channelColor'])
         print('SETTINGS: '+settings.ToJSON())
         print('Executing filter bank')
-        ImpUtils.ExecuteFilterbankSummary(destFolder, summaryid, settings)
+        ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid, settings)
         extraSettings = settings.Clone()
         extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
         sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
@@ -50,14 +50,14 @@ def ImportRefGenomeSummaryData(datasetId, folder):
 
 
 
-def ImportRefGenome(datasetId, folder):
+def ImportRefGenome(calculationObject, datasetId, folder):
 
-    ImportRefGenomeSummaryData(datasetId, folder)
+    ImportRefGenomeSummaryData(calculationObject, datasetId, folder)
 
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
     settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])
     print('Settings: '+str(settings.Get()))
-    ImpUtils.ImportGlobalSettings(datasetId, settings)
+    ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
     # Import reference genome
     print('Converting reference genome')
@@ -66,7 +66,7 @@ def ImportRefGenome(datasetId, folder):
         os.makedirs(destfolder)
     tempfastafile = destfolder + '/refsequence.fa'
     shutil.copyfile(os.path.join(folder, 'refsequence.fa'), tempfastafile)
-    ImpUtils.RunConvertor('Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+    ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
 
 
     # Import chromosomes
@@ -92,7 +92,7 @@ def ImportRefGenome(datasetId, folder):
     tempgfffile = ImpUtils.GetTempFileName()
     temppath = os.path.dirname(tempgfffile)
     shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
-    ImpUtils.RunConvertor('ParseGFF', temppath, [os.path.basename(tempgfffile)])
+    ImpUtils.RunConvertor(calculationObject, 'ParseGFF', temppath, [os.path.basename(tempgfffile)])
     print('Importing annotation')
     ImpUtils.ExecuteSQLScript(os.path.join(temppath, 'annotation_dump.sql'), datasetId)
     os.remove(tempgfffile)

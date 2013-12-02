@@ -11,7 +11,7 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
+def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folder):
     tableid = tableInfo['id']
     primkey = tableInfo['primkey']
     print('#### IMPORTING CUSTOM DATA into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
@@ -176,7 +176,7 @@ def ImportCustomData(datasetId, workspaceid, tableInfo, folder):
 
 
 
-def ImportWorkspace(datasetId, workspaceid, folder):
+def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
     print('##### IMPORTING WORKSPACE '+workspaceid)
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
     settings.RequireTokens(['Name'])
@@ -209,13 +209,13 @@ def ImportWorkspace(datasetId, workspaceid, folder):
                 raise Exception('Invalid table id '+tableid)
             for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
                 if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
-                    ImportCustomData(datasetId, workspaceid, tableMap[tableid], os.path.join(folder, 'customdata', tableid, customid))
+                    ImportCustomData(calculationObject, datasetId, workspaceid, tableMap[tableid], os.path.join(folder, 'customdata', tableid, customid))
 
 
-def ImportWorkspaces(datasetFolder, datasetId):
+def ImportWorkspaces(calculationObject, datasetFolder, datasetId):
     workspaces = []
     for dir in os.listdir(os.path.join(datasetFolder, 'workspaces')):
         if os.path.isdir(os.path.join(datasetFolder, 'workspaces', dir)):
             workspaces.append(dir)
     for workspace in workspaces:
-        ImportWorkspace(datasetId, workspace, os.path.join(datasetFolder, 'workspaces', workspace))
+        ImportWorkspace(calculationObject, datasetId, workspace, os.path.join(datasetFolder, 'workspaces', workspace))

@@ -36,8 +36,8 @@ require.config({
 });
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData",  ],
-    function (_, $, Application, Framework, FrameList, Controls, Msg, DQX, ServerIO, SQL, DataFetchers, MetaData) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData",  ],
+    function (_, $, Application, Framework, FrameList, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData) {
         $(function () {
 
 
@@ -78,6 +78,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         ]));
 
                         this.panelCalculations = FrameList(this.frameCalculations);
+                        this.panelCalculations.setOnItemHighlighted(that.showCalculationLog);
                         that.updateCalculationInfo();
                     }
 
@@ -135,6 +136,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 setTimeout(that.updateCalculationInfo,5000);
                             }
                         );
+                    }
+
+                    that.showCalculationLog = function(id) {
+                        DQX.customRequest(MetaData.serverUrl,'uploadtracks','getcalculationlog',{ id: id },function(resp) {
+                            if (resp.Error)
+                                Popup.create('Calculation log', 'No log data present');
+                            else
+                                Popup.create('Calculation log', '<PRE>'+resp.Content+'</PRE>');
+                        });
                     }
 
 

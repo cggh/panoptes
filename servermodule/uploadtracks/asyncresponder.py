@@ -2,6 +2,9 @@ import threading
 import uuid
 import DQXDbTools
 import datetime
+import config
+import os
+import sys
 
 
 
@@ -92,13 +95,22 @@ class CalculationThread (threading.Thread):
         self.data = data
     def run(self):
         theCalculationThreadList.AddThread(self.id, self.calculationname)
+        self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
+        self.logfile = open(self.logfilename, 'w')
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+        sys.stdout = self.logfile
+        sys.stderr = self.logfile
         try:
-            self.handler(self.data,self)
+            self.handler(self.data, self)
             theCalculationThreadList.DelThread(self.id)
         except Exception as e:
             theCalculationThreadList.SetFailed(self.id)
             print('====== CALCULATION ERROR '+str(e))
             self.SetInfo('Error: '+str(e))
+        sys.stdout = orig_stdout
+        sys.stderr = orig_stderr
+        self.logfile.close()
 
     def SetInfo(self, status, progress=None):
         theCalculationThreadList.SetInfo(self.id, status, progress)
@@ -108,6 +120,14 @@ class CalculationThread (threading.Thread):
 
     def SetScope(self, scope):
         theCalculationThreadList.SetScope(self.id, scope)
+
+
+    def RunPythonScript(self, scriptFile, runPath, arguments):
+        os.chdir(runPath)
+        cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
+        cmd += ' >> ' + self.logfilename + ' 2>&1'
+        print('EXECUTING COMMAND '+cmd)
+        os.system(cmd)
 
 
 def GetCalculationInfo(id):

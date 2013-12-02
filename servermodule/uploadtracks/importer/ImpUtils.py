@@ -49,16 +49,14 @@ def ExecuteSQL(database, command):
     cur.close()
     db.close()
 
-def RunConvertor(name, runpath, arguments):
-    os.chdir(runpath)
+def RunConvertor(calculationObject, name, runpath, arguments):
     path_DQXServer = DQXUtils.GetDQXServerPath()
-    scriptPath = os.path.join(path_DQXServer, 'Convertors')
-    cmd = config.pythoncommand + ' ' + scriptPath + '/' + name + '.py '+' '.join([str(a) for a in arguments])
-    print('EXECUTING COMMAND '+cmd)
-    os.system(cmd)
+    scriptFile = os.path.join(path_DQXServer, 'Convertors', name + '.py')
+    calculationObject.RunPythonScript(scriptFile, runpath, arguments)
 
-def ExecuteFilterbankSummary(destFolder, id, settings):
-    RunConvertor('_CreateSimpleFilterBankData', destFolder,
+
+def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
+    RunConvertor(calculationObject, '_CreateSimpleFilterBankData', destFolder,
                  [
                      id,
                      settings['MinVal'],
@@ -69,7 +67,7 @@ def ExecuteFilterbankSummary(destFolder, id, settings):
                 ]
     )
 
-def ImportGlobalSettings(datasetId, settings):
+def ImportGlobalSettings(calculationObject, datasetId, settings):
     for token in settings.GetTokenList():
         ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 

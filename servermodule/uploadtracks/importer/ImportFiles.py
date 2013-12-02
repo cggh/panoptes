@@ -16,7 +16,7 @@ import ImportWorkspaces
 
 
 
-def ImportDataSet(baseFolder, datasetId):
+def ImportDataSet(calculationObject, baseFolder, datasetId):
     print('==================================================================')
     print('IMPORTING DATASET {0}'.format(datasetId))
     print('==================================================================')
@@ -24,12 +24,17 @@ def ImportDataSet(baseFolder, datasetId):
     datasetFolder = os.path.join(baseFolder, datasetId)
     indexDb = 'datasetindex'
 
+    #raise Exception('Something went wrong')
+
+
     globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
     globalSettings.RequireTokens(['Name'])
     print('Global settings: '+str(globalSettings.Get()))
 
 
+
     # Dropping existing database
+    calculationObject.SetInfo('Dropping database')
     print('Dropping database')
     ImpUtils.ExecuteSQL(indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
     try:
@@ -40,14 +45,16 @@ def ImportDataSet(baseFolder, datasetId):
 
 
     # Creating new database
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
+    calculationObject.SetInfo('Creating database')
     print('Creating new database')
-    with open('createdataset.sql', 'r') as content_file:
+    with open(scriptPath + '/createdataset.sql', 'r') as content_file:
         sqlCreateCommands = content_file.read()
     ImpUtils.ExecuteSQL(datasetId, sqlCreateCommands)
 
     # Global settings
     print('Defining global settings')
-    ImpUtils.ImportGlobalSettings(datasetId, globalSettings)
+    ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
 
 
     datatables = []
@@ -56,11 +63,11 @@ def ImportDataSet(baseFolder, datasetId):
             datatables.append(dir)
     print('Data tables: '+str(datatables))
     for datatable in datatables:
-        ImportDataTable.ImportDataTable(datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable))
+        ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable))
 
-    ImportRefGenome.ImportRefGenome(datasetId, os.path.join(datasetFolder, 'refgenome'))
+    ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'))
 
-    ImportWorkspaces.ImportWorkspaces(datasetFolder, datasetId)
+    ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId)
 
     # Finalise: register dataset
     print('Registering data set')
@@ -74,7 +81,7 @@ def ImportFileSet(baseFolder):
         if os.path.isdir(os.path.join(baseFolder, dir)):
             datasets.append(dir)
     for dataset in datasets:
-        ImportDataSet(baseFolder, dataset)
+        ImportDataSet(calculationObject, baseFolder, dataset)
 
 
 
@@ -82,4 +89,4 @@ def ImportFileSet(baseFolder):
 
 
 #ImportFileSet(config.SOURCEDATADIR + '/datasets')
-ImportDataSet(config.SOURCEDATADIR + '/datasets', 'Sample')
+#ImportDataSet(config.SOURCEDATADIR + '/datasets', 'Sample')

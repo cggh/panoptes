@@ -13,7 +13,7 @@ import customresponders.uploadtracks.Utils as Utils
 
 
 
-def ImportDataTable(datasetId, tableid, folder):
+def ImportDataTable(calculationObject, datasetId, tableid, folder):
     print('==================================================================')
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
@@ -183,7 +183,7 @@ def ImportDataTable(datasetId, tableid, folder):
                     tb.GetValue(rownr, colnr_val)
                 ))
             fp.close()
-            ImpUtils.ExecuteFilterbankSummary(destFolder, propid, summSettings)
+            ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, propid, summSettings)
             extraSummSettings = summSettings.Clone()
             extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
             sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '{1}', '{2}', {3}, '{4}', {5}, {6}, {7})".format(
