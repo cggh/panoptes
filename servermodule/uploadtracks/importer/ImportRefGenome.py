@@ -17,7 +17,7 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder):
         if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):
             summaryids.append(dir)
     for summaryid in summaryids:
-        print('### IMPORTING REF GENOME SUMMARY DATA '+summaryid)
+        calculationObject.SetInfo('Importing reference genome summary data '+summaryid)
         DQXUtils.CheckValidIdentifier(summaryid)
         destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, summaryid)
         if not os.path.exists(destFolder):
@@ -60,7 +60,7 @@ def ImportRefGenome(calculationObject, datasetId, folder):
     ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
     # Import reference genome
-    print('Converting reference genome')
+    calculationObject.SetInfo('Converting reference genome')
     destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
     if not os.path.exists(destfolder):
         os.makedirs(destfolder)
@@ -88,7 +88,7 @@ def ImportRefGenome(calculationObject, datasetId, folder):
     os.remove(sqlfile)
 
     # Import annotation
-    print('Converting annotation')
+    calculationObject.SetInfo('Converting annotation')
     tempgfffile = ImpUtils.GetTempFileName()
     temppath = os.path.dirname(tempgfffile)
     shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)

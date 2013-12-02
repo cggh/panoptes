@@ -113,6 +113,10 @@ class CalculationThread (threading.Thread):
         self.logfile.close()
 
     def SetInfo(self, status, progress=None):
+        logentry = status
+        if progress is not None:
+            logentry += ' '+str(progress)
+        print(logentry)
         theCalculationThreadList.SetInfo(self.id, status, progress)
 
     def SetName(self, name):

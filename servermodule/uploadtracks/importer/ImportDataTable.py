@@ -17,6 +17,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
     print('==================================================================')
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
+    calculationObject.SetInfo('Importing datatable {0}'.format(tableid))
     DQXUtils.CheckValidIdentifier(tableid)
 
     tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
@@ -159,6 +160,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
         propid = property['propid']
         settings = property['settings']
         if settings.HasToken('SummaryValues'):
+            calculationObject.SetInfo('Creating summary values for {0}.{1}'.format(tableid,propid))
             summSettings = settings.GetSubSettings('SummaryValues')
             if settings.HasToken('minval'):
                 summSettings.AddTokenIfMissing('MinVal', settings['minval'])

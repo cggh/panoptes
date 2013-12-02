@@ -36,8 +36,8 @@ require.config({
 });
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData",  ],
-    function (_, $, Application, Framework, FrameList, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData",  ],
+    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData) {
         $(function () {
 
 
@@ -55,7 +55,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         rootFrame.makeGroupHor();
 
                         this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 300);
-                        this.frameChannels = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("Workspace overview");
+                        this.frameSourceData = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("Source data");
                         this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                     }
 
@@ -77,10 +77,29 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             buttonLoadDataset
                         ]));
 
+                        that.createPanelSourceData();
+
                         this.panelCalculations = FrameList(this.frameCalculations);
                         this.panelCalculations.setOnItemHighlighted(that.showCalculationLog);
                         that.updateCalculationInfo();
                     }
+
+
+                    that.createPanelSourceData = function() {
+                        that.panelSourceData = FrameTree.Tree(this.frameSourceData);
+
+                        $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
+                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+datasetid+'</span>'));
+                            var workspaceBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'Workspaces')).setCanSelect(false);
+                            $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
+                                var branch = workspaceBranch.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+workspaceid+'</span>'));
+                            });
+                        });
+
+                        that.panelSourceData.render();
+
+                    }
+
 
                     that.updateCalculationInfo = function() {
                         //return;
@@ -153,11 +172,21 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
             };
 
-            IntroModule.init();
+            Application.bootScheduler = DQX.Scheduler();
 
+            Application.bootScheduler.add([], function() {
+                DQX.customRequest(MetaData.serverUrl,'uploadtracks','getimportfilelist',{},function(resp) {
+                    MetaData.sourceFileInfo =resp.datasets;
+                    Application.bootScheduler.setCompleted('getimportfilelist');
+                });
+            });
 
-            Application.init('Panoptes Admin');
+            Application.bootScheduler.add(['getimportfilelist'], function() {
+                IntroModule.init();
+                Application.init('Panoptes Admin');
+            });
 
+            Application.bootScheduler.execute();
 
 
 
