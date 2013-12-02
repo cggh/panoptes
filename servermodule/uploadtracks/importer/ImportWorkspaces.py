@@ -177,7 +177,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
 
 
 def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
-    print('##### IMPORTING WORKSPACE '+workspaceid)
+    print('##### IMPORTING WORKSPACE {0}.{1}'.format(datasetId, workspaceid))
+    print('Source directory: '+folder)
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
     settings.RequireTokens(['Name'])
     print(settings.ToJSON())
@@ -192,9 +193,16 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
 
     for table in tables:
         tableid = table['id']
+        print('Re-creating custom data table for '+tableid)
+        cur.execute("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
         cur.execute("CREATE TABLE {0} AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
         cur.execute("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
 
+    print('Removing existing workspace properties')
+    cur.execute("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
+
+    print('Re-creating workspaces record')
+    cur.execute("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
     cur.execute("INSERT INTO workspaces VALUES (%s,%s)", (workspaceid, workspaceName) )
     for table in tables:
         Utils.UpdateTableInfoView(workspaceid, table['id'], cur)

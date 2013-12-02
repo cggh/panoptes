@@ -12,7 +12,11 @@ import importer.ImportFiles
 
 
 def ResponseExecute(data, calculationObject):
-    importer.ImportFiles.ImportDataSet(calculationObject, config.SOURCEDATADIR + '/datasets', 'Sample')
+    datasetid = data['dataset']
+    importer.ImportFiles.ImportDataSet(
+        calculationObject,
+        config.SOURCEDATADIR + '/datasets',
+        datasetid)
 
 def response(returndata):
     retval = asyncresponder.RespondAsync(ResponseExecute, returndata, "Load dataset")

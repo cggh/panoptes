@@ -45,6 +45,8 @@ class CalculationThreadList:
                 self.threads[id]['progress'] = progress
         db = DQXDbTools.OpenDatabase()
         cur = db.cursor()
+        status = status.replace('"','#')
+        status = status.replace("'",'#')
         sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
         cur.execute(sqlstring)
         db.commit()
@@ -108,6 +110,12 @@ class CalculationThread (threading.Thread):
             theCalculationThreadList.SetFailed(self.id)
             print('====== CALCULATION ERROR '+str(e))
             self.SetInfo('Error: '+str(e))
+        # except:
+        #     e = sys.exc_info()[0]
+        #     theCalculationThreadList.SetFailed(self.id)
+        #     print('====== GENERAL CALCULATION ERROR '+str(e))
+        #     self.SetInfo('Error: '+str(e))
+        print("--- Closing log ---")
         sys.stdout = orig_stdout
         sys.stderr = orig_stderr
         self.logfile.close()

@@ -65,12 +65,27 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         this.panelButtons = Framework.Form(this.frameButtons);
                         this.panelButtons.setPadding(10);
 
-                        var buttonLoadDataset = Controls.Button(null, { content: 'Load dataset', width:120, height:40 }).setOnChanged(function() {
-                            data={};
-                            data.dataset = 'Sample';
-                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
-                                alert('completed');
-                            });
+                        var buttonLoadDataset = Controls.Button(null, { content: 'Load highlighted file source', width:120, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if (!sourceFileInfo) {
+                                alert('Please select a source file set from the tree')
+                                return;
+                            }
+                            if (sourceFileInfo.workspaceid) {
+                                //Upload a workspace
+                                data={};
+                                data.dataset = sourceFileInfo.datasetid;
+                                data.workspace = sourceFileInfo.workspaceid;
+                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_workspace', data, function(resp) {
+                                });
+                            }
+                            else {
+                                //Upload a dataset
+                                data={};
+                                data.dataset = sourceFileInfo.datasetid;
+                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
+                                });
+                            }
                         })
 
                         this.panelButtons.addControl(Controls.CompoundHor([
@@ -88,11 +103,19 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.createPanelSourceData = function() {
                         that.panelSourceData = FrameTree.Tree(this.frameSourceData);
 
+                        that.sourceFileInfoList = {};
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
                             var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+datasetid+'</span>'));
+                            that.sourceFileInfoList[datasetBranch.getID()] = {
+                                datasetid: datasetid
+                            };
                             var workspaceBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'Workspaces')).setCanSelect(false);
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
                                 var branch = workspaceBranch.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+workspaceid+'</span>'));
+                                that.sourceFileInfoList[branch.getID()] = {
+                                    datasetid: datasetid,
+                                    workspaceid: workspaceid
+                                };
                             });
                         });
 
