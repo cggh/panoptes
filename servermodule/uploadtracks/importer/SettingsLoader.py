@@ -52,6 +52,7 @@ class SettingsLoader:
 
     def AddTokenIfMissing(self, token, value):
         self._CheckLoaded()
+        self.DefineKnownTokens([token])
         if token not in self.settings:
             self.settings[token] = value
 

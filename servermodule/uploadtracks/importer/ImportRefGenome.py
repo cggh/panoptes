@@ -52,6 +52,11 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder):
 
 def ImportRefGenome(calculationObject, datasetId, folder):
 
+    print('==== Importing reference genome data ===')
+    if not os.path.exists(folder):
+        print('No data: skipping')
+        return
+
     ImportRefGenomeSummaryData(calculationObject, datasetId, folder)
 
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
@@ -99,3 +104,5 @@ def ImportRefGenome(calculationObject, datasetId, folder):
     os.remove(os.path.join(temppath, 'annotation.txt'))
     os.remove(os.path.join(temppath, 'annotation_dump.sql'))
     os.remove(os.path.join(temppath, 'annotation_create.sql'))
+
+    print('--- Finished importing reference genome data ---')

@@ -29,6 +29,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId):
 
     globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
     globalSettings.RequireTokens(['Name'])
+    globalSettings.AddTokenIfMissing('hasGenomeBrowser', False)
+
     print('Global settings: '+str(globalSettings.Get()))
 
 

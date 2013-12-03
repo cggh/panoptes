@@ -14,11 +14,14 @@ import importer.ImportWorkspaces
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     workspaceid = data['workspaceid']
-    importer.ImportWorkspaces.ImportWorkspace(
+    sourceid = data['sourceid']
+    tableid = data['tableid']
+    importer.ImportWorkspaces.ImportCustomData(
         calculationObject,
         datasetid,
         workspaceid,
-        config.SOURCEDATADIR + '/datasets/' + datasetid + '/workspaces/' + workspaceid
+        tableid,
+        os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'workspaces', workspaceid, 'customdata', tableid, sourceid)
     )
 
 def response(returndata):

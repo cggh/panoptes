@@ -21,7 +21,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
     DQXUtils.CheckValidIdentifier(tableid)
 
     tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-    tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'IsPositionOnGenome'])
+    tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
+    tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
     extraSettings = tableSettings.Clone()
     extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome'])
 
@@ -39,7 +40,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
         if os.path.isfile(os.path.join(folder, 'properties', fle)):
-            if fle.find('~') < 0:
+            if (fle.find('~') < 0) and (fle[0] != '.'):
                 properties.append({'propid':fle})
     print('Properties: '+str(properties))
 
@@ -199,3 +200,5 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
                 summSettings['BlockSizeMin']
             )
             ImpUtils.ExecuteSQL(datasetId, sql)
+
+    print('--- Finished importing datatable {0} ---'.format(tableid))

@@ -11,10 +11,19 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folder):
-    tableid = tableInfo['id']
-    primkey = tableInfo['primkey']
+def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder):
+
     print('#### IMPORTING CUSTOM DATA into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
+
+    db = DQXDbTools.OpenDatabase(datasetId)
+    cur = db.cursor()
+    cur.execute('SELECT primkey FROM tablecatalog WHERE id="{0}"'.format(tableid))
+    primkey = cur.fetchone()[0]
+    db.close()
+
+
+    sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
+    print('Source table: '+sourcetable)
 
     #Get list of existing properties
     db = DQXDbTools.OpenDatabase(datasetId)
@@ -25,13 +34,42 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
     db.close()
 
 
-    # Load & create properties
+    # Load properties
     properties = []
     for fle in os.listdir(os.path.join(folder, 'properties')):
         if os.path.isfile(os.path.join(folder, 'properties', fle)):
-            if fle.find('~') < 0:
+            if (fle.find('~') < 0) and (fle[0] != '.'):
                 properties.append({'propid':fle})
     print('Properties: '+str(properties))
+
+    propidList = []
+    for property in properties:
+        DQXUtils.CheckValidIdentifier(property['propid'])
+        propidList.append(property['propid'])
+
+    db = DQXDbTools.OpenDatabase(datasetId)
+    cur = db.cursor()
+
+    # Dropping columns that will be replaced
+    toRemoveExistingProperties = []
+    for existProperty in existingProperties:
+        if existProperty in propidList:
+            toRemoveExistingProperties.append(existProperty)
+    print('Removing outdated information:')
+    if len(toRemoveExistingProperties) > 0:
+        for prop in toRemoveExistingProperties:
+            print('Removing outdated information: {0} {1} {2}'.format(workspaceid, prop, tableid))
+            sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
+            print(sql)
+            cur.execute(sql)
+        sql = "ALTER TABLE {0} ".format(sourcetable)
+        for prop in propidList:
+            if prop != propidList[0]:
+                sql += ", "
+            sql += "DROP COLUMN {0}".format(prop)
+        print('=========== STATEMENT '+sql)
+        cur.execute(sql)
+
 
     for property in properties:
         propid = property['propid']
@@ -45,6 +83,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
         property['Order'] = settings['Order']
         extraSettings = settings.Clone()
         extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
+        print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
         sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
             workspaceid,
             settings['DataType'],
@@ -59,11 +98,9 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
         property['settings'] = settings
 
     properties = sorted(properties, key=lambda k: k['Order'])
-    propidList = []
     propDict = {}
     for property in properties:
         propDict[property['propid']] = property
-        propidList.append(property['propid'])
 
     # Load datatable
     print('Loading data table')
@@ -97,7 +134,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
     print('---- PROCESSED TABLE ----')
     tb.PrintRows(0, 9)
 
-
     tmptable = Utils.GetTempID()
     tmpfile_create = ImpUtils.GetTempFileName()
     tmpfile_dump = ImpUtils.GetTempFileName()
@@ -108,30 +144,12 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableInfo, folde
     os.remove(tmpfile_create)
     os.remove(tmpfile_dump)
 
-    sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
 
-    db = DQXDbTools.OpenDatabase(datasetId)
-    cur = db.cursor()
 
     print('Indexing new information')
     cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
 
-    # Dropping columns that will be replaced
-    toRemoveExistingProperties = []
-    for existProperty in existingProperties:
-        if existProperty in propidList:
-            toRemoveExistingProperties.append(row[0])
-    if len(toRemoveExistingProperties) > 0:
-        print('Removing outdated information')
-        for prop in toRemoveExistingProperties:
-            cur.execute('DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid))
-        sql = "ALTER TABLE {0} ".format(sourcetable)
-        for prop in propidList:
-            if prop != propidList[0]:
-                sql += " ,"
-            sql += "DROP COLUMN {0}".format(prop)
-        print('=========== STATEMENT '+sql)
-        cur.execute(sql)
+
 
 
 
@@ -217,13 +235,20 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
                 raise Exception('Invalid table id '+tableid)
             for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
                 if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
-                    ImportCustomData(calculationObject, datasetId, workspaceid, tableMap[tableid], os.path.join(folder, 'customdata', tableid, customid))
+                    ImportCustomData(calculationObject, datasetId, workspaceid, tableid, os.path.join(folder, 'customdata', tableid, customid))
 
 
 def ImportWorkspaces(calculationObject, datasetFolder, datasetId):
+
+    print('==== IMPORTING WORKSPACE DATA ======')
+    if not os.path.exists(os.path.join(datasetFolder, 'workspaces')):
+        print('No data: skipping')
+        return
+
     workspaces = []
     for dir in os.listdir(os.path.join(datasetFolder, 'workspaces')):
         if os.path.isdir(os.path.join(datasetFolder, 'workspaces', dir)):
             workspaces.append(dir)
     for workspace in workspaces:
         ImportWorkspace(calculationObject, datasetId, workspace, os.path.join(datasetFolder, 'workspaces', workspace))
+    print('--- Finished importing workspace data')

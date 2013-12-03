@@ -55,7 +55,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         rootFrame.makeGroupHor();
 
                         this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 300);
-                        this.frameSourceData = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("Source data");
+                        this.frameSourceData = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("File sources");
                         this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                     }
 
@@ -71,21 +71,31 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 alert('Please select a source file set from the tree')
                                 return;
                             }
+                            if (sourceFileInfo.sourceid) {
+                                //Upload a specific custom data source
+                                var data={};
+                                data.datasetid = sourceFileInfo.datasetid;
+                                data.workspaceid = sourceFileInfo.workspaceid;
+                                data.sourceid = sourceFileInfo.sourceid;
+                                data.tableid = sourceFileInfo.tableid;
+                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_customsource', data, function(resp) {
+                                });
+                                return;
+                            }
                             if (sourceFileInfo.workspaceid) {
                                 //Upload a workspace
-                                data={};
-                                data.dataset = sourceFileInfo.datasetid;
-                                data.workspace = sourceFileInfo.workspaceid;
+                                var data={};
+                                data.datasetid = sourceFileInfo.datasetid;
+                                data.workspaceid = sourceFileInfo.workspaceid;
                                 ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_workspace', data, function(resp) {
                                 });
+                                return;
                             }
-                            else {
-                                //Upload a dataset
-                                data={};
-                                data.dataset = sourceFileInfo.datasetid;
-                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
-                                });
-                            }
+                            //Upload a dataset
+                            var data={};
+                            data.datasetid = sourceFileInfo.datasetid;
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
+                            });
                         })
 
                         this.panelButtons.addControl(Controls.CompoundHor([
@@ -109,13 +119,21 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.sourceFileInfoList[datasetBranch.getID()] = {
                                 datasetid: datasetid
                             };
-                            var workspaceBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'Workspaces')).setCanSelect(false);
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
-                                var branch = workspaceBranch.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+workspaceid+'</span>'));
-                                that.sourceFileInfoList[branch.getID()] = {
+                                var workspaceBranch = datasetBranch.addItem(FrameTree.Branch(null,'<b>'+workspaceid+'</b>'));
+                                that.sourceFileInfoList[workspaceBranch.getID()] = {
                                     datasetid: datasetid,
                                     workspaceid: workspaceid
                                 };
+                                $.each(workspaceInfo.sources, function(sourceid, sourceInfo) {
+                                    var branch = workspaceBranch.addItem(FrameTree.Branch(null,sourceid+' ('+sourceInfo.tableid+')'));
+                                    that.sourceFileInfoList[branch.getID()] = {
+                                        datasetid: datasetid,
+                                        workspaceid: workspaceid,
+                                        sourceid: sourceid,
+                                        tableid: sourceInfo.tableid
+                                    };
+                                });
                             });
                         });
 

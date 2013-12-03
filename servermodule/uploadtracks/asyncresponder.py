@@ -45,8 +45,8 @@ class CalculationThreadList:
                 self.threads[id]['progress'] = progress
         db = DQXDbTools.OpenDatabase()
         cur = db.cursor()
-        status = status.replace('"','#')
-        status = status.replace("'",'#')
+        status = status.replace('"','`')
+        status = status.replace("'",'`')
         sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
         cur.execute(sqlstring)
         db.commit()

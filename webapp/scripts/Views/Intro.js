@@ -31,10 +31,15 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelChannels = FrameTree.Tree(this.frameChannels);
                     that.updateChannelInfo();
 
-                    var browserButton = Application.getView('genomebrowser').createActivationButton({
-                        content: "Genome browser",
-                        bitmap: 'Bitmaps/circle_red_small.png'
-                    });
+                    var miscButtonList = [];
+
+                    if (MetaData.generalSettings.hasGenomeBrowser) {
+                        var browserButton = Application.getView('genomebrowser').createActivationButton({
+                            content: "Genome browser",
+                            bitmap: 'Bitmaps/circle_red_small.png'
+                        });
+                        miscButtonList.push(browserButton);
+                    }
 
                     var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
@@ -49,14 +54,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     bt_addprops.setOnChanged(function() {
                         UploadProperties.execute(function() {});
                     })
+                    miscButtonList.push(bt_addprops);
 
                     var bt_refresh = Controls.Button(null, { content: 'Refresh'}).setOnChanged(function() {
                         Msg.send({ type: 'ReloadChannelInfo' });
                     })
+                    miscButtonList.push(bt_refresh);
 
                     this.panelButtons.addControl(Controls.CompoundHor([
                         Controls.CompoundVert(tableButtons).setTreatAsBlock(),
-                        Controls.CompoundVert([browserButton, bt_addprops, bt_refresh]).setTreatAsBlock(),
+                        Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
                         Controls.VerticalSeparator(20),
                         Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
                         //Controls.ColorPicker(null, {label: 'Color', value: DQX.Color(1,1,0)})

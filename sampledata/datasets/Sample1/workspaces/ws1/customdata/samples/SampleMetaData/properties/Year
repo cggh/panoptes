@@ -1,0 +1,7 @@
+Name: Collection year
+DataType: Value
+Order: 1001
+ShowInTable: true
+MinVal: 0
+MaxVal: 20
+DecimDigits: 0
