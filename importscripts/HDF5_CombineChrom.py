@@ -41,8 +41,15 @@ def copy(object_name):
         #Dataset - create simlar copy but with room for all chroms
         shape = list(obj.shape)
         shape[0] = num_vars
-        dset = outfile.create_dataset(object_name, shape, obj.dtype,
-                                      maxshape=shape, compression='szip', fletcher32=False, shuffle=False)
+        print object_name, obj, shape, obj.dtype
+        try:
+            dset = outfile.create_dataset(object_name, shape, obj.dtype,
+                                          maxshape=shape, compression='szip', fletcher32=False, shuffle=False)
+        #Compression fails for some dtypes
+        except ValueError:
+            dset = outfile.create_dataset(object_name, shape, obj.dtype,
+                                          maxshape=shape, fletcher32=False, shuffle=False)
+
         offset = 0
         widgets[0] = object_name
         pbar = pb.ProgressBar(widgets=widgets, maxval=num_vars).start()
