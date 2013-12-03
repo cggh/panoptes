@@ -16,7 +16,7 @@ import ImportWorkspaces
 
 
 
-def ImportDataSet(calculationObject, baseFolder, datasetId):
+def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     print('==================================================================')
     print('IMPORTING DATASET {0}'.format(datasetId))
     print('==================================================================')
@@ -29,11 +29,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId):
 
     globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
     globalSettings.RequireTokens(['Name'])
-    globalSettings.AddTokenIfMissing('hasGenomeBrowser', False)
 
     print('Global settings: '+str(globalSettings.Get()))
-
-
 
     # Dropping existing database
     calculationObject.SetInfo('Dropping database')
@@ -54,10 +51,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId):
         sqlCreateCommands = content_file.read()
     ImpUtils.ExecuteSQL(datasetId, sqlCreateCommands)
 
-    # Global settings
-    print('Defining global settings')
-    ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
-
 
     datatables = []
     for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
@@ -65,11 +58,17 @@ def ImportDataSet(calculationObject, baseFolder, datasetId):
             datatables.append(dir)
     print('Data tables: '+str(datatables))
     for datatable in datatables:
-        ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable))
+        ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable), importSettings)
 
-    ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'))
+    if os.path.exists(os.path.join(datasetFolder, 'refgenome')):
+        ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'), importSettings)
+        globalSettings.AddTokenIfMissing('hasGenomeBrowser', True)
 
-    ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId)
+    ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId, importSettings)
+
+    # Global settings
+    print('Defining global settings')
+    ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
 
     # Finalise: register dataset
     print('Registering data set')
@@ -77,13 +76,13 @@ def ImportDataSet(calculationObject, baseFolder, datasetId):
 
 
 
-def ImportFileSet(baseFolder):
-    datasets = []
-    for dir in os.listdir(baseFolder):
-        if os.path.isdir(os.path.join(baseFolder, dir)):
-            datasets.append(dir)
-    for dataset in datasets:
-        ImportDataSet(calculationObject, baseFolder, dataset)
+# def ImportFileSet(baseFolder):
+#     datasets = []
+#     for dir in os.listdir(baseFolder):
+#         if os.path.isdir(os.path.join(baseFolder, dir)):
+#             datasets.append(dir)
+#     for dataset in datasets:
+#         ImportDataSet(calculationObject, baseFolder, dataset)
 
 
 

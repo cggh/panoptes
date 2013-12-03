@@ -13,7 +13,7 @@ import customresponders.uploadtracks.Utils as Utils
 
 
 
-def ImportDataTable(calculationObject, datasetId, tableid, folder):
+def ImportDataTable(calculationObject, datasetId, tableid, folder, importSettings):
     print('==================================================================')
     print('IMPORTING DATATABLE {0} from {1}'.format(tableid, folder))
     print('==================================================================')
@@ -23,8 +23,12 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
     tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
     tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
     tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
+    tableSettings.AddTokenIfMissing('MaxTableSize', None)
     extraSettings = tableSettings.Clone()
     extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome'])
+
+    if tableSettings['MaxTableSize'] is not None:
+        print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
 
     # Add to tablecatalog
     sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
@@ -91,7 +95,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder):
     tb = VTTable.VTTable()
     tb.allColumnsText = True
     try:
-        tb.LoadFile(os.path.join(folder, 'data'))
+        tb.LoadFile(os.path.join(folder, 'data'), tableSettings['MaxTableSize'])
     except Exception as e:
         raise Exception('Error while reading file: '+str(e))
     print('---- ORIG TABLE ----')

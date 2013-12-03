@@ -11,7 +11,9 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-def ImportRefGenomeSummaryData(calculationObject, datasetId, folder):
+def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
+    if not os.path.exists(os.path.join(folder, 'summaryvalues')):
+        return
     summaryids = []
     for dir in os.listdir(os.path.join(folder, 'summaryvalues')):
         if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):
@@ -50,14 +52,11 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder):
 
 
 
-def ImportRefGenome(calculationObject, datasetId, folder):
+def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
 
     print('==== Importing reference genome data ===')
-    if not os.path.exists(folder):
-        print('No data: skipping')
-        return
 
-    ImportRefGenomeSummaryData(calculationObject, datasetId, folder)
+    ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings)
 
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
     settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])

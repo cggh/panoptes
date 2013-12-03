@@ -11,7 +11,7 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder):
+def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder, importSettings):
 
     print('#### IMPORTING CUSTOM DATA into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
 
@@ -63,8 +63,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder)
             print(sql)
             cur.execute(sql)
         sql = "ALTER TABLE {0} ".format(sourcetable)
-        for prop in propidList:
-            if prop != propidList[0]:
+        for prop in toRemoveExistingProperties:
+            if prop != toRemoveExistingProperties[0]:
                 sql += ", "
             sql += "DROP COLUMN {0}".format(prop)
         print('=========== STATEMENT '+sql)
@@ -194,7 +194,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder)
 
 
 
-def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
+def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSettings):
     print('##### IMPORTING WORKSPACE {0}.{1}'.format(datasetId, workspaceid))
     print('Source directory: '+folder)
     settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
@@ -229,16 +229,19 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder):
     db.close()
 
     print('############ SCANNING FOR CUSTOM DATA')
-    for tableid in os.listdir(os.path.join(folder, 'customdata')):
-        if os.path.isdir(os.path.join(folder, 'customdata', tableid)):
-            if not tableid in tableMap:
-                raise Exception('Invalid table id '+tableid)
-            for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
-                if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
-                    ImportCustomData(calculationObject, datasetId, workspaceid, tableid, os.path.join(folder, 'customdata', tableid, customid))
+    if os.path.exists(os.path.join(folder, 'customdata')):
+        for tableid in os.listdir(os.path.join(folder, 'customdata')):
+            if os.path.isdir(os.path.join(folder, 'customdata', tableid)):
+                if not tableid in tableMap:
+                    raise Exception('Invalid table id '+tableid)
+                for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
+                    if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
+                        ImportCustomData(calculationObject, datasetId, workspaceid, tableid, os.path.join(folder, 'customdata', tableid, customid),  importSettings)
+    else:
+        print('Directory not present')
 
 
-def ImportWorkspaces(calculationObject, datasetFolder, datasetId):
+def ImportWorkspaces(calculationObject, datasetFolder, datasetId, settings):
 
     print('==== IMPORTING WORKSPACE DATA ======')
     if not os.path.exists(os.path.join(datasetFolder, 'workspaces')):
@@ -250,5 +253,5 @@ def ImportWorkspaces(calculationObject, datasetFolder, datasetId):
         if os.path.isdir(os.path.join(datasetFolder, 'workspaces', dir)):
             workspaces.append(dir)
     for workspace in workspaces:
-        ImportWorkspace(calculationObject, datasetId, workspace, os.path.join(datasetFolder, 'workspaces', workspace))
+        ImportWorkspace(calculationObject, datasetId, workspace, os.path.join(datasetFolder, 'workspaces', workspace), settings)
     print('--- Finished importing workspace data')

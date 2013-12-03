@@ -217,6 +217,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
             Application.bootScheduler.add([], function() {
                 DQX.customRequest(MetaData.serverUrl,'uploadtracks','getimportfilelist',{},function(resp) {
+                    if (resp.Error)
+                        alert(resp.Error);
                     MetaData.sourceFileInfo =resp.datasets;
                     Application.bootScheduler.setCompleted('getimportfilelist');
                 });

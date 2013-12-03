@@ -37,8 +37,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 wiz.performFinish();
             });
 
+            var ctrl_admin = Controls.Hyperlink(null, {content:'Admin tool...'}).setOnChanged(function() {
+                var hostname=window.location.hostname;
+                var pathname=window.location.pathname;
+                var protocol=window.location.protocol;
+                var url='{protocol}//{hostname}{pathname}'.DQXformat({
+                    protocol:protocol,
+                    hostname:hostname,
+                    pathname:pathname
+                });
+                window.open('admin.html');
+            });
+
             var controls = Controls.CompoundVert([
-                PromptDataSet.ctrl_datasetlist
+                PromptDataSet.ctrl_datasetlist,
+                ctrl_admin
             ]);
 
             wiz.addPage({
