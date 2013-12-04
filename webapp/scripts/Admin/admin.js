@@ -199,12 +199,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     }
 
                     that.showCalculationLog = function(id) {
-                        DQX.customRequest(MetaData.serverUrl,'uploadtracks','getcalculationlog',{ id: id },function(resp) {
-                            if (resp.Error)
-                                Popup.create('Calculation log', 'No log data present');
-                            else
-                                Popup.create('Calculation log', '<PRE>'+resp.Content+'</PRE>');
-                        });
+                        ServerIO.showLog(MetaData.serverUrl, id);
                     }
 
 

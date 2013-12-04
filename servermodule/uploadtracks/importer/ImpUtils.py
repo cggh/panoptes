@@ -18,13 +18,17 @@ def GetTempFileName():
     return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))
 
 
-def ExecuteSQLScript(filename, databaseName):
+def ExecuteSQLScript(calculationObject, filename, databaseName):
+    calculationObject.LogSQLCommand(databaseName+':SQL file')
+    if not os.path.exists(filename):
+        raise Exception('Unable to find SQL file '+filename)
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
     os.system(cmd)
 
 class SQLScript:
-    def __init__(self):
+    def __init__(self, calculationObject):
         self.commands = []
+        self.calculationObject = calculationObject
 
     def AddCommand(self, cmd):
         self.commands.append(cmd)
@@ -35,13 +39,14 @@ class SQLScript:
         for cmd in self.commands:
             fp.write(cmd+';\n')
         fp.close()
-        ExecuteSQLScript(filename, databaseName)
+        ExecuteSQLScript(self.calculationObject, filename, databaseName)
         os.remove(filename)
 
 
 
 
-def ExecuteSQL(database, command):
+def ExecuteSQL(calculationObject, database, command):
+    calculationObject.LogSQLCommand(database+';'+command)
     db = DQXDbTools.OpenDatabase(database)
     db.autocommit(True)
     cur = db.cursor()
@@ -69,6 +74,6 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
 
 def ImportGlobalSettings(calculationObject, datasetId, settings):
     for token in settings.GetTokenList():
-        ExecuteSQL(datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+        ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
 

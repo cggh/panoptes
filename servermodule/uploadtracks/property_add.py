@@ -132,7 +132,7 @@ def ResponseExecute(data, calculationObject):
                 if prop!=existingProperties[0]:
                     sql+=" ,"
                 sql += "DROP COLUMN {0}".format(prop)
-            print('=========== STATEMENT '+sql)
+            calculationObject.LogSQLCommand(sql)
             cur.execute(sql)
 
 
@@ -146,7 +146,7 @@ def ResponseExecute(data, calculationObject):
             if propertyTypes[prop] == 'Value':
                 sqldatatype = 'float'
             sql += "ADD COLUMN {0} {1}".format(prop,sqldatatype)
-        print('=========== STATEMENT '+sql)
+        calculationObject.LogSQLCommand(sql)
         cur.execute(sql)
 
 
@@ -156,7 +156,7 @@ def ResponseExecute(data, calculationObject):
             if prop!=properties[0]:
                 sql+=" ,"
             sql += "{0}.{2}={1}.{2}".format(sourcetable,tmptable,prop)
-        print('=========== STATEMENT '+sql)
+        calculationObject.LogSQLCommand(sql)
         cur.execute(sql)
 
         if cleanup:
@@ -169,7 +169,7 @@ def ResponseExecute(data, calculationObject):
             maxorder=int(cur.fetchone()[0])
             datatype=propertyTypes[prop]
             sql = 'INSERT INTO propertycatalog VALUES ("{0}","custom","{5}","{1}", "{2}", "{3}", {4}, NULL)'.format(workspaceid, prop, tableid, prop, maxorder+1,datatype)
-            print('=========== STATEMENT '+sql)
+            calculationObject.LogSQLCommand(sql)
             cur.execute(sql)
 
         Utils.UpdateTableInfoView(workspaceid, tableid, cur)
