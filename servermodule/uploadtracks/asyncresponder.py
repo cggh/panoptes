@@ -150,6 +150,18 @@ class CalculationThread (threading.Thread):
     def LogSQLCommand(self, cmd):
         print('SQL:'+cmd)
 
+    def LogFileTop(self, filename, maxlinecount=5):
+        if not os.path.exists(filename):
+            self.Log('ERROR:Unable to find file '+filename)
+        self.Log('Top lines of '+filename)
+        with open(filename) as fp:
+            ct = 0
+            for line in fp:
+                self.Log(line.rstrip('\r\n'))
+                ct += 1
+                if ct >= maxlinecount:
+                    break
+
 
     def RunPythonScript(self, scriptFile, runPath, arguments):
         os.chdir(runPath)

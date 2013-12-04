@@ -168,38 +168,20 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                     if settings.HasToken('minval'):
                         summSettings.AddTokenIfMissing('MinVal', settings['minval'])
                     summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
-                    summSettings.RequireTokens(['BlockSizeMax'])
-                    summSettings.AddTokenIfMissing('MinVal', 0)
-                    summSettings.AddTokenIfMissing('BlockSizeMin', 1)
-                    summSettings.DefineKnownTokens(['channelColor'])
-                    print('Executing filter bank')
+                    sourceFileName = os.path.join(folder, 'data')
                     destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
-                    fp = open(dataFileName, 'w')
-                    colnr_chrom = tb.GetColNr('chrom')
-                    colnr_pos = tb.GetColNr('pos')
-                    colnr_val = tb.GetColNr(propid)
-                    for rownr in tb.GetRowNrRange():
-                        fp.write("{0}\t{1}\t{2}\n".format(
-                            tb.GetValue(rownr, colnr_chrom),
-                            int(tb.GetValue(rownr, colnr_pos)),
-                            tb.GetValue(rownr, colnr_val)
-                        ))
-                    fp.close()
-                    ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, propid, summSettings)
-                    extraSummSettings = summSettings.Clone()
-                    extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                    sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '{1}', '{2}', {3}, '{4}', {5}, {6}, {7})".format(
-                        propid,
+                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, ['chrom', 'pos', propid], False)
+                    ImpUtils.CreateSummaryValues(
+                        calculationObject,
+                        summSettings,
+                        datasetId,
                         tableid,
+                        'fixed',
+                        propid,
                         settings['Name'],
-                        -1,
-                        extraSummSettings.ToJSON(),
-                        summSettings['MinVal'],
-                        summSettings['MaxVal'],
-                        summSettings['BlockSizeMin']
+                        dataFileName
                     )
-                    ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
 

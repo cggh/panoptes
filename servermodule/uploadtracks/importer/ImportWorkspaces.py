@@ -144,14 +144,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         os.remove(tmpfile_create)
         os.remove(tmpfile_dump)
 
-
-
         print('Indexing new information')
         cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
-
-
-
-
 
         print('Creating new columns')
         frst = True
@@ -190,6 +184,37 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         db.commit()
         db.close()
 
+        print('Creating summary values')
+        for property in properties:
+            propid = property['propid']
+            settings = property['settings']
+            if settings.HasToken('SummaryValues'):
+                with calculationObject.LogHeader('Creating summary values for custom data {0}'.format(tableid)):
+                    summSettings = settings.GetSubSettings('SummaryValues')
+                    if settings.HasToken('minval'):
+                        summSettings.AddTokenIfMissing('MinVal', settings['minval'])
+                    summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
+                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
+                    if not os.path.exists(destFolder):
+                        os.makedirs(destFolder)
+                    dataFileName = os.path.join(destFolder, propid)
+
+                    calculationObject.Log('Extracting data to '+dataFileName)
+                    script = ImpUtils.SQLScript(calculationObject)
+                    script.AddCommand("SELECT chrom, pos, {0} FROM {1} ORDER BY chrom,pos".format(propid, Utils.GetTableWorkspaceView(workspaceid, tableid)))
+                    script.Execute(datasetId, dataFileName)
+                    calculationObject.LogFileTop(dataFileName, 10)
+
+                    ImpUtils.CreateSummaryValues(
+                        calculationObject,
+                        summSettings,
+                        datasetId,
+                        tableid,
+                        'custom',
+                        propid,
+                        settings['Name'],
+                        dataFileName
+                    )
 
 
 
