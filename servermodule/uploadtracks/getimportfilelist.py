@@ -15,11 +15,12 @@ def response(returndata):
                         if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid)):
                             workspace = { 'sources': {} }
                             datasets[datasetid]['workspaces'][wsid] = workspace
-                            for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
-                                if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                    for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                        if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
-                                            workspace['sources'][sourceid] = { 'tableid': tableid }
+                            if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
+                                for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
+                                    if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
+                                        for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
+                                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
+                                                workspace['sources'][sourceid] = { 'tableid': tableid }
         returndata['datasets'] = datasets
     except Exception as e:
         returndata['Error'] = str(e)
