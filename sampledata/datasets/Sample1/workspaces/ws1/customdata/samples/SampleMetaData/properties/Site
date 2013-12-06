@@ -1,0 +1,5 @@
+Name: Sample Site
+DataType: Text
+Order: 1003
+ShowInTable: true
+IsCategorical: true

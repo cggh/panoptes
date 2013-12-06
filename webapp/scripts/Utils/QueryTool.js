@@ -9,7 +9,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         QueryTool.Create = function(tableid, settings) {
             var that={};
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
             that.query = SQL.WhereClause.Trivial();
             if (that.tableInfo.currentQuery)
                 that.query = SQL.WhereClause.decode(SQL.WhereClause.encode(that.tableInfo.currentQuery));
@@ -160,7 +160,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         QueryTool.CreateStoredQueryPicker = function(tableid, pickedHandler) {
             that = Controls.BaseCustom();
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
             that.pickedHandler = pickedHandler;
 
             that.handlePickQuery = function() {

@@ -3,39 +3,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
         ////////////// Utilities for async server communication in case of lengthy operations
 
-        waitForCompletion = function(calculationid, onCompleted, initialResponse) {
-            var popupid = Popup.create('Processing','Server is processing. This may take a while!<p><div id="calculationprogressbox" style="min-width:400px"></div><p>', null, {canClose: false} );
-            var poll = function() {
-                data = {};
-                DQX.customRequest(MetaData.serverUrl, 'uploadtracks', 'querycalculation', { calculationid: calculationid }, function(resp) {
-                    if (resp.failed) {
-                        alert(resp.status);
-                        DQX.ClosePopup(popupid);
-                    }
-                    else {
-                        if (resp.completed) {
-                            DQX.ClosePopup(popupid);
-                            if (onCompleted)
-                                onCompleted(initialResponse);
-                        }
-                        else {
-                            var str = resp.status;
-                            if (resp.progress)
-                                str+=' ('+(100*resp.progress).toFixed(0)+'%)';
-                            $('#calculationprogressbox').html('<h3>'+str+'</h3>');
-                            setTimeout(poll, 2000);
-                        }
-                    }
-                });
-            };
-            poll();
-        }
-
-        asyncRequest = function(request, data, onCompleted) {
-            DQX.customRequest(MetaData.serverUrl,'uploadtracks',request,data,function(resp) {
-                waitForCompletion(resp.calculationid, onCompleted, resp);
-            });
-        }
 
 
         var IntroModule = {
@@ -64,10 +31,15 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelChannels = FrameTree.Tree(this.frameChannels);
                     that.updateChannelInfo();
 
-                    var browserButton = Application.getView('genomebrowser').createActivationButton({
-                        content: "Genome browser",
-                        bitmap: 'Bitmaps/circle_red_small.png'
-                    });
+                    var miscButtonList = [];
+
+                    if (MetaData.generalSettings.hasGenomeBrowser) {
+                        var browserButton = Application.getView('genomebrowser').createActivationButton({
+                            content: "Genome browser",
+                            bitmap: 'Bitmaps/circle_red_small.png'
+                        });
+                        miscButtonList.push(browserButton);
+                    }
 
                     var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
@@ -82,14 +54,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     bt_addprops.setOnChanged(function() {
                         UploadProperties.execute(function() {});
                     })
+                    miscButtonList.push(bt_addprops);
 
                     var bt_refresh = Controls.Button(null, { content: 'Refresh'}).setOnChanged(function() {
                         Msg.send({ type: 'ReloadChannelInfo' });
                     })
+                    miscButtonList.push(bt_refresh);
 
                     this.panelButtons.addControl(Controls.CompoundHor([
                         Controls.CompoundVert(tableButtons).setTreatAsBlock(),
-                        Controls.CompoundVert([browserButton, bt_addprops, bt_refresh]).setTreatAsBlock(),
+                        Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
                         Controls.VerticalSeparator(20),
                         Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
                         //Controls.ColorPicker(null, {label: 'Color', value: DQX.Color(1,1,0)})

@@ -12,7 +12,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         ItemPopup.show = function(itemInfo) {
             var myurl = DQX.Url(MetaData.serverUrl);
             myurl.addUrlQueryItem("datatype", 'recordinfo');
-            var primkey = MetaData.mapTableCatalog[itemInfo.tableid].primkey;
+            var primkey = MetaData.getTableInfo(itemInfo.tableid).primkey;
             myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primkey, '=', itemInfo.itemid)));
             myurl.addUrlQueryItem("database", MetaData.database);
             myurl.addUrlQueryItem("tbname", itemInfo.tableid + 'CMB_' + MetaData.workspaceid);
@@ -49,7 +49,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid, {title:itemInfo.itemid, blocking:false, sizeX:700, sizeY:500 });
             that.itemid = itemInfo.itemid;
-            that.tableInfo = MetaData.mapTableCatalog[itemInfo.tableid];
+            that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
@@ -92,7 +92,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.create();
 
 
-            //var popupid = Popup.create(MetaData.mapTableCatalog[itemInfo.tableid].name+' '+itemInfo.itemid, content);
         }
 
 

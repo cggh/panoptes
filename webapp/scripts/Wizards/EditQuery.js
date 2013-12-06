@@ -6,7 +6,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         EditQuery.CreateDialogBox = function(tableid, query, proceedFunction) {
             var that = PopupFrame.PopupFrame('editquery', {title:'Edit query', blocking:true, sizeX:700, sizeY:500 });
-            that.tableInfo = MetaData.mapTableCatalog[tableid];
+            that.tableInfo = MetaData.getTableInfo(tableid);
             that.query = query;
 
             that.createFrames = function() {
@@ -21,7 +21,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 //that.panelBody = Framework.Form(that.frameBody).setPadding(10);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
-                that.builder = MetaData.mapTableCatalog[that.tableInfo.id].tableViewer.panelTable.createPanelAdvancedQuery(that.frameBody, function() {
+                that.builder = MetaData.getTableInfo(that.tableInfo.id).tableViewer.panelTable.createPanelAdvancedQuery(that.frameBody, function() {
                 }, true);
                 that.builder.setQuery(that.query);
 

@@ -3,21 +3,27 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
         //A helper function, turning a fraction into a color string
-        var funcFraction2Color = function (vl) {
-            if (vl == null)
-                return "white";
-            else {
-                vl=parseFloat(vl);
-                var vl = Math.abs(vl);
-                vl = Math.min(1, vl);
-                if (vl > 0) vl = 0.05 + vl * 0.95;
-                vl = Math.sqrt(vl);
-                var b = 255 ;
-                var g = 255 * (1 - 0.3*vl * vl);
-                var r = 255 * (1 - 0.6*vl);
-                return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
-            }
-        };
+        var createFuncFraction2Color = function(minval, maxval) {
+            var range = maxval-minval;
+            if (!range)
+                range = 1;
+            return function (vl) {
+                if (vl == null)
+                    return "white";
+                else {
+                    vl=parseFloat(vl);
+                    vl = (vl-minval) / range;
+                    vl = Math.max(0, vl);
+                    vl = Math.min(1, vl);
+                    if (vl > 0) vl = 0.05 + vl * 0.95;
+                    vl = Math.sqrt(vl);
+                    var b = 255 ;
+                    var g = 255 * (1 - 0.3*vl * vl);
+                    var r = 255 * (1 - 0.6*vl);
+                    return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
+                }
+            };
+        }
 
 
 
@@ -28,14 +34,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 // Instantiate the view object
                 var that = Application.View(
                     'table_'+tableid,  // View ID
-                    MetaData.mapTableCatalog[tableid].name+' table'  // View title
+                    MetaData.getTableInfo(tableid).name  // View title
                 );
 
                 that.setEarlyInitialisation();
-
                 that.tableid = tableid;
-
                 that.theQuery = QueryTool.Create(tableid);
+                MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if (that.tableid==tableid) {
@@ -44,7 +49,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 } );
 
-                if (tableid == 'SNP') {
+                if (tableid == 'SNP') {//!!! todo: make this generic
                     Msg.listen('',{type: 'ShowSNPsInRange'}, function(scope, info) {
                         that.activateState();
                         if (info.preservecurrentquery)
@@ -70,46 +75,38 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.recallSettings = function(settObj) {
                     var qry = SQL.WhereClause.decode(settObj.query);
                     that.theQuery.modify(qry);
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
                     tableInfo.currentQuery = qry;
                     if ((settObj.activecolumns) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.activecolumns, false);
 
                 };
 
+                // Activates this view, and loads a query
                 that.activateWithQuery = function(qry) {
                     that.activateState();
                     that.theQuery.modify(qry);
                 };
 
 
-                //This function is called during the initialisation. Create the frame structure of the view here
                 that.createFrames = function(rootFrame) {
-                    rootFrame.makeGroupHor();//Declare the root frame as a horizontally divided set of subframes
-                    //this.frameQueriesContainer = rootFrame.addMemberFrame(Framework.FrameGroupVert('', 0.4));//Create frame that will contain the query panels
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250)
+                    rootFrame.makeGroupHor();
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250);
                     this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,true);
                 }
 
-                MetaData.mapTableCatalog[that.tableid].tableViewer = that;
 
 
-                //This function is called during the initialisation. Create the panels that will populate the frames here
                 that.createPanels = function() {
-
-
                     //Initialise the data fetcher that will download the data for the table
                     this.theTableFetcher = DataFetchers.Table(
                         MetaData.serverUrl,
                         MetaData.database,
                         that.tableid + 'CMB_' + MetaData.workspaceid
                     );
-                    //this.theTableFetcher.showDownload=true; //Allows the user to download the data in the table
 
                     this.createPanelTableViewer();
-
-                    // Create the "simple query" panel
                     this.createPanelControls();
 
                     this.reLoad();
@@ -139,10 +136,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 }
 
-                //Create the table viwer panel
+                //Create the table viewer panel
                 that.createPanelTableViewer = function () {
                     //Initialise the panel that will contain the table
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
                     this.panelTable = QueryTable.Panel(
                         this.frameTable,
                         this.theTableFetcher,
@@ -155,21 +152,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
                     this.myTable.preventFetch = true;
                     that.myTable.setQuery(that.theQuery.get());
-
-
-                    // Add a column for chromosome
-                    var comp = that.myTable.createTableColumn(
-                        QueryTable.Column("Chrom.","chrom",0),
-                        "String",
-                        false
-                    );
-
-                    // For the query tools, define this column as a multiple choice set
-                    var chromPickList = [];
-                    $.each(MetaData.chromosomes,function(idx,chrom) {
-                        chromPickList.push({ id: idx+1, name: MetaData.chromosomes[idx].id });
-                    })
-                    //comp.setDataType_MultipleChoiceInt(chromPickList);
 
                 };
 
@@ -226,6 +208,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     ]));
                 }
 
+                //Returns a user-friendly text description of a query
                 that.getQueryDescription = function(qry) {
                     var str = '<div style="background-color: rgb(255,240,230);width:100%">';
                     if (!qry.isTrivial) {
@@ -251,7 +234,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.getSortColumn = function() {
                     if (!that.myTable)
-                        return MetaData.mapTableCatalog[that.tableid].primkey;
+                        return MetaData.getTableInfo(that.tableid).primkey;
                     return that.myTable.getSortColumn();
                 };
 
@@ -260,14 +243,15 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     if (that.myTable) {
                         that.myTable.setQuery(that.theQuery.get());
                         that.myTable.reLoadTable();
-                        var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                        var tableInfo = MetaData.getTableInfo(that.tableid);
                         tableInfo.currentQuery = that.theQuery.get();
                         Msg.broadcast({ type: 'QueryChanged'}, that.tableid );
                     }
                 };
 
+                // Initialise the table viewer columns
                 that.reLoad = function() {
-                    var tableInfo = MetaData.mapTableCatalog[that.tableid];
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
 
                     if (that.uptodate)
                         return;
@@ -281,7 +265,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     });
 
 
-                    //Temporarily store the column visibility status
+                    //Temporarily store the column visibility status, in case this is a reload
                     var colIsHidden = {};
                     if (that.columnVisibilityChecks) {
                         $.each(that.columnVisibilityChecks, function(idx, chk) {
@@ -293,39 +277,33 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     that.visibilityControlsGroup.clear();
 
-
-                    //Create a column for each population frequency
+                    //Create a column for each property
                     $.each(MetaData.customProperties,function(idx,propInfo) {
                         if ((propInfo.tableid == that.tableid) && (propInfo.settings.showInTable)) {
                             var encoding  = 'String';
-                            //var encoding  = 'Generic';
                             var tablePart = 1;
-                            if (propInfo.datatype=='Value') {
+                            if (propInfo.datatype=='Value')
                                 encoding  = 'Float3';
-                            }
-                            if (propInfo.datatype=='Boolean') {
+                            if (propInfo.datatype=='Boolean')
                                 encoding  = 'Int';
-                            }
                             if (propInfo.isPrimKey)
                                 tablePart = 0;
                             var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!='chrom') && (propInfo.propid!='pos') );
                             var col = that.myTable.createTableColumn(
-                                QueryTable.Column(
-                                    propInfo.name,propInfo.propid,tablePart),
+                                QueryTable.Column(propInfo.name,propInfo.propid,tablePart),
                                 encoding,
                                 sortable
                             );
                             if ( (tableInfo.hasGenomePositions) && (that.myTable.findColumn('chrom')) && (that.myTable.findColumn('pos')) ) {
-                                that.myTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true); // Define a joint sort action on both columns chrom+pos, and set it as default
+                                // Define a joint sort action on both columns chrom+pos, and set it as default
+                                that.myTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true);
                             }
 
-                            if (propInfo.datatype=='Boolean') {
+                            if (propInfo.datatype=='Boolean')
                                 col.setDataType_MultipleChoiceInt([{id:0, name:'No'}, {id:1, name:'Yes'}]);
-                            }
 
-                            if (propInfo.propid=='chrom') {
+                            if (propInfo.propid=='chrom')
                                 col.setDataType_MultipleChoiceString(MetaData.chromosomes);
-                            }
 
                             if (propInfo.propCategories) {
                                 var cats = [];
@@ -335,10 +313,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 col.setDataType_MultipleChoiceString(cats);
                             }
 
-                            //col.setToolTip(pop.name); //Provide a tool tip for the column
-                            //Define a callback when the user clicks on a column
                             col.setHeaderClickHandler(function(id) {
-                                alert('column clicked '+id);
+                                alert('column clicked '+id);//!!! todo: something meaningful here
                             })
 
                             if (propInfo.isPrimKey) {
@@ -350,13 +326,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                             col.CellToText = propInfo.toDisplayString;
 
-                            if (propInfo.isFloat) {
-                                col.CellToColor = funcFraction2Color; //Create a background color that reflects the value
-                            }
-                            if (propInfo.isBoolean) {
-                                col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
-                            }
+                            if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
+                                col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
 
+                            if (propInfo.isBoolean)
+                                col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
+
+                            // Create checkbox that controls the visibility of the column
                             var chk = Controls.Check(null,{label:propInfo.name, value:(!colIsHidden[col.myCompID]) }).setClassID(propInfo.propid).setOnChanged(function() {
                                 that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
                                 that.myTable.render();
@@ -370,10 +346,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     });
 
                     that.myTable.reLoadTable();
-                    //that.visibilityControlsGroup.render();
                     this.panelSimpleQuery.render();
                 }
-
 
 
                 that.theQuery.notifyQueryUpdated = that.updateQuery2;

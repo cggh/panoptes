@@ -1,0 +1,6 @@
+Name: Extra 1
+DataType: Text
+Order: 3
+ShowInTable: true
+ShowInBrowser: true
+categoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }

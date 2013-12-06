@@ -1,0 +1,5 @@
+Name: Country
+DataType: Text
+Order: 30
+IsCategorical: true
+ShowInTable: true

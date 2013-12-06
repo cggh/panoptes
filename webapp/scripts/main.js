@@ -66,6 +66,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         MetaData.tableCatalog = getter.getTableRecords('tablecatalog');
                         MetaData.generalSettings = {};
                         $.each(getter.getTableRecords('settings'), function(idx,sett) {
+                            if (sett.content=='False')
+                                sett.content = false;
                             MetaData.generalSettings[sett.id] = sett.content;
                         });
                         MetaData.mapTableCatalog = {};
@@ -83,9 +85,12 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             TableViewer.init(tableInfo.id);
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
-                        GenomeBrowser.init();
 
-                        if (MetaData.mapTableCatalog['SMP'] && MetaData.mapTableCatalog['SNP'])
+                        if (MetaData.generalSettings.hasGenomeBrowser) {
+                            GenomeBrowser.init();
+                        }
+
+                        if (MetaData.hasTable('SMP') && MetaData.hasTable('SNP'))
                           Genotypes.init();
 
                         Application.showViewsAsTabs();

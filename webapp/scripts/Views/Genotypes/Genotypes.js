@@ -39,7 +39,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         that.querySamples.notifyQueryUpdated = function () {
 
           var query = that.querySamples.get();
-          var tableInfo = MetaData.mapTableCatalog['SMP'];
+          var tableInfo = MetaData.getTableInfo('SMP');
 
           var sortColumn = query.sortColumn;
           if (!sortColumn)

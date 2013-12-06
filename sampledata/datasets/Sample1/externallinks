@@ -1,0 +1,2 @@
+annotation_gene	GeneDB	http://www.genedb.org/gene/{id}
+annotation_gene	PlasmoDB	http://plasmodb.org/plasmo/showRecord.do?name=GeneRecordClasses.GeneRecordClass&source_id={id}&project_id=PlasmoDB

@@ -1,0 +1,7 @@
+NameSingle: variant
+NamePlural: variants
+PrimKey: SnpName
+IsPositionOnGenome: true
+FetchRecordCount: false
+QuickFindFields: SnpName
+

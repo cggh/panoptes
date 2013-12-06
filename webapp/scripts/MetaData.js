@@ -3,7 +3,7 @@ define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
         var MetaData = {};
 
         MetaData.quickLoad = true;
-        MetaData.updateCalculationInfo = true;
+        MetaData.updateCalculationInfo = false;
 
 
         //MetaData.serverUrl="http://localhost:8000/app01";
@@ -34,6 +34,19 @@ define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
         ];
         */
 
+        MetaData.hasTable = function(tableid) {
+            if (!MetaData.mapTableCatalog)
+                DQX.reportError('Table info not yet available');
+            return !!MetaData.mapTableCatalog[tableid];
+        }
+
+        MetaData.getTableInfo = function(tableid) {
+            if (!MetaData.mapTableCatalog)
+                DQX.reportError('Table info not yet available');
+            if (!MetaData.mapTableCatalog[tableid])
+                DQX.reportError('Could not find table '+tableid);
+            return MetaData.mapTableCatalog[tableid];
+        }
 
         // Empty placeholders: this info has not been obtained yet
         MetaData.customProperties = [];

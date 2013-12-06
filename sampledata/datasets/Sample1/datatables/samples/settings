@@ -1,0 +1,7 @@
+NameSingle: sample
+NamePlural: samples
+PrimKey: ID
+IsPositionOnGenome: false
+FetchRecordCount: true
+QuickFindFields: ID,Country
+

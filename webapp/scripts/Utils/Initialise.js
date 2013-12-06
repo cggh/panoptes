@@ -124,11 +124,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings.maxval = 1;
                     settings.decimDigits = 2;
                 };
-                if (prop.propid == MetaData.mapTableCatalog[prop.tableid].primkey)
+                if (prop.propid == MetaData.getTableInfo(prop.tableid).primkey)
                     prop.isPrimKey = true;
                 if (prop.settings) {
                     try {
                         var settingsObj = JSON.parse(prop.settings);
+                        if ('maxval' in settingsObj)
+                            settingsObj.hasValueRange = true;
                     }
                     catch(e) {
                         alert('Invalid settings string for {table}.{propid}: {sett}\n{msg}'.DQXformat({
@@ -150,14 +152,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (prop.settings.isCategorical) {
                     var getter = DataFetchers.ServerDataGetter();
-                    getter.addTable(prop.tableid,[prop.propid],prop.propid,
+                    getter.addTable(prop.tableid + 'CMB_' + MetaData.workspaceid,
+                        [prop.propid],
+                        prop.propid,
                         SQL.WhereClause.Trivial(), { distinct:true }
                     );
                     prop.propCategories = [];
                     Initialise.incrWait();
                     getter.execute(MetaData.serverUrl,MetaData.database,
                         function() {
-                            var records = getter.getTableRecords(prop.tableid);
+                            var records = getter.getTableRecords(prop.tableid + 'CMB_' + MetaData.workspaceid);
                             $.each(records, function(idx, rec) {
                                 prop.propCategories.push(rec[prop.propid]);
                             });
@@ -205,7 +209,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableSummaryValue.settings = settings;
                 tableSummaryValue.isVisible = tableSummaryValue.settings.defaultVisible;
 
-                var tableInfo = MetaData.mapTableCatalog[tableSummaryValue.tableid];
+                var tableInfo = MetaData.getTableInfo(tableSummaryValue.tableid);
                 tableInfo.tableBasedSummaryValues.push(tableSummaryValue);
                 tableInfo.mapTableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
             });

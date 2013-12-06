@@ -1,7 +1,11 @@
 import threading
 import uuid
 import DQXDbTools
+import DQXUtils
 import datetime
+import config
+import os
+import sys
 
 
 
@@ -92,17 +96,49 @@ class CalculationThread (threading.Thread):
         self.calculationname = calculationname
         self.handler = handler
         self.data = data
+        self.logfile = None
+        self.orig_stdout = sys.stdout
+        self.orig_stderr = sys.stderr
     def run(self):
         theCalculationThreadList.AddThread(self.id, self.calculationname)
+        self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
+        self.logfile = open(self.logfilename, 'w')
+        sys.stdout = self
+        sys.stderr = self
         try:
-            self.handler(self.data,self)
+            self.handler(self.data, self)
             theCalculationThreadList.DelThread(self.id)
         except Exception as e:
             theCalculationThreadList.SetFailed(self.id)
-            print('====== CALCULATION ERROR '+str(e))
-            self.SetInfo('Error: '+str(e))
+            theCalculationThreadList.SetInfo(self.id, 'Error: '+str(e), None)
+            print('ERROR:'+str(e))
+        print("--- Closing log ---")
+        sys.stdout = self.orig_stdout
+        sys.stderr = self.orig_stderr
+        self.logfile.close()
+        self.logfile = None
+
+    def write(self, line):
+        if self.logfile is None:
+            self.orig_stdout.write(line)
+        else:
+            self.logfile.write(line)
+
+
+    def Log(self, content):
+        if self.logfile is None:
+            raise Exception('Calculation log file is not open')
+        self.logfile.write(content+'\n')
+
+    def LogHeader(self, title):
+        theCalculationThreadList.SetInfo(self.id, title, None)
+        return CalcLogHeader(self, title)
 
     def SetInfo(self, status, progress=None):
+        logentry = status
+        if progress is not None:
+            logentry += ' '+str(progress)
+        print(logentry)
         theCalculationThreadList.SetInfo(self.id, status, progress)
 
     def SetName(self, name):
@@ -110,6 +146,44 @@ class CalculationThread (threading.Thread):
 
     def SetScope(self, scope):
         theCalculationThreadList.SetScope(self.id, scope)
+
+    def LogSQLCommand(self, cmd):
+        print('SQL:'+cmd)
+
+    def LogFileTop(self, filename, maxlinecount=5):
+        if not os.path.exists(filename):
+            self.Log('ERROR:Unable to find file '+filename)
+        self.Log('Top lines of '+filename)
+        with open(filename) as fp:
+            ct = 0
+            for line in fp:
+                self.Log(line.rstrip('\r\n'))
+                ct += 1
+                if ct >= maxlinecount:
+                    break
+
+
+    def RunPythonScript(self, scriptFile, runPath, arguments):
+        os.chdir(runPath)
+        cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
+        cmd += ' >> ' + self.logfilename + ' 2>&1'
+        print('COMMAND:'+cmd)
+        self.logfile.close()
+        self.logfile = None
+        os.system(cmd)
+        self.logfile = open(self.logfilename, 'a')
+
+class CalcLogHeader:
+    def __init__(self, calcObject, title):
+        self.calcObject = calcObject
+        self.title = title
+        self.calcObject.Log('==>' + self.title)
+        self.timer = DQXUtils.Timer()
+    def __enter__(self):
+        return None
+    def __exit__(self, type, value, traceback):
+        self.calcObject.Log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
+
 
 
 def GetCalculationInfo(id):

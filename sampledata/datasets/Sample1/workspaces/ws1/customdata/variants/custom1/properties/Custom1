@@ -1,0 +1,12 @@
+Name: Custom Value 1
+DataType: Value
+Order: 1001
+ShowInTable: true
+ShowInBrowser: true
+MinVal: 0
+MaxVal: 20
+DecimDigits: 1
+SummaryValues:
+   BlockSizeMin: 20
+   BlockSizeMax: 50000
+   ChannelColor: "rgb(0,100,0)"
