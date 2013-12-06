@@ -66,7 +66,7 @@ subs = ','.join(['%s ' for name in names])
 names = ','.join(names)
 
 pbar = pb.ProgressBar(widgets=widgets, maxval=len(hdf_table)).start()
-step_size = 1000
+step_size = 500
 for start in range(0, len(hdf_table), step_size):
     end = min(start + step_size, len(hdf_table))
     cur.executemany("INSERT INTO "+table+" (" + names + ") VALUES (" + subs + ")",
