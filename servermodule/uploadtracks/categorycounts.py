@@ -30,7 +30,6 @@ def response(returndata):
         if len(whc.querystring_params) > 0:
             sql += " WHERE {0}".format(whc.querystring_params)
         sql += ' group by {1} order by _cnt desc limit 10000;'.format(tableid, propid1)
-        print(sql)
         cur.execute(sql, whc.queryparams)
         for row in cur.fetchall():
             categories1.append(row[0])

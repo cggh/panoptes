@@ -10,8 +10,6 @@ def response(returndata):
     databaseName = returndata['database']
     trackid = returndata['trackid']
 
-    print('deleting track '+trackid)
-
     db = DQXDbTools.OpenDatabase(databaseName)
     cur = db.cursor()
 

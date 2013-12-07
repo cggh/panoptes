@@ -47,10 +47,6 @@ def response(returndata):
 
     sql1 = 'UPDATE propertycatalog SET ordr={0} WHERE (workspaceid="{1}") and (tableid="{2}") and (propid="{3}")'.format(orders[index+dir], workspaces[index], tables[index], properties[index])
     sql2 = 'UPDATE propertycatalog SET ordr={0} WHERE (workspaceid="{1}") and (tableid="{2}") and (propid="{3}")'.format(orders[index], workspaces[index+dir], tables[index+dir], properties[index+dir])
-    print('-------------------------------')
-    print(sql1)
-    print(sql2)
-    print('-------------------------------')
     cur.execute(sql1)
     cur.execute(sql2)
 

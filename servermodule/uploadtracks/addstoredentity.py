@@ -24,7 +24,6 @@ def response(returndata):
 
 
     sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(tablename, uid, name, tableid, workspaceid)
-    #print(sql)
     cur.execute(sql, (content) )
 
     db.commit()

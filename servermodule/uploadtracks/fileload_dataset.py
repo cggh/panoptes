@@ -7,7 +7,6 @@ import time
 import asyncresponder
 import sys
 
-print(sys.path)
 import importer.ImportFiles
 
 

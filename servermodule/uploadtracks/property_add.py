@@ -55,9 +55,6 @@ def ResponseExecute(data, calculationObject):
             properties.append(propTokens[2*tokennr])
             propertyTypes[propTokens[2*tokennr]] = propTokens[2*tokennr+1]
 
-        print('======================================')
-        print(str(properties))
-        print(str(propertyTypes))
 
         calculationObject.SetName('Upload custom properties to {0}: {1}'.format(tableid, ', '.join(properties)))
 

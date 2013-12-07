@@ -12,8 +12,6 @@ def response(returndata):
     name = returndata['name']
     properties = returndata['properties']
 
-    print('modifying track '+trackid)
-
     db = DQXDbTools.OpenDatabase(databaseName)
     cur = db.cursor()
 

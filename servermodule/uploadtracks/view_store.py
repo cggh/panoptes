@@ -17,7 +17,6 @@ def response(returndata):
     #todo: remove that record
 
     sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}", "{3}")'.format(databaseName, workspaceid, id, settings)
-    print('=========== STATEMENT '+sql)
     cur.execute(sql)
     db.commit()
     db.close()

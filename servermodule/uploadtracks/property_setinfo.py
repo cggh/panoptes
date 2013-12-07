@@ -20,7 +20,6 @@ def ResponseExecute(data, calculationObject):
     sql = 'UPDATE propertycatalog SET name="{0}" WHERE (workspaceid="{1}") AND (propid="{2}" and (tableid="{3}"))'.format(name, workspaceid, propid, tableid)
     cur.execute(sql)
     sql = 'UPDATE propertycatalog SET settings=\'{0}\' WHERE (workspaceid="{1}") AND (propid="{2}" and (tableid="{3}"))'.format(settings, workspaceid, propid, tableid)
-    #print('========== '+sql)
     cur.execute(sql)
     db.commit()
     db.close()

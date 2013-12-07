@@ -51,22 +51,18 @@ def response(returndata):
     cur.execute("INSERT INTO customtracks VALUES (%s,%s,'',%s)", (trackUid, trackName,workspaceid) )
 
     sql = "CREATE TABLE {0} (chrom varchar(20), pos int, {1} float)".format(trackUid,trackUid)
-    print(sql)
     cur.execute(sql)
 
     sql = "CREATE INDEX chrom ON {0}(chrom)".format(trackUid)
-    print(sql)
     cur.execute(sql)
 
     sql = "CREATE INDEX pos ON {0}(pos)".format(trackUid)
-    print(sql)
     cur.execute(sql)
 
     db.commit()
     db.close()
 
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} < {3}".format(config.DBUSER, config.DBPASS, databaseName, sqlfile)
-    print(cmd)
     os.system(cmd)
 
 
