@@ -89,7 +89,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.execLoadData = function(configOnly) {
                         var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                         var data={};
-                        data.ConfigOnly = configOnly;
+                        data.ConfigOnly = configOnly?'1':'0';
                         if (sourceFileInfo.sourceid) {
                             //Upload a specific custom data source
                             data.datasetid = sourceFileInfo.datasetid;
@@ -123,7 +123,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         content += bt.renderHtml() + '<br>';
                         var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Load configuration only', width:160, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(false);
+                            that.execLoadData(true);
                         });
                         content += bt.renderHtml() + '<br>';
                         var popupid = Popup.create('Load file data', content);

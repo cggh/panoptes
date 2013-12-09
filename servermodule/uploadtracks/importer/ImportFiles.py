@@ -18,6 +18,7 @@ import ImportWorkspaces
 
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
+        calculationObject.Log('Import settings: '+str(importSettings))
         DQXUtils.CheckValidIdentifier(datasetId)
         datasetFolder = os.path.join(baseFolder, datasetId)
         indexDb = 'datasetindex'
@@ -30,23 +31,27 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         print('Global settings: '+str(globalSettings.Get()))
 
-        # Dropping existing database
-        calculationObject.SetInfo('Dropping database')
-        print('Dropping database')
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
-        try:
-            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DROP DATABASE IF EXISTS {0}'.format(datasetId))
-        except:
-            pass
-        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'CREATE DATABASE {0}'.format(datasetId))
 
+        if not importSettings['ConfigOnly']:
+            # Dropping existing database
+            calculationObject.SetInfo('Dropping database')
+            print('Dropping database')
+            try:
+                ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DROP DATABASE IF EXISTS {0}'.format(datasetId))
+            except:
+                pass
+            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'CREATE DATABASE {0}'.format(datasetId))
 
-        # Creating new database
-        scriptPath = os.path.dirname(os.path.realpath(__file__))
-        calculationObject.SetInfo('Creating database')
-        print('Creating new database')
-        ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
+            # Creating new database
+            scriptPath = os.path.dirname(os.path.realpath(__file__))
+            calculationObject.SetInfo('Creating database')
+            print('Creating new database')
+            ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
 
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
 
         datatables = []
         for dir in os.listdir(os.path.join(datasetFolder,'datatables')):

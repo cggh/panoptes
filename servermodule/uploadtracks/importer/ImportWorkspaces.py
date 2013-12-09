@@ -51,25 +51,26 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         db = DQXDbTools.OpenDatabase(datasetId)
         cur = db.cursor()
 
-        # Dropping columns that will be replaced
-        toRemoveExistingProperties = []
-        for existProperty in existingProperties:
-            if existProperty in propidList:
-                toRemoveExistingProperties.append(existProperty)
-        print('Removing outdated information:')
-        if len(toRemoveExistingProperties) > 0:
-            for prop in toRemoveExistingProperties:
-                print('Removing outdated information: {0} {1} {2}'.format(workspaceid, prop, tableid))
-                sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
-                print(sql)
+        if not importSettings['ConfigOnly']:
+            # Dropping columns that will be replaced
+            toRemoveExistingProperties = []
+            for existProperty in existingProperties:
+                if existProperty in propidList:
+                    toRemoveExistingProperties.append(existProperty)
+            print('Removing outdated information:')
+            if len(toRemoveExistingProperties) > 0:
+                for prop in toRemoveExistingProperties:
+                    print('Removing outdated information: {0} {1} {2}'.format(workspaceid, prop, tableid))
+                    sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
+                    print(sql)
+                    cur.execute(sql)
+                sql = "ALTER TABLE {0} ".format(sourcetable)
+                for prop in toRemoveExistingProperties:
+                    if prop != toRemoveExistingProperties[0]:
+                        sql += ", "
+                    sql += "DROP COLUMN {0}".format(prop)
+                calculationObject.LogSQLCommand(sql)
                 cur.execute(sql)
-            sql = "ALTER TABLE {0} ".format(sourcetable)
-            for prop in toRemoveExistingProperties:
-                if prop != toRemoveExistingProperties[0]:
-                    sql += ", "
-                sql += "DROP COLUMN {0}".format(prop)
-            calculationObject.LogSQLCommand(sql)
-            cur.execute(sql)
 
 
         for property in properties:
@@ -102,82 +103,83 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         for property in properties:
             propDict[property['propid']] = property
 
-        # Load datatable
-        print('Loading data table')
-        tb = VTTable.VTTable()
-        tb.allColumnsText = True
-        try:
-            tb.LoadFile(os.path.join(folder, 'data'))
-        except Exception as e:
-            raise Exception('Error while reading file: '+str(e))
-        print('---- ORIG TABLE ----')
-        tb.PrintRows(0, 9)
+        if not importSettings['ConfigOnly']:
+            # Load datatable
+            print('Loading data table')
+            tb = VTTable.VTTable()
+            tb.allColumnsText = True
+            try:
+                tb.LoadFile(os.path.join(folder, 'data'))
+            except Exception as e:
+                raise Exception('Error while reading file: '+str(e))
+            print('---- ORIG TABLE ----')
+            tb.PrintRows(0, 9)
 
-        for property in properties:
-            if not tb.IsColumnPresent(property['propid']):
-                raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
+            for property in properties:
+                if not tb.IsColumnPresent(property['propid']):
+                    raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
 
-        if not tb.IsColumnPresent(primkey):
-            raise Exception('Missing primary key '+primkey)
+            if not tb.IsColumnPresent(primkey):
+                raise Exception('Missing primary key '+primkey)
 
-        for col in tb.GetColList():
-            if (col not in propDict) and (col != primkey):
-                tb.DropCol(col)
-        tb.ArrangeColumns(propidList)
-        for property in properties:
-            propid = property['propid']
-            if property['DataType'] == 'Value':
-                tb.ConvertColToValue(propid)
-            if property['DataType'] == 'Boolean':
-                tb.MapCol(propid, ImpUtils.convertToBooleanInt)
-                tb.ConvertColToValue(propid)
-        print('---- PROCESSED TABLE ----')
-        tb.PrintRows(0, 9)
+            for col in tb.GetColList():
+                if (col not in propDict) and (col != primkey):
+                    tb.DropCol(col)
+            tb.ArrangeColumns(propidList)
+            for property in properties:
+                propid = property['propid']
+                if property['DataType'] == 'Value':
+                    tb.ConvertColToValue(propid)
+                if property['DataType'] == 'Boolean':
+                    tb.MapCol(propid, ImpUtils.convertToBooleanInt)
+                    tb.ConvertColToValue(propid)
+            print('---- PROCESSED TABLE ----')
+            tb.PrintRows(0, 9)
 
-        tmptable = Utils.GetTempID()
-        tmpfile_create = ImpUtils.GetTempFileName()
-        tmpfile_dump = ImpUtils.GetTempFileName()
-        tb.SaveSQLCreation(tmpfile_create, tmptable)
-        tb.SaveSQLDump(tmpfile_dump, tmptable)
-        ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_create, datasetId)
-        ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_dump, datasetId)
-        os.remove(tmpfile_create)
-        os.remove(tmpfile_dump)
+            tmptable = Utils.GetTempID()
+            tmpfile_create = ImpUtils.GetTempFileName()
+            tmpfile_dump = ImpUtils.GetTempFileName()
+            tb.SaveSQLCreation(tmpfile_create, tmptable)
+            tb.SaveSQLDump(tmpfile_dump, tmptable)
+            ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_create, datasetId)
+            ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_dump, datasetId)
+            os.remove(tmpfile_create)
+            os.remove(tmpfile_dump)
 
-        print('Indexing new information')
-        cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
+            print('Indexing new information')
+            cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
 
-        print('Creating new columns')
-        frst = True
-        sql = "ALTER TABLE {0} ".format(sourcetable)
-        for property in properties:
-            propid = property['propid']
-            if not frst:
-                sql += " ,"
-            sqldatatype = 'varchar(50)'
-            if property['DataType'] == 'Value':
-                sqldatatype = 'float'
-            sql += "ADD COLUMN {0} {1}".format(propid, sqldatatype)
-            frst = False
-            calculationObject.LogSQLCommand(sql)
-        cur.execute(sql)
-
-
-        print('Joining information')
-        frst = True
-        sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
-        for property in properties:
-            propid = property['propid']
-            if not frst:
-                sql += " ,"
-            sql += "{0}.{2}={1}.{2}".format(sourcetable,tmptable,propid)
-            frst = False
-            calculationObject.LogSQLCommand(sql)
-        cur.execute(sql)
+            print('Creating new columns')
+            frst = True
+            sql = "ALTER TABLE {0} ".format(sourcetable)
+            for property in properties:
+                propid = property['propid']
+                if not frst:
+                    sql += " ,"
+                sqldatatype = 'varchar(50)'
+                if property['DataType'] == 'Value':
+                    sqldatatype = 'float'
+                sql += "ADD COLUMN {0} {1}".format(propid, sqldatatype)
+                frst = False
+                calculationObject.LogSQLCommand(sql)
+            cur.execute(sql)
 
 
-        print('Cleaning up')
-        cur.execute("DROP TABLE {0}".format(tmptable))
+            print('Joining information')
+            frst = True
+            sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
+            for property in properties:
+                propid = property['propid']
+                if not frst:
+                    sql += " ,"
+                sql += "{0}.{2}={1}.{2}".format(sourcetable,tmptable,propid)
+                frst = False
+                calculationObject.LogSQLCommand(sql)
+            cur.execute(sql)
+
+
+            print('Cleaning up')
+            cur.execute("DROP TABLE {0}".format(tmptable))
 
         Utils.UpdateTableInfoView(workspaceid, tableid, cur)
 
@@ -199,11 +201,12 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
 
-                    calculationObject.Log('Extracting data to '+dataFileName)
-                    script = ImpUtils.SQLScript(calculationObject)
-                    script.AddCommand("SELECT chrom, pos, {0} FROM {1} ORDER BY chrom,pos".format(propid, Utils.GetTableWorkspaceView(workspaceid, tableid)))
-                    script.Execute(datasetId, dataFileName)
-                    calculationObject.LogFileTop(dataFileName, 10)
+                    if not importSettings['ConfigOnly']:
+                        calculationObject.Log('Extracting data to '+dataFileName)
+                        script = ImpUtils.SQLScript(calculationObject)
+                        script.AddCommand("SELECT chrom, pos, {0} FROM {1} ORDER BY chrom,pos".format(propid, Utils.GetTableWorkspaceView(workspaceid, tableid)))
+                        script.Execute(datasetId, dataFileName)
+                        calculationObject.LogFileTop(dataFileName, 10)
 
                     ImpUtils.CreateSummaryValues(
                         calculationObject,
@@ -214,7 +217,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                         workspaceid,
                         propid,
                         settings['Name'],
-                        dataFileName
+                        dataFileName,
+                        importSettings
                     )
 
 
@@ -235,12 +239,13 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         tables = [ { 'id': row[0], 'primkey': row[1] } for row in cur.fetchall()]
         tableMap = {table['id']:table for table in tables}
 
-        for table in tables:
-            tableid = table['id']
-            print('Re-creating custom data table for '+tableid)
-            cur.execute("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
-            cur.execute("CREATE TABLE {0} AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
-            cur.execute("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
+        if not importSettings['ConfigOnly']:
+            for table in tables:
+                tableid = table['id']
+                print('Re-creating custom data table for '+tableid)
+                cur.execute("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                cur.execute("CREATE TABLE {0} AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
+                cur.execute("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
 
         print('Removing existing workspace properties')
         cur.execute("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )

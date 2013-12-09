@@ -16,7 +16,9 @@ def ResponseExecute(data, calculationObject):
     sourceid = data['sourceid']
     tableid = data['tableid']
     importSettings = {}
-    importSettings['ConfigOnly'] = data['ConfigOnly']
+    importSettings['ConfigOnly'] = False
+    if data['ConfigOnly'] == '1':
+        importSettings['ConfigOnly'] = True
     importer.ImportWorkspaces.ImportCustomData(
         calculationObject,
         datasetid,

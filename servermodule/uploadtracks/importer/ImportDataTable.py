@@ -88,73 +88,74 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             if 'pos' not in propDict:
                 raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
 
-        # Load datatable
-        print('Loading data table')
-        tb = VTTable.VTTable()
-        tb.allColumnsText = True
-        try:
-            tb.LoadFile(os.path.join(folder, 'data'), tableSettings['MaxTableSize'])
-        except Exception as e:
-            raise Exception('Error while reading file: '+str(e))
-        print('---- ORIG TABLE ----')
-        tb.PrintRows(0, 9)
+        if not importSettings['ConfigOnly']:
+            # Load datatable
+            print('Loading data table')
+            tb = VTTable.VTTable()
+            tb.allColumnsText = True
+            try:
+                tb.LoadFile(os.path.join(folder, 'data'), tableSettings['MaxTableSize'])
+            except Exception as e:
+                raise Exception('Error while reading file: '+str(e))
+            print('---- ORIG TABLE ----')
+            tb.PrintRows(0, 9)
 
-        for property in properties:
-            if not tb.IsColumnPresent(property['propid']):
-                raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
+            for property in properties:
+                if not tb.IsColumnPresent(property['propid']):
+                    raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
 
-        if tableSettings['PrimKey'] not in propDict:
-            raise Exception('Missing primary key property "{0}" in datatable "{1}"'.format(tableSettings['PrimKey'], tableid))
+            if tableSettings['PrimKey'] not in propDict:
+                raise Exception('Missing primary key property "{0}" in datatable "{1}"'.format(tableSettings['PrimKey'], tableid))
 
-        for col in tb.GetColList():
-            if col not in propDict:
-                tb.DropCol(col)
-        tb.ArrangeColumns(propidList)
-        for property in properties:
-            propid = property['propid']
-            if property['DataType'] == 'Value':
-                tb.ConvertColToValue(propid)
-            if property['DataType'] == 'Boolean':
-                tb.MapCol(propid, ImpUtils.convertToBooleanInt)
-                tb.ConvertColToValue(propid)
-        print('---- PROCESSED TABLE ----')
-        tb.PrintRows(0, 9)
+            for col in tb.GetColList():
+                if col not in propDict:
+                    tb.DropCol(col)
+            tb.ArrangeColumns(propidList)
+            for property in properties:
+                propid = property['propid']
+                if property['DataType'] == 'Value':
+                    tb.ConvertColToValue(propid)
+                if property['DataType'] == 'Boolean':
+                    tb.MapCol(propid, ImpUtils.convertToBooleanInt)
+                    tb.ConvertColToValue(propid)
+            print('---- PROCESSED TABLE ----')
+            tb.PrintRows(0, 9)
 
-        createcmd = 'CREATE TABLE {0} ('.format(tableid)
-        frst = True
-        for property in properties:
-            if not frst:
-                createcmd += ', '
-            propid = property['propid']
-            colnr = tb.GetColNr(propid)
-            datatypestr = ''
-            if property['DataType'] == 'Text':
-                maxlength = 1
-                for rownr in tb.GetRowNrRange():
-                    maxlength = max(maxlength, len(tb.GetValue(rownr, colnr)))
-                datatypestr = 'varchar({0})'.format(maxlength)
-            if property['DataType'] == 'Value':
-                datatypestr = 'float'
-            if property['DataType'] == 'Boolean':
-                datatypestr = 'int'
-            createcmd += propid + ' ' + datatypestr
-            frst = False
-        createcmd += ')'
+            createcmd = 'CREATE TABLE {0} ('.format(tableid)
+            frst = True
+            for property in properties:
+                if not frst:
+                    createcmd += ', '
+                propid = property['propid']
+                colnr = tb.GetColNr(propid)
+                datatypestr = ''
+                if property['DataType'] == 'Text':
+                    maxlength = 1
+                    for rownr in tb.GetRowNrRange():
+                        maxlength = max(maxlength, len(tb.GetValue(rownr, colnr)))
+                    datatypestr = 'varchar({0})'.format(maxlength)
+                if property['DataType'] == 'Value':
+                    datatypestr = 'float'
+                if property['DataType'] == 'Boolean':
+                    datatypestr = 'int'
+                createcmd += propid + ' ' + datatypestr
+                frst = False
+            createcmd += ')'
 
-        print('Creating datatable')
-        scr = ImpUtils.SQLScript(calculationObject)
-        scr.AddCommand('drop table if exists {0}'.format(tableid))
-        scr.AddCommand(createcmd)
-        scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, tableSettings['PrimKey']))
-        if tableSettings['IsPositionOnGenome']:
-            scr.AddCommand('create index {0}_chrompos ON {0}(chrom,pos)'.format(tableid))
-        scr.Execute(datasetId)
+            print('Creating datatable')
+            scr = ImpUtils.SQLScript(calculationObject)
+            scr.AddCommand('drop table if exists {0}'.format(tableid))
+            scr.AddCommand(createcmd)
+            scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, tableSettings['PrimKey']))
+            if tableSettings['IsPositionOnGenome']:
+                scr.AddCommand('create index {0}_chrompos ON {0}(chrom,pos)'.format(tableid))
+            scr.Execute(datasetId)
 
-        print('Loading datatable values')
-        sqlfile = ImpUtils.GetTempFileName()
-        tb.SaveSQLDump(sqlfile, tableid)
-        ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
-        os.remove(sqlfile)
+            print('Loading datatable values')
+            sqlfile = ImpUtils.GetTempFileName()
+            tb.SaveSQLDump(sqlfile, tableid)
+            ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
+            os.remove(sqlfile)
 
 
 
@@ -183,6 +184,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         '',
                         propid,
                         settings['Name'],
-                        dataFileName
+                        dataFileName,
+                        importSettings
                     )
 

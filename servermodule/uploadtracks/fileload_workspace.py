@@ -14,7 +14,9 @@ def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     workspaceid = data['workspaceid']
     importSettings = {}
-    importSettings['ConfigOnly'] = data['ConfigOnly']
+    importSettings['ConfigOnly'] = False
+    if data['ConfigOnly'] == '1':
+        importSettings['ConfigOnly'] = True
     importer.ImportWorkspaces.ImportWorkspace(
         calculationObject,
         datasetid,
