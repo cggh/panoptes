@@ -211,6 +211,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                         datasetId,
                         tableid,
                         'custom',
+                        workspaceid,
                         propid,
                         settings['Name'],
                         dataFileName

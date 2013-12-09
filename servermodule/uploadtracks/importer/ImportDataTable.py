@@ -180,6 +180,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         datasetId,
                         tableid,
                         'fixed',
+                        '',
                         propid,
                         settings['Name'],
                         dataFileName

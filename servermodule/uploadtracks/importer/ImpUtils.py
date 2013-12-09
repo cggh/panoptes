@@ -100,7 +100,7 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
                     destFile.write('\t'.join([columns[colindex] for colindex in colindices]) + '\n')
 
 
-def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sourceid, propid, name, dataFileName):
+def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName):
     summSettings.RequireTokens(['BlockSizeMax'])
     summSettings.AddTokenIfMissing('MinVal', 0)
     summSettings.AddTokenIfMissing('BlockSizeMin', 1)
@@ -115,7 +115,10 @@ def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sou
     ExecuteFilterbankSummary(calculationObject, destFolder, propid, summSettings)
     extraSummSettings = summSettings.Clone()
     extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-    sql = "INSERT INTO summaryvalues VALUES ('', '{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, {7}, {8})".format(
+    sql = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')".format(propid, tableid, sourceid, workspaceid)
+    ExecuteSQL(calculationObject, datasetId, sql)
+    sql = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})".format(
+        workspaceid,
         sourceid,
         propid,
         tableid,
