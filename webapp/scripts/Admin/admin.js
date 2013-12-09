@@ -71,31 +71,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 alert('Please select a source file set from the tree')
                                 return;
                             }
-                            if (sourceFileInfo.sourceid) {
-                                //Upload a specific custom data source
-                                var data={};
-                                data.datasetid = sourceFileInfo.datasetid;
-                                data.workspaceid = sourceFileInfo.workspaceid;
-                                data.sourceid = sourceFileInfo.sourceid;
-                                data.tableid = sourceFileInfo.tableid;
-                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_customsource', data, function(resp) {
-                                });
-                                return;
-                            }
-                            if (sourceFileInfo.workspaceid) {
-                                //Upload a workspace
-                                var data={};
-                                data.datasetid = sourceFileInfo.datasetid;
-                                data.workspaceid = sourceFileInfo.workspaceid;
-                                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_workspace', data, function(resp) {
-                                });
-                                return;
-                            }
-                            //Upload a dataset
-                            var data={};
-                            data.datasetid = sourceFileInfo.datasetid;
-                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
-                            });
+                            that.loadData();
                         })
 
                         this.panelButtons.addControl(Controls.CompoundHor([
@@ -109,6 +85,49 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         that.updateCalculationInfo();
                     }
 
+
+                    that.execLoadData = function(configOnly) {
+                        var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                        var data={};
+                        data.ConfigOnly = configOnly;
+                        if (sourceFileInfo.sourceid) {
+                            //Upload a specific custom data source
+                            data.datasetid = sourceFileInfo.datasetid;
+                            data.workspaceid = sourceFileInfo.workspaceid;
+                            data.sourceid = sourceFileInfo.sourceid;
+                            data.tableid = sourceFileInfo.tableid;
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_customsource', data, function(resp) {
+                            });
+                            return;
+                        }
+                        if (sourceFileInfo.workspaceid) {
+                            //Upload a workspace
+                            data.datasetid = sourceFileInfo.datasetid;
+                            data.workspaceid = sourceFileInfo.workspaceid;
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_workspace', data, function(resp) {
+                            });
+                            return;
+                        }
+                        //Upload a dataset
+                        data.datasetid = sourceFileInfo.datasetid;
+                        ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
+                        });
+                    }
+
+                    that.loadData = function() {
+                        var content = '';
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Load all data', width:160, height:28 }).setOnChanged(function() {
+                            Popup.closeIfNeeded(popupid);
+                            that.execLoadData(false);
+                        });
+                        content += bt.renderHtml() + '<br>';
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Load configuration only', width:160, height:28 }).setOnChanged(function() {
+                            Popup.closeIfNeeded(popupid);
+                            that.execLoadData(false);
+                        });
+                        content += bt.renderHtml() + '<br>';
+                        var popupid = Popup.create('Load file data', content);
+                    }
 
                     that.createPanelSourceData = function() {
                         that.panelSourceData = FrameTree.Tree(this.frameSourceData);

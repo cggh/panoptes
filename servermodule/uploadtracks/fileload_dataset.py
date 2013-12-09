@@ -13,6 +13,7 @@ import importer.ImportFiles
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     importSettings = {}
+    importSettings['ConfigOnly'] = data['ConfigOnly']
     importer.ImportFiles.ImportDataSet(
         calculationObject,
         config.SOURCEDATADIR + '/datasets',

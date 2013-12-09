@@ -16,6 +16,7 @@ def ResponseExecute(data, calculationObject):
     sourceid = data['sourceid']
     tableid = data['tableid']
     importSettings = {}
+    importSettings['ConfigOnly'] = data['ConfigOnly']
     importer.ImportWorkspaces.ImportCustomData(
         calculationObject,
         datasetid,
