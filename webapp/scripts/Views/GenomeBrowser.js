@@ -119,7 +119,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     $.each(MetaData.tableCatalog, function(idx, table) {
                         if (table.hasGenomePositions) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.Name}),  width:120, height:30 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.name}),  width:120, height:30 }).setOnChanged(function() {
                                 var chromoid = that.panelBrowser.getCurrentChromoID();
                                 var range = that.panelBrowser.getVisibleRange();
                                 Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
