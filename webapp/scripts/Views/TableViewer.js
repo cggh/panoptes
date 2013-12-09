@@ -49,8 +49,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 } );
 
-                if (tableid == 'SNP') {//!!! todo: make this generic
-                    Msg.listen('',{type: 'ShowSNPsInRange'}, function(scope, info) {
+                if (MetaData.getTableInfo(that.tableid).hasGenomePositions) {
+                    Msg.listen('',{type: 'ShowItemsInGenomeRange', tableid: that.tableid}, function(scope, info) {
                         that.activateState();
                         if (info.preservecurrentquery)
                             var qry =that.theQuery.get();
