@@ -182,7 +182,8 @@ class CalcLogHeader:
     def __enter__(self):
         return None
     def __exit__(self, type, value, traceback):
-        self.calcObject.Log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
+        if value is None:
+            self.calcObject.Log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
 
 
 
