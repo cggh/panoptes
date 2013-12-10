@@ -5,6 +5,7 @@ import config
 import customresponders.uploadtracks.VTTable as VTTable
 import SettingsLoader
 import ImpUtils
+import LoadTable
 import uuid
 import sys
 import shutil
@@ -104,50 +105,18 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
             propDict[property['propid']] = property
 
         if not importSettings['ConfigOnly']:
-            # Load datatable
-            print('Loading data table')
-            tb = VTTable.VTTable()
-            tb.allColumnsText = True
-            try:
-                tb.LoadFile(os.path.join(folder, 'data'))
-            except Exception as e:
-                raise Exception('Error while reading file: '+str(e))
-            print('---- ORIG TABLE ----')
-            tb.PrintRows(0, 9)
-
-            for property in properties:
-                if not tb.IsColumnPresent(property['propid']):
-                    raise Exception('Missing column "{0}" in datatable "{1}"'.format(property['propid'], tableid))
-
-            if not tb.IsColumnPresent(primkey):
-                raise Exception('Missing primary key '+primkey)
-
-            for col in tb.GetColList():
-                if (col not in propDict) and (col != primkey):
-                    tb.DropCol(col)
-            tb.ArrangeColumns(propidList)
-            for property in properties:
-                propid = property['propid']
-                if property['DataType'] == 'Value':
-                    tb.ConvertColToValue(propid)
-                if property['DataType'] == 'Boolean':
-                    tb.MapCol(propid, ImpUtils.convertToBooleanInt)
-                    tb.ConvertColToValue(propid)
-            print('---- PROCESSED TABLE ----')
-            tb.PrintRows(0, 9)
-
             tmptable = Utils.GetTempID()
-            tmpfile_create = ImpUtils.GetTempFileName()
-            tmpfile_dump = ImpUtils.GetTempFileName()
-            tb.SaveSQLCreation(tmpfile_create, tmptable)
-            tb.SaveSQLDump(tmpfile_dump, tmptable)
-            ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_create, datasetId)
-            ImpUtils.ExecuteSQLScript(calculationObject, tmpfile_dump, datasetId)
-            os.remove(tmpfile_create)
-            os.remove(tmpfile_dump)
+            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'] } for prop in properties]
+            columns.append({'name':primkey, 'DataType':'Text'})
+            LoadTable.LoadTable(
+                calculationObject,
+                os.path.join(folder, 'data'),
+                datasetId,
+                tmptable,
+                columns,
+                {'PrimKey': primkey}
+            )
 
-            print('Indexing new information')
-            cur.execute('CREATE UNIQUE INDEX {1} ON {0}({1})'.format(tmptable, primkey))
 
             print('Creating new columns')
             frst = True

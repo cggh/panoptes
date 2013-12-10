@@ -92,19 +92,32 @@ theCalculationThreadList = CalculationThreadList()
 class CalculationThread (threading.Thread):
     def __init__(self, id, handler, data, calculationname):
         threading.Thread.__init__(self)
+        if id == '':
+            id = 'WR'+str(uuid.uuid1()).replace('-', '_')
         self.id = id
         self.calculationname = calculationname
         self.handler = handler
         self.data = data
+        self.logfilename = None
         self.logfile = None
         self.orig_stdout = sys.stdout
         self.orig_stderr = sys.stderr
-    def run(self):
-        theCalculationThreadList.AddThread(self.id, self.calculationname)
+
+    def OpenLog(self):
         self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
         self.logfile = open(self.logfilename, 'w')
         sys.stdout = self
         sys.stderr = self
+
+    def CloseLog(self):
+        sys.stdout = self.orig_stdout
+        sys.stderr = self.orig_stderr
+        self.logfile.close()
+        self.logfile = None
+
+    def run(self):
+        theCalculationThreadList.AddThread(self.id, self.calculationname)
+        self.OpenLog()
         try:
             self.handler(self.data, self)
             theCalculationThreadList.DelThread(self.id)
@@ -113,10 +126,7 @@ class CalculationThread (threading.Thread):
             theCalculationThreadList.SetInfo(self.id, 'Error: '+str(e), None)
             print('ERROR:'+str(e))
         print("--- Closing log ---")
-        sys.stdout = self.orig_stdout
-        sys.stderr = self.orig_stderr
-        self.logfile.close()
-        self.logfile = None
+        self.CloseLog()
 
     def write(self, line):
         if self.logfile is None:
@@ -127,8 +137,9 @@ class CalculationThread (threading.Thread):
 
     def Log(self, content):
         if self.logfile is None:
-            raise Exception('Calculation log file is not open')
-        self.logfile.write(content+'\n')
+            print(content)
+        else:
+            self.logfile.write(content+'\n')
 
     def LogHeader(self, title):
         theCalculationThreadList.SetInfo(self.id, title, None)
@@ -166,12 +177,15 @@ class CalculationThread (threading.Thread):
     def RunPythonScript(self, scriptFile, runPath, arguments):
         os.chdir(runPath)
         cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
-        cmd += ' >> ' + self.logfilename + ' 2>&1'
+        if self.logfilename is not None:
+            cmd += ' >> ' + self.logfilename + ' 2>&1'
         print('COMMAND:'+cmd)
-        self.logfile.close()
-        self.logfile = None
+        if self.logfilename is not None:
+            self.logfile.close()
+            self.logfile = None
         os.system(cmd)
-        self.logfile = open(self.logfilename, 'a')
+        if self.logfilename is not None:
+            self.logfile = open(self.logfilename, 'a')
 
 class CalcLogHeader:
     def __init__(self, calcObject, title):

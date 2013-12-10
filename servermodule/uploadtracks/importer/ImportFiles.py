@@ -86,9 +86,11 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 #         ImportDataSet(calculationObject, baseFolder, dataset)
 
 
-
-
-
-
-#ImportFileSet(config.SOURCEDATADIR + '/datasets')
-#ImportDataSet(config.SOURCEDATADIR + '/datasets', 'Sample')
+if __name__ == "__main__":
+    import customresponders.uploadtracks.asyncresponder as asyncresponder
+    calc = asyncresponder.CalculationThread('', None, {}, '')
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Sample1',
+        {
+            'ConfigOnly': False
+        }
+    )

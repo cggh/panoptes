@@ -25,7 +25,9 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
     if outputfilename is not None:
         cmd += ' > ' + outputfilename
-    os.system(cmd)
+    rt = os.system(cmd)
+    if (rt != 0) and (rt != 1):
+        raise Exception('SQL script error; return code '+str(rt))
 
 class SQLScript:
     def __init__(self, calculationObject):
