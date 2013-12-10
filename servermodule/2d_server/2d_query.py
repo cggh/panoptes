@@ -13,9 +13,9 @@ import numpy as np
 #TODO cache doesn't have locking....
 cache = FileDict('cache')
 
-callset_fn = '/home/benj/data/ag/gatk_ug-subset_A.h5'
+callset_fn = '/home/benj/data/ag/gatk_ug-subset_A_combined_chrom.h5'
 callset = h5py.File(callset_fn, 'r')
-allele_depth = callset['2L']['calldata_2d']['AD']
+allele_depth = callset['calldata_2d']['AD']
 
 import collections
 import functools

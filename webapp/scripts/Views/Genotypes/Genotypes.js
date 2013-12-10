@@ -57,7 +57,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           fetcher.addColumn('sex', 'ST');
           fetcher.addColumn('m_s', 'ST');
           fetcher.addColumn('dna_quant_method', 'ST');
-          fetcher.addColumn('Genotyped', 'IN');
           fetcher.getData(query, sortColumn, function (data) {
               that.genotypeViewer.setSamples(that.transposeQueryResult(data), query);
             }
@@ -102,7 +101,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
           var ctrlQuerySamples = that.querySamples.createControl();
           var ctrlQueryVariants = that.queryVariants.createControl();
-
           this.panelControls.addControl(Controls.CompoundVert([
             ctrlQuerySamples,
             ctrlQueryVariants
