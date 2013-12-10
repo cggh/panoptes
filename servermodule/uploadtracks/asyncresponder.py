@@ -99,21 +99,20 @@ class CalculationThread (threading.Thread):
         self.handler = handler
         self.data = data
         self.logfilename = None
-        self.logfile = None
         self.orig_stdout = sys.stdout
         self.orig_stderr = sys.stderr
 
     def OpenLog(self):
         self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
-        self.logfile = open(self.logfilename, 'w')
         sys.stdout = self
         sys.stderr = self
+        with open(self.logfilename, 'w') as logfile:
+            logfile.write('Log start\n')
 
     def CloseLog(self):
         sys.stdout = self.orig_stdout
         sys.stderr = self.orig_stderr
-        self.logfile.close()
-        self.logfile = None
+        self.logfilename = None
 
     def run(self):
         theCalculationThreadList.AddThread(self.id, self.calculationname)
@@ -129,17 +128,18 @@ class CalculationThread (threading.Thread):
         self.CloseLog()
 
     def write(self, line):
-        if self.logfile is None:
+        if self.logfilename is None:
             self.orig_stdout.write(line)
         else:
-            self.logfile.write(line)
+            with open(self.logfilename, 'a') as logfile:
+                logfile.write(line)
 
 
     def Log(self, content):
-        if self.logfile is None:
+        if self.logfilename is None:
             print(content)
         else:
-            self.logfile.write(content+'\n')
+            self.write(content+'\n')
 
     def LogHeader(self, title):
         theCalculationThreadList.SetInfo(self.id, title, None)
@@ -180,12 +180,7 @@ class CalculationThread (threading.Thread):
         if self.logfilename is not None:
             cmd += ' >> ' + self.logfilename + ' 2>&1'
         print('COMMAND:'+cmd)
-        if self.logfilename is not None:
-            self.logfile.close()
-            self.logfile = None
         os.system(cmd)
-        if self.logfilename is not None:
-            self.logfile = open(self.logfilename, 'a')
 
 class CalcLogHeader:
     def __init__(self, calcObject, title):
