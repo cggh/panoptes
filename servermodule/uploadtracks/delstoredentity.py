@@ -18,7 +18,6 @@ def response(returndata):
 
 
     sql = "DELETE FROM {0} WHERE id='{1}'".format(tablename, id)
-    #print(sql)
     cur.execute(sql)
 
     db.commit()

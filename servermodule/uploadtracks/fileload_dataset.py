@@ -7,13 +7,15 @@ import time
 import asyncresponder
 import sys
 
-print(sys.path)
 import importer.ImportFiles
 
 
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     importSettings = {}
+    importSettings['ConfigOnly'] = False
+    if data['ConfigOnly'] == '1':
+        importSettings['ConfigOnly'] = True
     importer.ImportFiles.ImportDataSet(
         calculationObject,
         config.SOURCEDATADIR + '/datasets',

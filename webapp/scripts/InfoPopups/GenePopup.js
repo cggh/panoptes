@@ -39,12 +39,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += '<b>Position</b>: '+data.chromid+':'+data.fstart+'-'+data.fstop+'<br/>';
 
 
-            var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show SNPs in this gene', width:120, height:50 }).setOnChanged(function() {
-//                Application.activateView('table_SNP');
-                Msg.send({type: 'ShowSNPsInRange'}, { preservecurrentquery:true, chrom:data.chromid, start:data.fstart, stop:data.fstop });
-                Popup.closeIfNeeded(popupid);
+            $.each(MetaData.tableCatalog, function(idx, table) {
+                if (table.hasGenomePositions) {
+                    var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show {name} in this gene'.DQXformat({name: table.name}), width:120, height:50 }).setOnChanged(function() {
+                        Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, { preservecurrentquery:true, chrom:data.chromid, start:data.fstart, stop:data.fstop });
+                        Popup.closeIfNeeded(popupid);
+                    });
+                    content += button_snps.renderHtml();
+                }
             });
-            content += button_snps.renderHtml();
+
 
             content += '<br>';
 

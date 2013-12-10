@@ -115,14 +115,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     }
 
-                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible variants in table",  width:120, height:30 }).setOnChanged(function() {
-                        var chromoid = that.panelBrowser.getCurrentChromoID();
-                        var range = that.panelBrowser.getVisibleRange();
-                        Msg.send({type: 'ShowSNPsInRange'}, {
-                            preservecurrentquery:(that.ctrl_filtertype.getValue()=='query'),
-                            chrom:chromoid, start:range.min, stop:range.max
-                        });
+                    var linkToTableButtonsGroup = Controls.CompoundVert([]);
+
+                    $.each(MetaData.tableCatalog, function(idx, table) {
+                        if (table.hasGenomePositions) {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.name}),  width:120, height:30 }).setOnChanged(function() {
+                                var chromoid = that.panelBrowser.getCurrentChromoID();
+                                var range = that.panelBrowser.getVisibleRange();
+                                Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
+                                    preservecurrentquery:(that.ctrl_filtertype.getValue()=='query'),
+                                    chrom:chromoid, start:range.min, stop:range.max
+                                });
+                            });
+                            linkToTableButtonsGroup.addControl(bt);
+                        }
                     });
+
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
@@ -160,7 +168,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     this.panelControls.addControl(Controls.CompoundVert([
-                        bt,
+                        linkToTableButtonsGroup,
                         that.visibilityControlsGroup,
                         that.buttonsGroup
                     ]));

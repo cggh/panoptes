@@ -35,8 +35,9 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             settings.AddTokenIfMissing('Order', 99999)
             settings.DefineKnownTokens(['channelColor'])
             print('SETTINGS: '+settings.ToJSON())
-            print('Executing filter bank')
-            ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid, settings)
+            if not importSettings['ConfigOnly']:
+                print('Executing filter bank')
+                ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid, settings)
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
             sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
@@ -63,13 +64,14 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
         ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
         # Import reference genome
-        with calculationObject.LogHeader('Converting reference genome'):
-            destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
-            if not os.path.exists(destfolder):
-                os.makedirs(destfolder)
-            tempfastafile = destfolder + '/refsequence.fa'
-            shutil.copyfile(os.path.join(folder, 'refsequence.fa'), tempfastafile)
-            ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+        if not importSettings['ConfigOnly']:
+            with calculationObject.LogHeader('Converting reference genome'):
+                destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
+                if not os.path.exists(destfolder):
+                    os.makedirs(destfolder)
+                tempfastafile = destfolder + '/refsequence.fa'
+                shutil.copyfile(os.path.join(folder, 'refsequence.fa'), tempfastafile)
+                ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
 
 
         # Import chromosomes
@@ -90,16 +92,17 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
             os.remove(sqlfile)
 
-        # Import annotation
-        with calculationObject.LogHeader('Converting annotation'):
-            tempgfffile = ImpUtils.GetTempFileName()
-            temppath = os.path.dirname(tempgfffile)
-            shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
-            ImpUtils.RunConvertor(calculationObject, 'ParseGFF', temppath, [os.path.basename(tempgfffile)])
-            print('Importing annotation')
-            ImpUtils.ExecuteSQLScript(calculationObject, os.path.join(temppath, 'annotation_dump.sql'), datasetId)
-            os.remove(tempgfffile)
-            os.remove(os.path.join(temppath, 'annotation.txt'))
-            os.remove(os.path.join(temppath, 'annotation_dump.sql'))
-            os.remove(os.path.join(temppath, 'annotation_create.sql'))
+        if not importSettings['ConfigOnly']:
+            # Import annotation
+            with calculationObject.LogHeader('Converting annotation'):
+                tempgfffile = ImpUtils.GetTempFileName()
+                temppath = os.path.dirname(tempgfffile)
+                shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
+                ImpUtils.RunConvertor(calculationObject, 'ParseGFF', temppath, [os.path.basename(tempgfffile)])
+                print('Importing annotation')
+                ImpUtils.ExecuteSQLScript(calculationObject, os.path.join(temppath, 'annotation_dump.sql'), datasetId)
+                os.remove(tempgfffile)
+                os.remove(os.path.join(temppath, 'annotation.txt'))
+                os.remove(os.path.join(temppath, 'annotation_dump.sql'))
+                os.remove(os.path.join(temppath, 'annotation_create.sql'))
 
