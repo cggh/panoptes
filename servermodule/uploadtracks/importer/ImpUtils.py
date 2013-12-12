@@ -22,6 +22,14 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
     calculationObject.LogSQLCommand(databaseName+':SQL file')
     if not os.path.exists(filename):
         raise Exception('Unable to find SQL file '+filename)
+    #Log (start of) script
+    with open(filename) as fp:
+        linect = 0
+        for line in fp:
+            calculationObject.LogSQLCommand(line[:200])
+            linect += 1
+            if linect > 10:
+                break
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
     if outputfilename is not None:
         cmd += ' > ' + outputfilename
