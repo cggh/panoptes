@@ -36,9 +36,10 @@ define(["_", "tween", "DQX/Utils"],
           else {
             var width = x_scale(view.cache_end_snp) - x_scale(view.cache_start_snp);
             var x_offset =  x_scale(view.cache_start_snp);
-            data.samples.forEach(function (sample, i) {
-              ctx.drawImage(sample.genotypes_canvas,x_offset,sample.vert + y_off, width, row_height);
-            });
+            if (width > 0)
+              data.samples.forEach(function (sample, i) {
+                ctx.drawImage(sample.genotypes_canvas,x_offset,sample.vert + y_off, width, row_height);
+              });
           }
 
 

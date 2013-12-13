@@ -1,6 +1,6 @@
 define(["_", "d3", "MetaData", "DQX/SVG"],
   function (_, d3, MetaData, SVG) {
-    return function SNPCache(providers, update_callback, position_update_callback, samples) {
+    return function SNPCache(providers, update_callback, x_index_update_callback, samples) {
 
 
       var UNFETCHED = 0;
@@ -11,8 +11,8 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
       var that = {};
       that.genotype_provider = providers.genotype;
       that.position_provider = providers.position;
-      that.update_callback = update_callback;
-      that.position_update_callback = position_update_callback;
+      that.data_update_callback = update_callback;
+      that.x_index_update_callback = x_index_update_callback;
 
       that.samples = samples;
       that.snp_positions_by_chrom = {};
@@ -82,56 +82,48 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         //Fetch state by chrom
         that.fetch_state_by_chrom = {};
         that.fetch_state = [];
+
         //Call set chrom to do the fetch
         that.set_chrom(that.chrom);
       }
 
       that.set_chrom = function(chrom) {
         that.chrom = chrom;
-        //Insert arrays for this chrom
-        that.snp_positions_by_chrom[chrom] || (that.snp_positions_by_chrom[chrom] = []);
-        that.snps_by_chrom[chrom] || (that.snps_by_chrom[chrom] = {});
-        that.fetch_state_by_chrom[chrom] || (that.fetch_state_by_chrom[chrom] = []);
+        if (that.snp_positions_by_chrom[chrom] == undefined) {
+          //Request the snp index
+          that.current_provider_requests += 1;
+          //Insert blanks till the data comes back
+          that.snp_positions_by_chrom[chrom] || (that.snp_positions_by_chrom[chrom] = []);
+          that.snps_by_chrom[chrom] || (that.snps_by_chrom[chrom] = {});
+          that.fetch_state_by_chrom[chrom] || (that.fetch_state_by_chrom[chrom] = []);
+          that.position_provider(that.variant_query, chrom, function(positions) {
+          if (positions) {
+            that.snp_positions_by_chrom[chrom] = positions;
+            that.fetch_state_by_chrom[chrom] = new Uint8Array(Math.ceil(positions.length / CHUNK_SIZE));
+            that.snps_by_chrom[chrom].alt = new Uint16Array(positions.length);
+            that.snps_by_chrom[chrom].ref = new Uint16Array(positions.length);
+            that.snps_by_chrom[chrom].alt_total = new Uint32Array(positions.length);
+            that.snps_by_chrom[chrom].ref_total = new Uint32Array(positions.length);
+            that.fetching_positions = false;
+            //Call again to set the data to the chrom again as we changed it and get an update_callback run.
+            that.set_chrom(chrom);
+            that.x_index_update_callback();
+            console.log('Positions loaded '+ positions.length);
+          }
+          else {
+            console.log('Error in snp position fetch '+ chrom);
+          }
+          that.current_provider_requests -= 1;
+          })
+        }
 
         //Set the data to be this chrom
         that.snp_positions = that.snp_positions_by_chrom[chrom];
         that.snps = that.snps_by_chrom[chrom];
         that.genotypes = that.genotypes_by_chrom[chrom];
         that.fetch_state = that.fetch_state_by_chrom[chrom];
-
-        if (that.variant_query == undefined || that.variant_query == null) {
-          that.update_callback();
-          return;
-        }
-
-
-        if (that.snp_positions.length == 0 && !that.fetching_positions) {
-          //Request the snp index
-          that.fetching_positions = true;
-          that.current_provider_requests += 1;
-          that.position_provider(this.variant_query, chrom, function(positions) {
-            if (positions) {
-              that.snp_positions_by_chrom[chrom] = positions;
-              that.fetch_state_by_chrom[chrom] = new Uint8Array(Math.ceil(positions.length / CHUNK_SIZE));
-              that.snps_by_chrom[chrom].alt = new Uint16Array(positions.length);
-              that.snps_by_chrom[chrom].ref = new Uint16Array(positions.length);
-              that.snps_by_chrom[chrom].alt_total = new Uint32Array(positions.length);
-              that.snps_by_chrom[chrom].ref_total = new Uint32Array(positions.length);
-              that.fetching_positions = false;
-              //Call again to set the data to the chrom again as we changed it and get an update_callback run.
-              that.set_chrom(chrom);
-              that.position_update_callback();
-              console.log('Positions loaded '+ chrom);
-            }
-            else {
-              console.log('Error in snp position fetch '+ chrom);
-              that.fetching_positions = false;
-              that.snp_positions_by_chrom[chrom] = [];
-            }
-            that.current_provider_requests -= 1;
-          })
-        }
-        that.update_callback();
+        that.x_index_update_callback();
+        that.data_update_callback();
       };
 
       that.retrieve_by_index = function (start, end) {
@@ -178,7 +170,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           _(that.samples).forEach(function (sample,i) {
             genotypes[i] || (genotypes[i] = {});
             var sample_gt = genotypes[i];
-            sample_gt || (sample_gt = {});
+            sample_gt || upd(sample_gt = {});
             sample_gt.alt || (sample_gt.alt = new Uint16Array(num_snps));
             sample_gt.ref || (sample_gt.ref = new Uint16Array(num_snps));
             sample_gt.col || (sample_gt.col = new Uint8Array(num_snps));
@@ -227,7 +219,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         }
         //Set chrom to update the exposed data
         that.set_chrom(that.chrom);
-        return that.update_callback();
+        return that.data_update_callback();
       };
 
       that._add_to_provider_queue_or_promote = function (chrom, chunk) {

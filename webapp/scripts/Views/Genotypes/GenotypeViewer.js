@@ -60,7 +60,6 @@
         that.view.genome_scale.range([ that.view.row_header_width, that.width()]);
         that.view.snp_scale.range([ that.view.row_header_width, that.width()]);
         that.needUpdate = 'resize';
-        that.tick();
       };
 
       that.width = function () {
@@ -218,8 +217,14 @@
         that.updateSNPs(true);
       },1000);
 
-      that.newPositions = function() {
-        that.view.rescaleGenomic();
+      that.new_x_index = function() {
+        var snps = that.data.snp_cache.snp_positions;
+        if (snps.length > 0) {
+          that.view.rescaleGenomic({left:snps[0],
+            right:snps[snps.length-1]});
+          that.view.rescaleSNPic({left:0,
+            right:snps.length});
+        }
       };
 
       that.newAnnotations = function() {
@@ -267,6 +272,7 @@
           var genotypes = that.data.snp_cache.genotypes;
           var r = that.data.snp_cache.colour_table_r;
           var g = that.data.snp_cache.colour_table_g;
+
           var b = that.data.snp_cache.colour_table_b;
           that.data.samples.forEach(function(sample, s) {
             //We want a canvas that is the next multiple of the number of snps
@@ -372,7 +378,7 @@
       };
       var locator = DQX.attr('start');
       that.data.annotation_cache = IntervalCache(that.providers.annotation, locator, null, that.newAnnotations);
-      that.data.snp_cache = SNPCache(providers, that.newData, that.newPositions, []);
+      that.data.snp_cache = SNPCache(providers, that.newData, that.new_x_index, []);
 
       //View parameters
       that.view = {
@@ -442,7 +448,6 @@
           {w:that.view.row_header_width, h:that.gene_map_height})
         },
       ]);
-      that.data.snp_cache.set_chrom('2L');
       that.last_view_change = 'genome';
 
 
@@ -471,16 +476,14 @@
       ];
       that.sample_leaf_sort = DQX.comp_attr('ox_code', d3.descending);
       that.sample_nest = [];
-      that.setSamples([]);
 
-      //TODO Auto-fix this
-      that.view.genome_scale.tweenTo({left: 2367890, right: 2368326});
-              
       that.resize();
 
       easel.Ticker.useRAF = true;
       easel.Ticker.addEventListener("tick", that.tick);
       easel.Ticker.setFPS(60);
+
+      that.data.snp_cache.set_chrom('2L');
 
       return that;
     };

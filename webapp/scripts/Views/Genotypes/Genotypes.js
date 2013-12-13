@@ -77,9 +77,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         that.recallSettings = function (settObj) {
           if (settObj.querySamples)
-            that.querySamples.recall(settObj.querySamples);
+            that.querySamples.recall(settObj.querySamples, true);
           if (settObj.queryVariants)
-            that.queryVariants.recall(settObj.queryVariants);
+            that.queryVariants.recall(settObj.queryVariants, true);
         };
 
 
@@ -170,6 +170,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
         that.snpIndexProvider = function (query, chrom, callback) {
+          if (query == undefined || query == null) {
+            callback([]);
+            return;
+          }
           query = SQL.WhereClause.AND([query, SQL.WhereClause.CompareFixed('chrom', '=', chrom)]);
           var myurl = DQX.Url(MetaData.serverUrl);
           myurl.addUrlQueryItem("datatype", "custom");
