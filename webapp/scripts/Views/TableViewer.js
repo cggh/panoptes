@@ -221,6 +221,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 };
                         });
                         str += '<span style="color: rgb(128,0,0)"><b>Active query:</b></span><br><span style="color: rgb(128,0,0);font-size:80%">'+qry.toDisplayString(nameMap,0)+'</span>';
+                    } else {
+                      str += '<span style="color: rgb(128,0,0)"><b>Active query:</b></span><br><span style="color: rgb(128,0,0);font-size:80%">All</span>'
                     }
                     str += '</div>';
                     return str;

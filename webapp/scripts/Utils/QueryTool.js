@@ -27,9 +27,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return SQL.WhereClause.encode(that.query);
             }
 
-            that.recall = function(settObj) {
+            that.recall = function(settObj, notify) {
                 that.query = SQL.WhereClause.decode(settObj);
                 that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
+                if (notify && that.notifyQueryUpdated)
+                  that.notifyQueryUpdated();
             }
 
             that.modify = function(qry) {
