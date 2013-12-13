@@ -10,6 +10,7 @@ cd `dirname ${SCRIPT_PATH}`
 cd ..
 PROJECT_ROOT=`pwd`;
 cd build/dependencies/DQXServer
+rm -rf cache
 source bin/activate
 bin/gunicorn -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 20 wsgi_static:application
 
