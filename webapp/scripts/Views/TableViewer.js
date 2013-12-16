@@ -284,6 +284,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             var tablePart = 1;
                             if (propInfo.datatype=='Value')
                                 encoding  = 'Float3';
+                            if ((propInfo.datatype=='Value') && (propInfo.propid=='pos') && (MetaData.getTableInfo(that.tableid).hasGenomePositions) )
+                                encoding  = 'IntDiff';
                             if (propInfo.datatype=='Boolean')
                                 encoding  = 'Int';
                             if (propInfo.isPrimKey)
