@@ -24,7 +24,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         db.close()
 
         settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-        settings.RequireTokens(['Properties'])
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
 

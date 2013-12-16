@@ -20,7 +20,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         DQXUtils.CheckValidIdentifier(tableid)
 
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-        tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey', 'Properties'])
+        tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
