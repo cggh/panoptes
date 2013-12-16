@@ -1,3 +1,5 @@
 NameSingle: Test item
 NamePlural: Test items
 PrimKey: ID
+Properties: Auto
+

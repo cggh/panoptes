@@ -19,6 +19,7 @@ class SettingsLoader:
             self.fileName = fileName
             with open(self.fileName, 'r') as configfile:
                 self.settings = yaml.load(configfile.read())
+                print('Loaded settings from: '+fileName+'\n'+str(self.settings))
         else:
             self.fileName = ''
 

@@ -1,6 +1,0 @@
-Name: Custom value 2
-DataType: Text
-Order: 1003
-ShowInTable: true
-ShowInBrowser: false
-IsCategorical: true

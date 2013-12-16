@@ -1,0 +1,16 @@
+
+Properties:
+
+- Id: Site
+  Name: Sample Site
+  DataType: Text
+  ShowInTable: true
+  IsCategorical: true
+
+- Id: Year
+  Name: Collection year
+  DataType: Value
+  ShowInTable: true
+  MinVal: 0
+  MaxVal: 20
+  DecimDigits: 0

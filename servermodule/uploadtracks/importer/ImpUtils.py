@@ -3,6 +3,7 @@ import config
 import uuid
 import DQXDbTools
 import DQXUtils
+import SettingsLoader
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -87,6 +88,28 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
 def ImportGlobalSettings(calculationObject, datasetId, settings):
     for token in settings.GetTokenList():
         ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+
+
+def LoadPropertyInfo(calculationObject, settings, datafile):
+    if not settings.HasToken('Properties'):
+        raise Exception('Missing tag "Properties"')
+    properties = []
+    for propSource in settings['Properties']:
+        if 'Id' not in propSource:
+            raise Exception('Property is missing Id field')
+        propid = propSource['Id']
+        property = {'propid': propid}
+        properties.append(property)
+        DQXUtils.CheckValidIdentifier(propid)
+        settings = SettingsLoader.SettingsLoader()
+        settings.LoadDict(propSource)
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+        settings.RequireTokens(['DataType'])
+        settings.ConvertToken_Boolean('isCategorical')
+        settings.AddTokenIfMissing('Name', propid)
+        property['DataType'] = settings['DataType']
+        property['Settings'] = settings
+    return properties
 
 
 def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, writeHeader):

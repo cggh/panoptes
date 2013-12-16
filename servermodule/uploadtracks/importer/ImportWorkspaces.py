@@ -23,6 +23,10 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         primkey = cur.fetchone()[0]
         db.close()
 
+        settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
+        settings.RequireTokens(['Properties'])
+
+        properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
 
         sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
         print('Source table: '+sourcetable)
@@ -34,15 +38,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         existingProperties = [row[0] for row in cur.fetchall()]
         print('Existing properties: '+str(existingProperties))
         db.close()
-
-
-        # Load properties
-        properties = []
-        for fle in os.listdir(os.path.join(folder, 'properties')):
-            if os.path.isfile(os.path.join(folder, 'properties', fle)):
-                if (fle.find('~') < 0) and (fle[0] != '.'):
-                    properties.append({'propid':fle})
-        print('Properties: '+str(properties))
 
         propidList = []
         for property in properties:
@@ -74,16 +69,10 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                 cur.execute(sql)
 
 
+        ranknr = 0
         for property in properties:
             propid = property['propid']
-            DQXUtils.CheckValidIdentifier(propid)
-            settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'properties', propid))
-            settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
-            settings.ConvertToken_Boolean('isCategorical')
-            settings.RequireTokens(['Name', 'DataType'])
-            settings.AddTokenIfMissing('Order', 99999)
-            property['DataType'] = settings['DataType']
-            property['Order'] = settings['Order']
+            settings = property['Settings']
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
             print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
@@ -93,13 +82,12 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                 propid,
                 tableid,
                 settings['Name'],
-                settings['Order'],
+                ranknr + 1000,
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            property['settings'] = settings
+            ranknr += 1
 
-        properties = sorted(properties, key=lambda k: k['Order'])
         propDict = {}
         for property in properties:
             propDict[property['propid']] = property
@@ -158,7 +146,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         print('Creating summary values')
         for property in properties:
             propid = property['propid']
-            settings = property['settings']
+            settings = property['Settings']
             if settings.HasToken('SummaryValues'):
                 with calculationObject.LogHeader('Creating summary values for custom data {0}'.format(tableid)):
                     summSettings = settings.GetSubSettings('SummaryValues')

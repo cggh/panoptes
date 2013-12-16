@@ -5,3 +5,41 @@ IsPositionOnGenome: true
 FetchRecordCount: false
 QuickFindFields: SnpName
 
+Properties:
+
+- Id: chrom
+  Namea: Chromosome
+  DataType: Text
+  ShowInTable: true
+
+- Id: pos
+  Name: Position
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0
+
+- Id: SnpName
+  Name: Variant name
+  DataType: Text
+  ShowInTable: true
+
+- Id: Value1
+  Name: Value 1
+  DataType: Value
+  Order: 2
+  ShowInTable: true
+  ShowInBrowser: true
+  MinVal: 0
+  MaxVal: 2
+  DecimDigits: 2
+  SummaryValues:
+     BlockSizeMin: 20
+     BlockSizeMax: 50000
+     ChannelColor: "rgb(0,100,0)"
+
+- Id: Extra1
+  Name: Extra 1
+  DataType: Text
+  ShowInTable: true
+  ShowInBrowser: true
+  categoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }

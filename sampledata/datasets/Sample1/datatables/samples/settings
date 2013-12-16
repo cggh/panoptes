@@ -5,3 +5,33 @@ IsPositionOnGenome: false
 FetchRecordCount: true
 QuickFindFields: ID,Country
 
+Properties:
+
+- Id: ID
+  Name: Sample ID
+  DataType: Text
+  ShowInTable: true
+
+- Id: Country
+  Name: Country
+  DataType: Text
+  IsCategorical: true
+  ShowInTable: true
+
+- Id: InUse
+  Name: In use
+  DataType: Boolean
+  ShowInTable: true
+
+- Id: Value1
+  Name: Value 1
+  DataType: Value
+  MinVal: 0
+  MaxVal: 1
+  DecimDigits: 3
+  ShowInTable: true
+
+- Id: Comment
+  Name: Comment
+  DataType: Text
+  ShowInTable: true
