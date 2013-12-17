@@ -9,11 +9,12 @@ from functools import partial
 import hashlib
 import h5py
 import numpy as np
+import config
 
 #TODO cache doesn't have locking....
 cache = FileDict('cache')
 
-callset_fn = '/home/benj/data/ag/gatk_ug-subset_A_combined_chrom.h5'
+callset_fn = config.HDF5_FILE
 callset = h5py.File(callset_fn, 'r')
 allele_depth = callset['calldata_2d']['AD']
 
