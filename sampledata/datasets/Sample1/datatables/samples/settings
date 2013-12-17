@@ -17,6 +17,7 @@ Properties:
   DataType: Text
   IsCategorical: true
   ShowInTable: true
+  Index: true
 
 - Id: InUse
   Name: In use

@@ -26,7 +26,7 @@ Properties:
 - Id: Value1
   Name: Value 1
   DataType: Value
-  Order: 2
+  Index: true
   ShowInTable: true
   ShowInBrowser: true
   MinVal: 0

@@ -93,8 +93,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
         if not importSettings['ConfigOnly']:
             tmptable = Utils.GetTempID()
-            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'] } for prop in properties]
-            columns.append({'name':primkey, 'DataType':'Text'})
+            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'], 'Index': prop['Settings']['Index'] } for prop in properties]
+            columns.append({'name':primkey, 'DataType':'Text', 'Index': False})
             LoadTable.LoadTable(
                 calculationObject,
                 os.path.join(folder, 'data'),

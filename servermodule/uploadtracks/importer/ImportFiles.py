@@ -89,7 +89,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.uploadtracks.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'PfCrosses',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Sample1',
         {
             'ConfigOnly': False
         }

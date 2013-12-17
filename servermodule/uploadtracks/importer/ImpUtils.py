@@ -28,9 +28,12 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
     with open(filename) as fp:
         linect = 0
         for line in fp:
-            calculationObject.LogSQLCommand(line[:200])
+            if len(line)>200:
+                line = line[:200] + '...'
+            calculationObject.LogSQLCommand(line)
             linect += 1
-            if linect > 10:
+            if linect > 15:
+                calculationObject.LogSQLCommand('...')
                 break
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
     if outputfilename is not None:
@@ -159,10 +162,15 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                 properties.append(property)
                 propidMap[propid] = True
 
+    for property in properties:
+        property['Settings'].AddTokenIfMissing('Index', False)
+
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
 
-    calculationObject.Log('Properties found: '+str(properties))
+    calculationObject.Log('Properties found:')
+    for property in properties:
+        calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
     return properties
 
 

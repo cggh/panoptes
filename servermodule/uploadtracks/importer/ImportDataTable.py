@@ -73,7 +73,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
 
         if not importSettings['ConfigOnly']:
-            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'] } for prop in properties]
+            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'], 'Index': prop['Settings']['Index'] } for prop in properties]
             LoadTable.LoadTable(
                 calculationObject,
                 os.path.join(folder, 'data'),

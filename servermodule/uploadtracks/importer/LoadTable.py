@@ -133,6 +133,9 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     scr.AddCommand(sql)
     calculationObject.Log('Creation statement: '+sql)
     scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, primkey))
+    for col in columns:
+        if ('Index' in col) and (col['Index']):
+            scr.AddCommand('create index {0}_{1} ON {0}({1})'.format(tableid, col['name']))
     scr.Execute(databaseid)
 
     calculationObject.Log('Importing data')
