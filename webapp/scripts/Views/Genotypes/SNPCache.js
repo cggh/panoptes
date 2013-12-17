@@ -170,7 +170,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           _(that.samples).forEach(function (sample,i) {
             genotypes[i] || (genotypes[i] = {});
             var sample_gt = genotypes[i];
-            sample_gt || upd(sample_gt = {});
+            sample_gt || (sample_gt = {});
             sample_gt.alt || (sample_gt.alt = new Uint16Array(num_snps));
             sample_gt.ref || (sample_gt.ref = new Uint16Array(num_snps));
             sample_gt.col || (sample_gt.col = new Uint8Array(num_snps));
@@ -185,6 +185,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
 //          for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
 //            snps.alt[i] = data[d];
           data = new Uint16Array(buffer, d);
+          var chunk_length = (data.length / that.samples.length) /2; //Hack until we have proper abstracted buffer parsing
           _(that.samples).forEach(function (sample,j) {
             var sample_gt = genotypes[j];
             //COMMENTED OUT AS OUR VCFs HAVE NO GENOTYPES!!!
@@ -194,11 +195,11 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
 //              sample_gt.ref[i] = data[d];
 //            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
 //              sample_gt.alt[i] = data[d];
-            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++) {
+            for (i = start_index, ref = start_index+chunk_length; i < ref; i++) {
               sample_gt.ref[i] = data[d];d++;
               sample_gt.alt[i] = data[d];d++;
             }
-            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++) {
+            for (i = start_index, ref = start_index+chunk_length; i < ref; i++) {
               var r = sample_gt.ref[i];
               var a = sample_gt.alt[i];
               var tot = r + a;
@@ -245,7 +246,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
         if (that.current_provider_requests < 4 && that.provider_queue.length > 0) {
           var chunk = that.provider_queue.pop();
           var start = chunk.chunk * CHUNK_SIZE;
-          start = that.snp_positions_by_chrom[chunk.chrom][start]
+          start = that.snp_positions_by_chrom[chunk.chrom][start];
           var end = Math.min(that.snp_positions_by_chrom[chunk.chrom].length-1, (chunk.chunk + 1) * CHUNK_SIZE);
           if (end == that.snp_positions_by_chrom[chunk.chrom].length-1)
             end = that.snp_positions_by_chrom[chunk.chrom][end] + 1;
