@@ -3,6 +3,8 @@ import config
 import uuid
 import DQXDbTools
 import DQXUtils
+import SettingsLoader
+import customresponders.uploadtracks.VTTable as VTTable
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -22,6 +24,17 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
     calculationObject.LogSQLCommand(databaseName+':SQL file')
     if not os.path.exists(filename):
         raise Exception('Unable to find SQL file '+filename)
+    #Log (start of) script
+    with open(filename) as fp:
+        linect = 0
+        for line in fp:
+            if len(line)>200:
+                line = line[:200] + '...'
+            calculationObject.LogSQLCommand(line)
+            linect += 1
+            if linect > 15:
+                calculationObject.LogSQLCommand('...')
+                break
     cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
     if outputfilename is not None:
         cmd += ' > ' + outputfilename
@@ -79,6 +92,88 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
 def ImportGlobalSettings(calculationObject, datasetId, settings):
     for token in settings.GetTokenList():
         ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+
+
+def LoadPropertyInfo(calculationObject, impSettings, datafile):
+    calculationObject.Log('Determining properties')
+    properties = []
+    propidMap = {}
+
+    if impSettings.HasToken('Properties'):
+        if not type(impSettings['Properties']) is list:
+            raise Exception('Properties token should be a list')
+        for propSource in impSettings['Properties']:
+            if 'Id' not in propSource:
+                raise Exception('Property is missing Id field')
+            propids = propSource['Id']
+            for propid in propids.split(','):
+                propid = propid.strip()
+                property = {'propid': propid}
+                properties.append(property)
+                DQXUtils.CheckValidIdentifier(propid)
+                settings = SettingsLoader.SettingsLoader()
+                settings.LoadDict(propSource)
+                settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+                settings.RequireTokens(['DataType'])
+                settings.ConvertToken_Boolean('isCategorical')
+                settings.AddTokenIfMissing('Name', propid)
+                property['DataType'] = settings['DataType']
+                property['Settings'] = settings
+                propidMap[propid] = True
+
+    if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
+        calculationObject.Log('Auto determining columns')
+        tb = VTTable.VTTable()
+        tb.allColumnsText = True
+        try:
+            tb.LoadFile(datafile, 9999)
+        except Exception as e:
+            raise Exception('Error while reading data file: '+str(e))
+        tb.PrintRows(0, 9)
+        for propid in tb.GetColList():
+            if propid not in propidMap:
+                property = { 'propid': propid }
+                colnr = tb.GetColNr(propid)
+                cnt_tot = 0
+                cnt_isnumber = 0
+                cnt_isbool = 0
+                for rownr in tb.GetRowNrRange():
+                    val = tb.GetValue(rownr, colnr)
+                    if val is not None:
+                        cnt_tot += 1
+                        try:
+                            float(val)
+                            cnt_isnumber += 1
+                        except ValueError:
+                            pass
+                        if val in ['True', 'true', 'TRUE', 'False', 'false', 'FALSE', '1', '0']:
+                            cnt_isbool += 1
+
+                property['DataType'] = 'Text'
+                if (cnt_isnumber > 0.75*cnt_tot) and (cnt_isnumber > cnt_isbool):
+                    property['DataType'] = 'Value'
+                if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
+                    property['DataType'] = 'Boolean'
+                calculationObject.Log('**** {0} {1} {2} {3} {4}'.format(propid, property['DataType'], cnt_tot, cnt_isnumber, cnt_isbool))
+
+                settings = SettingsLoader.SettingsLoader()
+                settings.LoadDict({})
+                settings.AddTokenIfMissing('Name', propid)
+                settings.AddTokenIfMissing('DataType', property['DataType'])
+                property['Settings'] = settings
+                properties.append(property)
+                propidMap[propid] = True
+
+    for property in properties:
+        property['Settings'].AddTokenIfMissing('Index', False)
+
+    if len(properties) == 0:
+        raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
+
+    calculationObject.Log('Properties found:')
+    for property in properties:
+        calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
+    return properties
 
 
 def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, writeHeader):

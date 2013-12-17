@@ -24,7 +24,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
-        extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome'])
+        extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome', 'Properties'])
 
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
@@ -39,24 +39,12 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         )
         ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
 
-        # Load & create properties
-        properties = []
-        for fle in os.listdir(os.path.join(folder, 'properties')):
-            if os.path.isfile(os.path.join(folder, 'properties', fle)):
-                if (fle.find('~') < 0) and (fle[0] != '.'):
-                    properties.append({'propid':fle})
-        print('Properties: '+str(properties))
+        properties = ImpUtils.LoadPropertyInfo(calculationObject, tableSettings, os.path.join(folder, 'data'))
 
+        ranknr = 0
         for property in properties:
             propid = property['propid']
-            DQXUtils.CheckValidIdentifier(propid)
-            settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'properties', propid))
-            settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
-            settings.ConvertToken_Boolean('isCategorical')
-            settings.RequireTokens(['Name', 'DataType'])
-            settings.AddTokenIfMissing('Order', 99999)
-            property['DataType'] = settings['DataType']
-            property['Order'] = settings['Order']
+            settings = property['Settings']
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
             sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
@@ -64,19 +52,14 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 propid,
                 tableid,
                 settings['Name'],
-                settings['Order'],
+                ranknr,
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            property['settings'] = settings
+            ranknr += 1
 
 
 
-
-
-
-
-        properties = sorted(properties, key=lambda k: k['Order'])
         propidList = []
         propDict = {}
         for property in properties:
@@ -90,7 +73,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
 
         if not importSettings['ConfigOnly']:
-            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'] } for prop in properties]
+            columns = [ {'name': prop['propid'], 'DataType': prop['DataType'], 'Index': prop['Settings']['Index'] } for prop in properties]
             LoadTable.LoadTable(
                 calculationObject,
                 os.path.join(folder, 'data'),
@@ -110,7 +93,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         print('Creating summary values')
         for property in properties:
             propid = property['propid']
-            settings = property['settings']
+            settings = property['Settings']
             if settings.HasToken('SummaryValues'):
                 with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
                     summSettings = settings.GetSubSettings('SummaryValues')

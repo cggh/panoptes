@@ -1,3 +1,4 @@
 NameSingle: Test item
 NamePlural: Test items
 PrimKey: ID
+AutoScanProperties: true
