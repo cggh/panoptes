@@ -105,19 +105,21 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         for propSource in impSettings['Properties']:
             if 'Id' not in propSource:
                 raise Exception('Property is missing Id field')
-            propid = propSource['Id']
-            property = {'propid': propid}
-            properties.append(property)
-            DQXUtils.CheckValidIdentifier(propid)
-            settings = SettingsLoader.SettingsLoader()
-            settings.LoadDict(propSource)
-            settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
-            settings.RequireTokens(['DataType'])
-            settings.ConvertToken_Boolean('isCategorical')
-            settings.AddTokenIfMissing('Name', propid)
-            property['DataType'] = settings['DataType']
-            property['Settings'] = settings
-            propidMap[propid] = True
+            propids = propSource['Id']
+            for propid in propids.split(','):
+                propid = propid.strip()
+                property = {'propid': propid}
+                properties.append(property)
+                DQXUtils.CheckValidIdentifier(propid)
+                settings = SettingsLoader.SettingsLoader()
+                settings.LoadDict(propSource)
+                settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+                settings.RequireTokens(['DataType'])
+                settings.ConvertToken_Boolean('isCategorical')
+                settings.AddTokenIfMissing('Name', propid)
+                property['DataType'] = settings['DataType']
+                property['Settings'] = settings
+                propidMap[propid] = True
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
         calculationObject.Log('Auto determining columns')

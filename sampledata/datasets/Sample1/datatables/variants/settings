@@ -23,8 +23,7 @@ Properties:
   DataType: Text
   ShowInTable: true
 
-- Id: Value1
-  Name: Value 1
+- Id: Value1, Value2, Value3
   DataType: Value
   Index: true
   ShowInTable: true
