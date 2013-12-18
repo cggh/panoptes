@@ -159,7 +159,8 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
     except Exception as e:
         raise Exception('Error while reading file: '+str(e))
     calculationObject.Log('---- ORIG TABLE ----')
-    tb.PrintRows(0, 9)
+    with calculationObject.LogDataDump():
+        tb.PrintRows(0, 9)
 
     for col in columns:
         if not tb.IsColumnPresent(col['name']):
@@ -180,7 +181,8 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
             tb.MapCol(colname, ImpUtils.convertToBooleanInt)
             tb.ConvertColToValue(colname)
     calculationObject.Log('---- PROCESSED TABLE ----')
-    tb.PrintRows(0, 9)
+    with calculationObject.LogDataDump():
+        tb.PrintRows(0, 9)
 
     createcmd = 'CREATE TABLE {0} ('.format(tableid)
     frst = True

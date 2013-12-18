@@ -144,6 +144,12 @@ class CalculationThread (threading.Thread):
         theCalculationThreadList.SetInfo(self.id, title, None)
         return CalcLogHeader(self, title)
 
+    def LogSubHeader(self, title):
+        return CalcLogSubHeader(self, title)
+
+    def LogDataDump(self):
+        return CalcLogDataDump(self)
+
     def SetInfo(self, status, progress=None):
         logentry = status
         if progress is not None:
@@ -164,22 +170,24 @@ class CalculationThread (threading.Thread):
         if not os.path.exists(filename):
             self.Log('ERROR:Unable to find file '+filename)
         self.Log('Top lines of '+filename)
-        with open(filename) as fp:
-            ct = 0
-            for line in fp:
-                self.Log(line.rstrip('\r\n'))
-                ct += 1
-                if ct >= maxlinecount:
-                    break
+        with self.LogDataDump():
+            with open(filename) as fp:
+                ct = 0
+                for line in fp:
+                    self.Log(line.rstrip('\r\n'))
+                    ct += 1
+                    if ct >= maxlinecount:
+                        break
 
 
     def RunPythonScript(self, scriptFile, runPath, arguments):
-        os.chdir(runPath)
-        cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
-        if self.logfilename is not None:
-            cmd += ' >> ' + self.logfilename + ' 2>&1'
-        print('COMMAND:'+cmd)
-        os.system(cmd)
+        with self.LogSubHeader('Python script'):
+            os.chdir(runPath)
+            cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
+            if self.logfilename is not None:
+                cmd += ' >> ' + self.logfilename + ' 2>&1'
+            print('COMMAND:'+cmd)
+            os.system(cmd)
 
 class CalcLogHeader:
     def __init__(self, calcObject, title):
@@ -193,6 +201,28 @@ class CalcLogHeader:
         if value is None:
             self.calcObject.Log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
 
+
+class CalcLogSubHeader:
+    def __init__(self, calcObject, title):
+        self.calcObject = calcObject
+        self.title = title
+        self.calcObject.Log('-->' + self.title)
+        self.timer = DQXUtils.Timer()
+    def __enter__(self):
+        return None
+    def __exit__(self, type, value, traceback):
+        if value is None:
+            self.calcObject.Log('<--Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
+
+class CalcLogDataDump:
+    def __init__(self, calcObject):
+        self.calcObject = calcObject
+        self.calcObject.Log('DD>')
+    def __enter__(self):
+        return None
+    def __exit__(self, type, value, traceback):
+        if value is None:
+            self.calcObject.Log('<DD')
 
 
 def GetCalculationInfo(id):
