@@ -12,8 +12,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.Create = function(tableid, plotTypeID, settings) {
             settings.blocking = false;
-            settings.sizeX = 700;
-            settings.sizeY = 550;
+            settings.sizeX = 750;
+            settings.sizeY = 600;
             var that = PopupFrame.PopupFrame(tableid+'_'+plotTypeID, settings);
             GenericPlot.activePlotList.push(that);
 
