@@ -5,6 +5,8 @@ IsPositionOnGenome: true
 FetchRecordCount: false
 QuickFindFields: SnpName
 
+
+
 Properties:
 
 - Id: chrom
@@ -36,9 +38,20 @@ Properties:
      BlockSizeMax: 50000
      ChannelColor: "rgb(0,100,0)"
 
+- Id: Value1
+  Name: The first value
+
+- Id: Value2
+  Name: The second value
+
+- Id: Value3
+  Name: The third value
+
 - Id: Extra1
   Name: Extra 1
   DataType: Text
   ShowInTable: true
   ShowInBrowser: true
   categoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }
+
+

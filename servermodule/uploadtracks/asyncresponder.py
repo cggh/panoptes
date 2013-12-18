@@ -48,7 +48,6 @@ class CalculationThreadList:
         cur = db.cursor()
         status = db.escape_string(status)
         sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
-        print sqlstring
         cur.execute(sqlstring)
         db.commit()
         db.close()

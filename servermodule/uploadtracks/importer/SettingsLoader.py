@@ -26,7 +26,9 @@ class SettingsLoader:
     def LoadDict(self, st):
         self.settings = copy.deepcopy(st)
 
-
+    def AddDict(self, st):
+        self._CheckLoaded()
+        self.settings.update(copy.deepcopy(st))
 
     def RequireTokens(self, tokensList):
         self._CheckLoaded()

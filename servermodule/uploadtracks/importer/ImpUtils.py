@@ -108,18 +108,18 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             propids = propSource['Id']
             for propid in propids.split(','):
                 propid = propid.strip()
-                property = {'propid': propid}
-                properties.append(property)
+                if propid in propidMap:
+                    property = propidMap[propid]
+                    settings = property['Settings']
+                else:
+                    property = {'propid': propid}
+                    settings = SettingsLoader.SettingsLoader()
+                    settings.LoadDict({})
+                    property['Settings'] = settings
+                    propidMap[propid] = property
+                    properties.append(property)
                 DQXUtils.CheckValidIdentifier(propid)
-                settings = SettingsLoader.SettingsLoader()
-                settings.LoadDict(propSource)
-                settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
-                settings.RequireTokens(['DataType'])
-                settings.ConvertToken_Boolean('isCategorical')
-                settings.AddTokenIfMissing('Name', propid)
-                property['DataType'] = settings['DataType']
-                property['Settings'] = settings
-                propidMap[propid] = True
+                settings.AddDict(propSource)
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
         calculationObject.Log('Auto determining columns')
@@ -162,10 +162,16 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                 settings.AddTokenIfMissing('DataType', property['DataType'])
                 property['Settings'] = settings
                 properties.append(property)
-                propidMap[propid] = True
+                propidMap[propid] = property
 
     for property in properties:
-        property['Settings'].AddTokenIfMissing('Index', False)
+        settings = property['Settings']
+        settings.AddTokenIfMissing('Index', False)
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+        settings.RequireTokens(['DataType'])
+        settings.ConvertToken_Boolean('isCategorical')
+        settings.AddTokenIfMissing('Name', property['propid'])
+        property['DataType'] = settings['DataType']
 
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
