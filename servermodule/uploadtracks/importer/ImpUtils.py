@@ -158,7 +158,6 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                     property['DataType'] = 'Value'
                 if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
                     property['DataType'] = 'Boolean'
-                calculationObject.Log('**** {0} {1} {2} {3} {4}'.format(propid, property['DataType'], cnt_tot, cnt_isnumber, cnt_isbool))
 
                 settings = SettingsLoader.SettingsLoader()
                 settings.LoadDict({})

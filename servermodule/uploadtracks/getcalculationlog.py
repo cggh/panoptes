@@ -1,6 +1,8 @@
 import os
 import config
 import VTTable
+import base64
+import unicodedata
 
 
 def response(returndata):
@@ -10,8 +12,14 @@ def response(returndata):
         returndata['Error'] = 'No log file present'
         return returndata
 
+    content = ''
     with open(filename, 'r') as content_file:
-        content = content_file.read()
+        for line in content_file:
+            try:
+                content += line.encode('ascii', 'ignore')
+            except UnicodeDecodeError as e:
+                content += '*** Failed to encode: ' + str(e) + '\n'
+
     returndata['Content'] = content
 
     return returndata
