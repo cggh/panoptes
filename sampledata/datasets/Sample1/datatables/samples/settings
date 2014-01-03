@@ -36,3 +36,13 @@ Properties:
   Name: Comment
   DataType: Text
   ShowInTable: true
+  
+
+TableBasedSummaryValues:
+- Id: SampleSummary1
+  Name: Sample summary 1
+  MinVal: 0
+  MaxVal: 100
+  BlockSizeMin: 20
+  BlockSizeMax: 50000
+  ChannelColor: "rgb(0,100,0)"

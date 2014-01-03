@@ -104,6 +104,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings = $.extend(settings,JSON.parse(summaryValue.settings));
                 summaryValue.settings = settings;
             });
+
         };
 
 
@@ -191,6 +192,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
             $.each(MetaData.tableBasedSummaryValues, function(idx, tableSummaryValue) {
+                if (tableSummaryValue.minval)
+                    tableSummaryValue.minval = parseFloat(tableSummaryValue.minval);
+                else
+                    tableSummaryValue.minval = 0;
+                if (tableSummaryValue.maxval)
+                    tableSummaryValue.maxval = parseFloat(tableSummaryValue.maxval);
+                else
+                    tableSummaryValue.maxval = 1;
+                tableSummaryValue.minblocksize = parseFloat(tableSummaryValue.minblocksize);
                 var settings = { channelColor:'rgb(0,0,180)' };
                 if (tableSummaryValue.settings) {
                     try{

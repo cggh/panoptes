@@ -119,3 +119,42 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         importSettings
                     )
 
+        if tableSettings.HasToken('TableBasedSummaryValues'):
+            calculationObject.Log('Processing table-based summary values')
+            if not type(tableSettings['TableBasedSummaryValues']) is list:
+                raise Exception('TableBasedSummaryValues token should be a list')
+            for stt in tableSettings['TableBasedSummaryValues']:
+                summSettings = SettingsLoader.SettingsLoader()
+                summSettings.LoadDict(stt)
+                summSettings.RequireTokens(['Id', 'Name', 'MaxVal', 'BlockSizeMax'])
+                summSettings.AddTokenIfMissing('MinVal', 0)
+                summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+                summSettings.DefineKnownTokens(['channelColor'])
+                summaryid = summSettings['Id']
+                with calculationObject.LogHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+                    extraSummSettings = summSettings.Clone()
+                    extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6})".format(
+                        tableid,
+                        summaryid,
+                        summSettings['Name'],
+                        extraSummSettings.ToJSON(),
+                        summSettings['MinVal'],
+                        summSettings['MaxVal'],
+                        summSettings['BlockSizeMin']
+                    )
+                    ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                    for fileid in os.listdir(os.path.join(folder, summaryid)):
+                        if not(os.path.isdir(os.path.join(folder, summaryid, fileid))):
+                            calculationObject.Log('Processing '+fileid)
+                            destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, 'TableTracks', tableid, summaryid, fileid)
+                            calculationObject.Log('Destination: '+destFolder)
+                            if not os.path.exists(destFolder):
+                                os.makedirs(destFolder)
+                            shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
+                            ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid+'_'+fileid, summSettings)
+
+
+
+
+
