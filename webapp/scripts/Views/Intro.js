@@ -44,7 +44,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                         var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
-                            content: "Table of <b>"+tableInfo.name+"</b>",
+                            content: "Table of <b>"+tableInfo.tableNamePlural+"</b>",
                             bitmap: 'Bitmaps/circle_red_small.png'
                         });
                         tableButtons.push(tableViewerButton);
@@ -87,7 +87,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var tableRoots = {}
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                        tableRoots[tableInfo.id] = that.panelChannels.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+tableInfo.name+'</span>')).setCanSelect(false);
+                        tableRoots[tableInfo.id] = that.panelChannels.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+tableInfo.tableCapNamePlural+'</span>')).setCanSelect(false);
                     });
 
                     var br = that.panelChannels.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">Genomic values</span>')).setCanSelect(false);

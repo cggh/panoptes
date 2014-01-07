@@ -32,9 +32,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
             init: function (tableid) {
                 // Instantiate the view object
+                var inf = MetaData.getTableInfo(tableid);
                 var that = Application.View(
                     'table_'+tableid,  // View ID
-                    MetaData.getTableInfo(tableid).name  // View title
+                    MetaData.getTableInfo(tableid).tableCapNamePlural
                 );
 
                 that.setEarlyInitialisation();

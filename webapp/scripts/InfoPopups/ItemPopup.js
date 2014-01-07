@@ -47,7 +47,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += bt.renderHtml();
             }*/
 
-            var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid, {title:itemInfo.itemid, blocking:false, sizeX:700, sizeY:500 });
+            var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
+                {
+                    title:MetaData.getTableInfo(itemInfo.tableid).tableCapNameSingle + ' "'+itemInfo.itemid+'"',
+                    blocking:false,
+                    sizeX:700, sizeY:500
+                }
+            );
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 

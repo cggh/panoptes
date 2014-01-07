@@ -24,7 +24,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
-        extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome', 'Properties'])
+        extraSettings.DropTokens(['PrimKey', 'IsPositionOnGenome', 'Properties'])
 
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))

@@ -119,7 +119,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     $.each(MetaData.tableCatalog, function(idx, table) {
                         if (table.hasGenomePositions) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.name}),  width:120, height:30 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.tableNamePlural}),  width:120, height:30 }).setOnChanged(function() {
                                 var chromoid = that.panelBrowser.getCurrentChromoID();
                                 var range = that.panelBrowser.getVisibleRange();
                                 Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
@@ -138,7 +138,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.buttonsGroup = Controls.CompoundVert([]);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.name+"...",  width:140 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.tableNamePlural+"...",  width:140 }).setOnChanged(function() {
                                 EditTableBasedSummaryValues.prompt(tableInfo.id);
                             });
                             states = [];
@@ -162,7 +162,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 bt,
                                 tableInfo.genomeBrowserFieldChoice,
                                 Controls.CompoundVert(activeTrackList)
-                            ]).setLegend('<h3>'+tableInfo.name+' tracks</h3>'));
+                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>'));
                         }
                     });
 
@@ -305,7 +305,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         tableInfo.primkey
                     );
                     theChannel
-                        .setTitle(tableInfo.name)
+                        .setTitle(tableInfo.tableCapNamePlural)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
                     if (propInfo.settings.categoryColors) {
@@ -446,7 +446,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                 that.panelBrowser.delDataFetcher(tableInfo.genomeBrowserInfo.dataFetcher);
                             }
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.name+'</h3>');
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
                             that.ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
