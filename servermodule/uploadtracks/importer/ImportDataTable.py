@@ -24,12 +24,13 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
-        extraSettings.DropTokens(['NamePlural', 'NameSingle', 'PrimKey', 'IsPositionOnGenome', 'Properties'])
+        extraSettings.DropTokens(['PrimKey', 'IsPositionOnGenome', 'Properties'])
 
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
 
         # Add to tablecatalog
+        extraSettings.ConvertStringsToSafeSQL()
         sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
             tableid,
             tableSettings['NamePlural'],
@@ -56,6 +57,21 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+            if settings.HasToken('Relation'):
+                relationSettings = settings.GetSubSettings('Relation')
+                calculationObject.Log('Creating relation: '+relationSettings.ToJSON())
+                relationSettings.RequireTokens(['TableId'])
+                relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
+                relationSettings.AddTokenIfMissing('ForwardName', 'has')
+                sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
+                    tableid,
+                    propid,
+                    relationSettings['TableId'],
+                    '',
+                    relationSettings['ForwardName'],
+                    relationSettings['ReverseName']
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             ranknr += 1
 
 
@@ -118,4 +134,43 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         dataFileName,
                         importSettings
                     )
+
+        if tableSettings.HasToken('TableBasedSummaryValues'):
+            calculationObject.Log('Processing table-based summary values')
+            if not type(tableSettings['TableBasedSummaryValues']) is list:
+                raise Exception('TableBasedSummaryValues token should be a list')
+            for stt in tableSettings['TableBasedSummaryValues']:
+                summSettings = SettingsLoader.SettingsLoader()
+                summSettings.LoadDict(stt)
+                summSettings.RequireTokens(['Id', 'Name', 'MaxVal', 'BlockSizeMax'])
+                summSettings.AddTokenIfMissing('MinVal', 0)
+                summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+                summSettings.DefineKnownTokens(['channelColor'])
+                summaryid = summSettings['Id']
+                with calculationObject.LogHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+                    extraSummSettings = summSettings.Clone()
+                    extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6})".format(
+                        tableid,
+                        summaryid,
+                        summSettings['Name'],
+                        extraSummSettings.ToJSON(),
+                        summSettings['MinVal'],
+                        summSettings['MaxVal'],
+                        summSettings['BlockSizeMin']
+                    )
+                    ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                    for fileid in os.listdir(os.path.join(folder, summaryid)):
+                        if not(os.path.isdir(os.path.join(folder, summaryid, fileid))):
+                            calculationObject.Log('Processing '+fileid)
+                            destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, 'TableTracks', tableid, summaryid, fileid)
+                            calculationObject.Log('Destination: '+destFolder)
+                            if not os.path.exists(destFolder):
+                                os.makedirs(destFolder)
+                            shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
+                            ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid+'_'+fileid, summSettings)
+
+
+
+
 

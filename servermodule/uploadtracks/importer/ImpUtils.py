@@ -15,32 +15,38 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
+def IsValueDataTypeIdenfifier(datatypeIdentifier):
+    return (datatypeIdentifier == 'Value') or (datatypeIdentifier == 'GeoLongitude') or (datatypeIdentifier == 'GeoLattitude')
+
 
 def GetTempFileName():
     return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))
 
 
 def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=None):
-    calculationObject.LogSQLCommand(databaseName+':SQL file')
-    if not os.path.exists(filename):
-        raise Exception('Unable to find SQL file '+filename)
-    #Log (start of) script
-    with open(filename) as fp:
-        linect = 0
-        for line in fp:
-            if len(line)>200:
-                line = line[:200] + '...'
-            calculationObject.LogSQLCommand(line)
-            linect += 1
-            if linect > 15:
-                calculationObject.LogSQLCommand('...')
-                break
-    cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
-    if outputfilename is not None:
-        cmd += ' > ' + outputfilename
-    rt = os.system(cmd)
-    if (rt != 0) and (rt != 1):
-        raise Exception('SQL script error; return code '+str(rt))
+    with calculationObject.LogSubHeader('SQL file on '+databaseName):
+        if not os.path.exists(filename):
+            raise Exception('Unable to find SQL file '+filename)
+        #Log (start of) script
+        with open(filename) as fp:
+            linect = 0
+            for line in fp:
+                if len(line)>200:
+                    line = line[:200] + '...'
+                calculationObject.LogSQLCommand(line)
+                linect += 1
+                if linect > 15:
+                    calculationObject.LogSQLCommand('...')
+                    break
+        cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
+        if outputfilename is not None:
+            cmd += ' > ' + outputfilename
+        if calculationObject.logfilename is not None:
+            cmd += ' 2>> ' + calculationObject.logfilename
+        calculationObject.Log('COMMAND:' + cmd)
+        rt = os.system(cmd)
+        if (rt != 0) and (rt != 1):
+            raise Exception('SQL script error; return code '+str(rt))
 
 class SQLScript:
     def __init__(self, calculationObject):
@@ -108,18 +114,18 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             propids = propSource['Id']
             for propid in propids.split(','):
                 propid = propid.strip()
-                property = {'propid': propid}
-                properties.append(property)
+                if propid in propidMap:
+                    property = propidMap[propid]
+                    settings = property['Settings']
+                else:
+                    property = {'propid': propid}
+                    settings = SettingsLoader.SettingsLoader()
+                    settings.LoadDict({})
+                    property['Settings'] = settings
+                    propidMap[propid] = property
+                    properties.append(property)
                 DQXUtils.CheckValidIdentifier(propid)
-                settings = SettingsLoader.SettingsLoader()
-                settings.LoadDict(propSource)
-                settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
-                settings.RequireTokens(['DataType'])
-                settings.ConvertToken_Boolean('isCategorical')
-                settings.AddTokenIfMissing('Name', propid)
-                property['DataType'] = settings['DataType']
-                property['Settings'] = settings
-                propidMap[propid] = True
+                settings.AddDict(propSource)
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
         calculationObject.Log('Auto determining columns')
@@ -129,7 +135,8 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             tb.LoadFile(datafile, 9999)
         except Exception as e:
             raise Exception('Error while reading data file: '+str(e))
-        tb.PrintRows(0, 9)
+        with calculationObject.LogDataDump():
+            tb.PrintRows(0, 9)
         for propid in tb.GetColList():
             if propid not in propidMap:
                 property = { 'propid': propid }
@@ -154,25 +161,33 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                     property['DataType'] = 'Value'
                 if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
                     property['DataType'] = 'Boolean'
-                calculationObject.Log('**** {0} {1} {2} {3} {4}'.format(propid, property['DataType'], cnt_tot, cnt_isnumber, cnt_isbool))
 
+                DQXUtils.CheckValidIdentifier(propid)
                 settings = SettingsLoader.SettingsLoader()
                 settings.LoadDict({})
                 settings.AddTokenIfMissing('Name', propid)
                 settings.AddTokenIfMissing('DataType', property['DataType'])
                 property['Settings'] = settings
                 properties.append(property)
-                propidMap[propid] = True
+                propidMap[propid] = property
 
     for property in properties:
-        property['Settings'].AddTokenIfMissing('Index', False)
+        settings = property['Settings']
+        settings.AddTokenIfMissing('Index', False)
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+        settings.RequireTokens(['DataType'])
+        settings.ConvertToken_Boolean('isCategorical')
+        settings.AddTokenIfMissing('Name', property['propid'])
+        settings.ConvertStringsToSafeSQL()
+        property['DataType'] = settings['DataType']
 
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
 
     calculationObject.Log('Properties found:')
-    for property in properties:
-        calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
+    with calculationObject.LogDataDump():
+        for property in properties:
+            calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
     return properties
 
 

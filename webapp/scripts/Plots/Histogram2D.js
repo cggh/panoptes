@@ -74,7 +74,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Value') ) )
+                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
                 that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:', states: propList }).setClassID('xvalue');

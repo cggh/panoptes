@@ -79,9 +79,19 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                         GenePopup.init();
                         ItemPopup.init();
 
+
+
                         // Initialise all the views in the application
                         Intro.init();
                         $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                            tableInfo.tableNameSingle = tableInfo.name;
+                            tableInfo.tableNamePlural = tableInfo.name;
+                            if (tableInfo.settings.NameSingle)
+                                tableInfo.tableNameSingle = tableInfo.settings.NameSingle;
+                            if (tableInfo.settings.NamePlural)
+                                tableInfo.tableNamePlural = tableInfo.settings.NamePlural;
+                            tableInfo.tableCapNameSingle = tableInfo.tableNameSingle.charAt(0).toUpperCase() + tableInfo.tableNameSingle.slice(1);
+                            tableInfo.tableCapNamePlural = tableInfo.tableNamePlural.charAt(0).toUpperCase() + tableInfo.tableNamePlural.slice(1);
                             TableViewer.init(tableInfo.id);
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
@@ -146,6 +156,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'trackid',
                                 SQL.WhereClause.Trivial()
                             );
+                            getter.addTable('relations',['childtableid', 'childpropid', 'parenttableid','parentpropid','forwardname','reversename'],'childtableid',
+                                SQL.WhereClause.Trivial()
+                            );
 
                             getter.addTable('externallinks',['linktype','linkname','linkurl'],'linkname');
                             getter.execute(MetaData.serverUrl,MetaData.database,
@@ -157,6 +170,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
                                     Initialise.parseTableBasedSummaryValues();
+                                    Initialise.parseRelations(getter.getTableRecords('relations'));
                                     if (proceedFunction)
                                         Initialise.waitForCompletion(proceedFunction);
                                 }

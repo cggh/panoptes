@@ -86,7 +86,8 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
             tb.RenameCol('chrom','id')
             tb.RenameCol('length','len')
             tb.ConvertColToValue('len')
-            tb.PrintRows(0, 99)
+            with calculationObject.LogDataDump():
+                tb.PrintRows(0, 99)
             sqlfile = ImpUtils.GetTempFileName()
             tb.SaveSQLDump(sqlfile, 'chromosomes')
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)

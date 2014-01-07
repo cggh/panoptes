@@ -18,15 +18,18 @@ class SettingsLoader:
         if fileName is not None:
             self.fileName = fileName
             with open(self.fileName, 'r') as configfile:
+                print('Loading settings from: '+fileName)
                 self.settings = yaml.load(configfile.read())
-                print('Loaded settings from: '+fileName+'\n'+str(self.settings))
+                print('Settings: '+str(self.settings))
         else:
             self.fileName = ''
 
     def LoadDict(self, st):
         self.settings = copy.deepcopy(st)
 
-
+    def AddDict(self, st):
+        self._CheckLoaded()
+        self.settings.update(copy.deepcopy(st))
 
     def RequireTokens(self, tokensList):
         self._CheckLoaded()
@@ -92,6 +95,13 @@ class SettingsLoader:
         st = SettingsLoader()
         st.LoadDict(self.settings[token])
         return st
+
+    def ConvertStringsToSafeSQL(self):
+        self._CheckLoaded()
+        for key in self.settings:
+            val = self.settings[key]
+            if type(val) is str:
+                self.settings[key] = val.replace('"', '`').replace("'", '`')
 
     def HasToken(self, token):
         self._CheckLoaded()

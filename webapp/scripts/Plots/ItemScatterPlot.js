@@ -37,7 +37,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.35))
                     .setAllowScrollBars(false,true);
                 that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
@@ -62,7 +62,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             if (prop.tableid==that.tableInfo.id) {
                                 if ( (prop.datatype==plotAspect.datatype) || (!plotAspect.datatype) )
                                     included = true;
-                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
+                                if ( (plotAspect.datatype=='Value') && (prop.isFloat) )
+                                    included = true;
+                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.isBoolean) ) )
                                     included = true;
                             }
                             if (included)
@@ -75,12 +77,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                 });
 
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 200, minval:0, maxval:1, value:1, digits: 2})
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                    that.reDraw();
+                });
+
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     pickControls,
+                    that.ctrl_Opacity,
                     that.colorLegend
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
@@ -139,9 +148,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                         fetcher.setMaxResultCount(999999);
                         var encoding='ST';
-                        if (propInfo.datatype=='Value')
+                        if (propInfo.isFloat)
                             encoding = 'F3';
-                        if (propInfo.datatype=='Boolean')
+                        if (propInfo.isBoolean)
                             encoding = 'GN';
                         fetcher.addColumn(aspectInfo.propid, encoding);
                         that.panelPlot.invalidate();
@@ -354,10 +363,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 ctx.restore();
 
+                var opacity = that.ctrl_Opacity.getValue();
+
+                //Prepare color category strings
+                var colorStrings = [];
+                $.each(DQX.standardColors, function(idx, color) {
+                    colorStrings.push(color.changeOpacity(opacity).toStringCanvas());
+                });
+
 
                 // Draw points
-                ctx.fillStyle="#000000";
-                ctx.strokeStyle="#000000";
+                ctx.fillStyle = ctx.strokeStyle = DQX.Color(0,0,0).changeOpacity(opacity).toStringCanvas();
                 var selectionMap = that.tableInfo.currentSelection;
                 var selpsX = [];
                 var selpsY = [];
@@ -373,7 +389,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var px = Math.round(valX[ii] * scaleX + offsetX);
                             var py = Math.round(valY[ii] * scaleY + offsetY);
                             if (valColorCat) {
-                                ctx.strokeStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
+                                ctx.strokeStyle = colorStrings[valColorCat[ii]];
                             }
                             if (selectionMap[ids[ii]]) {
                                 selpsX.push(px);
@@ -396,10 +412,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var px = /*Math.round*/(valX[ii] * scaleX + offsetX);
                             var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
                             if (valColorCat) {
-//                                if (!valColorCat[ii])
-//                                    var q=0;
-                                ctx.fillStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
-                                ctx.strokeStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
+                                ctx.fillStyle = ctx.strokeStyle = colorStrings[valColorCat[ii]];
                             }
                             if (selectionMap[ids[ii]]) {
                                 selpsX.push(px);

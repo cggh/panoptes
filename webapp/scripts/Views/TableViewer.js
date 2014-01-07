@@ -1,5 +1,5 @@
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery", "Utils/QueryTool"],
-    function (require, Application, Framework, Controls, Msg, DocEl, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery, QueryTool) {
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery", "Utils/QueryTool"],
+    function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery, QueryTool) {
 
 
         //A helper function, turning a fraction into a color string
@@ -32,9 +32,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
             init: function (tableid) {
                 // Instantiate the view object
+                var inf = MetaData.getTableInfo(tableid);
                 var that = Application.View(
                     'table_'+tableid,  // View ID
-                    MetaData.getTableInfo(tableid).name  // View title
+                    MetaData.getTableInfo(tableid).tableCapNamePlural
                 );
 
                 that.setEarlyInitialisation();
@@ -251,6 +252,44 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 };
 
+                that.createColumnPopup = function(propid) {
+                    var colInfo = MetaData.findProperty(that.tableid, propid);
+                    var content = '<p>';
+                    if (colInfo.settings.Description)
+                        content += colInfo.settings.Description;
+                    else
+                        content += 'No description available';
+                    content += '<p>';
+                    var buttons=[];
+                    var thecol = that.panelTable.getTable().findColumn(propid);
+                    if (thecol.sortOption) {
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow4down.png'), width:120, height:40 })
+                            .setOnChanged(function() {
+                                that.panelTable.getTable().sortByColumn(propid,false);
+                                if (!Popup.isPinned(popupID))
+                                    DQX.ClosePopup(popupID);
+                            }) );
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow4up.png'), width:120, height:40 })
+                            .setOnChanged(function() {
+                                that.panelTable.getTable().sortByColumn(propid,true);
+                                if (!Popup.isPinned(popupID))
+                                    DQX.ClosePopup(popupID);
+                            }) );
+                    }
+/*                    if (thecol.linkFunction) {
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: thecol.linkHint, width:170, height:50 })
+                            .setOnChanged(function() {
+                                thecol.linkFunction(id);
+                                if (!Popup.isPinned(popupID))
+                                    DQX.ClosePopup(popupID);
+                            }) );
+                    }*/
+
+                    $.each(buttons,function(idx,bt) { content+=bt.renderHtml(); });
+                    var popupID = Popup.create(colInfo.name, content);
+                }
+
+
                 // Initialise the table viewer columns
                 that.reLoad = function() {
                     var tableInfo = MetaData.getTableInfo(that.tableid);
@@ -298,6 +337,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 encoding,
                                 sortable
                             );
+                            if (propInfo.settings.Description)
+                                col.setToolTip(propInfo.settings.Description);
                             if ( (tableInfo.hasGenomePositions) && (that.myTable.findColumn('chrom')) && (that.myTable.findColumn('pos')) ) {
                                 // Define a joint sort action on both columns chrom+pos, and set it as default
                                 that.myTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true);
@@ -318,7 +359,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             }
 
                             col.setHeaderClickHandler(function(id) {
-                                alert('column clicked '+id);//!!! todo: something meaningful here
+                                that.createColumnPopup(id);
                             })
 
                             if (propInfo.isPrimKey) {

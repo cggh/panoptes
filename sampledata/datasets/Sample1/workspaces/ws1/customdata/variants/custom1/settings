@@ -3,6 +3,7 @@ Properties:
 
 - Id: Custom1
   Name: Custom Value 1
+  Description: An example of a custom numerical value
   DataType: Value
   ShowInTable: true
   ShowInBrowser: true
@@ -16,6 +17,7 @@ Properties:
 
 - Id: Custom2
   Name: Custom value 2
+  Description: An example of a custom categorical text value
   DataType: Text
   ShowInTable: true
   ShowInBrowser: false
