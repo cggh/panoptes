@@ -49,11 +49,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += '<td style="padding-left:5px;word-wrap:break-word;">' + propertyMap[key] + "</td>";
                 content += "</tr>";
             }
-            content += "</table>"
-
-/*            if (('pos' in data) && ('chrom' in data)) {
-                content += bt.renderHtml();
-            }*/
+            content += "</table>";
 
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
                 {
@@ -64,6 +60,37 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
+
+            // Fetch all info for child-parent relations
+            $.each(that.tableInfo.relationsChildOf, function(idx, relationInfo) {
+                var parentValue = data[relationInfo.childpropid];
+                if (!parentValue) {
+
+                }
+                else {
+                    var parentTableInfo = MetaData.mapTableCatalog[relationInfo.parenttableid];
+                    var myurl = DQX.Url(MetaData.serverUrl);
+                    myurl.addUrlQueryItem("datatype", 'recordinfo');
+                    var primkey = parentTableInfo.primkey;
+                    myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primkey, '=', parentValue)));
+                    myurl.addUrlQueryItem("database", MetaData.database);
+                    myurl.addUrlQueryItem("tbname", parentTableInfo.id + 'CMB_' + MetaData.workspaceid);
+                    $.ajax({
+                        url: myurl.toString(),
+                        success: function (resp) {
+                            DQX.stopProcessing();
+                            var keylist = DQX.parseResponse(resp);
+                            if ("Error" in keylist) {
+                                alert(keylist.Error);
+                                return;
+                            }
+                            debugger;
+                        },
+                        error: DQX.createMessageFailFunction()
+                    });
+                    DQX.setProcessing("Downloading...");
+                }
+            });
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
