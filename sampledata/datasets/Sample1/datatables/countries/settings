@@ -1,0 +1,18 @@
+NameSingle: country
+NamePlural: Countries
+PrimKey: CountryID
+IsPositionOnGenome: false
+FetchRecordCount: true
+QuickFindFields: CountryID,Name
+
+Properties:
+
+- Id: CountryID
+  Name: Country ID
+  Description: Country code
+  DataType: Text
+  ShowInTable: true
+
+- Id: Name
+  Name: Name
+  DataType: Text

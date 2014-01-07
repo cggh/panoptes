@@ -52,10 +52,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
                             descr += '<br><b>Relations:</b>'
                             $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
-                                descr += '<br>' + tableInfo.tableCapNameSingle + ' <i>' + relationInfo.forwardname+'</i> '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
+                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
                             });
                             $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
-                                descr += '<br>' + tableInfo.tableCapNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNamePlural;
+                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
                             });
                         }
                         var info = Controls.Static(descr);

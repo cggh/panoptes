@@ -40,6 +40,15 @@ Properties:
   DecimDigits: 3
   ShowInTable: true
 
+- Id: SampleTypeID
+  Name: Sample type ID
+  DataType: Text
+  ShowInTable: true
+  Relation:
+    TableId: sampletypes
+    ForwardName: is
+    ReverseName: contains
+
 - Id: Comment
   Name: Comment
   Description: An example of a comment string

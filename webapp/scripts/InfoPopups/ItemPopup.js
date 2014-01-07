@@ -1,5 +1,9 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils",
+    "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
+    "MetaData", "Utils/GetFullDataItemInfo"],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX,
+              Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
+              MetaData, GetFullDataItemInfo) {
 
         var ItemPopup = {};
 
@@ -10,26 +14,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         ItemPopup.show = function(itemInfo) {
-            var myurl = DQX.Url(MetaData.serverUrl);
-            myurl.addUrlQueryItem("datatype", 'recordinfo');
-            var primkey = MetaData.getTableInfo(itemInfo.tableid).primkey;
-            myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primkey, '=', itemInfo.itemid)));
-            myurl.addUrlQueryItem("database", MetaData.database);
-            myurl.addUrlQueryItem("tbname", itemInfo.tableid + 'CMB_' + MetaData.workspaceid);
-            $.ajax({
-                url: myurl.toString(),
-                success: function (resp) {
-                    DQX.stopProcessing();
-                    var keylist = DQX.parseResponse(resp);
-                    if ("Error" in keylist) {
-                        alert(keylist.Error);
-                        return;
-                    }
-                    ItemPopup.show_sub1(itemInfo, keylist.Data);
-                },
-                error: DQX.createMessageFailFunction()
-            });
-            DQX.setProcessing("Downloading...");
+            GetFullDataItemInfo.Get(itemInfo.tableid, itemInfo.itemid, function(resp) {
+                ItemPopup.show_sub1(itemInfo, resp);
+            })
         }
 
 
@@ -42,14 +29,32 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             });
 
-            content += "<table>";
-            for (key in propertyMap) {
-                content += '<tr>';
-                content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + key + "</b></td>";
-                content += '<td style="padding-left:5px;word-wrap:break-word;">' + propertyMap[key] + "</td>";
-                content += "</tr>";
+            function addLevelToContent(levelInfo) {
+                var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
+                content += "<table>";
+                $.each(MetaData.customProperties,function(idx, propInfo) {
+                    if (propInfo.tableid == tableInfo.id) {
+                        var fieldContent = levelInfo.fields[propInfo.propid];
+                        content += '<tr>';
+                        content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + propInfo.name + "</b></td>";
+                        content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
+                        content += "</tr>";
+                    }
+                });
+                content += "</table>";
+                $.each(levelInfo.parents, function(idx, parentInfo) {
+                    var parentTableInfo = MetaData.mapTableCatalog[parentInfo.tableid];
+                    content += '<div style="padding-left:30px">';
+                    content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px"><i>';
+                    content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
+                    content += '</i></div>';
+                    addLevelToContent(parentInfo);
+                    content += '</div>';
+                });
             }
-            content += "</table>";
+
+            addLevelToContent(data);
+
 
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
                 {
@@ -60,7 +65,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
-
+/*
             // Fetch all info for child-parent relations
             $.each(that.tableInfo.relationsChildOf, function(idx, relationInfo) {
                 var parentValue = data[relationInfo.childpropid];
@@ -91,6 +96,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     DQX.setProcessing("Downloading...");
                 }
             });
+*/
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();

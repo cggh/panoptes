@@ -15,11 +15,15 @@ Properties:
   ShowInTable: true
 
 - Id: Country
-  Name: Country
+  Name: Country Code
   DataType: Text
   IsCategorical: true
   ShowInTable: true
   Index: true
+  Relation:
+    TableId: countries
+    ForwardName: is located in
+    ReverseName: contains
 
 - Id: Longitude
   Name: Longitude
