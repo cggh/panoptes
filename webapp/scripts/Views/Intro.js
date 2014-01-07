@@ -18,7 +18,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
 
-                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 300);
+                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 400);
                     this.frameChannels = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("Workspace overview");
                     this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                 }
@@ -43,11 +43,24 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+//                        tableButtons.push(Controls.Static('gfkjgjkgfkj'));
                         var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
                             content: "Table of <b>"+tableInfo.tableNamePlural+"</b>",
                             bitmap: 'Bitmaps/circle_red_small.png'
                         });
-                        tableButtons.push(tableViewerButton);
+                        var descr = tableInfo.settings.Description||'';
+                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
+                            descr += '<br><b>Relations:</b>'
+                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
+                                descr += '<br>' + tableInfo.tableCapNameSingle + ' <i>' + relationInfo.forwardname+'</i> '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
+                            });
+                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
+                                descr += '<br>' + tableInfo.tableCapNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNamePlural;
+                            });
+                        }
+                        var info = Controls.Static(descr);
+                        var grp = Controls.CompoundVert([info, tableViewerButton]).setAutoFillX(true).setLegend('<h3>' + tableInfo.tableCapNamePlural + '</h3>');
+                        tableButtons.push(grp);
                     })
 
                     var bt_addprops = Controls.Button(null, { content: 'Upload custom properties...', width:120, height:40 });
@@ -61,7 +74,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     })
                     miscButtonList.push(bt_refresh);
 
-                    this.panelButtons.addControl(Controls.CompoundHor([
+                    this.panelButtons.addControl(Controls.CompoundVert([
                         Controls.CompoundVert(tableButtons).setTreatAsBlock(),
                         Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
                         Controls.VerticalSeparator(20),

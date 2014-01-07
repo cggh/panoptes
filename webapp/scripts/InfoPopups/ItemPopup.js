@@ -41,7 +41,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     propertyMap[propInfo.name] = propInfo.toDisplayString(data[propInfo.propid]);
                 }
             });
-            content += DQX.CreateKeyValueTable(propertyMap);
+
+            content += "<table>";
+            for (key in propertyMap) {
+                content += '<tr>';
+                content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + key + "</b></td>";
+                content += '<td style="padding-left:5px;word-wrap:break-word;">' + propertyMap[key] + "</td>";
+                content += "</tr>";
+            }
+            content += "</table>"
 
 /*            if (('pos' in data) && ('chrom' in data)) {
                 content += bt.renderHtml();

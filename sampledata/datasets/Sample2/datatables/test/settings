@@ -2,3 +2,15 @@ NameSingle: Test item
 NamePlural: Test items
 PrimKey: ID
 AutoScanProperties: true
+
+Properties:
+- Id: Parent
+  Name: Parent
+  DataType: Text
+  ShowInTable: true
+  Index: true
+  Relation:
+    TableId: testparent
+    ForwardName: is child of
+    ReverseName: is parent of
+

@@ -1,0 +1,31 @@
+NameSingle: sampling site
+NamePlural: sampling sites
+Description: Information about the sites where samples were collected
+PrimKey: SiteID
+IsPositionOnGenome: false
+FetchRecordCount: true
+QuickFindFields: SiteID,Country
+
+Properties:
+
+- Id: SiteID
+  Name: Site ID
+  Description: Unique identifier of a sampling site
+  DataType: Text
+  ShowInTable: true
+
+- Id: Country
+  Name: Country
+  DataType: Text
+  IsCategorical: true
+  ShowInTable: true
+  Index: true
+
+- Id: Longitude
+  Name: Longitude
+  DataType: GeoLongitude
+
+- Id: Lattitude
+  Name: Lattitude
+  DataType: GeoLattitude
+

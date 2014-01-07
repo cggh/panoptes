@@ -1,13 +1,6 @@
 
 Properties:
 
-- Id: Site
-  Name: Sample Site
-  Description: The site the sample originated from
-  DataType: Text
-  ShowInTable: true
-  IsCategorical: true
-
 - Id: Year
   Name: Year
   Description: The year the sample was collected

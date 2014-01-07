@@ -89,6 +89,16 @@ CREATE TABLE `tablecatalog` (
   `settings` text
 );
 
+CREATE TABLE `relations` (
+  `childtableid` varchar(40),
+  `childpropid` varchar(40),
+  `parenttableid` varchar(40),
+  `parentpropid` varchar(40),
+  `forwardname` varchar(50),
+  `reversename` varchar(50)
+);
+
+
 
 CREATE TABLE `workspaces` (
   `id` varchar(50),

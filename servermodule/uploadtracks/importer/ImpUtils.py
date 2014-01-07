@@ -15,6 +15,9 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
+def IsValueDataTypeIdenfifier(datatypeIdentifier):
+    return (datatypeIdentifier == 'Value') or (datatypeIdentifier == 'GeoLongitude') or (datatypeIdentifier == 'GeoLattitude')
+
 
 def GetTempFileName():
     return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))

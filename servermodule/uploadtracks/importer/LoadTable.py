@@ -55,7 +55,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
 
     for col in columns:
         col['IsString'] = (col['DataType'] == 'Text')
-        col['IsValue'] = (col['DataType'] == 'Value')
+        col['IsValue'] = ImpUtils.IsValueDataTypeIdenfifier(col['DataType'])
         col['IsBoolean'] = (col['DataType'] == 'Boolean')
         col['MaxLen'] = 0
 
@@ -122,10 +122,12 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         typestr = 'XXX'
         if col['DataType'] == 'Text':
             typestr = 'varchar({0})'.format(max(1, col['MaxLen']))
-        if col['DataType'] == 'Value':
+        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
             typestr = 'float'
         if col['DataType'] == 'Boolean':
             typestr = 'int'
+        if typestr == 'XXX':
+            raise Exception('Invalid property data type ' + col['DataType'])
         st += ' '+typestr
         colTokens.append(st)
     sql += ', '.join(colTokens)
@@ -175,7 +177,7 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
     tb.ArrangeColumns(colNameList)
     for col in columns:
         colname = col['name']
-        if col['DataType'] == 'Value':
+        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
             tb.ConvertColToValue(colname)
         if col['DataType'] == 'Boolean':
             tb.MapCol(colname, ImpUtils.convertToBooleanInt)
@@ -197,7 +199,7 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
             for rownr in tb.GetRowNrRange():
                 maxlength = max(maxlength, len(tb.GetValue(rownr, colnr)))
             datatypestr = 'varchar({0})'.format(maxlength)
-        if col['DataType'] == 'Value':
+        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
             datatypestr = 'float'
         if col['DataType'] == 'Boolean':
             datatypestr = 'int'

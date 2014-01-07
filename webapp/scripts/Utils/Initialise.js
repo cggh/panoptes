@@ -113,7 +113,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.isCustom = (prop.source=='custom');
                 if (prop.datatype=='Text')
                     prop.isText = true;
-                if (prop.datatype=='Value')
+                if ((prop.datatype=='Value') || (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') )
                     prop.isFloat = true;
                 if (prop.datatype=='Boolean')
                     prop.isBoolean = true;
@@ -125,6 +125,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings.maxval = 1;
                     settings.decimDigits = 2;
                 };
+                if (prop.datatype=='GeoLongitude') {
+                    settings.minval = 0;
+                    settings.maxval = 360;
+                    settings.decimDigits = 5;
+                }
+                if (prop.datatype=='GeoLattitude') {
+                    settings.minval = -90;
+                    settings.maxval = 90;
+                    settings.decimDigits = 5;
+                }
                 if (prop.propid == MetaData.getTableInfo(prop.tableid).primkey)
                     prop.isPrimKey = true;
                 if (prop.settings) {
@@ -173,6 +183,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             });
         }
+
+
+        Initialise.parseRelations = function(data) {
+            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                tableInfo.relationsChildOf = [];
+                tableInfo.relationsParentOf = [];
+            });
+            MetaData.relations = data;
+            $.each(data, function(idx, relationInfo) {
+                var childTableInfo = MetaData.mapTableCatalog[relationInfo.childtableid];
+                    if (!childTableInfo)
+                        DQX.reportError('Invalid child table in relation: '+relationInfo.childtableid)
+                var parentTableInfo = MetaData.mapTableCatalog[relationInfo.parenttableid];
+                if (!parentTableInfo)
+                    DQX.reportError('Invalid child table in relation: '+relationInfo.parenttableid)
+                childTableInfo.relationsChildOf.push(relationInfo);
+                parentTableInfo.relationsParentOf.push(relationInfo);
+            });
+        }
+
 
 
         Initialise.parseTableBasedSummaryValues = function() {

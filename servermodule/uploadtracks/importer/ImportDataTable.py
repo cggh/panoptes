@@ -57,6 +57,21 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+            if settings.HasToken('Relation'):
+                relationSettings = settings.GetSubSettings('Relation')
+                calculationObject.Log('Creating relation: '+relationSettings.ToJSON())
+                relationSettings.RequireTokens(['TableId'])
+                relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
+                relationSettings.AddTokenIfMissing('ForwardName', 'has')
+                sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
+                    tableid,
+                    propid,
+                    relationSettings['TableId'],
+                    '',
+                    relationSettings['ForwardName'],
+                    relationSettings['ReverseName']
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             ranknr += 1
 
 

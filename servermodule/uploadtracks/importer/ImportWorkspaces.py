@@ -113,7 +113,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                 if not frst:
                     sql += " ,"
                 sqldatatype = 'varchar(50)'
-                if property['DataType'] == 'Value':
+                if ImpUtils.IsValueDataTypeIdenfifier(property['DataType']):
                     sqldatatype = 'float'
                 sql += "ADD COLUMN {0} {1}".format(propid, sqldatatype)
                 frst = False

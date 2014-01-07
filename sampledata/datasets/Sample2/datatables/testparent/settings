@@ -1,0 +1,5 @@
+NameSingle: Test parent item
+NamePlural: Test parent items
+PrimKey: ID
+AutoScanProperties: true
+

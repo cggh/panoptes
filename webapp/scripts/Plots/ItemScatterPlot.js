@@ -62,7 +62,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             if (prop.tableid==that.tableInfo.id) {
                                 if ( (prop.datatype==plotAspect.datatype) || (!plotAspect.datatype) )
                                     included = true;
-                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
+                                if ( (plotAspect.datatype=='Value') && (prop.isFloat) )
+                                    included = true;
+                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.isBoolean) ) )
                                     included = true;
                             }
                             if (included)
@@ -146,9 +148,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                         fetcher.setMaxResultCount(999999);
                         var encoding='ST';
-                        if (propInfo.datatype=='Value')
+                        if (propInfo.isFloat)
                             encoding = 'F3';
-                        if (propInfo.datatype=='Boolean')
+                        if (propInfo.isBoolean)
                             encoding = 'GN';
                         fetcher.addColumn(aspectInfo.propid, encoding);
                         that.panelPlot.invalidate();

@@ -1,7 +1,7 @@
-ID	Country	Value1	InUse	Value2	Comment
-S0001	UK	0.75	Y	2.3	This is a very long comment, taking up a rather large space in the record. Ideally, the import routine should automatically reserve the right space for this!
-S0002	UK	0.85	Y	9.8	-
-S0003	UK	0.23	N	9.2	-
-S0004	BE	0.61	Y	4.2	-
-S0005	BE	0.12	N	0.6	-
-S0006	BE	0.62	Y	0.3	-
+ID	SiteID	Value1	InUse	Value2	Comment
+S0001	St01	0.75	Y	2.3	This is a very long comment, taking up a rather large space in the record. Ideally, the import routine should automatically reserve the right space for this!
+S0002	St01	0.85	Y	9.8	-
+S0003	St02	0.23	N	9.2	-
+S0004	St02	0.61	Y	4.2	-
+S0005	St03	0.12	N	0.6	-
+S0006	St03	0.62	Y	0.3	-

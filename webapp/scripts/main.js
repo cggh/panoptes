@@ -156,6 +156,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                             getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'trackid',
                                 SQL.WhereClause.Trivial()
                             );
+                            getter.addTable('relations',['childtableid', 'childpropid', 'parenttableid','parentpropid','forwardname','reversename'],'childtableid',
+                                SQL.WhereClause.Trivial()
+                            );
 
                             getter.addTable('externallinks',['linktype','linkname','linkurl'],'linkname');
                             getter.execute(MetaData.serverUrl,MetaData.database,
@@ -167,6 +170,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
                                     Initialise.parseTableBasedSummaryValues();
+                                    Initialise.parseRelations(getter.getTableRecords('relations'));
                                     if (proceedFunction)
                                         Initialise.waitForCompletion(proceedFunction);
                                 }

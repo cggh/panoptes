@@ -4,7 +4,7 @@ Description: This is a table containing a number of samples
 PrimKey: ID
 IsPositionOnGenome: false
 FetchRecordCount: true
-QuickFindFields: ID,Country
+QuickFindFields: ID,SiteID
 
 Properties:
 
@@ -14,13 +14,16 @@ Properties:
   DataType: Text
   ShowInTable: true
 
-- Id: Country
-  Name: Country
-  Description: Country of origin of the sample
+- Id: SiteID
+  Name: Site ID
+  Description: Identifier of the site the sample was collected from
   DataType: Text
-  IsCategorical: true
   ShowInTable: true
   Index: true
+  Relation:
+    TableId: samplingsites
+    ForwardName: is sampled from
+    ReverseName: contains
 
 - Id: InUse
   Name: In use
@@ -41,7 +44,7 @@ Properties:
   Name: Comment
   Description: An example of a comment string
   DataType: Text
-  ShowInTable: true
+  ShowInTable: false
   
 
 TableBasedSummaryValues:
