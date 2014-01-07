@@ -298,6 +298,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 encoding,
                                 sortable
                             );
+                            if (propInfo.settings.Description)
+                                col.setToolTip(propInfo.settings.Description);
                             if ( (tableInfo.hasGenomePositions) && (that.myTable.findColumn('chrom')) && (that.myTable.findColumn('pos')) ) {
                                 // Define a joint sort action on both columns chrom+pos, and set it as default
                                 that.myTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true);
@@ -318,7 +320,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             }
 
                             col.setHeaderClickHandler(function(id) {
-                                alert('column clicked '+id);//!!! todo: something meaningful here
+                                //alert('column clicked '+id);//!!! todo: something meaningful here
                             })
 
                             if (propInfo.isPrimKey) {

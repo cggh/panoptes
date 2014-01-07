@@ -30,6 +30,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
 
         # Add to tablecatalog
+        extraSettings.ConvertStringsToSafeSQL()
         sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
             tableid,
             tableSettings['NamePlural'],

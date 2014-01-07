@@ -1,5 +1,6 @@
 NameSingle: sample
 NamePlural: samples
+Description: This is a table containing a number of samples
 PrimKey: ID
 IsPositionOnGenome: false
 FetchRecordCount: true
@@ -9,11 +10,13 @@ Properties:
 
 - Id: ID
   Name: Sample ID
+  Description: Sample identifier
   DataType: Text
   ShowInTable: true
 
 - Id: Country
   Name: Country
+  Description: Country of origin of the sample
   DataType: Text
   IsCategorical: true
   ShowInTable: true
@@ -21,11 +24,13 @@ Properties:
 
 - Id: InUse
   Name: In use
+  Description: Flag determining if sample is used in the data set
   DataType: Boolean
   ShowInTable: true
 
 - Id: Value1
   Name: Value 1
+  Description: An example of a numerical value
   DataType: Value
   MinVal: 0
   MaxVal: 1
@@ -34,6 +39,7 @@ Properties:
 
 - Id: Comment
   Name: Comment
+  Description: An example of a comment string
   DataType: Text
   ShowInTable: true
   

@@ -96,6 +96,13 @@ class SettingsLoader:
         st.LoadDict(self.settings[token])
         return st
 
+    def ConvertStringsToSafeSQL(self):
+        self._CheckLoaded()
+        for key in self.settings:
+            val = self.settings[key]
+            if type(val) is str:
+                self.settings[key] = val.replace('"', '`').replace("'", '`')
+
     def HasToken(self, token):
         self._CheckLoaded()
         return token in self.settings

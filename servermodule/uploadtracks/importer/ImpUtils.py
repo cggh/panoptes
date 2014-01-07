@@ -159,6 +159,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                 if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
                     property['DataType'] = 'Boolean'
 
+                DQXUtils.CheckValidIdentifier(propid)
                 settings = SettingsLoader.SettingsLoader()
                 settings.LoadDict({})
                 settings.AddTokenIfMissing('Name', propid)
@@ -174,6 +175,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         settings.RequireTokens(['DataType'])
         settings.ConvertToken_Boolean('isCategorical')
         settings.AddTokenIfMissing('Name', property['propid'])
+        settings.ConvertStringsToSafeSQL()
         property['DataType'] = settings['DataType']
 
     if len(properties) == 0:
