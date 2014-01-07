@@ -7,6 +7,8 @@ from itertools import islice, takewhile
 from operator import ne
 from functools import partial
 import hashlib
+import arraybuffer
+import numpy as np
 
 #TODO cache doesn't have locking....
 cache = FileDict('cache')
@@ -17,11 +19,6 @@ def gzip(data):
     f.write(data)
     f.close()
     return out.getvalue()
-
-def pack_bytes(fmt, seq):
-    for num in seq:
-        for char in pack(fmt, num):
-            yield char
 
 def positions_from_query(database, table, query):
     db = DQXDbTools.OpenDatabase(database)
@@ -41,10 +38,10 @@ def positions_from_query(database, table, query):
     print('###PARAMS:'+str(whc.queryparams))
     print('################################################')
     cur.execute(sqlquery,whc.queryparams)
-    for row in cur.fetchall():
-        yield row[0]
+    resultlist = cur.fetchall()
     cur.close()
     db.close()
+    return np.array(resultlist, dtype = 'int32')
 
 def response(request_data):
     return request_data
@@ -59,7 +56,8 @@ def handler(start_response, request_data):
     #try:
     #    data = cache[key]
     #except KeyError:
-    data = gzip(bytes(bytearray(pack_bytes('<I', positions))))
+    positions = arraybuffer.encode_array(positions)
+    data = gzip(''.join(positions))
     #    cache[key] = data
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
