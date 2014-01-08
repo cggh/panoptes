@@ -47,8 +47,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 table.quickFindFields = table.settings.QuickFindFields.split(',');
 
 
-
-
             table.isItemSelected = function(id) { return table.currentSelection[id]; }
 
             table.selectItem = function(id, newState) {
@@ -110,6 +108,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         Initialise.parseCustomProperties = function() {
             $.each(MetaData.customProperties, function(idx, prop) {
+                var tableInfo = MetaData.mapTableCatalog[prop.tableid];
                 prop.isCustom = (prop.source=='custom');
                 if (prop.datatype=='Text')
                     prop.isText = true;
@@ -129,11 +128,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings.minval = 0;
                     settings.maxval = 360;
                     settings.decimDigits = 5;
+                    tableInfo.propIdGeoCoordLongit = prop.propid;
                 }
                 if (prop.datatype=='GeoLattitude') {
                     settings.minval = -90;
                     settings.maxval = 90;
                     settings.decimDigits = 5;
+                    tableInfo.propIdGeoCoordLattit = prop.propid;
                 }
                 if (prop.propid == MetaData.getTableInfo(prop.tableid).primkey)
                     prop.isPrimKey = true;

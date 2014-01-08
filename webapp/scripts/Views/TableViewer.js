@@ -1,5 +1,11 @@
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "MetaData", "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Wizards/EditQuery", "Utils/QueryTool"],
-    function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, ItemScatterPlot, BarGraph, Histogram, Histogram2D, EditQuery, QueryTool) {
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
+    "MetaData",
+    "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Plots/GeoMapPoints",
+    "Wizards/EditQuery", "Utils/QueryTool"],
+    function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
+              MetaData,
+              ItemScatterPlot, BarGraph, Histogram, Histogram2D, GeoMapPoints,
+              EditQuery, QueryTool) {
 
 
         //A helper function, turning a fraction into a color string
@@ -167,26 +173,40 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery.setPadding(10);
 
                     var ctrlQuery = that.theQuery.createControl();
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
+                    var buttonsPlots = [];
+
+                    if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit) {
+                        var cmdGeoMapPoints = Controls.Button(null, { content: 'Map points...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
+                        cmdGeoMapPoints.setOnChanged(function() {
+                            GeoMapPoints.Create(that.tableid);
+                        });
+                        buttonsPlots.push(cmdGeoMapPoints);
+                    }
 
                     var cmdHistogram = Controls.Button(null, { content: 'Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdHistogram.setOnChanged(function() {
                         Histogram.Create(that.tableid);
                     });
+                    buttonsPlots.push(cmdHistogram);
 
                     var cmdBarGraph = Controls.Button(null, { content: 'Bar graph...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdBarGraph.setOnChanged(function() {
                         BarGraph.Create(that.tableid);
                     });
+                    buttonsPlots.push(cmdBarGraph);
 
                     var cmdHistogram2d = Controls.Button(null, { content: '2D Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdHistogram2d.setOnChanged(function() {
                         Histogram2D.Create(that.tableid);
                     });
+                    buttonsPlots.push(cmdHistogram2d);
 
                     var cmdScatterPlot = Controls.Button(null, { content: 'Scatter plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                     cmdScatterPlot.setOnChanged(function() {
                         ItemScatterPlot.Create(that.tableid);
                     });
+                    buttonsPlots.push(cmdScatterPlot);
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
@@ -202,10 +222,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
                         Controls.VerticalSeparator(15),
-                        cmdHistogram,
-                        cmdBarGraph,
-                        cmdHistogram2d,
-                        cmdScatterPlot,
+                        Controls.CompoundVert(buttonsPlots),
                         Controls.CompoundVert([
                             cmdHideAllColumns,
                             that.visibilityControlsGroup
