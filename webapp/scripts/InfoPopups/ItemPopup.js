@@ -45,9 +45,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $.each(levelInfo.parents, function(idx, parentInfo) {
                     var parentTableInfo = MetaData.mapTableCatalog[parentInfo.tableid];
                     content += '<div style="padding-left:30px">';
-                    content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px"><i>';
+                    content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px;padding-left:8px"><i>';
                     content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
-                    content += '</i></div>';
+                    content += '</i>&nbsp;&nbsp;';
+                    var lnk = Controls.Hyperlink(null,{ content: 'Open'});
+                    lnk.setOnChanged(function() {
+                        Msg.send({type: 'ItemPopup'}, {tableid: parentInfo.tableid, itemid: parentInfo.fields[parentTableInfo.primkey]});
+                    });
+                    content += lnk.renderHtml();
+                    content += '</div>';
                     addLevelToContent(parentInfo);
                     content += '</div>';
                 });
