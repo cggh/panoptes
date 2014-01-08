@@ -146,7 +146,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var theTable = relTab.panelTable.getTable();
                     theTable.fetchBuffer = 300;
                     theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
-                    theTable.setQuery(SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]));
+                    var theQuery = SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]);
+                    theTable.setQuery(theQuery);
 
                     $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
                         var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
@@ -170,6 +171,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var buttons = [];
                     buttons.push(Controls.HorizontalSeparator(7));
 
+
                     relTab.panelButtons = Framework.Form(relTab.frameButtons);
                     var button_OpenInTable = Controls.Button(null, { content: 'Show in table view'}).setOnChanged(function() {
                         Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
@@ -177,6 +179,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         );
                     })
                     buttons.push(button_OpenInTable);
+
+                    if (relTab.childTableInfo.hasGeoCoord) {
+                        var button_OpenInMap = Controls.Button(null, { content: 'Show on map'}).setOnChanged(function() {
+                            Msg.send({type: 'CreateGeoMapPoint' },
+                                {
+                                    tableid: relTab.childTableInfo.id,
+                                    startQuery: theQuery
+                                });
+                            }
+                        );
+                        buttons.push(button_OpenInMap);
+                    }
+
                     relTab.panelButtons.addControl(Controls.CompoundHor(buttons));
 
                 });

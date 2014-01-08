@@ -176,7 +176,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     var tableInfo = MetaData.getTableInfo(that.tableid);
                     var buttonsPlots = [];
 
-                    if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit) {
+                    if (tableInfo.hasGeoCoord) {
                         var cmdGeoMapPoints = Controls.Button(null, { content: 'Map points...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
                         cmdGeoMapPoints.setOnChanged(function() {
                             GeoMapPoints.Create(that.tableid);

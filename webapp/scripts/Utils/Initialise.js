@@ -183,6 +183,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
             });
+
+            // Determine of datatables have geographic info
+            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
+                    tableInfo.hasGeoCoord = true;
+            });
         }
 
 

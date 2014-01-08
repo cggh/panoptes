@@ -4,7 +4,7 @@ Description: Information about the sites where samples were collected
 PrimKey: SiteID
 IsPositionOnGenome: false
 FetchRecordCount: true
-QuickFindFields: SiteID,Country
+QuickFindFields: SiteID,Country,Longitude,Lattitude
 
 Properties:
 

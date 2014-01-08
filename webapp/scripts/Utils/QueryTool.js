@@ -19,6 +19,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.includeCurrentQuery = settings.includeCurrentQuery;
             }
 
+            that.setStartQuery = function(qry) {
+                that.query = SQL.WhereClause.decode(SQL.WhereClause.encode(qry));
+            }
+
             that.get = function() {
                 return that.query;
             }

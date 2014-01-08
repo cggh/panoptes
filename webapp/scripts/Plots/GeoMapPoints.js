@@ -12,7 +12,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.registerPlotType('GeoMapPoints', GeoMapPoints);
 
-        GeoMapPoints.Create = function(tableid) {
+        Msg.listen('',{type:'CreateGeoMapPoint'}, function(scope, info) {
+            GeoMapPoints.Create(
+                info.tableid,
+                {
+                    zoomFit: true
+                },
+                info.startQuery);
+        });
+
+
+        GeoMapPoints.Create = function(tableid, settings, startQuery) {
             var that = GenericPlot.Create(tableid,'GeoMapPoints', {title:'Map' });
 
 
@@ -33,6 +43,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createPanels = function() {
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+
+                if (startQuery)
+                    that.theQuery.setStartQuery(startQuery);
 
                 var ctrl_Query = that.theQuery.createControl();
 
@@ -70,6 +83,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.pointSet.setPointClickCallBack(function(itemid) {
                     Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: itemid } );
                 });
+
+                if (settings && settings.zoomFit)
+                    that.startZoomFit = true;
                 that.reloadAll();
             };
 
@@ -103,6 +119,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             points.push(pt);
                         }
                         that.pointSet.setPoints(points);
+                        if (that.startZoomFit) {
+                            that.pointSet.zoomFit(20);
+                            that.startZoomFit = false;
+
+                        }
                     },
                     function (data) { //error
                         that.fetchCount -= 1;
