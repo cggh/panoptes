@@ -38,7 +38,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setAllowScrollBars(false,true);
                 that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(true,false);
+                    .setAllowScrollBars(false,false);
             };
 
             that.createPanels = function() {
@@ -120,7 +120,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         }
                         that.pointSet.setPoints(points);
                         if (that.startZoomFit) {
-                            that.pointSet.zoomFit(20);
+                            that.pointSet.zoomFit(100);
                             that.startZoomFit = false;
 
                         }

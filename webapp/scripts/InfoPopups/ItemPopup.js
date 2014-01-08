@@ -1,7 +1,7 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable",
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable,
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo) {
 
@@ -76,11 +76,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupTab();
+
+
                 that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Information fields');
                 that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
+
+                if (that.tableInfo.hasGeoCoord) {
+                    that.frameMap = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
+                        .setAllowScrollBars(false,false).setDisplayTitle('On map').setInitialiseFunction(function() {
+                            that.theMap = Map.GMap(that.frameMap);
+                            var pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
+                            pointSet.setPoints([{
+                                id: '',
+                                longit: data.fields[that.tableInfo.propIdGeoCoordLongit],
+                                lattit: data.fields[that.tableInfo.propIdGeoCoordLattit]
+                            }])
+                            setTimeout(function() {
+                                pointSet.zoomFit(100);
+                            }, 50);
+                        });
+                }
 
                 that.childRelationTabs = [];
                 $.each(that.tableInfo.relationsParentOf, function(idx,relationInfo) {
@@ -125,6 +143,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
 
+
                 that.createPanelsRelations();
             }
 
@@ -148,6 +167,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
                     var theQuery = SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]);
                     theTable.setQuery(theQuery);
+
 
                     $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
                         var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
