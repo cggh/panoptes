@@ -64,6 +64,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 }
 
+                Msg.listen('',{type: 'ShowItemsInSimpleQuery', tableid: that.tableid}, function(scope, info) {
+                    that.activateState();
+                    var qry = SQL.WhereClause.CompareFixed(info.propid, '=', info.value);
+                    that.theQuery.modify(qry);
+                });
 
                 that.storeSettings = function() {
                     var obj= {};
