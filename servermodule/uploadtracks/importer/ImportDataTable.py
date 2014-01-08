@@ -12,9 +12,10 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 
-
+tableOrder = 0
 
 def ImportDataTable(calculationObject, datasetId, tableid, folder, importSettings):
+    global tableOrder
     with calculationObject.LogHeader('Importing datatable {0}'.format(tableid)):
         print('Source: ' + folder)
         DQXUtils.CheckValidIdentifier(tableid)
@@ -31,14 +32,16 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
 
         # Add to tablecatalog
         extraSettings.ConvertStringsToSafeSQL()
-        sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
+        sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', {5})".format(
             tableid,
             tableSettings['NamePlural'],
             tableSettings['PrimKey'],
             tableSettings['IsPositionOnGenome'],
-            extraSettings.ToJSON()
+            extraSettings.ToJSON(),
+            tableOrder
         )
         ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+        tableOrder += 1
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, tableSettings, os.path.join(folder, 'data'))
 

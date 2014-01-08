@@ -1,1 +1,7 @@
 Name: A sample set
+DataTables:
+- variants
+- samples
+- samplingsites
+- countries
+- sampletypes

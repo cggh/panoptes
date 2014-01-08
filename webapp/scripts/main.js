@@ -59,7 +59,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Util
             function Start_Part2() {
 
                 var getter = DataFetchers.ServerDataGetter();
-                getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'id');
+                getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching

@@ -54,9 +54,17 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
 
         datatables = []
+
+        if globalSettings.HasToken('DataTables'):
+            if not type(globalSettings['DataTables']) is list:
+                raise Exception('DataTables token should be a list')
+            datatables = globalSettings['DataTables']
+
+
         for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
             if os.path.isdir(os.path.join(datasetFolder, 'datatables', dir)):
-                datatables.append(dir)
+                if dir not in datatables:
+                    datatables.append(dir)
         print('Data tables: '+str(datatables))
         for datatable in datatables:
             ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable), importSettings)

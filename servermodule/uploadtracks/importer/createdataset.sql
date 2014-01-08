@@ -86,7 +86,8 @@ CREATE TABLE `tablecatalog` (
   `name` varchar(50),
   `primkey` varchar(20),
   `IsPositionOnGenome` int,
-  `settings` text
+  `settings` text,
+  `ordr` int
 );
 
 CREATE TABLE `relations` (
