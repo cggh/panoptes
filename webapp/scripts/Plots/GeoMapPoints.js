@@ -47,11 +47,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.fetchData();
                 });
 
+                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit'}).setOnChanged(function () {
+                    that.pointSet.zoomFit();
+                });
+
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
+                    cmdZoomToFit,
+                    Controls.VerticalSeparator(10),
                     that.ctrlCatProperty1,
                     Controls.VerticalSeparator(10),
                     that.colorLegend
@@ -61,6 +67,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.theMap = Map.GMap(this.framePlot);
                 that.pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
+                that.pointSet.setPointClickCallBack(function(itemid) {
+                    Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: itemid } );
+                });
                 that.reloadAll();
             };
 
@@ -76,6 +85,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     encoding = 'F3';
                 if (propInfo.isBoolean)
                     encoding = 'GN';*/
+                fetcher.addColumn(that.tableInfo.primkey, 'ST');
                 fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F3');
                 fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F3');
                 that.pointSet.clearPoints();
@@ -86,7 +96,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         for (var nr =0; nr<data.Longitude.length; nr++) {
                             var pt =
                             {
-                                id: nr.toString(),
+                                id: data[that.tableInfo.primkey][nr],
                                 longit: data.Longitude[nr],
                                 lattit: data.Lattitude[nr]
                             }
