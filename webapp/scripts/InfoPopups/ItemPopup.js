@@ -1,9 +1,11 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
-    "MetaData", "Utils/GetFullDataItemInfo"],
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
+],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
-              MetaData, GetFullDataItemInfo) {
+              MetaData, GetFullDataItemInfo, MiscUtils
+        ) {
 
         var ItemPopup = {};
 
@@ -152,7 +154,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     //Initialise the data fetcher that will download the data for the table
                     var theDataFetcher = DataFetchers.Table(
-                        MetaData.serverUrl,MetaData.database,relTab.childTableInfo.id
+                        MetaData.serverUrl,
+                        MetaData.database,
+                        relTab.childTableInfo.id + 'CMB_' + MetaData.workspaceid
                     );
 
                     relTab.panelTable = QueryTable.Panel(
@@ -167,32 +171,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     theTable.setQuery(theQuery);
 
 
-                    $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
-                        if (propid!=relTab.relationInfo.childpropid) {
-                            var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
-                            var col = theTable.createTableColumn(
-                                QueryTable.Column(
-                                    propInfo.name,propid,
-                                    (propInfo.isPrimKey)?0:1),
-                                'String',//!!! todo: adapt this to datatype, see TableViewer
-                                true
-                            );
-                            if (propInfo.isPrimKey) {
-                                col.setCellClickHandler(function(fetcher,downloadrownr) {
-                                    var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
-                                    Msg.send({ type: 'ItemPopup' }, { tableid: relTab.childTableInfo.id, itemid: itemid } );
-                                })
-                            }
-
-                            if (propInfo.relationParentTableId) {
-                                col.setCellClickHandler(function(fetcher,downloadrownr) {
-                                    var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
-                                    Msg.send({ type: 'ItemPopup' }, { tableid: propInfo.relationParentTableId, itemid: itemid } );
-                                })
-                            }
-
+                    $.each(MetaData.customProperties, function(idx, propInfo) {
+                        if ( (propInfo.tableid == relTab.childTableInfo.id) && (propInfo.propid!=relTab.relationInfo.childpropid) ) {
+                            var col = MiscUtils.createItemTableViewerColumn(theTable, relTab.childTableInfo.id, propInfo.propid);
                         }
                     });
+//                    $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
+//                        if (propid!=relTab.relationInfo.childpropid) {
+//                            var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
+//                            var col = MiscUtils.createItemTableViewerColumn(theTable, relTab.childTableInfo.id, propid);
+//
+//                        }
+//                    });
 //                    that.updateQuery();
                     relTab.panelTable.onResize();
 

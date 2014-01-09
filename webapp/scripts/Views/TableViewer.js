@@ -1,35 +1,14 @@
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Plots/GeoMapPoints",
-    "Wizards/EditQuery", "Utils/QueryTool"],
+    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils"
+],
     function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
               ItemScatterPlot, BarGraph, Histogram, Histogram2D, GeoMapPoints,
-              EditQuery, QueryTool) {
+              EditQuery, QueryTool, MiscUtils) {
 
 
-        //A helper function, turning a fraction into a color string
-        var createFuncFraction2Color = function(minval, maxval) {
-            var range = maxval-minval;
-            if (!range)
-                range = 1;
-            return function (vl) {
-                if (vl == null)
-                    return "white";
-                else {
-                    vl=parseFloat(vl);
-                    vl = (vl-minval) / range;
-                    vl = Math.max(0, vl);
-                    vl = Math.min(1, vl);
-                    if (vl > 0) vl = 0.05 + vl * 0.95;
-                    vl = Math.sqrt(vl);
-                    var b = 255 ;
-                    var g = 255 * (1 - 0.3*vl * vl);
-                    var r = 255 * (1 - 0.6*vl);
-                    return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
-                }
-            };
-        }
 
 
 
@@ -343,71 +322,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     //Create a column for each property
                     $.each(MetaData.customProperties,function(idx,propInfo) {
                         if ((propInfo.tableid == that.tableid) && (propInfo.settings.showInTable)) {
-                            var encoding  = 'String';
-                            var tablePart = 1;
-                            if (propInfo.datatype=='Value') {
-                                encoding  = 'Float3';
-                                if (propInfo.settings.decimDigits ==0 )
-                                    encoding  = 'Int';
-                            }
-                            if ((propInfo.datatype=='Value') && (propInfo.propid=='pos') && (MetaData.getTableInfo(that.tableid).hasGenomePositions) )
-                                encoding  = 'Int';
-                            if (propInfo.datatype=='Boolean')
-                                encoding  = 'Int';
-                            if (propInfo.isPrimKey)
-                                tablePart = 0;
-                            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!='chrom') && (propInfo.propid!='pos') );
-                            var col = that.myTable.createTableColumn(
-                                QueryTable.Column(propInfo.name,propInfo.propid,tablePart),
-                                encoding,
-                                sortable
-                            );
-                            if (propInfo.settings.Description)
-                                col.setToolTip(propInfo.settings.Description);
-                            if ( (tableInfo.hasGenomePositions) && (that.myTable.findColumn('chrom')) && (that.myTable.findColumn('pos')) ) {
-                                // Define a joint sort action on both columns chrom+pos, and set it as default
-                                that.myTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true);
-                            }
-
-                            if (propInfo.datatype=='Boolean')
-                                col.setDataType_MultipleChoiceInt([{id:0, name:'No'}, {id:1, name:'Yes'}]);
-
-                            if (propInfo.propid=='chrom')
-                                col.setDataType_MultipleChoiceString(MetaData.chromosomes);
-
-                            if (propInfo.propCategories) {
-                                var cats = [];
-                                $.each(propInfo.propCategories, function(idx, cat) {
-                                    cats.push({id:cat, name:cat});
-                                });
-                                col.setDataType_MultipleChoiceString(cats);
-                            }
+                            var col = MiscUtils.createItemTableViewerColumn(that.myTable, that.tableid, propInfo.propid);
 
                             col.setHeaderClickHandler(function(id) {
                                 that.createColumnPopup(id);
                             })
-
-                            if (propInfo.isPrimKey) {
-                                col.setCellClickHandler(function(fetcher,downloadrownr) {
-                                    var itemid=that.panelTable.getTable().getCellValue(downloadrownr,propInfo.propid);
-                                    Msg.send({ type: 'ItemPopup' }, { tableid: that.tableid, itemid: itemid } );
-                                })
-                            }
-
-                            if (propInfo.relationParentTableId) {
-                                col.setCellClickHandler(function(fetcher,downloadrownr) {
-                                    var itemid=that.panelTable.getTable().getCellValue(downloadrownr,propInfo.propid);
-                                    Msg.send({ type: 'ItemPopup' }, { tableid: propInfo.relationParentTableId, itemid: itemid } );
-                                })
-                            }
-
-                            col.CellToText = propInfo.toDisplayString;
-
-                            if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
-                                col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
-
-                            if (propInfo.isBoolean)
-                                col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
 
                             // Create checkbox that controls the visibility of the column
                             var chk = Controls.Check(null,{label:propInfo.name, value:(!colIsHidden[col.myCompID]) }).setClassID(propInfo.propid).setOnChanged(function() {
