@@ -1,0 +1,14 @@
+NameSingle: Study
+NamePlural: Studies
+PrimKey: ID
+
+Properties:
+
+- Id: ID
+  Name: Study ID
+  ShowInTable: true
+
+- Id: Study
+  Name: Study
+  DataType: Text
+  ShowInTable: true

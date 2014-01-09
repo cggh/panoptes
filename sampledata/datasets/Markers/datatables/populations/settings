@@ -1,0 +1,19 @@
+NameSingle: Population
+NamePlural: Populations
+PrimKey: ID
+
+Properties:
+
+- Id: ID
+  Name: Population ID
+  ShowInTable: true
+
+- Id: Name
+  Name: Name
+  DataType: Text
+  ShowInTable: true
+
+- Id: Description
+  Name: Description
+  DataType: Text
+  ShowInTable: true

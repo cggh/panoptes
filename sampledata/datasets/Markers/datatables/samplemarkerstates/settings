@@ -1,0 +1,32 @@
+NameSingle: Sample marker state
+NamePlural: Samples marker states
+
+Properties:
+
+- Id: SampleID
+  Name: Sample ID
+  ShowInTable: true
+  Index: true
+  Relation:
+    TableId: samples
+    ForwardName: belongs to
+    ReverseName: has
+
+- Id: MarkerID
+  Name: Marker ID
+  DataType: Text
+  ShowInTable: true
+  Index: true
+  Relation:
+    TableId: markers
+    ForwardName: belongs to
+    ReverseName: has
+
+- Id: StateID
+  Name: Marker state ID
+  DataType: Text
+  ShowInTable: true
+  Relation:
+    TableId: markerstates
+    ForwardName: belongs to
+    ReverseName: has

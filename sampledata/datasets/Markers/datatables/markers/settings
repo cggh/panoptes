@@ -1,0 +1,5 @@
+NameSingle: Marker state
+NamePlural: Marker states
+PrimKey: ID
+AutoScanProperties: true
+

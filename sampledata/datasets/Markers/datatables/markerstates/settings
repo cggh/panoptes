@@ -1,0 +1,23 @@
+NameSingle: Marker state
+NamePlural: Marker states
+PrimKey: ID
+
+Properties:
+
+- Id: ID
+  Name: Marker state ID
+  ShowInTable: true
+
+- Id: MarkerID
+  Name: Marker ID
+  DataType: Text
+  ShowInTable: true
+  Relation:
+    TableId: markers
+    ForwardName: is state of
+    ReverseName: has
+
+- Id: StateName
+  Name: State name
+  DataType: Text
+  ShowInTable: true

@@ -1,0 +1,30 @@
+NameSingle: Sample
+NamePlural: Samples
+PrimKey: ID
+
+Properties:
+
+- Id: ID
+  Name: Sample ID
+  ShowInTable: true
+
+- Id: PopId
+  Name: Population ID
+  DataType: Text
+  ShowInTable: true
+  Index: true
+  Relation:
+    TableId: populations
+    ForwardName: is member of
+    ReverseName: contains
+
+- Id: StudyId
+  Name: Study ID
+  DataType: Text
+  ShowInTable: true
+  Index: true
+  Relation:
+    TableId: study
+    ForwardName: is member of
+    ReverseName: contains
+

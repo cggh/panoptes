@@ -1,0 +1,8 @@
+Name: Markers
+DataTables:
+- samples
+- studies
+- markers
+- populations
+- markerstates
+- samplemarkerstates
