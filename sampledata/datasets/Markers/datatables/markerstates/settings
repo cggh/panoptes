@@ -1,11 +1,13 @@
-NameSingle: Marker state
-NamePlural: Marker states
+NameSingle: marker state
+NamePlural: marker states
 PrimKey: ID
+QuickFindFields: ID,MarkerID,StateName
 
 Properties:
 
 - Id: ID
   Name: Marker state ID
+  DataType: Text
   ShowInTable: true
 
 - Id: MarkerID
@@ -14,7 +16,7 @@ Properties:
   ShowInTable: true
   Relation:
     TableId: markers
-    ForwardName: is state of
+    ForwardName: belongs to
     ReverseName: has
 
 - Id: StateName

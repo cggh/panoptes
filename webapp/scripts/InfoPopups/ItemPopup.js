@@ -151,15 +151,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $.each(that.childRelationTabs, function(idx, relTab) {
 
                     //Initialise the data fetcher that will download the data for the table
-                    if (!relTab.childTableInfo.summaryValuesTableFetcher) {
-                        relTab.childTableInfo.summaryValuesTableFetcher = DataFetchers.Table(
-                            MetaData.serverUrl,MetaData.database,relTab.childTableInfo.id
-                        );
-                    }
+                    var theDataFetcher = DataFetchers.Table(
+                        MetaData.serverUrl,MetaData.database,relTab.childTableInfo.id
+                    );
 
                     relTab.panelTable = QueryTable.Panel(
                         relTab.frameTable,
-                        relTab.childTableInfo.summaryValuesTableFetcher,
+                        theDataFetcher,
                         { leftfraction: 50 }
                     );
                     var theTable = relTab.panelTable.getTable();
@@ -170,19 +168,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
-                        var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
-                        var col = theTable.createTableColumn(
-                            QueryTable.Column(
-                                propInfo.name,propid,
-                                (propInfo.isPrimKey)?0:1),
-                            'String',//!!! todo: adapt this to datatype, see TableViewer
-                            true
-                        );
-                        if (propInfo.isPrimKey) {
-                            col.setCellClickHandler(function(fetcher,downloadrownr) {
-                                var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
-                                Msg.send({ type: 'ItemPopup' }, { tableid: relTab.childTableInfo.id, itemid: itemid } );
-                            })
+                        if (propid!=relTab.relationInfo.childpropid) {
+                            var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
+                            var col = theTable.createTableColumn(
+                                QueryTable.Column(
+                                    propInfo.name,propid,
+                                    (propInfo.isPrimKey)?0:1),
+                                'String',//!!! todo: adapt this to datatype, see TableViewer
+                                true
+                            );
+                            if (propInfo.isPrimKey) {
+                                col.setCellClickHandler(function(fetcher,downloadrownr) {
+                                    var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
+                                    Msg.send({ type: 'ItemPopup' }, { tableid: relTab.childTableInfo.id, itemid: itemid } );
+                                })
+                            }
+
+                            if (propInfo.relationParentTableId) {
+                                col.setCellClickHandler(function(fetcher,downloadrownr) {
+                                    var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
+                                    Msg.send({ type: 'ItemPopup' }, { tableid: propInfo.relationParentTableId, itemid: itemid } );
+                                })
+                            }
+
                         }
                     });
 //                    that.updateQuery();

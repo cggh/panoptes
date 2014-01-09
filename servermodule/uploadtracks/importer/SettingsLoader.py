@@ -60,6 +60,13 @@ class SettingsLoader:
         if token not in self.settings:
             self.settings[token] = value
 
+    def SetToken(self, token, value):
+        if not(self.HasToken(token)):
+            self.AddTokenIfMissing(token, value)
+        else:
+            self.settings[token] = value
+
+
     def DropTokens(self, tokensList):
         self._CheckLoaded()
         for token in tokensList:

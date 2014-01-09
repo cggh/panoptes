@@ -1,18 +1,20 @@
-NameSingle: Sample
-NamePlural: Samples
+NameSingle: sample
+NamePlural: samples
 PrimKey: ID
+QuickFindFields: ID,PopId,StudyId
 
 Properties:
 
 - Id: ID
   Name: Sample ID
   ShowInTable: true
+  DataType: Text
 
 - Id: PopId
   Name: Population ID
   DataType: Text
   ShowInTable: true
-  Index: true
+  IsCategorical: true
   Relation:
     TableId: populations
     ForwardName: is member of
@@ -22,9 +24,9 @@ Properties:
   Name: Study ID
   DataType: Text
   ShowInTable: true
-  Index: true
+  IsCategorical: true
   Relation:
-    TableId: study
+    TableId: studies
     ForwardName: is member of
     ReverseName: contains
 

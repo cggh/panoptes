@@ -50,6 +50,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     colDict = {col['name']: col for col in columns}
     colNameList = [col['name'] for col in columns]
     primkey = loadSettings['PrimKey']
+    autoPrimKey = (primkey == 'AutoKey')
     print('Column info: ' + str(columns))
     print('Primary key: ' + primkey)
 
@@ -70,7 +71,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             fileColNames = ifp.readline().rstrip('\n\r').split('\t')
             calculationObject.Log('File columns: ' + str(fileColNames))
             fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
-            if primkey not in fileColIndex:
+            if not(autoPrimKey) and (primkey not in fileColIndex):
                 raise Exception('File is missing primary key '+primkey)
             for colname in colNameList:
                 if colname not in fileColIndex:
@@ -117,6 +118,8 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     scr.AddCommand('drop table if exists {0};'.format(DecoId(tableid)))
     sql = 'CREATE TABLE {0} (\n'.format(DecoId(tableid))
     colTokens = []
+    if autoPrimKey:
+        colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(primkey))
     for col in columns:
         st = DecoId(col['name'])
         typestr = 'XXX'
@@ -134,7 +137,8 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     sql +=')'
     scr.AddCommand(sql)
     calculationObject.Log('Creation statement: '+sql)
-    scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, primkey))
+    if not(autoPrimKey):
+        scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, primkey))
     for col in columns:
         if ('Index' in col) and (col['Index']):
             scr.AddCommand('create index {0}_{1} ON {0}({1})'.format(tableid, col['name']))

@@ -345,8 +345,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         if ((propInfo.tableid == that.tableid) && (propInfo.settings.showInTable)) {
                             var encoding  = 'String';
                             var tablePart = 1;
-                            if (propInfo.datatype=='Value')
+                            if (propInfo.datatype=='Value') {
                                 encoding  = 'Float3';
+                                if (propInfo.settings.decimDigits ==0 )
+                                    encoding  = 'Int';
+                            }
                             if ((propInfo.datatype=='Value') && (propInfo.propid=='pos') && (MetaData.getTableInfo(that.tableid).hasGenomePositions) )
                                 encoding  = 'Int';
                             if (propInfo.datatype=='Boolean')

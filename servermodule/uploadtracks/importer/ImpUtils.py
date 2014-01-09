@@ -105,6 +105,22 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     properties = []
     propidMap = {}
 
+    autoPrimKey = (impSettings['PrimKey'] == 'AutoKey')
+
+    if autoPrimKey:
+        propid = impSettings['PrimKey']
+        property = {'propid': propid}
+        propidMap[propid] = property
+        properties.append(property)
+        settings = SettingsLoader.SettingsLoader()
+        settings.LoadDict({
+            'Name': impSettings['PrimKey'],
+            'ShowInTable': True,
+            'DataType': 'Value',
+            'DecimDigits': 0
+        })
+        property['Settings'] = settings
+
     if impSettings.HasToken('Properties'):
         if not type(impSettings['Properties']) is list:
             raise Exception('Properties token should be a list')
@@ -177,6 +193,10 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
         settings.RequireTokens(['DataType'])
         settings.ConvertToken_Boolean('isCategorical')
+        if settings.HasToken('isCategorical') and settings['isCategorical']:
+            settings.SetToken('Index', True) # Categorical data types are always indexed
+        if settings.HasToken('Relation'):
+            settings.SetToken('Index', True) # Relation child properties are always indexed
         settings.AddTokenIfMissing('Name', property['propid'])
         settings.ConvertStringsToSafeSQL()
         property['DataType'] = settings['DataType']

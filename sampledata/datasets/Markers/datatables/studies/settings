@@ -1,14 +1,16 @@
-NameSingle: Study
-NamePlural: Studies
+NameSingle: study
+NamePlural: studies
 PrimKey: ID
+QuickFindFields: ID,Name
 
 Properties:
 
 - Id: ID
   Name: Study ID
+  DataType: Text
   ShowInTable: true
 
-- Id: Study
-  Name: Study
+- Id: Name
+  Name: Study name
   DataType: Text
   ShowInTable: true

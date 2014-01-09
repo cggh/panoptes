@@ -26,12 +26,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         success: function (resp) {
                             sched.setCompleted(curtableid);
                             var keylist = DQX.parseResponse(resp);
+                            resultLevel.tableid = curtableid;
                             if ("Error" in keylist) {
                                 alert(keylist.Error);
+                                resultLevel.fields = {};
                                 return;
                             }
                             resultLevel.fields = keylist.Data;
-                            resultLevel.tableid = curtableid;
                         },
                         error: function() {
                             sched.setCompleted(curtableid);

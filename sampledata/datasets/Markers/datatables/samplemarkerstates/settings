@@ -1,12 +1,14 @@
-NameSingle: Sample marker state
-NamePlural: Samples marker states
+NameSingle: sample marker state
+NamePlural: sample marker states
+PrimKey: AutoKey
+QuickFindFields: AutoKey,SampleID,MarkerID,StateID
 
 Properties:
 
 - Id: SampleID
   Name: Sample ID
+  DataType: Text
   ShowInTable: true
-  Index: true
   Relation:
     TableId: samples
     ForwardName: belongs to
@@ -16,7 +18,6 @@ Properties:
   Name: Marker ID
   DataType: Text
   ShowInTable: true
-  Index: true
   Relation:
     TableId: markers
     ForwardName: belongs to

@@ -1,11 +1,13 @@
-NameSingle: Population
-NamePlural: Populations
+NameSingle: population
+NamePlural: populations
 PrimKey: ID
+QuickFindFields: ID,Name
 
 Properties:
 
 - Id: ID
   Name: Population ID
+  DataType: Text
   ShowInTable: true
 
 - Id: Name

@@ -1,5 +1,6 @@
-NameSingle: Marker state
-NamePlural: Marker states
+NameSingle: marker
+NamePlural: markers
 PrimKey: ID
 AutoScanProperties: true
+QuickFindFields: Name
 
