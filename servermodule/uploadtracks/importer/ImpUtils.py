@@ -105,7 +105,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     properties = []
     propidMap = {}
 
-    autoPrimKey = (impSettings['PrimKey'] == 'AutoKey')
+    autoPrimKey = (impSettings.HasToken('PrimKey') and (impSettings['PrimKey'] == 'AutoKey'))
 
     if autoPrimKey:
         propid = impSettings['PrimKey']
