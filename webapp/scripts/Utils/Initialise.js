@@ -207,6 +207,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     DQX.reportError('Invalid child table in relation: '+relationInfo.parenttableid)
                 childTableInfo.relationsChildOf.push(relationInfo);
                 parentTableInfo.relationsParentOf.push(relationInfo);
+                MetaData.findProperty(childTableInfo.id, relationInfo.childpropid).relationParentTableId = parentTableInfo.id;
             });
         }
 

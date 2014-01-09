@@ -15,3 +15,7 @@ Properties:
 - Id: TypeName
   Name: Type name
   DataType: Text
+
+- Id: Descr
+  Name: Description
+  DataType: Text

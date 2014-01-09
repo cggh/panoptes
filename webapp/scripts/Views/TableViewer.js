@@ -391,6 +391,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 })
                             }
 
+                            if (propInfo.relationParentTableId) {
+                                col.setCellClickHandler(function(fetcher,downloadrownr) {
+                                    var itemid=that.panelTable.getTable().getCellValue(downloadrownr,propInfo.propid);
+                                    Msg.send({ type: 'ItemPopup' }, { tableid: propInfo.relationParentTableId, itemid: itemid } );
+                                })
+                            }
+
                             col.CellToText = propInfo.toDisplayString;
 
                             if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
