@@ -15,7 +15,8 @@ require.config({
         DQX: "DQX",
         _:"DQX/Externals/lodash",
         easel: "Externals/createjs-2013.05.14.min",
-        tween: "Externals/Tween"
+        tween: "Externals/Tween",
+        datastream: "DQX/Externals/DataStream"
     },
     shim: {
         d3: {
@@ -29,6 +30,9 @@ require.config({
         },
         tween: {
           exports: 'TWEEN'
+        },
+        datastream: {
+          exports: 'DataStream'
         }
     },
     waitSeconds: 15,

@@ -150,7 +150,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           return _(that.snp_positions).last();
       };
 
-      that._insert_received_data = function (chunk, variant_query, sample_query, buffer) {
+      that._insert_received_data = function (chunk, variant_query, sample_query, array) {
         if (!_.isEqual(sample_query, that.sample_query) || !_.isEqual(variant_query, that.variant_query)) return;
         var chrom = chunk.chrom;
         chunk = chunk.chunk;
@@ -159,7 +159,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
           console.log("Got data for chunk that was not fetching", chunk);
           return;
         }
-        if (buffer) {
+        if (array) {
           that.fetch_state_by_chrom[chrom][chunk] = FETCHED;
           var num_snps = that.snp_positions_by_chrom[chrom].length;
           var num_samples = that.samples.length;
@@ -176,7 +176,6 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
             sample_gt.col || (sample_gt.col = new Uint8Array(num_snps));
             sample_gt.gt || (sample_gt.gt = new Uint8Array(num_snps));
           });
-          var data = new Uint8Array(buffer);
           var d = 0;
           //TODO Fix snp totals
           var i, ref
@@ -184,8 +183,7 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
 //            snps.ref[i] = data[d];
 //          for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
 //            snps.alt[i] = data[d];
-          data = new Uint16Array(buffer, d);
-          var chunk_length = (data.length / that.samples.length) /2; //Hack until we have proper abstracted buffer parsing
+          var chunk_length = (array.length / that.samples.length) /2;
           _(that.samples).forEach(function (sample,j) {
             var sample_gt = genotypes[j];
             //COMMENTED OUT AS OUR VCFs HAVE NO GENOTYPES!!!
@@ -196,8 +194,8 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
 //            for (i = start_index, ref = start_index+CHUNK_SIZE; i < ref; i++, d++)
 //              sample_gt.alt[i] = data[d];
             for (i = start_index, ref = start_index+chunk_length; i < ref; i++) {
-              sample_gt.ref[i] = data[d];d++;
-              sample_gt.alt[i] = data[d];d++;
+              sample_gt.ref[i] = array[d];d++;
+              sample_gt.alt[i] = array[d];d++;
             }
             for (i = start_index, ref = start_index+chunk_length; i < ref; i++) {
               var r = sample_gt.ref[i];
@@ -258,10 +256,10 @@ define(["_", "d3", "MetaData", "DQX/SVG"],
             chunk.chrom,
             start,
             end,
-            function (data) {
+            function (array) {
               that.current_provider_requests -= 1;
               //Clone as otherwise these can change
-              that._insert_received_data(_.clone(chunk), _.clone(that.variant_query), _.clone(that.sample_query), data);
+              that._insert_received_data(_.clone(chunk), _.clone(that.variant_query), _.clone(that.sample_query), array);
             });
           that.current_provider_requests += 1;
         }

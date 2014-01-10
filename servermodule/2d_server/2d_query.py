@@ -90,56 +90,6 @@ def read_count_stream(coord_groups):
             yield a
             yield r
 
-def cartesian(arrays, out=None):
-    """
-    Generate a cartesian product of input arrays.
-
-    Parameters
-    ----------
-    arrays : list of array-like
-        1-D arrays to form the cartesian product of.
-    out : ndarray
-        Array to place the cartesian product in.
-
-    Returns
-    -------
-    out : ndarray
-        2-D array of shape (M, len(arrays)) containing cartesian products
-        formed of input arrays.
-
-    Examples
-    --------
-    >>> cartesian(([1, 2, 3], [4, 5], [6, 7]))
-    array([[1, 4, 6],
-           [1, 4, 7],
-           [1, 5, 6],
-           [1, 5, 7],
-           [2, 4, 6],
-           [2, 4, 7],
-           [2, 5, 6],
-           [2, 5, 7],
-           [3, 4, 6],
-           [3, 4, 7],
-           [3, 5, 6],
-           [3, 5, 7]])
-
-    """
-
-    arrays = [np.asarray(x) for x in arrays]
-    dtype = arrays[0].dtype
-
-    n = np.prod([x.size for x in arrays])
-    if out is None:
-        out = np.zeros([n, len(arrays)], dtype=dtype)
-
-    m = n / arrays[0].size
-    out[:,0] = np.repeat(arrays[0], m)
-    if arrays[1:]:
-        cartesian(arrays[1:], out=out[0:m,1:])
-        for j in xrange(1, arrays[0].size):
-            out[j*m:(j+1)*m,1:] = out[0:m,1:]
-    return out
-
 def handler(start_response, request_data):
     key = hashlib.sha224((request_data['database'] + 
                           request_data['var_tbname'] +
@@ -163,7 +113,7 @@ def handler(start_response, request_data):
         #SQL interface can't cope with con-current queries....
         samp_idx = list(samp_idx)
         var_idx = list(var_idx)
-        coords = cartesian((var_idx, samp_idx))
+        coords = [(var, samp) for samp in samp_idx for var in var_idx]
         genotypes = select_by_list(allele_depth, coords)
         data = gzip(''.join(arraybuffer.encode_array(genotypes)))
         cache[key] = data
