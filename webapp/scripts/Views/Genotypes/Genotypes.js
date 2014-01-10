@@ -1,9 +1,9 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL",
+define(["require", "DQX/ArrayBufferClient", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL",
   "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals",
   "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/DataFetcher/DataFetchers",
   "DQX/DataFetcher/DataFetcherSummary", "Utils/QueryTool", "MetaData", "DQX/Model", "DQX/DataFetcher/DataFetcherAnnotation",
   "Views/Genotypes/GenotypeViewer"],
-  function (require, base64, Application, Framework, Controls, Msg, SQL,
+  function (require, ArrayBufferClient, base64, Application, Framework, Controls, Msg, SQL,
             DocEl, DQX, Wizard, GenomePlotter, ChannelYVals,
             ChannelPositions, ChannelSequence, DataFetchers,
             DataFetcherSummary, QueryTool, MetaData, Model, DataFetcherAnnotation,
@@ -182,21 +182,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           myurl.addUrlQueryItem('database', MetaData.database);
           myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(query));
           myurl.addUrlQueryItem("tbname", 'SNP');
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', myurl.toString(), true);
-          xhr.responseType = 'arraybuffer';
-          xhr.onreadystatechange = function handler() {
-            if(this.readyState == this.DONE) {
-              if(this.status == 200 && this.response != null) {
-                var positions = new Uint32Array(this.response);
-                callback(positions);
-                return;
-              }
-              //error
+          ArrayBufferClient.request(myurl.toString(),
+            callback,
+            function(error) {
+              console.log(error);
               callback(null);
             }
-          };
-          xhr.send();
+          );
         };
 
         that.genotypeProvider = function (variant_query, sample_query, chrom, start, end, callback) {
@@ -214,20 +206,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
           myurl.addUrlQueryItem("samp_qry", SQL.WhereClause.encode(sample_query));
           myurl.addUrlQueryItem("var_tbname", 'SNP');
           myurl.addUrlQueryItem("samp_tbname", 'SMP' + 'CMB_' + MetaData.workspaceid);
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', myurl.toString(), true);
-          xhr.responseType = 'arraybuffer';
-          xhr.onreadystatechange = function handler() {
-            if(this.readyState == this.DONE) {
-              if(this.status == 200 && this.response != null) {
-                callback(this.response);
-                return;
-              }
-              //error
+          ArrayBufferClient.request(myurl.toString(),
+            callback,
+            function(error) {
+              console.log(error);
               callback(null);
             }
-          };
-          xhr.send();
+          );
         };
 
         return that;

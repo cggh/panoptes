@@ -41,7 +41,7 @@ def positions_from_query(database, table, query):
     resultlist = cur.fetchall()
     cur.close()
     db.close()
-    return np.array(resultlist, dtype = 'int32')
+    return resultlist
 
 def response(request_data):
     return request_data
@@ -56,7 +56,7 @@ def handler(start_response, request_data):
     #try:
     #    data = cache[key]
     #except KeyError:
-    positions = arraybuffer.encode_array(positions)
+    positions = arraybuffer.encode_array(positions, dtype = 'int32')
     data = gzip(''.join(positions))
     #    cache[key] = data
     status = '200 OK'
