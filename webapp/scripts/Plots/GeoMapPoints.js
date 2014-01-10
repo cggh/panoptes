@@ -64,12 +64,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.pointSet.zoomFit();
                 });
 
+                var onStopLassoSelection = function() {
+                    cmdLassoSelection.changeContent('Lasso select Points');
+                    that.theMap.stopLassoSelection();
+                    cmdLassoSelection.busy = false;
+                };
+
+                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select Points'}).setOnChanged(function () {
+                    cmdLassoSelection.busy = !cmdLassoSelection.busy;
+                    if (cmdLassoSelection.busy) {
+                        cmdLassoSelection.changeContent('Complete lasso selection');
+                        that.theMap.startLassoSelection(onStopLassoSelection);
+                    }
+                    else {
+                        onStopLassoSelection();
+                    }
+                });
+
+
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     cmdZoomToFit,
+                    cmdLassoSelection,
                     Controls.VerticalSeparator(10),
                     that.ctrlCatProperty1,
                     Controls.VerticalSeparator(10),
