@@ -1,0 +1,33 @@
+NameSingle: sample
+NamePlural: samples
+PrimKey: ID
+QuickFindFields: ID,CatId,RegionId
+
+Properties:
+
+- Id: ID
+  Name: Sample ID
+  ShowInTable: true
+  DataType: Text
+
+- Id: CatId
+  Name: Category ID
+  DataType: Text
+  ShowInTable: true
+  IsCategorical: true
+
+- Id: RegionId
+  Name: Region ID
+  DataType: Text
+  ShowInTable: true
+  IsCategorical: true
+
+- Id: Longitude
+  Name: Longitude
+  DataType: GeoLongitude
+  ShowInTable: true
+
+- Id: Lattitude
+  Name: Lattitude
+  DataType: GeoLattitude
+  ShowInTable: true
