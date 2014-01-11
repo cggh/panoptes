@@ -22,9 +22,9 @@ regioncenters = [
 def coorddist(c1, c2):
     return math.pow(c1['latt']-c2['latt'], 2.0) + math.pow(c1['long']-c2['long'], 2.0)
 
-samplecount = 2000
+samplecount = 20000
 
-fp = open('/home/pvaut/WebstormProjects/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
+fp = open('/Users/pvaut/Documents/SourceCode/WebApps/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
 fp.write('ID	CatId	RegionId	Longitude	Lattitude\n')
 
 samplenr = 0

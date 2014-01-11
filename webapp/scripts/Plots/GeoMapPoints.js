@@ -83,6 +83,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 });
 
 
+                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}], value:'rectangle' }).setClassID('pointShape')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 200, minval:0.1, maxval:15, value:4, digits: 2}).setClassID('pointSize')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 200, minval:0, maxval:1, value:1, digits: 2}).setClassID('pointOpacity')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+
+
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
@@ -92,6 +112,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     cmdLassoSelection,
                     Controls.VerticalSeparator(10),
                     that.ctrlCatProperty1,
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointShape,
+                    that.ctrl_PointSize,
+                    that.ctrl_Opacity,
                     Controls.VerticalSeparator(10),
                     that.colorLegend
                 ]);
@@ -125,23 +149,35 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 fetcher.addColumn(that.tableInfo.primkey, 'ST');
                 fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F3');
                 fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F3');
+
+                that.catPropId = null;
+                if (that.ctrlCatProperty1.getValue()) {
+                    that.catPropId = that.ctrlCatProperty1.getValue();
+                    fetcher.addColumn(that.catPropId, 'ST');
+                }
+
                 that.points_Keys = null;
                 that.points_Longitude = null;
                 that.points_Lattitude = null;
+                that.points_CatProp = null;
                 that.pointSet.clearPoints();
                 that.points = null;
                 var requestID = DQX.getNextUniqueID();
+                that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
                 fetcher.getData(that.theQuery.get(), that.tableInfo.primkey,
                     function (data) { //success
-                        that.points_Keys = data[that.tableInfo.primkey];
-                        that.points_Longitude = data.Longitude;
-                        that.points_Lattitude = data.Lattitude;
-                        that.setPoints();
-                        if (that.startZoomFit) {
-                            that.pointSet.zoomFit(100);
-                            that.startZoomFit = false;
-
+                        if (that.requestID == requestID) {
+                            that.points_Keys = data[that.tableInfo.primkey];
+                            that.points_Longitude = data.Longitude;
+                            that.points_Lattitude = data.Lattitude;
+                            if (that.catPropId)
+                                that.points_CatProp = data[that.catPropId];
+                            that.setPoints();
+                            if (that.startZoomFit) {
+                                that.pointSet.zoomFit(100);
+                                that.startZoomFit = false;
+                            }
                         }
                     },
                     function (data) { //error
@@ -156,6 +192,37 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var longitudes = that.points_Longitude;
                 var lattitudes = that.points_Lattitude;
                 var selectionInfo = that.tableInfo.currentSelection;
+
+                if (that.catPropId) {
+                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
+                    var catProps = that.points_CatProp;
+                    var colormapper = MetaData.findProperty(that.tableInfo.id, that.catPropId).category2Color;
+
+                    if (!catProps)
+                        debugger;
+                    for (var i=0; i<catProps.length; i++)
+                        catProps[i] = catPropInfo.toDisplayString(catProps[i]);
+
+                    var catMap = {};
+                    var cats = []
+                    for (var i=0; i<catProps.length; i++) {
+                        if (!catMap[catProps[i]]) {
+                            catMap[catProps[i]] = true;
+                            cats.push(catProps[i]);
+                        }
+                    }
+
+                    colormapper.map(cats);
+                    var catData = [];
+                    for (var i=0; i<catProps.length; i++) {
+                        var idx = colormapper.get(catProps[i]);
+                        if (idx<0)
+                            idx = colormapper.itemCount-1;
+                        catData.push(idx);
+                    }
+
+                }
+
                 that.points = [];
                 for (var nr =0; nr<keys.length; nr++) {
                     var itemid = keys[nr];
@@ -166,22 +233,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         lattit: lattitudes[nr],
                         sel: !!(selectionInfo[itemid])
                     }
+                    if (catProps)
+                        pt.catNr = catData[nr];
+                    else pt.catNr = 0;
                     that.points.push(pt);
                 }
                 that.pointSet.setPoints(that.points);
+                that.reDraw();
             }
 
             that.updateSelection = function() {
                 if (!that.points)  return;
                 var points = that.points;
                 var selectionInfo = that.tableInfo.currentSelection;
-                for (var nr =0; nr<points.length; nr++) {
-                    var cursel = !!(selectionInfo[points[nr].id]);
-                    if (points[nr].sel != cursel) {
-                        points[nr].sel = cursel;
-                        that.pointSet.updateSelectionState(nr);
-                    }
-                }
+                for (var nr =0; nr<points.length; nr++)
+                    points[nr].sel = !!(selectionInfo[points[nr].id]);
+                that.reDraw();
             }
 
             that.fetchLassoSelection = function() {
@@ -206,7 +273,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.reDraw = function() {
-                that.panelPlot.invalidate();
+                that.pointSet.setPointStyle({
+                    opacity: that.ctrl_Opacity.getValue(),
+                    pointSize: that.ctrl_PointSize.getValue(),
+                    pointShape: that.ctrl_PointShape.getValue()
+                });
+                that.pointSet.draw();
             }
 
 

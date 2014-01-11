@@ -2,6 +2,7 @@ NameSingle: sample
 NamePlural: samples
 PrimKey: ID
 QuickFindFields: ID,CatId,RegionId
+FetchRecordCount: true
 
 Properties:
 

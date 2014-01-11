@@ -1,0 +1,17 @@
+NameSingle: sample category
+NamePlural: sample categories
+PrimKey: ID
+QuickFindFields: ID,Name
+
+Properties:
+
+- Id: ID
+  Name: ID
+  ShowInTable: true
+  DataType: Text
+
+- Id: Name
+  Name: Name
+  DataType: Text
+  ShowInTable: true
+  IsCategorical: true
