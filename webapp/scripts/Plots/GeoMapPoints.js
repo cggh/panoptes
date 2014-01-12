@@ -83,13 +83,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 });
 
 
-                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}], value:'rectangle' }).setClassID('pointShape')
+                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
 
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 200, minval:0.1, maxval:15, value:4, digits: 2}).setClassID('pointSize')
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 200, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
@@ -101,6 +101,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
+                that.ctrl_AggrType = Controls.Combo(null,{ label:'Style:', states: [{id: 'piechart', 'name':'Pie chart'}, {id: 'cluster', 'name':'Cluster'}], value:'piechart' }).setClassID('aggrStyle')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_AggrSize = Controls.ValueSlider(null, {label: 'Size', width: 170, minval:10, maxval:100, value:20, digits: 0}).setClassID('aggrSize')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
 
 
                 that.colorLegend = Controls.Html(null,'');
@@ -116,6 +126,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrl_PointShape,
                     that.ctrl_PointSize,
                     that.ctrl_Opacity,
+                    Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points'),
                     Controls.VerticalSeparator(10),
                     that.colorLegend
                 ]);
@@ -147,8 +158,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (propInfo.isBoolean)
                     encoding = 'GN';*/
                 fetcher.addColumn(that.tableInfo.primkey, 'ST');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F3');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F3');
+                fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F4');
+                fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
 
                 that.catPropId = null;
                 if (that.ctrlCatProperty1.getValue()) {
@@ -274,9 +285,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.reDraw = function() {
                 that.pointSet.setPointStyle({
-                    opacity: that.ctrl_Opacity.getValue(),
+                    opacity: Math.pow(that.ctrl_Opacity.getValue(),1.5),
                     pointSize: that.ctrl_PointSize.getValue(),
-                    pointShape: that.ctrl_PointShape.getValue()
+                    pointShape: that.ctrl_PointShape.getValue(),
+                    aggrSize: that.ctrl_AggrSize.getValue(),
+                    aggregateStyle: that.ctrl_AggrType.getValue()
                 });
                 that.pointSet.draw();
             }

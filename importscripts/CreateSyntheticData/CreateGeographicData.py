@@ -4,6 +4,9 @@ import math
 import random
 
 
+cats = ['CAT01', 'CAT02', 'CAT03', 'CAT04']
+catcount = len(cats)
+
 centers = [
     { 'latt':20.055931, 'long':10.534178, 'cat':'CAT01', 'prevalence':0.7, 'sigma':4 },
     { 'latt':20.632784, 'long':24.858397, 'cat':'CAT02', 'prevalence':1.0, 'sigma':3 },
@@ -51,5 +54,33 @@ while samplenr < samplecount:
             lattit
         ))
         samplenr += 1
+
+# add some aggregate site data
+
+samplecount += 5000
+
+aggrcenters = [
+    { 'latt':-2.811371, 'long':17.578125, 'name':'REGF', 'prevalence':0.7, 'catprobs':[0.8, 0.15, 0.2, 0] },
+    { 'latt':-10.919618, 'long':25.751953, 'name':'REGG', 'prevalence':0.2, 'catprobs':[0.3, 0.5, 0.1, 0.1] },
+    { 'latt':-16.804541, 'long':22.412109, 'name':'REGH', 'prevalence':0.5, 'catprobs':[0.4, 0.2, 0.2, 0.2] },
+    { 'latt':-16.804541, 'long':31.025391, 'name':'REGI', 'prevalence':0.2, 'catprobs':[0.0, 0.0, 0.1, 0.9] },
+    { 'latt':-25.562265, 'long':24.082031, 'name':'REGJ', 'prevalence':0.1, 'catprobs':[0.1, 0.1, 0.7, 0.1] }
+]
+
+while samplenr < samplecount:
+    centernr = random.randint(0, len(aggrcenters)-1)
+    aggrcenter = aggrcenters[centernr]
+    if random.random() < aggrcenter['prevalence']:
+        catnr = random.randint(0,catcount-1)
+        if random.random()<aggrcenter['catprobs'][catnr]:
+            fp.write('{0}\t{1}\t{2}\t{3}\t{4}\n'.format(
+                samplenr,
+                cats[catnr],
+                aggrcenter['name'],
+                aggrcenter['long'],
+                aggrcenter['latt']
+            ))
+            samplenr += 1
+
 
 fp.close()
