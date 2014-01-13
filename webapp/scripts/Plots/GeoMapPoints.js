@@ -136,9 +136,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.theMap = Map.GMap(this.framePlot);
                 //that.pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
                 that.pointSet = PointSet.Create(that.theMap, {});
-                that.pointSet.setPointClickCallBack(function(itemid) {
-                    Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: itemid } );
-                });
+                that.pointSet.setPointClickCallBack(
+                    function(itemid) {
+                        Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: itemid } );
+                    },
+                    function(pieChartInfo) {
+                    }
+                );
 
                 if (settings && settings.zoomFit)
                     that.startZoomFit = true;
