@@ -45,6 +45,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Int';
             if (propInfo.datatype=='Boolean')
                 encoding  = 'Int';
+            if ( (propInfo.datatype=='GeoLongitude') || (propInfo.datatype=='GeoLattitude') )
+                encoding  = 'Float4';
             if (propInfo.isPrimKey)
                 tablePart = 0;
             var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!='chrom') && (propInfo.propid!='pos') );
