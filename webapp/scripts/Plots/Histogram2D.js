@@ -35,8 +35,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.registerPlotType('histogram2d', Histogram2D);
 
-        Histogram2D.Create = function(tableid) {
-            var that = GenericPlot.Create(tableid,'histogram2d', {title:'2D Histogram' });
+        Histogram2D.Create = function(tableid, settings, startQuery) {
+            var that = GenericPlot.Create(tableid, 'histogram2d', {title:'2D Histogram' }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

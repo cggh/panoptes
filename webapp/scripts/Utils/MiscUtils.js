@@ -101,6 +101,43 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
+        MiscUtils.createDataItemTable = function(frameTable, tableInfo, query, settings) {
+            //Initialise the data fetcher that will download the data for the table
+            var theDataFetcher = DataFetchers.Table(
+                MetaData.serverUrl,
+                MetaData.database,
+                tableInfo.id + 'CMB_' + MetaData.workspaceid
+            );
+
+            var panelTable = QueryTable.Panel(
+                frameTable,
+                theDataFetcher,
+                { leftfraction: 50 }
+            );
+            var theTable = panelTable.getTable();
+            theTable.fetchBuffer = 300;
+            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+            theTable.setQuery(query);
+
+            if (settings.hasSelection) {
+                theTable.createSelectionColumn("sel", "", tableInfo.id, tableInfo.primkey, tableInfo, DQX.Color(1,0,0), function() {
+                    Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
+                });
+            }
+
+            $.each(MetaData.customProperties, function(idx, propInfo) {
+                if (propInfo.tableid == tableInfo.id)
+                    if (tableInfo.isPropertyColumnVisible(propInfo.propid))
+                    {
+                        var col = MiscUtils.createItemTableViewerColumn(theTable, tableInfo.id, propInfo.propid);
+                    }
+            });
+            panelTable.onResize();
+
+            return panelTable;
+        }
+
+
 
         return MiscUtils;
     });

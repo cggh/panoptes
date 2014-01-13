@@ -23,7 +23,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
         GeoMapPoints.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid,'GeoMapPoints', {title:'Map' });
+            var that = GenericPlot.Create(tableid, 'GeoMapPoints', {title:'Map' }, startQuery);
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
@@ -43,9 +43,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createPanels = function() {
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
-
-                if (startQuery)
-                    that.theQuery.setStartQuery(startQuery);
 
                 var ctrl_Query = that.theQuery.createControl();
 
@@ -147,7 +144,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit, pieChartInfo.lattit-range, pieChartInfo.lattit+range);
                         Msg.send({type: 'DataItemTablePopup'}, {
                             tableid: that.tableInfo.id,
-                            query: qry
+                            query: qry,
+                            title: that.tableInfo.tableCapNamePlural + ' at ' + pieChartInfo.longit + ', ' + pieChartInfo.lattit
                         });
                     }
                 );
