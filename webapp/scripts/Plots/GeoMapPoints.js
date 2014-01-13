@@ -36,7 +36,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
+                    .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
                 that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
             };
@@ -269,7 +269,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var selectionInfo = that.tableInfo.currentSelection;
                 for (var nr =0; nr<points.length; nr++)
                     points[nr].sel = !!(selectionInfo[points[nr].id]);
-                that.reDraw();
+                that.pointSet.updateSelection();
             }
 
             that.fetchLassoSelection = function() {
