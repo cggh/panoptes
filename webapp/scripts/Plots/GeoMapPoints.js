@@ -137,10 +137,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 //that.pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
                 that.pointSet = PointSet.Create(that.theMap, {});
                 that.pointSet.setPointClickCallBack(
-                    function(itemid) {
+                    function(itemid) { // single point click handler
                         Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: itemid } );
                     },
-                    function(pieChartInfo) {
+                    function(pieChartInfo) { // pie chart click handler
+                        var qry = that.theQuery.get();
+                        var range = 0.0001;
+                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLongit, pieChartInfo.longit-range, pieChartInfo.longit+range);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit, pieChartInfo.lattit-range, pieChartInfo.lattit+range);
+                        Msg.send({type: 'DataItemTablePopup'}, {
+                            tableid: that.tableInfo.id,
+                            query: qry
+                        });
                     }
                 );
 
