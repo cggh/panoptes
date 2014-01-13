@@ -155,9 +155,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.reloadAll();
             };
 
+
+            that.storeCustomSettings = function() {
+                var sett = {};
+                sett.mapSettings = that.theMap.storeSettings();
+                return sett;
+            };
+
+            that.recallCustomSettings = function(sett) {
+                that.theMap.recallSettings(sett.mapSettings);
+            };
+
             that.reloadAll = function() {
                 that.fetchData();
-            }
+            };
 
             that.fetchData = function() {
                 var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);

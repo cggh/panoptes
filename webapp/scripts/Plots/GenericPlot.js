@@ -56,6 +56,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 $.each(that.plotSettingsControls, function(id, ctrl) {
                     obj.settings[id] = Controls.storeSettings(ctrl);
                 });
+                if (that.storeCustomSettings)
+                    obj.settingsCustom = that.storeCustomSettings();
                 return obj;
             }
 
@@ -70,6 +72,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
                     that.staging = false;
                 }
+                if (settObj.settingsCustom && that.recallCustomSettings)
+                     that.recallCustomSettings(settObj.settingsCustom);
                 that.reloadAll();
             }
 
