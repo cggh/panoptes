@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #Find out where this script is
 SCRIPT_PATH="${BASH_SOURCE[0]}";
 if ([ -h "${SCRIPT_PATH}" ]) then
@@ -16,6 +16,7 @@ sleep 1
 
 cd ${PROJECT_ROOT}/tests
 casperjs test simple.js
+result=$?
 
 PID=`cat ${PROJECT_ROOT}/scripts/gunicorn.pid`
 kill ${PID}
@@ -23,3 +24,4 @@ while kill -0 "${PID}" > /dev/null 2>&1; do
             sleep 0.5
 done
 
+exit ${result}
