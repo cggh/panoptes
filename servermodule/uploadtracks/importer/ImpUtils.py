@@ -3,6 +3,7 @@ import config
 import uuid
 import DQXDbTools
 import DQXUtils
+import errno
 import SettingsLoader
 import customresponders.uploadtracks.VTTable as VTTable
 
@@ -20,7 +21,14 @@ def IsValueDataTypeIdenfifier(datatypeIdentifier):
 
 
 def GetTempFileName():
-    return os.path.join(config.BASEDIR,'temp','TMP'+str(uuid.uuid1()).replace('-', '_'))
+    #Check the temp dir exists and then return a new file name in it
+    temp_dir = os.path.join(config.BASEDIR,'temp')
+    try:
+        os.makedirs(temp_dir)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+    return os.path.join(temp_dir, 'TMP'+str(uuid.uuid1()).replace('-', '_'))
 
 
 def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=None):
