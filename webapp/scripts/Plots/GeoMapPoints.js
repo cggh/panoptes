@@ -25,6 +25,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         GeoMapPoints.Create = function(tableid, settings, startQuery) {
             var that = GenericPlot.Create(tableid, 'GeoMapPoints', {title:'Map' }, startQuery);
 
+            that.pointData = {};//first index: property id, second index: point nr
+
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
             Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
@@ -173,39 +175,38 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.fetchData = function() {
                 var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                 fetcher.setMaxResultCount(999999);
-/*                var encoding='ST';
-                if (propInfo.isFloat)
-                    encoding = 'F3';
-                if (propInfo.isBoolean)
-                    encoding = 'GN';*/
-                fetcher.addColumn(that.tableInfo.primkey, 'ST');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F4');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
 
-                that.catPropId = null;
-                if (that.ctrlCatProperty1.getValue()) {
-                    that.catPropId = that.ctrlCatProperty1.getValue();
-                    fetcher.addColumn(that.catPropId, 'ST');
-                }
-
-                that.points_Keys = null;
-                that.points_Longitude = null;
-                that.points_Lattitude = null;
-                that.points_CatProp = null;
                 that.pointSet.clearPoints();
                 that.points = null;
                 that.colorLegend.modifyValue('');
+
+                if (!that.pointData[that.tableInfo.primkey])
+                    fetcher.addColumn(that.tableInfo.primkey, 'ST');
+                if (!that.pointData[that.tableInfo.propIdGeoCoordLongit])
+                    fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F4');
+                if (!that.pointData[that.tableInfo.propIdGeoCoordLattit])
+                    fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
+                that.catPropId = null;
+                if (that.ctrlCatProperty1.getValue()) {
+                    that.catPropId = that.ctrlCatProperty1.getValue();
+                    if (!that.pointData[that.catPropId])
+                        fetcher.addColumn(that.catPropId, 'ST');
+                }
+
+                if (fetcher.getColumnIDs().length <= 0) {
+                    that.setPoints();
+                    return;
+                }
+
                 var requestID = DQX.getNextUniqueID();
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
                 fetcher.getData(that.theQuery.get(), that.tableInfo.primkey,
                     function (data) { //success
                         if (that.requestID == requestID) {
-                            that.points_Keys = data[that.tableInfo.primkey];
-                            that.points_Longitude = data.Longitude;
-                            that.points_Lattitude = data.Lattitude;
-                            if (that.catPropId)
-                                that.points_CatProp = data[that.catPropId];
+                            $.each(data, function(id, values) {
+                                that.pointData[id] = values;
+                            });
                             that.setPoints();
                             if (that.startZoomFit) {
                                 that.pointSet.zoomFit(100);
@@ -221,18 +222,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.setPoints = function() {
-                var keys = that.points_Keys;
-                var longitudes = that.points_Longitude;
-                var lattitudes = that.points_Lattitude;
+                var keys = that.pointData[that.tableInfo.primkey];
+                var longitudes = that.pointData[that.tableInfo.propIdGeoCoordLongit];
+                var lattitudes = that.pointData[that.tableInfo.propIdGeoCoordLattit];
                 var selectionInfo = that.tableInfo.currentSelection;
 
                 if (that.catPropId) {
                     var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
-                    var catProps = that.points_CatProp;
+                    var catProps = that.pointData[that.catPropId];
                     var colormapper = MetaData.findProperty(that.tableInfo.id, that.catPropId).category2Color;
 
-                    if (!catProps)
-                        debugger;
                     for (var i=0; i<catProps.length; i++)
                         catProps[i] = catPropInfo.toDisplayString(catProps[i]);
 
@@ -244,7 +243,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             cats.push(catProps[i]);
                         }
                     }
-
 
                     colormapper.map(cats);
                     var catData = [];
@@ -261,7 +259,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
                     });
                     that.colorLegend.modifyValue(legendStr);
-
                 }
 
                 that.points = [];
@@ -310,6 +307,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.reloadAll = function() {
+                that.pointData = {}; // remove all stored data
                 that.fetchData();
             }
 
@@ -326,7 +324,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.updateQuery = function() {
-                that.fetchData();
+                that.reloadAll();
             }
 
 
