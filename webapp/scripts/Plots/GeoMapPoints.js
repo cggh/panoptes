@@ -51,11 +51,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
+                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Point color:', states: propList }).setClassID('pointcolor');
-                that.ctrlCatProperty1.setOnChanged(function() {
+                that.ctrlColorProperty = Controls.Combo(null,{ label:'Point color:', states: propList }).setClassID('pointcolor');
+                that.ctrlColorProperty.setOnChanged(function() {
                     that.fetchData();
                 });
 
@@ -120,7 +120,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     cmdZoomToFit,
                     cmdLassoSelection,
                     Controls.VerticalSeparator(10),
-                    that.ctrlCatProperty1,
+                    that.ctrlColorProperty,
                     Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
                     that.ctrl_PointSize,
@@ -187,10 +187,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (!that.pointData[that.tableInfo.propIdGeoCoordLattit])
                     fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
                 that.catPropId = null;
-                if (that.ctrlCatProperty1.getValue()) {
-                    that.catPropId = that.ctrlCatProperty1.getValue();
-                    if (!that.pointData[that.catPropId])
-                        fetcher.addColumn(that.catPropId, 'ST');
+                that.numPropId = null;
+                if (that.ctrlColorProperty.getValue()) {
+                    var propInfo = MetaData.findProperty(that.tableInfo.id, that.ctrlColorProperty.getValue());
+                    if ( (propInfo.datatype=='Text') || (propInfo.datatype=='Boolean') ) {
+                        that.catPropId = that.ctrlColorProperty.getValue();
+                        if (!that.pointData[that.catPropId])
+                            fetcher.addColumn(that.catPropId, 'ST');
+                    }
+                    if (propInfo.datatype=='Value') {
+                        that.numPropId = that.ctrlColorProperty.getValue();
+                        if (!that.pointData[that.numPropId])
+                            fetcher.addColumn(that.numPropId, 'ST');
+                    }
                 }
 
                 if (fetcher.getColumnIDs().length <= 0) {
@@ -261,6 +270,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.colorLegend.modifyValue(legendStr);
                 }
 
+                if (that.numPropId) {
+                    var numPropInfo = MetaData.findProperty(that.tableInfo.id, that.numPropId);
+                    var numProps = that.pointData[that.numPropId];
+                    that.numPropMin = 1.0e99;
+                    that.numPropMax = -1.0e99;
+                    $.each(numProps, function(idx, val) {
+                        that.numPropMax = Math.max(that.numPropMax, val);
+                        that.numPropMin = Math.min(that.numPropMin, val);
+                    });
+                    that.numPropRange = that.numPropMax - that.numPropMin;
+                    if (that.numPropRange <= 0)
+                        that.numPropRange = 1;
+                }
+
+
                 that.points = [];
                 for (var nr =0; nr<keys.length; nr++) {
                     var itemid = keys[nr];
@@ -274,9 +298,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if (catProps)
                         pt.catNr = catData[nr];
                     else pt.catNr = 0;
+                    if (numProps)
+                        pt.numPropFrac = (numProps[nr]-that.numPropMin)/that.numPropRange;
                     that.points.push(pt);
                 }
-                that.pointSet.setPoints(that.points);
+                that.pointSet.setPoints(that.points, {
+                    catData: !!that.catPropId,
+                    numData: !!that.numPropId
+                });
                 that.reDraw();
             }
 

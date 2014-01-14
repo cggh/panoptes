@@ -3,6 +3,12 @@
 import math
 import random
 
+smp_longit = []
+smp_lattit = []
+smp_cat = []
+smp_reg = []
+smp_numprop1 = []
+smp_numprop2 = []
 
 cats = ['CAT01', 'CAT02', 'CAT03', 'CAT04']
 catcount = len(cats)
@@ -27,8 +33,6 @@ def coorddist(c1, c2):
 
 samplecount = 20000
 
-fp = open('/Users/pvaut/Documents/SourceCode/WebApps/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
-fp.write('ID	CatId	RegionId	Longitude	Lattitude\n')
 
 samplenr = 0
 while samplenr < samplecount:
@@ -46,13 +50,10 @@ while samplenr < samplecount:
                 mindst = dst
                 regionid = region['cat']
 
-        fp.write('{0}\t{1}\t{2}\t{3}\t{4}\n'.format(
-            samplenr,
-            center['cat'],
-            regionid,
-            longit,
-            lattit
-        ))
+        smp_longit.append(longit)
+        smp_lattit.append(lattit)
+        smp_cat.append(center['cat'])
+        smp_reg.append(regionid)
         samplenr += 1
 
 # add some aggregate site data
@@ -73,14 +74,32 @@ while samplenr < samplecount:
     if random.random() < aggrcenter['prevalence']:
         catnr = random.randint(0,catcount-1)
         if random.random()<aggrcenter['catprobs'][catnr]:
-            fp.write('{0}\t{1}\t{2}\t{3}\t{4}\n'.format(
-                samplenr,
-                cats[catnr],
-                aggrcenter['name'],
-                aggrcenter['long'],
-                aggrcenter['latt']
-            ))
+            smp_longit.append(aggrcenter['long'])
+            smp_lattit.append(aggrcenter['latt'])
+            smp_cat.append(cats[catnr])
+            smp_reg.append(aggrcenter['name'])
             samplenr += 1
 
+
+for nr in range(samplenr):
+    coord = {'long': smp_longit[nr], 'latt': smp_lattit[nr]}
+    prop1 = coorddist(coord, {'long': 32, 'latt': 7})/50.0
+    prop2 = coorddist(coord, {'long': 12, 'latt': 30})/500.0 + coorddist(coord, {'long': 20, 'latt': -11})/500.0
+    smp_numprop1.append(prop1 + random.gauss(0,2))
+    smp_numprop2.append(prop2 + random.gauss(0,2))
+
+
+fp = open('/home/pvaut/WebstormProjects/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
+fp.write('ID\tCatId\tRegionId\tLongitude\tLattitude\tNumProp1\tNumProp2\n')
+for nr in range(samplenr):
+    fp.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n'.format(
+        nr,
+        smp_cat[nr],
+        smp_reg[nr],
+        smp_longit[nr],
+        smp_lattit[nr],
+        smp_numprop1[nr],
+        smp_numprop2[nr]
+    ))
 
 fp.close()

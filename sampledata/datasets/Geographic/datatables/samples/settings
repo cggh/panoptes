@@ -32,3 +32,13 @@ Properties:
   Name: Lattitude
   DataType: GeoLattitude
   ShowInTable: true
+
+- Id: NumProp1
+  Name: Numerical 1
+  DataType: Value
+  ShowInTable: true
+
+- Id: NumProp2
+  Name: Numerical 2
+  DataType: Value
+  ShowInTable: true
