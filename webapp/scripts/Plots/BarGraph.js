@@ -8,8 +8,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.registerPlotType('bargraph', BarGraph);
 
-        BarGraph.Create = function(tableid) {
-            var that = GenericPlot.Create(tableid,'bargraph', {title:'Bar graph' });
+        BarGraph.Create = function(tableid, settings, startQuery) {
+            var that = GenericPlot.Create(tableid, 'bargraph', {title:'Bar graph' }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

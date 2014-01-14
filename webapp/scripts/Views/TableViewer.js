@@ -1,11 +1,9 @@
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Plots/GeoMapPoints",
     "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils"
 ],
     function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
-              ItemScatterPlot, BarGraph, Histogram, Histogram2D, GeoMapPoints,
               EditQuery, QueryTool, MiscUtils) {
 
 
@@ -53,6 +51,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     that.activateState();
                     var qry = SQL.WhereClause.CompareFixed(info.propid, '=', info.value);
                     that.theQuery.modify(qry);
+                });
+
+                Msg.listen('',{type: 'ShowItemsInQuery', tableid: that.tableid}, function(scope, info) {
+                    that.activateState();
+                    that.theQuery.modify(info.query);
                 });
 
                 that.storeSettings = function() {
@@ -153,39 +156,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var ctrlQuery = that.theQuery.createControl();
                     var tableInfo = MetaData.getTableInfo(that.tableid);
-                    var buttonsPlots = [];
 
-                    if (tableInfo.hasGeoCoord) {
-                        var cmdGeoMapPoints = Controls.Button(null, { content: 'Map points...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-                        cmdGeoMapPoints.setOnChanged(function() {
-                            GeoMapPoints.Create(that.tableid, { zoomFit: true});
-                        });
-                        buttonsPlots.push(cmdGeoMapPoints);
-                    }
-
-                    var cmdHistogram = Controls.Button(null, { content: 'Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-                    cmdHistogram.setOnChanged(function() {
-                        Histogram.Create(that.tableid);
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create a plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
+                    buttonCreatePlot.setOnChanged(function() {
+                        Msg.send({type: 'CreateDataItemPlot'}, { tableid: that.tableid });
                     });
-                    buttonsPlots.push(cmdHistogram);
-
-                    var cmdBarGraph = Controls.Button(null, { content: 'Bar graph...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-                    cmdBarGraph.setOnChanged(function() {
-                        BarGraph.Create(that.tableid);
-                    });
-                    buttonsPlots.push(cmdBarGraph);
-
-                    var cmdHistogram2d = Controls.Button(null, { content: '2D Histogram...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-                    cmdHistogram2d.setOnChanged(function() {
-                        Histogram2D.Create(that.tableid);
-                    });
-                    buttonsPlots.push(cmdHistogram2d);
-
-                    var cmdScatterPlot = Controls.Button(null, { content: 'Scatter plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-                    cmdScatterPlot.setOnChanged(function() {
-                        ItemScatterPlot.Create(that.tableid);
-                    });
-                    buttonsPlots.push(cmdScatterPlot);
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
@@ -201,7 +176,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
                         Controls.VerticalSeparator(15),
-                        Controls.CompoundVert(buttonsPlots),
+                        buttonCreatePlot,
                         Controls.CompoundVert([
                             cmdHideAllColumns,
                             that.visibilityControlsGroup
@@ -308,15 +283,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
                     //Temporarily store the column visibility status, in case this is a reload
-                    var colIsHidden = {};
-                    if (that.columnVisibilityChecks) {
-                        $.each(that.columnVisibilityChecks, function(idx, chk) {
-                            if (!chk.getValue())
-                                colIsHidden[chk.colID] = true;
-                        });
-                    }
                     that.columnVisibilityChecks = [];
-
                     that.visibilityControlsGroup.clear();
 
                     //Create a column for each property
@@ -329,12 +296,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             })
 
                             // Create checkbox that controls the visibility of the column
-                            var chk = Controls.Check(null,{label:propInfo.name, value:(!colIsHidden[col.myCompID]) }).setClassID(propInfo.propid).setOnChanged(function() {
+                            var chk = Controls.Check(null,{label:propInfo.name, value:tableInfo.isPropertyColumnVisible(col.myCompID) }).setClassID(propInfo.propid).setOnChanged(function() {
                                 that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
                                 that.myTable.render();
+                                tableInfo.setPropertyColumnVisible(chk.colID, chk.getValue());
                             });
                             chk.colID = col.myCompID;
-                            if (colIsHidden[col.myCompID])
+                            if (!tableInfo.isPropertyColumnVisible(col.myCompID))
                                 col.setVisible(false);
                             that.visibilityControlsGroup.addControl(chk);
                             that.columnVisibilityChecks.push(chk);

@@ -8,8 +8,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         GenericPlot.registerPlotType('scatterplot', ItemScatterPlot);
 
-        ItemScatterPlot.Create = function(tableid) {
-            var that = GenericPlot.Create(tableid,'scatterplot', {title:'Scatter plot' });
+        ItemScatterPlot.Create = function(tableid, settings, startQuery) {
+            var that = GenericPlot.Create(tableid, 'scatterplot', {title:'Scatter plot' }, startQuery);
             that.fetchCount = 0;
             that.propDataMap = {};
 

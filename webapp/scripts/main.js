@@ -43,12 +43,12 @@ require.config({
 require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise"
+    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise"
 ],
     function (
         _, $, Application, Framework, Msg, DQX, SQL, DataFetchers,
         MetaData,
-        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes, GenePopup, ItemPopup, DataItemTablePopup, PromptWorkspace, PromptDataSet, Serialise) {
+        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes, GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PromptWorkspace, PromptDataSet, Serialise) {
         $(function () {
 
 
@@ -90,6 +90,7 @@ require([
                         GenePopup.init();
                         ItemPopup.init();
                         DataItemTablePopup.init();
+                        DataItemPlotPopup.init();
 
 
 

@@ -10,7 +10,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.activePlotList = [];
 
-        GenericPlot.Create = function(tableid, plotTypeID, settings) {
+        GenericPlot.Create = function(tableid, plotTypeID, settings, startQuery) {
             settings.blocking = false;
             settings.sizeX = 750;
             settings.sizeY = 600;
@@ -20,7 +20,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.plotTypeID = plotTypeID;
             that.tableInfo = MetaData.getTableInfo(tableid);
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
+
             that.theQuery = QueryTool.Create(tableid, {includeCurrentQuery:true});
+            if (startQuery)
+                that.theQuery.setStartQuery(startQuery);
 
             that.onClose = function() {
                 $.each(that.eventids,function(idx,eventid) {
@@ -53,6 +56,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 $.each(that.plotSettingsControls, function(id, ctrl) {
                     obj.settings[id] = Controls.storeSettings(ctrl);
                 });
+                if (that.storeCustomSettings)
+                    obj.settingsCustom = that.storeCustomSettings();
                 return obj;
             }
 
@@ -67,6 +72,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
                     that.staging = false;
                 }
+                if (settObj.settingsCustom && that.recallCustomSettings)
+                     that.recallCustomSettings(settObj.settingsCustom);
                 that.reloadAll();
             }
 

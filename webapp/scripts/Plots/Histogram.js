@@ -7,8 +7,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.registerPlotType('histogram', Histogram);
 
-        Histogram.Create = function(tableid) {
-            var that = GenericPlot.Create(tableid,'histogram', {title:'Histogram' });
+        Histogram.Create = function(tableid, settings, startQuery) {
+            var that = GenericPlot.Create(tableid, 'histogram', {title:'Histogram' }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

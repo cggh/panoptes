@@ -23,7 +23,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
         GeoMapPoints.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid,'GeoMapPoints', {title:'Map' });
+            var that = GenericPlot.Create(tableid, 'GeoMapPoints', {title:'Map' }, startQuery);
+
+            that.pointData = {};//first index: property id, second index: point nr
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
@@ -36,16 +38,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
+                    .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
                 that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
             };
 
             that.createPanels = function() {
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
-
-                if (startQuery)
-                    that.theQuery.setStartQuery(startQuery);
 
                 var ctrl_Query = that.theQuery.createControl();
 
@@ -128,7 +127,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrl_Opacity,
                     Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points'),
                     Controls.VerticalSeparator(10),
-                    that.colorLegend
+                    Controls.CompoundVert([that.colorLegend]).setLegend('Color legend')
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
@@ -147,7 +146,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit, pieChartInfo.lattit-range, pieChartInfo.lattit+range);
                         Msg.send({type: 'DataItemTablePopup'}, {
                             tableid: that.tableInfo.id,
-                            query: qry
+                            query: qry,
+                            title: that.tableInfo.tableCapNamePlural + ' at ' + pieChartInfo.longit + ', ' + pieChartInfo.lattit
                         });
                     }
                 );
@@ -157,45 +157,56 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.reloadAll();
             };
 
+
+            that.storeCustomSettings = function() {
+                var sett = {};
+                sett.mapSettings = that.theMap.storeSettings();
+                return sett;
+            };
+
+            that.recallCustomSettings = function(sett) {
+                that.theMap.recallSettings(sett.mapSettings);
+            };
+
             that.reloadAll = function() {
                 that.fetchData();
-            }
+            };
 
             that.fetchData = function() {
                 var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                 fetcher.setMaxResultCount(999999);
-/*                var encoding='ST';
-                if (propInfo.isFloat)
-                    encoding = 'F3';
-                if (propInfo.isBoolean)
-                    encoding = 'GN';*/
-                fetcher.addColumn(that.tableInfo.primkey, 'ST');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F4');
-                fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
 
+                that.pointSet.clearPoints();
+                that.points = null;
+                that.colorLegend.modifyValue('');
+
+                if (!that.pointData[that.tableInfo.primkey])
+                    fetcher.addColumn(that.tableInfo.primkey, 'ST');
+                if (!that.pointData[that.tableInfo.propIdGeoCoordLongit])
+                    fetcher.addColumn(that.tableInfo.propIdGeoCoordLongit, 'F4');
+                if (!that.pointData[that.tableInfo.propIdGeoCoordLattit])
+                    fetcher.addColumn(that.tableInfo.propIdGeoCoordLattit, 'F4');
                 that.catPropId = null;
                 if (that.ctrlCatProperty1.getValue()) {
                     that.catPropId = that.ctrlCatProperty1.getValue();
-                    fetcher.addColumn(that.catPropId, 'ST');
+                    if (!that.pointData[that.catPropId])
+                        fetcher.addColumn(that.catPropId, 'ST');
                 }
 
-                that.points_Keys = null;
-                that.points_Longitude = null;
-                that.points_Lattitude = null;
-                that.points_CatProp = null;
-                that.pointSet.clearPoints();
-                that.points = null;
+                if (fetcher.getColumnIDs().length <= 0) {
+                    that.setPoints();
+                    return;
+                }
+
                 var requestID = DQX.getNextUniqueID();
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
                 fetcher.getData(that.theQuery.get(), that.tableInfo.primkey,
                     function (data) { //success
                         if (that.requestID == requestID) {
-                            that.points_Keys = data[that.tableInfo.primkey];
-                            that.points_Longitude = data.Longitude;
-                            that.points_Lattitude = data.Lattitude;
-                            if (that.catPropId)
-                                that.points_CatProp = data[that.catPropId];
+                            $.each(data, function(id, values) {
+                                that.pointData[id] = values;
+                            });
                             that.setPoints();
                             if (that.startZoomFit) {
                                 that.pointSet.zoomFit(100);
@@ -211,18 +222,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.setPoints = function() {
-                var keys = that.points_Keys;
-                var longitudes = that.points_Longitude;
-                var lattitudes = that.points_Lattitude;
+                var keys = that.pointData[that.tableInfo.primkey];
+                var longitudes = that.pointData[that.tableInfo.propIdGeoCoordLongit];
+                var lattitudes = that.pointData[that.tableInfo.propIdGeoCoordLattit];
                 var selectionInfo = that.tableInfo.currentSelection;
 
                 if (that.catPropId) {
                     var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
-                    var catProps = that.points_CatProp;
+                    var catProps = that.pointData[that.catPropId];
                     var colormapper = MetaData.findProperty(that.tableInfo.id, that.catPropId).category2Color;
 
-                    if (!catProps)
-                        debugger;
                     for (var i=0; i<catProps.length; i++)
                         catProps[i] = catPropInfo.toDisplayString(catProps[i]);
 
@@ -244,6 +253,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         catData.push(idx);
                     }
 
+                    var legendStr = '';
+                    $.each(cats,function(idx,value) {
+                        if ((colormapper.get(value)>=0)&&(colormapper.get(value)<colormapper.itemCount-1))
+                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
+                    });
+                    that.colorLegend.modifyValue(legendStr);
                 }
 
                 that.points = [];
@@ -271,7 +286,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var selectionInfo = that.tableInfo.currentSelection;
                 for (var nr =0; nr<points.length; nr++)
                     points[nr].sel = !!(selectionInfo[points[nr].id]);
-                that.reDraw();
+                that.pointSet.updateSelection();
             }
 
             that.fetchLassoSelection = function() {
@@ -292,6 +307,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.reloadAll = function() {
+                that.pointData = {}; // remove all stored data
                 that.fetchData();
             }
 
@@ -308,7 +324,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.updateQuery = function() {
-                that.fetchData();
+                that.reloadAll();
             }
 
 

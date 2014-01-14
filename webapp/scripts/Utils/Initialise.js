@@ -65,6 +65,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return activeList;
             }
 
+            table.colIsHidden = {};
+
+            table.isPropertyColumnVisible = function(propid) {
+                return !table.colIsHidden[propid];
+            }
+
+            table.setPropertyColumnVisible = function(propid, isVisible) {
+                table.colIsHidden[propid] = !isVisible;
+            }
 
 
 
