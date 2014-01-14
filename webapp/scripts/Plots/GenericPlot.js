@@ -39,6 +39,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 }
                 else
                     DQX.reportError('Plot not found!');
+                if (that.onCloseCustom)
+                    that.onCloseCustom();
             };
 
             that.plotSettingsControls = {};

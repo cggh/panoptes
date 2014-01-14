@@ -295,11 +295,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         lattit: lattitudes[nr],
                         sel: !!(selectionInfo[itemid])
                     }
-                    if (catProps)
+                    if (catProps) {
+                        pt.catName = catProps[nr];
                         pt.catNr = catData[nr];
+                    }
                     else pt.catNr = 0;
-                    if (numProps)
+                    if (numProps) {
+                        pt.numProp = numProps[nr];
                         pt.numPropFrac = (numProps[nr]-that.numPropMin)/that.numPropRange;
+                    }
                     that.points.push(pt);
                 }
                 that.pointSet.setPoints(that.points, {
