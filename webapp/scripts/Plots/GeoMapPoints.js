@@ -125,7 +125,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrl_Opacity,
                     Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points'),
                     Controls.VerticalSeparator(10),
-                    that.colorLegend
+                    Controls.CompoundVert([that.colorLegend]).setLegend('Color legend')
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
@@ -194,6 +194,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.points_CatProp = null;
                 that.pointSet.clearPoints();
                 that.points = null;
+                that.colorLegend.modifyValue('');
                 var requestID = DQX.getNextUniqueID();
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
@@ -244,6 +245,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         }
                     }
 
+
                     colormapper.map(cats);
                     var catData = [];
                     for (var i=0; i<catProps.length; i++) {
@@ -252,6 +254,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                             idx = colormapper.itemCount-1;
                         catData.push(idx);
                     }
+
+                    var legendStr = '';
+                    $.each(cats,function(idx,value) {
+                        if ((colormapper.get(value)>=0)&&(colormapper.get(value)<colormapper.itemCount-1))
+                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
+                    });
+                    that.colorLegend.modifyValue(legendStr);
 
                 }
 
