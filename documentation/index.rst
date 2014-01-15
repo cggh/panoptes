@@ -1,7 +1,4 @@
-.. panoptes documentation master file, created by
-   sphinx-quickstart on Wed Jan 15 16:44:08 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. panoptes documentation master file
 
 Panoptes - eyes on your data
 ============================
@@ -14,20 +11,24 @@ data.
 
 Panoptes is a new project and in an early phase of development. For
 more information about the project please contact Paul Vauterin
-<paul.vauterin@gmail.com> or Alistair Miles
-<alimanfoo@googlemail.com>.
+<paul.vauterin@gmail.com> or Alistair Miles <alimanfoo@googlemail.com>
+or send an email to the public mailing list
+<panoptes-dev@googlegroups.com>.
 
 Links:
 
 * Source code: https://github.com/malariagen/panoptes
 * Documentation: http://panoptes.readthedocs.org
-* Mailing list: TODO
+* Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   deployment
+   datasets
+   roadmap
 
 
 Indices and tables
