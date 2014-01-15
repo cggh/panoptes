@@ -73,8 +73,9 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
             if not(autoPrimKey) and (primkey not in fileColIndex):
                 raise Exception('File is missing primary key '+primkey)
-            for colname in colNameList:
-                if colname not in fileColIndex:
+            for col in columns:
+                colname = col['name']
+                if (col['ReadData']) and (colname not in fileColIndex):
                     raise Exception('File is missing column '+colname)
 
             blockSize = 499
@@ -87,8 +88,10 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                     sourceCells = line.split('\t')
                     writeCells = []
                     for col in columns:
-                        content = sourceCells[fileColIndex[col['name']]]
-                        content = EncodeCell(content, col)
+                        content = 'NULL'
+                        if col['name'] in fileColIndex:
+                            content = sourceCells[fileColIndex[col['name']]]
+                            content = EncodeCell(content, col)
                         writeCells.append(content)
                         if col['IsString']:
                             col['MaxLen'] = max(col['MaxLen'], len(content))

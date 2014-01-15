@@ -42,3 +42,10 @@ Properties:
   Name: Numerical 2
   DataType: Value
   ShowInTable: true
+
+- Id: Selection
+  Name: Selection
+  Datatype: Boolean
+  ReadData: false
+  ShowInTable: true
+  CanUpdate: true

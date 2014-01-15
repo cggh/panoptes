@@ -1,10 +1,10 @@
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils"
+    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools"
 ],
     function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
-              EditQuery, QueryTool, MiscUtils) {
+              EditQuery, QueryTool, MiscUtils, SelectionTools) {
 
 
 
@@ -23,11 +23,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
+                that.tableInfo = MetaData.getTableInfo(tableid);
                 that.theQuery = QueryTool.Create(tableid);
                 MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if (that.tableid==tableid) {
+                        if (that.selectedItemCountText)
+                            that.selectedItemCountText.modifyValue(that.tableInfo.getSelectedCount() + ' selected');
                         if (that.myTable)
                             that.myTable.render();
                     }
@@ -162,6 +165,30 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         Msg.send({type: 'CreateDataItemPlot'}, { tableid: that.tableid });
                     });
 
+
+
+                    // Selection controls
+
+                    that.selectedItemCountText = Controls.Html(null, '0 selected');
+
+                    var selectionClear = Controls.Button(null, { content: 'Clear', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    selectionClear.setOnChanged(function() {
+                        tableInfo.clearSelection();
+                        Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
+                    });
+                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    selectionStore.setOnChanged(function() {
+                        SelectionTools.cmdStore(that.tableInfo);
+                    });
+
+                    var groupSelection = Controls.CompoundVert([
+                        that.selectedItemCountText,
+                        Controls.CompoundHor([selectionClear, selectionStore])
+                    ]).setLegend('Current selection');
+
+
+
+
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
                     var cmdHideAllColumns = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2' }).setOnChanged(function() {
@@ -175,6 +202,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
+                        Controls.VerticalSeparator(15),
+                        groupSelection,
                         Controls.VerticalSeparator(15),
                         buttonCreatePlot,
                         Controls.CompoundVert([

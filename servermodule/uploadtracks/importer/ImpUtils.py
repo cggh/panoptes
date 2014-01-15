@@ -206,6 +206,10 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         if settings.HasToken('Relation'):
             settings.SetToken('Index', True) # Relation child properties are always indexed
         settings.AddTokenIfMissing('Name', property['propid'])
+        settings.AddTokenIfMissing('ReadData', True)
+        settings.ConvertToken_Boolean('ReadData')
+        settings.AddTokenIfMissing('CanUpdate', False)
+        settings.ConvertToken_Boolean('CanUpdate')
         settings.ConvertStringsToSafeSQL()
         property['DataType'] = settings['DataType']
 
