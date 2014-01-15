@@ -55,6 +55,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         iscustom: propInfo.isCustom
                     },
                     function(resp) {
+                        Msg.broadcast({ type: 'PropertyContentChanged'}, {
+                            tableid: tableInfo.id,
+                            propid: propid
+                        });
                     }
                 );
 

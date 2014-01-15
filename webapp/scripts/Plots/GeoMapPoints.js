@@ -35,6 +35,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             } );
 
 
+
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
@@ -338,6 +339,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
             }
 
+
+            that.notifyPropertyContentChanged = function(propid) {
+                if (that.pointData[propid]) {
+                    that.pointData[propid] = null;
+                    that.fetchData()
+                }
+            }
 
             that.reloadAll = function() {
                 that.pointData = {}; // remove all stored data
