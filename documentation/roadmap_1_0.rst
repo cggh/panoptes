@@ -50,11 +50,22 @@ position. The colour of the block represents the genotype
 call. Physical space between variants appears as blank space between
 columns.
 
+@@TODO What happens if columns get crowded? Do columns strictly have
+to appear at their physical location, or can you use available screen
+space on either side?
+
 An option is provided to switch the UI to a space-filling
 representation, where physical space between variants is collapsed and
 the columns are rendered as a rectangular grid. However, navigation is
 still based on genome position, i.e., dragging and zooming operates in
 genome position coordinate space.
+
+Lines are drawn above and below the genotype grid connecting each
+column to its physical location in genome coordinate space.
+
+In either rendering mode, if there are more columns than available
+pixels, a message is shown informing the user that they need to zoom
+in.
 
 Both categorical (e.g., diploid) and continuous (e.g., mixture)
 genotype calls are supported. In the diploid case each possible
