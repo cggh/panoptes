@@ -21,7 +21,6 @@ def ResponseExecute(returndata, calculationObject):
         datastring = fp.read()
     os.remove(filename)
 
-    keys = datastring.split('\t')
 
     db = DQXDbTools.OpenDatabase(databaseName)
     cur = db.cursor()
@@ -29,30 +28,32 @@ def ResponseExecute(returndata, calculationObject):
     cur.execute(sqlstring)
     db.commit()
 
-    def submitkeys(keylist):
-        if len(keylist) > 0:
-            sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(tableid, propid, keyid, ', '.join(keylist))
-            print(sqlstring)
-            cur.execute(sqlstring)
-            db.commit()
+    if len(datastring) > 0:
+        keys = datastring.split('\t')
 
-    keysublist = []
-    keyNr = 0
-    for key in keys:
-        keysublist.append(key)
-        if len(keysublist) >= 500:
-            submitkeys(keysublist)
-            keysublist = []
-            calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
-        keyNr +=1
-    submitkeys(keysublist)
+        def submitkeys(keylist):
+            if len(keylist) > 0:
+                sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(tableid, propid, keyid, ', '.join(keylist))
+                print(sqlstring)
+                cur.execute(sqlstring)
+                db.commit()
+
+        keysublist = []
+        keyNr = 0
+        for key in keys:
+            keysublist.append(key)
+            if len(keysublist) >= 500:
+                submitkeys(keysublist)
+                keysublist = []
+                calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
+            keyNr +=1
+        submitkeys(keysublist)
 
     db.close()
 
 
 
 def response(returndata):
-    print('starting')
     retval = asyncresponder.RespondAsync(
         ResponseExecute,
         returndata,
