@@ -40,7 +40,7 @@ def ResponseExecute(returndata, calculationObject):
     keyNr = 0
     for key in keys:
         keysublist.append(key)
-        if len(keysublist) >= 50:
+        if len(keysublist) >= 500:
             submitkeys(keysublist)
             keysublist = []
             calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
