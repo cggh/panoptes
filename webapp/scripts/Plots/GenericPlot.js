@@ -21,6 +21,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.tableInfo = MetaData.getTableInfo(tableid);
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
 
+            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
+            Msg.listen(eventid, { type: 'PropertyContentChanged'}, function(scope, data) {
+                if (that.tableInfo.id==data.tableid) {
+                    if (that.notifyPropertyContentChanged)
+                        that.notifyPropertyContentChanged(data.propid);
+                }
+            });
+
+
             that.theQuery = QueryTool.Create(tableid, {includeCurrentQuery:true});
             if (startQuery)
                 that.theQuery.setStartQuery(startQuery);
