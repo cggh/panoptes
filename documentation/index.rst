@@ -15,13 +15,12 @@ more information about the project please contact Paul Vauterin
 or send an email to the public mailing list
 <panoptes-dev@googlegroups.com>.
 
-Links:
-
 * Source code: https://github.com/malariagen/panoptes
 * Documentation: http://panoptes.readthedocs.org
 * Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 
-Contents:
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
@@ -31,10 +30,4 @@ Contents:
    roadmap
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
