@@ -56,6 +56,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     delete table.currentSelection[id];
             }
 
+            table.clearSelection = function(id, newState) {
+                table.currentSelection = {};
+            }
+
+            table.getSelectedCount = function() {
+                var cnt = 0;
+                $.each(table.currentSelection, function(key, val) {
+                    if (val)
+                        cnt += 1;
+                });
+                return cnt;
+            }
+
             table.getSelectedList = function() {
                 var activeList = [];
                 $.each(table.currentSelection, function(key, val) {
