@@ -1,0 +1,16 @@
+NameSingle: sample
+NamePlural: samples
+Description: This is a table containing a number of samples
+PrimKey: ID
+IsPositionOnGenome: false
+FetchRecordCount: true
+QuickFindFields: ID
+
+Properties:
+
+- Id: ID
+  Name: Sample ID
+  Description: Sample identifier
+  DataType: Text
+  ShowInTable: true
+
