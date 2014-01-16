@@ -43,8 +43,8 @@ Properties:
   DataType: Value
   ShowInTable: true
 
-- Id: Selection
-  Name: Selection
+- Id: Filtrd
+  Name: Filtered
   Datatype: Boolean
   ReadData: false
   ShowInTable: true

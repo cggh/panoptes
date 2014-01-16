@@ -12,7 +12,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
              });
 
             var content = '<div style="padding:10px">';
-            var fieldPicker = Controls.Combo(null,{ label:'Store in property: ', states: fieldList, value:fieldList[0].id });
+            var fieldPicker = Controls.Combo(null,{ label:'Store in property: ', states: fieldList, value:'StoredSelection' });
             content += fieldPicker.renderHtml();
             content += '<br>';
 
@@ -58,6 +58,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         Msg.broadcast({ type: 'PropertyContentChanged'}, {
                             tableid: tableInfo.id,
                             propid: propid
+                        });
+                        Msg.send({type: 'DataItemTablePopup'}, {
+                            tableid: tableInfo.id,
+                            query: SQL.WhereClause.CompareFixed(propid, '=', 1),
+                            title: 'Stored ' + tableInfo.tableNamePlural + ' selection'
                         });
                     }
                 );
