@@ -10,7 +10,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             PromptDataSet.proceedFunction = proceedFunction;
             var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
             getter.addTable('datasetindex',['id','name'],'id');
-            getter.execute(MetaData.serverUrl,'datasetindex',
+            getter.execute(MetaData.serverUrl,''/*Falls back to default DB in DQXServer config*/,
                 function() {
                     PromptDataSet.datasets = getter.getTableRecords('datasetindex');
                     if (DQX.getUrlSearchString('dataset')) {
