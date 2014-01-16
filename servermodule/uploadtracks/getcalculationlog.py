@@ -1,6 +1,6 @@
 import os
 import config
-import VTTable
+from DQXTableUtils import VTTable
 import base64
 import unicodedata
 

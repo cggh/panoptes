@@ -2,7 +2,7 @@ import DQXDbTools
 import uuid
 import os
 import config
-import VTTable
+from DQXTableUtils import VTTable
 
 
 def response(returndata):

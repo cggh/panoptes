@@ -5,7 +5,7 @@ import DQXDbTools
 import DQXUtils
 import errno
 import SettingsLoader
-import customresponders.uploadtracks.VTTable as VTTable
+from DQXTableUtils import VTTable
 
 def convertToBooleanInt(vl):
     if vl is None:

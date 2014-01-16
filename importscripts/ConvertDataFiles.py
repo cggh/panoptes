@@ -1,4 +1,4 @@
-from TableUtils import VTTable
+from DQXTableUtils import VTTable
 import sys
 
 

@@ -3,7 +3,7 @@ import uuid
 import os
 import config
 import asyncresponder
-import VTTable
+from DQXTableUtils import VTTable
 import Utils
 import threading
 

@@ -2,7 +2,7 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
-import customresponders.uploadtracks.VTTable as VTTable
+from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
 import LoadTable
