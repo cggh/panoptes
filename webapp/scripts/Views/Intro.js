@@ -172,7 +172,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.updateCalculationInfo = function() {
                     //return;
-                    var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, 'datasetindex', 'calculations');
+                    var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, ''/*Falls back to default DB in DQXServer config*/, 'calculations');
                     fetcher.addColumn('id', 'GN');
                     fetcher.addColumn('user', 'GN');
                     fetcher.addColumn('timestamp', 'GN');

@@ -49,8 +49,8 @@ source bin/activate
 pip install -q -r REQUIREMENTS
 #Extra ones for custom responder
 #Have to do numpy first as h5py does not stipulate it as an install requirement....
-pip install -q numpy
-pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
+#pip install -q numpy
+#pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
 pip install -q gunicorn #For testing, not a strict requirement of DQXServer
 
 echo -e "${red}  Linking DQX${NC}"
@@ -81,6 +81,18 @@ USE ${DB};
 CREATE TABLE IF NOT EXISTS datasetindex  (
    id  varchar(20) DEFAULT NULL,
    name  varchar(50) DEFAULT NULL
+);
+CREATE TABLE calculations (
+  id varchar(50) NOT NULL,
+  user varchar(50) DEFAULT NULL,
+  timestamp varchar(50) DEFAULT NULL,
+  name varchar(300) DEFAULT NULL,
+  status varchar(300) DEFAULT NULL,
+  progress float DEFAULT NULL,
+  completed int(11) DEFAULT NULL,
+  failed int(11) DEFAULT NULL,
+  scope varchar(100) DEFAULT NULL,
+  PRIMARY KEY (id)
 );
 EOF
 
