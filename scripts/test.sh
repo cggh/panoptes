@@ -11,7 +11,7 @@ cd ..
 PROJECT_ROOT=`pwd`;
 
 #Start a server
-./scripts/run.sh &
+./scripts/run.sh localhost:8000 &
 sleep 1
 
 cd ${PROJECT_ROOT}/tests
