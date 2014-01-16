@@ -200,11 +200,19 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
                 tableid = table['id']
                 print('Re-creating custom data table for '+tableid)
                 cur.execute("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
-                cur.execute("CREATE TABLE {0} AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
+                cur.execute("CREATE TABLE {0} (StoredSelection TINYINT) AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
                 cur.execute("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
 
         print('Removing existing workspace properties')
         cur.execute("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
+
+        calculationObject.Log('Creating StoredSelection columns')
+        for table in tables:
+            tableid = table['id']
+            sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false}'
+            cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 9999, '{2}')".format(workspaceid, tableid, sett)
+            calculationObject.LogSQLCommand(cmd)
+            cur.execute(cmd)
 
         print('Re-creating workspaces record')
         cur.execute("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )

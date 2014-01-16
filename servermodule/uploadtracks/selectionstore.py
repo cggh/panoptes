@@ -2,6 +2,7 @@ import DQXDbTools
 import asyncresponder
 import os
 import config
+import Utils
 
 
 def ResponseExecute(returndata, calculationObject):
@@ -14,6 +15,10 @@ def ResponseExecute(returndata, calculationObject):
     dataid = DQXDbTools.ToSafeIdentifier(returndata['dataid'])
     iscustom = DQXDbTools.ToSafeIdentifier(returndata['iscustom'])
 
+    tableName =tableid
+    if iscustom:
+        tableName = Utils.GetTableWorkspaceProperties(workspaceid, tableid)
+
     print('storing selection '+dataid)
 
     filename = os.path.join(config.BASEDIR, 'temp', 'store_'+dataid)
@@ -24,7 +29,7 @@ def ResponseExecute(returndata, calculationObject):
 
     db = DQXDbTools.OpenDatabase(databaseName)
     cur = db.cursor()
-    sqlstring = 'UPDATE {0} SET {1}=0 WHERE {1}=1'.format(tableid, propid)
+    sqlstring = 'UPDATE {0} SET {1}=0 WHERE {1}=1'.format(tableName, propid)
     cur.execute(sqlstring)
     db.commit()
 
@@ -33,7 +38,7 @@ def ResponseExecute(returndata, calculationObject):
 
         def submitkeys(keylist):
             if len(keylist) > 0:
-                sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(tableid, propid, keyid, ', '.join(keylist))
+                sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(tableName, propid, keyid, ', '.join(keylist))
                 print(sqlstring)
                 cur.execute(sqlstring)
                 db.commit()

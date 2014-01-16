@@ -110,6 +110,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var states = [];
                     states.push({id:'', name:'[ Queries ]'})
                     states.push({id:'_all_', name:'- All '+that.tableInfo.name+' -'})
+                    states.push({id:'_storedselection_', name:'- Stored selection -'})
                     if (that.includeCurrentQuery)
                         states.push({id:'_current_', name:'- '+that.tableInfo.name+' active in table -'})
                     $.each(data, function(idx, record) {
@@ -135,6 +136,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (state=='_all_') {
                     that.modify(SQL.WhereClause.Trivial());
+                    return;
+                }
+
+                if (state=='_storedselection_') {
+                    that.modify(SQL.WhereClause.CompareFixed('StoredSelection', '=', 1));
                     return;
                 }
 
