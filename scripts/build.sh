@@ -37,20 +37,21 @@ echo -e "${red}    DQXServer${NC}"
 git clone git@github.com:malariagen/DQXServer.git
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
-cp $PROJECT_ROOT/config.py config.py
-echo pythoncommand = \'`which python`\' >> config.py
-echo mysqlcommand = \'`which mysql`\' >> config.py
 
 echo -e "${red}    Python dependancies${NC}"
 cd .. 
 virtualenv DQXServer
 cd DQXServer
 source bin/activate
+echo -e "${red}      DQXServer requirements...${NC}"
 pip install -q -r REQUIREMENTS
 #Extra ones for custom responder
 #Have to do numpy first as h5py does not stipulate it as an install requirement....
-#pip install -q numpy
-#pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
+echo -e "${red}      NumPy...${NC}"
+pip install -q numpy
+echo -e "${red}      Panoptes requirements...${NC}"
+pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
+echo -e "${red}      gunicorn...${NC}"
 pip install -q gunicorn #For testing, not a strict requirement of DQXServer
 
 echo -e "${red}  Linking DQX${NC}"
@@ -70,6 +71,11 @@ echo -e "${red}  Linking static content into DQXServer${NC}"
 cd $PROJECT_ROOT/build/DQXServer
 ln -s $PROJECT_ROOT/webapp static
 
+echo -e "${red}  Copying config.py${NC}"
+cp $PROJECT_ROOT/config.py config.py
+echo pythoncommand = \'`which python`\' >> config.py
+echo mysqlcommand = \'`which mysql`\' >> config.py
+
 echo -e "${red}  Creating skeleton DB - if needed${NC}"
 DBSRV=`python -c "import config;print config.DBSRV"`
 DBUSER=`python -c "import config;print config.DBUSER"`
@@ -82,7 +88,7 @@ CREATE TABLE IF NOT EXISTS datasetindex  (
    id  varchar(20) DEFAULT NULL,
    name  varchar(50) DEFAULT NULL
 );
-CREATE TABLE calculations (
+CREATE TABLE IF NOT EXISTS calculations (
   id varchar(50) NOT NULL,
   user varchar(50) DEFAULT NULL,
   timestamp varchar(50) DEFAULT NULL,
