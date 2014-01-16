@@ -24,3 +24,15 @@ Generalised support for visualisation and browsing of 2-dimensional array data
 
 @@TODO 
 
+
+Advanced visualisations for genotype data
+-----------------------------------------
+
+@@TODO haplotype bifurcation plots
+
+@@TODO LD maps
+
+@@TODO sample sorting by genotype
+
+@@TODO haplotype network
+
