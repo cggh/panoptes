@@ -5,9 +5,8 @@ Panoptes - eyes on your data
 
 Panoptes is a web application for exploration and visualisation of
 data. Many of the features, such as querying and browsing tables, are
-generic and can be used with any kind of data. However, there are
-currently also some specialised features for genomic and geospatial
-data.
+generic and can be used with any kind of data. There are also some
+specialised features for genomic and geospatial data.
 
 Panoptes is a new project and in an early phase of development. For
 more information about the project please contact Paul Vauterin
