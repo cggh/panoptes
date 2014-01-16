@@ -39,15 +39,17 @@ normal, and if the item has links to other items, the properties of
 linked items are also displayed.
 
 
-Geospatial data & map visualisations
-------------------------------------
+Map visualisations of geospatial data
+-------------------------------------
 
 Displaying data on a map is a common requirement for many domains. In
-scope for this release is a preliminary set of features around
-map-based visualisations.
+some cases data may also have a temporal component as well as a
+spatial component. In scope for this release is a preliminary set of
+features around map-based visualisations.
 
-Extend the YAML configuration to enable specifying that a columns in a
-table contains geospatial coordinate values.
+Extend the YAML configuration to enable specifying that a column in a
+table contains geospatial coordinate values. Similarly for a column
+with temporal values (e.g., year).
 
 For tables with geospatial coordinates, extend the UI to provide
 various features for displaying data from the table on a map.
@@ -56,9 +58,13 @@ E.g., the simplest case is to show all data items as bubbles on a
 map. Where data items have the same location, implement a
 visualisation that makes it apparent multiple items are colocated.
 
-Further development of the UI to enable rendering of summarised data
-on a map, e.g., pie charts for some categorical property aggregated at
-some spatial scale.
+Further development of the map visualisations UI to enable rendering
+of summarised data on a map, e.g., pie charts for some categorical
+property aggregated at some spatial scale.
+
+Extend the UI for map visualisations to enable integration of spatial
+and temporal data. E.g., show a timeline and enable selection of data
+items based on a time range.
 
 
 Position-based genotype visualisation
@@ -77,11 +83,8 @@ In the default rendering a set of genotype calls for a variant are
 rendered as a column of colour blocks centred at the variant
 position. The colour of the block represents the genotype
 call. Physical space between variants appears as blank space between
-columns.
-
-@@TODO What happens if columns get crowded? Do columns strictly have
-to appear at their physical location, or can you use available screen
-space on either side?
+columns. Where columns become crowded, enable columns to be shifted
+left or right to fill any available space.
 
 An option is provided to switch the UI to a space-filling
 representation, where physical space between variants is collapsed and
@@ -97,11 +100,8 @@ pixels, a message is shown informing the user that they need to zoom
 in.
 
 Both categorical (e.g., diploid) and continuous (e.g., mixture)
-genotype calls are supported. In the diploid case each possible
-genotype state is mapped to a discrete colour. In the continuous case
-the reference allele fraction is mapped to a colour. Only biallelic
-are in scope for this release, multiallelics will be considered in
-future releases.
+genotype calls are supported. Only biallelic are in scope for this
+release, multiallelics will be considered in future releases.
 
 A second array of the same shape as the array of genotype calls (such
 as depth or genotype quality) can be configured to control the alpha
@@ -131,11 +131,24 @@ the sample.
 
 A query can be applied over the associated samples table to choose
 which rows will appear. Rows for samples not in the query results are
-removed from the grid.
+removed from the grid. The selection of samples query is made
+independently of any other tracks on the genome browser which also
+involve a samples selection. I.e., different tracks can be showing
+different selections of samples.
 
 A query can be applied over the associated variants table to choose
 which columns will appear. Columns for variants not in the query
-results are removed from the grid.
+results are removed from the grid. The selection of variants query is
+independent of any other genome browser tracks which involve a
+variants query. I.e., different tracks can be showing different
+selections of variants.
+
+When sufficiently zoomed in, the actual data values (e.g., genotype
+call value) are displayed as text within the colour block.
+
+Configuration of which array controls genotype, which array (if any)
+controls alpha, how data values are mapped to colour and alpha values,
+is all done via YAML configuration, i.e., no UI options to change.
 
 
 User annotation of data items

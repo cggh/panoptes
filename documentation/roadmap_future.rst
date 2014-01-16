@@ -4,8 +4,8 @@ Roadmap: future
 Collected ideas for future releases.
 
 
-More friendly API for fetching data
------------------------------------
+More developer-friendly REST API for fetching data
+--------------------------------------------------
 
 Self-documenting REST API for serving data, with more
 developer-friendly URLs and other return formats e.g. JSON.
@@ -36,3 +36,12 @@ Advanced visualisations for genotype data
 
 @@TODO haplotype network
 
+
+Generalised genome-interval data
+--------------------------------
+
+Add support for a table to contain items which are associated with a
+genome interval, i.e., there are columns for chromosome, start and
+stop position. These data can then be rendered on tracks in the genome
+browser. Generalisation of the genes track, to enable support for any
+genome interval data, e.g., tandem repeats.
