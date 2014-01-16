@@ -151,7 +151,3 @@ controls alpha, how data values are mapped to colour and alpha values,
 is all done via YAML configuration, i.e., no UI options to change.
 
 
-User annotation of data items
------------------------------
-
-@@TODO
