@@ -100,6 +100,17 @@ CREATE TABLE IF NOT EXISTS calculations (
   scope varchar(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );
+CREATE TABLE storedviews (
+  dataset varchar(100) DEFAULT NULL,
+  workspace varchar(100) DEFAULT NULL,
+  id varchar(100) DEFAULT NULL,
+  settings varchar(10000) DEFAULT NULL
+);
+CREATE TABLE storage (
+  id varchar(50) DEFAULT NULL,
+  content text,
+  UNIQUE KEY storage_id (id)
+);
 EOF
 
 
