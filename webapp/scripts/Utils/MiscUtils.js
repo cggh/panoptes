@@ -129,7 +129,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             $.each(MetaData.customProperties, function(idx, propInfo) {
                 if (propInfo.tableid == tableInfo.id)
-                    if (tableInfo.isPropertyColumnVisible(propInfo.propid))
+                    if ( (propInfo.settings.showInTable) && (tableInfo.isPropertyColumnVisible(propInfo.propid)))
                     {
                         var col = MiscUtils.createItemTableViewerColumn(theTable, tableInfo.id, propInfo.propid);
                     }
