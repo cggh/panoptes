@@ -74,6 +74,8 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             if not(autoPrimKey) and (primkey not in fileColIndex):
                 raise Exception('File is missing primary key '+primkey)
             for col in columns:
+                # if 'ReadData' not in col:
+                #     print('==========' + str(col))
                 colname = col['name']
                 if (col['ReadData']) and (colname not in fileColIndex):
                     raise Exception('File is missing column '+colname)

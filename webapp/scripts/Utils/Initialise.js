@@ -3,6 +3,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var Initialise = {};
 
+//        alert('a');
+//        var barcodecount = 2000;
+//        var markercount = 40;
+//        var barcodes = [];
+//        for (var i=0; i<barcodecount; i++) {
+//            var bc = [];
+//            for (var j = 0; j<markercount; j++)
+//                bc.push(Math.random());
+//            barcodes.push(bc);
+//        }
+//        var dists = [];
+//        for (var i1=0; i1<barcodecount; i1++) {
+//            r1 = barcodes[i1];
+//            var mrow = [];
+//            for (var i2=i1+1; i2<barcodecount; i2++) {
+//                r2 = barcodes[i2];
+//                var sm = 0;
+//                for (var j = 0; j<markercount; j++)
+//                    sm += Math.abs(r1[j]-r2[j]);
+//                mrow.push(sm);
+//            }
+//            dists.push(mrow);
+//        }
+//        alert('b');
+
 
         //A helper function, turning a fraction into a 3 digit text string
         var createFuncVal2Text = function(digits) {
