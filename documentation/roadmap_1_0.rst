@@ -4,32 +4,61 @@ Roadmap: 1.0 release
 The 1.0 release is a major release. The following features are in scope.
 
 
+Filesystem-based data import and dataset configuration
+------------------------------------------------------
+
+In many cases it would be more convenient for users to be able to add
+data to a dataset and configure various properties of the data by
+working directly with a shared filesystem, e.g., copying source data
+to an NFS mounted share and configuring via YAML configuration files.
+
+Implement a set of conventions for creating datasets, adding tables to
+a dataset, and configuring tables (e.g., specifying column types), by
+working directly with a filesystem shared between the user and a
+panoptes instance.
+
+
 Linking tables
 --------------
 
 In scope for this release is a set of features around linking tables
-via foreign key relationships.
+via foreign key one-to-many relationships.
 
 Extend the YAML configuration language for a data table to enable
 specification of a foreign key relatonship to another data table.
 
-In the data table UI, when viewing a table with a link to another
-table, the values in the column which contains the foreign key values
-become hyperlinks. Clicking on the hyperlink raises a popup containing
-information about the linked entity in the other table.
+Extend the UI to enable navigation between linked data items. 
 
-In entity popups, properties of the entity are displayed as normal,
-and if the entity has links to other entities, the properties of
-linked entities are also displayed. I.e., the links between entities
-can be navigated forwards and backwards.
+E.g., in the data table UI, when viewing a table with a link to
+another table, the values in the column which contains the foreign key
+values become hyperlinks. Clicking on the hyperlink raises a popup
+containing information about the linked data item in the other table.
 
-@@TODO further features
+E.g, in data item popups, properties of the item are displayed as
+normal, and if the item has links to other items, the properties of
+linked items are also displayed.
 
 
 Geospatial data & map visualisations
 ------------------------------------
 
-@@TODO describe this feature set
+Displaying data on a map is a common requirement for many domains. In
+scope for this release is a preliminary set of features around
+map-based visualisations.
+
+Extend the YAML configuration to enable specifying that a columns in a
+table contains geospatial coordinate values.
+
+For tables with geospatial coordinates, extend the UI to provide
+various features for displaying data from the table on a map.
+
+E.g., the simplest case is to show all data items as bubbles on a
+map. Where data items have the same location, implement a
+visualisation that makes it apparent multiple items are colocated.
+
+Further development of the UI to enable rendering of summarised data
+on a map, e.g., pie charts for some categorical property aggregated at
+some spatial scale.
 
 
 Position-based genotype visualisation
@@ -108,3 +137,8 @@ A query can be applied over the associated variants table to choose
 which columns will appear. Columns for variants not in the query
 results are removed from the grid.
 
+
+User annotation of data items
+-----------------------------
+
+@@TODO
