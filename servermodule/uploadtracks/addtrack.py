@@ -3,6 +3,7 @@ import uuid
 import os
 import config
 import VTTable
+import scipy
 
 def GenerateError(returndata, msg):
     returndata['Error'] = msg
