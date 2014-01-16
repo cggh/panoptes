@@ -59,6 +59,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             tableid: tableInfo.id,
                             propid: propid
                         });
+                        Msg.send({type: 'DataItemTablePopup'}, {
+                            tableid: tableInfo.id,
+                            query: SQL.WhereClause.CompareFixed(propid, '=', 1),
+                            title: 'Stored ' + tableInfo.tableNamePlural + ' selection'
+                        });
                     }
                 );
 
