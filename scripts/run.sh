@@ -12,7 +12,7 @@ cd `dirname ${SCRIPT_PATH}`
 #We are now at the dir of the script go one up to project
 cd ..
 PROJECT_ROOT=`pwd`;
-cd build/dependencies/DQXServer
+cd build/DQXServer
 rm -rf cache
 source bin/activate
 if [ -z "$1" ]; then
