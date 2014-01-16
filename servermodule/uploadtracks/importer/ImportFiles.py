@@ -21,7 +21,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         calculationObject.Log('Import settings: '+str(importSettings))
         DQXUtils.CheckValidIdentifier(datasetId)
         datasetFolder = os.path.join(baseFolder, datasetId)
-        indexDb = 'datasetindex'
+        indexDb = config.DB
 
         #raise Exception('Something went wrong')
 
@@ -97,7 +97,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.uploadtracks.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Geographic',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Genotypes',
         {
             'ConfigOnly': False
         }
