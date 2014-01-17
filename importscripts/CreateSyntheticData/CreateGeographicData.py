@@ -9,6 +9,7 @@ smp_cat = []
 smp_reg = []
 smp_numprop1 = []
 smp_numprop2 = []
+smp_data = []
 
 cats = ['CAT01', 'CAT02', 'CAT03', 'CAT04']
 catcount = len(cats)
@@ -29,7 +30,7 @@ regioncenters = [
 ]
 
 def coorddist(c1, c2):
-    return math.pow(c1['latt']-c2['latt'], 2.0) + math.pow(c1['long']-c2['long'], 2.0)
+    return math.sqrt(math.pow(c1['latt']-c2['latt'], 2.0) + math.pow(c1['long']-c2['long'], 2.0))
 
 samplecount = 20000
 
@@ -87,19 +88,21 @@ for nr in range(samplenr):
     prop2 = coorddist(coord, {'long': 12, 'latt': 30})/500.0 + coorddist(coord, {'long': 20, 'latt': -11})/500.0
     smp_numprop1.append(prop1 + random.gauss(0,2))
     smp_numprop2.append(prop2 + random.gauss(0,2))
+    smp_data.append(2456674.5 + coorddist(coord, {'long': 0, 'latt': 70})*5 + random.gauss(0,20) )
 
 
 fp = open('/home/pvaut/WebstormProjects/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
-fp.write('ID\tCatId\tRegionId\tLongitude\tLattitude\tNumProp1\tNumProp2\n')
+fp.write('ID\tCatId\tRegionId\tLongitude\tLattitude\tNumProp1\tNumProp2\tJD\n')
 for nr in range(samplenr):
-    fp.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n'.format(
+    fp.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n'.format(
         nr,
         smp_cat[nr],
         smp_reg[nr],
         smp_longit[nr],
         smp_lattit[nr],
         smp_numprop1[nr],
-        smp_numprop2[nr]
+        smp_numprop2[nr],
+        smp_data[nr]
     ))
 
 fp.close()
