@@ -114,15 +114,14 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
 
             print('Creating new columns')
+            calculationObject.Log('WARNING: better mechanism to determine column types needed here')#TODO: implement
             frst = True
             sql = "ALTER TABLE {0} ".format(sourcetable)
             for property in properties:
                 propid = property['propid']
                 if not frst:
                     sql += " ,"
-                sqldatatype = 'varchar(50)'
-                if ImpUtils.IsValueDataTypeIdenfifier(property['DataType']):
-                    sqldatatype = 'float'
+                sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
                 sql += "ADD COLUMN {0} {1}".format(propid, sqldatatype)
                 frst = False
                 calculationObject.LogSQLCommand(sql)

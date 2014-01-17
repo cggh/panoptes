@@ -127,14 +127,12 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(primkey))
     for col in columns:
         st = DecoId(col['name'])
-        typestr = 'XXX'
+        typestr = ''
         if col['DataType'] == 'Text':
             typestr = 'varchar({0})'.format(max(1, col['MaxLen']))
-        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
-            typestr = 'float'
-        if col['DataType'] == 'Boolean':
-            typestr = 'int'
-        if typestr == 'XXX':
+        if len(typestr) == 0:
+            typestr = ImpUtils.GetSQLDataType(col['DataType'])
+        if len(typestr) == 0:
             raise Exception('Invalid property data type ' + col['DataType'])
         st += ' '+typestr
         colTokens.append(st)
@@ -208,10 +206,8 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
             for rownr in tb.GetRowNrRange():
                 maxlength = max(maxlength, len(tb.GetValue(rownr, colnr)))
             datatypestr = 'varchar({0})'.format(maxlength)
-        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
-            datatypestr = 'float'
-        if col['DataType'] == 'Boolean':
-            datatypestr = 'int'
+        if len(datatypestr) == 0:
+            datatypestr = ImpUtils.GetSQLDataType(col['DataType'])
         createcmd += colname + ' ' + datatypestr
         frst = False
     createcmd += ')'
