@@ -159,7 +159,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.isCustom = (prop.source=='custom');
                 if (prop.datatype=='Text')
                     prop.isText = true;
-                if ((prop.datatype=='Value') || (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') )
+                if ((prop.datatype=='Value') || (prop.datatype=='LowPrecisionValue') || (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') || (prop.datatype=='Date') )
                     prop.isFloat = true;
                 if (prop.datatype=='Boolean')
                     prop.isBoolean = true;

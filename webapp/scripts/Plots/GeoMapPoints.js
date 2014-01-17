@@ -52,7 +52,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') ) )
+                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') || (prop.datatype=='Date') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
                 that.ctrlColorProperty = Controls.Combo(null,{ label:'Point color:', states: propList }).setClassID('pointcolor');
@@ -196,7 +196,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         if (!that.pointData[that.catPropId])
                             fetcher.addColumn(that.catPropId, 'ST');
                     }
-                    if (propInfo.datatype=='Value') {
+                    if (propInfo.isFloat) {
                         that.numPropId = that.ctrlColorProperty.getValue();
                         if (!that.pointData[that.numPropId])
                             fetcher.addColumn(that.numPropId, 'ST');

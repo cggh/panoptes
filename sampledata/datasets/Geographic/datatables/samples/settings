@@ -24,8 +24,8 @@ Properties:
   IsCategorical: true
 
 - Id: JD
-  Name: Date
-  DataType: Value
+  Name: Sampling date
+  DataType: Date
   ShowInTable: true
 
 - Id: Longitude
