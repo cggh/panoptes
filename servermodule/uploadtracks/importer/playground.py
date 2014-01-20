@@ -11,7 +11,7 @@ propcount = 30
 dataMatrix = []
 
 for samplenr in range(samplecount):
-    row =[ random.random() for i in range(propcount) ]
+    row =[ random.gauss(0,1) for i in range(propcount) ]
     dataMatrix.append(row)
 print('matrix created')
 

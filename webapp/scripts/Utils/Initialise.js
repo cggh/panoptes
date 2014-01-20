@@ -163,6 +163,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     prop.isFloat = true;
                 if (prop.datatype=='Boolean')
                     prop.isBoolean = true;
+                if (prop.datatype=='Date')
+                    prop.isDate = true;
                 if (!prop.name) prop.name = prop.propid;
                 var settings = { showInTable: true, showInBrowser: false, channelName: '', channelColor:'rgb(0,0,0)', connectLines: false };
                 if (prop.isFloat) {
@@ -203,10 +205,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
+
                 if (prop.isFloat)
                     prop.toDisplayString = createFuncVal2Text(prop.settings.decimDigits);
+
                 if (prop.isBoolean)
                     prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
+
+                if (prop.isDate) {
+                    prop.toDisplayString = function(vl) {
+                        var dt = DQX.JD2DateTime(parseFloat(vl));
+                        var pad = function(n) {return n<10 ? '0'+n : n};
+                        return dt.getUTCFullYear()
+                            + '-' + pad( dt.getUTCMonth() + 1 )
+                            + '-' + pad( dt.getUTCDate() );
+                    }
+                    prop.fromDisplayString = function(str) {
+                        var year = parseInt(str.substring(0,4));
+                        var month = parseInt(str.substring(5,7));
+                        var day = parseInt(str.substring(8,10));
+                        return DQX.DateTime2JD(new Date(year, month-1, day, 6, 0, 0));
+                    }
+                }
+
                 prop.category2Color = DQX.PersistentAssociator(DQX.standardColors.length);
 
                 if (prop.settings.isCategorical) {
