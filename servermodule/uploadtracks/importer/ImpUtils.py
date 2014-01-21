@@ -17,8 +17,22 @@ def convertToBooleanInt(vl):
     return None
 
 def IsValueDataTypeIdenfifier(datatypeIdentifier):
-    return (datatypeIdentifier == 'Value') or (datatypeIdentifier == 'GeoLongitude') or (datatypeIdentifier == 'GeoLattitude')
+    return (datatypeIdentifier == 'Value') or \
+           (datatypeIdentifier == 'GeoLongitude') or\
+           (datatypeIdentifier == 'GeoLattitude') or\
+           (datatypeIdentifier == 'LowPrecisionValue') or\
+           (datatypeIdentifier == 'Date')
 
+
+def GetSQLDataType(datatypeIdentifier):
+    datatypestr = 'varchar(50)'
+    if IsValueDataTypeIdenfifier(datatypeIdentifier):
+        datatypestr = 'double'
+    if (datatypeIdentifier == 'LowPrecisionValue'):
+        datatypestr = 'float'
+    if datatypeIdentifier == 'Boolean':
+        datatypestr = 'int'
+    return datatypestr
 
 def GetTempFileName():
     #Check the temp dir exists and then return a new file name in it

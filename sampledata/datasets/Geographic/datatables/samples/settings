@@ -23,6 +23,11 @@ Properties:
   ShowInTable: true
   IsCategorical: true
 
+- Id: JD
+  Name: Sampling date
+  DataType: Date
+  ShowInTable: true
+
 - Id: Longitude
   Name: Longitude
   DataType: GeoLongitude

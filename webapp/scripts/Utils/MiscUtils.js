@@ -47,6 +47,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Int';
             if ( (propInfo.datatype=='GeoLongitude') || (propInfo.datatype=='GeoLattitude') )
                 encoding  = 'Float4';
+            if ( (propInfo.datatype=='Date') )
+                encoding  = 'Float4';
             if (propInfo.isPrimKey)
                 tablePart = 0;
             var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!='chrom') && (propInfo.propid!='pos') );
@@ -92,6 +94,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             col.CellToText = propInfo.toDisplayString;
+            col.CellToTextInv = propInfo.fromDisplayString;
 
             if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
                 col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
