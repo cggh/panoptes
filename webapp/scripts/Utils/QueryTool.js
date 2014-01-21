@@ -54,7 +54,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.createControl = function() {
 
                 var theControl = Controls.BaseCustom(true);
-                theControl.setLegend("Active "+that.tableInfo.name).setAutoFillX(true);
+                theControl.setLegend("<h4>Active "+that.tableInfo.name+'</h4>').setAutoFillX(true);
 
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {

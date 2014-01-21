@@ -34,8 +34,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             return function(vl) {
                 if ( (vl==null) || (vl=='None') )
                     return '-';
-                else
-                    return parseFloat(vl).toFixed(digits);
+                else {
+                    vl = parseFloat(vl);
+                    if (isNaN(vl))
+                        return '';
+                    else
+                        return vl.toFixed(digits);
+                }
             }
         }
 
@@ -213,6 +218,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
 
                 if (prop.isDate) {
+                    tableInfo.hasDate = true;
                     prop.toDisplayString = function(vl) {
                         var dt = DQX.JD2DateTime(parseFloat(vl));
                         var pad = function(n) {return n<10 ? '0'+n : n};
@@ -224,6 +230,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var year = parseInt(str.substring(0,4));
                         var month = parseInt(str.substring(5,7));
                         var day = parseInt(str.substring(8,10));
+                        if (isNaN(year)) year=2000;
+                        if (isNaN(month)) month=1;
+                        if (isNaN(day)) day=1;
                         return DQX.DateTime2JD(new Date(year, month-1, day, 6, 0, 0));
                     }
                 }
