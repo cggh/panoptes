@@ -1,4 +1,8 @@
 Name: Genotypes Example
 DataTables:
-- variants
-- samples
+    - variants
+    - samples
+
+#List the 2D datatables that should be exposed in the app.
+2D_DataTables:
+    - genotypes

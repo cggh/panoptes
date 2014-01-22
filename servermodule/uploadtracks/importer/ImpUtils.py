@@ -99,6 +99,16 @@ def ExecuteSQL(calculationObject, database, command):
     cur.close()
     db.close()
 
+def ExecuteSQLQuery(calculationObject, database, query):
+    calculationObject.LogSQLCommand(database+';'+query)
+    db = DQXDbTools.OpenDatabase(database)
+    cur = db.cursor()
+    cur.execute(query)
+    result = cur.fetchall()
+    cur.close()
+    db.close()
+    return result
+
 def RunConvertor(calculationObject, name, runpath, arguments):
     path_DQXServer = DQXUtils.GetDQXServerPath()
     scriptFile = os.path.join(path_DQXServer, 'Convertors', name + '.py')
