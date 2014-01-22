@@ -84,6 +84,7 @@ with open('datatables/variants/data', 'w') as tabfile:
 #Need int8 as -1 is missingness
 first_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
 second_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
+
 #Draw an arrow to 0,0 of missingness
 first_allele[0:min(10, NUM_SAMPLES), 0] = -1
 second_allele[0:min(10, NUM_SAMPLES), 0] = -1
@@ -124,8 +125,9 @@ for i,s in enumerate(sample_shuffle):
     for j,v in enumerate(var_shuffle):
         shuffled_first_allele[i,j] = first_allele[s,v]
         shuffled_second_allele[i,j] = second_allele[s,v]
+shuffled_total_depth = np.array(np.random.randint(0,1000,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
 
-with h5py.File('2D_datatables/data.hdf5', 'w') as f:
+with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
@@ -134,3 +136,5 @@ with h5py.File('2D_datatables/data.hdf5', 'w') as f:
     first_allele[:, :] = shuffled_first_allele
     second_allele = f.create_dataset("second_allele", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
     second_allele[:, :] = shuffled_second_allele
+    total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
+    total_depth[:, :] = shuffled_total_depth
