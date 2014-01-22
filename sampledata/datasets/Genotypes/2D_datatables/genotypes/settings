@@ -1,0 +1,29 @@
+NameSingle: genotype
+NamePlural: genotypes
+Description: A table of diploid genotypes
+
+ColumnDataTable: variants            #The 1D datatable where each entry corresponds to a column
+ColumnIndexField: SnpName            #1D Array in HDF5 that gives a primary key into ColumnDataTable for each column
+RowDataTable: samples                #The 1D datatable where each entry corresponds to a row
+RowIndexField: ID                    #1D Array in HDF5 that gives a primary key into RowDataTable for each row
+
+Properties:
+    -  Id: first_allele
+       Name: First Allele
+       Description: Genotype of the first allele
+
+    -  Id: second_allele
+       Name: Second Allele
+       Description: Genotype of the first Allele
+
+ShowInBrowser:                       #Requires that ColumnDataTable "IsPositionOnGenome"
+    Type: diploid                    #Either 'diploid' or 'fractional'
+    FirstAllele:  first_allele       #Reference to property that is first allele
+    SecondAllele: second_allele
+    Depth:        total_depth
+
+#    Type: fractional                    #Either 'diploid' or 'fractional'
+#    RefFraction:  ref_fraction
+#    Depth:        total_depth
+
+

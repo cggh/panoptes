@@ -99,7 +99,14 @@ CREATE TABLE `relations` (
   `reversename` varchar(50)
 );
 
-
+CREATE TABLE `2D_tablecatalog` (
+  `id` varchar(20),
+  `name` varchar(50),
+  `col_table` varchar(20),
+  `row_table` varchar(20),
+  `settings` text,
+  `ordr` int
+);
 
 CREATE TABLE `workspaces` (
   `id` varchar(50),

@@ -1,9 +1,13 @@
-NUM_SAMPLES = 20
-NUM_VARIANTS = 20#1000
+NUM_SAMPLES = 100
+NUM_VARIANTS = 1000
 
 import errno
 import csv
 import random
+random.seed("""
+By convention sweetness, by convention bitterness, by convention colour, in reality only atoms and the void.
+Foolish intellect! Do you seek to overthrow the senses, whilst using them for your evidence?
+""")
 import os
 import h5py
 import numpy as np
@@ -15,14 +19,8 @@ def mkdir(name):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
-            # pic.put(color, (xc + x, yc + y))
-            # pic.put(color, (xc - x, yc + y))
-            # pic.put(color, (xc + x, yc - y))
-            # pic.put(color, (xc - x, yc - y))
-
 
 def quadrant_points(rx, ry):
-    #set the center of circle
     x = 0
     y = ry
     p = (ry * ry) - (rx * rx * ry) + ((rx * rx) / 4)
@@ -78,7 +76,7 @@ with open('datatables/variants/data', 'w') as tabfile:
     writer.writerow('chrom pos SnpName Value1 Value2 Value3 Extra1'.split())
     for i in range(NUM_VARIANTS):
         writer.writerow(('Pf3D7_01_v3',
-                         random.randint(0, 20000),
+                         1000+(i*10),
                          var_ids[i],
                          random.random(),
                          random.random(),
@@ -90,6 +88,7 @@ with open('datatables/variants/data', 'w') as tabfile:
 #Need int8 as -1 is missingness
 first_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
 second_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
+
 #Draw an arrow to 0,0 of missingness
 first_allele[0:min(10, NUM_SAMPLES), 0] = -1
 second_allele[0:min(10, NUM_SAMPLES), 0] = -1
@@ -101,6 +100,8 @@ for i in range(10):
 #Then an ellipse of non-ref on both alleles
 for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 1)):
     genotype = (count % 9) + 1
+    x = min(NUM_VARIANTS-1, x)
+    y = min(NUM_SAMPLES-1, y)
     first_allele[y, x] = genotype
     second_allele[y, x] = genotype
 #Then an ellipse of non-ref on each alleles
@@ -128,8 +129,9 @@ for i,s in enumerate(sample_shuffle):
     for j,v in enumerate(var_shuffle):
         shuffled_first_allele[i,j] = first_allele[s,v]
         shuffled_second_allele[i,j] = second_allele[s,v]
+shuffled_total_depth = np.array(np.random.randint(0,1000,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
 
-with h5py.File('2D_datatables/data.hdf5', 'w') as f:
+with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
@@ -138,3 +140,5 @@ with h5py.File('2D_datatables/data.hdf5', 'w') as f:
     first_allele[:, :] = shuffled_first_allele
     second_allele = f.create_dataset("second_allele", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
     second_allele[:, :] = shuffled_second_allele
+    total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
+    total_depth[:, :] = shuffled_total_depth

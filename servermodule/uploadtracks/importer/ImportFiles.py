@@ -11,6 +11,7 @@ import shutil
 import customresponders.uploadtracks.Utils as Utils
 
 import ImportDataTable
+import Import2DDataTable
 import ImportRefGenome
 import ImportWorkspaces
 
@@ -60,7 +61,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
                 raise Exception('DataTables token should be a list')
             datatables = globalSettings['DataTables']
 
-
         for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
             if os.path.isdir(os.path.join(datasetFolder, 'datatables', dir)):
                 if dir not in datatables:
@@ -68,6 +68,16 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         print('Data tables: '+str(datatables))
         for datatable in datatables:
             ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable), importSettings)
+
+        try:
+            datatables_2D = globalSettings['2D_DataTables']
+        except KeyError:
+            datatables_2D = []
+        if type(datatables_2D) is not list:
+            raise TypeError('2D_DataTables token should be a list')
+        for datatable in datatables_2D:
+            Import2DDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, '2D_datatables', datatable), importSettings)
+
 
         if os.path.exists(os.path.join(datasetFolder, 'refgenome')):
             ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'), importSettings)
@@ -97,7 +107,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.uploadtracks.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Sample1',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Genotypes',
         {
             'ConfigOnly': False
         }
