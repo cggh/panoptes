@@ -4,6 +4,10 @@ NUM_VARIANTS = 1000
 import errno
 import csv
 import random
+random.seed("""
+By convention sweetness, by convention bitterness, by convention colour, in reality only atoms and the void.
+Foolish intellect! Do you seek to overthrow the senses, whilst using them for your evidence?
+""")
 import os
 import h5py
 import numpy as np
