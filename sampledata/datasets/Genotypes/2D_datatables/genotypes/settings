@@ -16,7 +16,7 @@ Properties:
        Name: Second Allele
        Description: Genotype of the first Allele
 
-ShowInBrowser:                       #Requires that ColumnDataTable "IsPositionOnGenome"
+ShowInGenomeBrowser:                       #Requires that ColumnDataTable "IsPositionOnGenome"
     Type: diploid                    #Either 'diploid' or 'fractional'
     FirstAllele:  first_allele       #Reference to property that is first allele
     SecondAllele: second_allele

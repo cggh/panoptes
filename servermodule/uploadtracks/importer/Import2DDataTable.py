@@ -22,7 +22,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
 
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         tableSettings.RequireTokens(['NameSingle', 'NamePlural'])
-        tableSettings.AddTokenIfMissing('ShowInBrowser', False)
+        tableSettings.AddTokenIfMissing('ShowInGenomeBrowser', False)
         tableSettings.AddTokenIfMissing('ColumnDataTable', '')
         tableSettings.AddTokenIfMissing('ColumnIndexField', '')
         tableSettings.AddTokenIfMissing('RowDataTable', '')
@@ -61,6 +61,13 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 field = ImpUtils.ExecuteSQLQuery(calculationObject, datasetId, sql)
             except:
                 raise Exception(tableSettings['RowIndexField'] + " row index field doesn't exist in table " + tableSettings['RowDataTable'])
+
+        if tableSettings['ShowInGenomeBrowser']:
+            sql = "SELECT IsPositionOnGenome FROM tablecatalog WHERE id='{0}' ".format(tableSettings['ColumnDataTable'])
+            is_position = ImpUtils.ExecuteSQLQuery(calculationObject, datasetId, sql)[0][0]
+            if not is_position:
+                raise Exception(tableSettings['ColumnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
+
 
         # Add to tablecatalog
         extraSettings.ConvertStringsToSafeSQL()
