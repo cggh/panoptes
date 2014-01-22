@@ -1,5 +1,5 @@
-NUM_SAMPLES = 20
-NUM_VARIANTS = 20#1000
+NUM_SAMPLES = 100
+NUM_VARIANTS = 1000
 
 import errno
 import csv
@@ -15,14 +15,8 @@ def mkdir(name):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
-            # pic.put(color, (xc + x, yc + y))
-            # pic.put(color, (xc - x, yc + y))
-            # pic.put(color, (xc + x, yc - y))
-            # pic.put(color, (xc - x, yc - y))
-
 
 def quadrant_points(rx, ry):
-    #set the center of circle
     x = 0
     y = ry
     p = (ry * ry) - (rx * rx * ry) + ((rx * rx) / 4)
@@ -78,7 +72,7 @@ with open('datatables/variants/data', 'w') as tabfile:
     writer.writerow('chrom pos SnpName Value1 Value2 Value3 Extra1'.split())
     for i in range(NUM_VARIANTS):
         writer.writerow(('Pf3D7_01_v3',
-                         random.randint(0, 20000),
+                         1000+(i*10),
                          var_ids[i],
                          random.random(),
                          random.random(),
@@ -101,6 +95,8 @@ for i in range(10):
 #Then an ellipse of non-ref on both alleles
 for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 1)):
     genotype = (count % 9) + 1
+    x = min(NUM_VARIANTS-1, x)
+    y = min(NUM_SAMPLES-1, y)
     first_allele[y, x] = genotype
     second_allele[y, x] = genotype
 #Then an ellipse of non-ref on each alleles
