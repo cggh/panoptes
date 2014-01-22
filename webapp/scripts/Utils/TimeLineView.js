@@ -230,15 +230,19 @@ define([
                     var psx1 = Math.round((JDCent-blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
                     var psx2 = Math.round((JDCent+blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
 
+                    var barScale = blockSize*that.rateScale;
+                    if (that.myTimeLine.drawStyle.showTimeBarsAsPercentage)
+                        barScale = Math.max(1,block.memberCount);
+
                     var incrCount = 0;
                     $.each(block.memberCategoriesCount, function(catNr, catCount) {
-                        var psh1 = Math.round(incrCount*1.0/(blockSize*that.rateScale)*ySize);
-                        var psh2 = Math.round((incrCount+catCount)*1.0/(blockSize*that.rateScale)*ySize);
+                        var psh1 = Math.round(incrCount*1.0/barScale*ySize);
+                        var psh2 = Math.round((incrCount+catCount)*1.0/barScale*ySize);
                         drawInfo.centerContext.fillStyle = colorStrings0[catNr];
                         drawInfo.centerContext.fillRect(psx1,yOffset-psh2,psx2-psx1,psh2-psh1);
                         incrCount += catCount;
                     });
-                    var psh = Math.round(block.memberCount*1.0/(blockSize*that.rateScale)*ySize);
+                    var psh = Math.round(block.memberCount*1.0/barScale*ySize);
                     drawInfo.centerContext.beginPath();
                     drawInfo.centerContext.rect(psx1,yOffset-psh,psx2-psx1,psh);
                     drawInfo.centerContext.stroke();
@@ -260,6 +264,12 @@ define([
             var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false});
             that.scaleConversionFactor = 1.0;
             that.myPointSet = [];
+
+            that.drawStyle = {
+                showTimeBarsAsPercentage: false
+            };
+
+
 
             that.addChannel(TimeLineView.ChannelScale(that), true);
             that.addChannel(TimeLineView.ChannelData(that), true);
@@ -306,6 +316,11 @@ define([
             that.clearPoints = function() {
                 this.myPointSet = [];
             };
+
+            that.setDrawStyle = function(drawStyle) {
+                that.drawStyle = drawStyle;
+            }
+
 
             that.draw = function() {
                 that.render();
