@@ -221,6 +221,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     tableInfo.hasDate = true;
                     prop.toDisplayString = function(vl) {
                         var dt = DQX.JD2DateTime(parseFloat(vl));
+                        if (isNaN(dt.getTime()))
+                            return "2000-01-01";
                         var pad = function(n) {return n<10 ? '0'+n : n};
                         return dt.getUTCFullYear()
                             + '-' + pad( dt.getUTCMonth() + 1 )

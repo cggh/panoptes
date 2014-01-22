@@ -88,10 +88,14 @@ for nr in range(samplenr):
     prop2 = coorddist(coord, {'long': 12, 'latt': 30})/500.0 + coorddist(coord, {'long': 20, 'latt': -11})/500.0
     smp_numprop1.append(prop1 + random.gauss(0,2))
     smp_numprop2.append(prop2 + random.gauss(0,2))
-    smp_data.append(2456674.5 + coorddist(coord, {'long': 0, 'latt': 70})*5 + random.gauss(0,20) )
+    JD = 2456674.5 + round(coorddist(coord, {'long': 0, 'latt': 70})*10 + random.gauss(0,40), 0) + 0.5 # note: JD is set at noon of day
+    smp_data.append(JD)
 
 
-fp = open('/home/pvaut/WebstormProjects/panoptes/sampledata/datasets/Geographic/datatables/samples/data', 'w')
+#basedir = '/home/pvaut/WebstormProjects/panoptes/sampledata'
+basedir = '/Users/pvaut/Documents/SourceCode/WebApps/panoptes/sampledata'
+
+fp = open(basedir + '/datasets/Geographic/datatables/samples/data', 'w')
 fp.write('ID\tCatId\tRegionId\tLongitude\tLattitude\tNumProp1\tNumProp2\tJD\n')
 for nr in range(samplenr):
     fp.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n'.format(

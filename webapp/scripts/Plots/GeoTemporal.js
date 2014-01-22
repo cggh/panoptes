@@ -121,7 +121,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.fetchData();
                 });
 
-                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty]).setLegend('<h4>Time line</h4>');
+                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict '+that.tableInfo.tableNamePlural+' to viewport'});
+                that.ctrl_restrictToTimeViewPort.setOnChanged(function() {
+                    if (that.ctrl_restrictToTimeViewPort.getValue())
+                        that.updateTimeViewPort();
+                    else {
+                        that.pointSet.setPointFilter('timeFilter', null);
+                        that.updateMapPoints();
+                        that.reDraw();
+                    }
+                });
+
+
+                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
 
 
 
@@ -144,10 +156,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
+
+                // Create Time line
                 that.theMap = Map.GMap(this.frameGeoMap);
                 that.theTimeLine = TimeLineView.Create(this.frameTimeLine);
 
+                that.updateTimeViewPort = function() {
+                    if (that.ctrl_restrictToTimeViewPort.getValue()) {
+                        var timeRange = that.theTimeLine.getVisibleTimeRange();
+                        that.pointSet.setPointFilter('timeFilter', function(pt) {
+                            return (pt.dateJD<timeRange.min)||(pt.dateJD>timeRange.max);
+                        });
+                        that.updateMapPoints();
+                        that.pointSet.draw();
+                    }
+                }
 
+                that.theTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,200));
+
+
+                // Create points overlay on map
                 that.pointSet = PointSet.Create(that.theMap, {});
                 that.pointSet.setPointClickCallBack(
                     function(itemid) { // single point click handler
@@ -335,16 +363,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
                 }
 
-                that.pointSet.setPoints(that.points, {
-                    catData: !!that.catPropId,
-                    numData: !!that.numPropId
-                });
+                that.updateMapPoints();
+
                 that.theTimeLine.setPoints(that.points, {
                     catData: !!that.catPropId,
                     numData: !!that.numPropId
                 });
                 that.reDraw();
             }
+
+            that.updateMapPoints = function() {
+                that.pointSet.setPoints(that.points, {
+                    catData: !!that.catPropId,
+                    numData: !!that.numPropId
+                });
+            }
+
 
             that.updateSelection = function() {
                 if (!that.points)  return;
