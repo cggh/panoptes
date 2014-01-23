@@ -3,9 +3,12 @@ NamePlural: genotypes
 Description: A table of diploid genotypes
 
 ColumnDataTable: variants            #The 1D datatable where each entry corresponds to a column
-ColumnIndexField: SnpName            #1D Array in HDF5 that gives a primary key into ColumnDataTable for each column
+ColumnIndexField: SnpName            #The column name in ColumnDataTable that maps into ColumnIndexArray
+ColumnIndexArray: col_index          #1D Array in HDF5 that gives the value of ColumnDataField for each column
+
 RowDataTable: samples                #The 1D datatable where each entry corresponds to a row
-RowIndexField: ID                    #1D Array in HDF5 that gives a primary key into RowDataTable for each row
+RowIndexField: ID                    #The column name in RowDataTable that maps into RowIndexArray
+RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowDataField for each row
 
 Properties:
     -  Id: first_allele

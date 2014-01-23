@@ -1,6 +1,7 @@
 import os
 import DQXDbTools
 import DQXUtils
+import h5py
 import config
 from DQXTableUtils import VTTable
 import SettingsLoader
@@ -24,9 +25,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.RequireTokens(['NameSingle', 'NamePlural'])
         tableSettings.AddTokenIfMissing('ShowInGenomeBrowser', False)
         tableSettings.AddTokenIfMissing('ColumnDataTable', '')
-        tableSettings.AddTokenIfMissing('ColumnIndexField', '')
         tableSettings.AddTokenIfMissing('RowDataTable', '')
-        tableSettings.AddTokenIfMissing('RowIndexField', '')
         extraSettings = tableSettings.Clone()
         extraSettings.DropTokens(['ColumnDataTable',
                                   'ColumnIndexField',
@@ -84,7 +83,68 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
 
         #TODO Can do properties table (not needed till 2D array browser)
 
-        # if not importSettings['ConfigOnly']:
+        if not importSettings['ConfigOnly']:
+            #Insert an index column into the index tables
+            if tableSettings['ColumnDataTable']:
+                #Firstly create a temporay table with the index array
+                hdf5 = h5py.File(os.path.join(folder, 'data.hdf5'), 'r')
+                try:
+                    column_index = hdf5[tableSettings['ColumnIndexArray']]
+                except KeyError:
+                    raise Exception("HDF5 doesn't contain {0} at the root".format(tableSettings['ColumnIndexArray']))
+                sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', tableSettings['ColumnIndexField'], column_index)
+                ImpUtils.ExecuteSQLGenerator(calculationObject, datasetId, sql)
+
+                #We have a datatable - add an index to it then copy that index across to the data table
+                sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
+                         SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
+                         ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
+                         UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
+                         DROP TABLE `TempColIndex`""".format(
+                    tableSettings['ColumnDataTable'],
+                    tableSettings['ColumnIndexField'],
+                    tableid)
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                #Now check we have no NULLS
+                sql = "SELECT `{1}_column_index` from `{0}` where `{1}_column_index` IS NULL".format(
+                    tableSettings['ColumnDataTable'],
+                    tableid)
+                nulls = ImpUtils.ExecuteSQLQuery(calculationObject, datasetId, sql)
+                if len(nulls) > 0:
+                    raise Exception("Not all rows in {0} have a corresponding column in 2D datatable {1}".format(tableSettings['ColumnDataTable'], tableid))
+            if tableSettings['RowDataTable']:
+                #Firstly create a temporay table with the index array
+                hdf5 = h5py.File(os.path.join(folder, 'data.hdf5'), 'r')
+                try:
+                    row_index = hdf5[tableSettings['RowIndexArray']]
+                except KeyError:
+                    raise Exception("HDF5 doesn't contain {0} at the root".format(tableSettings['RowIndexArray']))
+                sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', tableSettings['RowIndexField'], row_index)
+                ImpUtils.ExecuteSQLGenerator(calculationObject, datasetId, sql)
+
+                #We have a datatable - add an index to it then copy that index across to the data table
+                sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
+                         SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
+                         ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
+                         UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
+                         DROP TABLE `TempRowIndex`""".format(
+                    tableSettings['RowDataTable'],
+                    tableSettings['RowIndexField'],
+                    tableid)
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                #Now check we have no NULLS
+                sql = "SELECT `{1}_row_index` from `{0}` where `{1}_row_index` IS NULL".format(
+                    tableSettings['RowDataTable'],
+                    tableid)
+                nulls = ImpUtils.ExecuteSQLQuery(calculationObject, datasetId, sql)
+                if len(nulls) > 0:
+                    raise Exception("Not all rows in {0} have a corresponding row in 2D datatable {1}".format(tableSettings['RowDataTable'], tableid))
+
+
+
+
+
+
         #     columns = [ {
         #                     'name': prop['propid'],
         #                     'DataType': prop['DataType'],
