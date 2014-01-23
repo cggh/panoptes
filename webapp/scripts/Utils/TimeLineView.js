@@ -14,6 +14,7 @@ define([
             that._height = 28;
             that.myTimeLine = itimeLine;
 
+
             that.draw = function (drawInfo) {
                 if ((!that.myTimeLine.minJD) && (!that.myTimeLine.maxJD))
                     return;
@@ -269,6 +270,26 @@ define([
                 showTimeBarsAsPercentage: false
             };
 
+            that.storeSettings = function() {
+                var obj = {};
+                obj.range = that.getVisibleRange();
+                var markInfo = that.getMark();
+                if (markInfo)
+                    obj.mark = markInfo;
+
+                obj.minJD = that.minJD;
+                obj.maxJD = that.maxJD;
+
+                return obj;
+            };
+
+            that.recallSettings = function(settObj) {
+                that.setRangeJD(settObj.minJD, settObj.maxJD);
+                that.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
+                if (settObj.mark)
+                    that.setMark(settObj.mark.min, settObj.mark.max);
+
+            };
 
 
             that.addChannel(TimeLineView.ChannelScale(that), true);
@@ -294,6 +315,12 @@ define([
                 return range;
             }
 
+            that.setRangeJD = function(minJD, maxJD) {
+                that.minJD = minJD;
+                that.maxJD = maxJD;
+                that.rangeJD = that.maxJD - that.minJD;
+                that.setRange(0,that.rangeJD, that.rangeJD/4);
+            }
 
             that.setPoints = function(ipointset, iSettings) {
                 that.myPointSet = ipointset;
@@ -305,12 +332,8 @@ define([
                     minJD = Math.min(minJD, pt.dateJD-0.5);
                     maxJD = Math.max(maxJD, pt.dateJD+0.5);
                 })
-                if ( (!that.minJD) || (!that.maxJD) || (Math.abs(that.minJD-minJD)>0.001) || (Math.abs(that.maxJD-maxJD)>0.001) ) {
-                    that.minJD = minJD;
-                    that.maxJD = maxJD;
-                    that.rangeJD = that.maxJD - that.minJD;
-                    that.setRange(0,that.rangeJD, that.rangeJD/4);
-                }
+                if ( (!that.minJD) || (!that.maxJD) || (Math.abs(that.minJD-minJD)>0.001) || (Math.abs(that.maxJD-maxJD)>0.001) )
+                    that.setRangeJD(minJD, maxJD);
             };
 
             that.clearPoints = function() {

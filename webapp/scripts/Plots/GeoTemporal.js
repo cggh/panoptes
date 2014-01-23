@@ -207,11 +207,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.storeCustomSettings = function() {
                 var sett = {};
                 sett.mapSettings = that.theMap.storeSettings();
+                sett.timeLineSettings = that.theTimeLine.storeSettings();
                 return sett;
             };
 
             that.recallCustomSettings = function(sett) {
                 that.theMap.recallSettings(sett.mapSettings);
+                that.theTimeLine.recallSettings(sett.timeLineSettings);
             };
 
             that.reloadAll = function() {
@@ -377,10 +379,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.updateMapPoints = function() {
-                that.pointSet.setPoints(that.points, {
-                    catData: !!that.catPropId,
-                    numData: !!that.numPropId
-                });
+                if (that.points) {
+                    that.pointSet.setPoints(that.points, {
+                        catData: !!that.catPropId,
+                        numData: !!that.numPropId
+                    });
+                }
             }
 
 
