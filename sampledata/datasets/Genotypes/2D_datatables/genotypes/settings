@@ -11,7 +11,7 @@ RowIndexField: ID                    #The column name in RowDataTable that maps 
 RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowDataField for each row
 
 Properties:
-    -  Id: first_allele
+    -  Id: first_allele                            #Name of dataset in HDF5
        Name: First Allele
        Description: Genotype of the first allele
 
@@ -19,7 +19,11 @@ Properties:
        Name: Second Allele
        Description: Genotype of the first Allele
 
-ShowInGenomeBrowser:                       #Requires that ColumnDataTable "IsPositionOnGenome"
+    -  Id: total_depth
+       Name: Total Depth
+       Description: Total number of reads for this variant
+
+ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionOnGenome"
     Type: diploid                    #Either 'diploid' or 'fractional'
     FirstAllele:  first_allele       #Reference to property that is first allele
     SecondAllele: second_allele

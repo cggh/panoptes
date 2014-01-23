@@ -108,6 +108,14 @@ CREATE TABLE `2D_tablecatalog` (
   `ordr` int
 );
 
+CREATE TABLE `2D_propertycatalog` (
+  `id` varchar(50),
+  `tableid` varchar(20),
+  `name` varchar(50),
+  `ordr` int,
+  `settings` text
+);
+
 CREATE TABLE `workspaces` (
   `id` varchar(50),
   `name` varchar(50)

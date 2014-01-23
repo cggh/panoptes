@@ -362,3 +362,9 @@ class Numpy_to_SQL(object):
             yield lambda cur: cur.executemany("INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name),
                                               list(array[start: end]))
 
+def mkdir(name):
+    try:
+        os.makedirs(name)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
