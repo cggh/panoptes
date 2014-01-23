@@ -121,7 +121,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.fetchData();
                 });
 
-                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict '+that.tableInfo.tableNamePlural+' to viewport'});
+                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict '+that.tableInfo.tableNamePlural+' to viewport'}).setClassID('restricttotimeviewport');
                 that.ctrl_restrictToTimeViewPort.setOnChanged(function() {
                     if (that.ctrl_restrictToTimeViewPort.getValue())
                         that.updateTimeViewPort();
@@ -132,8 +132,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
                 });
 
+                that.ctrl_showTimeBarsAsPercentage = Controls.Check(null,{ label: 'Show as percentage'}).setClassID('showtimeaspercentage');
+                that.ctrl_showTimeBarsAsPercentage.setOnChanged(function() {
+                    that.reDraw();
+                });
 
-                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
+                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_showTimeBarsAsPercentage, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
 
 
 
@@ -428,6 +432,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     aggregateStyle: that.ctrl_AggrType.getValue()
                 });
                 that.pointSet.draw();
+                that.theTimeLine.setDrawStyle({
+                    showTimeBarsAsPercentage: that.ctrl_showTimeBarsAsPercentage.getValue()
+                });
                 that.theTimeLine.draw();
             }
 
