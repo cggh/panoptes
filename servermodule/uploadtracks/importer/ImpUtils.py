@@ -117,7 +117,7 @@ def ExecuteSQLGenerator(calculationObject, database, commands):
     cur = db.cursor()
     for i, command in enumerate(commands):
         if i < 5:
-            calculationObject.LogSQLCommand(database+';'+command.func_code.co_consts[1])
+            calculationObject.LogSQLCommand(database+';'+command.func_closure[-1].cell_contents)
         if i == 5:
             calculationObject.LogSQLCommand(database+'; Commands truncated...')
         command(cur)
@@ -352,15 +352,17 @@ class Numpy_to_SQL(object):
 
     #Currently assumes simple 1D
     def create_table(self, table_name, column_name, array):
-        yield lambda cur: cur.execute("DROP TABLE IF EXISTS `{0}`".format(table_name, ))
+        sql = "DROP TABLE IF EXISTS `{0}`".format(table_name, )
+        yield lambda cur: cur.execute(sql)
         column_type = self.dtype_to_column_type(str(array.dtype))
-        yield lambda cur: cur.execute("CREATE TABLE `{0}` (`{1}` {2})".format(table_name,
-                                                                              column_name,
-                                                                              column_type))
+        sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
+        yield lambda cur: cur.execute(sql)
         for start in range(0, len(array), 500):
             end = min(start + 500, len(array))
-            yield lambda cur: cur.executemany("INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name),
-                                              list(array[start: end]))
+            sql = "INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name)
+            data = list(array[start: end])
+            yield lambda cur: cur.executemany(sql,
+                                              data)
 
 def mkdir(name):
     try:
