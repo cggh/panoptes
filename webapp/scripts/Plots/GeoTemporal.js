@@ -13,34 +13,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         GenericPlot.registerPlotType('GeoTemporal', GeoTemporal);
 
 
-        GeoTemporal.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geotemporal analysis' }, startQuery);
-
-            that.pointData = {};//first index: property id, second index: point nr
-
-
-            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
-            Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
-                if (that.tableInfo.id==tableid)
-                    that.updateSelection();
-            } );
 
 
 
-            that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
-                var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7));
-                that.frameTimeLine = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,false);
-                that.frameGeoMap = frameRight.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(false,false);
+
+
+        GeoTemporal.CreateComp_TimeLine = function(thePlot) {
+            var that = {};
+            that.thePlot = thePlot;
+            that.tableInfo = thePlot.tableInfo;
+
+            that.createView = function() {
+                that.myTimeLine = TimeLineView.Create(that.frame);
+                that.myTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,50));
+                that.myTimeLine.setOnTimeRangeSelected(that.fetchTimeRangeSelection);
             };
 
 
-            that.createControlsTimeLine = function() {
-                //Create time controls
+            that.createControls = function() {
                 var propList = [];
                 $.each(MetaData.customProperties, function(idx, propInfo) {
                     if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
@@ -56,21 +46,140 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if (that.ctrl_restrictToTimeViewPort.getValue())
                         that.updateTimeViewPort();
                     else {
-                        that.pointSet.setPointFilter('timeFilter', null);
-                        that.updateMapPoints();
-                        that.reDraw();
+                        that.thePlot.pointSet.setPointFilter('timeFilter', null);
+                        that.thePlot.updateMapPoints();
+                        that.theplot.reDraw();
                     }
                 });
 
                 that.ctrl_showTimeBarsAsPercentage = Controls.Check(null,{ label: 'Show as percentage'}).setClassID('showtimeaspercentage');
                 that.ctrl_showTimeBarsAsPercentage.setOnChanged(function() {
-                    that.reDraw();
+                    that.thePlot.reDraw();
                 });
 
                 var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_showTimeBarsAsPercentage, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
 
+
                 return groupTimeControls;
             }
+
+
+            that.addFetchProperties = function(fetcher) {
+                that.datePropId = that.ctrlDateProperty.getValue();
+                fetcher.addColumn(that.datePropId, 'F4');
+            }
+
+            that.processFetchedPoints = function(pointData, points) {
+                if (that.datePropId) {
+                    var times = pointData[that.datePropId];
+                    for (var nr =0; nr<points.length; nr++) {
+                        points[nr].dateJD = times[nr];
+                    }
+                }
+            }
+
+            that.clearPoints = function() {
+                that.myTimeLine.clearPoints();
+            };
+
+            that.setPoints = function(points, settings) {
+                that.myTimeLine.setPoints(points, settings);
+
+            };
+
+            that.draw = function() {
+                that.myTimeLine.setDrawStyle({
+                    showTimeBarsAsPercentage: that.ctrl_showTimeBarsAsPercentage.getValue()
+                });
+                that.myTimeLine.draw();
+            }
+
+            that.updateSelection = function() {
+                that.myTimeLine.updateSelection();
+            }
+
+            that.updateTimeViewPort = function() {
+                if (that.ctrl_restrictToTimeViewPort.getValue()) {
+                    var timeRange = that.myTimeLine.getVisibleTimeRange();
+                    that.thePlot.pointSet.setPointFilter('timeFilter', function(pt) {
+                        return (pt.dateJD<timeRange.min)||(pt.dateJD>timeRange.max);
+                    });
+                    that.thePlot.updateMapPoints();
+                    that.thePlot.pointSet.draw();
+                }
+            }
+
+
+            that.fetchTimeRangeSelection = function(JDmin, JDmax) {
+                if (!that.thePlot.points)  return;
+                var points = that.thePlot.points;
+                var selectionInfo = that.tableInfo.currentSelection;
+                var modified = false;
+                for (var nr =0; nr<points.length; nr++) {
+                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
+                    if (sel!=!!(selectionInfo[points[nr].id])) {
+                        modified = true;
+                        that.tableInfo.selectItem(points[nr].id, sel);
+                    }
+                }
+                if (modified)
+                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+            }
+
+            that.storeSettings = function() {
+                var obj = {};
+                obj.timeLine = that.myTimeLine.storeSettings();
+                return obj;
+            }
+
+            that.recallSettings = function(settObj) {
+                that.myTimeLine.recallSettings(settObj.timeLine);
+            }
+
+
+            return that;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+        GeoTemporal.Create = function(tableid, settings, startQuery) {
+            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geotemporal analysis' }, startQuery);
+
+            that.pointData = {};//first index: property id, second index: point nr
+
+
+            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
+            Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
+                if (that.tableInfo.id==tableid)
+                    that.updateSelection();
+            } );
+
+
+            that.plotComponents = {};
+
+            that.plotComponents.timeLine = GeoTemporal.CreateComp_TimeLine(that);
+
+            that.createFrames = function() {
+                that.frameRoot.makeGroupHor();
+                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
+                var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7));
+                that.plotComponents.timeLine.frame = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    .setAllowScrollBars(false,false);
+                that.frameGeoMap = frameRight.addMemberFrame(Framework.FrameFinal('', 0.7))
+                    .setAllowScrollBars(false,false);
+            };
+
+
 
 
 
@@ -157,47 +266,38 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.fetchData();
                 });
 
-
-
                 that.colorLegend = Controls.Html(null,'');
 
+                var controlsList = [ctrl_Query,
+                    Controls.VerticalSeparator(2),
+                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>')];
 
-                var groupTimeControls = that.createControlsTimeLine();
+                $.each(that.plotComponents, function(key, plotComp) {
+                    controlsList.push(Controls.VerticalSeparator(2));
+                    controlsList.push(plotComp.createControls());
+                });
 
                 var groupMapControls = that.createControlsMap();
 
+                controlsList.push(Controls.VerticalSeparator(2));
+                controlsList.push(groupMapControls);
 
-                var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
-                    Controls.VerticalSeparator(2),
-                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>'),
-                    Controls.VerticalSeparator(2),
-                    groupTimeControls,
-                    Controls.VerticalSeparator(2),
-                    groupMapControls
-                ]);
+
+
+
+
+                var controlsGroup = Controls.CompoundVert(controlsList);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
 
-                // Create Time line
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.createView();
+                });
+
                 that.theMap = Map.GMap(this.frameGeoMap);
-                that.theTimeLine = TimeLineView.Create(this.frameTimeLine);
 
-                that.updateTimeViewPort = function() {
-                    if (that.ctrl_restrictToTimeViewPort.getValue()) {
-                        var timeRange = that.theTimeLine.getVisibleTimeRange();
-                        that.pointSet.setPointFilter('timeFilter', function(pt) {
-                            return (pt.dateJD<timeRange.min)||(pt.dateJD>timeRange.max);
-                        });
-                        that.updateMapPoints();
-                        that.pointSet.draw();
-                    }
-                }
 
-                that.theTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,200));
-
-                that.theTimeLine.setOnTimeRangeSelected(that.fetchTimeRangeSelection);
 
 
                 // Create points overlay on map
@@ -228,13 +328,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.storeCustomSettings = function() {
                 var sett = {};
                 sett.mapSettings = that.theMap.storeSettings();
-                sett.timeLineSettings = that.theTimeLine.storeSettings();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    sett[key] = plotComp.storeSettings();
+                })
+
                 return sett;
             };
 
             that.recallCustomSettings = function(sett) {
                 that.theMap.recallSettings(sett.mapSettings);
-                that.theTimeLine.recallSettings(sett.timeLineSettings);
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.recallSettings(sett[key]);
+                })
             };
 
             that.reloadAll = function() {
@@ -246,15 +352,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 fetcher.setMaxResultCount(999999);
 
                 that.pointSet.clearPoints();
-                that.theTimeLine.clearPoints();
+
+                $.each(that.plotComponents, function(idx, comp) {
+                    comp.clearPoints();
+                })
+
                 that.points = null;
                 that.colorLegend.modifyValue('');
 
                 var sortField = that.tableInfo.primkey;
 
-                that.datePropId = that.ctrlDateProperty.getValue();
-                fetcher.addColumn(that.datePropId, 'F4');
-                sortField = that.datePropId;
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.addFetchProperties(fetcher);
+                });
+                //sortField = that.datePropId;
 
                 if (!that.pointData[that.tableInfo.primkey])
                     fetcher.addColumn(that.tableInfo.primkey, 'ST');
@@ -383,19 +494,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.points.push(pt);
                 }
 
-                if (that.datePropId) {
-                    var times = that.pointData[that.datePropId];
-                    for (var nr =0; nr<keys.length; nr++) {
-                        that.points[nr].dateJD = times[nr];
-                    }
-                }
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.processFetchedPoints(that.pointData, that.points);
+                });
 
                 that.updateMapPoints();
 
-                that.theTimeLine.setPoints(that.points, {
-                    catData: !!that.catPropId,
-                    numData: !!that.numPropId
+                $.each(that.plotComponents, function(idx, plotComp) {
+                    plotComp.setPoints(that.points, {
+                        catData: !!that.catPropId,
+                        numData: !!that.numPropId
+                    });
                 });
+
                 that.reDraw();
             }
 
@@ -416,7 +527,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 for (var nr =0; nr<points.length; nr++)
                     points[nr].sel = !!(selectionInfo[points[nr].id]);
                 that.pointSet.updateSelection();
-                that.theTimeLine.updateSelection();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.updateSelection();
+                });
             }
 
             that.fetchLassoSelection = function() {
@@ -435,21 +549,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
             }
 
-            that.fetchTimeRangeSelection = function(JDmin, JDmax) {
-                if (!that.points)  return;
-                var points = that.points;
-                var selectionInfo = that.tableInfo.currentSelection;
-                var modified = false;
-                for (var nr =0; nr<points.length; nr++) {
-                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
-                    if (sel!=!!(selectionInfo[points[nr].id])) {
-                        modified = true;
-                        that.tableInfo.selectItem(points[nr].id, sel);
-                    }
-                }
-                if (modified)
-                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
-            }
 
 
             that.notifyPropertyContentChanged = function(propid) {
@@ -473,10 +572,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     aggregateStyle: that.ctrl_AggrType.getValue()
                 });
                 that.pointSet.draw();
-                that.theTimeLine.setDrawStyle({
-                    showTimeBarsAsPercentage: that.ctrl_showTimeBarsAsPercentage.getValue()
-                });
-                that.theTimeLine.draw();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.draw();
+                })
+
             }
 
 
