@@ -111,6 +111,8 @@ CREATE TABLE `2D_tablecatalog` (
 CREATE TABLE `2D_propertycatalog` (
   `id` varchar(50),
   `tableid` varchar(20),
+  `col_table` varchar(20),
+  `row_table` varchar(20),
   `name` varchar(50),
   `ordr` int,
   `settings` text

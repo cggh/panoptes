@@ -84,9 +84,11 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
             extra_settings = copy.deepcopy(property)
             del extra_settings['Id']
             del extra_settings['Name']
-            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}')".format(
+            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
                 property['Id'],
                 tableid,
+                table_settings['ColumnDataTable'],
+                table_settings['RowDataTable'],
                 property['Name'],
                 property_order,
                 simplejson.dumps(extra_settings)
