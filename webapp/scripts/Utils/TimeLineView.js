@@ -177,7 +177,7 @@ define([
 
                 var colorStrings0 = [];
                 $.each(DQX.standardColors, function(idx, color) {
-                    colorStrings0.push(color.toStringCanvas());
+                    colorStrings0.push(color.lighten(0.3).toStringCanvas());
                 });
 
                 var pointSet = that.myTimeLine.myPointSet;
@@ -186,7 +186,7 @@ define([
 
                 var hasCategoricalData = that.myTimeLine.mySettings.catData;
 
-                var blockSize = Math.max(1,Math.round(5/drawInfo.zoomFactX));
+                var blockSize = Math.max(1,Math.round(7/drawInfo.zoomFactX));
                 var JD1IntMin = Math.floor(that.myTimeLine.minJD);
                 var JD1IntMax = Math.ceil(that.myTimeLine.maxJD);
 
@@ -198,6 +198,7 @@ define([
                 for (var blockNr = 0; blockNr<blockCount; blockNr++) {
                     var block = {
                         memberCount: 0,
+                        selectedMemberCount: 0,
                         memberCategoriesCount: []
                     };
                     blocks.push(block);
@@ -210,6 +211,8 @@ define([
                         if ( (blockNr>=0) && (blockNr<blockCount) ) {
                             var block = blocks[blockNr];
                             block.memberCount += 1;
+                            if (point.sel)
+                                block.selectedMemberCount += 1;
                             while (block.memberCategoriesCount.length<=point.catNr)
                                 block.memberCategoriesCount.push(0);
                             block.memberCategoriesCount[point.catNr] += 1;
@@ -223,13 +226,14 @@ define([
 
                 var yOffset = drawInfo.sizeY-10;
                 var ySize = drawInfo.sizeY-20;
+                var selBarWidth = Math.max(2,0.33*blockSize*drawInfo.zoomFactX);
 
                 drawInfo.centerContext.strokeStyle = 'rgb(0,0,0)';
                 drawInfo.centerContext.lineWidth = 0.25;
                 $.each(blocks, function(blockNr, block) {
                     var JDCent = (blockNr+blockNrMin)*blockSize;
-                    var psx1 = Math.round((JDCent-blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
-                    var psx2 = Math.round((JDCent+blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
+                    var psx1 = /*Math.round(*/(JDCent-blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX/*) + 0.5*/;
+                    var psx2 = /*Math.round(*/(JDCent+blockSize/2.0-that.myTimeLine.minJD) * drawInfo.zoomFactX - drawInfo.offsetX/*) + 0.5*/;
 
                     var barScale = blockSize*that.rateScale;
                     if (that.myTimeLine.drawStyle.showTimeBarsAsPercentage)
@@ -244,9 +248,19 @@ define([
                         incrCount += catCount;
                     });
                     var psh = Math.round(block.memberCount*1.0/barScale*ySize);
+                    drawInfo.centerContext.strokeStyle = 'rgb(0,0,0)';
                     drawInfo.centerContext.beginPath();
                     drawInfo.centerContext.rect(psx1,yOffset-psh,psx2-psx1,psh);
                     drawInfo.centerContext.stroke();
+                    drawInfo.centerContext.strokeStyle = 'rgba(0,0,0,0.15)';
+                    drawInfo.centerContext.beginPath();
+                    drawInfo.centerContext.rect(psx1,0,psx2-psx1,yOffset);
+                    drawInfo.centerContext.stroke();
+                    if (block.selectedMemberCount>0) {
+                        var psh = Math.round(block.selectedMemberCount*1.0/barScale*ySize);
+                        drawInfo.centerContext.fillStyle = 'rgb(64,0,0)';
+                        drawInfo.centerContext.fillRect(psx1,yOffset-psh,selBarWidth,psh);
+                    }
                 });
 
 
@@ -254,7 +268,7 @@ define([
                 drawInfo.centerContext.font = '11px sans-serif';
                 drawInfo.centerContext.textBaseline = 'top';
                 drawInfo.centerContext.textAlign = 'center';
-                this.drawMark(drawInfo, true);
+                this.drawMark(drawInfo, false);
             }
 
             return that;
@@ -300,12 +314,23 @@ define([
                     that._onViewPortModified();
             });
 
+            that.setOnRangeSelected(function() {
+                var range = that.getMark();
+                that.delMark();
+                if (that._onTimeRangeSelected)
+                    that._onTimeRangeSelected(range.min+that.minJD,range.max+that.minJD);
+            });
+
 
             that.handleResize();
 
 
             that.setOnViewPortModified = function(handler) {
                 that._onViewPortModified = handler;
+            }
+
+            that.setOnTimeRangeSelected = function(handler) {
+                that._onTimeRangeSelected = handler;
             }
 
             that.getVisibleTimeRange = function() {
@@ -348,6 +373,10 @@ define([
             that.draw = function() {
                 that.render();
             }
+
+            that.updateSelection = function() {
+                that.render();
+            };
 
             return that;
         }

@@ -178,6 +178,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.theTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,200));
 
+                that.theTimeLine.setOnTimeRangeSelected(that.fetchTimeRangeSelection);
+
 
                 // Create points overlay on map
                 that.pointSet = PointSet.Create(that.theMap, {});
@@ -405,6 +407,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var modified = false;
                 for (var nr =0; nr<points.length; nr++) {
                     var sel = that.theMap.isCoordInsideLassoSelection(Map.Coord(points[nr].longit, points[nr].lattit));
+                    if (sel!=!!(selectionInfo[points[nr].id])) {
+                        modified = true;
+                        that.tableInfo.selectItem(points[nr].id, sel);
+                    }
+                }
+                if (modified)
+                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+            }
+
+            that.fetchTimeRangeSelection = function(JDmin, JDmax) {
+                if (!that.points)  return;
+                var points = that.points;
+                var selectionInfo = that.tableInfo.currentSelection;
+                var modified = false;
+                for (var nr =0; nr<points.length; nr++) {
+                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
                     if (sel!=!!(selectionInfo[points[nr].id])) {
                         modified = true;
                         that.tableInfo.selectItem(points[nr].id, sel);
