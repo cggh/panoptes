@@ -38,90 +38,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     .setAllowScrollBars(false,false);
             };
 
-            that.createPanels = function() {
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
 
-                var ctrl_Query = that.theQuery.createControl();
-
-                var propList = [ {id:'', name:'-- None --'}];
-                $.each(MetaData.customProperties, function(idx, prop) {
-                    var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') || (prop.datatype=='Date') ) )
-                        propList.push({ id:prop.propid, name:prop.name });
-                });
-                that.ctrlColorProperty = Controls.Combo(null,{ label:'Point color:', states: propList }).setClassID('pointcolor');
-                that.ctrlColorProperty.setOnChanged(function() {
-                    that.fetchData();
-                });
-
-                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit'}).setOnChanged(function () {
-                    that.pointSet.zoomFit();
-                });
-
-                var onStopLassoSelection = function() {
-                    cmdLassoSelection.changeContent('Lasso select Points');
-                    that.theMap.stopLassoSelection();
-                    cmdLassoSelection.busy = false;
-                    that.fetchLassoSelection();
-                };
-
-                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select Points'}).setOnChanged(function () {
-                    cmdLassoSelection.busy = !cmdLassoSelection.busy;
-                    if (cmdLassoSelection.busy) {
-                        cmdLassoSelection.changeContent('Complete lasso selection');
-                        that.theMap.startLassoSelection(onStopLassoSelection);
-                    }
-                    else {
-                        onStopLassoSelection();
-                    }
-                });
-
-
-                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 200, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
-                    .setNotifyOnFinished()
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 200, minval:0, maxval:1, value:1, digits: 2}).setClassID('pointOpacity')
-                    .setNotifyOnFinished()
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-                that.ctrl_AggrType = Controls.Combo(null,{ label:'Style:', states: [{id: 'piechart', 'name':'Pie chart'}, {id: 'cluster', 'name':'Cluster'}], value:'piechart' }).setClassID('aggrStyle')
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-                that.ctrl_AggrSize = Controls.ValueSlider(null, {label: 'Size', width: 170, minval:10, maxval:100, value:20, digits: 0}).setClassID('aggrSize')
-                    .setNotifyOnFinished()
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-
-                that.colorLegend = Controls.Html(null,'');
-
-
+            that.createControlsTimeLine = function() {
                 //Create time controls
                 var propList = [];
                 $.each(MetaData.customProperties, function(idx, propInfo) {
                     if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
-                    propList.push({id:propInfo.propid, name:propInfo.name});
+                        propList.push({id:propInfo.propid, name:propInfo.name});
                 });
                 that.ctrlDateProperty = Controls.Combo(null,{ label:'Date:', states: propList, value:propList[0].id }).setClassID('dateprop');
                 that.ctrlDateProperty.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict '+that.tableInfo.tableNamePlural+' to viewport'}).setClassID('restricttotimeviewport');
+                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict to viewport'}).setClassID('restricttotimeviewport');
                 that.ctrl_restrictToTimeViewPort.setOnChanged(function() {
                     if (that.ctrl_restrictToTimeViewPort.getValue())
                         that.updateTimeViewPort();
@@ -139,23 +69,112 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_showTimeBarsAsPercentage, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
 
+                return groupTimeControls;
+            }
 
 
-                var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
-                    Controls.VerticalSeparator(20),
-                    groupTimeControls,
+
+            that.createControlsMap = function() {
+
+                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    that.pointSet.zoomFit();
+                });
+
+                var onStopLassoSelection = function() {
+                    cmdLassoSelection.changeContent('Lasso select Points');
+                    that.theMap.stopLassoSelection();
+                    cmdLassoSelection.busy = false;
+                    that.fetchLassoSelection();
+                };
+
+                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select Points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    cmdLassoSelection.busy = !cmdLassoSelection.busy;
+                    if (cmdLassoSelection.busy) {
+                        cmdLassoSelection.changeContent('Complete lasso selection');
+                        that.theMap.startLassoSelection(onStopLassoSelection);
+                    }
+                    else {
+                        onStopLassoSelection();
+                    }
+                });
+
+
+                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:1, digits: 2}).setClassID('pointOpacity')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_AggrType = Controls.Combo(null,{ label:'Style:', states: [{id: 'piechart', 'name':'Pie chart'}, {id: 'cluster', 'name':'Cluster'}], value:'piechart' }).setClassID('aggrStyle')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_AggrSize = Controls.ValueSlider(null, {label: 'Size', width: 150, minval:10, maxval:100, value:20, digits: 0}).setClassID('aggrSize')
+                    .setNotifyOnFinished()
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                var grp = Controls.CompoundVert([
                     cmdZoomToFit,
                     cmdLassoSelection,
-                    Controls.VerticalSeparator(10),
-                    that.ctrlColorProperty,
                     Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
                     that.ctrl_PointSize,
                     that.ctrl_Opacity,
-                    Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points'),
-                    Controls.VerticalSeparator(10),
-                    Controls.CompoundVert([that.colorLegend]).setLegend('Color legend')
+                    Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points')
+                    ]);
+                grp.setLegend('<h4>Map</h4>');
+                return grp;
+            }
+
+            that.createPanels = function() {
+                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+
+                var ctrl_Query = that.theQuery.createControl();
+
+                var propList = [ {id:'', name:'-- None --'}];
+                $.each(MetaData.customProperties, function(idx, prop) {
+                    var included = false;
+                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') || (prop.datatype=='Date') ) )
+                        propList.push({ id:prop.propid, name:prop.name });
+                });
+                that.ctrlColorProperty = Controls.Combo(null,{ label:'Color:', states: propList }).setClassID('pointcolor');
+                that.ctrlColorProperty.setOnChanged(function() {
+                    that.fetchData();
+                });
+
+
+
+                that.colorLegend = Controls.Html(null,'');
+
+
+                var groupTimeControls = that.createControlsTimeLine();
+
+                var groupMapControls = that.createControlsMap();
+
+
+                var controlsGroup = Controls.CompoundVert([
+                    ctrl_Query,
+                    Controls.VerticalSeparator(2),
+                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>'),
+                    Controls.VerticalSeparator(2),
+                    groupTimeControls,
+                    Controls.VerticalSeparator(2),
+                    groupMapControls
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

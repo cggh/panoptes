@@ -56,7 +56,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var theControl = Controls.BaseCustom(true);
                 theControl.setLegend("<h4>Active "+that.tableInfo.name+'</h4>').setAutoFillX(true);
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: DQX.BMP('filter1.png') });
+                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'PnButtonLarge', width:100, height:35, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
                         that.modify(query);
@@ -64,9 +64,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
-                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:130 }).setOnChanged(that.handlePickQuery);
+                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:160 }).setOnChanged(that.handlePickQuery);
 
-                that.buttonPrevQuery = Controls.Button(null, { content: 'Previous', hint:'Back to previous query', buttonClass: 'DQXToolButton2', bitmap: DQX.BMP('link2.png'), width:120, height:20}).setOnChanged(function() {
+                that.buttonPrevQuery = Controls.Button(null, { content: ' ', hint:'Back to previous query', buttonClass: 'PnButtonLarge', bitmap: DQX.BMP('link2.png'), width:25, height:35}).setOnChanged(function() {
                     if (that.prevQueries.length>0) {
                         that.query = SQL.WhereClause.decode(that.prevQueries.pop());
                         that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
@@ -79,9 +79,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 
-                theControl.addControl(buttonDefineQuery);
+                theControl.addControl(Controls.CompoundHor([buttonDefineQuery, Controls.HorizontalSeparator(10), that.buttonPrevQuery]));
+                theControl.addControl(Controls.VerticalSeparator(5));
                 theControl.addControl(that.ctrlPick);
-                theControl.addControl(that.buttonPrevQuery);
+//                theControl.addControl();
                 theControl.addControl(that.ctrlQueryString);
 
 
