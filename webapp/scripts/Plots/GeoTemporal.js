@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     else {
                         that.thePlot.pointSet.setPointFilter('timeFilter', null);
                         that.thePlot.updateMapPoints();
-                        that.theplot.reDraw();
+                        that.thePlot.reDraw();
                     }
                 });
 
