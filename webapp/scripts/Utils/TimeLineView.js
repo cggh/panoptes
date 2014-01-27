@@ -11,7 +11,7 @@ define([
 
         TimeLineView.ChannelScale = function (itimeLine) {
             var that = ChannelCanvas.Base('_TimeScale');
-            that._height = 28;
+            that._height = 31;
             that.myTimeLine = itimeLine;
 
 
@@ -137,19 +137,19 @@ define([
                     var day = dt.getUTCDate();
                     if (textScaleInfo.isOnScale(year, month, day)) {
                         var st1 = year;
-                        drawInfo.centerContext.fillText(st1, psx, 1);
+                        drawInfo.centerContext.fillText(st1, psx, 6);
                         if (!textScaleInfo.yearInterval) {
                             var st2 = pad(month)+'-'+pad(day);
-                            drawInfo.centerContext.fillText(st2, psx, 11);
+                            drawInfo.centerContext.fillText(st2, psx, 16);
                             drawInfo.centerContext.beginPath();
-                            drawInfo.centerContext.moveTo(psx, drawInfo.sizeY-7);
-                            drawInfo.centerContext.lineTo(psx, drawInfo.sizeY);
+                            drawInfo.centerContext.moveTo(psx, 0);
+                            drawInfo.centerContext.lineTo(psx, 7);
                             drawInfo.centerContext.stroke();
                         }
                     } else if (tickScaleInfo.isOnScale(year, month, day)) {
                         drawInfo.centerContext.beginPath();
-                        drawInfo.centerContext.moveTo(psx, drawInfo.sizeY-3);
-                        drawInfo.centerContext.lineTo(psx, drawInfo.sizeY);
+                        drawInfo.centerContext.moveTo(psx, 0);
+                        drawInfo.centerContext.lineTo(psx, 3);
                         drawInfo.centerContext.stroke();
                     }
                 }
@@ -224,8 +224,10 @@ define([
                     that.rateScale = Math.max(that.rateScale, block.memberCount*1.0/blockSize);
                 });
 
-                var yOffset = drawInfo.sizeY-10;
-                var ySize = drawInfo.sizeY-20;
+
+
+                var yOffset = drawInfo.sizeY;
+                var ySize = drawInfo.sizeY*0.9;
                 var selBarWidth = Math.max(2,0.33*blockSize*drawInfo.zoomFactX);
 
                 drawInfo.centerContext.strokeStyle = 'rgb(0,0,0)';
@@ -252,10 +254,6 @@ define([
                     drawInfo.centerContext.beginPath();
                     drawInfo.centerContext.rect(psx1,yOffset-psh,psx2-psx1,psh);
                     drawInfo.centerContext.stroke();
-                    drawInfo.centerContext.strokeStyle = 'rgba(0,0,0,0.15)';
-                    drawInfo.centerContext.beginPath();
-                    drawInfo.centerContext.rect(psx1,0,psx2-psx1,yOffset);
-                    drawInfo.centerContext.stroke();
                     if (block.selectedMemberCount>0) {
                         var psh = Math.round(block.selectedMemberCount*1.0/barScale*ySize);
                         drawInfo.centerContext.fillStyle = 'rgb(64,0,0)';
@@ -269,6 +267,14 @@ define([
                 drawInfo.centerContext.textBaseline = 'top';
                 drawInfo.centerContext.textAlign = 'center';
                 this.drawMark(drawInfo, false);
+
+                that.drawVertScale(drawInfo, 0, that.rateScale, { offsetFrac:0.0, rangeFrac:0.9 });
+
+                drawInfo.leftContext.font = '11px sans-serif';
+                drawInfo.leftContext.fillStyle = "black";
+                drawInfo.leftContext.fillText('1/d', 20, Math.round(drawInfo.sizeY*0.5)+7);
+
+
             }
 
             return that;
@@ -276,7 +282,7 @@ define([
 
 
         TimeLineView.Create = function(iParentRef) {
-            var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false});
+            var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false, leftWidth:80});
             that.scaleConversionFactor = 1.0;
             that.myPointSet = [];
 
@@ -306,8 +312,8 @@ define([
             };
 
 
-            that.addChannel(TimeLineView.ChannelScale(that), true);
             that.addChannel(TimeLineView.ChannelData(that), true);
+            that.addChannel(TimeLineView.ChannelScale(that), true);
 
             Msg.listen('',{ type: 'PosOrZoomFactorXChanged', id: that.myID }, function() {
                 if (that._onViewPortModified)
