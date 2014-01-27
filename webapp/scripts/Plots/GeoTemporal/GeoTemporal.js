@@ -411,10 +411,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var selectionInfo = that.tableInfo.currentSelection;
                 var modified = false;
                 for (var nr =0; nr<points.length; nr++) {
-                    var sel = that.theMap.isCoordInsideLassoSelection(Map.Coord(points[nr].longit, points[nr].lattit));
-                    if (sel!=!!(selectionInfo[points[nr].id])) {
-                        modified = true;
-                        that.tableInfo.selectItem(points[nr].id, sel);
+                    if (!that.pointSet.isPointFiltered(points[nr])) {
+                        var sel = that.theMap.isCoordInsideLassoSelection(Map.Coord(points[nr].longit, points[nr].lattit));
+                        if (sel!=!!(selectionInfo[points[nr].id])) {
+                            modified = true;
+                            that.tableInfo.selectItem(points[nr].id, sel);
+                        }
                     }
                 }
                 if (modified)
