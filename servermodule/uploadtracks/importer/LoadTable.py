@@ -5,6 +5,9 @@ import DQXUtils
 import config
 from DQXTableUtils import VTTable
 import ImpUtils
+import datetime
+import dateutil.parser
+
 
 # Columns: list of dict
 #       name
@@ -36,6 +39,12 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf'):
                 content = 'NULL'
 
+        if col['IsDate']:
+            dt = dateutil.parser.parse(content)
+            tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
+            tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
+            content = str(tmdiff)
+
         if col['IsBoolean']:
             vl = content
             content = 'NULL'
@@ -57,6 +66,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     for col in columns:
         col['IsString'] = (col['DataType'] == 'Text')
         col['IsValue'] = ImpUtils.IsValueDataTypeIdenfifier(col['DataType'])
+        col['IsDate'] = ImpUtils.IsDateDataTypeIdenfifier(col['DataType'])
         col['IsBoolean'] = (col['DataType'] == 'Boolean')
         col['MaxLen'] = 0
 

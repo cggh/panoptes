@@ -25,6 +25,9 @@ def IsValueDataTypeIdenfifier(datatypeIdentifier):
            (datatypeIdentifier == 'LowPrecisionValue') or\
            (datatypeIdentifier == 'Date')
 
+def IsDateDataTypeIdenfifier(datatypeIdentifier):
+    return (datatypeIdentifier == 'Date')
+
 
 def GetSQLDataType(datatypeIdentifier):
     datatypestr = 'varchar(50)'

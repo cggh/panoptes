@@ -107,7 +107,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.uploadtracks.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Genotypes',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Geographic',
         {
             'ConfigOnly': False
         }

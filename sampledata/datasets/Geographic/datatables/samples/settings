@@ -23,8 +23,8 @@ Properties:
   ShowInTable: true
   IsCategorical: true
 
-- Id: JD
-  Name: Sampling date
+- Id: CollectionDate
+  Name: Collection date
   DataType: Date
   ShowInTable: true
 
