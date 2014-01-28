@@ -102,26 +102,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
-//            that.fetchTimeRangeSelection = function(JDmin, JDmax, add, narrow) {
-//                if (!that.thePlot.points)  return;
-//                var points = that.thePlot.points;
-//                var selectionInfo = that.tableInfo.currentSelection;
-//                var modified = false;
-//                for (var nr =0; nr<points.length; nr++) {
-//                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
-//                    if (add && selectionInfo[points[nr].id])
-//                        sel = true;
-//                    if (narrow && (!selectionInfo[points[nr].id]) )
-//                        sel = false
-//                    if (sel!=!!(selectionInfo[points[nr].id])) {
-//                        modified = true;
-//                        that.tableInfo.selectItem(points[nr].id, sel);
-//                    }
-//                }
-//                if (modified)
-//                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
-//            }
-
             that.onTimeRangeSelected = function(JDmin, JDmax) {
                 if (!that.thePlot.points) return;
                 var datePropId = that.ctrlDateProperty.getValue();
