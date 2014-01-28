@@ -130,7 +130,7 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        Application.setHeader('<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/malariagen_logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>');
+                        Application.setHeader('<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>');
 
 
                         //Provide a hook to fetch some data upfront from the server. Upon completion, 'proceedFunction' should be called;
