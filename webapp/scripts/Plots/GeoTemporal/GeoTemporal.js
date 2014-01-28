@@ -69,34 +69,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createControlsMap = function() {
 
-//                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-//                    that.pointSet.zoomFit();
-//                });
+                var cmdLassoSelection = Controls.Button(null, { content: 'Select points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    var actions = [];
 
-                var onStopLassoSelection = function() {
-                    cmdLassoSelection.changeContent('Lasso select Points');
-                    that.theMap.stopLassoSelection();
-                    cmdLassoSelection.busy = false;
-                    that.fetchLassoSelection();
-                };
+                    actions.push( { content:'Rectangular latt-long area', handler:function() {
+                        that.theMap.startLassoSelection(that.fetchLassoSelection);
+                    }
+                    });
 
-                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select Points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    cmdLassoSelection.busy = !cmdLassoSelection.busy;
-                    if (cmdLassoSelection.busy) {
-                        cmdLassoSelection.changeContent('Complete lasso selection');
-                        that.theMap.startLassoSelection(onStopLassoSelection);
+                    actions.push( { content:'Lasso tool', handler:function() {
+                        that.theMap.startLassoSelection(that.fetchLassoSelection);
                     }
-                    else {
-                        onStopLassoSelection();
-                    }
+                    });
+
+                    ButtonChoiceBox.create('Select points','', [actions]);
                 });
-
 
                 that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
-
 
                 that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
