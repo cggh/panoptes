@@ -73,7 +73,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     var actions = [];
 
                     actions.push( { content:'Rectangular latt-long area', handler:function() {
-                        that.theMap.startLassoSelection(that.fetchLassoSelection);
+                        that.theMap.startRectSelection(that.fetchRectSelection);
                     }
                     });
 
@@ -428,6 +428,33 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var content = '';
                 ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Geographic area', content, null, selectionCreationFunction);
+            }
+
+
+            that.fetchRectSelection = function(coord1, coord2) {
+                var longitMin = Math.min(coord1.longit, coord2.longit);
+                var longitMax = Math.max(coord1.longit, coord2.longit);
+                var lattitMin = Math.min(coord1.lattit, coord2.lattit);
+                var lattitMax = Math.max(coord1.lattit, coord2.lattit);
+                var qry = that.theQuery.get();
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLongit,
+                    longitMin, longitMax);
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit,
+                    lattitMin, lattitMax);
+
+                selectionCreationFunction = function() {
+                    var selList = [];
+                    $.each(that.points, function(idx, point) {
+                        if (!that.pointSet.isPointFiltered(point)) {
+                            var sel = (point.longit>=longitMin) && (point.longit<=longitMax) && (point.lattit>=lattitMin) && (point.lattit<=lattitMax);
+                            if (sel)
+                                selList.push(point.id);
+                        }
+                    });
+                    return selList;
+                };
+
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Geographic range', '', qry, selectionCreationFunction);
             }
 
 
