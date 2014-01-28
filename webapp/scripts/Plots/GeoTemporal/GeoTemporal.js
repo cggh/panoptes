@@ -1,11 +1,11 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/Map", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "DQX/GMaps/PointSet",
     "MetaData",
-    "Utils/QueryTool", "Plots/GenericPlot",
+    "Utils/QueryTool", "Utils/ButtonChoiceBox", "Plots/GenericPlot",
     "Plots/GeoTemporal/TimeLine"
 ],
     function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, Map, DataFetchers, EditQuery, PointSet,
               MetaData,
-              QueryTool, GenericPlot,
+              QueryTool, ButtonChoiceBox, GenericPlot,
               TimeLine
         ) {
 
@@ -269,8 +269,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var requestID = DQX.getNextUniqueID();
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
+                DQX.setProcessing();
                 fetcher.getData(that.theQuery.get(), sortField,
                     function (data) { //success
+                        DQX.stopProcessing();
                         if (that.requestID == requestID) {
                             $.each(data, function(id, values) {
                                 that.pointData[id] = values;
@@ -283,6 +285,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         }
                     },
                     function (data) { //error
+                        DQX.stopProcessing();
                         that.fetchCount -= 1;
                     }
 
@@ -407,20 +410,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.fetchLassoSelection = function() {
                 if (!that.points)  return;
-                var points = that.points;
-                var selectionInfo = that.tableInfo.currentSelection;
-                var modified = false;
-                for (var nr =0; nr<points.length; nr++) {
-                    if (!that.pointSet.isPointFiltered(points[nr])) {
-                        var sel = that.theMap.isCoordInsideLassoSelection(Map.Coord(points[nr].longit, points[nr].lattit));
-                        if (sel!=!!(selectionInfo[points[nr].id])) {
-                            modified = true;
-                            that.tableInfo.selectItem(points[nr].id, sel);
+
+                var selectionCreationFunction = function() {
+                    var selList = [];
+                    $.each(that.points,function(idx, point) {
+                        if (!that.pointSet.isPointFiltered(point)) {
+                            if (that.theMap.isCoordInsideLassoSelection(Map.Coord(point.longit, point.lattit)))
+                                selList.push(point.id);
                         }
-                    }
-                }
-                if (modified)
-                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+                    });
+                    return selList;
+                };
+
+                var content = '';
+                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Geographic area', content, null, selectionCreationFunction);
             }
 
 

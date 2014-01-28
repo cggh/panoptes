@@ -1,5 +1,11 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+],
+    function (
+        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        ) {
 
         var ItemScatterPlot = {};
 
@@ -532,6 +538,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 qry = SQL.WhereClause.createRangeRestriction(qry, aspectX.propid, rangeXMin, rangeXMax);
                 qry = SQL.WhereClause.createRangeRestriction(qry, aspectY.propid, rangeYMin, rangeYMax);
 
+/*
                 var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
                     var tableView = Application.getView('table_'+that.tableInfo.id);
                     tableView.activateWithQuery(qry);
@@ -543,27 +550,54 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Popup.closeIfNeeded(popupid);
                 });
 
-                var bt3 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Highlight items in range (replace)",  width:120, height:30 }).setOnChanged(function() {
+                */
+/*
+                buttonsRow1 = [];
+
+                buttonsRow1.push( { content:'Select<br>(REPLACE)', bitmap:'Bitmaps/venn2.png', handler:function() {
                     doSelect(0);
-                    Popup.closeIfNeeded(popupid);
+                }
                 });
 
-                var bt4 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Highlight items in range (add)",  width:120, height:30 }).setOnChanged(function() {
+                buttonsRow1.push( { content:'Select<br>(ADD)', bitmap:'Bitmaps/venn3.png', handler:function() {
                     doSelect(2);
-                    Popup.closeIfNeeded(popupid);
+                }
                 });
 
-                var bt5 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Unhighlight items in range",  width:120, height:30 }).setOnChanged(function() {
+                buttonsRow1.push( { content:'Select<br>(NARROW)', bitmap:'Bitmaps/venn1.png', handler:function() {
                     doSelect(3);
-                    Popup.closeIfNeeded(popupid);
+                }
                 });
+
+                buttonsRow2 = [];
+
+                buttonsRow2.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
+                    that.setActiveQuery(qry);
+                }
+                } );
+*/
 
                 var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
                 content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
-                content +=  bt1.renderHtml() + bt2.renderHtml()+'<br>';
-                content +=  bt3.renderHtml() + bt4.renderHtml() + bt5.renderHtml();
-                var popupid = Popup.create('2D Histogram area', content);
 
+
+                var selectionCreationFunction = function() {
+                    var sellist = [];
+                    for (var i=0; i<valX.length; i++) {
+                        if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                            var px = valX[i] * scaleX + offsetX;
+                            var py = valY[i] * scaleY + offsetY;
+                            if ((px>=minX) && (px<=maxX) && (py>minY) && (py<=maxY)) {
+                                sellist.push(ids[i]);
+                            }
+                        }
+                    }
+                    return sellist;
+                };
+
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatter plot area', content, qry, selectionCreationFunction);
+
+/*
                 var doSelect = function(tpe) {
                     if (tpe==0)
                         that.tableInfo.currentSelection = {};
@@ -581,6 +615,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
                 }
+*/
 
             }
 

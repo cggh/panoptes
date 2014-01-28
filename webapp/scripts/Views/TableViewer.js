@@ -187,7 +187,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableInfo.clearSelection();
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
                     });
-                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {
                         SelectionTools.cmdStore(that.tableInfo);
                     });

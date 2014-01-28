@@ -1,5 +1,11 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+],
+    function (
+        require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        ) {
 
         var Histogram2D = {};
 
@@ -389,16 +395,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueX, tooltip.minvalX, tooltip.maxvalX);
                     qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueY, tooltip.minvalY, tooltip.maxvalY);
 
-                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table",  width:120, height:30 }).setOnChanged(function() {
-                        var tableView = Application.getView('table_'+that.tableInfo.id);
-                        tableView.activateWithQuery(qry);
-                        Popup.closeIfNeeded(popupid);
-                    });
                     var content = 'X Range: '+tooltip.minvalX+' - '+tooltip.maxvalX+'<br>';
                     content += 'Y Range: '+tooltip.minvalY+' - '+tooltip.maxvalY+'<br>';
                     content += 'Number of items: '+tooltip.count;
-                    content += '<br/>' + bt.renderHtml();
-                    var popupid = Popup.create('Histogram bar', content);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
                 }
             }
 
@@ -413,21 +413,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueX, rangeXMin, rangeXMax);
                 qry = SQL.WhereClause.createRangeRestriction(qry, that.propidValueY, rangeYMin, rangeYMax);
 
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
-                    var tableView = Application.getView('table_'+that.tableInfo.id);
-                    tableView.activateWithQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
-
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
-                    that.setActiveQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
 
                 var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
                 content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
-                content +=  bt1.renderHtml() + bt2.renderHtml();
-                var popupid = Popup.create('2D Histogram area', content);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
             }
 
 

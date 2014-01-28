@@ -1,9 +1,9 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/Map", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "DQX/GMaps/PointSet",
     "MetaData",
-    "Utils/QueryTool", "Plots/GenericPlot", "Utils/TimeLineView"],
+    "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/TimeLineView"],
     function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, Map, DataFetchers, EditQuery, PointSet,
               MetaData,
-              QueryTool, GenericPlot, TimeLineView) {
+              QueryTool, GenericPlot, ButtonChoiceBox, TimeLineView) {
 
         var TimeLine = {};
 
@@ -18,7 +18,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.createView = function() {
                 that.myTimeLine = TimeLineView.Create(that.frame);
                 that.myTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,50));
-                that.myTimeLine.setOnTimeRangeSelected(that.fetchTimeRangeSelection);
+                that.myTimeLine.setOnTimeRangeSelected(that.onTimeRangeSelected);
             };
 
 
@@ -102,20 +102,48 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
-            that.fetchTimeRangeSelection = function(JDmin, JDmax) {
-                if (!that.thePlot.points)  return;
-                var points = that.thePlot.points;
-                var selectionInfo = that.tableInfo.currentSelection;
-                var modified = false;
-                for (var nr =0; nr<points.length; nr++) {
-                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
-                    if (sel!=!!(selectionInfo[points[nr].id])) {
-                        modified = true;
-                        that.tableInfo.selectItem(points[nr].id, sel);
-                    }
-                }
-                if (modified)
-                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+//            that.fetchTimeRangeSelection = function(JDmin, JDmax, add, narrow) {
+//                if (!that.thePlot.points)  return;
+//                var points = that.thePlot.points;
+//                var selectionInfo = that.tableInfo.currentSelection;
+//                var modified = false;
+//                for (var nr =0; nr<points.length; nr++) {
+//                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
+//                    if (add && selectionInfo[points[nr].id])
+//                        sel = true;
+//                    if (narrow && (!selectionInfo[points[nr].id]) )
+//                        sel = false
+//                    if (sel!=!!(selectionInfo[points[nr].id])) {
+//                        modified = true;
+//                        that.tableInfo.selectItem(points[nr].id, sel);
+//                    }
+//                }
+//                if (modified)
+//                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+//            }
+
+            that.onTimeRangeSelected = function(JDmin, JDmax) {
+                if (!that.thePlot.points) return;
+                var datePropId = that.ctrlDateProperty.getValue();
+                var qry = that.thePlot.theQuery.get();
+                qry = SQL.WhereClause.createRangeRestriction(qry, datePropId, JDmin, JDmax);
+
+                selectionCreationFunction = function() {
+                    var points = that.thePlot.points;
+                    var selList = [];
+                    $.each(points, function(idx, point) {
+                        if (!that.thePlot.pointSet.isPointFiltered(point)) {
+                            var sel = (point.dateJD>=JDmin) && (point.dateJD<=JDmax);
+                            if (sel)
+                                selList.push(point.id);
+                        }
+                    });
+                    return selList;
+                };
+
+                var datePropInfo = MetaData.findProperty(that.tableInfo.id, datePropId);
+                var content = datePropInfo.name+' between '+datePropInfo.toDisplayString(JDmin)+' and '+datePropInfo.toDisplayString(JDmax);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Date range', content, qry, selectionCreationFunction);
             }
 
             that.storeSettings = function() {
