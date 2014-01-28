@@ -24,9 +24,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
         GeoTemporal.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geotemporal analysis' }, startQuery);
+            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geographic map' }, startQuery);
 
             that.pointData = {};//first index: property id, second index: point nr
+
+            that.hasTimeLine = false;
+            $.each(MetaData.customProperties, function(idx, propInfo) {
+                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
+                    that.hasTimeLine = true;
+            });
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
@@ -38,15 +44,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.plotComponents = {};
 
-            that.plotComponents.timeLine = TimeLine.Create(that);
+            if (that.hasTimeLine) {
+                that.plotComponents.timeLine = TimeLine.Create(that);
+            }
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
                 var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7));
-                that.plotComponents.timeLine.frame = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,false);
+
+                if (that.hasTimeLine) {
+                    that.plotComponents.timeLine.frame = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
+                        .setAllowScrollBars(false,false);
+                }
+
                 that.frameGeoMap = frameRight.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
             };
@@ -57,9 +69,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createControlsMap = function() {
 
-                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    that.pointSet.zoomFit();
-                });
+//                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+//                    that.pointSet.zoomFit();
+//                });
 
                 var onStopLassoSelection = function() {
                     cmdLassoSelection.changeContent('Lasso select Points');
@@ -92,7 +104,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:1, digits: 2}).setClassID('pointOpacity')
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:0.7, digits: 2}).setClassID('pointOpacity')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
@@ -110,7 +122,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
 
                 var grp = Controls.CompoundVert([
-                    cmdZoomToFit,
+//                    cmdZoomToFit,
                     cmdLassoSelection,
                     Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
