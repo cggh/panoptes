@@ -17,9 +17,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 //This function is called during the initialisation. Create the frame structure of the view here
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
+                    rootFrame.setSeparatorSize(0);
 
-                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5))/*.setFixedSize(Framework.dimX, 400)*/;
-                    this.frameChannels = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5));
+                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.45));
+                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.55))/*.setFixedSize(Framework.dimX, 400)*/;
+                    this.frameButtons.setMargins(15);
+                    this.frameButtons2.setMargins(15);
                     //this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                 }
 
@@ -27,6 +30,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.createPanels = function() {
                     this.panelButtons = Framework.Form(this.frameButtons);
                     this.panelButtons.setPadding(10);
+                    this.panelButtons2 = Framework.Form(this.frameButtons2);
+                    this.panelButtons2.setPadding(10);
 
                     //this.panelChannels = FrameTree.Tree(this.frameChannels);
                     //that.updateChannelInfo();
@@ -36,50 +41,51 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     if (MetaData.generalSettings.hasGenomeBrowser) {
                         var browserButton = Application.getView('genomebrowser').createActivationButton({
                             content: "Genome browser",
-                            bitmap: 'Bitmaps/circle_red_small.png'
+                            bitmap: 'Bitmaps/GenomeBrowser.png'
                         });
                         miscButtonList.push(browserButton);
                     }
 
                     var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-//                        tableButtons.push(Controls.Static('gfkjgjkgfkj'));
                         var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
                             content: "Show table",
                             bitmap: 'Bitmaps/datagrid2.png'
                         });
-                        var descr = tableInfo.settings.Description||'';
+                        var descr = tableInfo.settings.Description||'<i>No description</i>';
                         if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
-                            descr += '<br><b>Relations:</b>'
+                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
                             $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
                                 descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
                             });
                             $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
                                 descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
                             });
+                            descr += '</div>';
                         }
                         var info = Controls.Static(descr);
-                        var grp = Controls.CompoundVert([info, tableViewerButton]).setAutoFillX(true).setLegend('<h3>' + tableInfo.tableCapNamePlural + '</h3>');
+                        var grp = Controls.CompoundHor([info, Controls.AlignRight(tableViewerButton)]).setAutoFillX(true).setLegend('<h2>' + tableInfo.tableCapNamePlural + '</h2>');
                         tableButtons.push(grp);
+                        tableButtons.push(Controls.VerticalSeparator(10));
                     })
 
-                    var bt_addprops = Controls.Button(null, { content: 'Upload custom properties...', width:120, height:40 });
-                    bt_addprops.setOnChanged(function() {
-                        UploadProperties.execute(function() {});
-                    })
-                    miscButtonList.push(bt_addprops);
+//                    var bt_addprops = Controls.Button(null, { content: 'Upload custom properties...', width:120, height:40 });
+//                    bt_addprops.setOnChanged(function() {
+//                        UploadProperties.execute(function() {});
+//                    })
+//                    miscButtonList.push(bt_addprops);
 
-                    //var bt_refresh = Controls.Button(null, { content: 'Refresh'}).setOnChanged(function() {
-                    //    Msg.send({ type: 'ReloadChannelInfo' });
-                    //})
-                    //miscButtonList.push(bt_refresh);
 
                     this.panelButtons.addControl(Controls.CompoundVert([
-                        Controls.CompoundVert(tableButtons)/*.setTreatAsBlock()*/,
-                        Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
+                        Controls.CompoundVert(tableButtons)
+                    ]));
+
+                    this.panelButtons2.addControl(Controls.CompoundVert([
+                        //Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
+                        Controls.Static('<h1>'+MetaData.generalSettings.Name+'</h1>'),
+                        Controls.Static(MetaData.generalSettings.Description||'<i>No description</i>'),
                         Controls.VerticalSeparator(20),
-                        Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
-                        //Controls.ColorPicker(null, {label: 'Color', value: DQX.Color(1,1,0)})
+                        Controls.CompoundVert(miscButtonList).setTreatAsBlock()
                     ]));
 
 

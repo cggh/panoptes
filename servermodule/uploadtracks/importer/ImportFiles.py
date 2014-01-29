@@ -29,6 +29,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
         globalSettings.RequireTokens(['Name'])
+        globalSettings.AddTokenIfMissing('Description','')
 
         print('Global settings: '+str(globalSettings.Get()))
 

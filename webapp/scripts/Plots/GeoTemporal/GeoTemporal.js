@@ -90,13 +90,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:3, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:0.7, digits: 2}).setClassID('pointOpacity')
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:0.8, digits: 2}).setClassID('pointOpacity')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
