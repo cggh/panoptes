@@ -127,7 +127,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     buttons.push(Controls.HorizontalSeparator(7));
                     var bt = Controls.Button(null, { content: 'Show on genome'}).setOnChanged(function() {
                         //that.close();//!!!todo: only when blocking
-                        Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.chrom, position:parseInt(data.pos) });
+                        Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.fields.chrom, position:parseInt(data.fields.pos) });
                     })
                     buttons.push(bt)
                 }
