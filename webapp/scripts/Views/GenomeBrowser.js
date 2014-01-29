@@ -1,5 +1,10 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "Wizards/EditTableBasedSummaryValues", "MetaData"],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, EditTableBasedSummaryValues, MetaData) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
+    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool"
+],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
+              EditTableBasedSummaryValues, MetaData, QueryTool
+        ) {
 
         var GenomeBrowserModule = {
 
@@ -10,7 +15,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     'Genome browser'    // View title
                 );
                 that.setEarlyInitialisation();
-
 
                 that.storeSettings = function() {
                     var obj= {};
@@ -23,6 +27,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         obj.settings = Controls.storeSettings(that.visibilityControlsGroup);
                         obj.settingsButtons = Controls.storeSettings(that.buttonsGroup);
                     }
+                    obj.datatables = {};
+                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                        if (tableInfo.hasGenomePositions) {
+                            var tableSett = {};
+                            tableSett.query = SQL.WhereClause.encode(tableInfo.genomeBrowserInfo.theQuery.get());
+                            obj.datatables[tableid] = tableSett;
+                        }
+                    });
                     return obj;
                 };
 
@@ -39,6 +51,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if ((settObj.settingsButtons) && (that.buttonsGroup) )
                         Controls.recallSettings(that.buttonsGroup, settObj.settingsButtons, false);
 
+                    if (settObj.datatables) {
+                        $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                            if (tableInfo.hasGenomePositions) {
+                                if (settObj.datatables[tableid]) {
+                                    tableSett = settObj.datatables[tableid];
+                                    if (tableSett.query) {
+                                        var qry = SQL.WhereClause.decode(tableSett.query);
+                                        tableInfo.genomeBrowserInfo.theQuery.modify(qry);
+                                    }
+                                }
+                            }
+                        });
+                    }
+
                     //Initialise all the table based summary values
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                         that.rebuildTableBasedSummaryValues(tableInfo.id);
@@ -50,21 +76,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 that.createFrames = function(rootFrame) {
-                    that.filterByQuery = false;
                     rootFrame.makeGroupHor();
                     this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3));//Create frame that will contain the controls panel
                     this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
                     Msg.listen("", { type: 'JumpgenomePosition' }, that.onJumpGenomePosition);
-
-                    Msg.listen("", {type: 'QueryChanged'}, function(scope, tableid) {
-                        var tableInfo = MetaData.getTableInfo(tableid);
-                        if (tableInfo.hasGenomePositions) {
-                            if ( (tableInfo.genomeBrowserInfo.dataFetcher) && (tableInfo.genomeBrowserInfo.filterByQuery) )
-                                tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
-                        }
-                    });
 
                     Msg.listen("", { type: 'TableBasedSummaryValueSelectionChanged' }, function(scope, params) {
                         that.rebuildTableBasedSummaryValues(params.tableid);
@@ -116,21 +133,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
 
                     var linkToTableButtonsGroup = Controls.CompoundVert([]);
-
-                    $.each(MetaData.tableCatalog, function(idx, table) {
-                        if (table.hasGenomePositions) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible {name} in table".DQXformat({name:table.tableNamePlural}),  width:120, height:30 }).setOnChanged(function() {
-                                var chromoid = that.panelBrowser.getCurrentChromoID();
-                                var range = that.panelBrowser.getVisibleRange();
-                                Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
-                                    preservecurrentquery:(that.ctrl_filtertype.getValue()=='query'),
-                                    chrom:chromoid, start:range.min, stop:range.max
-                                });
-                            });
-                            linkToTableButtonsGroup.addControl(bt);
-                        }
-                    });
-
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
@@ -449,15 +451,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
-                            that.ctrl_filtertype = Controls.Combo(null, { label:'Filter method: ', states:[{id:'all', name:'All'}, {id:'query', name:'Currently query'}], value:'all'}).setClassID('filteronoff').setOnChanged(function() {
-                                tableInfo.genomeBrowserInfo.filterByQuery = (that.ctrl_filtertype.getValue()=='query');
-                                if (tableInfo.genomeBrowserInfo.filterByQuery)
-                                    tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.currentQuery);
-                                else
-                                    tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(SQL.WhereClause.Trivial());
+                            tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
+                            tableInfo.genomeBrowserInfo.theQuery.notifyQueryUpdated = function() {
+                                tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
+                            };
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            controlsGroup.addControl(ctrlQuery);
+
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible in range".DQXformat({name:tableInfo.tableNamePlural}),  width:150, height:40, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
+                                var chromoid = that.panelBrowser.getCurrentChromoID();
+                                var range = that.panelBrowser.getVisibleRange();
+                                range.min = Math.floor(range.min);
+                                range.max = Math.floor(range.max);
+                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
+                                qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', chromoid);
+                                qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', range.min, range.max, true);
+                                Msg.send({type: 'DataItemTablePopup'}, {
+                                    tableid: tableInfo.id,
+                                    query: qry,
+                                    title: '{name} in genomic range {chromoid}:{start}-{stop}'.DQXformat({name:tableInfo.tableCapNamePlural, chromoid:chromoid, start:range.min, stop:range.max })
+                                });
                             });
-                            controlsGroup.addControl(that.ctrl_filtertype);
+                            controlsGroup.addControl(Controls.VerticalSeparator(7));
+                            controlsGroup.addControl(bt);
+
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
 
                             //Initialise the data fetcher that will download the data for the table
@@ -471,8 +489,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
                             dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");//add id column to the datafetcher, not plotted but needed for the tooltip & click actions
 
-                            if (tableInfo.genomeBrowserInfo.filterByQuery)
-                                dataFetcher.setUserQuery2(tableInfo.currentQuery);
+                            dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
 
                             //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
                             tableInfo.genomeBrowserInfo.currentCustomProperties = [];
