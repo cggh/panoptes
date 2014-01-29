@@ -144,6 +144,152 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
+
+
+        MiscUtils.createDateScaleInfo = function(optimDist, zoomFact) {
+            var dist,shear;
+            var minShear = 1.0e9;
+            var calcShear = function(dst) {
+                return Math.abs(dst/optimDist-1.0);
+            }
+            var rs = {
+                namedDays: null,
+                monthInterval: null,
+                yearInterval: null
+            };
+
+            // try each day
+            dist = 1*zoomFact;
+            shear = calcShear(dist);
+            if (shear<minShear) {
+                minShear = shear;
+                rs.namedDays = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,39,31];
+            }
+
+            // try each 2 days
+            dist = 2*zoomFact;
+            shear = calcShear(dist);
+            if (shear<minShear) {
+                minShear = shear;
+                rs.namedDays = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30];
+            }
+
+            // try each 5 days
+            dist = 5*zoomFact;
+            shear = calcShear(dist);
+            if (shear<minShear) {
+                minShear = shear;
+                rs.namedDays = [1,5,10,15,20,25];
+            }
+
+            // try each 10 days
+            dist = 10*zoomFact;
+            shear = calcShear(dist);
+            if (shear<minShear) {
+                minShear = shear;
+                rs.namedDays = [1,10,20];
+            }
+
+            // try each 15 days
+            dist = 15*zoomFact;
+            shear = calcShear(dist);
+            if (shear<minShear) {
+                minShear = shear;
+                rs.namedDays = [1,15];
+            }
+
+            // try month multiples
+            $.each([1,2,3,6,12], function(idx, mult) {
+                dist = mult*30*zoomFact;
+                shear = calcShear(dist)
+                if (shear<minShear) {
+                    minShear = shear;
+                    rs.monthInterval = mult;
+                    rs.namedDays = null;
+                    rs.yearInterval = null;
+                }
+            })
+
+            // try year multiples
+            $.each([1,2,5,10], function(idx, mult) {
+                dist = mult*365*zoomFact;
+                shear = calcShear(dist)
+                if (shear<minShear) {
+                    minShear = shear;
+                    rs.monthInterval = null;
+                    rs.namedDays = null;
+                    rs.yearInterval = mult;
+                }
+            });
+
+            rs.isOnScale = function(year, month, day) {
+                if (this.yearInterval) {
+                    if ( (year%this.yearInterval == 0) && (month==1) &&(day==1) )
+                        return true;
+                    return false;
+                }
+                if (this.monthInterval) {
+                    if ( ((month-1)%this.monthInterval == 0) && (day==1) )
+                        return true;
+                    return false;
+                }
+                if (this.namedDays.indexOf(day)>=0)
+                    return true;
+                return false;
+            }
+
+            return rs;
+        }
+
+
+
+        MiscUtils.createPropertyScale = function(tableid, propid, zoomFactor, minVal, maxVal) {
+            var propInfo = MetaData.findProperty(tableid, propid);
+            if (propInfo.isDate) {// Date scale
+                var pad = function(n) {return n<10 ? '0'+n : n};
+                var textScaleInfo = MiscUtils.createDateScaleInfo(80, zoomFactor);
+                var tickScaleInfo = MiscUtils.createDateScaleInfo(20, zoomFactor);
+                var ticks = [];
+                var JD1IntMin = Math.floor(minVal);
+                var JD1IntMax = Math.ceil(maxVal);
+                for (var JDInt = JD1IntMin; JDInt<= JD1IntMax; JDInt++) {
+                    var dt = DQX.JD2DateTime(JDInt);
+                    var year = dt.getUTCFullYear();
+                    var month = dt.getUTCMonth() + 1;
+                    var day = dt.getUTCDate();
+                    if (textScaleInfo.isOnScale(year, month, day)) {
+                        var tick = {
+                            value: JDInt,
+                            label: year.toString()
+                        };
+                        ticks.push(tick);
+                        if (!textScaleInfo.yearInterval)
+                            tick.label2 = '-'+pad(month)+'-'+pad(day);
+                    } else if (tickScaleInfo.isOnScale(year, month, day)) {
+                        ticks.push({
+                            value: JDInt
+                        });
+                    }
+                }
+                return ticks;
+            }
+            else {// Ordinary numerical scale
+                var scale = DQX.DrawUtil.getScaleJump(30/zoomFactor);
+                var ticks = [];
+                for (var i=Math.ceil(minVal/scale.Jump1); i<=Math.floor(maxVal/scale.Jump1); i++) {
+                    var tick = {};
+                    tick.value = i*scale.Jump1;
+                    if (i%scale.JumpReduc==0) {
+                        tick.label = scale.value2String(tick.value);
+                    }
+                    ticks.push(tick);
+                }
+                return ticks;
+            }
+        };
+
+
+
         return MiscUtils;
     });
 

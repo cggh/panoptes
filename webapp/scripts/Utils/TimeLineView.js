@@ -1,8 +1,10 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/ChannelPlot/ChannelPlotter", "DQX/ChannelPlot/ChannelCanvas"
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/ChannelPlot/ChannelPlotter", "DQX/ChannelPlot/ChannelCanvas",
+    "Utils/MiscUtils"
 ],
     function (
-        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, ChannelPlotter, ChannelCanvas
+        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, ChannelPlotter, ChannelCanvas,
+        MiscUtils
         ) {
 
         var TimeLineView = {};
@@ -27,103 +29,9 @@ define([
                 drawInfo.centerContext.textBaseline = 'top';
                 drawInfo.centerContext.textAlign = 'center';
 
-                var createDateScaleInfo = function(optimDist) {
-                    var dist,shear;
-                    var minShear = 1.0e9;
-                    var calcShear = function(dst) {
-                        return Math.abs(dst/optimDist-1.0);
-                    }
-                    var rs = {
-                        namedDays: null,
-                        monthInterval: null,
-                        yearInterval: null
-                    };
 
-                    // try each day
-                    dist = 1*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,39,31];
-                    }
-
-                    // try each 2 days
-                    dist = 2*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30];
-                    }
-
-                    // try each 5 days
-                    dist = 5*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,5,10,15,20,25];
-                    }
-
-                    // try each 10 days
-                    dist = 10*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,10,20];
-                    }
-
-                    // try each 15 days
-                    dist = 15*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,15];
-                    }
-
-                    // try month multiples
-                    $.each([1,2,3,6,12], function(idx, mult) {
-                        dist = mult*30*drawInfo.zoomFactX;
-                        shear = calcShear(dist)
-                        if (shear<minShear) {
-                            minShear = shear;
-                            rs.monthInterval = mult;
-                            rs.namedDays = null;
-                            rs.yearInterval = null;
-                        }
-                    })
-
-                    // try year multiples
-                    $.each([1,2,5,10], function(idx, mult) {
-                        dist = mult*365*drawInfo.zoomFactX;
-                        shear = calcShear(dist)
-                        if (shear<minShear) {
-                            minShear = shear;
-                            rs.monthInterval = null;
-                            rs.namedDays = null;
-                            rs.yearInterval = mult;
-                        }
-                    });
-
-                    rs.isOnScale = function(year, month, day) {
-                        if (this.yearInterval) {
-                            if ( (year%this.yearInterval == 0) && (month==1) &&(day==1) )
-                                return true;
-                            return false;
-                        }
-                        if (this.monthInterval) {
-                            if ( ((month-1)%this.monthInterval == 0) && (day==1) )
-                                return true;
-                            return false;
-                        }
-                        if (this.namedDays.indexOf(day)>=0)
-                            return true;
-                        return false;
-                    }
-
-                    return rs;
-                }
-
-                var textScaleInfo = createDateScaleInfo(80);
-                var tickScaleInfo = createDateScaleInfo(20);
+                var textScaleInfo = MiscUtils.createDateScaleInfo(80, drawInfo.zoomFactX);
+                var tickScaleInfo = MiscUtils.createDateScaleInfo(20, drawInfo.zoomFactX);
 
                 var pad = function(n) {return n<10 ? '0'+n : n};
 
@@ -139,7 +47,7 @@ define([
                         var st1 = year;
                         drawInfo.centerContext.fillText(st1, psx, 6);
                         if (!textScaleInfo.yearInterval) {
-                            var st2 = pad(month)+'-'+pad(day);
+                            var st2 = '-'+pad(month)+'-'+pad(day);
                             drawInfo.centerContext.fillText(st2, psx, 16);
                             drawInfo.centerContext.beginPath();
                             drawInfo.centerContext.moveTo(psx, 0);
