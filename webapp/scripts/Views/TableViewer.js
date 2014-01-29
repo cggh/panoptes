@@ -46,6 +46,19 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 });
 
+                if (MetaData.getTableInfo(that.tableid).hasGenomePositions) {
+                    Msg.listen('',{type: 'ShowItemsInGenomeRange', tableid: that.tableid}, function(scope, info) {
+                        that.activateState();
+                        if (info.preservecurrentquery)
+                            var qry =that.theQuery.get();
+                        else
+                            var qry = SQL.WhereClause.Trivial();
+                        qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', info.chrom);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', info.start, info.stop, true);
+                        that.theQuery.modify(qry);
+                    });
+
+                }
 
                 Msg.listen('',{type: 'ShowItemsInSimpleQuery', tableid: that.tableid}, function(scope, info) {
                     that.activateState();
