@@ -119,18 +119,20 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
-                            alert('Navigation button clicked');
+                        Application.addNavigationButton('Find...','Bitmaps/Find.png', 80, function(){
+                            alert('Find button clicked');
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
+                        Application.addNavigationButton('Get link...',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
                             Serialise.createLink();
                         });
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        Application.setHeader('<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/malariagen_logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>');
+                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>';
+                        headerContent += '<div style="font-size:11pt;display:inline-block;margin-top:8px;margin-left:8px"><b><i>Eyes on your data<i/><b/></div>';
+                        Application.setHeader(headerContent);
 
 
                         //Provide a hook to fetch some data upfront from the server. Upon completion, 'proceedFunction' should be called;

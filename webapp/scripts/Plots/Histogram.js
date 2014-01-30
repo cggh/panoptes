@@ -1,10 +1,10 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
         require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
         ) {
 
         var Histogram = {};
@@ -222,21 +222,24 @@ define([
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
                 ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/scaleX);
-                for (var i=Math.ceil(XMin/scale.Jump1); i<=Math.floor(XMax/scale.Jump1); i++) {
-                    var vl = i*scale.Jump1;
-                    var px = Math.round(vl * scaleX + offsetX)-0.5;
-                    ctx.strokeStyle = "rgb(230,230,230)";
-                    if (i%scale.JumpReduc==0)
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, that.propidValue, scaleX, XMin, XMax);
+                $.each(scaleTicks, function(idx, tick) {
+                    var px = Math.round(tick.value * scaleX + offsetX)-0.5;
+                    if (tick.label) {
+                        ctx.fillText(tick.label,px,drawInfo.sizeY-marginY+13);
+                        if (tick.label2)
+                            ctx.fillText(tick.label2,px,drawInfo.sizeY-marginY+23);
                         ctx.strokeStyle = "rgb(190,190,190)";
+                    }
+                    else {
+                        ctx.strokeStyle = "rgb(230,230,230)";
+                    }
                     ctx.beginPath();
                     ctx.moveTo(px,0);
                     ctx.lineTo(px,drawInfo.sizeY-marginY);
                     ctx.stroke();
-                    if (i%scale.JumpReduc==0) {
-                        ctx.fillText(scale.value2String(vl),px,drawInfo.sizeY-marginY+13);
-                    }
-                }
+
+                });
                 ctx.restore();
 
                 // Draw y scale

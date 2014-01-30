@@ -1,10 +1,10 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
         require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
         ) {
 
         var Histogram2D = {};
@@ -315,47 +315,56 @@ define([
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
                 ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/scaleX);
-                for (var i=Math.ceil(XMin/scale.Jump1); i<=Math.floor(XMax/scale.Jump1); i++) {
-                    var vl = i*scale.Jump1;
-                    var px = Math.round(vl * scaleX + offsetX)-0.5;
-                    ctx.strokeStyle = "rgba(128,128,128,0.15)";
-                    if (i%scale.JumpReduc==0)
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, that.propidValueX, scaleX, XMin, XMax);
+                $.each(scaleTicks, function(idx, tick) {
+                    var px = Math.round(tick.value * scaleX + offsetX)-0.5;
+                    if (tick.label) {
+                        ctx.fillText(tick.label,px,drawInfo.sizeY-marginY+13);
+                        if (tick.label2)
+                            ctx.fillText(tick.label2,px,drawInfo.sizeY-marginY+23);
                         ctx.strokeStyle = "rgba(0,0,0,0.25)";
+                    }
+                    else {
+                        ctx.strokeStyle = "rgba(128,128,128,0.15)";
+                    }
                     ctx.beginPath();
                     ctx.moveTo(px,0);
                     ctx.lineTo(px,drawInfo.sizeY-marginY);
                     ctx.stroke();
-                    if (i%scale.JumpReduc==0) {
-                        ctx.fillText(scale.value2String(vl),px,drawInfo.sizeY-marginY+13);
-                    }
-                }
+
+                });
                 ctx.restore();
 
                 // Draw y scale
-                ctx.save();
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
                 ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(scaleY));
-                for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
-                    var vl = i*scale.Jump1;
-                    var py = Math.round(vl * scaleY + offsetY)-0.5;
-                    ctx.strokeStyle = "rgba(128,128,128,0.15)";
-                    if (i%scale.JumpReduc==0)
+                ctx.save();
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, that.propidValueY, Math.abs(scaleY), YMin, YMax);
+                $.each(scaleTicks, function(idx, tick) {
+                    var py = Math.round(tick.value * scaleY + offsetY)-0.5;
+                    if (tick.label) {
+                        ctx.save();
+                        ctx.translate(marginX-5,py);
+                        ctx.rotate(-Math.PI/2);
+                        if (!tick.label2)
+                            ctx.fillText(tick.label,0,0);
+                        else {
+                            ctx.fillText(tick.label,0,-10);
+                            ctx.fillText(tick.label2,0,0);
+                        }
+                        ctx.restore();
                         ctx.strokeStyle = "rgba(0,0,0,0.25)";
+                    }
+                    else {
+                        ctx.strokeStyle = "rgba(128,128,128,0.15)";
+                    }
                     ctx.beginPath();
                     ctx.moveTo(marginX,py);
                     ctx.lineTo(drawInfo.sizeX,py);
                     ctx.stroke();
-                    if (i%scale.JumpReduc==0) {
-                        ctx.save();
-                        ctx.translate(marginX-5,py);
-                        ctx.rotate(-Math.PI/2);
-                        ctx.fillText(scale.value2String(vl),0,0);
-                        ctx.restore();
-                    }
-                }
+                });
+
                 ctx.restore();
 
 

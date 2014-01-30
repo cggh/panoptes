@@ -1,4 +1,5 @@
 Name: Geographic
+Description: A fictitious data set, used to illustrate the geographic & time visualisation functionality of Panoptes.
 DataTables:
 - samples
 

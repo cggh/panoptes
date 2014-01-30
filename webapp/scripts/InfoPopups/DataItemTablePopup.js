@@ -49,11 +49,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.query, {hasSelection: true });
                 that.myTable = that.panelTable.getTable();
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in table viewer'}).setOnChanged(function() {
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in table', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
                     Msg.send({type: 'ShowItemsInQuery', tableid: that.tableInfo.id}, { query: that.query });
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create a plot...'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, { query: that.query , tableid: that.tableInfo.id });
                 });
 
