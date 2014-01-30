@@ -24,8 +24,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         datasetFolder = os.path.join(baseFolder, datasetId)
         indexDb = config.DB
 
-        #raise Exception('Something went wrong')
-
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(indexDb, 'datasetindex')
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId)
 
         globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
         globalSettings.RequireTokens(['Name'])

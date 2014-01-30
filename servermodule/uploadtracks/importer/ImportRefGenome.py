@@ -14,6 +14,9 @@ import customresponders.uploadtracks.Utils as Utils
 def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
     if not os.path.exists(os.path.join(folder, 'summaryvalues')):
         return
+
+    calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'summaryvalues')
+
     summaryids = []
     for dir in os.listdir(os.path.join(folder, 'summaryvalues')):
         if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):

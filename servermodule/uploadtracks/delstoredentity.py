@@ -13,7 +13,7 @@ def response(returndata):
     id = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(returndata), databaseName)
     cur = db.cursor()
 
 

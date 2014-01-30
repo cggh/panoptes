@@ -17,7 +17,11 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
     with calculationObject.LogHeader('Importing custom data'):
         print('Importing custom data into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
 
-        db = DQXDbTools.OpenDatabase(datasetId)
+        credInfo = calculationObject.credentialInfo
+        db = DQXDbTools.OpenDatabase(credInfo, datasetId)
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'propertycatalog')
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'workspaces')
+
         cur = db.cursor()
         cur.execute('SELECT primkey FROM tablecatalog WHERE id="{0}"'.format(tableid))
         primkey = cur.fetchone()[0]
@@ -31,7 +35,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         print('Source table: '+sourcetable)
 
         #Get list of existing properties
-        db = DQXDbTools.OpenDatabase(datasetId)
+        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()
         cur.execute('SELECT propid FROM propertycatalog WHERE (workspaceid="{0}") and (source="custom") and (tableid="{1}")'.format(workspaceid, tableid))
         existingProperties = [row[0] for row in cur.fetchall()]
@@ -43,7 +47,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
             DQXUtils.CheckValidIdentifier(property['propid'])
             propidList.append(property['propid'])
 
-        db = DQXDbTools.OpenDatabase(datasetId)
+        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()
 
         if not importSettings['ConfigOnly']:
@@ -130,6 +134,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
             print('Joining information')
             frst = True
+            credInfo.VerifyCanModifyDatabase(datasetId, sourcetable)
             sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
             for property in properties:
                 propid = property['propid']
@@ -195,7 +200,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         print(settings.ToJSON())
         workspaceName = settings['Name']
 
-        db = DQXDbTools.OpenDatabase(datasetId)
+        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()
 
         cur.execute('SELECT id, primkey FROM tablecatalog')

@@ -20,6 +20,11 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         print('Source: ' + folder)
         DQXUtils.CheckValidIdentifier(tableid)
 
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'tablecatalog')
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'propertycatalog')
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'relations')
+        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'tablebasedsummaryvalues')
+
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)

@@ -13,7 +13,7 @@ def ResponseExecute(data, calculationObject):
     propid = DQXDbTools.ToSafeIdentifier(data['propid'])
     tableid = DQXDbTools.ToSafeIdentifier(data['tableid'])
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, databaseName)
     cur = db.cursor()
     propertiestable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
 

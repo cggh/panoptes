@@ -8,7 +8,9 @@ def response(returndata):
     id = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
     #Obtain the settings from storeddata
-    db = DQXDbTools.OpenDatabase()
+    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    db = DQXDbTools.OpenDatabase(credInfo)
+    credInfo.VerifyCanModifyDatabase('', 'storedviews')
     cur = db.cursor()
     sqlstring = 'SELECT content FROM storage WHERE id="{0}"'.format(id)
     cur.execute(sqlstring)

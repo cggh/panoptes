@@ -10,7 +10,9 @@ def ResponseExecute(data, calculationObject):
     workspaceId = DQXDbTools.ToSafeIdentifier(data['id'])
     workspaceName = DQXDbTools.ToSafeIdentifier(data['name'])
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    credInfo = calculationObject.credentialInfo
+    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
+    credInfo.VerifyCanModifyDatabase(databaseName, 'workspaces')
     cur = db.cursor()
 
     cur.execute('SELECT id, primkey FROM tablecatalog')

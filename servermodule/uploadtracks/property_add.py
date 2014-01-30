@@ -43,7 +43,8 @@ def ResponseExecute(data, calculationObject):
         #raise Exception('A random error!')
 
 
-        db = DQXDbTools.OpenDatabase(databaseName)
+        credInfo = calculationObject.credentialInfo
+        db = DQXDbTools.OpenDatabase(credInfo, databaseName)
         primkey = Utils.GetTablePrimKey(tableid, db.cursor())
         db.close()
 
@@ -107,7 +108,8 @@ def ResponseExecute(data, calculationObject):
 
         sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
 
-        db = DQXDbTools.OpenDatabase(databaseName)
+        credInfo = calculationObject.credentialInfo
+        db = DQXDbTools.OpenDatabase(credInfo, databaseName)
         cur = db.cursor()
 
         calculationObject.SetInfo('Indexing new information')
@@ -148,6 +150,8 @@ def ResponseExecute(data, calculationObject):
 
 
         calculationObject.SetInfo('Joining information')
+        credInfo.VerifyCanModifyDatabase(databaseName, sourcetable)
+        credInfo.VerifyCanModifyDatabase(databaseName, 'propertycatalog')
         sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
         for prop in properties:
             if prop!=properties[0]:
