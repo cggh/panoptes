@@ -8,6 +8,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         ) {
 
         var ItemPopup = {};
+        ItemPopup.activeList = [];
 
         ItemPopup.init = function() {
             Msg.listen('',{type:'ItemPopup'}, function(scope, info) {
@@ -213,12 +214,49 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     relTab.panelButtons.addControl(Controls.CompoundHor(buttons));
 
                 });
-
             }
 
+            that.onClose = function() {
+                var activeIndex = -1;
+                $.each(ItemPopup.activeList, function(idx,popup) {
+                    if (popup===that)
+                        activeIndex = idx;
+                });
+                if (activeIndex>=0) {
+                    ItemPopup.activeList.splice(activeIndex,1);
+                }
+                else
+                    DQX.reportError('Plot not found!');
+//                if (that.onCloseCustom)
+//                    that.onCloseCustom();
+            };
+
+            that.store = function() {
+                var obj = {};
+                obj.itemid = that.itemid;
+                obj.tableid = that.tableInfo.id;
+                return obj;
+            };
+
+
+            ItemPopup.activeList.push(that);
             that.create();
+        }
 
 
+
+        ItemPopup.store = function() {
+            var obj = [];
+            $.each(ItemPopup.activeList, function(idx,popup) {
+                obj.push(popup.store());
+            });
+            return obj;
+        }
+
+        ItemPopup.recall = function(settObj) {
+            $.each(settObj, function(idx,popupSettObj) {
+                ItemPopup.show(popupSettObj);
+            });
         }
 
 
