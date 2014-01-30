@@ -9,10 +9,8 @@ generic and can be used with any kind of data. There are also some
 specialised features for genomic and geospatial data.
 
 Panoptes is a new project and in an early phase of development. For
-more information about the project please contact Paul Vauterin
-<paul.vauterin@gmail.com>, Ben Jeffery <ben.jeffery@gmail.com> or
-Alistair Miles <alimanfoo@googlemail.com> or send an email to the
-public mailing list <panoptes-dev@googlegroups.com>.
+more information about the project please send an email to the public
+mailing list <panoptes-dev@googlegroups.com>.
 
 * Source code: https://github.com/malariagen/panoptes
 * Documentation: http://panoptes.readthedocs.org
