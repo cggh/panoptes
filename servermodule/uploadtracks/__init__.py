@@ -1,11 +1,11 @@
 import DQXDbTools
 import config
+import authorization
 
-print('IMPORTING UPLOADTRACKS')
+print('Defining Panoptes specifics')
 
+# Verifies if a database operation can be done with given credentials
 
-def CanDo(credInfo, operation):
-    return True
-
-DQXDbTools.DbCredentialVerifier = CanDo
+# We set our custom credential verifier
+DQXDbTools.DbCredentialVerifier = authorization.CanDo
 
