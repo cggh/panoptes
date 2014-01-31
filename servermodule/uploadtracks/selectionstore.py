@@ -30,7 +30,7 @@ def ResponseExecute(returndata, calculationObject):
     credInfo = calculationObject.credentialInfo
     db = DQXDbTools.OpenDatabase(credInfo, databaseName)
     cur = db.cursor()
-    credInfo.VerifyCanModifyDatabase(databaseName, tableName, propid)
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tableName, propid))
     sqlstring = 'UPDATE {0} SET {1}=0 WHERE {1}=1'.format(tableName, propid)
     cur.execute(sqlstring)
     db.commit()

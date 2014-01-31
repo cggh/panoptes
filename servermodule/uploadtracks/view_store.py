@@ -10,7 +10,7 @@ def response(returndata):
     #Obtain the settings from storeddata
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
     db = DQXDbTools.OpenDatabase(credInfo)
-    credInfo.VerifyCanModifyDatabase('', 'storedviews')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
     cur = db.cursor()
     sqlstring = 'SELECT content FROM storage WHERE id="{0}"'.format(id)
     cur.execute(sqlstring)

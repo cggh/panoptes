@@ -150,8 +150,8 @@ def ResponseExecute(data, calculationObject):
 
 
         calculationObject.SetInfo('Joining information')
-        credInfo.VerifyCanModifyDatabase(databaseName, sourcetable)
-        credInfo.VerifyCanModifyDatabase(databaseName, 'propertycatalog')
+        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, sourcetable))
+        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'propertycatalog'))
         sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
         for prop in properties:
             if prop!=properties[0]:

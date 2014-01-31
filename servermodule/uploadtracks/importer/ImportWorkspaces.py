@@ -19,8 +19,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
         credInfo = calculationObject.credentialInfo
         db = DQXDbTools.OpenDatabase(credInfo, datasetId)
-        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'propertycatalog')
-        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'workspaces')
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'workspaces'))
 
         cur = db.cursor()
         cur.execute('SELECT primkey FROM tablecatalog WHERE id="{0}"'.format(tableid))
@@ -134,7 +134,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
             print('Joining information')
             frst = True
-            credInfo.VerifyCanModifyDatabase(datasetId, sourcetable)
+            credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, sourcetable))
             sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
             for property in properties:
                 propid = property['propid']

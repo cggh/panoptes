@@ -16,7 +16,7 @@ def response(returndata):
     db = DQXDbTools.OpenDatabase(credInfo, databaseName)
     cur = db.cursor()
 
-    credInfo.VerifyCanModifyDatabase(databaseName, 'customtracks')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'customtracks'))
     cur.execute("UPDATE customtracks SET name=%s WHERE ID=%s", (name,trackid) )
     cur.execute("UPDATE customtracks SET properties=%s WHERE ID=%s", (properties,trackid) )
 

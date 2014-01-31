@@ -20,7 +20,7 @@ def response(returndata):
 
     #Make sure we have a decent ordr field
     cur.execute("set @rn:=0")
-    credInfo.VerifyCanModifyDatabase(databaseName, 'propertycatalog')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'propertycatalog'))
     cur.execute("update propertycatalog set ordr=(@rn:=@rn+1) order by ordr")
 
     sql = 'SELECT workspaceid, tableid, propid, ordr FROM propertycatalog WHERE ((workspaceid="{0}") or (source="fixed")) and (tableid="{1}") ORDER by ordr'.format(workspaceid, tableid)
@@ -47,7 +47,7 @@ def response(returndata):
         return
 
 
-    credInfo.VerifyCanModifyDatabase(databaseName, 'propertycatalog')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'propertycatalog'))
     sql1 = 'UPDATE propertycatalog SET ordr={0} WHERE (workspaceid="{1}") and (tableid="{2}") and (propid="{3}")'.format(orders[index+dir], workspaces[index], tables[index], properties[index])
     sql2 = 'UPDATE propertycatalog SET ordr={0} WHERE (workspaceid="{1}") and (tableid="{2}") and (propid="{3}")'.format(orders[index], workspaces[index+dir], tables[index+dir], properties[index+dir])
     cur.execute(sql1)

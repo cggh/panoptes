@@ -50,7 +50,7 @@ def response(returndata):
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
     db = DQXDbTools.OpenDatabase(credInfo, databaseName)
     cur = db.cursor()
-    credInfo.VerifyCanModifyDatabase(databaseName, 'customtracks')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'customtracks'))
     cur.execute("INSERT INTO customtracks VALUES (%s,%s,'',%s)", (trackUid, trackName,workspaceid) )
 
     sql = "CREATE TABLE {0} (chrom varchar(20), pos int, {1} float)".format(trackUid,trackUid)

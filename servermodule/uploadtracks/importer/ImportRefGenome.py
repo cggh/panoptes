@@ -15,7 +15,7 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
     if not os.path.exists(os.path.join(folder, 'summaryvalues')):
         return
 
-    calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'summaryvalues')
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
 
     summaryids = []
     for dir in os.listdir(os.path.join(folder, 'summaryvalues')):

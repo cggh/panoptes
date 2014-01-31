@@ -24,8 +24,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         datasetFolder = os.path.join(baseFolder, datasetId)
         indexDb = config.DB
 
-        calculationObject.credentialInfo.VerifyCanModifyDatabase(indexDb, 'datasetindex')
-        calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId)
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
 
         globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
         globalSettings.RequireTokens(['Name'])

@@ -12,7 +12,7 @@ def ResponseExecute(data, calculationObject):
 
     credInfo = calculationObject.credentialInfo
     db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    credInfo.VerifyCanModifyDatabase(databaseName, 'workspaces')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
     cur = db.cursor()
 
     cur.execute('SELECT id, primkey FROM tablecatalog')

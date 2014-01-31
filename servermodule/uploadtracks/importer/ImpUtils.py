@@ -147,7 +147,7 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
     )
 
 def ImportGlobalSettings(calculationObject, datasetId, settings):
-    calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'settings')
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))
     for token in settings.GetTokenList():
         ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
@@ -289,7 +289,7 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
 
 
 def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
-    calculationObject.credentialInfo.VerifyCanModifyDatabase(datasetId, 'summaryvalues')
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
     summSettings.RequireTokens(['BlockSizeMax'])
     summSettings.AddTokenIfMissing('MinVal', 0)
     summSettings.AddTokenIfMissing('BlockSizeMin', 1)

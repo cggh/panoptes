@@ -17,7 +17,7 @@ def ResponseExecute(data, calculationObject):
 
     credInfo = calculationObject.credentialInfo
     db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    credInfo.VerifyCanModifyDatabase(databaseName, 'propertycatalog')
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'propertycatalog'))
     cur = db.cursor()
     sql = 'UPDATE propertycatalog SET name="{0}" WHERE (workspaceid="{1}") AND (propid="{2}" and (tableid="{3}"))'.format(name, workspaceid, propid, tableid)
     cur.execute(sql)
