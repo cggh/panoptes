@@ -8,11 +8,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         PromptDataSet.execute = function(proceedFunction) {
             PromptDataSet.proceedFunction = proceedFunction;
-            var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
-            getter.addTable('datasetindex',['id','name'],'id');
-            getter.execute(MetaData.serverUrl,''/*Falls back to default DB in DQXServer config*/,
-                function() {
-                    PromptDataSet.datasets = getter.getTableRecords('datasetindex');
+
+            DQX.setProcessing();
+            DQX.customRequest(MetaData.serverUrl,'uploadtracks','getdatasetlist', {}, function(resp) {
+                DQX.stopProcessing();
+                    PromptDataSet.datasets = resp['datasets'];
                     if (DQX.getUrlSearchString('dataset')) {
                         MetaData.database = DQX.getUrlSearchString('dataset');
                         PromptDataSet.proceedFunction();
@@ -21,6 +21,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         PromptDataSet.execute2();
                 }
             );
+
+//            ....
+//            var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
+//            getter.addTable('datasetindex',['id','name'],'id');
+//            getter.execute(MetaData.serverUrl,''/*Falls back to default DB in DQXServer config*/,
+//                function() {
+//                    PromptDataSet.datasets = getter.getTableRecords('datasetindex');
+//                    if (DQX.getUrlSearchString('dataset')) {
+//                        MetaData.database = DQX.getUrlSearchString('dataset');
+//                        PromptDataSet.proceedFunction();
+//                    }
+//                    else
+//                        PromptDataSet.execute2();
+//                }
+//            );
 
         }
 

@@ -34,7 +34,7 @@ def CanDo(credInfo, operation):
         for rule in authRules:
             if rule.Match(credInfo, operation.databaseName, PnAuthRule.read):
                 return DQXDbTools.DbAuthorization(True)
-        return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to perform this change.')
+        return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to view these data.')
 
     for rule in authRules:
         if rule.Match(credInfo, operation.databaseName, PnAuthRule.manage):
