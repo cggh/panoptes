@@ -18,6 +18,9 @@ def CanDo(credInfo, operation):
     # We can read everything from the index database
     if not(operation.IsModify()) and operation.OnDatabase(config.DB):
         return DQXDbTools.DbAuthorization(True)
+    # We can do all actions on index database, table 'datasetindex'
+    if operation.OnDatabase(config.DB) and operation.OnTable('datasetindex'):
+        return DQXDbTools.DbAuthorization(True)
 
     if operation.OnDatabase(config.DB):
         if operation.OnTable('storedviews'):
@@ -67,9 +70,11 @@ class PnAuthRule:
         self.dataSetMatch = re.compile(self.dataSetPattern)
 
     def Match(self, credInfo, dataSet, level):
-        if self.userMatch.match(credInfo.userid):
-            if self.dataSetMatch.match(dataSet):
-                if self.privLevel >= level:
+        if (self.dataSetMatch.match(dataSet)) and (self.privLevel >= level):
+            if self.userMatch.match(credInfo.userid):
+                return True
+            for groupid in self.groupids:
+                if self.userMatch.match(groupid):
                     return True
         return False
 
