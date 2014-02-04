@@ -27,21 +27,32 @@ def CanDo(credInfo, operation):
             return DQXDbTools.DbAuthorization(True)
     if operation.OnTable('storedqueries'):
         return DQXDbTools.DbAuthorization(True)
-    if operation.OnColumn('StoredSelection'):
-        return DQXDbTools.DbAuthorization(True)
 
-    authRules = GetPnAuthRules()
+    authRules = PnAuthRuleSet()
+
+    if authRules.Match(credInfo, operation.databaseName, PnAuthRule.edit):
+        if operation.OnColumn('StoredSelection'):
+            return DQXDbTools.DbAuthorization(True)
 
     if not(operation.IsModify()):
         # Check if any of the rules allows reading
-        for rule in authRules:
-            if rule.Match(credInfo, operation.databaseName, PnAuthRule.read):
-                return DQXDbTools.DbAuthorization(True)
+        if authRules.Match(credInfo, operation.databaseName, PnAuthRule.read):
+            return DQXDbTools.DbAuthorization(True)
         return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to view these data.')
 
-    for rule in authRules:
-        if rule.Match(credInfo, operation.databaseName, PnAuthRule.manage):
-            return DQXDbTools.DbAuthorization(True)
+    if authRules.Match(credInfo, operation.databaseName, PnAuthRule.manage):
+        return DQXDbTools.DbAuthorization(True)
+
+    # Allow some more restricted stuff for uploading custom data
+    if authRules.Match(credInfo, operation.databaseName, PnAuthRule.edit):
+        if operation.tableName is not None:
+            allowedTables = ['propertycatalog', 'workspaces', 'summaryvalues']
+            for allowedTable in allowedTables:
+                if operation.OnTable(allowedTable):
+                    return DQXDbTools.DbAuthorization(True)
+                if operation.tableName.find('INFO_')>0:# todo: implement better mechanism
+                    return DQXDbTools.DbAuthorization(True)
+
     return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to perform this change.')
 
 
@@ -78,15 +89,25 @@ class PnAuthRule:
                     return True
         return False
 
-def GetPnAuthRules():
-    rules = []
-    with open(authFileName) as fp:
-        for line in fp:
-            line = line.strip()
-            if (len(line) > 1) and (line[0] != '#'):
-                lineTokens = line.split(',')
-                if len(lineTokens) != 3:
-                    raise Exception('ERROR: Invalid authority file')
-                (userPattern, dataSetPattern, privToken) = lineTokens
-                rules.append(PnAuthRule(userPattern.strip(), dataSetPattern.strip(), privToken.strip()))
-    return rules
+
+
+class PnAuthRuleSet:
+
+    def __init__(self):
+        self.rules = []
+        with open(authFileName) as fp:
+            for line in fp:
+                line = line.strip()
+                if (len(line) > 1) and (line[0] != '#'):
+                    lineTokens = line.split(',')
+                    if len(lineTokens) != 3:
+                        raise Exception('ERROR: Invalid authority file')
+                    (userPattern, dataSetPattern, privToken) = lineTokens
+                    self.rules.append(PnAuthRule(userPattern.strip(), dataSetPattern.strip(), privToken.strip()))
+
+    def Match(self, credInfo, databaseName, level):
+        for rule in self.rules:
+            if rule.Match(credInfo, databaseName, level):
+                return True
+        return False
+

@@ -12,7 +12,7 @@ def response(returndata):
         datasets = {}
         for datasetid in os.listdir(baseFolder):
             if os.path.isdir(os.path.join(baseFolder, datasetid)):
-                if authorization.CanDo(credInfo, DQXDbTools.DbOperationWrite(datasetid)).IsGranted():
+                if authorization.CanDo(credInfo, DQXDbTools.DbOperationWrite(datasetid, 'workspaces')).IsGranted():
                     datasets[datasetid] = { 'workspaces': {} }
                     if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces')):
                         for wsid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces')):
