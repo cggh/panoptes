@@ -19,7 +19,7 @@
         FindGene.init = function() {
             if (FindGene.theWizard)
                 return;
-            FindGene.theWizard = Wizard.Create("FindGene.theWizard");
+            FindGene.theWizard = Wizard.Create("FindGeneWizard");
 
             FindGene.theWizard._currentSearchNr = 0;
 
@@ -86,6 +86,7 @@
                     FindGene.theWizard.setResult(FindGene.theWizard.controlFindByKeyword.getValue());
                 }
             });
+
 
             /////// Page: search by position /////////////////////////////////
 
@@ -229,10 +230,10 @@
 
 
         FindGene.execute = function() {
-//            FindGene.init();
             FindGene.theWizard.execute(function () {
-                debugger;
+                Msg.send({type:'GenePopup'}, FindGene.theWizard.resultGeneID);
             });
+
         }
 
         return FindGene;
