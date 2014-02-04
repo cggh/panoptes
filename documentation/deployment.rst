@@ -58,3 +58,17 @@ Deployment
 @@TODO instructions for deploying a new instance of panoptes on a web
 server such as apache or nginx
 
+
+Authorization
+-------------
+Panoptes contains a simple authorization mechanism that can be used to grant or deny certain privileges on datasets.
+There are three levels of privileges:
+ - read: View the data in a dataset.
+ - edit: Add custom data properties to a workspace.
+ - manage: All actions, including loading the dataset from the file source.
+ 
+The authorization mechanism interacts with authentication systems implemented at the web server level,
+by reading the REMOTE_USER environment variable (in case of CAS authentication, it can also use information in HTTP_CAS_MEMBEROF).
+
+The file PanoptesAuthDb (https://raw2.github.com/malariagen/panoptes/master/servermodule/uploadtracks/PanoptesAuthDb)
+is used to link user authentication information to privileges on specific datasets. The default installation grants all rights to everybody.
