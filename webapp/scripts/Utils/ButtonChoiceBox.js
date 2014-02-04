@@ -14,7 +14,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (idx>0)
                     content += '<br>';
                 $.each(buttonsRow, function(idx, button) {
-                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, width:120, height:40 }).setOnChanged(function() {
+                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, width:140, height:50 }).setOnChanged(function() {
                         button.handler();
                         Popup.closeIfNeeded(popupid);
                     });

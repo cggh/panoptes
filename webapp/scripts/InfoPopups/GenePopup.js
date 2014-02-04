@@ -38,6 +38,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += '<b>Name</b>: '+data.fname+'<br/>';
             content += '<b>Position</b>: '+data.chromid+':'+data.fstart+'-'+data.fstop+'<br/>';
 
+            var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show in genome browser', width:140, height:50, bitmap:'Bitmaps/GenomeBrowser.png' }).setOnChanged(function() {
+                Msg.send({type: 'JumpgenomeRegion'}, { chromoID:data.chromid, start:parseInt(data.fstart), end:parseInt(data.fstop) });
+                Popup.closeIfNeeded(popupid);
+            });
+            content += button_snps.renderHtml();
 
             $.each(MetaData.tableCatalog, function(idx, table) {
                 if (table.hasGenomePositions) {
