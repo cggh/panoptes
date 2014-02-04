@@ -45,7 +45,7 @@ require([
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
-    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene",
+    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
     "Utils/Serialise", "Utils/ButtonChoiceBox"
 ],
     function (
@@ -53,7 +53,7 @@ require([
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
-        PromptWorkspace, PromptDataSet, FindGene,
+        PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
         Serialise, ButtonChoiceBox
         ) {
         $(function () {
@@ -144,6 +144,13 @@ require([
                                 }
                                 });
                             }
+
+                            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                                actions.push( { content:'Find '+tableInfo.tableNameSingle+'...', bitmap:'Bitmaps/datagrid2.png', handler:function() {
+                                    FindDataItem.execute(tableInfo.id);
+                                }
+                                });
+                            });
 
                             ButtonChoiceBox.create('Find item','', [actions]);
                         });

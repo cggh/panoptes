@@ -153,7 +153,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     if not(autoPrimKey):
         scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, primkey))
     for col in columns:
-        if ('Index' in col) and (col['Index']):
+        if ('Index' in col) and (col['Index']) and (col['name'] != primkey):
             scr.AddCommand('create index {0}_{1} ON {0}({1})'.format(tableid, col['name']))
     scr.Execute(databaseid)
 
