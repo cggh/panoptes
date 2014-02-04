@@ -1,5 +1,11 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
+],
+    function (
+        require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
+        ) {
 
         var Histogram = {};
 
@@ -216,21 +222,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
                 ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/scaleX);
-                for (var i=Math.ceil(XMin/scale.Jump1); i<=Math.floor(XMax/scale.Jump1); i++) {
-                    var vl = i*scale.Jump1;
-                    var px = Math.round(vl * scaleX + offsetX)-0.5;
-                    ctx.strokeStyle = "rgb(230,230,230)";
-                    if (i%scale.JumpReduc==0)
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, that.propidValue, scaleX, XMin, XMax);
+                $.each(scaleTicks, function(idx, tick) {
+                    var px = Math.round(tick.value * scaleX + offsetX)-0.5;
+                    if (tick.label) {
+                        ctx.fillText(tick.label,px,drawInfo.sizeY-marginY+13);
+                        if (tick.label2)
+                            ctx.fillText(tick.label2,px,drawInfo.sizeY-marginY+23);
                         ctx.strokeStyle = "rgb(190,190,190)";
+                    }
+                    else {
+                        ctx.strokeStyle = "rgb(230,230,230)";
+                    }
                     ctx.beginPath();
                     ctx.moveTo(px,0);
                     ctx.lineTo(px,drawInfo.sizeY-marginY);
                     ctx.stroke();
-                    if (i%scale.JumpReduc==0) {
-                        ctx.fillText(scale.value2String(vl),px,drawInfo.sizeY-marginY+13);
-                    }
-                }
+
+                });
                 ctx.restore();
 
                 // Draw y scale
@@ -312,35 +321,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.onMouseClick = function(ev, info) {
                 var tooltip = that.getToolTipInfo(info.x, info.y);
                 if (tooltip) {
-                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table",  width:120, height:30 }).setOnChanged(function() {
-                        var tableView = Application.getView('table_'+that.tableInfo.id);
-                        var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, tooltip.minval, tooltip.maxval);
-                        tableView.activateWithQuery(qry);
-                        Popup.closeIfNeeded(popupid);
-                    });
+                    var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, tooltip.minval, tooltip.maxval);
                     var content = 'Number of items: '+tooltip.count;
-                    content += '<br/>' + bt.renderHtml();
-                    var popupid = Popup.create('Histogram bar', content);
+                    content += '<br>Range: '+tooltip.minval+' - '+tooltip.maxval+'<br>';
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram bar', content, qry, null);
                 }
             }
 
             that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
-                    var tableView = Application.getView('table_'+that.tableInfo.id);
-                    var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
-                    tableView.activateWithQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
-                    var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
-                    that.setActiveQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
                 var rangeMin = (minX-that.offsetX)/that.scaleX;
                 var rangeMax = (maxX-that.offsetX)/that.scaleX;
                 var content = 'Range: '+rangeMin+' - '+rangeMax+'<br>';
-                content +=  bt1.renderHtml() + bt2.renderHtml();
-                var popupid = Popup.create('Histogram area', content);
+
+                var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
+
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
             }
 
 

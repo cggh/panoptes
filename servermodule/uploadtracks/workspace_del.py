@@ -11,7 +11,7 @@ def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(returndata), databaseName)
     cur = db.cursor()
 
     #Remove all the tables that have custom tracks for this workspace

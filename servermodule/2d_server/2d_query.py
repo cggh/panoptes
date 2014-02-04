@@ -7,7 +7,7 @@ import config
 import arraybuffer
 from gzipstream import gzip
 
-#curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6ImNvbXBvdW5kIiwiaXNDb21wb3VuZCI6dHJ1ZSwiVHBlIjoiQU5EIiwiQ29tcG9uZW50cyI6W3sid2hjQ2xhc3MiOiJjb21wb3VuZCIsImlzQ29tcG91bmQiOnRydWUsIlRwZSI6IkFORCIsIkNvbXBvbmVudHMiOlt7IndoY0NsYXNzIjoiY29tcGFyZWZpeGVkIiwiaXNDb21wb3VuZCI6ZmFsc2UsIkNvbE5hbWUiOiJwb3MiLCJUcGUiOiI8IiwiQ29tcFZhbHVlIjoiMTAwMDAwIn1dfSx7IndoY0NsYXNzIjoiY29tcGFyZWZpeGVkIiwiaXNDb21wb3VuZCI6ZmFsc2UsIkNvbE5hbWUiOiJjaHJvbSIsIlRwZSI6Ij0iLCJDb21wVmFsdWUiOiIyTCJ9LHsid2hjQ2xhc3MiOiJjb21wYXJlZml4ZWQiLCJpc0NvbXBvdW5kIjpmYWxzZSwiQ29sTmFtZSI6InBvcyIsIlRwZSI6Ij49IiwiQ29tcFZhbHVlIjo3ODQwNn0seyJ3aGNDbGFzcyI6ImNvbXBhcmVmaXhlZCIsImlzQ29tcG91bmQiOmZhbHNlLCJDb2xOYW1lIjoicG9zIiwiVHBlIjoiPCIsIkNvbXBWYWx1ZSI6OTk5OTh9XX0=&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=genotypes_column_index&row_order=genotypes_row_index' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
+#curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=SnpName&row_order=ID' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
 
 def index_from_query(db, table, index_column, query, order):
     cur = db.cursor()
@@ -28,9 +28,10 @@ def select_by_list(property_array, col_idx, row_idx):
     coords = ((row, col) for row in row_idx for col in col_idx)
     CHUNK_SIZE = 400
     result_array = np.empty((num_cells,), dtype=property_array.id.dtype)
-    for i in xrange((num_cells / CHUNK_SIZE) + 1):
+    num_chunks = num_cells / CHUNK_SIZE
+    num_chunks = num_chunks + 1 if num_cells % CHUNK_SIZE else num_chunks
+    for i in xrange(num_chunks):
         selection = np.asarray(list(itertools.islice(coords, CHUNK_SIZE)))
-        print selection
         sel = h5py._hl.selections.PointSelection(property_array.shape)
         sel.set(selection)
         out = np.ndarray(sel.mshape, property_array.id.dtype)
@@ -39,7 +40,7 @@ def select_by_list(property_array, col_idx, row_idx):
                                out,
                                h5py.h5t.py_create(property_array.id.dtype))
         result_array[i * CHUNK_SIZE: (i * CHUNK_SIZE)+len(selection)] = out[:]
-    result_array.reshape((len(row_idx), len(col_idx)))
+    result_array.shape = (len(row_idx), len(col_idx))
     return result_array
 
 
@@ -82,8 +83,11 @@ def handler(start_response, request_data):
     db.close()
     hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', datatable + '.hdf5'), 'r')
     property_array = hdf5_file[property]
-    genotypes = select_by_list(property_array, col_idx, row_idx)
-    data = gzip(''.join(arraybuffer.encode_array(genotypes)))
+    if len(col_idx) == 0 or len(row_idx) == 0:
+        data = gzip(''.join(arraybuffer.encode_array(np.array([], dtype=property_array.id.dtype))))
+    else:
+        genotypes = select_by_list(property_array, col_idx, row_idx)
+        data = gzip(''.join(arraybuffer.encode_array(genotypes)))
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),

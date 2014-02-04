@@ -1,7 +1,7 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils",
-    "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Plots/GeoMapPoints", "Plots/GeoTemporal"
+    "Plots/ItemScatterPlot", "Plots/BarGraph", "Plots/Histogram", "Plots/Histogram2D", "Plots/GeoMapPoints", "Plots/GeoTemporal/GeoTemporal"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
@@ -26,17 +26,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var plots = [];
 
+//            if (tableInfo.hasGeoCoord) {
+//                plots.push({
+//                    title: 'Geographic map',
+//                    plotter: GeoMapPoints,
+//                    settings: { zoomFit: true }
+//                })
+//            }
+
             if (tableInfo.hasGeoCoord) {
                 plots.push({
                     title: 'Geographic map',
-                    plotter: GeoMapPoints,
-                    settings: { zoomFit: true }
-                })
-            }
-
-            if (tableInfo.hasGeoCoord && tableInfo.hasDate) {
-                plots.push({
-                    title: 'Geotemporal analysis',
                     plotter: GeoTemporal,
                     settings: { zoomFit: true }
                 })

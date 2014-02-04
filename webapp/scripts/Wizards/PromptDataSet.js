@@ -8,11 +8,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         PromptDataSet.execute = function(proceedFunction) {
             PromptDataSet.proceedFunction = proceedFunction;
-            var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
-            getter.addTable('datasetindex',['id','name'],'id');
-            getter.execute(MetaData.serverUrl,''/*Falls back to default DB in DQXServer config*/,
-                function() {
-                    PromptDataSet.datasets = getter.getTableRecords('datasetindex');
+
+            DQX.setProcessing();
+            DQX.customRequest(MetaData.serverUrl,'uploadtracks','getdatasetlist', {}, function(resp) {
+                DQX.stopProcessing();
+                    PromptDataSet.datasets = resp['datasets'];
                     if (DQX.getUrlSearchString('dataset')) {
                         MetaData.database = DQX.getUrlSearchString('dataset');
                         PromptDataSet.proceedFunction();
@@ -22,10 +22,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             );
 
+//            ....
+//            var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
+//            getter.addTable('datasetindex',['id','name'],'id');
+//            getter.execute(MetaData.serverUrl,''/*Falls back to default DB in DQXServer config*/,
+//                function() {
+//                    PromptDataSet.datasets = getter.getTableRecords('datasetindex');
+//                    if (DQX.getUrlSearchString('dataset')) {
+//                        MetaData.database = DQX.getUrlSearchString('dataset');
+//                        PromptDataSet.proceedFunction();
+//                    }
+//                    else
+//                        PromptDataSet.execute2();
+//                }
+//            );
+
         }
 
         PromptDataSet.execute2 = function() {
-            var wiz=Wizard.Create('SelectDataSet', {title:'Select Data set', sizeX:450, sizeY: 400, canCancel: false});
+            var wiz=Wizard.Create('SelectDataSet', {title:'Panoptes - Select data set', sizeX:450, sizeY: 400, canCancel: false});
 
             PromptDataSet.ctrl_datasetlist = Controls.List(null,{width:400, height:210 })
             var items=[];

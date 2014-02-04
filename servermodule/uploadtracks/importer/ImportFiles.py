@@ -24,11 +24,12 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         datasetFolder = os.path.join(baseFolder, datasetId)
         indexDb = config.DB
 
-        #raise Exception('Something went wrong')
-
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
 
         globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
         globalSettings.RequireTokens(['Name'])
+        globalSettings.AddTokenIfMissing('Description','')
 
         print('Global settings: '+str(globalSettings.Get()))
 
@@ -107,7 +108,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.uploadtracks.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Genotypes',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Geographic',
         {
             'ConfigOnly': False
         }

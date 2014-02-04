@@ -27,7 +27,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         PromptWorkspace.execute2 = function() {
-            var wiz=Wizard.Create('SelectWorkSpace', {title:'Select workspace', sizeX:450, sizeY: 400, canCancel: false});
+            var wiz=Wizard.Create('SelectWorkSpace', {title:'Panoptes - Select workspace', sizeX:450, sizeY: 400, canCancel: false});
 
             PromptWorkspace.ctrl_workspacelist = Controls.List(null,{width:400, height:210 })
             var items=[];

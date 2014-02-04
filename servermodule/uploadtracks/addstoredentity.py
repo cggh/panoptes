@@ -19,10 +19,12 @@ def response(returndata):
     returndata['id'] = uid
 
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
     cur = db.cursor()
 
 
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
     sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(tablename, uid, name, tableid, workspaceid)
     cur.execute(sql, (content) )
 

@@ -28,13 +28,13 @@ cd build
 echo -e "${red}  Fetching dependancies${NC}"
 cd $PROJECT_ROOT/build
 echo -e "${red}    DQX${NC}"
-git clone git@github.com:malariagen/DQX.git
+git clone https://github.com/malariagen/DQX.git
 cd DQX
 git checkout `cat $PROJECT_ROOT/dependencies/DQX_Version`
 cd ..
 
 echo -e "${red}    DQXServer${NC}"
-git clone git@github.com:malariagen/DQXServer.git
+git clone https://github.com/malariagen/DQXServer.git
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 

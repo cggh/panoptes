@@ -20,6 +20,11 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         print('Source: ' + folder)
         DQXUtils.CheckValidIdentifier(tableid)
 
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablecatalog'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'relations'))
+        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablebasedsummaryvalues'))
+
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)

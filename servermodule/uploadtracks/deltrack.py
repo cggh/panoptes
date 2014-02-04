@@ -10,7 +10,7 @@ def response(returndata):
     databaseName = returndata['database']
     trackid = returndata['trackid']
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(returndata), databaseName)
     cur = db.cursor()
 
     cur.execute("DROP TABLE "+trackid)

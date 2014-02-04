@@ -1,5 +1,6 @@
 NameSingle: sample
 NamePlural: samples
+Description: A synthetic set of samples collected from a large area of Africa. The data set contains GPS coordinates, collection datas, and some fictitious properties.
 PrimKey: ID
 QuickFindFields: ID,CatId,RegionId
 FetchRecordCount: true
@@ -23,8 +24,8 @@ Properties:
   ShowInTable: true
   IsCategorical: true
 
-- Id: JD
-  Name: Sampling date
+- Id: CollectionDate
+  Name: Collection date
   DataType: Date
   ShowInTable: true
 

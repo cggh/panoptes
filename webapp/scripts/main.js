@@ -43,12 +43,19 @@ require.config({
 require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise"
+    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
+    "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
+    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene",
+    "Utils/Serialise", "Utils/ButtonChoiceBox"
 ],
     function (
         _, $, Application, Framework, Msg, DQX, SQL, DataFetchers,
         MetaData,
-        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes, GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PromptWorkspace, PromptDataSet, Serialise) {
+        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
+        GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
+        PromptWorkspace, PromptDataSet, FindGene,
+        Serialise, ButtonChoiceBox
+        ) {
         $(function () {
 
 
@@ -91,6 +98,7 @@ require([
                         ItemPopup.init();
                         DataItemTablePopup.init();
                         DataItemPlotPopup.init();
+                        FindGene.init();
 
 
 
@@ -119,18 +127,29 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Test','Bitmaps/Icons/Small/MagGlassG.png', 80, function(){
-                            alert('Navigation button clicked');
+                        Application.addNavigationButton('Find...','Bitmaps/Find.png', 80, function(){
+                            var actions = [];
+
+                            if (MetaData.generalSettings.hasGenomeBrowser) {
+                                actions.push( { content:'Find gene...', handler:function() {
+                                    FindGene.execute()
+                                }
+                                });
+                            }
+
+                            ButtonChoiceBox.create('Find item','', [actions]);
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
+                        Application.addNavigationButton('Get link...',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
                             Serialise.createLink();
                         });
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        Application.setHeader('<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/malariagen_logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>');
+                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>';
+                        headerContent += '<div style="font-size:11pt;display:inline-block;margin-top:8px;margin-left:8px"><b><i>Eyes on your data<i/><b/></div>';
+                        Application.setHeader(headerContent);
 
 
                         //Provide a hook to fetch some data upfront from the server. Upon completion, 'proceedFunction' should be called;

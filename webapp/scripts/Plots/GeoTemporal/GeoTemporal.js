@@ -1,9 +1,13 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/Map", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "DQX/GMaps/PointSet",
     "MetaData",
-    "Utils/QueryTool", "Plots/GenericPlot", "Utils/TimeLineView"],
+    "Utils/QueryTool", "Utils/ButtonChoiceBox", "Plots/GenericPlot",
+    "Plots/GeoTemporal/TimeLine"
+],
     function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, Map, DataFetchers, EditQuery, PointSet,
               MetaData,
-              QueryTool, GenericPlot, TimeLineView) {
+              QueryTool, ButtonChoiceBox, GenericPlot,
+              TimeLine
+        ) {
 
         var GeoTemporal = {};
 
@@ -13,10 +17,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         GenericPlot.registerPlotType('GeoTemporal', GeoTemporal);
 
 
+
+
+
+
+
+
         GeoTemporal.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geotemporal analysis' }, startQuery);
+            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geographic map' }, startQuery);
 
             that.pointData = {};//first index: property id, second index: point nr
+
+            that.hasTimeLine = false;
+            $.each(MetaData.customProperties, function(idx, propInfo) {
+                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
+                    that.hasTimeLine = true;
+            });
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
@@ -26,92 +42,61 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             } );
 
 
+            that.plotComponents = {};
+
+            if (that.hasTimeLine) {
+                that.plotComponents.timeLine = TimeLine.Create(that);
+            }
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
                 var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7));
-                that.frameTimeLine = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,false);
+
+                if (that.hasTimeLine) {
+                    that.plotComponents.timeLine.frame = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
+                        .setAllowScrollBars(false,false);
+                }
+
                 that.frameGeoMap = frameRight.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
             };
 
 
-            that.createControlsTimeLine = function() {
-                //Create time controls
-                var propList = [];
-                $.each(MetaData.customProperties, function(idx, propInfo) {
-                    if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
-                        propList.push({id:propInfo.propid, name:propInfo.name});
-                });
-                that.ctrlDateProperty = Controls.Combo(null,{ label:'Date:', states: propList, value:propList[0].id }).setClassID('dateprop');
-                that.ctrlDateProperty.setOnChanged(function() {
-                    that.fetchData();
-                });
-
-                that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict to viewport'}).setClassID('restricttotimeviewport');
-                that.ctrl_restrictToTimeViewPort.setOnChanged(function() {
-                    if (that.ctrl_restrictToTimeViewPort.getValue())
-                        that.updateTimeViewPort();
-                    else {
-                        that.pointSet.setPointFilter('timeFilter', null);
-                        that.updateMapPoints();
-                        that.reDraw();
-                    }
-                });
-
-                that.ctrl_showTimeBarsAsPercentage = Controls.Check(null,{ label: 'Show as percentage'}).setClassID('showtimeaspercentage');
-                that.ctrl_showTimeBarsAsPercentage.setOnChanged(function() {
-                    that.reDraw();
-                });
-
-                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_showTimeBarsAsPercentage, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
-
-                return groupTimeControls;
-            }
 
 
 
             that.createControlsMap = function() {
 
-                var cmdZoomToFit = Controls.Button(null, { content: 'Zoom to fit', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    that.pointSet.zoomFit();
-                });
+                var cmdLassoSelection = Controls.Button(null, { content: 'Select points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    var actions = [];
 
-                var onStopLassoSelection = function() {
-                    cmdLassoSelection.changeContent('Lasso select Points');
-                    that.theMap.stopLassoSelection();
-                    cmdLassoSelection.busy = false;
-                    that.fetchLassoSelection();
-                };
-
-                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select Points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    cmdLassoSelection.busy = !cmdLassoSelection.busy;
-                    if (cmdLassoSelection.busy) {
-                        cmdLassoSelection.changeContent('Complete lasso selection');
-                        that.theMap.startLassoSelection(onStopLassoSelection);
+                    actions.push( { content:'Rectangular latt-long area', handler:function() {
+                        that.theMap.startRectSelection(that.fetchRectSelection);
                     }
-                    else {
-                        onStopLassoSelection();
-                    }
-                });
+                    });
 
+                    actions.push( { content:'Lasso tool', handler:function() {
+                        that.theMap.startLassoSelection(that.fetchLassoSelection);
+                    }
+                    });
+
+                    ButtonChoiceBox.create('Select points','', [actions]);
+                });
 
                 that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
-
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:3, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:1, digits: 2}).setClassID('pointOpacity')
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 170, minval:0, maxval:1, value:0.8, digits: 2}).setClassID('pointOpacity')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
@@ -129,7 +114,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
 
                 var grp = Controls.CompoundVert([
-                    cmdZoomToFit,
+//                    cmdZoomToFit,
                     cmdLassoSelection,
                     Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
@@ -157,47 +142,38 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.fetchData();
                 });
 
-
-
                 that.colorLegend = Controls.Html(null,'');
 
+                var controlsList = [ctrl_Query,
+                    Controls.VerticalSeparator(2),
+                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>')];
 
-                var groupTimeControls = that.createControlsTimeLine();
+                $.each(that.plotComponents, function(key, plotComp) {
+                    controlsList.push(Controls.VerticalSeparator(2));
+                    controlsList.push(plotComp.createControls());
+                });
 
                 var groupMapControls = that.createControlsMap();
 
+                controlsList.push(Controls.VerticalSeparator(2));
+                controlsList.push(groupMapControls);
 
-                var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
-                    Controls.VerticalSeparator(2),
-                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>'),
-                    Controls.VerticalSeparator(2),
-                    groupTimeControls,
-                    Controls.VerticalSeparator(2),
-                    groupMapControls
-                ]);
+
+
+
+
+                var controlsGroup = Controls.CompoundVert(controlsList);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
 
-                // Create Time line
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.createView();
+                });
+
                 that.theMap = Map.GMap(this.frameGeoMap);
-                that.theTimeLine = TimeLineView.Create(this.frameTimeLine);
 
-                that.updateTimeViewPort = function() {
-                    if (that.ctrl_restrictToTimeViewPort.getValue()) {
-                        var timeRange = that.theTimeLine.getVisibleTimeRange();
-                        that.pointSet.setPointFilter('timeFilter', function(pt) {
-                            return (pt.dateJD<timeRange.min)||(pt.dateJD>timeRange.max);
-                        });
-                        that.updateMapPoints();
-                        that.pointSet.draw();
-                    }
-                }
 
-                that.theTimeLine.setOnViewPortModified(DQX.ratelimit(that.updateTimeViewPort,200));
-
-                that.theTimeLine.setOnTimeRangeSelected(that.fetchTimeRangeSelection);
 
 
                 // Create points overlay on map
@@ -228,13 +204,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.storeCustomSettings = function() {
                 var sett = {};
                 sett.mapSettings = that.theMap.storeSettings();
-                sett.timeLineSettings = that.theTimeLine.storeSettings();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    sett[key] = plotComp.storeSettings();
+                })
+
                 return sett;
             };
 
             that.recallCustomSettings = function(sett) {
                 that.theMap.recallSettings(sett.mapSettings);
-                that.theTimeLine.recallSettings(sett.timeLineSettings);
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.recallSettings(sett[key]);
+                })
             };
 
             that.reloadAll = function() {
@@ -246,15 +228,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 fetcher.setMaxResultCount(999999);
 
                 that.pointSet.clearPoints();
-                that.theTimeLine.clearPoints();
+
+                $.each(that.plotComponents, function(idx, comp) {
+                    comp.clearPoints();
+                })
+
                 that.points = null;
                 that.colorLegend.modifyValue('');
 
                 var sortField = that.tableInfo.primkey;
 
-                that.datePropId = that.ctrlDateProperty.getValue();
-                fetcher.addColumn(that.datePropId, 'F4');
-                sortField = that.datePropId;
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.addFetchProperties(fetcher);
+                });
+                //sortField = that.datePropId;
 
                 if (!that.pointData[that.tableInfo.primkey])
                     fetcher.addColumn(that.tableInfo.primkey, 'ST');
@@ -286,8 +273,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var requestID = DQX.getNextUniqueID();
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
+                DQX.setProcessing();
                 fetcher.getData(that.theQuery.get(), sortField,
                     function (data) { //success
+                        DQX.stopProcessing();
                         if (that.requestID == requestID) {
                             $.each(data, function(id, values) {
                                 that.pointData[id] = values;
@@ -300,6 +289,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         }
                     },
                     function (data) { //error
+                        DQX.stopProcessing();
                         that.fetchCount -= 1;
                     }
 
@@ -383,19 +373,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.points.push(pt);
                 }
 
-                if (that.datePropId) {
-                    var times = that.pointData[that.datePropId];
-                    for (var nr =0; nr<keys.length; nr++) {
-                        that.points[nr].dateJD = times[nr];
-                    }
-                }
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.processFetchedPoints(that.pointData, that.points);
+                });
 
                 that.updateMapPoints();
 
-                that.theTimeLine.setPoints(that.points, {
-                    catData: !!that.catPropId,
-                    numData: !!that.numPropId
+                $.each(that.plotComponents, function(idx, plotComp) {
+                    plotComp.setPoints(that.points, {
+                        catData: !!that.catPropId,
+                        numData: !!that.numPropId
+                    });
                 });
+
                 that.reDraw();
             }
 
@@ -416,40 +406,57 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 for (var nr =0; nr<points.length; nr++)
                     points[nr].sel = !!(selectionInfo[points[nr].id]);
                 that.pointSet.updateSelection();
-                that.theTimeLine.updateSelection();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.updateSelection();
+                });
             }
 
             that.fetchLassoSelection = function() {
                 if (!that.points)  return;
-                var points = that.points;
-                var selectionInfo = that.tableInfo.currentSelection;
-                var modified = false;
-                for (var nr =0; nr<points.length; nr++) {
-                    var sel = that.theMap.isCoordInsideLassoSelection(Map.Coord(points[nr].longit, points[nr].lattit));
-                    if (sel!=!!(selectionInfo[points[nr].id])) {
-                        modified = true;
-                        that.tableInfo.selectItem(points[nr].id, sel);
-                    }
-                }
-                if (modified)
-                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+
+                var selectionCreationFunction = function() {
+                    var selList = [];
+                    $.each(that.points,function(idx, point) {
+                        if (!that.pointSet.isPointFiltered(point)) {
+                            if (that.theMap.isCoordInsideLassoSelection(Map.Coord(point.longit, point.lattit)))
+                                selList.push(point.id);
+                        }
+                    });
+                    return selList;
+                };
+
+                var content = '';
+                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Geographic area', content, null, selectionCreationFunction);
             }
 
-            that.fetchTimeRangeSelection = function(JDmin, JDmax) {
-                if (!that.points)  return;
-                var points = that.points;
-                var selectionInfo = that.tableInfo.currentSelection;
-                var modified = false;
-                for (var nr =0; nr<points.length; nr++) {
-                    var sel = (points[nr].dateJD>=JDmin) && (points[nr].dateJD<=JDmax);
-                    if (sel!=!!(selectionInfo[points[nr].id])) {
-                        modified = true;
-                        that.tableInfo.selectItem(points[nr].id, sel);
-                    }
-                }
-                if (modified)
-                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+
+            that.fetchRectSelection = function(coord1, coord2) {
+                var longitMin = Math.min(coord1.longit, coord2.longit);
+                var longitMax = Math.max(coord1.longit, coord2.longit);
+                var lattitMin = Math.min(coord1.lattit, coord2.lattit);
+                var lattitMax = Math.max(coord1.lattit, coord2.lattit);
+                var qry = that.theQuery.get();
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLongit,
+                    longitMin, longitMax);
+                qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit,
+                    lattitMin, lattitMax);
+
+                selectionCreationFunction = function() {
+                    var selList = [];
+                    $.each(that.points, function(idx, point) {
+                        if (!that.pointSet.isPointFiltered(point)) {
+                            var sel = (point.longit>=longitMin) && (point.longit<=longitMax) && (point.lattit>=lattitMin) && (point.lattit<=lattitMax);
+                            if (sel)
+                                selList.push(point.id);
+                        }
+                    });
+                    return selList;
+                };
+
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Geographic range', '', qry, selectionCreationFunction);
             }
+
 
 
             that.notifyPropertyContentChanged = function(propid) {
@@ -473,10 +480,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     aggregateStyle: that.ctrl_AggrType.getValue()
                 });
                 that.pointSet.draw();
-                that.theTimeLine.setDrawStyle({
-                    showTimeBarsAsPercentage: that.ctrl_showTimeBarsAsPercentage.getValue()
-                });
-                that.theTimeLine.draw();
+
+                $.each(that.plotComponents, function(key, plotComp) {
+                    plotComp.draw();
+                })
+
             }
 
 

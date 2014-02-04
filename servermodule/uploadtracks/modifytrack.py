@@ -12,9 +12,11 @@ def response(returndata):
     name = returndata['name']
     properties = returndata['properties']
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
     cur = db.cursor()
 
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'customtracks'))
     cur.execute("UPDATE customtracks SET name=%s WHERE ID=%s", (name,trackid) )
     cur.execute("UPDATE customtracks SET properties=%s WHERE ID=%s", (properties,trackid) )
 

@@ -1,8 +1,10 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/ChannelPlot/ChannelPlotter", "DQX/ChannelPlot/ChannelCanvas"
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/ChannelPlot/ChannelPlotter", "DQX/ChannelPlot/ChannelCanvas",
+    "Utils/MiscUtils"
 ],
     function (
-        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, ChannelPlotter, ChannelCanvas
+        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, ChannelPlotter, ChannelCanvas,
+        MiscUtils
         ) {
 
         var TimeLineView = {};
@@ -11,7 +13,7 @@ define([
 
         TimeLineView.ChannelScale = function (itimeLine) {
             var that = ChannelCanvas.Base('_TimeScale');
-            that._height = 28;
+            that._height = 31;
             that.myTimeLine = itimeLine;
 
 
@@ -27,103 +29,9 @@ define([
                 drawInfo.centerContext.textBaseline = 'top';
                 drawInfo.centerContext.textAlign = 'center';
 
-                var createDateScaleInfo = function(optimDist) {
-                    var dist,shear;
-                    var minShear = 1.0e9;
-                    var calcShear = function(dst) {
-                        return Math.abs(dst/optimDist-1.0);
-                    }
-                    var rs = {
-                        namedDays: null,
-                        monthInterval: null,
-                        yearInterval: null
-                    };
 
-                    // try each day
-                    dist = 1*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,39,31];
-                    }
-
-                    // try each 2 days
-                    dist = 2*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30];
-                    }
-
-                    // try each 5 days
-                    dist = 5*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,5,10,15,20,25];
-                    }
-
-                    // try each 10 days
-                    dist = 10*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,10,20];
-                    }
-
-                    // try each 15 days
-                    dist = 15*drawInfo.zoomFactX;
-                    shear = calcShear(dist);
-                    if (shear<minShear) {
-                        minShear = shear;
-                        rs.namedDays = [1,15];
-                    }
-
-                    // try month multiples
-                    $.each([1,2,3,6,12], function(idx, mult) {
-                        dist = mult*30*drawInfo.zoomFactX;
-                        shear = calcShear(dist)
-                        if (shear<minShear) {
-                            minShear = shear;
-                            rs.monthInterval = mult;
-                            rs.namedDays = null;
-                            rs.yearInterval = null;
-                        }
-                    })
-
-                    // try year multiples
-                    $.each([1,2,5,10], function(idx, mult) {
-                        dist = mult*365*drawInfo.zoomFactX;
-                        shear = calcShear(dist)
-                        if (shear<minShear) {
-                            minShear = shear;
-                            rs.monthInterval = null;
-                            rs.namedDays = null;
-                            rs.yearInterval = mult;
-                        }
-                    });
-
-                    rs.isOnScale = function(year, month, day) {
-                        if (this.yearInterval) {
-                            if ( (year%this.yearInterval == 0) && (month==1) &&(day==1) )
-                                return true;
-                            return false;
-                        }
-                        if (this.monthInterval) {
-                            if ( ((month-1)%this.monthInterval == 0) && (day==1) )
-                                return true;
-                            return false;
-                        }
-                        if (this.namedDays.indexOf(day)>=0)
-                            return true;
-                        return false;
-                    }
-
-                    return rs;
-                }
-
-                var textScaleInfo = createDateScaleInfo(80);
-                var tickScaleInfo = createDateScaleInfo(20);
+                var textScaleInfo = MiscUtils.createDateScaleInfo(80, drawInfo.zoomFactX);
+                var tickScaleInfo = MiscUtils.createDateScaleInfo(20, drawInfo.zoomFactX);
 
                 var pad = function(n) {return n<10 ? '0'+n : n};
 
@@ -137,19 +45,19 @@ define([
                     var day = dt.getUTCDate();
                     if (textScaleInfo.isOnScale(year, month, day)) {
                         var st1 = year;
-                        drawInfo.centerContext.fillText(st1, psx, 1);
+                        drawInfo.centerContext.fillText(st1, psx, 6);
                         if (!textScaleInfo.yearInterval) {
-                            var st2 = pad(month)+'-'+pad(day);
-                            drawInfo.centerContext.fillText(st2, psx, 11);
+                            var st2 = '-'+pad(month)+'-'+pad(day);
+                            drawInfo.centerContext.fillText(st2, psx, 16);
                             drawInfo.centerContext.beginPath();
-                            drawInfo.centerContext.moveTo(psx, drawInfo.sizeY-7);
-                            drawInfo.centerContext.lineTo(psx, drawInfo.sizeY);
+                            drawInfo.centerContext.moveTo(psx, 0);
+                            drawInfo.centerContext.lineTo(psx, 7);
                             drawInfo.centerContext.stroke();
                         }
                     } else if (tickScaleInfo.isOnScale(year, month, day)) {
                         drawInfo.centerContext.beginPath();
-                        drawInfo.centerContext.moveTo(psx, drawInfo.sizeY-3);
-                        drawInfo.centerContext.lineTo(psx, drawInfo.sizeY);
+                        drawInfo.centerContext.moveTo(psx, 0);
+                        drawInfo.centerContext.lineTo(psx, 3);
                         drawInfo.centerContext.stroke();
                     }
                 }
@@ -224,8 +132,10 @@ define([
                     that.rateScale = Math.max(that.rateScale, block.memberCount*1.0/blockSize);
                 });
 
-                var yOffset = drawInfo.sizeY-10;
-                var ySize = drawInfo.sizeY-20;
+
+
+                var yOffset = drawInfo.sizeY;
+                var ySize = drawInfo.sizeY*0.9;
                 var selBarWidth = Math.max(2,0.33*blockSize*drawInfo.zoomFactX);
 
                 drawInfo.centerContext.strokeStyle = 'rgb(0,0,0)';
@@ -252,10 +162,6 @@ define([
                     drawInfo.centerContext.beginPath();
                     drawInfo.centerContext.rect(psx1,yOffset-psh,psx2-psx1,psh);
                     drawInfo.centerContext.stroke();
-                    drawInfo.centerContext.strokeStyle = 'rgba(0,0,0,0.15)';
-                    drawInfo.centerContext.beginPath();
-                    drawInfo.centerContext.rect(psx1,0,psx2-psx1,yOffset);
-                    drawInfo.centerContext.stroke();
                     if (block.selectedMemberCount>0) {
                         var psh = Math.round(block.selectedMemberCount*1.0/barScale*ySize);
                         drawInfo.centerContext.fillStyle = 'rgb(64,0,0)';
@@ -269,6 +175,14 @@ define([
                 drawInfo.centerContext.textBaseline = 'top';
                 drawInfo.centerContext.textAlign = 'center';
                 this.drawMark(drawInfo, false);
+
+                that.drawVertScale(drawInfo, 0, that.rateScale, { offsetFrac:0.0, rangeFrac:0.9 });
+
+                drawInfo.leftContext.font = '11px sans-serif';
+                drawInfo.leftContext.fillStyle = "black";
+                drawInfo.leftContext.fillText('1/d', 20, Math.round(drawInfo.sizeY*0.5)+7);
+
+
             }
 
             return that;
@@ -276,7 +190,7 @@ define([
 
 
         TimeLineView.Create = function(iParentRef) {
-            var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false});
+            var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false, leftWidth:80});
             that.scaleConversionFactor = 1.0;
             that.myPointSet = [];
 
@@ -306,8 +220,8 @@ define([
             };
 
 
-            that.addChannel(TimeLineView.ChannelScale(that), true);
             that.addChannel(TimeLineView.ChannelData(that), true);
+            that.addChannel(TimeLineView.ChannelScale(that), true);
 
             Msg.listen('',{ type: 'PosOrZoomFactorXChanged', id: that.myID }, function() {
                 if (that._onViewPortModified)

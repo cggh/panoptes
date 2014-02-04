@@ -1,0 +1,14 @@
+###############################################################################
+#    Format:
+#    UsernamePattern, DatasetPattern, Privilege (can be read,edit,manage)
+#    Patterns are regex
+###############################################################################
+
+
+# The following line grants universal privileges to everybody:
+.*, .*, manage
+
+
+
+anonymous, Sample1, manage
+anonymous, Markers, read

@@ -18,7 +18,7 @@ class CalculationThreadList:
     def AddThread(self,id, calculationname):
         with self.lock:
             self.threads[id] = { 'status':'Calculating', 'progress':None, 'failed':False }
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         timestamp = str(datetime.datetime.now())[0:19]
         sqlstring = 'INSERT INTO calculations VALUES ("{0}", "UserX", "{1}", "{2}", "Calculating", 0, 0, 0, "")'.format(id, timestamp, calculationname)
@@ -30,7 +30,7 @@ class CalculationThreadList:
     def DelThread(self, id):
         with self.lock:
             del self.threads[id]
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         sqlstring = 'UPDATE calculations SET completed=1, status="Finished", progress=0 WHERE id="{0}"'.format(id)
         cur.execute(sqlstring)
@@ -44,7 +44,7 @@ class CalculationThreadList:
             if id in self.threads:
                 self.threads[id]['status'] = status
                 self.threads[id]['progress'] = progress
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         status = db.escape_string(status)
         sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
@@ -53,7 +53,7 @@ class CalculationThreadList:
         db.close()
 
     def SetName(self, id, name):
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         sqlstring = 'UPDATE calculations SET name="{1}" WHERE id="{0}"'.format(id, name)
         cur.execute(sqlstring)
@@ -61,7 +61,7 @@ class CalculationThreadList:
         db.close()
 
     def SetScope(self, id, scope):
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         sqlstring = 'UPDATE calculations SET scope="{1}" WHERE id="{0}"'.format(id, scope)
         cur.execute(sqlstring)
@@ -72,7 +72,7 @@ class CalculationThreadList:
         with self.lock:
             if id in self.threads:
                 self.threads[id]['failed'] = True
-        db = DQXDbTools.OpenDatabase()
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         sqlstring = 'UPDATE calculations SET failed=1 WHERE id="{0}"'.format(id)
         cur.execute(sqlstring)
@@ -80,11 +80,24 @@ class CalculationThreadList:
         db.close()
 
     def GetInfo(self,id):
-        with self.lock:
-            if id in self.threads:
-                return { 'status': self.threads[id]['status'], 'progress': self.threads[id]['progress'], 'failed': self.threads[id]['failed'], 'completed': False }
-            else:
-                return None
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
+        cur = db.cursor()
+        cur.execute('SELECT status, progress, failed, completed FROM calculations WHERE id="{0}"'.format(id))
+        rs = cur.fetchone()
+        if rs is None:
+            return None
+        return {
+            'status': rs[0],
+            'progress': rs[1],
+            'failed': rs[2],
+            'completed': rs[3]
+        }
+
+        # with self.lock:
+        #     if id in self.threads:
+        #         return { 'status': self.threads[id]['status'], 'progress': self.threads[id]['progress'], 'failed': self.threads[id]['failed'], 'completed': False }
+        #     else:
+        #         return None
 
 theCalculationThreadList = CalculationThreadList()
 
@@ -100,6 +113,7 @@ class CalculationThread (threading.Thread):
         self.logfilename = None
         self.orig_stdout = sys.stdout
         self.orig_stderr = sys.stderr
+        self.credentialInfo = DQXDbTools.ParseCredentialInfo(data)
 
     def OpenLog(self):
         self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)

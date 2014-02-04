@@ -16,7 +16,7 @@ def response(returndata):
     whc.Decode(encodedquery)
     whc.CreateSelectStatement()
 
-    db = DQXDbTools.OpenDatabase(databaseName)
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(returndata), databaseName)
     cur = db.cursor()
     coder = B64.ValueListCoder()
 

@@ -25,6 +25,9 @@ def IsValueDataTypeIdenfifier(datatypeIdentifier):
            (datatypeIdentifier == 'LowPrecisionValue') or\
            (datatypeIdentifier == 'Date')
 
+def IsDateDataTypeIdenfifier(datatypeIdentifier):
+    return (datatypeIdentifier == 'Date')
+
 
 def GetSQLDataType(datatypeIdentifier):
     datatypestr = 'varchar(50)'
@@ -94,7 +97,7 @@ class SQLScript:
 
 def ExecuteSQL(calculationObject, database, command):
     calculationObject.LogSQLCommand(database+';'+command)
-    db = DQXDbTools.OpenDatabase(database)
+    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
     db.autocommit(True)
     cur = db.cursor()
     cur.execute(command)
@@ -103,7 +106,7 @@ def ExecuteSQL(calculationObject, database, command):
 
 def ExecuteSQLQuery(calculationObject, database, query):
     calculationObject.LogSQLCommand(database+';'+query)
-    db = DQXDbTools.OpenDatabase(database)
+    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
     cur = db.cursor()
     cur.execute(query)
     result = cur.fetchall()
@@ -112,7 +115,7 @@ def ExecuteSQLQuery(calculationObject, database, query):
     return result
 
 def ExecuteSQLGenerator(calculationObject, database, commands):
-    db = DQXDbTools.OpenDatabase(database)
+    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
     db.autocommit(True)
     cur = db.cursor()
     for i, command in enumerate(commands):
@@ -144,6 +147,7 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
     )
 
 def ImportGlobalSettings(calculationObject, datasetId, settings):
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))
     for token in settings.GetTokenList():
         ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
 
@@ -285,6 +289,7 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
 
 
 def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
     summSettings.RequireTokens(['BlockSizeMax'])
     summSettings.AddTokenIfMissing('MinVal', 0)
     summSettings.AddTokenIfMissing('BlockSizeMin', 1)

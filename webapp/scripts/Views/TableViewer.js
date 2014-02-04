@@ -46,7 +46,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 });
 
-
                 if (MetaData.getTableInfo(that.tableid).hasGenomePositions) {
                     Msg.listen('',{type: 'ShowItemsInGenomeRange', tableid: that.tableid}, function(scope, info) {
                         that.activateState();
@@ -171,7 +170,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     var ctrlQuery = that.theQuery.createControl();
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create a plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         Msg.send({type: 'CreateDataItemPlot'}, { tableid: that.tableid });
                     });
@@ -187,7 +186,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableInfo.clearSelection();
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
                     });
-                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {
                         SelectionTools.cmdStore(that.tableInfo);
                     });

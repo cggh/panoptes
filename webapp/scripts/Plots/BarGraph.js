@@ -1,5 +1,11 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot"],
-    function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData, QueryTool, GenericPlot) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+],
+    function (
+        require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        ) {
 
         var BarGraph = {};
 
@@ -359,32 +365,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.onMouseClick = function(ev, info) {
                 var tooltip = that.getToolTipInfo(info.x, info.y);
                 if (tooltip) {
-                    var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table (replace)",  width:120, height:30 }).setOnChanged(function() {
-                        var tableView = Application.getView('table_'+that.tableInfo.id);
-                        var qry= SQL.WhereClause.AND([]);
-                        if (!that.theQuery.get().isTrivial)
-                            qry.addComponent(that.theQuery.get());
-                        $.each(tooltip.selectors, function(key, value) {
-                            qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
-                        });
-                        tableView.activateWithQuery(qry);
-                        Popup.closeIfNeeded(popupid);
-                    });
-                    var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in table (add)",  width:120, height:30 }).setOnChanged(function() {
-                        var tableView = Application.getView('table_'+that.tableInfo.id);
-                        var qry= SQL.WhereClause.AND([]);
-                        if (!that.theQuery.get().isTrivial)
-                            qry.addComponent(that.theQuery.get());
-                        $.each(tooltip.selectors, function(key, value) {
-                            qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
-                        });
-                        var currentQuery = tableView.theQuery.get();
-                        tableView.activateWithQuery(SQL.WhereClause.OR([currentQuery,qry]));
-                        Popup.closeIfNeeded(popupid);
+
+                    var qry= SQL.WhereClause.AND([]);
+                    if (!that.theQuery.get().isTrivial)
+                        qry.addComponent(that.theQuery.get());
+                    $.each(tooltip.selectors, function(key, value) {
+                        qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
                     });
                     var content = tooltip.content;
-                    content += '<br/>' + bt1.renderHtml() + bt2.renderHtml();
-                    var popupid = Popup.create('Bargraph bar', content);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Bargraph bar', content, qry, null);
                 }
             }
 

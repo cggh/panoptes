@@ -151,3 +151,26 @@ controls alpha, how data values are mapped to colour and alpha values,
 is all done via YAML configuration, i.e., no UI options to change.
 
 
+Dataset access control
+----------------------
+
+Implement some kind of simple per-dataset role-based access
+control. E.g., For each dataset there are two roles, viewer and
+controller. Viewers can view all data in the dataset. Controllers can
+view all data in the dataset, upload custom data to workspaces, and
+perform dataset administration functions (e.g., trigger dataset
+imports).
+
+It is assumed that controllers will also have read/write access to the
+source data filesystem for the dataset, i.e., controllers are the
+people who will be copying files into the filesystem for import and
+editing YAML configuration files. However the filesystem access
+management will be handled independently of panoptes.
+
+It is assumed that integration with authentication systems and user
+role/group management system (e.g., LDAP repository) can be done via
+the web container (e.g., Apache), i.e., that the authenticated user ID
+and user roles can be obtained by panoptes via something like
+environment variables.
+
+
