@@ -46,10 +46,10 @@ The simplest way to run Panoptes is using::
 
 	./scripts/run.sh
 
-by default, this serves Panoptes on http://localhost:8000 using gunicorn. 
+by default, this serves Panoptes on http://localhost:8000/static/main.html using gunicorn.
 To run on your external network interface use (with the port you desire)::
 
-	./scripts/run 0.0.0.0:8000
+	./scripts/run.sh 0.0.0.0:8000
 
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
 
