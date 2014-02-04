@@ -16,12 +16,24 @@ Build
 Copy 'config.py.example' to 'config.py'. Edit the file for your MYSQL setup and specify a directory Panoptes can use for storing files.
 Note that changes in 'config.py' are only used on build, so you will need to rebuild if they change.
 
+
 To build run::
 
 	./scripts/build.sh
 
 to create a panoptes installation in 'build'. Note that this deletes any existing build.
 This will attempt to install the needed python packages and link Panoptes into the DQXServer framework which serves the app.
+
+Server data file structure
+--------------------------
+Panoptes uses two file directories, and the location of both has to be specified in config.py.
+
+BASEDIR:
+This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks" and "temp".
+Both should have write privileges for the user that runs the service.
+
+SOURCEDATADIR:
+This directory contains the file-bases data sources that are used to import into the Panoptes datasets.
 
 Simple Server
 -------------
