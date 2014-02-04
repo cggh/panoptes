@@ -43,12 +43,19 @@ require.config({
 require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes", "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Utils/Serialise"
+    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
+    "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
+    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene",
+    "Utils/Serialise", "Utils/ButtonChoiceBox"
 ],
     function (
         _, $, Application, Framework, Msg, DQX, SQL, DataFetchers,
         MetaData,
-        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes, GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PromptWorkspace, PromptDataSet, Serialise) {
+        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
+        GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
+        PromptWorkspace, PromptDataSet, FindGene,
+        Serialise, ButtonChoiceBox
+        ) {
         $(function () {
 
 
@@ -91,6 +98,7 @@ require([
                         ItemPopup.init();
                         DataItemTablePopup.init();
                         DataItemPlotPopup.init();
+                        FindGene.init();
 
 
 
@@ -120,7 +128,16 @@ require([
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Find...','Bitmaps/Find.png', 80, function(){
-                            alert('Find button clicked');
+                            var actions = [];
+
+                            if (MetaData.generalSettings.hasGenomeBrowser) {
+                                actions.push( { content:'Find gene...', handler:function() {
+                                    FindGene.execute()
+                                }
+                                });
+                            }
+
+                            ButtonChoiceBox.create('Find item','', [actions]);
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
