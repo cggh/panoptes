@@ -80,11 +80,24 @@ class CalculationThreadList:
         db.close()
 
     def GetInfo(self,id):
-        with self.lock:
-            if id in self.threads:
-                return { 'status': self.threads[id]['status'], 'progress': self.threads[id]['progress'], 'failed': self.threads[id]['failed'], 'completed': False }
-            else:
-                return None
+        db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
+        cur = db.cursor()
+        cur.execute('SELECT status, progress, failed, completed FROM calculations WHERE id="{0}"'.format(id))
+        rs = cur.fetchone()
+        if rs is None:
+            return None
+        return {
+            'status': rs[0],
+            'progress': rs[1],
+            'failed': rs[2],
+            'completed': rs[3]
+        }
+
+        # with self.lock:
+        #     if id in self.threads:
+        #         return { 'status': self.threads[id]['status'], 'progress': self.threads[id]['progress'], 'failed': self.threads[id]['failed'], 'completed': False }
+        #     else:
+        #         return None
 
 theCalculationThreadList = CalculationThreadList()
 
