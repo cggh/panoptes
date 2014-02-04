@@ -131,7 +131,7 @@ require([
                             var actions = [];
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
-                                actions.push( { content:'Find gene...', handler:function() {
+                                actions.push( { content:'Find gene...', bitmap:'Bitmaps/GenomeBrowser.png', handler:function() {
                                     FindGene.execute()
                                 }
                                 });
