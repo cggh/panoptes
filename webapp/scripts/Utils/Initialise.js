@@ -173,7 +173,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (!prop.name) prop.name = prop.propid;
                 var settings = { showInTable: true, showInBrowser: false, channelName: '', channelColor:'rgb(0,0,0)', connectLines: false };
                 if (prop.isFloat) {
-                    settings.showInBrowser = true;
                     settings.minval = 0;
                     settings.maxval = 1;
                     settings.decimDigits = 2;
