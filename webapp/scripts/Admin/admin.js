@@ -96,7 +96,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             data.workspaceid = sourceFileInfo.workspaceid;
                             data.sourceid = sourceFileInfo.sourceid;
                             data.tableid = sourceFileInfo.tableid;
-                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_customsource', data, function(resp) {
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_customsource', data, function(resp) {
                             });
                             return;
                         }
@@ -104,13 +104,13 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             //Upload a workspace
                             data.datasetid = sourceFileInfo.datasetid;
                             data.workspaceid = sourceFileInfo.workspaceid;
-                            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_workspace', data, function(resp) {
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_workspace', data, function(resp) {
                             });
                             return;
                         }
                         //Upload a dataset
                         data.datasetid = sourceFileInfo.datasetid;
-                        ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'fileload_dataset', data, function(resp) {
+                        ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_dataset', data, function(resp) {
                         });
                     }
 
@@ -230,7 +230,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
             Application.bootScheduler = DQX.Scheduler();
 
             Application.bootScheduler.add([], function() {
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','getimportfilelist',{},function(resp) {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'getimportfilelist',{},function(resp) {
                     if (resp.Error)
                         alert(resp.Error);
                     MetaData.sourceFileInfo =resp.datasets;

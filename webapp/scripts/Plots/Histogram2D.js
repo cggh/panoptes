@@ -177,7 +177,7 @@ define([
                     data.binsizex = that.ctrl_binsizeValueX.getValue();
                     data.binsizey = that.ctrl_binsizeValueY.getValue();
                 }
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','histogram2d', data, function(resp) {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogram2d', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);

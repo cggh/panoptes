@@ -1,5 +1,8 @@
 define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
     function (DQX, Controls, Msg, Popup) {
+
+        PnServerModule = 'uploadtracks';
+
         var MetaData = {};
 
         MetaData.quickLoad = true;

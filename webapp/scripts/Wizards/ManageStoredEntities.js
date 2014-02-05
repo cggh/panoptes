@@ -75,7 +75,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                 var id = that.panelList.getActiveItem();
                 if (id) {
                     if (window.confirm("Remove "+nameSingle+'?')) {
-                        DQX.customRequest(MetaData.serverUrl, 'uploadtracks', 'delstoredentity',
+                        DQX.customRequest(MetaData.serverUrl, PnServerModule, 'delstoredentity',
                             {
                                 database: MetaData.database,
                                 tablename: tablename,
@@ -94,7 +94,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                 var name = prompt("Please enter a name for the "+nameSingle,"");
 
                 if (name != null) {
-                    DQX.customRequest(MetaData.serverUrl, 'uploadtracks', 'addstoredentity',
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'addstoredentity',
                         {
                             database: MetaData.database,
                             tablename: tablename,

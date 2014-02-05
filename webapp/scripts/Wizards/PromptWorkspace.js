@@ -89,7 +89,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             data={};
             data.database = MetaData.database;
             data.name = name;
-            ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'workspace_create', data, function(resp) {
+            ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'workspace_create', data, function(resp) {
                 PromptWorkspace.reload(resp.id);
             });
         }
@@ -99,7 +99,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             data.database = MetaData.database;
             data.id = id;
             DQX.setProcessing();
-            DQX.customRequest(MetaData.serverUrl,'uploadtracks','workspace_del',data,function(resp) {
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'workspace_del',data,function(resp) {
                 DQX.stopProcessing();
                 if ('Error' in resp) {
                     alert(resp.Error);
