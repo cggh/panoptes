@@ -96,7 +96,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 } );
 
-                choicesRow.push( { content:'Show query in table', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
+                choicesRow.push( { content:'Show items in query', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: tableInfo.id,
                         query: newQuery,
