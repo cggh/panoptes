@@ -52,6 +52,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             content: "Show table",
                             bitmap: 'Bitmaps/datagrid2.png'
                         });
+
+                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:50, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                            Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
+                        });
+
                         var descr = tableInfo.settings.Description||'<i>No description</i>';
                         if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
                             descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
@@ -64,7 +69,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             descr += '</div>';
                         }
                         var info = Controls.Static(descr);
-                        var grp = Controls.CompoundHor([info, Controls.AlignRight(tableViewerButton)]).setAutoFillX(true).setLegend('<h2>' + tableInfo.tableCapNamePlural + '</h2>');
+                        var grp = Controls.CompoundHor([
+                            info,
+                            Controls.AlignRight(Controls.CompoundHor([tableViewerButton, button_Showplots]))
+                        ]).setAutoFillX(true).setLegend('<h2>' + tableInfo.tableCapNamePlural + '</h2>');
                         tableButtons.push(grp);
                         tableButtons.push(Controls.VerticalSeparator(10));
                     })

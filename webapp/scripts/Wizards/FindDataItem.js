@@ -68,15 +68,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.query, {hasSelection: false });
                 that.myTable = that.panelTable.getTable();
 
-                that.ctrl_searchString = Controls.Edit(null,{ size: 30, value: '' }).setOnChanged(DQX.debounce(that.updateQuery,200)).setHasDefaultFocus();
+                that.ctrl_searchString = Controls.Edit(null,{ size: 20, value: '' }).setOnChanged(DQX.debounce(that.updateQuery,200)).setHasDefaultFocus();
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
-                var findstr = 'in '
+                var findstr = '';
                 $.each(MetaData.customProperties, function(idx, propInfo) {
                     if (propInfo.tableid == that.tableInfo.id) {
-                        if ( (propInfo.settings.Search != 'None') || (propInfo.propid == that.tableInfo.primkey) )
-                            findstr += ' ' + propInfo.name
+                        if ( (propInfo.settings.Search != 'None') || (propInfo.propid == that.tableInfo.primkey) ) {
+                            if (findstr)
+                                findstr+=', ';
+                            findstr += propInfo.name
+                        }
                     }
                 });
 
@@ -85,7 +88,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Controls.HorizontalSeparator(7),
                     that.ctrl_searchString,
                     Controls.HorizontalSeparator(7),
-                    Controls.Static(findstr)
+                    Controls.Static(' in ' + findstr)
                 ]));
 
             };
