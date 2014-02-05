@@ -8,7 +8,7 @@ import SettingsLoader
 import ImpUtils
 import uuid
 import shutil
-import customresponders.uploadtracks.Utils as Utils
+import customresponders.panoptesserver.Utils as Utils
 
 import ImportDataTable
 import Import2DDataTable
@@ -106,7 +106,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 
 if __name__ == "__main__":
-    import customresponders.uploadtracks.asyncresponder as asyncresponder
+    import customresponders.panoptesserver.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {}, '')
     ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Geographic',
         {

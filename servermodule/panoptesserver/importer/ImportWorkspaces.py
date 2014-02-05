@@ -9,7 +9,7 @@ import LoadTable
 import uuid
 import sys
 import shutil
-import customresponders.uploadtracks.Utils as Utils
+import customresponders.panoptesserver.Utils as Utils
 
 
 def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder, importSettings):

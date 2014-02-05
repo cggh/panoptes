@@ -1,7 +1,7 @@
 define(["DQX/Utils", "DQX/Controls", "DQX/Msg", "DQX/Popup"],
     function (DQX, Controls, Msg, Popup) {
 
-        PnServerModule = 'uploadtracks';
+        PnServerModule = 'panoptesserver';
 
         var MetaData = {};
 

@@ -8,7 +8,7 @@ import ImpUtils
 import uuid
 import sys
 import shutil
-import customresponders.uploadtracks.Utils as Utils
+import customresponders.panoptesserver.Utils as Utils
 
 
 def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):

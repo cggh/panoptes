@@ -7,7 +7,7 @@ import config
 import SettingsLoader
 import ImpUtils
 import copy
-import customresponders.uploadtracks.Utils as Utils
+import customresponders.panoptesserver.Utils as Utils
 
 
 tableOrder = 0

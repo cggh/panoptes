@@ -70,5 +70,5 @@ There are three levels of privileges:
 The authorization mechanism interacts with authentication systems implemented at the web server level,
 by reading the REMOTE_USER environment variable (in case of CAS authentication, it can also use information in HTTP_CAS_MEMBEROF).
 
-The file PanoptesAuthDb (https://raw2.github.com/malariagen/panoptes/master/servermodule/uploadtracks/PanoptesAuthDb)
+The file PanoptesAuthDb (https://raw2.github.com/malariagen/panoptes/master/servermodule/panoptesserver/PanoptesAuthDb)
 is used to link user authentication information to privileges on specific datasets. The default installation grants all rights to everybody.
