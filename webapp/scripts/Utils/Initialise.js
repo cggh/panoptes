@@ -135,7 +135,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
         }
 
-
+        Initialise.augment2DTableInfo = function(table) {
+            table.col_table = MetaData.mapTableCatalog[table.col_table];
+            table.row_table = MetaData.mapTableCatalog[table.row_table];
+            table.hasGenomePositions = table.col_table.hasGenomePositions;
+            var settings = {};
+            if (table.settings)
+                settings = $.extend(settings,JSON.parse(table.settings));
+            table.settings = settings;
+        };
 
         Initialise.parseSummaryValues = function() {
             $.each(MetaData.summaryValues, function(idx, summaryValue) {
@@ -269,6 +277,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
         }
 
+        Initialise.parse2DProperties = function() {
+            $.each(MetaData.twoDProperties, function(idx, prop) {
+                var settings = { showInTable: true, showInBrowser: false};
+                if (prop.settings) {
+                    try {
+                        var settingsObj = JSON.parse(prop.settings);
+                    }
+                    catch(e) {
+                        alert('Invalid settings string for {table}.{propid}: {sett}\n{msg}'.DQXformat({
+                            table:prop.tableid,
+                            propid:prop.propid,
+                            sett:prop.settings,
+                            msg:e
+                        }));
+                    }
+                    settings = $.extend(settings,settingsObj);
+                }
+                prop.settings = settings;
+                prop.toDisplayString = function(vl) { return vl; }
+            });
+
+        };
 
         Initialise.parseRelations = function(data) {
             $.each(MetaData.tableCatalog, function(idx, tableInfo) {
