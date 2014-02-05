@@ -62,8 +62,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
             table.currentSelection = {};
-            if (table.hasGenomePositions)
-                table.genomeBrowserInfo = {};
 
             var settings = { GenomeMaxViewportSizeX:50000 };
             if (table.settings)
@@ -71,6 +69,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.settings = settings;
 
             table.fieldCache = TableFieldCache.Create(table);
+
+            table.hasGenomeRegions = !!(table.settings.IsRegionOnGenome);
+
+            if (table.hasGenomeRegions || table.hasGenomePositions)
+                table.genomeBrowserInfo = {};
 
             table.quickFindFields = [table.primkey];
             if ('QuickFindFields' in table.settings)

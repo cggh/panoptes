@@ -1,8 +1,12 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard",
+    "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation",
+    "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
     "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool"
 ],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard,
+              GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation,
+              DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
               EditTableBasedSummaryValues, MetaData, QueryTool
         ) {
 
@@ -504,6 +508,88 @@ define([
                         }
 
                     });
+
+
+
+
+                    // Loop over all datatables that contain genomic regions
+                    $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
+                        if (tableInfo.hasGenomeRegions) {
+
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            that.visibilityControlsGroup.addControl(controlsGroup);
+
+                            tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
+                            tableInfo.genomeBrowserInfo.theQuery.notifyQueryUpdated = function() {
+                                tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+                                that.panelBrowser.render();
+                            };
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            controlsGroup.addControl(ctrlQuery);
+
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible in range".DQXformat({name:tableInfo.tableNamePlural}),  width:150, height:40, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
+                                var chromoid = that.panelBrowser.getCurrentChromoID();
+                                var range = that.panelBrowser.getVisibleRange();
+                                range.min = Math.floor(range.min);
+                                range.max = Math.floor(range.max);
+                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
+                                qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', chromoid);
+                                qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', range.min, range.max, true);
+                                Msg.send({type: 'DataItemTablePopup'}, {
+                                    tableid: tableInfo.id,
+                                    query: qry,
+                                    title: '{name} in genomic range {chromoid}:{start}-{stop}'.DQXformat({name:tableInfo.tableCapNamePlural, chromoid:chromoid, start:range.min, stop:range.max })
+                                });
+                            });
+                            controlsGroup.addControl(Controls.VerticalSeparator(7));
+                            controlsGroup.addControl(bt);
+
+                            controlsGroup.addControl(Controls.VerticalSeparator(12));
+
+                            //Create the repeats channel
+                            var repeatConfig = {
+                                database: MetaData.database,
+                                serverURL: MetaData.serverUrl,
+                                annotTableName: tableInfo.id + 'CMB_' + MetaData.workspaceid
+//                                chromidfield: 'chrom'
+                            };
+                            var repeatFetcher = new DataFetcherAnnotation.Fetcher(repeatConfig);
+                            repeatFetcher.fetchSubFeatures = false;
+                            //repeatFetcher.translateChromoId = translateChromoId;
+                            that.panelBrowser.addDataFetcher(repeatFetcher);
+                            repeatChannel = ChannelAnnotation.Channel("Repeats", repeatFetcher);
+                            repeatChannel.setHeight(120);
+                            repeatChannel.setTitle('Repeats');
+                            that.panelBrowser.addChannel(repeatChannel, false);
+
+
+//                            //Initialise the data fetcher that will download the data for the table
+//                            var dataFetcher = new DataFetchers.Curve(
+//                                MetaData.serverUrl,
+//                                MetaData.database,
+//                                tableInfo.id + 'CMB_' + MetaData.workspaceid
+//                            );
+//                            dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
+//
+//                            tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
+//                            dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");//add id column to the datafetcher, not plotted but needed for the tooltip & click actions
+//
+//                            dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+
+//                            //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
+//                            tableInfo.genomeBrowserInfo.currentCustomProperties = [];
+//                            $.each(MetaData.customProperties,function(idx,propInfo) {
+//                                if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
+//                                    that.createPropertyChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
+//                                }
+//                                if ((propInfo.tableid==tableInfo.id) && (propInfo.isText) && (propInfo.settings.showInBrowser)) {
+//                                    that.createPositionChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
+//                                }
+//                            });
+                        }
+
+                    });
+
 
 
                     that.tableBasedSummaryValue_Add = function(tableid, trackid, recordid) {
