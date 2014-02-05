@@ -18,8 +18,12 @@ unless you want a specific HDF5 setup.
 
 Build
 -----
-Copy 'config.py.example' to 'config.py'. Edit the file for your MYSQL setup and specify a directory Panoptes can use for storing files.
-Note that changes in 'config.py' are only used on build, so you will need to rebuild if they change.
+Copy 'config.py.example' to 'config.py'. Edit the file and specify the following components:
+ - MySQL setup (DBSRV, DBUSER, DBPASS).
+   NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
+ - A directory Panoptes can use for storing files (BASEDIR, see further).
+ - A directory that will contain the source data files (SOURCEDATADIR, see further)
+Note that changes in 'config.py' are used on build, so you will need to rebuild if they change.
 
 
 To build run::
@@ -63,9 +67,9 @@ Authorization
 -------------
 Panoptes contains a simple authorization mechanism that can be used to grant or deny certain privileges on datasets.
 There are three levels of privileges:
- - read: View the data in a dataset.
- - edit: Add custom data properties to a workspace.
- - manage: All actions, including loading the dataset from the file source.
+ - Read: View the data in a dataset.
+ - Edit: Add custom data properties to a workspace.
+ - Manage: All actions, including loading the dataset from the file source.
  
 The authorization mechanism interacts with authentication systems implemented at the web server level,
 by reading the REMOTE_USER environment variable (in case of CAS authentication, it can also use information in HTTP_CAS_MEMBEROF).
