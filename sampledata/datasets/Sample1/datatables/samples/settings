@@ -13,6 +13,7 @@ Properties:
   Description: Sample identifier
   DataType: Text
   ShowInTable: true
+  Search: StartPattern
 
 - Id: SiteID
   Name: Site ID
@@ -44,6 +45,7 @@ Properties:
   Name: Sample type ID
   DataType: Text
   ShowInTable: true
+  Search: StartPattern
   Relation:
     TableId: sampletypes
     ForwardName: is
@@ -54,6 +56,7 @@ Properties:
   Description: An example of a comment string
   DataType: Text
   ShowInTable: false
+  Search: Pattern
   
 
 TableBasedSummaryValues:

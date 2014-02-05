@@ -121,7 +121,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             var theTable = panelTable.getTable();
             theTable.fetchBuffer = 300;
-            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+
+            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.NONE;
+            if (tableInfo.settings.FetchRecordCount)
+                theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+
             theTable.setQuery(query);
 
             if (settings.hasSelection) {

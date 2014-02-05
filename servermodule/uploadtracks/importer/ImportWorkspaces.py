@@ -221,7 +221,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         calculationObject.Log('Creating StoredSelection columns')
         for table in tables:
             tableid = table['id']
-            sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false}'
+            sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
             cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 9999, '{2}')".format(workspaceid, tableid, sett)
             calculationObject.LogSQLCommand(cmd)
             cur.execute(cmd)

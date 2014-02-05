@@ -242,6 +242,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     for property in properties:
         settings = property['Settings']
         settings.AddTokenIfMissing('Index', False)
+        settings.AddTokenIfMissing('Search', 'None')
         settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
         settings.RequireTokens(['DataType'])
         settings.ConvertToken_Boolean('isCategorical')
@@ -249,6 +250,10 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             settings.SetToken('Index', True) # Categorical data types are always indexed
         if settings.HasToken('Relation'):
             settings.SetToken('Index', True) # Relation child properties are always indexed
+        if settings['Search'] not in ['None', 'StartPattern', 'Pattern', 'Match']:
+            raise Exception('Property "Search" token should be None,StartPattern,Pattern,Match')
+        if settings['Search'] in ['StartPattern', 'Pattern', 'Match']:
+            settings.SetToken('Index', True) # Use index to speed up search
         settings.AddTokenIfMissing('Name', property['propid'])
         settings.AddTokenIfMissing('ReadData', True)
         settings.ConvertToken_Boolean('ReadData')
