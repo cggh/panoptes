@@ -124,7 +124,7 @@ define([
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','histogram', data, function(resp) {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogram', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);

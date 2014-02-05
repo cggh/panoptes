@@ -93,7 +93,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 data.fileid = wiz.getResultValue(ctrl_trackFile.getID());
                 data.props = propChoiceString;
                 data.tableid = UploadProperties.tableid;
-                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", 'property_add', data, function(resp) {
+                ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'property_add', data, function(resp) {
                     Msg.send({ type: 'ReloadChannelInfo' });
                     UploadProperties.proceedFunction();
                 });
@@ -105,7 +105,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         UploadProperties.getFileInfo = function(fileid) {
             UploadProperties.correctFileUploaded = false;
             DQX.setProcessing();
-            DQX.customRequest(MetaData.serverUrl,'uploadtracks','gettabfileinfo',{ database: MetaData.database, fileid: fileid },function(resp) {
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'gettabfileinfo',{ database: MetaData.database, fileid: fileid },function(resp) {
                 DQX.stopProcessing();
                 if ('Error' in resp) {
                     alert(resp.Error);

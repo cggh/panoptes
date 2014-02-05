@@ -10,7 +10,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             PromptDataSet.proceedFunction = proceedFunction;
 
             DQX.setProcessing();
-            DQX.customRequest(MetaData.serverUrl,'uploadtracks','getdatasetlist', {}, function(resp) {
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'getdatasetlist', {}, function(resp) {
                 DQX.stopProcessing();
                     PromptDataSet.datasets = resp['datasets'];
                     if (DQX.getUrlSearchString('dataset')) {

@@ -29,7 +29,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 data.workspaceid = MetaData.workspaceid;
                 data.propid = propid;
                 data.tableid = tableid;
-                ServerIO.customAsyncRequest(MetaData.serverUrl, "uploadtracks", "property_del", data, function() {
+                ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, "property_del", data, function() {
                     Msg.send({ type: 'ReloadChannelInfo' });
                 });
             }
@@ -145,7 +145,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.close();
 
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','property_setinfo', data, function(resp) {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'property_setinfo', data, function(resp) {
                     DQX.stopProcessing();
                     setTimeout(function() {
                         Msg.send({ type: 'ReloadChannelInfo' });

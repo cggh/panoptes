@@ -19,7 +19,7 @@ define([
             var pathname=window.location.pathname;
             var protocol=window.location.protocol;
             DQX.serverDataStore(MetaData.serverUrl,content,function(id) {
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','view_store',
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_store',
                     { database: MetaData.database, workspaceid:MetaData.workspaceid, id: id },
                     function(resp) {
                         url='{protocol}//{hostname}{pathname}?dataset={ds}&workspace={ws}&view={id}{hash}'.DQXformat({
@@ -53,7 +53,7 @@ define([
         Serialise.checkLoadView = function(proceedFunction) {
             var viewid  = DQX.getUrlSearchString('view');
             if (viewid) {
-                DQX.customRequest(MetaData.serverUrl,'uploadtracks','view_get',
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_get',
                     { id: viewid },
                     function(resp) {
                         Serialise._recall(resp.settings);

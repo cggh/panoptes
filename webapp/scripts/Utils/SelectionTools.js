@@ -44,7 +44,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 DQX.stopProcessing();
                 var propInfo = MetaData.findProperty(tableInfo.id, propid);
 
-                ServerIO.customAsyncRequest(MetaData.serverUrl,'uploadtracks','selectionstore',
+                ServerIO.customAsyncRequest(MetaData.serverUrl,PnServerModule,'selectionstore',
                     {
                         database: MetaData.database,
                         workspaceid:MetaData.workspaceid,

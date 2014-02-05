@@ -177,7 +177,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 //                    data.tableid = tableid;
 //                    data.propid = propid;
 //                    data.dir = dir;
-//                    DQX.customRequest(MetaData.serverUrl,'uploadtracks','property_move', data, function(resp) {
+//                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'property_move', data, function(resp) {
 //                        DQX.stopProcessing();
 //                        Msg.send({ type: 'ReloadChannelInfo' });
 //                    });
