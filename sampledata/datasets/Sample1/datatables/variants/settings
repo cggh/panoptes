@@ -3,6 +3,7 @@ NamePlural: variants
 Description: A table containing a number of genomic variants
 PrimKey: SnpName
 IsPositionOnGenome: true
+GenomeMaxViewportSizeX: 10000000
 FetchRecordCount: false
 QuickFindFields: SnpName
 
