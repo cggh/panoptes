@@ -78,10 +78,12 @@ require([
 
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
+                getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching
                         MetaData.tableCatalog = getter.getTableRecords('tablecatalog');
+                        MetaData.twoDTableCatalog = getter.getTableRecords('2D_tablecatalog');
                         MetaData.generalSettings = {};
                         $.each(getter.getTableRecords('settings'), function(idx,sett) {
                             if (sett.content=='False')
@@ -93,6 +95,12 @@ require([
                             Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
                         });
+                        MetaData.map2DTableCatalog = {};
+                        $.each(MetaData.twoDTableCatalog, function(idx, table) {
+                            Initialise.augment2DTableInfo(table);
+                            MetaData.map2DTableCatalog[table.id] = table;
+                        });
+
 
                         GenePopup.init();
                         ItemPopup.init();
@@ -179,6 +187,9 @@ require([
                             getter.addTable('propertycatalog',['propid','datatype','tableid','source','name', 'settings'],'ordr',
                                 SQL.WhereClause.OR([SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),SQL.WhereClause.CompareFixed('workspaceid','=','')])
                             );
+                            getter.addTable('2D_propertycatalog',['id','tableid', 'col_table', 'row_table', 'name', 'settings'],'ordr',
+                                SQL.WhereClause.Trivial()
+                            );
                             getter.addTable('summaryvalues',['propid','name','minval','maxval','minblocksize','tableid','settings'],'ordr',
                                 SQL.WhereClause.AND([
                                     SQL.WhereClause.OR([SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),SQL.WhereClause.CompareFixed('workspaceid','=','')]),
@@ -198,9 +209,11 @@ require([
                                     MetaData.externalLinks = getter.getTableRecords('externallinks');
                                     MetaData.summaryValues = getter.getTableRecords('summaryvalues');
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
+                                    MetaData.twoDProperties = getter.getTableRecords('2D_propertycatalog');
                                     MetaData.tableBasedSummaryValues = getter.getTableRecords('tablebasedsummaryvalues');
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
+                                    Initialise.parse2DProperties();
                                     Initialise.parseTableBasedSummaryValues();
                                     Initialise.parseRelations(getter.getTableRecords('relations'));
                                     if (proceedFunction)
