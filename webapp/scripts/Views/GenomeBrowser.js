@@ -510,8 +510,28 @@ define([
 
                     });
 
-
-
+                    // Loop over all 2D data tables that have genomic columns
+                    $.each(MetaData.map2DTableCatalog,function(tableid,tableInfo) {
+                        if (!tableInfo.hasGenomePositions) {
+                            return;
+                        }
+                        var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                        that.visibilityControlsGroup.addControl(controlsGroup);
+                        tableInfo.genomeBrowserInfo.col_query = QueryTool.Create(tableInfo.col_table.id, {includeCurrentQuery:true});
+                        tableInfo.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
+                            tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.col_query.get());
+                            that.panelBrowser.render();
+                        };
+                        var col_query = tableInfo.genomeBrowserInfo.col_query.createControl();
+                        controlsGroup.addControl(col_query);
+                        tableInfo.genomeBrowserInfo.row_query = QueryTool.Create(tableInfo.row_table.id, {includeCurrentQuery:true});
+                        tableInfo.genomeBrowserInfo.row_query.notifyQueryUpdated = function() {
+                            tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.row_query.get());
+                            that.panelBrowser.render();
+                        };
+                        var row_query = tableInfo.genomeBrowserInfo.row_query.createControl();
+                        controlsGroup.addControl(row_query);
+                    });
 
                     // Loop over all datatables that contain genomic regions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
