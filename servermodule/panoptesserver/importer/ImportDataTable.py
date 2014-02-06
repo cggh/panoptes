@@ -28,6 +28,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
+        tableSettings.AddTokenIfMissing('IsRegionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
         extraSettings.DropTokens(['PrimKey', 'IsPositionOnGenome', 'Properties'])
@@ -95,6 +96,24 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 raise Exception('Genome-related datatable {0} is missing property "chrom"'.format(tableid))
             if 'pos' not in propDict:
                 raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
+
+        if tableSettings['IsRegionOnGenome']:
+            if not tableSettings.HasToken('Chromosome'):
+                raise Exception('Missing setting "Chromosome" in genome region datatable {0} (required because of tag "IsRegionOnGenome")'.format(tableid))
+            if not tableSettings.HasToken('RegionStart'):
+                raise Exception('Missing setting "RegionStart" in genome region datatable {0} (required because of tag "IsRegionOnGenome")'.format(tableid))
+            if not tableSettings.HasToken('RegionStop'):
+                raise Exception('Missing setting "RegionStop" in genome region datatable {0} (required because of tag "IsRegionOnGenome")'.format(tableid))
+            if tableSettings['Chromosome'] not in propDict:
+                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
+            if tableSettings['RegionStart'] not in propDict:
+                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStart']))
+            if tableSettings['RegionStop'] not in propDict:
+                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStop']))
+            propDict[tableSettings['Chromosome']]['Settings'].SetToken('Index', True)
+            propDict[tableSettings['RegionStart']]['Settings'].SetToken('Index', True)
+            propDict[tableSettings['RegionStop']]['Settings'].SetToken('Index', True)
+
 
         if not importSettings['ConfigOnly']:
             columns = [ {
