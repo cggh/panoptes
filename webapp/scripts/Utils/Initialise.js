@@ -160,6 +160,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.col_table = MetaData.mapTableCatalog[table.col_table];
             table.row_table = MetaData.mapTableCatalog[table.row_table];
             table.hasGenomePositions = table.col_table.hasGenomePositions;
+            if (table.hasGenomePositions)
+                table.genomeBrowserInfo = {};
+
             var settings = {};
             if (table.settings)
                 settings = $.extend(settings,JSON.parse(table.settings));
