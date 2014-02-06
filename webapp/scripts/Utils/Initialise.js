@@ -59,6 +59,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         Initialise.augmentTableInfo = function(table) {
+            table.tableNameSingle = table.name;
+            table.tableNamePlural = table.name;
+            if (table.settings.NameSingle)
+                table.tableNameSingle = table.settings.NameSingle;
+            if (table.settings.NamePlural)
+                table.tableNamePlural = table.settings.NamePlural;
+            table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
+            table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
+
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
             table.currentSelection = {};
@@ -139,6 +148,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         Initialise.augment2DTableInfo = function(table) {
+            table.tableNameSingle = table.name;
+            table.tableNamePlural = table.name;
+            if (table.settings.NameSingle)
+                table.tableNameSingle = table.settings.NameSingle;
+            if (table.settings.NamePlural)
+                table.tableNamePlural = table.settings.NamePlural;
+            table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
+            table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
+
             table.col_table = MetaData.mapTableCatalog[table.col_table];
             table.row_table = MetaData.mapTableCatalog[table.row_table];
             table.hasGenomePositions = table.col_table.hasGenomePositions;
