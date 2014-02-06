@@ -10,6 +10,7 @@ servermodule/panoptesserver/VTTable.py
 servermodule/panoptesserver/import/VTTable.py
 importscripts/TableUtils
 
+servermodule/panoptesserver/PanoptesAuthDb
 
 
 *.py[cod]
