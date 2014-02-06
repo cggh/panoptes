@@ -6,9 +6,9 @@
 
 
 # The following line grants universal privileges to everybody:
-# .*, .*, manage
+ .*, .*, manage
 
 
 
- janonymous, Sample1, edit
- janonymous, Markers, read
+ anonymous, Sample1, edit
+ anonymous, Markers, read
