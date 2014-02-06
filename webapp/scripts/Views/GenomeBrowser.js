@@ -33,7 +33,7 @@ define([
                     }
                     obj.datatables = {};
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
-                        if (tableInfo.hasGenomePositions) {
+                        if (tableInfo.hasGenomePositions || tableInfo.hasGenomeRegions) {
                             var tableSett = {};
                             tableSett.query = SQL.WhereClause.encode(tableInfo.genomeBrowserInfo.theQuery.get());
                             obj.datatables[tableid] = tableSett;
@@ -57,7 +57,7 @@ define([
 
                     if (settObj.datatables) {
                         $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
-                            if (tableInfo.hasGenomePositions) {
+                            if (tableInfo.hasGenomePositions || tableInfo.hasGenomeRegions) {
                                 if (settObj.datatables[tableid]) {
                                     tableSett = settObj.datatables[tableid];
                                     if (tableSett.query) {
@@ -151,7 +151,7 @@ define([
                             $.each(tableInfo.quickFindFields, function(idx, propid) {
                                 states.push({id: propid, name: MetaData.findProperty(tableInfo.id,propid).name});
                             });
-                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Displayed field', states: states}).setClassID('genometrack_displayedfields_'+tableInfo.id);
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states}).setClassID('genometrack_displayedfields_'+tableInfo.id);
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 that.updateTableBasedSummaryValueHeaders();
                             });
@@ -176,6 +176,7 @@ define([
                     this.panelControls.addControl(Controls.CompoundVert([
                         linkToTableButtonsGroup,
                         that.visibilityControlsGroup,
+                        Controls.VerticalSeparator(12),
                         that.buttonsGroup
                     ]));
 
@@ -517,6 +518,7 @@ define([
                         if (tableInfo.hasGenomeRegions) {
 
                             var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(12));
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
@@ -527,8 +529,20 @@ define([
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
                             controlsGroup.addControl(ctrlQuery);
 
+                            states = [];
+                            $.each(MetaData.customProperties, function(idx, propInfo) {
+                                if (propInfo.tableid == tableInfo.id)
+                                    states.push({id: propInfo.propid, name: propInfo.name});
+                            });
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.primkey}).setClassID('genometrack_displayedfields_'+tableInfo.id);
+                            tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
+                                tableInfo.genomeBrowserInfo.dataFetcher.field_name = tableInfo.genomeBrowserFieldChoice.getValue();
+                                tableInfo.genomeBrowserInfo.dataFetcher.clearData();
+                                that.panelBrowser.render();
+                            });
 
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
+                            controlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
 
                             //Create the repeats channel
                             var regionConfig = {
@@ -552,6 +566,9 @@ define([
                             regionChannel.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
                             regionChannel.setMinDrawZoomFactX(1.0/99999999);
                             that.panelBrowser.addChannel(regionChannel, false);
+                            regionChannel.handleFeatureClicked = function (itemid) {
+                                Msg.send({ type: 'ItemPopup' }, { tableid: tableInfo.id, itemid: itemid } );
+                            };
 
 
                         }
