@@ -85,7 +85,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
+                    .setFixedSize(Framework.dimY, 90).setFrameClassClient('DQXGrayClient');
 
                 if (that.tableInfo.hasGeoCoord) {
                     that.frameMap = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
@@ -126,11 +126,42 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.hasGenomePositions) {
                     buttons.push(Controls.HorizontalSeparator(7));
-                    var bt = Controls.Button(null, { content: 'Show on genome'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'DQXToolButton2', width:140, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
                         //that.close();//!!!todo: only when blocking
-                        Msg.send({ type: 'JumpgenomePosition' }, {chromoID:data.fields.chrom, position:parseInt(data.fields.pos) });
+                        Msg.send({ type: 'JumpgenomePosition' }, {
+                            chromoID: data.fields.chrom,
+                            position: parseInt(data.fields.pos)
+                        });
                     })
-                    buttons.push(bt)
+                    buttons.push(bt);
+                }
+
+                if (that.tableInfo.hasGenomeRegions) {
+                    buttons.push(Controls.HorizontalSeparator(7));
+                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'DQXToolButton2', width:140, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
+                        //that.close();//!!!todo: only when blocking
+                        Msg.send({ type: 'JumpgenomeRegion' }, {
+                            chromoID: data.fields[that.tableInfo.settings.Chromosome],
+                            start: parseInt(data.fields[that.tableInfo.settings.RegionStart]),
+                            end: parseInt(data.fields[that.tableInfo.settings.RegionStop])
+                        });
+                    })
+                    buttons.push(bt);
+
+                    $.each(MetaData.tableCatalog,  function(idx, tableInfo) {
+                        if (tableInfo.hasGenomePositions) {
+                            buttons.push(Controls.HorizontalSeparator(7));
+                            var bt = Controls.Button(null, { content: 'Show '+tableInfo.tableNamePlural+' in range', buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                                Msg.send({type: 'ShowItemsInGenomeRange', tableid:tableInfo.id}, {
+                                    preservecurrentquery:false,
+                                    chrom: data.fields[that.tableInfo.settings.Chromosome],
+                                    start: parseInt(data.fields[that.tableInfo.settings.RegionStart]),
+                                    stop: parseInt(data.fields[that.tableInfo.settings.RegionStop])
+                                });
+                            })
+                            buttons.push(bt);
+                        }
+                    });
                 }
 
                 if (that.tableInfo.tableBasedSummaryValues.length>0) {

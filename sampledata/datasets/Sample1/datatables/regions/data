@@ -1,6 +1,9 @@
-regid	chrom	start	stop	name	Value1	Value2	Value3	type
+regid	chromosome	regionstart	regionstop	name	Value1	Value2	Value3	type
 R01	Pf3D7_01_v3	20	40	Reg A	0.02	0.55	0.77	A
 R02	Pf3D7_01_v3	50	55	Reg B	0.23	0.34	0.47	B
 R03	Pf3D7_01_v3	80	140	Reg C	0.88	0.55	0.77	B
 R04	Pf3D7_01_v3	140	160	Reg D	0.96	0.55	0.75	B
 R05	Pf3D7_01_v3	200	207	Reg E	0.34	0.53	0.43	A
+R06	Pf3D7_01_v3	250	307	Reg F	0.65	0.02	0.71	A
+R07	Pf3D7_01_v3	270	508	Reg G	0.35	0.32	0.41	A
+R08	Pf3D7_01_v3	360	945	Reg F	0.98	0.56	0.12	B

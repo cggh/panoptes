@@ -5,9 +5,9 @@ PrimKey: regid
 
 IsRegionOnGenome: true
 GenomeMaxViewportSizeX: 10000000
-Chromosome: chrom
-RegionStart: start
-RegionStop: stop
+Chromosome: chromosome
+RegionStart: regionstart
+RegionStop: regionstop
 
 
 Properties:
@@ -18,19 +18,19 @@ Properties:
   DataType: Text
   ShowInTable: true
 
-- Id: chrom
+- Id: chromosome
   Name: Chromosome
   Description: Chromosome name
   DataType: Text
   ShowInTable: true
 
-- Id: start
+- Id: regionstart
   Name: Start position
   DataType: Value
   ShowInTable: true
   DecimDigits: 0
 
-- Id: stop
+- Id: regionstop
   Name: Stop position
   DataType: Value
   ShowInTable: true

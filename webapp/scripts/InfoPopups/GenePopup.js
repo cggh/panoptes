@@ -47,7 +47,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             $.each(MetaData.tableCatalog, function(idx, table) {
                 if (table.hasGenomePositions) {
                     var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show {name} in this gene'.DQXformat({name: table.name}), width:140, height:50, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
-                        Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, { preservecurrentquery:false, chrom:data.chromid, start:data.fstart, stop:data.fstop });
+                        Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
+                            preservecurrentquery:false,
+                            chrom:data.chromid,
+                            start:data.fstart,
+                            stop:data.fstop
+                        });
                         Popup.closeIfNeeded(popupid);
                     });
                     content += button_snps.renderHtml();
