@@ -107,7 +107,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
-    calc = asyncresponder.CalculationThread('', None, {}, '')
+    calc = asyncresponder.CalculationThread('', None, {'environ':{}}, '')
     ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Geographic',
         {
             'ConfigOnly': False
