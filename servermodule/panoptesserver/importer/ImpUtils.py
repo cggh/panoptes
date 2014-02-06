@@ -370,7 +370,7 @@ class Numpy_to_SQL(object):
         for start in range(0, len(array), 500):
             end = min(start + 500, len(array))
             sql = "INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name)
-            data = list(array[start: end])
+            data = [(ele,) for ele in array[start: end]]
             yield lambda cur: cur.executemany(sql,
                                               data)
 
