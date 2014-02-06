@@ -3,8 +3,8 @@ NamePlural: genomic regions
 Description: Defines a number of regions on the genome
 PrimKey: regid
 
-IsRegionOnGenome: true
 GenomeMaxViewportSizeX: 10000000
+IsRegionOnGenome: true
 Chromosome: chromosome
 RegionStart: regionstart
 RegionStop: regionstop
