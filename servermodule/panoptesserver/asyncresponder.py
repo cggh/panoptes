@@ -15,13 +15,18 @@ class CalculationThreadList:
         self.threads = {}
         self.lock = threading.Lock()
 
-    def AddThread(self,id, calculationname):
+    def AddThread(self,id, calculationname, userid):
         with self.lock:
             self.threads[id] = { 'status':'Calculating', 'progress':None, 'failed':False }
         db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
         timestamp = str(datetime.datetime.now())[0:19]
-        sqlstring = 'INSERT INTO calculations VALUES ("{0}", "UserX", "{1}", "{2}", "Calculating", 0, 0, 0, "")'.format(id, timestamp, calculationname)
+        sqlstring = 'INSERT INTO calculations VALUES ("{0}", "{1}", "{2}", "{3}", "Calculating", 0, 0, 0, "")'.format(
+            id,
+            userid,
+            timestamp,
+            calculationname
+        )
         cur.execute(sqlstring)
         db.commit()
         db.close()
@@ -128,7 +133,7 @@ class CalculationThread (threading.Thread):
         self.logfilename = None
 
     def run(self):
-        theCalculationThreadList.AddThread(self.id, self.calculationname)
+        theCalculationThreadList.AddThread(self.id, self.calculationname, self.credentialInfo.userid)
         self.OpenLog()
         try:
             self.handler(self.data, self)
