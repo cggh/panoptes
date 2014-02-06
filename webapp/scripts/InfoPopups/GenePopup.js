@@ -59,6 +59,27 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             });
 
+            // Create buttons to show genomic regions spanning this position
+            $.each(MetaData.tableCatalog, function(idx, oTableInfo) {
+                if (oTableInfo.hasGenomeRegions) {
+                    var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                        var qry = SQL.WhereClause.AND([
+                            SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', data.chromid),
+                            SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', data.fstop),
+                            SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStop, '>=', data.fstart)
+                        ]);
+                        Msg.send({type: 'DataItemTablePopup'}, {
+                            tableid: oTableInfo.id,
+                            query: qry,
+                            title: oTableInfo.tableCapNamePlural + ' in ' + data.chromid + ':' + data.fstart + '-' + data.fstop
+                        });
+                        Popup.closeIfNeeded(popupid);
+                    })
+                    content += bt.renderHtml();
+                }
+            });
+
+
 
             content += '<br>';
 
