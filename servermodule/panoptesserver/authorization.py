@@ -84,7 +84,7 @@ class PnAuthRule:
         if (self.dataSetMatch.match(dataSet)) and (self.privLevel >= level):
             if self.userMatch.match(credInfo.userid):
                 return True
-            for groupid in self.groupids:
+            for groupid in credInfo.groupids:
                 if self.userMatch.match(groupid):
                     return True
         return False
