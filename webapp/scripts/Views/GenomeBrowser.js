@@ -510,8 +510,14 @@ define([
 
                     });
 
-
-
+                    // Loop over all 2D data tables that have genomic columns
+                    $.each(MetaData.map2DTableCatalog,function(tableid,tableInfo) {
+                        if (!tableInfo.hasGenomePositions) {
+                            return;
+                        }
+                        var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                        that.visibilityControlsGroup.addControl(controlsGroup);
+                    });
 
                     // Loop over all datatables that contain genomic regions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
