@@ -13,11 +13,7 @@ cd `dirname ${SCRIPT_PATH}` > /dev/null
 cd ..
 PROJECT_ROOT=`pwd`;
 
-if [ -z "$CONFIG" ]; then
-    CONFIG=default
-fi
-
-echo -e "${red}Building PANOPTES....${NC}"
+echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
 mkdir -p webapp/scripts/Local
 cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
@@ -25,7 +21,7 @@ rm -rf build
 mkdir -p build
 cd build
 
-echo -e "${red}  Fetching dependancies${NC}"
+echo -e "${green}  Fetching dependancies${NC}"
 cd $PROJECT_ROOT/build
 ret=0
 ssh git@github.com > /dev/null 2>&1 || ret=$?
@@ -36,7 +32,7 @@ else
     use_ssh=0
     echo -e "    Using http checkout${NC}"
 fi
-echo -e "${red}    DQX${NC}"
+echo -e "${green}    DQX${NC}"
 
 if [ "$use_ssh" -eq "1" ]; then
     git clone git@github.com:malariagen/DQX.git
@@ -47,7 +43,7 @@ cd DQX
 git checkout `cat $PROJECT_ROOT/dependencies/DQX_Version`
 cd ..
 
-echo -e "${red}    DQXServer${NC}"
+echo -e "${green}    DQXServer${NC}"
 if [ "$use_ssh" -eq "1" ]; then
     git clone git@github.com:malariagen/DQXServer.git
 else
@@ -56,45 +52,45 @@ fi
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 
-echo -e "${red}    Python dependancies${NC}"
+echo -e "${green}    Python dependancies${NC}"
 cd .. 
 virtualenv DQXServer
 cd DQXServer
 source bin/activate
-echo -e "${red}      DQXServer requirements...${NC}"
+echo -e "${green}      DQXServer requirements...${NC}"
 pip install -q -r REQUIREMENTS
 #Extra ones for custom responder
 #Have to do numpy first as h5py does not stipulate it as an install requirement....
-echo -e "${red}      NumPy...${NC}"
+echo -e "${green}      NumPy...${NC}"
 pip install -q numpy
-echo -e "${red}      Panoptes requirements...${NC}"
+echo -e "${green}      Panoptes requirements...${NC}"
 pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
-echo -e "${red}      gunicorn...${NC}"
-pip install -q gunicorn #For testing, not a strict requirement of DQXServer
+echo -e "${green}      gunicorn...${NC}"
+pip install -q gunicorn #For testing and instant run, not a strict requirement of DQXServer
 
-echo -e "${red}  Linking DQX${NC}"
+echo -e "${green}  Linking DQX${NC}"
 cd $PROJECT_ROOT
 rm -rf webapp/scripts/DQX
 cd webapp/scripts
 ln -s $PROJECT_ROOT/build/DQX DQX
 
-echo -e "${red}  Linking custom responders into DQXServer${NC}"
+echo -e "${green}  Linking custom responders into DQXServer${NC}"
 cd $PROJECT_ROOT
 mkdir -p build/DQXServer/customresponders
 touch build/DQXServer/customresponders/__init__.py
 cd build/DQXServer/customresponders
 ln -s $PROJECT_ROOT/servermodule/* .
 
-echo -e "${red}  Linking static content into DQXServer${NC}"
+echo -e "${green}  Linking static content into DQXServer${NC}"
 cd $PROJECT_ROOT/build/DQXServer
 ln -s $PROJECT_ROOT/webapp static
 
-echo -e "${red}  Copying config.py${NC}"
+echo -e "${green}  Copying config.py${NC}"
 cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
 echo mysqlcommand = \'`which mysql`\' >> config.py
 
-echo -e "${red}  Creating skeleton DB - if needed${NC}"
+echo -e "${green}  Creating skeleton DB - if needed${NC}"
 DBSRV=`python -c "import config;print config.DBSRV"`
 DBUSER=`python -c "import config;print config.DBUSER"`
 DBPASS=`python -c "import config;print config.DBPASS"`
@@ -118,7 +114,7 @@ CREATE TABLE IF NOT EXISTS calculations (
   scope varchar(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS storedviews (
+CREATE TABLE IF NOT EXISTS stogreenviews (
   dataset varchar(100) DEFAULT NULL,
   workspace varchar(100) DEFAULT NULL,
   id varchar(100) DEFAULT NULL,
@@ -130,6 +126,30 @@ CREATE TABLE IF NOT EXISTS storage (
   UNIQUE KEY storage_id (id)
 );
 EOF
+
+BASEDIR=`python -c "import config;print config.BASEDIR"`
+echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
+mkdir -p $BASEDIR
+mkdir -p $BASEDIR/temp
+mkdir -p $BASEDIR/SummaryTracks
+if ! [ -w $BASEDIR ]; then
+    echo -e "${red}  WARNING ${BASEDIR} is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/temp ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/temp is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/SummaryTracks ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/SummaryTracks is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+
+SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
+echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist"
+mkdir -p $SOURCEDATADIR
+mkdir -p $SOURCEDATADIR/datasets
+if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
+    echo -e "${green}  SourceDataDir is empty - copying sample datasets"
+    cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
+fi
 
 
 echo -e "${green}Done!${NC}"

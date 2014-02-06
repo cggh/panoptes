@@ -3,27 +3,26 @@
 # Configuration parameters for connecting to the MySQL database
 ###########################################################################################################
 
-# Machine name where the database is running
+# MYSQL Hostname
 DBSRV = 'localhost'
 
-# Login name used to gain access
+# MYSQL User
 DBUSER = 'root'
 
-# Password used to gain access
+# MYSQL Pass
 #todo: for production server data that also includes confidential information, this should be moved to a safer place outside the source code.
 DBPASS = '1234'
 
-# Default database name (e.g. used to store certain settings)
+# Name to use for the central panoptes MYSQL DB
 DB='datasetindex'
 
 ###########################################################################################################
-# Server side file structure location
+# Server side file locations
 #########################################################################################################
-# Root directory of the server side file structure where data will be stored by panoptes
+# Directory where disk-held data will be stored by panoptes - created if not existing
 BASEDIR = 'basedir_path'
 
-#Root dir where file for import will be found
-#e.g. To load the example data:
-#SOURCEDATADIR = 'path/to/panoptes/sampledata'
+#Dir which is scanned for data to import  - created if not existing
+#If this is empty, examples datasets will be copied to it
 SOURCEDATADIR = 'sourcedir_path'
 
