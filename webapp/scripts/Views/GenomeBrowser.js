@@ -312,7 +312,7 @@ define([
                         tableInfo.primkey
                     );
                     theChannel
-                        .setTitle(tableInfo.tableCapNamePlural)
+                        .setTitle(tableInfo.tableCapNamePlural + ' - ' + propInfo.name)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
                     if (propInfo.settings.categoryColors) {
