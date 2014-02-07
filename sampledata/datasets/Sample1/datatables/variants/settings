@@ -4,8 +4,8 @@ Description: A table containing a number of genomic variants
 PrimKey: SnpName
 
 IsPositionOnGenome: true
-Chromosome: chrom
-Position: pos
+Chromosome: chromosome
+Position: position
 GenomeMaxViewportSizeX: 10000000
 
 QuickFindFields: SnpName
@@ -14,13 +14,13 @@ QuickFindFields: SnpName
 
 Properties:
 
-- Id: chrom
+- Id: chromosome
   Name: Chromosome
   Description: Chromosome name
   DataType: Text
   ShowInTable: true
 
-- Id: pos
+- Id: position
   Name: Position
   Description: Genomic position of the variant on the chromosome (1-based)
   DataType: Value

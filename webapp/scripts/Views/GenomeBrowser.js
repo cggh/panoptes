@@ -99,13 +99,24 @@ define([
                     this.panelControls = Framework.Form(this.frameControls);
                     this.panelControls.setPadding(10);
 
+                    var chromosomeField = null;
+                    $.each(MetaData.mapTableCatalog, function(idx, tableInfo) {
+                        if (tableInfo.hasGenomePositions) {
+                            if (!chromosomeField)
+                                chromosomeField = tableInfo.ChromosomeField;
+                            else {
+                                if (chromosomeField != tableInfo.ChromosomeField)
+                                    DQX.reportError('Inconsistent chromosome field column over different datasets: ' + chromosomeField + ', ' + tableInfo.ChromosomeField);
+                            }
+                        }
+                    });
+
                     //Browser configuration settings
                     var browserConfig = {
                         serverURL: MetaData.serverUrl,              //Url of the DQXServer instance used
                         database: MetaData.database,                //Database name
                         annotTableName: MetaData.tableAnnotation,   //Name of the table containing the annotation
-                        chromoIdField: 'chrom',                      //Specifies that chromosomes are identifier by *numbers* in the field 'chrom'
-                        //*NOTE*: chromosome identifiers can be used by specifying chromoIdField: 'chromid'
+                        chromoIdField: chromosomeField,
                         viewID: '',
                         canZoomVert: true                           //Viewer contains buttons to alter the vertical size of the channels
                     };
@@ -478,8 +489,8 @@ define([
                                 range.min = Math.floor(range.min);
                                 range.max = Math.floor(range.max);
                                 var qry = tableInfo.genomeBrowserInfo.theQuery.get();
-                                qry = SQL.WhereClause.createValueRestriction(qry, 'chrom', chromoid);
-                                qry = SQL.WhereClause.createRangeRestriction(qry, 'pos', range.min, range.max, true);
+                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromoid);
+                                qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, range.min, range.max, true);
                                 Msg.send({type: 'DataItemTablePopup'}, {
                                     tableid: tableInfo.id,
                                     query: qry,
@@ -495,7 +506,8 @@ define([
                             var dataFetcher = new DataFetchers.Curve(
                                 MetaData.serverUrl,
                                 MetaData.database,
-                                tableInfo.id + 'CMB_' + MetaData.workspaceid
+                                tableInfo.id + 'CMB_' + MetaData.workspaceid,
+                                tableInfo.PositionField
                             );
                             dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 

@@ -81,6 +81,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             table.hasGenomeRegions = !!(table.settings.IsRegionOnGenome);
 
+            if (table.hasGenomePositions) {
+                table.ChromosomeField = table.settings.Chromosome || 'chrom';
+                table.PositionField = table.settings.Position || 'pos';
+            }
+
             if (table.hasGenomeRegions || table.hasGenomePositions)
                 table.genomeBrowserInfo = {};
 
