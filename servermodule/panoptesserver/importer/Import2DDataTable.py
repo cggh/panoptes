@@ -7,6 +7,7 @@ import config
 import SettingsLoader
 import ImpUtils
 import copy
+import arraybuffer
 import customresponders.panoptesserver.Utils as Utils
 
 
@@ -82,15 +83,17 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
 
         for property in table_settings['Properties']:
             extra_settings = copy.deepcopy(property)
+            dtype = arraybuffer._strict_dtype_string(remote_hdf5[property['Id']].dtype)
             del extra_settings['Id']
             del extra_settings['Name']
-            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
+            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}')".format(
                 property['Id'],
                 tableid,
                 table_settings['ColumnDataTable'],
                 table_settings['RowDataTable'],
                 property['Name'],
                 property_order,
+                dtype,
                 simplejson.dumps(extra_settings)
             )
             ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
