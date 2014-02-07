@@ -318,13 +318,6 @@ define([
                     })
 
                 }
-                that.createGenotypeChannel = function(tableInfo, controlsGroup) {
-                    var trackid =tableInfo.id+'_genotypes';
-                    var theChannel = GenotypeChannel.Channel(trackid)
-                      .setTitle(tableInfo.tableCapNamePlural)
-                    that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
-                };
-
 
 
                 //Map a categorical property to position indicators, color coding a categorical property
@@ -543,21 +536,8 @@ define([
                         }
                         var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                         that.visibilityControlsGroup.addControl(controls_group);
-                        table_info.genomeBrowserInfo.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
-                        table_info.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
-                            table_info.genomeBrowserInfo.dataFetcher.setUserQuery2(table_info.genomeBrowserInfo.col_query.get());
-                            that.panelBrowser.render();
-                        };
-                        var col_query = table_info.genomeBrowserInfo.col_query.createControl();
-                        controls_group.addControl(col_query);
-                        table_info.genomeBrowserInfo.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
-                        table_info.genomeBrowserInfo.row_query.notifyQueryUpdated = function() {
-                            table_info.genomeBrowserInfo.dataFetcher.setUserQuery2(table_info.genomeBrowserInfo.row_query.get());
-                            that.panelBrowser.render();
-                        };
-                        var row_query = table_info.genomeBrowserInfo.row_query.createControl();
-                        controls_group.addControl(row_query);
-                        that.createGenotypeChannel(table_info, controls_group);
+                        var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
+                        that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
                     });
 
                     // Loop over all datatables that contain genomic regions
