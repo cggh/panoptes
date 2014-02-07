@@ -1,6 +1,6 @@
 Datasets
 =============================
-_import_datasets
+.. _import-datasets
 Importing datasets
 ------------------
 Panoptes imports datasets into the server database from source data, consisting in sets of simple, structured files. 
