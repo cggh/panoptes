@@ -2,12 +2,12 @@ define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard",
     "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
-    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool"
+    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/Components/GenotypeChannel"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard,
               GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
-              EditTableBasedSummaryValues, MetaData, QueryTool
+              EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel
         ) {
 
         var GenomeBrowserModule = {
@@ -302,6 +302,14 @@ define([
                     })
 
                 }
+                that.createGenotypeChannel = function(tableInfo, controlsGroup) {
+                    var trackid =tableInfo.id+'_genotypes';
+                    var theChannel = GenotypeChannel.Channel(trackid)
+                      .setTitle(tableInfo.tableCapNamePlural)
+                    that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
+                };
+
+
 
                 //Map a categorical property to position indicators, color coding a categorical property
                 that.createPositionChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
@@ -510,27 +518,29 @@ define([
 
                     });
 
-                    // Loop over all 2D data tables that have genomic columns
-                    $.each(MetaData.map2DTableCatalog,function(tableid,tableInfo) {
-                        if (!tableInfo.hasGenomePositions) {
+                    // Loop over all 2D data tables that have genotypes to show
+                    // TODO - Could be for all that have genomic columns
+                    $.each(MetaData.map2DTableCatalog,function(tableid,table_info) {
+                        if (!table_info.settings.ShowInGenomeBrowser) {
                             return;
                         }
-                        var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
-                        that.visibilityControlsGroup.addControl(controlsGroup);
-                        tableInfo.genomeBrowserInfo.col_query = QueryTool.Create(tableInfo.col_table.id, {includeCurrentQuery:true});
-                        tableInfo.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
-                            tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.col_query.get());
+                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>');
+                        that.visibilityControlsGroup.addControl(controls_group);
+                        table_info.genomeBrowserInfo.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
+                        table_info.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
+                            table_info.genomeBrowserInfo.dataFetcher.setUserQuery2(table_info.genomeBrowserInfo.col_query.get());
                             that.panelBrowser.render();
                         };
-                        var col_query = tableInfo.genomeBrowserInfo.col_query.createControl();
-                        controlsGroup.addControl(col_query);
-                        tableInfo.genomeBrowserInfo.row_query = QueryTool.Create(tableInfo.row_table.id, {includeCurrentQuery:true});
-                        tableInfo.genomeBrowserInfo.row_query.notifyQueryUpdated = function() {
-                            tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.row_query.get());
+                        var col_query = table_info.genomeBrowserInfo.col_query.createControl();
+                        controls_group.addControl(col_query);
+                        table_info.genomeBrowserInfo.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
+                        table_info.genomeBrowserInfo.row_query.notifyQueryUpdated = function() {
+                            table_info.genomeBrowserInfo.dataFetcher.setUserQuery2(table_info.genomeBrowserInfo.row_query.get());
                             that.panelBrowser.render();
                         };
-                        var row_query = tableInfo.genomeBrowserInfo.row_query.createControl();
-                        controlsGroup.addControl(row_query);
+                        var row_query = table_info.genomeBrowserInfo.row_query.createControl();
+                        controls_group.addControl(row_query);
+                        that.createGenotypeChannel(table_info, controls_group);
                     });
 
                     // Loop over all datatables that contain genomic regions
