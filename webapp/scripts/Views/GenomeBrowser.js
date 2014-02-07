@@ -1,10 +1,10 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup",
     "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
     "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/Components/GenotypeChannel"
 ],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard,
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup,
               GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
               EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel
@@ -81,7 +81,7 @@ define([
 
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3));//Create frame that will contain the controls panel
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
                     this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
@@ -133,6 +133,12 @@ define([
                     this.panelBrowser.getAnnotationFetcher().setFeatureType('gene', 'CDS');
                     this.panelBrowser.getAnnotationChannel().setMinDrawZoomFactX(1.0/99999999);
 
+                    that.panelBrowser.setOnRangeSelected(function() {
+                        var range = that.panelBrowser.getMark();
+                        that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(), range.min, range. max);
+                    });
+
+
                     if (MetaData.generalSettings.AnnotMaxViewportSize)
                         this.panelBrowser.getAnnotationChannel().setMaxViewportSizeX(MetaData.generalSettings.AnnotMaxViewportSize);
 
@@ -146,8 +152,6 @@ define([
                         this.panelBrowser.addChannel(SeqChannel, true);
 
                     }
-
-                    var linkToTableButtonsGroup = Controls.CompoundVert([]);
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
@@ -179,13 +183,12 @@ define([
                                 bt,
                                 tableInfo.genomeBrowserFieldChoice,
                                 Controls.CompoundVert(activeTrackList)
-                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>'));
+                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>')).setLegendClass('GenomeBrowserControlGroup');
                         }
                     });
 
 
                     this.panelControls.addControl(Controls.CompoundVert([
-                        linkToTableButtonsGroup,
                         that.visibilityControlsGroup,
                         Controls.VerticalSeparator(12),
                         that.buttonsGroup
@@ -261,6 +264,8 @@ define([
 
                     if (MetaData.summaryValues.length==0)
                         return;
+
+                    that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(10));
 
                     //Iterate over all summary profiles shown by the app
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
@@ -472,7 +477,7 @@ define([
                                 that.panelBrowser.delDataFetcher(tableInfo.genomeBrowserInfo.dataFetcher);
                             }
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
@@ -483,22 +488,22 @@ define([
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
                             controlsGroup.addControl(ctrlQuery);
 
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible in range".DQXformat({name:tableInfo.tableNamePlural}),  width:150, height:40, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
-                                var chromoid = that.panelBrowser.getCurrentChromoID();
-                                var range = that.panelBrowser.getVisibleRange();
-                                range.min = Math.floor(range.min);
-                                range.max = Math.floor(range.max);
-                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
-                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromoid);
-                                qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, range.min, range.max, true);
-                                Msg.send({type: 'DataItemTablePopup'}, {
-                                    tableid: tableInfo.id,
-                                    query: qry,
-                                    title: '{name} in genomic range {chromoid}:{start}-{stop}'.DQXformat({name:tableInfo.tableCapNamePlural, chromoid:chromoid, start:range.min, stop:range.max })
-                                });
-                            });
-                            controlsGroup.addControl(Controls.VerticalSeparator(7));
-                            controlsGroup.addControl(bt);
+//                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible in range".DQXformat({name:tableInfo.tableNamePlural}),  width:150, height:40, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
+//                                var chromoid = that.panelBrowser.getCurrentChromoID();
+//                                var range = that.panelBrowser.getVisibleRange();
+//                                range.min = Math.floor(range.min);
+//                                range.max = Math.floor(range.max);
+//                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
+//                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromoid);
+//                                qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, range.min, range.max, true);
+//                                Msg.send({type: 'DataItemTablePopup'}, {
+//                                    tableid: tableInfo.id,
+//                                    query: qry,
+//                                    title: '{name} in genomic range {chromoid}:{start}-{stop}'.DQXformat({name:tableInfo.tableCapNamePlural, chromoid:chromoid, start:range.min, stop:range.max })
+//                                });
+//                            });
+//                            controlsGroup.addControl(Controls.VerticalSeparator(7));
+//                            controlsGroup.addControl(bt);
 
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
 
@@ -536,7 +541,7 @@ define([
                         if (!table_info.settings.ShowInGenomeBrowser) {
                             return;
                         }
-                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>');
+                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                         that.visibilityControlsGroup.addControl(controls_group);
                         table_info.genomeBrowserInfo.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                         table_info.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
@@ -559,7 +564,7 @@ define([
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomeRegions) {
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                             that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(12));
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
@@ -734,6 +739,54 @@ define([
                         that.panelBrowser.render();
                     }
 
+                    that.genomeRangePopup = function(chromosome, rangeMin, rangeMax) {
+                        var content = '';
+                        var hasButtons  = false;
+                        var regionString = chromosome + ':' + parseInt(rangeMin) + '-' + parseInt(rangeMax);
+                        $.each(MetaData.mapTableCatalog, function(idx, tableInfo) {
+
+                            if (tableInfo.hasGenomePositions) {
+                                hasButtons = true;
+                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
+                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromosome);
+                                qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, rangeMin, rangeMax);
+
+                                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: tableInfo.tableCapNamePlural+' in range', bitmap:'Bitmaps/datagrid2.png', width:160, height:50 }).setOnChanged(function() {
+                                    Msg.send({type: 'DataItemTablePopup'}, {
+                                        tableid: tableInfo.id,
+                                        query: qry,
+                                        title: tableInfo.tableCapNamePlural + ' in ' + regionString
+                                    });
+                                    Popup.closeIfNeeded(popupid);
+                                });
+                                content += bt.renderHtml();
+                            }
+
+                            if (tableInfo.hasGenomeRegions) {
+                                hasButtons = true;
+                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
+                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.settings.Chromosome, chromosome);
+                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.settings.RegionStart, rangeMax, '<=');
+                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.settings.RegionStop, rangeMin, '>=');
+
+                                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: tableInfo.tableCapNamePlural+' spanning range', bitmap:'Bitmaps/datagrid2.png', width:160, height:50 }).setOnChanged(function() {
+                                    Msg.send({type: 'DataItemTablePopup'}, {
+                                        tableid: tableInfo.id,
+                                        query: qry,
+                                        title: tableInfo.tableCapNamePlural + ' spanning ' + regionString
+                                    });
+                                    Popup.closeIfNeeded(popupid);
+                                });
+                                content += bt.renderHtml();
+                            }
+
+                        });
+
+                        if (hasButtons) {
+                            var popupid = Popup.create('Genome region '+regionString, content);
+
+                        }
+                    };
 
 
                     that.createSummaryChannels();

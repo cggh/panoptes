@@ -70,3 +70,23 @@
     background: linear-gradient(to bottom, #f3f9ac 0%,#ffe36b 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f9ac', endColorstr='#ffe36b',GradientType=0 ); /* IE6-9 */
 }
+
+
+.GenomeBrowserControlBackground
+{
+    color:Black;
+    background-color: rgb(240,240,240);
+    border-width:0px;
+}
+
+
+.GenomeBrowserControlGroup
+{
+    border:1px solid rgb(75,75,75);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    background-color:rgb(255,255,255);
+    padding:10px;
+    margin-right:6px;
+    margin-top:10px;
+    margin-bottom:5px;
+}

@@ -36,6 +36,12 @@ Properties:
   ShowInTable: true
   DecimDigits: 0
 
+- Id: length
+  Name: Length
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0
+
 - Id: name
   Name: Region name
   DataType: Text
