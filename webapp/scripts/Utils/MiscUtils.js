@@ -41,7 +41,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (propInfo.settings.decimDigits ==0 )
                     encoding  = 'Int';
             }
-            if ((propInfo.datatype=='Value') && (propInfo.propid=='pos') && (MetaData.getTableInfo(tableid).hasGenomePositions) )
+            if ((propInfo.datatype=='Value') && (propInfo.propid==MetaData.getTableInfo(tableid).PositionField) && (MetaData.getTableInfo(tableid).hasGenomePositions) )
                 encoding  = 'Int';
             if (propInfo.datatype=='Boolean')
                 encoding  = 'Int';
@@ -51,7 +51,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Float4';
             if (propInfo.isPrimKey)
                 tablePart = 0;
-            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!='chrom') && (propInfo.propid!='pos') );
+            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!=theTable.ChromosomeField) && (propInfo.propid!=theTable.PositionField) );
             var col = theTable.createTableColumn(
                 QueryTable.Column(propInfo.name,propInfo.propid,tablePart),
                 encoding,
@@ -59,15 +59,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             if (propInfo.settings.Description)
                 col.setToolTip(propInfo.settings.Description);
-            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn('chrom')) && (theTable.findColumn('pos')) ) {
-                // Define a joint sort action on both columns chrom+pos, and set it as default
-                theTable.addSortOption("Position", SQL.TableSort(['chrom', 'pos']),true);
+            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(theTable.ChromosomeField)) && (theTable.findColumn(theTable.PositionField)) ) {
+                // Define a joint sort action on both columns chromosome+position, and set it as default
+                theTable.addSortOption("Position", SQL.TableSort([theTable.ChromosomeField, theTable.PositionField]),true);
             }
 
             if (propInfo.datatype=='Boolean')
                 col.setDataType_MultipleChoiceInt([{id:0, name:'No'}, {id:1, name:'Yes'}]);
 
-            if (propInfo.propid=='chrom')
+            if (propInfo.propid==tableInfo.ChromosomeField)
                 col.setDataType_MultipleChoiceString(MetaData.chromosomes);
 
             if (propInfo.propCategories) {

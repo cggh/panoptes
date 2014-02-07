@@ -68,13 +68,17 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
 
         # Import reference genome
         if not importSettings['ConfigOnly']:
-            with calculationObject.LogHeader('Converting reference genome'):
-                destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
-                if not os.path.exists(destfolder):
-                    os.makedirs(destfolder)
-                tempfastafile = destfolder + '/refsequence.fa'
-                shutil.copyfile(os.path.join(folder, 'refsequence.fa'), tempfastafile)
-                ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+            refsequencefile = os.path.join(folder, 'refsequence.fa')
+            if os.path.exists(refsequencefile):
+                with calculationObject.LogHeader('Converting reference genome'):
+                    destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
+                    if not os.path.exists(destfolder):
+                        os.makedirs(destfolder)
+                    tempfastafile = destfolder + '/refsequence.fa'
+                    shutil.copyfile(refsequencefile, tempfastafile)
+                    ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+            else:
+                calculationObject.Log('WARNING: missing reference sequence file')
 
 
         # Import chromosomes

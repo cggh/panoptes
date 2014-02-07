@@ -122,15 +122,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.frameFields.setContentHtml(content);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
+
                 var buttons = [];
 
                 if (that.tableInfo.hasGenomePositions) {
+                    var genome_chromosome = data.fields[that.tableInfo.ChromosomeField];
+                    var genome_position = parseInt(data.fields[that.tableInfo.PositionField]);
                     buttons.push(Controls.HorizontalSeparator(7));
                     var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'DQXToolButton2', width:140, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
                         //that.close();//!!!todo: only when blocking
                         Msg.send({ type: 'JumpgenomePosition' }, {
-                            chromoID: data.fields.chrom,
-                            position: parseInt(data.fields.pos)
+                            chromoID: genome_chromosome,
+                            position: genome_position
                         });
                     })
                     buttons.push(bt);
@@ -140,14 +143,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (oTableInfo.hasGenomeRegions) {
                             var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
                                 var qry = SQL.WhereClause.AND([
-                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', data.fields.chrom),
-                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', data.fields.pos),
-                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStop, '>=', data.fields.pos)
+                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', genome_chromosome),
+                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', genome_position),
+                                    SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStop, '>=', genome_position)
                                 ]);
                                 Msg.send({type: 'DataItemTablePopup'}, {
                                     tableid: oTableInfo.id,
                                     query: qry,
-                                    title: oTableInfo.tableCapNamePlural + ' at ' + data.fields.chrom + ':' + data.fields.pos
+                                    title: oTableInfo.tableCapNamePlural + ' at ' + genome_chromosome + ':' + genome_position
                                 });
                             })
                             buttons.push(bt);
