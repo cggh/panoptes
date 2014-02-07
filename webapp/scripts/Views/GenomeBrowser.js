@@ -81,7 +81,7 @@ define([
 
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3));//Create frame that will contain the controls panel
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
                     this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
@@ -153,8 +153,6 @@ define([
 
                     }
 
-                    var linkToTableButtonsGroup = Controls.CompoundVert([]);
-
                     that.visibilityControlsGroup = Controls.CompoundVert([]);
 
                     //Create controls for each table that has genome summary tracks defined
@@ -185,13 +183,12 @@ define([
                                 bt,
                                 tableInfo.genomeBrowserFieldChoice,
                                 Controls.CompoundVert(activeTrackList)
-                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>'));
+                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>')).setLegendClass('GenomeBrowserControlGroup');
                         }
                     });
 
 
                     this.panelControls.addControl(Controls.CompoundVert([
-                        linkToTableButtonsGroup,
                         that.visibilityControlsGroup,
                         Controls.VerticalSeparator(12),
                         that.buttonsGroup
@@ -267,6 +264,8 @@ define([
 
                     if (MetaData.summaryValues.length==0)
                         return;
+
+                    that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(10));
 
                     //Iterate over all summary profiles shown by the app
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
@@ -478,7 +477,7 @@ define([
                                 that.panelBrowser.delDataFetcher(tableInfo.genomeBrowserInfo.dataFetcher);
                             }
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
@@ -542,7 +541,7 @@ define([
                         if (!table_info.settings.ShowInGenomeBrowser) {
                             return;
                         }
-                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>');
+                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                         that.visibilityControlsGroup.addControl(controls_group);
                         table_info.genomeBrowserInfo.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                         table_info.genomeBrowserInfo.col_query.notifyQueryUpdated = function() {
@@ -565,7 +564,7 @@ define([
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomeRegions) {
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>');
+                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                             that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(12));
                             that.visibilityControlsGroup.addControl(controlsGroup);
 
