@@ -134,7 +134,7 @@ define([
                     this.panelBrowser.getAnnotationChannel().setMinDrawZoomFactX(1.0/99999999);
 
                     if (MetaData.generalSettings.AnnotMaxViewportSize)
-                        this.panelBrowser.getAnnotationChannel().setMaxViewportSizeX(MetaData.generalSettings.AnnotMaxViewportSize*1.0E6);
+                        this.panelBrowser.getAnnotationChannel().setMaxViewportSizeX(MetaData.generalSettings.AnnotMaxViewportSize);
 
                     //Define the action when a user clicks on a gene in the annotation channel
                     this.panelBrowser.getAnnotationChannel().handleFeatureClicked = function (geneID) {
