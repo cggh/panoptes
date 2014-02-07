@@ -186,7 +186,7 @@ require([
                             getter.addTable('propertycatalog',['propid','datatype','tableid','source','name', 'settings'],'ordr',
                                 SQL.WhereClause.OR([SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid),SQL.WhereClause.CompareFixed('workspaceid','=','')])
                             );
-                            getter.addTable('2D_propertycatalog',['id','tableid', 'col_table', 'row_table', 'name', 'settings'],'ordr',
+                            getter.addTable('2D_propertycatalog',['id','tableid', 'col_table', 'row_table', 'name', 'dtype', 'settings'],'ordr',
                                 SQL.WhereClause.Trivial()
                             );
                             getter.addTable('summaryvalues',['propid','name','minval','maxval','minblocksize','tableid','settings'],'ordr',
