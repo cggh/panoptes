@@ -1,9 +1,9 @@
-define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "DQX/DataFetcher/DataFetchers"],
+define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils"],
     function (require, Framework, Controls, Msg, DQX, ChannelCanvas) {
 
-        var GenotypeChannel = {};
+        var TwoDChannel = {};
 
-        GenotypeChannel.Channel = function (id) {
+        TwoDChannel.Channel = function (id) {
             var that = ChannelCanvas.Base(id);
             that._height = 20;
             that._toolTipHandler = null;
@@ -34,5 +34,5 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
             return that;
         };
     };
-    return GenotypeChannel;
+    return TwoDChannel;
 });
