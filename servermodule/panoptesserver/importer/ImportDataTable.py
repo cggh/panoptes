@@ -31,7 +31,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('IsRegionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         extraSettings = tableSettings.Clone()
-        extraSettings.DropTokens(['PrimKey', 'IsPositionOnGenome', 'Properties'])
+        extraSettings.DropTokens(['PrimKey', 'Properties'])
 
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
@@ -92,10 +92,16 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             propidList.append(property['propid'])
 
         if tableSettings['IsPositionOnGenome']:
-            if 'chrom' not in propDict:
-                raise Exception('Genome-related datatable {0} is missing property "chrom"'.format(tableid))
-            if 'pos' not in propDict:
-                raise Exception('Genome-related datatable {0} is missing property "pos"'.format(tableid))
+            if not tableSettings.HasToken('Chromosome'):
+                raise Exception('Missing setting "Chromosome" in genome position datatable {0} (required because of tag "IsPositionOnGenome")'.format(tableid))
+            if not tableSettings.HasToken('Position'):
+                raise Exception('Missing setting "Position" in genome position datatable {0} (required because of tag "IsPositionOnGenome")'.format(tableid))
+            if tableSettings['Chromosome'] not in propDict:
+                 raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
+            if tableSettings['Position'] not in propDict:
+                 raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Position']))
+            propDict[tableSettings['Chromosome']]['Settings'].SetToken('Index', True)
+            propDict[tableSettings['Position']]['Settings'].SetToken('Index', True)
 
         if tableSettings['IsRegionOnGenome']:
             if not tableSettings.HasToken('Chromosome'):
@@ -134,7 +140,11 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             if tableSettings['IsPositionOnGenome']:
                 calculationObject.Log('Indexing chromosome')
                 scr = ImpUtils.SQLScript(calculationObject)
-                scr.AddCommand('create index {0}_chrompos ON {0}(chrom,pos)'.format(tableid))
+                scr.AddCommand('create index {0}_chrompos ON {0}({1},{2})'.format(
+                    tableid,
+                    tableSettings['Chromosome'],
+                    tableSettings['Position']
+                ))
                 scr.Execute(datasetId)
 
 
@@ -154,7 +164,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
-                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, ['chrom', 'pos', propid], False)
+                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
                     ImpUtils.CreateSummaryValues(
                         calculationObject,
                         summSettings,

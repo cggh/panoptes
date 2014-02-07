@@ -10,7 +10,7 @@ import uuid
 import sys
 import shutil
 import customresponders.panoptesserver.Utils as Utils
-
+import simplejson
 
 def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder, importSettings):
 
@@ -23,9 +23,21 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'workspaces'))
 
         cur = db.cursor()
-        cur.execute('SELECT primkey FROM tablecatalog WHERE id="{0}"'.format(tableid))
-        primkey = cur.fetchone()[0]
+        cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
+        row = cur.fetchone()
+        primkey = row[0]
+        tableSettingsStr = row[1]
         db.close()
+
+        tableSettings = SettingsLoader.SettingsLoader()
+        tableSettings.LoadDict(simplejson.loads(tableSettingsStr))
+
+        isPositionOnGenome = False
+        if tableSettings.HasToken('IsPositionOnGenome') and tableSettings['IsPositionOnGenome']:
+            isPositionOnGenome = True
+            chromField = tableSettings['Chromosome']
+            posField = tableSettings['Position']
+
 
         settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
 
@@ -169,10 +181,18 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
 
+                    if not isPositionOnGenome:
+                        raise Exception('Summary values defined for non-position table')
+
                     if not importSettings['ConfigOnly']:
                         calculationObject.Log('Extracting data to '+dataFileName)
                         script = ImpUtils.SQLScript(calculationObject)
-                        script.AddCommand("SELECT chrom, pos, {0} FROM {1} ORDER BY chrom,pos".format(propid, Utils.GetTableWorkspaceView(workspaceid, tableid)))
+                        script.AddCommand("SELECT {2} as chrom, {3} as pos, {0} FROM {1} ORDER BY {2},{3}".format(
+                            propid,
+                            Utils.GetTableWorkspaceView(workspaceid, tableid),
+                            chromField,
+                            posField
+                        ))
                         script.Execute(datasetId, dataFileName)
                         calculationObject.LogFileTop(dataFileName, 10)
 

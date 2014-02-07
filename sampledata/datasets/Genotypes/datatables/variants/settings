@@ -4,6 +4,9 @@ Description: A table containing a number of genomic variants
 PrimKey: SnpName
 
 IsPositionOnGenome: true         #Requires that chrom and pos exist
+Chromosome: chrom
+Position: pos
+
 FetchRecordCount: false
 QuickFindFields: SnpName
 
