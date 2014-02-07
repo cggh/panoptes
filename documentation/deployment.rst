@@ -56,7 +56,7 @@ To run on your external network interface use (with the port you desire)::
 	./scripts/run.sh 0.0.0.0:8000
 
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
-See :ref:`import-datasets` for more information on how to populate the Panoptes instance with data.
+See section :ref:`import-datasets` for more information on how to populate the Panoptes instance with data.
 
 Deployment
 ----------
