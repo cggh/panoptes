@@ -23,6 +23,26 @@ After installation, a number of sample dataset sources are copied into the sourc
 
 Panoptes data structure
 -----------------------
+Terminology
+~~~~~~~~~~~
+The data server by Panoptes is structured according to a number of central  concept.
+
+**Dataset**
+  Lorem ipsut ...
+  
+**Datatable**
+  Lorem ipsut ...
+  
+**Data item**
+  Lorem ipsut ...
+
+**Workspace**
+  Lorem ipsut ...
+  
+@@Todo: get terminology from docx file.
+  
+
+  
 
 Source files structure
 ----------------------
