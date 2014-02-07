@@ -23,3 +23,11 @@ Properties:
   ShowInBrowser: false
   IsCategorical: true
 
+
+
+- Id: EditBoolean1
+  Name: Editable boolean
+  Datatype: Boolean
+  ReadData: false
+  ShowInTable: true
+  CanUpdate: true
