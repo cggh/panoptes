@@ -1,6 +1,5 @@
 Datasets
 =============================
-.. _import-datasets:
 Importing datasets
 ------------------
 Panoptes imports datasets into the server database from source data, consisting in sets of simple, structured files. 
@@ -16,16 +15,15 @@ After installation, a number of sample dataset sources are copied into the sourc
 - The administration section shows the available source data file sets as a tree. Click on a dataset name you want to import (e.g. "Sample1")
 - Click the button "Load highlighted file source", and click "Load all data" in the popup that appears
 - This initiates the data import. A progress box is shown during this action.
-- Upon completion, a new item appears in the list "Server calculations". Clicking on this shows a log of the import activities.
-  If an error occurred, this can be useful for troubleshooting.
+- Upon completion, a new item appears in the list "Server calculations". Clicking on this shows a log of the import activities. If an error occurred, this can be useful for troubleshooting.
 - Go back to the browser tab with the Panoptes intro screen, and reload the app to retrieve the updated dataset information
 - The imported dataset should appear in the list.
 
 Panoptes data structure
 -----------------------
 Basic concepts
-~~~~~~~~~~~
-The data served by Panoptes is structured according to a number of central  concepts.
+~~~~~~~~~~~~~~
+The data served by Panoptes is structured according to a number of central concepts.
 
 Dataset
 .......
@@ -57,7 +55,7 @@ or a single variant.
 
 Property
 ........
-A *property* is a column in a *data table*. As such, it defines a property of a *data item*. Examples are collection date and geographical coordinates for samples.
+A *property* is a column in a *data table*. As such, it defines a property of a *data item*. Examples are collection dates and geographical coordinates for samples.
 There are two types of properties:
 
 - **Standard property**: provided in the *dataset*. These are shared amongst every *workspace*.
@@ -83,3 +81,16 @@ Genotype data
 
 Source files structure
 ----------------------
+Internally, Panoptes uses a combination of a set of MySQL databases and a file structure to serve the data. Data are loaded into this system be launching an **import action** that reads the data from a **source file location** (specified by SOURCEDATADIR in config.py).
+
+The formatting of the source data relies a few concepts:
+
+- It is organised in a way that closely mimicks basic concepts of the Panoptes data structures, using nested folders to build the structure.
+- In most cases, data are provided using simple, TAB-delimited files. Exceptions are made where a widely accepted standard format is used for a specific type of information (e.g. GFF files for genome annotations).
+- YAML (http://www.yaml.org/about.html) structured files are used to provide the necessary metadata to interpret and parse the data in the context of Panoptes. These metadata are provided in files called "settings".
+
+.. caution::
+  **IMPORTANT NOTE**: Identifiers used in the source data structures (folder names, table column headers, etc..), are directly mapped to identifiers in the MySQL database tables. Therefore, they should be formatted as standard variable names (e.g. do not contain dashes, white spaces or other special characters, do not start with a number, ...)
+
+- The SOURCEDATADIR folder should contain a single folder "datasets", serving as a root for all *datasets* being served by the Panoptes instance.
+- In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset.
