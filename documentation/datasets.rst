@@ -111,14 +111,14 @@ A *dataset* source data folder may optionally contain a subfolder ``refgenome``,
 - ``settings`` (required, yaml formatted). Various settings concerning the reference genome.
 
 Summary values
-..............
+~~~~~~~~~~~~~~
 The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Each subfolder in this folder represents a different (numerical) property defined over the genome that will be filter banked and can be displayed in the genome browser. The folder name serves as the identifier of the summary value. Each summary value folder should contain the following two files:
 
 - `values`. A TAB-delimited file having three columns (and no header):
    - column 1: Chromosome identifier
    - column 2: Position
    - column 3: Value
-- `settings` (yaml formatted). Contains the displayed name of the summary value, and further guidelines on how to treat the information.
+- `settings` (yaml formatted). Contains the displayed name of the summary value, and further guidelines on how to process the information.
 
 Data tables
 ~~~~~~~~~~~
@@ -127,3 +127,20 @@ In the *dataset* folder, a subfolder ``datatables`` should be present. This is t
 In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers of all *properties*.
 
 In addition, a yaml ``settings`` file should be present in the *datatable* folder. This file can contain a number of settings, both at the level of the *data table*, as at the level of individual *properties*.
+
+Workspaces
+~~~~~~~~~~
+In the *dataset* folder, a subfolder ``workspaces`` should be present. This is the root for a set of subfolders, each one describing a *workspace* for this *dataset*. The folder name serves as identifier for the *workspace*.
+
+In a *workspace* folder, a yaml structured ``settings`` file should be present, specifying the displayed name of the workspace.
+
+In addition, a subfolder ``customdata`` should be present. This location is used to specify *Custom data*, which has the following basic properties:
+
+- It only exists in the contect of a specific *workspace*.
+- It adds extra properties to a *data table* that already exists in the *dataset*. 
+- The primary key of the *data table* (as defined in the settings) is used to link the custom properties to the original table.
+
+The ``customdata`` folder should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
+
+- ``data``. TAB-delimited file containing the custom property values.
+- ``settings``. (yaml formatted). Specifies how the custom data should be interpreted.
