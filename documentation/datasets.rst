@@ -58,7 +58,7 @@ Property
 A *property* is a column in a *data table*. As such, it defines a property of a *data item*. Examples are collection dates and geographical coordinates for samples.
 There are two types of properties:
 
-- **Standard property**: provided in the *dataset*. These are shared amongst every *workspace*.
+- **Standard property**: provided in the *dataset*. These are visible in every *workspace*.
 - **Custom property**: specified at the level of a *workspace*.
 
 Reference genome
@@ -81,23 +81,23 @@ Genotype data
 
 Source files structure
 ----------------------
-Internally, Panoptes uses a combination of a set of MySQL databases and a file structure to serve the data. Data are loaded into this system be launching an **import action** that reads the data from a **source file location** (specified by ``SOURCEDATADIR`` in ``config.py``).
+Panoptes uses a combination of a set of MySQL databases and an internal file structure to serve the data. Data are loaded into this system be launching an **import action** that reads the data from a **source file location** (specified by ``SOURCEDATADIR`` in ``config.py``).
 
 The formatting of the source data relies a few concepts:
 
-- It is organised in a way that closely mimicks basic concepts of the Panoptes data structures, using nested folders to build the structure.
-- In most cases, data are provided using simple, TAB-delimited files. Exceptions are made where a widely accepted standard format is used for a specific type of information (e.g. GFF files for genome annotations).
-- YAML (http://www.yaml.org/about.html) structured files are used to provide the necessary metadata to interpret and parse the data in the context of Panoptes. These metadata are provided in files called "settings".
+- It is organised in a way that closely mimicks the basic concepts of the Panoptes data structures, using nested folders to reflect the structure.
+- In most cases, data are provided using simple, TAB-delimited files. Exceptions are made in those cases where a widely accepted standard format is used for a specific type of information (e.g. GFF files for genome annotations).
+- YAML (http://www.yaml.org/about.html) structured files are used to provide the necessary metadata to interpret and parse the data in the context of Panoptes. These metadata are provided in files called ``settings``.
 
 .. caution::
   **IMPORTANT WARNING**: Identifiers used in the source data structures (folder names, table column headers, etc..), are directly mapped to identifiers in the MySQL database tables. Therefore, they should be formatted as standard variable names (e.g. do not contain dashes, white spaces or other special characters, do not start with a number, ...)
   
 .. Note:: 
-  This documentation does not describe the directives that can be specified in the yaml settings file in full detail. The sample datasets contain settings files that are fully commented, and can serve as a starting point to explore the possibe options.
+  This documentation does not describe all the directives that can be specified in the yaml settings files. The sample datasets contain settings files that are fully commented, and can serve as a starting point to explore the possibe options. The dataset ``samples_and_variants`` provides a good starting point for exploring those settings.
 
 Datasets
 ~~~~~~~~
-The ``SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
+The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
 
 In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset. In the *dataset* folder, a yaml ``settings`` file should be present, specifying the displayed name of the dataset, and an optional description.
 
@@ -126,7 +126,7 @@ Data tables
 ~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``datatables`` should be present. This is the root for a set of folders, each one describing an individual *data table*, with the name of the folder serves as an identifier.
 
-In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers of all *properties*.
+In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers for all *properties*.
 
 In addition, a yaml ``settings`` file should be present in the *datatable* folder. This file can contain a number of settings, both at the level of the *data table*, as at the level of individual *properties*.
 
@@ -138,7 +138,7 @@ In a *workspace* folder, a yaml structured ``settings`` file should be present, 
 
 In addition, a subfolder ``customdata`` should be present. This location is used to specify *Custom data*, which has the following basic properties:
 
-- It only exists in the contect of a specific *workspace*.
+- It only exists in the context of a specific *workspace*.
 - It adds extra properties to a *data table* that already exists in the *dataset*. 
 - The primary key of the *data table* (as defined in the settings) is used to link the custom properties to the original table.
 
