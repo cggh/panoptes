@@ -101,7 +101,6 @@ require([
                             MetaData.map2DTableCatalog[table.id] = table;
                         });
 
-
                         GenePopup.init();
                         ItemPopup.init();
                         DataItemTablePopup.init();
@@ -209,6 +208,7 @@ require([
                                     MetaData.summaryValues = getter.getTableRecords('summaryvalues');
                                     MetaData.customProperties = getter.getTableRecords('propertycatalog');
                                     MetaData.twoDProperties = getter.getTableRecords('2D_propertycatalog');
+                                    MetaData.map2DProperties = DQX.attrMap(MetaData.twoDProperties, 'id');
                                     MetaData.tableBasedSummaryValues = getter.getTableRecords('tablebasedsummaryvalues');
                                     Initialise.parseSummaryValues();
                                     Initialise.parseCustomProperties();
