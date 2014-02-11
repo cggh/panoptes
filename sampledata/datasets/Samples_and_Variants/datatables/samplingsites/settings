@@ -1,0 +1,41 @@
+
+NameSingle: sampling site    # Display name referring to a table item (single, no capital)
+NamePlural: sampling sites    # Display name referring to a table item (plural, no capital)
+Description: Information about the sites where samples were collected     # A description of this data set
+
+# The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
+# Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
+PrimKey: SiteID
+IsPositionOnGenome: false
+FetchRecordCount: true
+
+# The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
+QuickFindFields: SiteID,Country
+
+
+# The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
+# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
+# Both mechanisms can be combined: further settings can still be specified for individual properties
+Properties:
+
+- Id: SiteID                                         # Identifier of the property, corresponding to the column header in the [data] file
+  Name: Site ID                                      # Display name of the property
+  Description: Unique identifier of a sampling site  # Description of the property
+  DataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+  ShowInTable: true                                  # If true, this property will appear by default in data table grids in the application
+
+- Id: Country
+  Name: Country Code
+  DataType: Text
+  IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  ShowInTable: true
+  Index: true                # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+
+- Id: Longitude
+  Name: Longitude
+  DataType: GeoLongitude     # Specifies a geographic longitude property
+
+- Id: Lattitude
+  Name: Lattitude
+  DataType: GeoLattitude     # Specifies a geographic lattitude property
+

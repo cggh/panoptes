@@ -1,0 +1,68 @@
+
+NameSingle: genomic region     # Display name referring to a table item (single, no capital)
+NamePlural: genomic regions    # Display name referring to a table item (plural, no capital)
+Description: Contains a number of regions defined on the genome     # A description of this data set
+
+# The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
+# Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
+PrimKey: regid
+
+# The following set of tags is used to define the items in this data table as regions on the genome
+IsRegionOnGenome: true              # Tells Panoptes that this should be interpreted as genomic regions
+Chromosome: chromosome              # Speficies the table column ID that contains the chromosome
+RegionStart: regionstart            # Specifies the table column ID that contains the start position of the region
+RegionStop: regionstop              # Specifies the table column ID that contains the end position of the region
+GenomeMaxViewportSizeX: 10000000    # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
+
+
+# The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
+# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
+# Both mechanisms can be combined: further settings can still be specified for individual properties
+Properties:
+
+- Id: regid                      # Identifier of the property, corresponding to the column header in the [data] file
+  Name: Region ID                # Display name of the property
+  Description: Region Identifier # Description of the property
+  DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+  ShowInTable: true              # If true, this property will appear by default in data table grids in the application
+
+- Id: chromosome
+  Name: Chromosome
+  Description: Chromosome name
+  DataType: Text
+  ShowInTable: true
+
+- Id: regionstart
+  Name: Start position
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+
+- Id: regionstop
+  Name: Stop position
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0
+
+- Id: length
+  Name: Length
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0
+
+- Id: name
+  Name: Region name
+  DataType: Text
+  ShowInTable: true
+
+- Id: Value1, Value2, Value3  # Properties sharing the same settings can also be defined in group
+  DataType: Value
+  ShowInTable: true
+
+- Id: type
+  Name: Feature type
+  Description: An example categorical property
+  DataType: Text
+  IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  ShowInTable: true
+

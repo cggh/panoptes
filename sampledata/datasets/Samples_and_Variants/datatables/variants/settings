@@ -1,0 +1,80 @@
+
+NameSingle: variant     # Display name referring to a table item (single, no capital)
+NamePlural: variants    # Display name referring to a table item (plural, no capital)
+Description: A table containing a number of genomic variants     # A description of this data set
+
+# The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
+# Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
+PrimKey: SnpName
+
+# The following set of tags is used to define the items in this data table as positions on the genome
+IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
+Chromosome: chromosome            # Speficies the table column ID that contains the chromosome
+Position: position                # Specifies the table column ID that contains the position on the chromosome
+GenomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
+
+
+# The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
+QuickFindFields: SnpName
+
+
+
+# The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
+# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
+# Both mechanisms can be combined: further settings can still be specified for individual properties
+Properties:
+
+- Id: chromosome                 # Identifier of the property, corresponding to the column header in the [data] file
+  Name: Chromosome               # Display name of the property
+  Description: Chromosome name   # Description of the property
+  DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+  ShowInTable: true              # If true, this property will appear by default in data table grids in the application
+
+- Id: position
+  Name: Position
+  Description: Genomic position of the variant on the chromosome (1-based)
+  DataType: Value
+  ShowInTable: true
+  DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+
+- Id: SnpName
+  Name: Variant name
+  Description: Unique name of the variant
+  DataType: Text
+  ShowInTable: true
+  Search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
+
+- Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
+  DataType: Value
+  Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  ShowInTable: true
+  ShowInBrowser: true           # If true, this property will be displayed in the genome browser
+  MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
+  MaxVal: 2                     # Optional: For Value types, specifies the maximum value that can be reached.
+  DecimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
+  SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
+     BlockSizeMin: 20               # Minimum summary block size (in bp)
+     BlockSizeMax: 50000            # Maximum summary block size (in bp)
+     ChannelColor: "rgb(0,100,0)"   # Colour of the channel
+
+- Id: Value1
+  Name: Value 1
+  Description: The first numerical value
+
+- Id: Value2
+  Name: Value 2
+  Description: The second numerical value
+
+- Id: Value3
+  Name: Value 3
+  Description: The third numerical value
+
+- Id: Extra1
+  Name: Extra 1
+  Description: An example categorical property
+  DataType: Text
+  ShowInTable: true
+  ShowInBrowser: true
+  IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  categoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }   # Specifies display colours for the categorical states of this property
+

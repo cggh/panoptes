@@ -1,6 +1,0 @@
-NameSingle: marker
-NamePlural: markers
-PrimKey: ID
-AutoScanProperties: true
-QuickFindFields: Name
-

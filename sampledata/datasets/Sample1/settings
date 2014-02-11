@@ -1,8 +1,0 @@
-Name: A sample set
-Description: This is a sample dataset
-DataTables:
-- variants
-- samples
-- samplingsites
-- countries
-- sampletypes

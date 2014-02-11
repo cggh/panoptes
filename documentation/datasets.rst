@@ -93,7 +93,7 @@ The formatting of the source data relies a few concepts:
   **IMPORTANT WARNING**: Identifiers used in the source data structures (folder names, table column headers, etc..), are directly mapped to identifiers in the MySQL database tables. Therefore, they should be formatted as standard variable names (e.g. do not contain dashes, white spaces or other special characters, do not start with a number, ...)
   
 .. Note:: 
-  This documentation does not describe all the directives that can be specified in the yaml settings files. The sample datasets contain settings files that are fully commented, and can serve as a starting point to explore the possibe options. The dataset ``samples_and_variants`` provides a good starting point for exploring those settings.
+  This documentation does not describe all the directives that can be specified in the yaml settings files. The sample dataset **Samples_and_Variants** contains settings files that are fully commented, and can serve as a starting point to explore the possibe options. Additional comments are provided in other datasets as well, wherever concepts are introduced that are not present in this dataset.
 
 Datasets
 ~~~~~~~~
