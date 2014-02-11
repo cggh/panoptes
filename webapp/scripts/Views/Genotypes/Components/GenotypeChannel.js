@@ -1,5 +1,5 @@
-define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "Views/Genotypes/Components/Model"],
-    function (require, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, Model) {
+define(["require", "_", "d3", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
+    function (require, _, d3, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
 
         var GenotypeChannel = {};
 
@@ -23,12 +23,33 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
                 var row_query_tool = that.row_query.createControl();
                 controls_group.addControl(row_query_tool);
 
-                //Fix order to by position for col and primary key for row
+                that.data_type = table_info.settings.ShowInGenomeBrowser.Type;
+                if (that.data_type != 'diploid' && that.data_type != 'fractional')
+                    DQX.reportError("Genotype data type is not diploid or fractional");
+                if (that.data_type == 'diploid') {
+                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
+                    that.first_allele_property = table_info.settings.ShowInGenomeBrowser.FirstAllele;
+                    that.second_allele_property = table_info.settings.ShowInGenomeBrowser.SecondAllele;
+                    that.property_list = [that.depth_property, that.first_allele_property, that.second_allele_property];
+                }
+                if (that.data_type == 'fractional') {
+                    that.ref_fraction_property = table_info.settings.ShowInGenomeBrowser.RefFraction;
+                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
+                    that.property_list = [that.depth_property, that.ref_fraction_property];
+                }
+
+                var properties = {};
+                _.each(that.properties, function(prop) {
+                    properties[prop] = ArrayBufferClient.dtype_to_array[MetaData.map2DProperties[prop].dtype.substring(1)];
+                });
+                //Fix order to by pothat.parent_browser.getCurrentChromoID()sition for col and primary key for row
                 that.model = Model(table_info,
                     that.col_query.get(),
                     that.row_query.get(),
                     table_info.col_table.PositionField,
-                    table_info.row_table.primkey
+                    table_info.row_table.primkey,
+                    properties,
+                    _.map(MetaData.chromosomes, DQX.attr('id'))
                 );
             };
             
@@ -46,9 +67,21 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
                 that._myPlotter=iPlotter;
             };
 
+            that.new_col_query = function (q) {
+                console.log(q);
+            };
+
+            that.new_row_query = function (q) {
+                console.log(q);
+            };
+
             that.draw = function (drawInfo, args) {
-                var PosMin = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
-                var PosMax = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var chrom = that.parent_browser.getCurrentChromoID();
+                if (!chrom) return;
+
+                var min_genomic_pos = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var max_genomic_pos = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var xscale = d3.scale.linear().domain([min_genomic_pos, max_genomic_pos]).range([0,1039]);
 
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 1);
@@ -62,6 +95,8 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
                 drawInfo.centerContext.lineTo(psx, psy);
                 drawInfo.centerContext.fill();
                 drawInfo.centerContext.stroke();
+
+                console.log(that.model.get_range(chrom, min_genomic_pos, max_genomic_pos));
 
                 this.drawMark(drawInfo);
 //                this.drawXScale(drawInfo);

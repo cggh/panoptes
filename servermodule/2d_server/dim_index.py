@@ -20,7 +20,7 @@ def gzip(data):
     f.close()
     return out.getvalue()
 
-def positions_from_query(database, table, query):
+def positions_from_query(database, table, query, field):
     db = DQXDbTools.OpenDatabase(database)
     cur = db.cursor()
 
@@ -32,7 +32,7 @@ def positions_from_query(database, table, query):
     sqlquery = "SELECT "
     sqlquery += "pos FROM {0}".format(table)
     if len(whc.querystring_params)>0:
-        sqlquery += " WHERE {0} ORDER BY pos".format(whc.querystring_params)
+        sqlquery += " WHERE {0} ORDER BY {1}".format((whc.querystring_params, field))
     print('################################################')
     print('###QRY:'+sqlquery)
     print('###PARAMS:'+str(whc.queryparams))
@@ -49,7 +49,8 @@ def response(request_data):
 def handler(start_response, request_data):
     positions = positions_from_query(request_data['database'], 
                                      request_data['tbname'],
-                                     request_data['qry'])
+                                     request_data['qry'],
+                                     request_data['field'])
     key = hashlib.sha224((request_data['database'] + 
                           request_data['tbname'] +
                           request_data['qry'] + '_pos')).hexdigest()
