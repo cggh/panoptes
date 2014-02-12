@@ -36,8 +36,8 @@ require.config({
 });
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData",  ],
-    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Admin/CustomDataManager" ],
+    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData, CustomDataManager) {
         $(function () {
 
 
@@ -74,8 +74,18 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.loadData();
                         })
 
-                        this.panelButtons.addControl(Controls.CompoundHor([
-                            buttonLoadDataset
+                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data', width:120, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
+                                alert('Please select a workspace from the tree')
+                                return;
+                            }
+                            CustomDataManager.upload(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
+                        })
+
+                        this.panelButtons.addControl(Controls.CompoundVert([
+                            buttonLoadDataset,
+                            buttonUploadCustomData
                         ]));
 
                         that.createPanelSourceData();
