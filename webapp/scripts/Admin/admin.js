@@ -50,8 +50,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         'Start page'    // View title
                     );
 
-                    Msg.listen('',{ type: 'RenderSourceDataInfo' }, function(scope, selectPath) {
-                        that.renderInfo(selectPath);
+                    Msg.listen('',{ type: 'RenderSourceDataInfo' }, function(scope, settings) {
+                        var selectPath = null;
+                        var proceedFunction = null;
+                        if (settings) {
+                            selectPath = settings.selectPath;
+                            proceedFunction = settings.proceedFunction;
+                        }
+                        that.reloadInfo(selectPath, proceedFunction);
                     });
 
                     Msg.listen('',{ type: 'PromptLoadData' }, function(scope) {
@@ -73,7 +79,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         this.panelButtons = Framework.Form(this.frameButtons);
                         this.panelButtons.setPadding(10);
 
-                        var buttonLoadDataset = Controls.Button(null, { content: 'Load highlighted file source', width:120, height:40 }).setOnChanged(function() {
+                        var buttonLoadDataset = Controls.Button(null, { content: 'Import highlighted file source...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a source file set from the tree')
@@ -82,7 +88,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.loadData();
                         })
 
-                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data', width:120, height:40 }).setOnChanged(function() {
+                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
                                 alert('Please select a workspace from the tree')
@@ -91,7 +97,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.upload(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
                         })
 
-                        var buttonEditSettings = Controls.Button(null, { content: 'Edit custom data settings', width:120, height:40 }).setOnChanged(function() {
+                        var buttonEditSettings = Controls.Button(null, { content: 'Edit custom data settings...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (!sourceFileInfo.sourceid) ) {
                                 alert('Please select a custom data source from the tree')
@@ -100,10 +106,20 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.editSettings(sourceFileInfo.datasetid, sourceFileInfo.workspaceid, sourceFileInfo.tableid, sourceFileInfo.sourceid);
                         })
 
+                        var buttonDelCustomData = Controls.Button(null, { content: 'Delete custom data...', width:150, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (!sourceFileInfo.sourceid) ) {
+                                alert('Please select a custom data source from the tree')
+                                return;
+                            }
+                            CustomDataManager.delCustomData(sourceFileInfo.datasetid, sourceFileInfo.workspaceid, sourceFileInfo.tableid, sourceFileInfo.sourceid);
+                        })
+
                         this.panelButtons.addControl(Controls.CompoundVert([
                             buttonLoadDataset,
                             buttonUploadCustomData,
-                            buttonEditSettings
+                            buttonEditSettings,
+                            buttonDelCustomData
                         ]));
 
                         that.createPanelSourceData();
@@ -143,18 +159,20 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     }
 
                     that.loadData = function() {
-                        var content = '';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Load all data', width:160, height:28 }).setOnChanged(function() {
+                        var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                        var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
+                        content += '<p>';
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:160, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
                             that.execLoadData(false);
                         });
                         content += bt.renderHtml() + '<br>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Load configuration only', width:160, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:160, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
                             that.execLoadData(true);
                         });
                         content += bt.renderHtml() + '<br>';
-                        var popupid = Popup.create('Load file data', content);
+                        var popupid = Popup.create('Import source data', content);
                     }
 
                     that.createPanelSourceData = function() {
@@ -258,12 +276,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         );
                     }
 
-                    that.reloadInfo = function() {
+                    that.reloadInfo = function(selectPath, proceedFunction) {
                         DQX.customRequest(MetaData.serverUrl,PnServerModule,'getimportfilelist',{},function(resp) {
                             if (resp.Error)
                                 alert(resp.Error);
                             MetaData.sourceFileInfo =resp.datasets;
-                            that.renderInfo();
+                            that.renderInfo(selectPath);
+                            if (proceedFunction)
+                                proceedFunction()
                         });
                     };
 
