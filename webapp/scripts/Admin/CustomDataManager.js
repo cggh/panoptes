@@ -157,6 +157,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         alert(resp.Error);
                         return;
                     }
+                    alert('NOTE: please re-import the workspace to reflect the deleted custom data in the server database!');
                     Msg.send({type: 'RenderSourceDataInfo'}, {
                         selectPath: {
                             datasetid: datasetid,

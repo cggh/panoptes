@@ -14,7 +14,10 @@ def response(returndata):
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
+    # db = DQXDbTools.OpenDatabase(credInfo, databaseName)
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'propertycatalog'))
     credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
+
 
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
