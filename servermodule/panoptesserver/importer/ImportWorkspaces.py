@@ -25,6 +25,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         cur = db.cursor()
         cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
         row = cur.fetchone()
+        if row is None:
+            raise Exception('Unable to find table record for table {0} in dataset {1}'.format(tableid, datasetId))
         primkey = row[0]
         tableSettingsStr = row[1]
         db.close()
@@ -42,6 +44,9 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
+
+        # remove primary key, just in case
+        properties = [prop for prop in properties if prop['propid'] != primkey ]
 
         sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
         print('Source table: '+sourcetable)
@@ -91,6 +96,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
             print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
+            sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(workspaceid, propid, tableid)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
                 workspaceid,
                 settings['DataType'],

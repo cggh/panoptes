@@ -106,6 +106,19 @@ class CalculationThreadList:
 
 theCalculationThreadList = CalculationThreadList()
 
+def full_stack():
+    import traceback, sys
+    exc = sys.exc_info()[0]
+    stack = traceback.extract_stack()[:-1]  # last one would be full_stack()
+    if not exc is None:  # i.e. if an exception is present
+        del stack[-1]       # remove call of full_stack, the printed exception
+                            # will contain the caught exception caller instead
+    trc = 'Traceback (most recent call last):\n'
+    stackstr = trc + ''.join(traceback.format_list(stack))
+    if not exc is None:
+         stackstr += '  ' + traceback.format_exc().lstrip(trc)
+    return stackstr
+
 class CalculationThread (threading.Thread):
     def __init__(self, id, handler, data, calculationname):
         threading.Thread.__init__(self)
@@ -142,6 +155,7 @@ class CalculationThread (threading.Thread):
             theCalculationThreadList.SetFailed(self.id)
             theCalculationThreadList.SetInfo(self.id, 'Error: '+str(e), None)
             print('ERROR:'+str(e))
+            print(full_stack())
         print("--- Closing log ---")
         self.CloseLog()
 
@@ -201,6 +215,7 @@ class CalculationThread (threading.Thread):
 
     def RunPythonScript(self, scriptFile, runPath, arguments):
         with self.LogSubHeader('Python script'):
+            print('Run path: '+runPath)
             os.chdir(runPath)
             cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
             if self.logfilename is not None:

@@ -8,11 +8,14 @@ import shutil
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     fileid = DQXDbTools.ToSafeIdentifier(returndata['fileid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
+
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
 
     for char in ['.', ' ', ',', '/']:
         sourceid = sourceid.replace(char, '_')

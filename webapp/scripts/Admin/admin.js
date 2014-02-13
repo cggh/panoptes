@@ -50,12 +50,20 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         'Start page'    // View title
                     );
 
+                    Msg.listen('',{ type: 'RenderSourceDataInfo' }, function(scope, selectPath) {
+                        that.renderInfo(selectPath);
+                    });
+
+                    Msg.listen('',{ type: 'PromptLoadData' }, function(scope) {
+                        that.loadData();
+                    });
+
                     //This function is called during the initialisation. Create the frame structure of the view here
                     that.createFrames = function(rootFrame) {
                         rootFrame.makeGroupHor();
 
-                        this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 300);
-                        this.frameSourceData = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7)).setDisplayTitle("File sources");
+                        this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFixedSize(Framework.dimX, 200);
+                        this.frameSourceData = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.6)).setDisplayTitle("File sources");
                         this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                     }
 
@@ -83,9 +91,19 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.upload(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
                         })
 
+                        var buttonEditSettings = Controls.Button(null, { content: 'Edit custom data settings', width:120, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (!sourceFileInfo.sourceid) ) {
+                                alert('Please select a custom data source from the tree')
+                                return;
+                            }
+                            CustomDataManager.editSettings(sourceFileInfo.datasetid, sourceFileInfo.workspaceid, sourceFileInfo.tableid, sourceFileInfo.sourceid);
+                        })
+
                         this.panelButtons.addControl(Controls.CompoundVert([
                             buttonLoadDataset,
-                            buttonUploadCustomData
+                            buttonUploadCustomData,
+                            buttonEditSettings
                         ]));
 
                         that.createPanelSourceData();
@@ -141,21 +159,26 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                     that.createPanelSourceData = function() {
                         that.panelSourceData = FrameTree.Tree(this.frameSourceData);
+                        that.renderInfo();
 
+                    }
+
+                    that.renderInfo = function(selectItemPath) {
+                        that.panelSourceData.clear();
                         that.sourceFileInfoList = {};
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
-                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(null,'<span class="DQXLarge">'+datasetid+'</span>'));
+                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(datasetid, '<span class="DQXLarge">'+datasetid+'</span>'));
                             that.sourceFileInfoList[datasetBranch.getID()] = {
                                 datasetid: datasetid
                             };
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
-                                var workspaceBranch = datasetBranch.addItem(FrameTree.Branch(null,'<b>'+workspaceid+'</b>'));
+                                var workspaceBranch = datasetBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid, '<b>'+workspaceid+'</b>'));
                                 that.sourceFileInfoList[workspaceBranch.getID()] = {
                                     datasetid: datasetid,
                                     workspaceid: workspaceid
                                 };
                                 $.each(workspaceInfo.sources, function(sourceid, sourceInfo) {
-                                    var branch = workspaceBranch.addItem(FrameTree.Branch(null,sourceid+' ('+sourceInfo.tableid+')'));
+                                    var branch = workspaceBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid+'_'+sourceid, sourceid+' ('+sourceInfo.tableid+')'));
                                     that.sourceFileInfoList[branch.getID()] = {
                                         datasetid: datasetid,
                                         workspaceid: workspaceid,
@@ -168,6 +191,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         that.panelSourceData.render();
 
+                        if (selectItemPath) {
+                            selectId = selectItemPath.datasetid;
+                            if (selectItemPath.workspaceid)
+                                selectId += '_' + selectItemPath.workspaceid;
+                            if (selectItemPath.sourceid)
+                                selectId += '_' + selectItemPath.sourceid;
+                            that.panelSourceData.setActiveItem(selectId);
+                        }
                     }
 
 
@@ -226,6 +257,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             }
                         );
                     }
+
+                    that.reloadInfo = function() {
+                        DQX.customRequest(MetaData.serverUrl,PnServerModule,'getimportfilelist',{},function(resp) {
+                            if (resp.Error)
+                                alert(resp.Error);
+                            MetaData.sourceFileInfo =resp.datasets;
+                            that.renderInfo();
+                        });
+                    };
 
                     that.showCalculationLog = function(id) {
                         ServerIO.showLog(MetaData.serverUrl, id);
