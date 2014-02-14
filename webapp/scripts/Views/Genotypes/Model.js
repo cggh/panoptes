@@ -46,10 +46,14 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     callback(start, end, null);
                     return;
                 }
-                var query = SQL.WhereClause.AND([query,
-                    SQL.WhereClause.CompareFixed('chrom', '=', chrom),
-                    SQL.WhereClause.CompareFixed('pos', '>=', start),
-                    SQL.WhereClause.CompareFixed('pos', '<', end)]);
+                if (query.isTrivial)
+                    query = [];
+                else
+                    query = [query];
+                query.push(SQL.WhereClause.CompareFixed('chrom', '=', chrom));
+                query.push(SQL.WhereClause.CompareFixed('pos', '>=', start));
+                query.push(SQL.WhereClause.CompareFixed('pos', '<', end));
+                query = SQL.WhereClause.AND(query);
                 var myurl = DQX.Url(MetaData.serverUrl);
                 myurl.addUrlQueryItem("datatype", "custom");
                 myurl.addUrlQueryItem("respmodule", "2d_server");
@@ -57,12 +61,12 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem('database', MetaData.database);
                 myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(query));
                 myurl.addUrlQueryItem("tbname", that.table.col_table.id);
-                myurl.addUrlQueryItem("field", that.table.col_order);
+                myurl.addUrlQueryItem("field", that.col_order);
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
                         var elements = _.map(data, function(ele) {
                             var a = {};
-                            a[that.table.col_order] = ele;
+                            a[that.col_order] = ele;
                             return a;
                         });
                         callback(start, end, elements);

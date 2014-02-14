@@ -21,8 +21,7 @@ def gzip(data):
     return out.getvalue()
 
 def positions_from_query(database, table, query, field):
-    db = DQXDbTools.OpenDatabase(database)
-    cur = db.cursor()
+    cur = database.cursor()
 
     whc=DQXDbTools.WhereClause()
     whc.ParameterPlaceHolder='%s'#NOTE!: MySQL PyODDBC seems to require this nonstardard coding
@@ -30,28 +29,32 @@ def positions_from_query(database, table, query, field):
     whc.CreateSelectStatement()
 
     sqlquery = "SELECT "
-    sqlquery += "pos FROM {0}".format(table)
-    if len(whc.querystring_params)>0:
-        sqlquery += " WHERE {0} ORDER BY {1}".format((whc.querystring_params, field))
+    sqlquery += "{0} FROM {1}".format(field, table)
+    if len(whc.querystring_params) > 0:
+        sqlquery += " WHERE {0} ".format(whc.querystring_params)
+    sqlquery += " ORDER BY {0}".format(field)
+
     print('################################################')
     print('###QRY:'+sqlquery)
     print('###PARAMS:'+str(whc.queryparams))
     print('################################################')
     cur.execute(sqlquery,whc.queryparams)
+    cur.execute(sqlquery , whc.queryparams)
     resultlist = cur.fetchall()
     cur.close()
-    db.close()
     return resultlist
 
 def response(request_data):
     return request_data
     
 def handler(start_response, request_data):
-    positions = positions_from_query(request_data['database'], 
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), request_data['database'])
+
+    positions = positions_from_query(db,
                                      request_data['tbname'],
                                      request_data['qry'],
                                      request_data['field'])
-    key = hashlib.sha224((request_data['database'] + 
+    key = hashlib.sha224((request_data['database'] +
                           request_data['tbname'] +
                           request_data['qry'] + '_pos')).hexdigest()
     #try:
@@ -66,6 +69,7 @@ def handler(start_response, request_data):
                         ('Content-Encoding', 'gzip')]
     start_response(status, response_headers)
     yield data
+    db.close()
 
 
 

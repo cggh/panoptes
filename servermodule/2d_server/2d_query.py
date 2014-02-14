@@ -66,7 +66,7 @@ def handler(start_response, request_data):
     row_qry = request_data['row_qry']
     row_order = request_data['row_order']
 
-    db = DQXDbTools.OpenDatabase(dataset)
+    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), dataset)
     col_table, row_table = get_table_names(db, datatable)
 
     col_idx = index_from_query(db,
@@ -86,8 +86,8 @@ def handler(start_response, request_data):
     if len(col_idx) == 0 or len(row_idx) == 0:
         data = gzip(''.join(arraybuffer.encode_array(np.array([], dtype=property_array.id.dtype))))
     else:
-        genotypes = select_by_list(property_array, col_idx, row_idx)
-        data = gzip(''.join(arraybuffer.encode_array(genotypes)))
+        data = select_by_list(property_array, col_idx, row_idx)
+        data = gzip(''.join(arraybuffer.encode_array(data)))
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
