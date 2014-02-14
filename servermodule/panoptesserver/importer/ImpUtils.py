@@ -65,12 +65,18 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
                 if linect > 15:
                     calculationObject.LogSQLCommand('...')
                     break
-        cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
+        cmd = config.mysqlcommand
+        if len(config.DBUSER) > 0:
+            cmd += " -u {username}"
+        if len(config.DBPASS) > 0:
+            cmd += " -p{password}"
+        cmd +=" {database} --column-names=FALSE < {filename}".format(database=databaseName, filename=filename)
         if outputfilename is not None:
             cmd += ' > ' + outputfilename
         if calculationObject.logfilename is not None:
             cmd += ' 2>> ' + calculationObject.logfilename
         calculationObject.Log('COMMAND:' + cmd)
+        cmd = cmd.format(username=config.DBUSER, password=config.DBPASS)
         rt = os.system(cmd)
         if (rt != 0) and (rt != 1):
             raise Exception('SQL script error; return code '+str(rt))
