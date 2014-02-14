@@ -69,7 +69,7 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
         if len(config.DBUSER) > 0:
             cmd += " -u {username}"
         if len(config.DBPASS) > 0:
-            cmd += " -p{password}"
+            cmd += " -p'{password}'"
         cmd +=" {database} --column-names=FALSE < {filename}".format(database=databaseName, filename=filename)
         if outputfilename is not None:
             cmd += ' > ' + outputfilename
