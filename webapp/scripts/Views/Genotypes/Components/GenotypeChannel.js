@@ -1,5 +1,5 @@
-define(["require", "_", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
-    function (require, _, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
+define(["require", "_", "d3", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
+    function (require, _, d3, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
 
         var GenotypeChannel = {};
 
@@ -67,9 +67,21 @@ define(["require", "_", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils",
                 that._myPlotter=iPlotter;
             };
 
+            that.new_col_query = function (q) {
+                console.log(q);
+            };
+
+            that.new_row_query = function (q) {
+                console.log(q);
+            };
+
             that.draw = function (drawInfo, args) {
-                var PosMin = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
-                var PosMax = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var chrom = that.parent_browser.getCurrentChromoID();
+                if (!chrom) return;
+
+                var min_genomic_pos = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var max_genomic_pos = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var xscale = d3.scale.linear().domain([min_genomic_pos, max_genomic_pos]).range([0,1039]);
 
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 1);

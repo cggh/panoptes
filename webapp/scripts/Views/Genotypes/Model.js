@@ -41,8 +41,9 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.data_provider = function(chrom, start, end, callback) {
+                var query = that.col_query;
                 if (query == undefined || query == null) {
-                    callback([]);
+                    callback(start, end, null);
                     return;
                 }
                 var query = SQL.WhereClause.AND([query,
@@ -68,14 +69,14 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     },
                     function(error) {
                         console.log(error);
-                        callback(null);
+                        callback(start, end, null);
                     }
                 );
             };
 
             that.get_range = function(chrom, start, end) {
-                
-            }
+                return that.cache_for_chrom[chrom].get_by_pos(start, end);
+            };
 
             that.init(table_info,
                       col_query,
