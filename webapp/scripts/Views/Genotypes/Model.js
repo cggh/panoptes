@@ -41,31 +41,33 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.data_provider = function(chrom, start, end, callback) {
-                var query = that.col_query;
-                if (query == undefined || query == null) {
-                    callback(start, end, null);
-                    return;
-                }
-                var query = SQL.WhereClause.AND([query,
-                    SQL.WhereClause.CompareFixed('chrom', '=', chrom),
-                    SQL.WhereClause.CompareFixed('pos', '>=', start),
-                    SQL.WhereClause.CompareFixed('pos', '<', end)]);
+                var col_query = that.col_query;
+                if (col_query.isTrivial)
+                    col_query = [];
+                else
+                    col_query = [col_query];
+                //TODO Dynamic chrom field
+                col_query.push(SQL.WhereClause.CompareFixed('chrom', '=', chrom));
+                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '>=', start));
+                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '<', end));
+                col_query = SQL.WhereClause.AND(col_query);
                 var myurl = DQX.Url(MetaData.serverUrl);
                 myurl.addUrlQueryItem("datatype", "custom");
                 myurl.addUrlQueryItem("respmodule", "2d_server");
-                myurl.addUrlQueryItem("respid", "dim_index");
-                myurl.addUrlQueryItem('database', MetaData.database);
-                myurl.addUrlQueryItem("qry", SQL.WhereClause.encode(query));
-                myurl.addUrlQueryItem("tbname", that.table.col_table.id);
-                myurl.addUrlQueryItem("field", that.table.col_order);
+                myurl.addUrlQueryItem("respid", "2d_query");
+                myurl.addUrlQueryItem('dataset', MetaData.database);
+                myurl.addUrlQueryItem('datatable', that.table.id);
+                myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
+                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(col_query));
+                myurl.addUrlQueryItem("col_order", that.col_order);
+                myurl.addUrlQueryItem("row_order", that.row_order);
+                myurl.addUrlQueryItem("col_properties", that.col_order);
+                myurl.addUrlQueryItem("row_properties", that.row_order);
+                myurl.addUrlQueryItem("2D_properties", that.properties);
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
-                        var elements = _.map(data, function(ele) {
-                            var a = {};
-                            a[that.table.col_order] = ele;
-                            return a;
-                        });
-                        callback(start, end, elements);
+                        console.log(data);
+                        callback(start, end, []);
                     },
                     function(error) {
                         console.log(error);
