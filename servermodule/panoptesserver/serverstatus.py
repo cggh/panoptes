@@ -1,11 +1,20 @@
 import config
 import os
+import uuid
 
 def response(returndata):
 
     def CheckFolderExistence(dir, name, needWriteAccess):
         if not os.path.isdir(dir):
-            raise Exception('Directory {0} does not exist ({1})'.format(name, dir))
+            raise Exception('{0} does not exist ({1})'.format(name, dir))
+        if needWriteAccess:
+            try:
+                tryFileName = os.path.join(dir, str(uuid.uuid1()))
+                with open(tryFileName, 'w'):
+                    pass
+                os.remove(tryFileName)
+            except:
+                raise Exception('Unable to write to {0} ({1})'.format(name, dir))
 
 
     try:
