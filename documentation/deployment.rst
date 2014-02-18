@@ -4,6 +4,7 @@ Installation and deployment guide
 Dependencies
 ------------
 Panoptes needs a running MySQL with permission to create and remove databases.
+
 .. caution::
   Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
   **Use a separate MySQL install or set your MySQL permissions carefully!**
