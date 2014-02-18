@@ -1,7 +1,7 @@
 
 NameSingle: genomic region     # Display name referring to a table item (single, no capital)
 NamePlural: genomic regions    # Display name referring to a table item (plural, no capital)
-Description: Contains a number of regions defined on the genome     # A description of this data set
+Description: Contains a number of regions defined on the genome     # A description of this dataset
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key

@@ -87,7 +87,7 @@ def response(returndata):
             counts.append(row[2])
 
     if len(bucketsx) >= maxbincount:
-        returndata['Error'] = 'Too many bins in data set'
+        returndata['Error'] = 'Too many bins in dataset'
 
     returndata['bucketsx'] = coder.EncodeIntegers(bucketsx)
     returndata['bucketsy'] = coder.EncodeIntegers(bucketsy)

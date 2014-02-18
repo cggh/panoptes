@@ -25,10 +25,10 @@ Genotype browser
   @TODO.
   
 Visual Analytics
-  Panoptes implements some basic concepts of Visual Analytics, offering near-realtime visualisations with a high level of interactivity, and extensive selection methods that can be used to drill down in the data set.
+  Panoptes implements some basic concepts of Visual Analytics, offering near-realtime visualisations with a high level of interactivity, and extensive selection methods that can be used to drill down in the dataset.
     
 Data sharing
-  One of the fundamental design goals of the application is to serve as a data sharing tool and a collaborative platform between a group of scientists working on a common data set. As an example, every visualisation that can be created in Panoptes, can be turned into a permanent link, ready to be shared by other users.
+  One of the fundamental design goals of the application is to serve as a data sharing tool and a collaborative platform between a group of scientists working on a common dataset. As an example, every visualisation that can be created in Panoptes, can be turned into a permanent link, ready to be shared by other users.
   
 Data import
   Panoptes offers an easy and flexible data import path. It can grab source data from simple, TAB-delimited source files, augmented by settings files containing metadata that instruct the software how to treat these data. 

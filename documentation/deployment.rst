@@ -4,8 +4,10 @@ Installation and deployment guide
 Dependencies
 ------------
 Panoptes needs a running MySQL with permission to create and remove databases.
-Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
-USE A SEPERATE MySQL INSTALL OR SET YOUR MySQL PERMISSIONS CAREFULLY!
+.. caution::
+  Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
+  **Use a separate MySQL install or set your MySQL permissions carefully!**
+
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based machines::
 
 	apt-get install gcc gfortran python-dev libblas-dev liblapack-dev cython libmysqlclient-dev

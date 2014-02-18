@@ -2,7 +2,7 @@ Datasets
 =============================
 Importing datasets
 ------------------
-Panoptes imports datasets into the server database from source data, consisting in a set of simple, structured files. 
+Panoptes imports datasets into the server database from source data, consisting in a set of simple, structured files.
 These source data files are located in ``SOURCEDATADIR/datasets`` (as specified in ``config.py``). 
 The structure of these source data files is described in more detail in `Source files structure`_.
 Importing a dataset source does not happen automatically, and has to be initiated by the user.
@@ -10,7 +10,7 @@ Importing a dataset source does not happen automatically, and has to be initiate
 After installation, a number of sample dataset sources are copied into the source data folder, and are ready to be imported.
 
 - Start the Panoptes app in a browser.
-- In the intro screen, click on the hyperlink "Admin tool". This creates a new tab in the browser, showing the administration section of the app.
+- In the intro screen, click on the hyperlink "Open admin page". This creates a new tab in the browser, showing the administration section of the app.
 - The administration section shows the available source data file sets as a tree. Click on a dataset name you want to import (e.g. "Sample1").
 - Click the button "Load highlighted file source", and click "Load all data" in the popup that appears.
 - This initiates the data import. A progress box is shown during this action.
@@ -89,7 +89,7 @@ The formatting of the source data relies a few concepts:
 - YAML (http://www.yaml.org/about.html) structured files are used to provide the necessary metadata to interpret and parse the data in the context of Panoptes. These metadata are provided in files called ``settings``.
 
 .. caution::
-  **IMPORTANT WARNING**: Identifiers used in the source data structures (folder names, table column headers, etc..), are directly mapped to identifiers in the MySQL database tables. Therefore, they should be formatted as standard variable names (e.g. do not contain dashes, white spaces or other special characters, do not start with a number, ...)
+  Identifiers used in the source data structures (folder names, table column headers, etc..), are directly mapped to identifiers in the MySQL database tables. Therefore, they should be formatted as standard variable names (e.g. do not contain dashes, white spaces or other special characters, do not start with a number, ...)
   
 .. Note:: 
   This documentation does not describe all the directives that can be specified in the yaml settings files. The sample dataset **Samples_and_Variants** contains settings files that are fully commented, and can serve as a starting point to explore the possibe options. Additional comments are provided in other datasets as well, wherever concepts are introduced that are not present in this dataset.

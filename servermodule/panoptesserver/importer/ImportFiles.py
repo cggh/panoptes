@@ -91,7 +91,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
 
         # Finalise: register dataset
-        print('Registering data set')
+        print('Registering dataset')
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}")'.format(datasetId, globalSettings['Name']))
 
 

@@ -5,7 +5,7 @@ Name: Samples and genomic variants
 # A description of the dataset that will appear on the start page
 Description: This is a sample dataset
 
-# Optional: a list of all the data table identifiers in the data set
+# Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder banes in [datatables]
 # The main reason for including this is to provide an explicit ordering of the data tables
 DataTables:
