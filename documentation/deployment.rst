@@ -45,8 +45,8 @@ Server data file structure
 Panoptes uses two file directories, and the location of both has to be specified in config.py.
 
 BASEDIR:
-This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks" and "temp".
-Both should have write privileges for the user that runs the service.
+This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks", "Uploads" and "temp".
+All should have write privileges for the user that runs the server.
 
 SOURCEDATADIR:
 This directory contains the file-bases data sources that are used to import into the Panoptes datasets.
