@@ -241,7 +241,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                     if (data.completed[i]&&(!data.failed[i]))
                                         color = DQX.Color(0.6,0.6,0.6);
                                     var str = '<span style="color:{cl}">'.DQXformat({cl: color.toString()});
-                                    str += '<span style="font-size:70%">{usr}, {tme}</span><br>{name}<br>'.DQXformat({
+                                    str += '<img SRC="{bmp}" style="float:left;margin-right:5px;margin-bottom:1px;margin-top:2px"/>'.DQXformat({bmp:DQX.BMP('link1.png')});
+                                    str += '<span style="font-size:75%">{usr}, {tme}</span><br>{name}<br>'.DQXformat({
                                         usr: data.user[i],
                                         tme: data.timestamp[i],
                                         name: data.name[i]
