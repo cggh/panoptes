@@ -1,5 +1,6 @@
 import DQXDbTools
 import os
+import MySQLdb
 import h5py
 import itertools
 import numpy as np
@@ -12,6 +13,24 @@ from gzipstream import gzip
 CHUNK_SIZE = 400
 
 
+def desc_to_dtype(desc):
+    col_type = desc[1]
+    if col_type in MySQLdb.STRING:
+        #Returning none lets numpy figure it out
+        return None
+    dtype = {
+        MySQLdb.FIELD_TYPE.BIT: '?',
+        MySQLdb.FIELD_TYPE.SHORT: 'i1',
+        MySQLdb.FIELD_TYPE.CHAR: 'u1',
+        MySQLdb.FIELD_TYPE.LONG: 'i4',
+        MySQLdb.FIELD_TYPE.LONGLONG: 'i8',
+        MySQLdb.FIELD_TYPE.TINY: 'i1',
+        MySQLdb.FIELD_TYPE.DOUBLE: 'f8',
+        MySQLdb.FIELD_TYPE.FLOAT: 'f4'
+    }
+    return dtype[col_type]
+
+
 def index_table_query(db, table, fields, query, order):
     cur = db.cursor()
     where = DQXDbTools.WhereClause()
@@ -19,13 +38,15 @@ def index_table_query(db, table, fields, query, order):
     where.Decode(query)
     where.CreateSelectStatement()
     query = "WHERE " + where.querystring_params if len(where.querystring_params) > 0 else ''
-    fields = ','.join(fields)
-    sqlquery = "SELECT {fields} FROM {table} {query} ORDER BY {order}".format(**locals())
+    fields_string = ','.join(fields)
+    sqlquery = "SELECT {fields_string} FROM {table} {query} ORDER BY {order}".format(**locals())
+    print sqlquery
     cur.execute(sqlquery, where.queryparams)
     rows = cur.fetchall()
     result = {}
-    for i, field in enumerate(fields):
-        result[field] = [row[i] for row in rows]
+    for i, (field, desc) in enumerate(zip(fields, cur.description)):
+        dtype = desc_to_dtype(desc)
+        result[field] = np.array([row[i] for row in rows], dtype=dtype)
     cur.close()
     return result
 
@@ -102,6 +123,7 @@ def handler(start_response, request_data):
     db.close()
     hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', datatable + '.hdf5'), 'r')
 
+    two_d_properties = dict((prop, None) for prop in two_d_properties)
     for prop in two_d_properties.keys():
         two_d_properties[prop] = hdf5_file[prop]
     if len(col_idx) == 0 or len(row_idx) == 0:
@@ -112,12 +134,12 @@ def handler(start_response, request_data):
         two_d_result = select_by_list(two_d_properties, col_idx, row_idx)
 
     result_set = []
-    for name, array in col_result:
-        result_set.append(('col_'+name), array)
-    for name, array in row_result:
-        result_set.append(('col_'+name), array)
-    for name, array in two_d_result:
-        result_set.append(('2D_'+name), array)
+    for name, array in col_result.items():
+        result_set.append((('col_'+name), array))
+    for name, array in row_result.items():
+        result_set.append((('row_'+name), array))
+    for name, array in two_d_result.items():
+        result_set.append((('2D_'+name), array))
     data = gzip(''.join(arraybuffer.encode_array_set(result_set)))
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),

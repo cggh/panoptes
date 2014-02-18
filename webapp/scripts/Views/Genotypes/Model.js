@@ -58,12 +58,12 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem('dataset', MetaData.database);
                 myurl.addUrlQueryItem('datatable', that.table.id);
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
-                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(col_query));
+                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(row_query));
                 myurl.addUrlQueryItem("col_order", that.col_order);
                 myurl.addUrlQueryItem("row_order", that.row_order);
                 myurl.addUrlQueryItem("col_properties", that.col_order);
                 myurl.addUrlQueryItem("row_properties", that.row_order);
-                myurl.addUrlQueryItem("2D_properties", that.properties);
+                myurl.addUrlQueryItem("2D_properties", _.keys(that.properties).join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
                         console.log(data);

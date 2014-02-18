@@ -1,5 +1,5 @@
-define(["require", "_", "d3", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
-    function (require, _, d3, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
+define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
+    function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
 
         var GenotypeChannel = {};
 
@@ -39,8 +39,9 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/U
                 }
 
                 var properties = {};
-                _.each(that.properties, function(prop) {
-                    properties[prop] = ArrayBufferClient.dtype_to_array[MetaData.map2DProperties[prop].dtype.substring(1)];
+                _.each(that.property_list, function(prop) {
+                    //Strip the endianess from the dtype
+                    properties[prop] = MetaData.map2DProperties[prop].dtype.substring(1);
                 });
                 //Fix order to by position for col and primary key for row
                 that.model = Model(table_info,
@@ -86,6 +87,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/U
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 1);
                 this.drawStandardGradientRight(drawInfo, 1);
+
+                console.log(that.model.get_range(chrom, min_genomic_pos, max_genomic_pos));
 
                 var psx = 10, psy = 10;
                 drawInfo.centerContext.beginPath();
