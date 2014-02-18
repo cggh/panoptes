@@ -51,6 +51,9 @@ Both should have write privileges for the user that runs the service.
 SOURCEDATADIR:
 This directory contains the file-bases data sources that are used to import into the Panoptes datasets.
 
+..note:
+  Both paths have to be specified as absolute, starting from /. Do not use relative paths here.
+
 Simple Server
 -------------
 The simplest way to run Panoptes is using::
