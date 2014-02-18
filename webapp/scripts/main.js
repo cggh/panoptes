@@ -59,6 +59,17 @@ require([
         $(function () {
 
 
+            function Start_Part0() {
+//                DQX.setProcessing();
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
+//                    DQX.stopProcessing();
+                    if ('issue' in resp) {
+                        alert('Server configuration problem:\n' + resp.issue);
+                        return;
+                    }
+                    Start_Part1();
+                });
+            };
 
             function Start_Part1() {
                 PromptDataSet.execute(function() {
@@ -234,7 +245,7 @@ require([
                 });
             }
 
-            Start_Part1();
+            Start_Part0();
 
 
         });
