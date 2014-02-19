@@ -1,8 +1,18 @@
 Installation and deployment guide
 =================================
 
-Dependencies
-------------
+.. note::
+  Panoptes is currently in an early stage of development, and does not yet come in a polished distribution. Successfully deploying it requires familiarity with the following technologies:
+  - MySQL
+  - Python
+  - WSGI
+  - Web servers (e.g. Apache2)
+  - Unix system administration
+
+Download & dependencies
+-----------------------
+The Panoptes project can be downloaded from the GitHub repository: `https://github.com/malariagen/panoptes`__.
+
 Panoptes needs a running MySQL with permission to create and remove databases.
 
 .. caution::
