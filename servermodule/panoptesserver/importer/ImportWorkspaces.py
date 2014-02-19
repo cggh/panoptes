@@ -18,6 +18,10 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         print('Importing custom data into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
 
         credInfo = calculationObject.credentialInfo
+
+        if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
+            raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
+
         db = DQXDbTools.OpenDatabase(credInfo, datasetId)
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'workspaces'))
@@ -226,6 +230,9 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         settings.RequireTokens(['Name'])
         print(settings.ToJSON())
         workspaceName = settings['Name']
+
+        if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
+            raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
 
         db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()

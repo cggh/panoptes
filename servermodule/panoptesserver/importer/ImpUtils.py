@@ -1,4 +1,5 @@
 import os
+import os
 import numpy
 import re
 import config
@@ -398,3 +399,11 @@ def mkdir(name):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
+
+
+def IsDatasetPresentInServer(credInfo, datasetId):
+    db = DQXDbTools.OpenDatabase(credInfo)
+    cur = db.cursor()
+    cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
+    return cur.fetchone()[0] > 0
+
