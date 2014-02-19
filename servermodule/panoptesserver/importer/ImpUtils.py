@@ -67,12 +67,15 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
                     break
         cmd = config.mysqlcommand
         customlogin = False
+        cmdArguments = {}
         try:
             if len(config.DBUSER) > 0:
                 cmd += " -u {username}"
+                cmdArguments['username'] = config.DBUSER
                 try:
                     if len(config.DBPASS) > 0:
                         cmd += " -p'{password}'"
+                        cmdArguments['password'] = config.DBPASS
                 except:
                     pass
                 customlogin = True
@@ -85,12 +88,7 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
             cmd += ' 2>> ' + calculationObject.logfilename
         calculationObject.Log('COMMAND:' + cmd)
         if customlogin:
-            cmd = cmd.format(username=config.DBUSER)
-            try:
-                if len(config.DBPASS) > 0:
-                   cmd = cmd.format(password=config.DBPASS)
-            except:
-                pass
+            cmd = cmd.format(**cmdArguments)
         rt = os.system(cmd)
         if (rt != 0) and (rt != 1):
             raise Exception('SQL script error; return code '+str(rt))
