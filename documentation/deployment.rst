@@ -11,7 +11,7 @@ Installation and deployment guide
 
 Download & dependencies
 -----------------------
-The Panoptes project can be downloaded from the GitHub repository: `https://github.com/malariagen/panoptes`__.
+The Panoptes project can be downloaded from the GitHub repository: `https://github.com/malariagen/panoptes`_.
 
 Panoptes needs a running MySQL with permission to create and remove databases.
 
