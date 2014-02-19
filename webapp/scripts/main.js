@@ -41,7 +41,7 @@ require.config({
 
 
 require([
-    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers",
+    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
@@ -49,7 +49,7 @@ require([
     "Utils/Serialise", "Utils/ButtonChoiceBox"
 ],
     function (
-        _, $, Application, Framework, Msg, DQX, SQL, DataFetchers,
+        _, $, Application, Framework, Msg, DQX, SQL, Popup, DataFetchers,
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
@@ -60,11 +60,12 @@ require([
 
 
             function Start_Part0() {
-//                DQX.setProcessing();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
-//                    DQX.stopProcessing();
                     if ('issue' in resp) {
-                        alert('Server configuration problem:\n' + resp.issue);
+                        var issueText = resp.issue;
+                        issueText = issueText.replace(/\n/g, "<br>");
+                        var content = '<div style="margin:30px"><p><h2>Server configuration problem</h2><p>' + issueText + '</div>';
+                        Popup.create('Fatal error', content, null, {canClose: false});
                         return;
                     }
                     Start_Part1();
