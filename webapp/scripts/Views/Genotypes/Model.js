@@ -66,11 +66,9 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("2D_properties", _.keys(that.properties).join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
-                        console.log(data);
-                        callback(start, end, []);
+                        callback(start, end, data);
                     },
                     function(error) {
-                        console.log(error);
                         callback(start, end, null);
                     }
                 );
