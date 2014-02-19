@@ -31,15 +31,18 @@ unless you want a specific HDF5 setup.
 
 Build
 -----
-Copy 'config.py.example' to 'config.py'. Edit the file and specify the following components:
- - MySQL setup (DBSRV, DBUSER, DBPASS).
-   By default, Panoptes uses the MySQL defaults file ``~/.my.cnf`` to obtain the login credentials.
+In the directory where the Panoptes project was downloaded, copy 'config.py.example' to 'config.py'.
+Edit the file and specify the following components:
+
+- MySQL setup (DBSRV, DBUSER, DBPASS).
+  By default, Panoptes uses the MySQL defaults file ``~/.my.cnf`` to obtain the login credentials.
    
-     * Make sure that the account used to run the Panoptes server has the right MySQL configuration file in the home directory.
-     * NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
+  * Make sure that the account used to run the Panoptes server has the right MySQL configuration file in the home directory.
+  * NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
      
- - A directory Panoptes can use for storing files (BASEDIR, see further).
- - A directory that will contain the source data files (SOURCEDATADIR, see further)
+- A directory Panoptes can use for storing files (BASEDIR, see further).
+- A directory that will contain the source data files (SOURCEDATADIR, see further)
+ 
 Note that changes in 'config.py' are used on build, so you will need to rebuild if they change.
 
 
