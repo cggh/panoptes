@@ -1,4 +1,4 @@
-[![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)](http://creativecommons.org/publicdomain/zero/1.0/)
+[![CC0](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/)
 
 Panoptes
 ========
