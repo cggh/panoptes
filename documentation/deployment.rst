@@ -52,6 +52,8 @@ To build run::
 	./scripts/build.sh
 
 to create a panoptes installation in 'build'. Note that this deletes any existing build.
+This build copies the different components of the application, and merges them into a single file structure.
+Note that, during this process, a copy of `config.py` is put in the build folder. This copy is used by the actual server process.
 This will attempt to install the needed python packages and link Panoptes into the DQXServer framework which serves the app.
 
 Server data file structure
