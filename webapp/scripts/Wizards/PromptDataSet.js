@@ -64,9 +64,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 window.open('admin.html');
             });
 
+            var ctrl_doc = Controls.Hyperlink(null, {content:'Documentation'}).setOnChanged(function() {
+                window.open('http://panoptes.readthedocs.org/en/latest/');
+            });
+
             var controls = Controls.CompoundVert([
                 PromptDataSet.ctrl_datasetlist,
-                ctrl_admin
+                ctrl_admin,
+                ctrl_doc
             ]);
 
             wiz.addPage({
