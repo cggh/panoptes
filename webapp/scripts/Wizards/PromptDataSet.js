@@ -40,7 +40,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         PromptDataSet.execute2 = function() {
-            var wiz=Wizard.Create('SelectDataSet', {title:'Panoptes - Select dataset', sizeX:450, sizeY: 400, canCancel: false});
+            var wiz=Wizard.Create('SelectDataSet', {title:'Panoptes - Select dataset', sizeX:450, sizeY: 400, canCancel: false, noBackground: true});
 
             PromptDataSet.ctrl_datasetlist = Controls.List(null,{width:400, height:210 })
             var items=[];

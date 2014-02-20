@@ -166,7 +166,7 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:0px"/></a>';
+                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a>';
 //                        headerContent += '<div style="font-size:11pt;display:inline-block;margin-top:8px;margin-left:8px"><b><i>Eyes on your data<i/><b/></div>';
                         Application.setHeader(headerContent);
 
