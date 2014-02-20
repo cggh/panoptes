@@ -1,3 +1,5 @@
+.. image:: PanoptesLarge.png
+
 .. panoptes documentation master file
 
 Panoptes - eyes on your data
