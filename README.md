@@ -1,4 +1,4 @@
-[!(https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/)
+[![logo](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/)
 
 Panoptes
 ========
