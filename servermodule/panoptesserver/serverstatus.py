@@ -2,6 +2,7 @@ import config
 import os
 import uuid
 import DQXDbTools
+import authorization
 
 def response(returndata):
 
@@ -41,10 +42,14 @@ def response(returndata):
         # Checks for source data folder
         CheckFolderExistence(os.path.join(config.SOURCEDATADIR, 'datasets'), '[SOURCEDATADIR]/datasets', False)
 
+        # Try getting auth rules
+        authorization.PnAuthRuleSet()
 
+        print('PANOPTES CLIENT APP START: ' + credInfo.GetAuthenticationInfo())
 
 
     except Exception as e:
+        print('SERVER CONFIGURATION ERROR: ' + str(e))
         returndata['issue'] = str(e)
 
     return returndata
