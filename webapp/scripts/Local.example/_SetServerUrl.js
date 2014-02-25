@@ -1,2 +1,2 @@
-serverUrl = "http://localhost:8000/DQXServer";
-//serverUrl = "/DQXServer/DQXServer";
+serverUrl = "http://localhost:8000/app";
+//serverUrl = "/DQXServer/app";
