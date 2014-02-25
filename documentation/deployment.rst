@@ -95,14 +95,10 @@ Install the Apache2 wsgi dependency `libapache2-mod-wsgi`.
 
 Create a symbolic link in `/var/www/DQXServer` to `[PanoptesInstallationPath]/build/DQXServer`.
 
-Modify `./webapp/scripts/Local/_SetServerUrl.js` to::
-
-  serverUrl = "/DQXServer/app";
-
 The build script uses a virtualenv for the installation of Python dependencies,
 and the Apache2 WSGI configuration has to be instructed to use that virtualenv.
 This can be done by inserting the following statement at the virtual host level
-(note that the tokens need to be replaced by their proper values::
+(note that the tokens need to be replaced by their proper values)::
 
    WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/DQXServer/lib/python[Version]/site-packages
 
