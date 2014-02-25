@@ -115,7 +115,7 @@ Create a new directory, pointing to DQXServer::
 
 In this configuration, the app is served from::
 
-  [ServerName]/DQXServer/app/static/admin.html
+  [ServerName]/DQXServer/app/static/main.html
 
 Authorization
 -------------
