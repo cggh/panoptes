@@ -87,9 +87,13 @@ See section :doc:`datasets` for more information on how to populate the Panoptes
 Deployment on Apache2
 ---------------------
 
+.. note::
+  This section describes a deployment strategy where the static files (html, css, js)
+  are also served through the WSGI interface. This allows one to protect the application using a CAS Single Sign-On service.
+  
 Install the Apache2 wsgi dependency `libapache2-mod-wsgi`.
 
-Create a symbolic link in `/var/www/DQXServer` to `./build/DQXServer'.
+Create a symbolic link in `/var/www/DQXServer` to `[PanoptesInstallationPath]/build/DQXServer`.
 
 Modify `./webapp/scripts/Local/_SetServerUrl.js` to::
 
@@ -102,7 +106,7 @@ This can be done by inserting the following statement at the virtual host level
 
    WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/DQXServer/lib/python[Version]/site-packages
 
-A new directory should be created, pointing to DQXServer::
+Create a new directory, pointing to DQXServer::
 
     <Directory "/var/www/DQXServer">
         WSGIProcessGroup Panoptes
@@ -113,6 +117,9 @@ A new directory should be created, pointing to DQXServer::
         AllowOverride All
     </Directory>
 
+In this configuration, the app is served from::
+
+  [ServerName]/DQXServer/app/static/admin.html
 
 Authorization
 -------------
@@ -123,7 +130,11 @@ There are three levels of privileges:
  - Manage: All actions, including loading the dataset from the file source.
  
 The authorization mechanism interacts with authentication systems implemented at the web server level,
-by reading the REMOTE_USER environment variable (in case of CAS authentication, it can also use information in HTTP_CAS_MEMBEROF).
+by reading the REMOTE_USER environment variable.
+
+Specifically, Panoptes can integrate with a CAS Single Sign-On service. To enable this, specify the CAS service
+url in the `CAS_SERVICE` variable in `config.py`. In this case, authentication can also be based on user groups.
 
 The file PanoptesAuthDb (https://raw2.github.com/malariagen/panoptes/master/servermodule/panoptesserver/PanoptesAuthDb)
-is used to link user authentication information to privileges on specific datasets. The default installation grants all rights to everybody.
+is used to link user authentication information to privileges on specific datasets.
+The default installation grants all rights to everybody.
