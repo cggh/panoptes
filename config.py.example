@@ -1,3 +1,4 @@
+import tempfile
 
 ###########################################################################################################
 # Configuration parameters for connecting to the MySQL database
