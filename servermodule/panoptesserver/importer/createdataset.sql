@@ -54,12 +54,6 @@ CREATE TABLE `storedqueries` (
   `content` text
 );
 
-CREATE TABLE `storedviews` (
-  `id` varchar(100),
-  `dataset` varchar(100),
-  `workspace` varchar(100),
-  `settings` text
-);
 
 
 CREATE TABLE `summaryvalues` (
