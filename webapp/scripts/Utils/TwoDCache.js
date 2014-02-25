@@ -20,6 +20,8 @@ define(["Utils/RequestCounter"],
 
             //TODO Chunk requests to a multiple of 10 boundary or something to prevent small intervals
             that.get_by_pos = function (start, end, retrieve_missing) {
+                if (that.bypass)
+                    return that.bypass;
                 var bisect, i, interval, last_match, matched_elements, matching_intervals, missing_intervals, ref;
                 if (retrieve_missing == null) retrieve_missing = true;
                 if (start < 0) start = 0;
@@ -132,6 +134,8 @@ define(["Utils/RequestCounter"],
 
             that._insert_received_data = function (start, end, data) {
                 that.request_counter.decrement();
+                if (data['col_pos'].length > 0)
+                    that.bypass = data;
                 var match;
                 match = that.intervals.filter(function (i) {
                     return i.start === start && i.end === end;
