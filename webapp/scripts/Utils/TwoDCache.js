@@ -18,10 +18,28 @@ define(["Utils/RequestCounter"],
                 return Array.prototype.push.apply(array, other);
             };
 
+            that.find_start = function(array, threshold) {
+                var len = array.length;
+                var index = -1;
+                while (++index < len) {
+                    if (array[index] >= threshold) {
+                        break;
+                    }
+                }
+                return index;
+            }
+            that.find_end = function(array, threshold) {
+                var index = array.length;
+                while (index--) {
+                    if (array[index] < threshold) {
+                        break;
+                    }
+                }
+                return index;
+            }
+
             //TODO Chunk requests to a multiple of 10 boundary or something to prevent small intervals
             that.get_by_pos = function (start, end, retrieve_missing) {
-                if (that.bypass)
-                    return that.bypass;
                 var bisect, i, interval, last_match, matched_elements, matching_intervals, missing_intervals, ref;
                 if (retrieve_missing == null) retrieve_missing = true;
                 if (start < 0) start = 0;
@@ -30,8 +48,15 @@ define(["Utils/RequestCounter"],
                 matching_intervals = that.intervals.filter(function (interval) {
                     return interval.start <= end && start <= interval.end;
                 });
-                matched_elements = [];
-                if (matching_intervals.length > 0) {
+                var col_properties = {};
+                if (matching_intervals.length == 1) {
+                    var interval = matching_intervals[0];
+                    var col_ordinal_array = interval[that.col_ordinal];
+                    var start_index = //USE NEW FUNC ABOVE
+                    col_ordinal_array
+                    _.forEach(interval.col_properties, function (array, prop) {
+                        col
+                    })
                     that.merge(matched_elements, matching_intervals[0].elements.filter(function (element) {
                         var l = element[that.col_ordinal];
                         return l >= start && l < end;
@@ -106,9 +131,9 @@ define(["Utils/RequestCounter"],
 
                 for (i = 0, ref = missing_intervals.length; i < ref; i++) {
                     interval = missing_intervals[i];
+                    interval.fetched = false;
                     that._intervals_being_fetched.push(interval);
                     that.intervals.splice(bisect(that.intervals, interval.start), 0, interval);
-                    interval.elements = [];
                     that._add_to_provider_queue(interval);
                 }
                 return matched_elements;
@@ -134,12 +159,11 @@ define(["Utils/RequestCounter"],
 
             that._insert_received_data = function (start, end, data) {
                 that.request_counter.decrement();
-                if (data['col_pos'].length > 0)
-                    that.bypass = data;
                 var match;
                 match = that.intervals.filter(function (i) {
                     return i.start === start && i.end === end;
                 });
+                //Remove from the being fetched list
                 that._intervals_being_fetched = that._intervals_being_fetched.filter(function (i) {
                     return i.start != match[0].start;
                 });
@@ -147,15 +171,22 @@ define(["Utils/RequestCounter"],
                     console.log("Got data for non-existant interval or multiples", start, end);
                     return;
                 }
+                match = match[0]
                 if (data) {
-                    match[0].elements = data;
-                    if (that.indexer) {
-                        data.forEach(function (element) {
-                            that.indexed[that.indexer(element)] = element;
-                        });
+                    match.fetched = true;
+                    match.col_properties = {};
+                    var props = _.keys(data);
+                    for (var i = 0, ref = props.length; i < ref; i++) {
+                        var full_prop = props[i];
+                        var type = full_prop.substring(0,1);
+                        var prop = props;
+                        if (type == 'col')
+                            match.col_properties[prop] = data[full_prop];
                     }
+                    match.elements = data;
+                    //TODO MERGE TO NEIGHBOURS
                 } else {
-                    match[0].elements = null;
+                    match.elements = null;
                     that.intervals = that.intervals.filter(function (i) {
                         return i.elements !== null;
                     });

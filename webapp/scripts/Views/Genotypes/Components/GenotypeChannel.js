@@ -30,16 +30,16 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
                     that.first_allele_property = table_info.settings.ShowInGenomeBrowser.FirstAllele;
                     that.second_allele_property = table_info.settings.ShowInGenomeBrowser.SecondAllele;
-                    that.property_list = [that.depth_property, that.first_allele_property, that.second_allele_property];
+                    var properties_list = [that.depth_property, that.first_allele_property, that.second_allele_property];
                 }
                 if (that.data_type == 'fractional') {
                     that.ref_fraction_property = table_info.settings.ShowInGenomeBrowser.RefFraction;
                     that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
-                    that.property_list = [that.depth_property, that.ref_fraction_property];
+                    var properties_list = [that.depth_property, that.ref_fraction_property];
                 }
 
                 var properties = {};
-                _.each(that.property_list, function(prop) {
+                _.each(properties_list, function(prop) {
                     //Strip the endianess from the dtype
                     properties[prop] = MetaData.map2DProperties[prop].dtype.substring(1);
                 });
