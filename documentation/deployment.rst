@@ -22,7 +22,7 @@ Note that the MySQL client tools also have to be installed on the machine runnin
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based machines::
 
-	apt-get install gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
+	apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
 
 You will also need libhdf5-dev. This is a virtual package satisfied by the several different install types of HDF5. The simplest solution is to::
 
