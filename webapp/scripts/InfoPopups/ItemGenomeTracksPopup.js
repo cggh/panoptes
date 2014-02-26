@@ -39,12 +39,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var popupid = Popup.create('Genome tracks', content);
         };
 
-//                    var chk = Controls.Check(null, {
-//                            label: 'Show Genome tracks',
-//                            value:that.tableInfo.genomeTrackSelectionManager.isItemSelected(that.itemid)
-//                        }).setOnChanged(function() {
-//                        that.tableInfo.genomeTrackSelectionManager.selectItem(that.itemid,chk.getValue())
-//                    })
 
 
         return ItemGenomeTracksPopup;

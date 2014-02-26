@@ -77,6 +77,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
+            that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
+            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
+            Msg.listen(eventid, { type: 'SelectionUpdated'}, function(scope,tableid) {
+                if (that.tableInfo.id==tableid) {
+                    that._selchk.modifyValue(that.tableInfo.isItemSelected(that.itemid), true);
+                }
+            } );
+
+
             that.createFrames = function() {
                 that.frameRoot.makeGroupTab();
 
@@ -194,6 +203,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     buttons.push(bt)
                 }
 
+                that._selchk = Controls.Check(null, {
+                        label: 'Select',
+                        value: that.tableInfo.isItemSelected(that.itemid)
+                    }).setOnChanged(function() {
+                        that.tableInfo.selectItem(that.itemid, that._selchk.getValue());
+                        Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+                })
+                buttons.push(Controls.HorizontalSeparator(7));
+                buttons.push(Controls.CompoundVert([Controls.VerticalSeparator(20), that._selchk]).setTreatAsBlock());
+
+
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
 
 
@@ -277,8 +297,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 else
                     DQX.reportError('Plot not found!');
-//                if (that.onCloseCustom)
-//                    that.onCloseCustom();
+
+                $.each(that.eventids,function(idx,eventid) {
+                    Msg.delListener(eventid);
+                });
             };
 
             that.store = function() {
