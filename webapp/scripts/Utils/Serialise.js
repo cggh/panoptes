@@ -1,9 +1,9 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "DQX/HistoryManager",
     "Wizards/EditQuery", "MetaData", "Plots/GenericPlot", "InfoPopups/ItemPopup"
 ],
     function (
-        require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, HistoryManager,
         EditQuery, MetaData, GenericPlot, ItemPopup
         ) {
 
@@ -22,15 +22,22 @@ define([
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_store',
                     { database: MetaData.database, workspaceid:MetaData.workspaceid, id: id },
                     function(resp) {
-                        url='{protocol}//{hostname}{pathname}?dataset={ds}&workspace={ws}&view={id}{hash}'.DQXformat({
+                        var url='{protocol}//{hostname}{pathname}?dataset={ds}&workspace={ws}&view={id}'.DQXformat({
                             protocol:protocol,
                             hostname:hostname,
                             pathname:pathname,
                             ds:MetaData.database,
                             ws:MetaData.workspaceid,
-                            id:id,
-                            hash:window.location.hash
+                            id:id
                         });
+                        var theState = null;
+                        $.each(Application.getViewList(), function(idx, view) {
+                            if (view.isActive())
+                                theState = view.getStateID()
+                        });
+                        if (theState) {
+                            url += '&state=' + theState;
+                        }
                         var str='';
                         var edt = Controls.Textarea('', { size:80, linecount:4, value: url}).setHasDefaultFocus();
                         str += 'Permanent url to this view:<p>';
@@ -56,6 +63,11 @@ define([
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_get',
                     { id: viewid },
                     function(resp) {
+                        if (DQX.getUrlSearchString('state')) {
+                            HistoryManager.__preventSetFragment = true;
+                            Application.activateView(DQX.getUrlSearchString('state'));
+                            HistoryManager.__preventSetFragment = false;
+                        }
                         Serialise._recall(resp.settings);
                         proceedFunction();
                     });
