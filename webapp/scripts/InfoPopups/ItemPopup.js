@@ -1,10 +1,10 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
-    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
-              MetaData, GetFullDataItemInfo, MiscUtils
+              MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup
         ) {
 
         var ItemPopup = {};
@@ -188,13 +188,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.tableBasedSummaryValues.length>0) {
                     buttons.push(Controls.HorizontalSeparator(7));
-                    var chk = Controls.Check(null, {
-                            label: 'Show Genome tracks',
-                            value:that.tableInfo.genomeTrackSelectionManager.isItemSelected(that.itemid)
-                        }).setOnChanged(function() {
-                        that.tableInfo.genomeTrackSelectionManager.selectItem(that.itemid,chk.getValue())
+                    var bt = Controls.Button(null, { content: 'Show genome tracks...', buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
+                        ItemGenomeTracksPopup.show(that.tableInfo, that.itemid);
                     })
-                    buttons.push(chk)
+                    buttons.push(bt)
                 }
 
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
