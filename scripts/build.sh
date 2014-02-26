@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS calculations (
   scope varchar(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS stogreenviews (
+CREATE TABLE IF NOT EXISTS storedviews (
   dataset varchar(100) DEFAULT NULL,
   workspace varchar(100) DEFAULT NULL,
   id varchar(100) DEFAULT NULL,
