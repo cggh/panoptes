@@ -147,6 +147,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
+        MiscUtils.selectQuery = function(tableInfo, query) {
+            var maxcount = 100000;
+            var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableInfo.id + 'CMB_' + MetaData.workspaceid);
+            fetcher.setMaxResultCount(maxcount);
+            fetcher.addColumn(tableInfo.primkey, 'ST');
+            DQX.setProcessing();
+            fetcher.getData(query, tableInfo.primkey,
+                function (data) { //success
+                    DQX.stopProcessing();
+                    var items = data[tableInfo.primkey];
+                    if (items.length >= maxcount)
+                        alert('WARNING: maximum number of items reached. Only {nr} will be selected'.DQXformat({nr: maxcount}))
+                    $.each(items, function(idx, item) {
+                        tableInfo.selectItem(item, true);
+                    });
+                    Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
+                },
+                function (data) { //error
+                    DQX.stopProcessing();
+                    DQX.reportError('Query failed');
+                }
+
+            );
+        };
+
 
 
 

@@ -189,6 +189,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableInfo.clearSelection();
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
                     });
+                    var selectionAll = Controls.Button(null, { content: 'Select all', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    selectionAll.setOnChanged(function() {
+                        MiscUtils.selectQuery(that.tableInfo, that.theQuery.get());
+                    });
                     var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {
                         SelectionTools.cmdStore(that.tableInfo);
@@ -196,7 +200,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var groupSelection = Controls.CompoundVert([
                         that.selectedItemCountText,
-                        Controls.CompoundHor([selectionClear, selectionStore])
+                        Controls.CompoundHor([selectionClear, selectionAll, selectionStore])
                     ]).setLegend('Current selection');
 
 
