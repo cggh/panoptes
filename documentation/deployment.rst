@@ -121,6 +121,7 @@ Automatic deployment on a new Ubuntu EC2 image
 ----------------------------------------------
 
 For testing purposes, a script is provided that performs a full deployment on a fresh Ubuntu 12.04 image, including
+
 - Installation of all dependencies
 - Deployment and configuration of MySQL
 - Deployment and configuration of Apache2
