@@ -20,6 +20,13 @@ define([
                 );
                 that.setEarlyInitialisation();
 
+                Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
+                    if ((MetaData.mapTableCatalog[tableid].hasGenomePositions) || (MetaData.mapTableCatalog[tableid].hasGenomeRegions)) {
+                        that.panelBrowser.render();
+                    }
+                } );
+
+
                 that.storeSettings = function() {
                     var obj= {};
                     if (that.panelBrowser) {
@@ -332,6 +339,8 @@ define([
                         .setTitle(tableInfo.tableCapNamePlural + ' - ' + propInfo.name)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
+                    theChannel.setSelectionStateHandler(tableInfo.isItemSelected);
+
                     if (propInfo.settings.categoryColors) {
                         var mapping = {};
                         $.each(propInfo.settings.categoryColors, function(key, val) {
@@ -480,24 +489,6 @@ define([
                             };
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
                             controlsGroup.addControl(ctrlQuery);
-
-//                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show visible in range".DQXformat({name:tableInfo.tableNamePlural}),  width:150, height:40, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
-//                                var chromoid = that.panelBrowser.getCurrentChromoID();
-//                                var range = that.panelBrowser.getVisibleRange();
-//                                range.min = Math.floor(range.min);
-//                                range.max = Math.floor(range.max);
-//                                var qry = tableInfo.genomeBrowserInfo.theQuery.get();
-//                                qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromoid);
-//                                qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, range.min, range.max, true);
-//                                Msg.send({type: 'DataItemTablePopup'}, {
-//                                    tableid: tableInfo.id,
-//                                    query: qry,
-//                                    title: '{name} in genomic range {chromoid}:{start}-{stop}'.DQXformat({name:tableInfo.tableCapNamePlural, chromoid:chromoid, start:range.min, stop:range.max })
-//                                });
-//                            });
-//                            controlsGroup.addControl(Controls.VerticalSeparator(7));
-//                            controlsGroup.addControl(bt);
-
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
 
                             //Initialise the data fetcher that will download the data for the table
