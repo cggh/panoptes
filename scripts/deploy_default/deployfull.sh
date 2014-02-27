@@ -8,6 +8,8 @@ NC='\e[0m'
 release='master'
 
 
+# target: ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9)
+
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
    exit 1
@@ -33,8 +35,8 @@ echo "mysql-server-5.5 mysql-server/root_password password 1234" | debconf-set-s
 echo "mysql-server-5.5 mysql-server/root_password_again password 1234" | debconf-set-selections
 apt-get -y install mysql-server-5.5
 
-apt-get install unzip wget git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
-apt-get install libhdf5-serial-dev
+apt-get -y install unzip wget git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
+apt-get -y install libhdf5-serial-dev
 
 cd /
 mkdir panoptes
@@ -56,10 +58,11 @@ mv panoptes-${release} source
 
 cd source
 
-cp scripts/deploy_default/_SetServerUrl.js build/DQXServer/static/scripts/Local/_SetServerUrl.js
 cp scripts/deploy_default/config.py config.py
 
 ./scripts/build.sh
+
+cp scripts/deploy_default/_SetServerUrl.js build/DQXServer/static/scripts/Local/_SetServerUrl.js
 
 cp /etc/apache2/sites-enabled/000-default /panoptes/bck_000-default
 cp scripts/deploy_default/apache_settings /etc/apache2/sites-enabled/000-default
