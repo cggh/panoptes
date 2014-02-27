@@ -75,7 +75,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.get_range = function(chrom, start, end) {
-                return that.cache_for_chrom[chrom].get_by_pos(start, end);
+                return that.cache_for_chrom[chrom].get_by_ordinal(start, end);
             };
 
             that.init(table_info,

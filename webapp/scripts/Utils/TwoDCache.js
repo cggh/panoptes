@@ -1,17 +1,20 @@
 define(["Utils/RequestCounter"],
     function (RequestCounter) {
-        return function TwoDCache(col_ordinal, properties, provider) {
+        return function TwoDCache(col_ordinal, properties, provider, update_callback) {
             var that = {};
-            that.init = function (col_ordinal, properties, provider) {
+            that.init = function (col_ordinal, properties, provider, update_callback) {
                 that.col_ordinal = col_ordinal;
                 that.properties = properties;
                 that.provider = provider;
+                that.update_callback = update_callback;
                 that.request_counter = RequestCounter();
 
                 that.intervals = [];
                 that._intervals_being_fetched = [];
                 that.provider_queue = [];
                 that.current_provider_requests = 0;
+                that.row_data_fetched = false;
+                that.row_data = {};
             };
 
             that.merge = function (array, other) {
@@ -27,7 +30,7 @@ define(["Utils/RequestCounter"],
                     }
                 }
                 return index;
-            }
+            };
             that.find_end = function(array, threshold) {
                 var index = array.length;
                 while (index--) {
@@ -36,11 +39,25 @@ define(["Utils/RequestCounter"],
                     }
                 }
                 return index;
-            }
+            };
+            that.slice = function(array, start, end) {
+                if (array.slice) {
+                    return array.slice(start,end);
+                }
+                if (array.subarray) {
+                    return array.subarray(start,end);
+                }
+                DQX.reportError('No slice available for array');
+            };
+            that.twoD_col_slice = function(array, start, end) {
+                return _.map(array, function(row) {
+                    return that.slice(row, start, end);
+                });
+            };
 
             //TODO Chunk requests to a multiple of 10 boundary or something to prevent small intervals
-            that.get_by_pos = function (start, end, retrieve_missing) {
-                var bisect, i, interval, last_match, matched_elements, matching_intervals, missing_intervals, ref;
+            that.get_by_ordinal = function (start, end, retrieve_missing) {
+                var bisect, i, last_match, matching_intervals, missing_intervals, ref;
                 if (retrieve_missing == null) retrieve_missing = true;
                 if (start < 0) start = 0;
                 if (end < 0) end = 0;
@@ -48,32 +65,25 @@ define(["Utils/RequestCounter"],
                 matching_intervals = that.intervals.filter(function (interval) {
                     return interval.start <= end && start <= interval.end;
                 });
-                var col_properties = {};
-                if (matching_intervals.length == 1) {
-                    var interval = matching_intervals[0];
-                    var col_ordinal_array = interval[that.col_ordinal];
-                    var start_index = //USE NEW FUNC ABOVE
-                    col_ordinal_array
-                    _.forEach(interval.col_properties, function (array, prop) {
-                        col
-                    })
-                    that.merge(matched_elements, matching_intervals[0].elements.filter(function (element) {
-                        var l = element[that.col_ordinal];
-                        return l >= start && l < end;
-                    }));
+                var matching_intervals_with_data = matching_intervals.filter(function (interval) {
+                    return interval.fetched == true;
+                });
+                var result = {'row':that.row_data, 'col':{}, 'twoD':{}};
+                if (matching_intervals_with_data.length == 1) {
+                    var interval = matching_intervals_with_data[0];
+                    var col_ordinal_array = interval.col[that.col_ordinal];
+                    var start_index = that.find_start(col_ordinal_array, start);
+                    var end_index = that.find_end(col_ordinal_array, end);
+                    _.forEach(interval.col, function(array, prop) {
+                        result.col[prop] = that.slice(array, start_index, end_index);
+                    });
+                    _.forEach(interval.twoD, function(array, prop) {
+                        result.twoD[prop] = that.twoD_col_slice(array, start_index, end_index);
+                    });
+                } else {
+                    console.log('boom');
                 }
-                if (matching_intervals.length > 2) {
-                    for (i = 1, ref = matching_intervals.length - 2; i <= ref; i++) {
-                        that.merge(matched_elements, matching_intervals[i].elements);
-                    }
-                }
-                if (matching_intervals.length > 1) {
-                    that.merge(matched_elements, matching_intervals[matching_intervals.length - 1].elements.filter(function (element) {
-                        var l = element[col_ordinal];
-                        return l >= start && l < end;
-                    }));
-                }
-                if (!retrieve_missing) return matched_elements;
+                if (!retrieve_missing) return result;
                 missing_intervals = [];
                 if (matching_intervals.length === 0) {
                     missing_intervals.push({
@@ -136,7 +146,7 @@ define(["Utils/RequestCounter"],
                     that.intervals.splice(bisect(that.intervals, interval.start), 0, interval);
                     that._add_to_provider_queue(interval);
                 }
-                return matched_elements;
+                return result;
             };
 
             that._add_to_provider_queue = function (interval) {
@@ -171,29 +181,37 @@ define(["Utils/RequestCounter"],
                     console.log("Got data for non-existant interval or multiples", start, end);
                     return;
                 }
-                match = match[0]
+                match = match[0];
                 if (data) {
                     match.fetched = true;
-                    match.col_properties = {};
+                    match.col = {};
+                    match.twoD = {};
                     var props = _.keys(data);
                     for (var i = 0, ref = props.length; i < ref; i++) {
                         var full_prop = props[i];
-                        var type = full_prop.substring(0,1);
-                        var prop = props;
+                        var type = full_prop.split('_')[0];
+                        var prop = full_prop.substring(full_prop.indexOf('_')+1);
                         if (type == 'col')
-                            match.col_properties[prop] = data[full_prop];
+                            match.col[prop] = data[full_prop];
+                        if (type == 'row')
+                            that.row_data[prop] = data[full_prop];
+                        if (type == '2D') {
+                            var packed = data[full_prop];
+                            match.twoD[prop] = _.times(packed.shape[0], function(i) {
+                                return that.slice(packed, i*packed.shape[1], (i+1)*packed.shape[1]);
+                            });
+                        }
+
                     }
-                    match.elements = data;
                     //TODO MERGE TO NEIGHBOURS
                 } else {
-                    match.elements = null;
                     that.intervals = that.intervals.filter(function (i) {
                         return i.elements !== null;
                     });
                 }
             };
 
-            that.init(col_ordinal, properties, provider);
+            that.init(col_ordinal, properties, provider, update_callback);
             return that
         };
     }

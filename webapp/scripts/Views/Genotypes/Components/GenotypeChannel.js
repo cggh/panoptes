@@ -85,17 +85,22 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 var x_scale = d3.scale.linear().domain([min_genomic_pos, max_genomic_pos]).range([0,1039]);
 
                 var data = that.model.get_range(chrom, min_genomic_pos, max_genomic_pos);
-                if (!('row_ID' in data))
+                if (!('pos' in data.col))
                     return;
                 var psx = 10, psy = 10;
                 var snp_width = 10;
-                var pos = data['col_pos'];
-                var first_allele = data['2D_first_allele'];
-                var second_allele = data['2D_second_allele'];
-                var depth = data['2D_total_depth'];
-                var row_ID = data['row_ID'];
-//TODO - Fix
-                that._height = 10 * row_ID.length;
+                var pos = data.col['pos'];
+                var first_allele = data.twoD['first_allele'];
+                var second_allele = data.twoD['second_allele'];
+                var depth = data.twoD['total_depth'];
+                var row_ID = data.row['ID'];
+
+                if (that._height != 10 * row_ID.length) {
+                    that.modifyHeight(10 * row_ID.length);
+                    that._myPlotter.handleResize();
+                }
+
+
 //                drawInfo.sizeY = that._height;
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 1);
@@ -103,13 +108,15 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
                 var ctx = drawInfo.centerContext;
                 for (var row = 0, lr = row_ID.length; row < lr; ++row) {
+                    var row_depth = depth[row];
+                    var row_first_allele = first_allele[row];
+                    var row_second_allele = second_allele[row];
                     for (var col = 0, lc = pos.length; col < lc; ++col) {
-                        var idx = (row*lc) + col;
-                        if (first_allele[idx] == second_allele[idx])
-                            ctx.fillStyle = 'rgba(0,0,255,'+(depth[idx]/100)+')';
+                        if (row_first_allele[col] == row_second_allele[col])
+                            ctx.fillStyle = 'rgba(0,0,255,'+(row_depth[col]/100)+')';
                         else
-                            ctx.fillStyle = 'rgba(255,0,0,'+(depth[idx]/100)+')';
-                        if (first_allele[idx] == -1 || second_allele[idx] == -1)
+                            ctx.fillStyle = 'rgba(255,0,0,'+(row_depth[col]/100)+')';
+                        if (row_first_allele[col] == -1 || row_second_allele[col] == -1)
                             ctx.fillStyle = 'rgb(0,0,0)';
                         ctx.fillRect(x_scale(pos[col])-(snp_width*0.01), row*10, Math.ceil(snp_width), 10);
                     }
