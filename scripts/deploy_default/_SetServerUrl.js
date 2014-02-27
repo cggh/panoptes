@@ -1,0 +1,1 @@
+serverUrl = "/DQXServer/app";
