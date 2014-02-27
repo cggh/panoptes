@@ -30,6 +30,7 @@ echo "Start installation"
 apt-get update
 
 apt-get -y install apache2
+apt-get -y install libapache2-mod-wsgi
 
 echo "mysql-server-5.5 mysql-server/root_password password 1234" | debconf-set-selections
 echo "mysql-server-5.5 mysql-server/root_password_again password 1234" | debconf-set-selections

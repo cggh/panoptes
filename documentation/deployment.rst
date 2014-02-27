@@ -117,6 +117,21 @@ In this configuration, the app is served from::
 
   [ServerName]/DQXServer/app/static/main.html
 
+Automatic deployment on a new image
+-----------------------------------
+
+.. caution::
+  This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
+
+The following steps will create a fully working Panoptes instance on a Amazon EC2 ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9) image::
+
+  cd /
+  wget https://raw.github.com/malariagen/panoptes/master/scripts/deploy_default/deployfull.sh
+  chmod +x deployfull.sh
+  ./deployfull.sh
+
+The source data folder is set to `/panoptes/sourcedata`. The url of the deployment is `[ServerName]/panoptes/main.html`.
+
 Authorization
 -------------
 Panoptes contains a simple authorization mechanism that can be used to grant or deny certain privileges on datasets.

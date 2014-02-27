@@ -31,6 +31,7 @@
                 AddHandler cgi-script .cgi .pl
                 AllowOverride All
         </Directory>
+        Alias /panoptes/ "/var/www/DQXServer/static/"
 
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
