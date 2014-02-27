@@ -18,13 +18,18 @@ define([
             var hostname=window.location.hostname;
             var pathname=window.location.pathname;
             var protocol=window.location.protocol;
+            var portToken = '';
+            if (window.location.port)
+                if (window.location.port!=80)
+                    portToken = ':'+window.location.port;
             DQX.serverDataStore(MetaData.serverUrl,content,function(id) {
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_store',
                     { database: MetaData.database, workspaceid:MetaData.workspaceid, id: id },
                     function(resp) {
-                        var url='{protocol}//{hostname}{pathname}?dataset={ds}&workspace={ws}&view={id}'.DQXformat({
+                        var url='{protocol}//{hostname}{port}{pathname}?dataset={ds}&workspace={ws}&view={id}'.DQXformat({
                             protocol:protocol,
                             hostname:hostname,
+                            port: portToken,
                             pathname:pathname,
                             ds:MetaData.database,
                             ws:MetaData.workspaceid,
