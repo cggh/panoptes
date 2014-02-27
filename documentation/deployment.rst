@@ -132,9 +132,9 @@ For testing purposes, a script is provided that performs a full deployment on a 
 The following steps will create a fully working Panoptes instance on a Amazon EC2 ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9) image::
 
   cd /
-  wget https://raw.github.com/malariagen/panoptes/master/scripts/deploy_default/deployfull.sh
-  chmod +x deployfull.sh
-  ./deployfull.sh
+  sudo wget https://raw.github.com/malariagen/panoptes/master/scripts/deploy_default/deployfull.sh
+  sudo chmod +x deployfull.sh
+  sudo ./deployfull.sh
 
 The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/DQXServer/app/static/main.html` or `[ServerName]/panoptes/main.html`.
 
