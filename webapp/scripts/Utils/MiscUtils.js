@@ -147,7 +147,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        MiscUtils.selectQuery = function(tableInfo, query) {
+        MiscUtils.selectQuery = function(tableInfo, query, method) {
+            if (['replace', 'add', 'restrict', 'exclude'].indexOf(method)<0)
+                DQX.reportError('Invalid selection method');
             var maxcount = 100000;
             var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableInfo.id + 'CMB_' + MetaData.workspaceid);
             fetcher.setMaxResultCount(maxcount);
@@ -159,9 +161,41 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var items = data[tableInfo.primkey];
                     if (items.length >= maxcount)
                         alert('WARNING: maximum number of items reached. Only {nr} will be selected'.DQXformat({nr: maxcount}))
-                    $.each(items, function(idx, item) {
-                        tableInfo.selectItem(item, true);
-                    });
+
+                    if (method == 'replace') {
+                        tableInfo.currentSelection = {};
+                        $.each(items, function(idx, item) {
+                            tableInfo.selectItem(item, true);
+                        });
+                    }
+                    if (method == 'add') {
+                        $.each(items, function(idx, item) {
+                            tableInfo.selectItem(item, true);
+                        });
+                    }
+                    if (method == 'restrict') {
+                        var curSelList = tableInfo.getSelectedList();
+                        var newSelMap = {};
+                        $.each(items, function(idx,id) {
+                            newSelMap[id] = true;
+                        });
+                        $.each(curSelList, function(idx,id) {
+                            if (!newSelMap[id])
+                                tableInfo.selectItem(id, false);
+                        });
+                    }
+                    if (method == 'exclude') {
+                        var curSelList = tableInfo.getSelectedList();
+                        var newSelMap = {};
+                        $.each(items, function(idx,id) {
+                            newSelMap[id] = true;
+                        });
+                        $.each(curSelList, function(idx,id) {
+                            if (newSelMap[id])
+                                tableInfo.selectItem(id, false);
+                        });
+                    }
+
                     Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
                 },
                 function (data) { //error

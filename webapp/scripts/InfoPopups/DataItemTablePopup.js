@@ -1,10 +1,10 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
-    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "Utils/ButtonChoiceBox"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
-              MetaData, GetFullDataItemInfo, MiscUtils
+              MetaData, GetFullDataItemInfo, MiscUtils, ButtonChoiceBox
         ) {
 
         var DataItemTablePopup = {};
@@ -49,17 +49,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.query, {hasSelection: true });
                 that.myTable = that.panelTable.getTable();
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in main table', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
+                    ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.query);
+                });
+
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
                     Msg.send({type: 'ShowItemsInQuery', tableid: that.tableInfo.id}, { query: that.query });
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, { query: that.query , tableid: that.tableInfo.id });
                 });
 
                 that.panelButtons = Framework.Form(that.frameButtons);
                 that.panelButtons.addControl(Controls.CompoundHor([
                     Controls.HorizontalSeparator(7),
+                    button_Selection,
                     button_ShowInTableViewer,
                     button_Showplots
                 ]));

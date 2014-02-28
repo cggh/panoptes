@@ -1,10 +1,11 @@
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools"
+    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools", "Utils/ButtonChoiceBox"
 ],
     function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
-              EditQuery, QueryTool, MiscUtils, SelectionTools) {
+              EditQuery, QueryTool, MiscUtils, SelectionTools, ButtonChoiceBox
+        ) {
 
 
 
@@ -189,9 +190,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableInfo.clearSelection();
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
                     });
-                    var selectionAll = Controls.Button(null, { content: 'Select all', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionAll = Controls.Button(null, { content: 'Select...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionAll.setOnChanged(function() {
-                        MiscUtils.selectQuery(that.tableInfo, that.theQuery.get());
+                        ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery.get());
                     });
                     var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {
@@ -243,9 +244,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                     toDisplayString: propInfo.toDisplayString
                                 };
                         });
-                        str += '<span style="color: rgb(128,0,0)"><b>Active query:</b></span><br><span style="color: rgb(128,0,0);font-size:80%">'+qry.toDisplayString(nameMap,0)+'</span>';
+                        str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">'+qry.toDisplayString(nameMap,0)+'</span>';
                     } else {
-                      str += '<span style="color: rgb(128,0,0)"><b>Active query:</b></span><br><span style="color: rgb(128,0,0);font-size:80%">All</span>'
+                      str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">All</span>'
                     }
                     str += '</div>';
                     return str;

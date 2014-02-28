@@ -1,5 +1,11 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame"],
-    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable",
+    "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame",
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
+],
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable,
+              Wizard, Popup, PopupFrame,
+              MetaData, GetFullDataItemInfo, MiscUtils
+        ) {
 
         var ButtonChoiceBox = {};
 
@@ -90,12 +96,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             if (newQuery) {
                 var choicesRow = [];
-
                 choicesRow.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
                     thePlot.theQuery.modify(newQuery);
                 }
                 } );
-
                 choicesRow.push( { content:'Show items in query', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: tableInfo.id,
@@ -104,15 +108,45 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 }
                 } );
-
                 choices.push(choicesRow);
             }
 
-
-
-
             ButtonChoiceBox.create(title, header, choices);
+        }
 
+
+
+        ButtonChoiceBox.createQuerySelectionOptions = function(tableInfo, query) {
+
+            var choices = [];
+
+            var choicesRow = [];
+
+            choicesRow.push( { content:'REPLACE', bitmap:'Bitmaps/venn2.png', handler:function() {
+                MiscUtils.selectQuery(tableInfo, query, 'replace');
+            }
+            });
+
+            choicesRow.push( { content:'ADD', bitmap:'Bitmaps/venn3.png', handler:function() {
+                MiscUtils.selectQuery(tableInfo, query, 'add');
+            }
+            });
+
+            choicesRow.push( { content:'RESTRICT', bitmap:'Bitmaps/venn1.png', handler:function() {
+                MiscUtils.selectQuery(tableInfo, query, 'restrict');
+            }
+            });
+
+            choicesRow.push( { content:'EXCLUDE', bitmap:'Bitmaps/venn4.png', handler:function() {
+                MiscUtils.selectQuery(tableInfo, query, 'exclude');
+            }
+            });
+
+            choices.push(choicesRow);
+
+            var queryDescription = tableInfo.tableViewer.getQueryDescription(query);
+
+            ButtonChoiceBox.create('Select '+tableInfo.tableNamePlural, queryDescription, choices);
         }
 
 
