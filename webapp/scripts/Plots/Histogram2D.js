@@ -31,6 +31,8 @@ define([
             }
 
             if (name=='Heath') {
+                if (fr>0)
+                    fr = (fr +0.07)/0.93;
                 return DQX.Color(1-Math.pow(Math.max(fr-0.66,0)/(1-0.66),2),1-Math.pow(Math.max(fr-0.33,0)/(1-0.33),0.8),1-Math.pow(fr,0.6));
             }
 
@@ -114,13 +116,16 @@ define([
                 $.each(paletteList, function(idx,name) {
                     colormaplist.push({id:name, name:name});
                 });
-                that.ctrlPalette = Controls.Combo(null,{label:'Colors', states:colormaplist, value:'Gray'}).setClassID('color').setOnChanged(function() {
+                that.ctrlPalette = Controls.Combo(null,{label:'Colors', states:colormaplist, value:'Heath'}).setClassID('color').setOnChanged(function() {
                     that.reDraw();
                 });
 
-                that.ctrlMappingStyle = Controls.Combo(null,{label:'Mapping', states:[{id:'lin',name:'Linear'}, {id:'log1',name:'Log (weak)'}, {id:'log2',name:'Log (strong)'}, {id:'loglog',name:'Log log'}], value:'linear'}).setClassID('mapping').setOnChanged(function() {
-                    that.reDraw();
-                });
+                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Intensity correction', width: 200, minval:0.1, maxval:1, value:0.75, digits: 2})
+                    .setNotifyOnFinished().setClassID('gamma')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
@@ -133,7 +138,7 @@ define([
                     Controls.VerticalSeparator(20),
                     that.ctrlPalette,
                     Controls.VerticalSeparator(20),
-                    that.ctrlMappingStyle
+                    that.ctrl_Gamma
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
@@ -284,6 +289,7 @@ define([
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;
 
+                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
                 for (var ix=0; ix<that.bucketCountX; ix++) {
                     var x1 = (that.bucketNrOffsetX+ix+0)*that.bucketSizeX;
                     var x2 = (that.bucketNrOffsetX+ix+1)*that.bucketSizeX;
@@ -295,14 +301,7 @@ define([
                         var py1 = Math.round(y1 * scaleY + offsetY);
                         var py2 = Math.round(y2 * scaleY + offsetY);
                         var fr = that.bucketDens[ix][iy]*1.0/that.maxDens;
-                        if (that.ctrlMappingStyle.getValue()=='log1')
-                            fr=Math.log(1+20*fr)/Math.log(21);
-                        if (that.ctrlMappingStyle.getValue()=='log2')
-                            fr=Math.log(1+500*fr)/Math.log(501);
-                        if (that.ctrlMappingStyle.getValue()=='loglog') {
-                            fr=Math.log(1+500*fr)/Math.log(501);
-                            fr=Math.log(1+500*fr)/Math.log(501);
-                        }
+                        fr  = Math.pow(fr,gamma);
                         var cl = getPaletteColor(paletteName, fr);
                         ctx.fillStyle=cl.toString();
                         ctx.fillRect(px1,py2,px2-px1,py1-py2);

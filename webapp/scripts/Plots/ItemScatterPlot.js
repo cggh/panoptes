@@ -84,7 +84,7 @@ define([
                 });
 
                 that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 200, minval:0, maxval:1, value:1, digits: 2})
-                    .setNotifyOnFinished()
+                    .setNotifyOnFinished().setClassID('opacity')
                     .setOnChanged(function() {
                     that.reDraw();
                 });
