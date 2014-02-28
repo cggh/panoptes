@@ -1,5 +1,9 @@
-define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model"],
-    function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model) {
+define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
+    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
+    "Views/Genotypes/Components/TabContainer", "Views/Genotypes/Components/Container", "Views/Genotypes/ColourAllocator"
+    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/Genotypes"],
+    function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+              TabContainer, Container, ColourAllocator, ColumnHeader, Genotypes) {
 
         var GenotypeChannel = {};
 
@@ -23,35 +27,53 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 var row_query_tool = that.row_query.createControl();
                 controls_group.addControl(row_query_tool);
 
-                that.data_type = table_info.settings.ShowInGenomeBrowser.Type;
-                if (that.data_type != 'diploid' && that.data_type != 'fractional')
-                    DQX.reportError("Genotype data type is not diploid or fractional");
-                if (that.data_type == 'diploid') {
-                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
-                    that.first_allele_property = table_info.settings.ShowInGenomeBrowser.FirstAllele;
-                    that.second_allele_property = table_info.settings.ShowInGenomeBrowser.SecondAllele;
-                    var properties_list = [that.depth_property, that.first_allele_property, that.second_allele_property];
-                }
-                if (that.data_type == 'fractional') {
-                    that.ref_fraction_property = table_info.settings.ShowInGenomeBrowser.RefFraction;
-                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
-                    var properties_list = [that.depth_property, that.ref_fraction_property];
-                }
-
-                var properties = {};
-                _.each(properties_list, function(prop) {
-                    //Strip the endianess from the dtype
-                    properties[prop] = MetaData.map2DProperties[prop].dtype.substring(1);
-                });
                 //Fix order to by position for col and primary key for row
                 that.model = Model(table_info,
                     that.col_query.get(),
                     that.row_query.get(),
                     table_info.col_table.PositionField,
                     table_info.row_table.primkey,
-                    properties,
                     _.map(MetaData.chromosomes, DQX.attr('id'))
                 );
+                //View parameters
+                that.view = {
+                    colours: ColourAllocator(),
+                    compress: false,
+                    row_height: that.row_height,
+                    row_header_width: 150
+                };
+                var col_header = ColumnHeader(that.data, that.view, that.col_header_height, that.clickSNP);
+                that.root_container = Container([
+                    {name: 'data_area', t:that.gene_map_height, content:
+                        TabContainer([
+                            {name: 'genotypes', content:
+                                Container([
+                                    {name:'table', t: that.col_header_height, content:Genotypes(that.data, that.view)},
+                                    {name:'column_header', content: col_header}
+//                                    {name:'row_header', t: that.col_header_height, content:RowHeader(that.data, that.view)}
+                                ])}
+//                            {name: 'bifurcation', content:
+//                                Container([
+//                                    {name:'table', t: that.col_header_height, content:Bifurcation(that.data, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+//                            {name: 'ld', content:
+//                                Container([
+//                                    {name:'table', t: that.col_header_height, content: LDMap(that.data, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+//                            {name: 'network', content:
+//                                Container([
+//                                    {name:'network', t: that.col_header_height, content: Network(that.data, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+                        ])}
+//                    {name: 'genome', content:GeneMap(that.data, that.view)},
+//                    {name: 'controls', content:Controls(that.data, that.view,
+//                        {w:that.view.row_header_width, h:that.gene_map_height})
+//                    },
+                ]);
+
             };
             
             //Provides a function that will be called when hovering over a position. The return string of this function will be displayed as tooltip

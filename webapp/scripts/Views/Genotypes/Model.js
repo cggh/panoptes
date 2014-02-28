@@ -5,7 +5,6 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                               row_query,
                               col_order,
                               row_order,
-                              properties,
                               chromosomes) {
             var that = {};
             that.init = function(table_info,
@@ -13,17 +12,33 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                                  row_query,
                                  col_order,
                                  row_order,
-                                 properties,
                                  chromosomes) {
                 that.table = table_info;
                 that.row_query = row_query;
                 that.col_query = col_query;
                 that.row_order = row_order;
                 that.col_order = col_order;
-                that.properties = properties;
                 that.chromosomes = chromosomes;
 
+                that.first_col_ordinal = 0;
+                that.last_col_ordinal = 0;
+
+                that.data_type = table_info.settings.ShowInGenomeBrowser.Type;
+                if (that.data_type != 'diploid' && that.data_type != 'fractional')
+                    DQX.reportError("Genotype data type is not diploid or fractional");
+                if (that.data_type == 'diploid') {
+                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
+                    that.first_allele_property = table_info.settings.ShowInGenomeBrowser.FirstAllele;
+                    that.second_allele_property = table_info.settings.ShowInGenomeBrowser.SecondAllele;
+                    that.properties = [that.depth_property, that.first_allele_property, that.second_allele_property];
+                }
+                if (that.data_type == 'fractional') {
+                    that.ref_fraction_property = table_info.settings.ShowInGenomeBrowser.RefFraction;
+                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
+                    that.properties = [that.depth_property, that.ref_fraction_property];
+                }
                 that.reset_cache();
+
             };
 
             that.reset_cache = function() {
@@ -32,13 +47,42 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 _.each(that.chromosomes, function (chrom) {
                     that.cache_for_chrom[chrom] = TwoDCache(
                         that.col_order,
-                        properties,
                         function(start, end, callback) {
                             that.data_provider(chrom, start, end, callback);
                         }
                     )
                 });
+                that.col_ordinal = [];
+                that.row_ordinal = [];
+                if (that.data_type == 'diploid') {
+                    that.depth = [];
+                    that.first_allele = [];
+                    that.second_allele = [];
+                }
+                if (that.data_type == 'fractional') {
+                    that.ref_fraction = [];
+                    that.depth = [];
+                }
+
             };
+
+            that.change_col_range = function(chrom, start, end) {
+                var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
+                that.col_ordinal = data[that.col_order] || [];
+                that.row_ordinal = data[that.row_order] || [];
+
+                if (that.data_type == 'diploid') {
+                    that.depth = data[that.depth_property] || [];
+                    that.first_allele = data[that.first_allele_property] || [];
+                    that.second_allele = data[that.second_allele_property] || [];
+                }
+                if (that.data_type == 'fractional') {
+                    that.depth = data[that.depth_property] || [];
+                    that.ref_fraction = data[that.ref_fraction_property] || [];
+                }
+            };
+            //Throttle this so that we don't clog the redraw
+            that.change_col_range = _.throttle(that.change_col_range, 500);
 
             that.data_provider = function(chrom, start, end, callback) {
                 var col_query = that.col_query;
@@ -63,7 +107,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("row_order", that.row_order);
                 myurl.addUrlQueryItem("col_properties", that.col_order);
                 myurl.addUrlQueryItem("row_properties", that.row_order);
-                myurl.addUrlQueryItem("2D_properties", _.keys(that.properties).join('~'));
+                myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
                         callback(start, end, data);
@@ -74,17 +118,12 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 );
             };
 
-            that.get_range = function(chrom, start, end) {
-                return that.cache_for_chrom[chrom].get_by_ordinal(start, end);
-            };
-
             that.init(table_info,
-                      col_query,
-                      row_query,
-                      col_order,
-                      row_order,
-                      properties,
-                      chromosomes);
+                col_query,
+                row_query,
+                col_order,
+                row_order,
+                chromosomes);
             return that
         };
     }

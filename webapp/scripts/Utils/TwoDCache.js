@@ -1,10 +1,9 @@
 define(["Utils/RequestCounter"],
     function (RequestCounter) {
-        return function TwoDCache(col_ordinal, properties, provider, update_callback) {
+        return function TwoDCache(col_ordinal, provider, update_callback) {
             var that = {};
-            that.init = function (col_ordinal, properties, provider, update_callback) {
+            that.init = function (col_ordinal, provider, update_callback) {
                 that.col_ordinal = col_ordinal;
-                that.properties = properties;
                 that.provider = provider;
                 that.update_callback = update_callback;
                 that.request_counter = RequestCounter();
@@ -211,7 +210,7 @@ define(["Utils/RequestCounter"],
                 }
             };
 
-            that.init(col_ordinal, properties, provider, update_callback);
+            that.init(col_ordinal, provider, update_callback);
             return that
         };
     }
