@@ -43,6 +43,10 @@ class CalculationThreadList:
         db.close()
 
     def SetInfo(self, id, status, progress):
+
+        def cap(s, l):
+            return s if len(s)<=l else s[0:l-3]+'...'
+
         if progress is None:
             progress = 0
         with self.lock:
@@ -51,7 +55,9 @@ class CalculationThreadList:
                 self.threads[id]['progress'] = progress
         db = DQXDbTools.OpenDatabase(DQXDbTools.CredentialInformation())
         cur = db.cursor()
+        status = cap(status,250)
         status = db.escape_string(status)
+        status = status.encode('ascii','ignore')
         sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
         cur.execute(sqlstring)
         db.commit()

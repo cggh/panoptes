@@ -108,7 +108,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {'isRunningLocal':'True'}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'PVixax',
+    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Samples_and_Variants',
         {
             'ConfigOnly': False
         }

@@ -19,7 +19,11 @@ class SettingsLoader:
             self.fileName = fileName
             with open(self.fileName, 'r') as configfile:
                 print('Loading settings from: '+fileName)
-                self.settings = yaml.load(configfile.read())
+                try:
+                    self.settings = yaml.load(configfile.read())
+                except Exception as e:
+                    print('ERROR: yaml parsing error: ' + str(e))
+                    raise Exception('Error while parsing yaml file {0}'.format(fileName))
                 print('Settings: '+str(self.settings))
         else:
             self.fileName = ''

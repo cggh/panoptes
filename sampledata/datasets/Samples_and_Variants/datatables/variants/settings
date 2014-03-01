@@ -44,6 +44,15 @@ Properties:
   ShowInTable: true
   Search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
+- Id: HighQuality
+  Name: High Quality
+  Description: Variant Quality filter
+  DataType: Text
+  ShowInTable: true
+  ShowInBrowser: true
+  IsCategorical: true
+  categoryColors: {"No":"rgb(255,255,200)", "Yes":"rgb(0,100,0)" }
+
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
   DataType: Value
   Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
