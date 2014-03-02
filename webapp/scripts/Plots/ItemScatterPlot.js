@@ -83,6 +83,12 @@ define([
                     }
                 });
 
+                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Size factor', width: 200, minval:0, maxval:2, value:1, digits: 2})
+                    .setNotifyOnFinished().setClassID('sizefactor')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
                 that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 200, minval:0, maxval:1, value:1, digits: 2})
                     .setNotifyOnFinished().setClassID('opacity')
                     .setOnChanged(function() {
@@ -95,6 +101,7 @@ define([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     pickControls,
+                    that.ctrl_SizeFactor,
                     that.ctrl_Opacity,
                     that.colorLegend
                 ]);
@@ -378,6 +385,7 @@ define([
                 });
                 ctx.restore();
 
+                var sizeFactor =that.ctrl_SizeFactor.getValue();
                 var opacity = that.ctrl_Opacity.getValue();
 
                 //Prepare color category strings
@@ -393,7 +401,7 @@ define([
                 var selpsX = [];
                 var selpsY = [];
 
-                var smallPoints = (!valSize)&&(valX.length>10000);
+                var smallPoints = (!valSize)&&(sizeFactor<0.05);
                 var sortIndex = that.sortIndex;
                 var ptcount = valX.length;
 
@@ -421,6 +429,7 @@ define([
                 }
 
                 if ((!smallPoints) && (!valSize)) {
+                    var pointSize = 2*sizeFactor;
                     for (var i=0; i<ptcount; i++) {
                         var ii = sortIndex[i];
                         if ( (valX[ii]!=null) && (valY[ii]!=null) ) {
@@ -434,27 +443,27 @@ define([
                                 selpsY.push(py);
                             }
                             ctx.beginPath();
-                            ctx.arc(px, py, 2, 0, 2 * Math.PI, false);
+                            ctx.arc(px, py, pointSize, 0, 2 * Math.PI, false);
                             ctx.closePath();
                             ctx.fill();
-                            ctx.stroke();
+                            //ctx.stroke();
                         }
                     }
                 }
 
-                ctx.fillStyle='rgba(255,0,0,0.25)';
-                ctx.strokeStyle='rgba(255,0,0,0.75)';
+                ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
+                ctx.strokeStyle=DQX.Color(1,0,0,0.75*opacity).toStringCanvas();
                 for (var i=0; i<selpsX.length; i++) {
                     ctx.beginPath();
-                    ctx.arc(selpsX[i], selpsY[i], 4, 0, 2 * Math.PI, false);
+                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
                     ctx.closePath();
                     ctx.fill();
                     ctx.stroke();
                 }
 
                 if (valSize) {
-                    ctx.fillStyle='rgb(220,220,220)';
-                    ctx.strokeStyle='rgb(128,128,128)';
+                    ctx.fillStyle=DQX.Color(0.8,0.8,0.8,opacity).toStringCanvas();
+                    ctx.strokeStyle=DQX.Color(0.5,0.5,0.5,opacity).toStringCanvas();
                     var sizeMin = that.mapPlotAspects['size'].minval;
                     var sizeMax = that.mapPlotAspects['size'].maxval;
                     for (var i=0; i<ptcount; i++) {
@@ -462,9 +471,9 @@ define([
                         if ( (valX[ii]!=null) && (valY[ii]!=null) ) {
                             var px = /*Math.round*/(valX[ii] * scaleX + offsetX);
                             var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
-                            var rd = (valSize[ii]-sizeMin)/(sizeMax-sizeMin)*10+2;
+                            var rd = ((valSize[ii]-sizeMin)/(sizeMax-sizeMin)*10+2) * sizeFactor;
                             if (valColorCat) {
-                                ctx.fillStyle=DQX.standardColors[valColorCat[ii]].toStringCanvas();
+                                ctx.fillStyle=DQX.standardColors[valColorCat[ii]].changeOpacity(opacity).toStringCanvas();
                             }
                             ctx.beginPath();
                             ctx.arc(px, py, rd, 0, 2 * Math.PI, false);
