@@ -252,7 +252,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     prop.toDisplayString = createFuncVal2Text(prop.settings.decimDigits);
 
                 if (prop.isBoolean)
-                    prop.toDisplayString = function(vl) { return parseInt(vl)?'Yes':'No'; }
+                    prop.toDisplayString = function(vl) {
+                        if (vl == 'Yes') return vl;
+                        return parseInt(vl)?'Yes':'No';
+                    }
 
                 if (prop.isDate) {
                     tableInfo.hasDate = true;
