@@ -351,6 +351,12 @@ define([
                             mapping
                         );
                     }
+                    else if (propInfo.isBoolean) {
+                        theChannel.makeCategoricalColors(
+                            propInfo.propid,
+                            { '0': DQX.Color(1,0.75,0.5), '1': DQX.Color(0,0.5,0.5) }
+                        );
+                    }
 
                     //Define a custom tooltip
                     theChannel.setToolTipHandler(function(id) { return id; })
@@ -511,7 +517,7 @@ define([
                                 if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
                                     that.createPropertyChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
                                 }
-                                if ((propInfo.tableid==tableInfo.id) && (propInfo.isText) && (propInfo.settings.showInBrowser)) {
+                                if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) && (propInfo.settings.showInBrowser)) {
                                     that.createPositionChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
                                 }
                             });

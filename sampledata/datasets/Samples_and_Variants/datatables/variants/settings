@@ -47,11 +47,9 @@ Properties:
 - Id: HighQuality
   Name: High Quality
   Description: Variant Quality filter
-  DataType: Text
+  DataType: Boolean
   ShowInTable: true
   ShowInBrowser: true
-  IsCategorical: true
-  categoryColors: {"No":"rgb(255,255,200)", "Yes":"rgb(0,100,0)" }
 
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
   DataType: Value
@@ -85,5 +83,5 @@ Properties:
   ShowInTable: true
   ShowInBrowser: true
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  categoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }   # Specifies display colours for the categorical states of this property
+  CategoryColors: {"A":"rgb(255,128,60)", "B":"rgb(0,100,0)" }   # Specifies display colours for the categorical states of this property
 
