@@ -95,6 +95,41 @@ define([
                     that.reDraw();
                 });
 
+                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    that.panelPlot.startLassoSelection(function(selectedPoints) {
+
+                        function isPointInPoly(poly, pt) {
+                            for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+                                ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
+                                    && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
+                                && (c = !c);
+                            return c;
+                        }
+
+                        if (!that.plotPresent) return;
+                        scaleX = that.scaleX; offsetX = that.offsetX;
+                        scaleY = that.scaleY; offsetY = that.offsetY;
+                        var ids =that.mapPlotAspects['id'].data;
+                        var aspectX = that.mapPlotAspects['xaxis'];
+                        var aspectY = that.mapPlotAspects['yaxis'];
+                        var valX = aspectX.data;
+                        var valY = aspectY.data;
+                        var selList = [];
+                        for (var i=0; i<valX.length; i++) {
+                            if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                                var px = valX[i] * scaleX + offsetX;
+                                var py = valY[i] * scaleY + offsetY;
+                                if (isPointInPoly(selectedPoints, {x:px, y:py}))
+                                    selList.push(ids[i]);
+                            }
+                        }
+                        var selectionCreationFunction = function() { return selList; };
+                        var content = '';
+                        ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Scatterplot area', content, null, selectionCreationFunction);
+                    });
+                });
+
+
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
@@ -103,6 +138,9 @@ define([
                     pickControls,
                     that.ctrl_SizeFactor,
                     that.ctrl_Opacity,
+                    Controls.VerticalSeparator(10),
+                    cmdLassoSelection,
+                    Controls.VerticalSeparator(10),
                     that.colorLegend
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
