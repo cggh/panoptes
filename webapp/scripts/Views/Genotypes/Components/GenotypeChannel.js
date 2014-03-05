@@ -1,9 +1,9 @@
 define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
     "Views/Genotypes/Components/TabContainer", "Views/Genotypes/Components/Container", "Views/Genotypes/ColourAllocator",
-    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/Genotypes"],
+    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/GenotypesTable"],
     function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
-              TabContainer, Container, ColourAllocator, ColumnHeader, Genotypes) {
+              TabContainer, Container, ColourAllocator, ColumnHeader, GenotypesTable) {
 
         var GenotypeChannel = {};
 
@@ -12,7 +12,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
             var that = ChannelCanvas.Base(id);
 
             that.init = function(table_info, controls_group, parent) {
-                that._height = 40;
+                that._height = 400;
                 that._toolTipHandler = null;
                 that._clickHandler = null;
                 that.parent_browser = parent;
@@ -39,37 +39,38 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that.view = {
                     colours: ColourAllocator(),
                     compress: false,
-                    row_height: that.row_height,
-                    row_header_width: 150
+                    row_height: 10,
+                    row_header_width: 150,
+                    col_scale: d3.scale.linear()
                 };
-                var col_header = ColumnHeader(that.data, that.view, that.col_header_height, that.clickSNP);
+                var col_header = ColumnHeader(that.model, that.view, that.col_header_height, that.clickSNP);
                 that.root_container = Container([
                     {name: 'data_area', t:that.gene_map_height, content:
                         TabContainer([
                             {name: 'genotypes', content:
                                 Container([
-                                    {name:'table', t: that.col_header_height, content:Genotypes(that.data, that.view)},
-                                    {name:'column_header', content: col_header}
-//                                    {name:'row_header', t: that.col_header_height, content:RowHeader(that.data, that.view)}
+                                    {name:'table', t: that.col_header_height, content:GenotypesTable(that.model, that.view)}
+//                                    {name:'column_header', content: col_header}
+//                                    {name:'row_header', t: that.col_header_height, content:RowHeader(that.model, that.view)}
                                 ])}
 //                            {name: 'bifurcation', content:
 //                                Container([
-//                                    {name:'table', t: that.col_header_height, content:Bifurcation(that.data, that.view)},
+//                                    {name:'table', t: that.col_header_height, content:Bifurcation(that.model, that.view)},
 //                                    {name:'column_header', content: col_header},
 //                                ])},
 //                            {name: 'ld', content:
 //                                Container([
-//                                    {name:'table', t: that.col_header_height, content: LDMap(that.data, that.view)},
+//                                    {name:'table', t: that.col_header_height, content: LDMap(that.model, that.view)},
 //                                    {name:'column_header', content: col_header},
 //                                ])},
 //                            {name: 'network', content:
 //                                Container([
-//                                    {name:'network', t: that.col_header_height, content: Network(that.data, that.view)},
+//                                    {name:'network', t: that.col_header_height, content: Network(that.model, that.view)},
 //                                    {name:'column_header', content: col_header},
 //                                ])},
                         ])}
-//                    {name: 'genome', content:GeneMap(that.data, that.view)},
-//                    {name: 'controls', content:Controls(that.data, that.view,
+//                    {name: 'genome', content:GeneMap(that.model, that.view)},
+//                    {name: 'controls', content:Controls(that.model, that.view,
 //                        {w:that.view.row_header_width, h:that.gene_map_height})
 //                    },
                 ]);
@@ -99,19 +100,20 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
             };
 
             that.draw = function (drawInfo, args) {
+                if (that.drawing == true)
+                    return;
+                that.drawing = true;
                 var chrom = that.parent_browser.getCurrentChromoID();
                 if (!chrom) return;
 
                 var min_genomic_pos = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
                 var max_genomic_pos = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
-                var x_scale = d3.scale.linear().domain([min_genomic_pos, max_genomic_pos]).range([0,1039]);
 
-                that.model.change_col_range(chrom, min_genomic_pos, max_genomic_pos);
-                that.root_container.draw(drawInfo.centerContext, {t:0, b:that.height(), l:0, r:that.width()});
-                if (that._height != 10 * row_ID.length) {
-                    that.modifyHeight(10 * row_ID.length);
-                    that._myPlotter.handleResize();
-                }
+                //TODO Get height somehow... hmm
+//                if (that._height != 100+(10 * that.model.row_index.length)) {
+//                    that.modifyHeight(100+(10 * that.model.row_index.length));
+//                    that._myPlotter.handleResize();
+//                }
 
 
 //                drawInfo.sizeY = that._height;
@@ -119,9 +121,16 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 this.drawStandardGradientLeft(drawInfo, 1);
                 this.drawStandardGradientRight(drawInfo, 1);
 
+                that.model.change_col_range(chrom, min_genomic_pos, max_genomic_pos);
+                var ctx = drawInfo.centerContext;
+                that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
+                that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
+
+
                 this.drawMark(drawInfo);
 //                this.drawXScale(drawInfo);
                 this.drawTitle(drawInfo);
+                that.drawing = false;
             };
             
             that.init(table_info, controls_group, parent);

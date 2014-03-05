@@ -64,22 +64,40 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     that.depth = [];
                 }
 
+                that.col_positions = [];
+                that.col_width = 0;
+                that.row_index = [];
+
             };
 
             that.change_col_range = function(chrom, start, end) {
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
-                that.col_ordinal = data[that.col_order] || [];
-                that.row_ordinal = data[that.row_order] || [];
+                that.col_ordinal = data.col[that.col_order] || [];
+                that.row_ordinal = data.row[that.row_order] || [];
 
                 if (that.data_type == 'diploid') {
-                    that.depth = data[that.depth_property] || [];
-                    that.first_allele = data[that.first_allele_property] || [];
-                    that.second_allele = data[that.second_allele_property] || [];
+                    that.depth = data.twoD[that.depth_property] || [];
+                    that.first_allele = data.twoD[that.first_allele_property] || [];
+                    that.second_allele = data.twoD[that.second_allele_property] || [];
                 }
                 if (that.data_type == 'fractional') {
-                    that.depth = data[that.depth_property] || [];
-                    that.ref_fraction = data[that.ref_fraction_property] || [];
+                    that.depth = data.twoD[that.depth_property] || [];
+                    that.ref_fraction = data.twoD[that.ref_fraction_property] || [];
                 }
+
+                //TODO Assign x locations for each col - for now just copy
+                that.col_positions = that.col_ordinal;
+                if (that.col_ordinal.length > 0)
+                    that.col_width = (that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length;
+                else
+                    that.col_width = 0;
+
+                //TODO Set row index by sort
+                if (that.row_ordinal.length > 0)
+                    that.row_index = _.times(that.row_ordinal.length, function (i) {return i;});
+                else
+                    that.row_index = []
+
             };
             //Throttle this so that we don't clog the redraw
             that.change_col_range = _.throttle(that.change_col_range, 500);

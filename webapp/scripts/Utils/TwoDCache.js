@@ -79,7 +79,7 @@ define(["Utils/RequestCounter"],
                     _.forEach(interval.twoD, function(array, prop) {
                         result.twoD[prop] = that.twoD_col_slice(array, start_index, end_index);
                     });
-                } else {
+                } else if (matching_intervals_with_data.length != 0) {
                     console.log('boom');
                 }
                 if (!retrieve_missing) return result;
