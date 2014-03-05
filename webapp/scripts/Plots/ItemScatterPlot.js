@@ -129,6 +129,11 @@ define([
                     });
                 });
 
+                var cmdHalfPlaneSelection = Controls.Button(null, { content: 'Half plane', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    that.panelPlot.startHalfPlaneSelection(function(center, dir) {
+                    });
+
+                });
 
                 that.colorLegend = Controls.Html(null,'');
 
@@ -139,7 +144,7 @@ define([
                     that.ctrl_SizeFactor,
                     that.ctrl_Opacity,
                     Controls.VerticalSeparator(10),
-                    cmdLassoSelection,
+                    cmdLassoSelection,cmdHalfPlaneSelection,
                     Controls.VerticalSeparator(10),
                     that.colorLegend
                 ]);
