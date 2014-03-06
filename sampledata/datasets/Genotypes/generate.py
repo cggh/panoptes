@@ -71,18 +71,21 @@ with open('datatables/samples/data', 'w') as tabfile:
     for id in sample_ids:
         writer.writerow((id, ))
 
+gaps = list(np.random.poisson(10,(NUM_VARIANTS)))
+pos = 10
 with open('datatables/variants/data', 'w') as tabfile:
     writer = csv.writer(tabfile, delimiter='\t')
     writer.writerow('chrom pos SnpName Value1 Value2 Value3 Extra1'.split())
-    for i in range(NUM_VARIANTS):
+    for i, gap in zip(range(NUM_VARIANTS), gaps):
         writer.writerow(('Pf3D7_01_v3',
-                         1000+(i*10),
+                         pos,
                          var_ids[i],
                          random.random(),
                          random.random(),
                          random.random(),
                          random.choice(['A', 'B', 'C', 'D']),
         ))
+        pos = pos + gap
 
 #Create arrays of diploid genotypes that are all ref, each row is a sample
 #Need int8 as -1 is missingness
