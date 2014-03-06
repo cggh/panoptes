@@ -88,6 +88,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.loadData();
                         })
 
+                        var buttonViewData = Controls.Button(null, { content: 'View data...', width:150, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if (!sourceFileInfo) {
+                                alert('Please select a data source from the tree')
+                                return;
+                            }
+                            CustomDataManager.viewData(sourceFileInfo);
+                        })
+
                         var buttonEditSettings = Controls.Button(null, { content: 'Edit settings...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
@@ -118,6 +127,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         this.panelButtons.addControl(Controls.CompoundVert([
                             buttonLoadDataset,
+                            buttonViewData,
                             buttonEditSettings,
                             Controls.VerticalSeparator(10),
                             buttonUploadCustomData,

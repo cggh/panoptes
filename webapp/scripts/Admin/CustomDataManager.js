@@ -91,9 +91,46 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
 
+        CustomDataManager.viewData = function(sourceInfo) {
+            if (['datatable', 'customdata'].indexOf(sourceInfo.tpe)<0) {
+                alert('Please select a datatable or a custom data source');
+                return;
+            }
+            DQX.setProcessing();
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_gettopdata',{
+                sourcetype: sourceInfo.tpe,
+                database: sourceInfo.datasetid,
+                workspaceid: sourceInfo.workspaceid,
+                tableid: sourceInfo.tableid,
+                sourceid: sourceInfo.sourceid
+            },function(resp) {
+                DQX.stopProcessing();
+                if ('Error' in resp) {
+                    alert(resp.Error);
+                    return;
+                }
+                var topdata = Base64.decode(resp.content);
+                var content = CustomDataManager.getSourceFileDescription({datasetid: sourceInfo.datasetid, workspaceid: sourceInfo.workspaceid, tableid:sourceInfo.tableid, sourceid: sourceInfo.sourceid});
+                content += '<div style="overflow-x: scroll; overflow-y: scroll; height:400px;resize:both"><table style="border-spacing: 0px;border-collapse:collapse">';
+                $.each(topdata.split('\n'), function(idx, line) {
+                    content += '<tr>';
+                    $.each(line.split('\t'), function(idx2, cell) {
+                        if (idx==0)
+                            content += '<th style="white-space: nowrap;border:2px solid black;padding:5px">'+cell+'</th>';
+                        else
+                            content += '<td style="white-space: nowrap;border:1px solid rgb(150,150,150);padding:5px">'+cell+'</td>';
+                    });
+                    content += '</tr>';
+                });
+                content += '</table></div>'
+                //var edt = Controls.Textarea('', { size:65, linecount:20, value: topdata, fixedfont: true, noWrap: true});
+                //content += edt.renderHtml();
+                var popupid = Popup.create('Data content (top rows)', content);
+            });
+        };
+
 
         CustomDataManager.editSettings = function(sourceInfo) {
-
             DQX.setProcessing();
             DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_getsettings',{
                 sourcetype: sourceInfo.tpe,
@@ -110,13 +147,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var settingsStr = Base64.decode(resp.content);
                 CustomDataManager._editSettings_2(sourceInfo, settingsStr);
             });
-
-
         };
 
         CustomDataManager._editSettings_2 = function(sourceInfo, settingsStr) {
             var content = CustomDataManager.getSourceFileDescription({datasetid: sourceInfo.datasetid, workspaceid: sourceInfo.workspaceid, tableid:sourceInfo.tableid, sourceid: sourceInfo.sourceid});
-            var edt = Controls.Textarea('', { size:65, linecount:20, value: settingsStr, fixedfont: true});
+            var edt = Controls.Textarea('', { size:65, linecount:20, value: settingsStr, fixedfont: true, noWrap: true});
             content += edt.renderHtml();
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update settings</b>', width:140, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();

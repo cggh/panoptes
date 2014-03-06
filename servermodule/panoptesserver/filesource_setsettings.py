@@ -39,7 +39,7 @@ def response(returndata):
         credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
     if settingsFile is None:
         returndata['Error'] = 'Invalid file source type'
-        return returndata;
+        return returndata
 
 
     try:
