@@ -74,3 +74,8 @@
     margin-top:10px;
     margin-bottom:5px;
 }
+
+.AdminTreeNonClickable
+{
+    color:rgb(128,128,128);
+}

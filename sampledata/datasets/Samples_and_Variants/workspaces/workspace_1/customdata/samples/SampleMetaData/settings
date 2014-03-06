@@ -1,4 +1,3 @@
-
 Properties:
 
 - Id: Year
@@ -6,4 +5,4 @@ Properties:
   Description: The year the sample was collected
   DataType: Value
   ShowInTable: true
-  DecimDigits: 0
+  DecimDigits: 1

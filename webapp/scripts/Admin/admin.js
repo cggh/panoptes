@@ -189,8 +189,19 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.sourceFileInfoList[datasetBranch.getID()] = {
                                 datasetid: datasetid
                             };
+
+                            var datatablesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<span class="AdminTreeNonClickable">Datatables</span>').setCanSelect(false));
+                            $.each(datasetInfo.datatables, function(datatableid, datatableInfo) {
+                                var branch = datatablesBranch.addItem(FrameTree.Branch('datatable_'+datasetid+'_'+datatableid, '<b>'+datatableid+'</b>'));
+                                that.sourceFileInfoList[branch.getID()] = {
+                                    datasetid: datasetid,
+                                    tableid: datatableid
+                                };
+                            });
+
+                            var workspacesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<span class="AdminTreeNonClickable">Workspaces</span>').setCanSelect(false));
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
-                                var workspaceBranch = datasetBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid, '<b>'+workspaceid+'</b>'));
+                                var workspaceBranch = workspacesBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid, '<b>'+workspaceid+'</b>'));
                                 that.sourceFileInfoList[workspaceBranch.getID()] = {
                                     datasetid: datasetid,
                                     workspaceid: workspaceid
