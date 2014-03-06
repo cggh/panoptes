@@ -85,6 +85,7 @@ with open('datatables/variants/data', 'w') as tabfile:
                          random.random(),
                          random.choice(['A', 'B', 'C', 'D']),
         ))
+        gap = (random.randint(10,60) if random.uniform(0,1) > 0.1 else gap)
         pos = pos + gap
 
 #Create arrays of diploid genotypes that are all ref, each row is a sample
