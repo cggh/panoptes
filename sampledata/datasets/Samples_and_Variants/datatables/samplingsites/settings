@@ -1,4 +1,3 @@
-
 NameSingle: sampling site    # Display name referring to a table item (single, no capital)
 NamePlural: sampling sites    # Display name referring to a table item (plural, no capital)
 Description: Information about the sites where samples were collected     # A description of this dataset

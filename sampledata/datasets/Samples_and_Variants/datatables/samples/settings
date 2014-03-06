@@ -1,4 +1,3 @@
-
 NameSingle: sample    # Display name referring to a table item (single, no capital)
 NamePlural: samples    # Display name referring to a table item (plural, no capital)
 Description: A table containing a number of samples     # A description of this dataset
@@ -7,7 +6,7 @@ Description: A table containing a number of samples     # A description of this 
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: ID
 
-# Optionally, "FetchRecordCount: false" can be used to instruct Panoptes *not* to try to fetch total record counts in data table views. This can be used to speed up the software in case of large datasets (e.g. >1E6 records)
+# Optionally, "FetchRecordCount: false" can be used to instruct Panoptes *not* to try to fetch total record counts in data table views. This can be used to speed up the software in case of large datasets (e.g. ﱅ6 records)
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 QuickFindFields: ID,SiteID,SampleTypeID
@@ -37,7 +36,7 @@ Properties:
     ReverseName: contains           # Display name of the relatio from parent to child
 
 - Id: InUse
-  Name: In use
+  Name: Used
   Description: Flag determining if sample is used in the dataset
   DataType: Boolean
   ShowInTable: true

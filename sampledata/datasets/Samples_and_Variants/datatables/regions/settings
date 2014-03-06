@@ -1,4 +1,3 @@
-
 NameSingle: genomic region     # Display name referring to a table item (single, no capital)
 NamePlural: genomic regions    # Display name referring to a table item (plural, no capital)
 Description: Contains a number of regions defined on the genome     # A description of this dataset
@@ -64,5 +63,5 @@ Properties:
   Description: An example categorical property
   DataType: Text
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  ShowInTable: true
+  ShowInTable: True
 

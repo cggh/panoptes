@@ -1,4 +1,3 @@
-
 NameSingle: sample type    # Display name referring to a table item (single, no capital)
 NamePlural: sample types    # Display name referring to a table item (plural, no capital)
 Description: Information about the different types of samples     # A description of this dataset

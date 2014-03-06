@@ -92,14 +92,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-        CustomDataManager.editSettings = function(datasetid, workspaceid, tableid, sourceid) {
+        CustomDataManager.editSettings = function(sourceInfo) {
 
             DQX.setProcessing();
-            DQX.customRequest(MetaData.serverUrl,PnServerModule,'customdata_getsettings',{
-                database: datasetid,
-                workspaceid: workspaceid,
-                tableid: tableid,
-                sourceid:sourceid
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_getsettings',{
+                sourcetype: sourceInfo.tpe,
+                database: sourceInfo.datasetid,
+                workspaceid: sourceInfo.workspaceid,
+                tableid: sourceInfo.tableid,
+                sourceid: sourceInfo.sourceid
             },function(resp) {
                 DQX.stopProcessing();
                 if ('Error' in resp) {
@@ -107,23 +108,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     return;
                 }
                 var settingsStr = Base64.decode(resp.content);
-                CustomDataManager._editSettings_2(datasetid, workspaceid, tableid, sourceid, settingsStr);
+                CustomDataManager._editSettings_2(sourceInfo, settingsStr);
             });
 
 
         };
 
-        CustomDataManager._editSettings_2 = function(datasetid, workspaceid, tableid, sourceid, settingsStr) {
-            var content = CustomDataManager.getSourceFileDescription({datasetid: datasetid, workspaceid: workspaceid, tableid:tableid, sourceid: sourceid});
+        CustomDataManager._editSettings_2 = function(sourceInfo, settingsStr) {
+            var content = CustomDataManager.getSourceFileDescription({datasetid: sourceInfo.datasetid, workspaceid: sourceInfo.workspaceid, tableid:sourceInfo.tableid, sourceid: sourceInfo.sourceid});
             var edt = Controls.Textarea('', { size:65, linecount:20, value: settingsStr, fixedfont: true});
             content += edt.renderHtml();
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update settings</b>', width:140, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();
-                DQX.customRequest(MetaData.serverUrl,PnServerModule,'customdata_setsettings',{
-                    database: datasetid,
-                    workspaceid: workspaceid,
-                    tableid: tableid,
-                    sourceid:sourceid,
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_setsettings',{
+                    sourcetype: sourceInfo.tpe,
+                    database: sourceInfo.datasetid,
+                    workspaceid: sourceInfo.workspaceid,
+                    tableid: sourceInfo.tableid,
+                    sourceid: sourceInfo.sourceid,
                     content: Base64.encode(settingsStr)
                 },function(resp) {
                     DQX.stopProcessing();
@@ -138,7 +140,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '<p>' ;
-            var popupid = Popup.create('Edit custom data settings', content);
+            var popupid = Popup.create('Edit data settings', content);
         }
 
 

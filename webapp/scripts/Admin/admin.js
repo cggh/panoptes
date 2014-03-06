@@ -88,6 +88,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.loadData();
                         })
 
+                        var buttonEditSettings = Controls.Button(null, { content: 'Edit settings...', width:150, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if (!sourceFileInfo) {
+                                alert('Please select a data source from the tree')
+                                return;
+                            }
+                            CustomDataManager.editSettings(sourceFileInfo);
+                        })
+
                         var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
@@ -97,14 +106,6 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.upload(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
                         })
 
-                        var buttonEditSettings = Controls.Button(null, { content: 'Edit custom data settings...', width:150, height:40 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (!sourceFileInfo.sourceid) ) {
-                                alert('Please select a custom data source from the tree')
-                                return;
-                            }
-                            CustomDataManager.editSettings(sourceFileInfo.datasetid, sourceFileInfo.workspaceid, sourceFileInfo.tableid, sourceFileInfo.sourceid);
-                        })
 
                         var buttonDelCustomData = Controls.Button(null, { content: 'Delete custom data...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
@@ -117,8 +118,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         this.panelButtons.addControl(Controls.CompoundVert([
                             buttonLoadDataset,
-                            buttonUploadCustomData,
                             buttonEditSettings,
+                            Controls.VerticalSeparator(10),
+                            buttonUploadCustomData,
                             buttonDelCustomData
                         ]));
 
@@ -187,6 +189,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
                             var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(datasetid, '<span class="DQXLarge">'+datasetid+'</span>'));
                             that.sourceFileInfoList[datasetBranch.getID()] = {
+                                tpe: 'dataset',
                                 datasetid: datasetid
                             };
 
@@ -194,6 +197,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             $.each(datasetInfo.datatables, function(datatableid, datatableInfo) {
                                 var branch = datatablesBranch.addItem(FrameTree.Branch('datatable_'+datasetid+'_'+datatableid, '<b>'+datatableid+'</b>'));
                                 that.sourceFileInfoList[branch.getID()] = {
+                                    tpe: 'datatable',
                                     datasetid: datasetid,
                                     tableid: datatableid
                                 };
@@ -203,12 +207,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
                                 var workspaceBranch = workspacesBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid, '<b>'+workspaceid+'</b>'));
                                 that.sourceFileInfoList[workspaceBranch.getID()] = {
+                                    tpe: 'workspace',
                                     datasetid: datasetid,
                                     workspaceid: workspaceid
                                 };
                                 $.each(workspaceInfo.sources, function(sourceid, sourceInfo) {
                                     var branch = workspaceBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid+'_'+sourceid, sourceid+' ('+sourceInfo.tableid+')'));
                                     that.sourceFileInfoList[branch.getID()] = {
+                                        tpe: 'customdata',
                                         datasetid: datasetid,
                                         workspaceid: workspaceid,
                                         sourceid: sourceid,

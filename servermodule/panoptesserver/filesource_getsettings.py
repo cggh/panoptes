@@ -9,6 +9,7 @@ def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
 
+    sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
@@ -18,7 +19,19 @@ def response(returndata):
 
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
-    settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
+
+    settingsFile = None
+    if sourcetype == 'dataset':
+        settingsFile = os.path.join(baseFolder, databaseName, 'settings')
+    if sourcetype == 'datatable':
+        settingsFile = os.path.join(baseFolder, databaseName, 'datatables', tableid, 'settings')
+    if sourcetype == 'customdata':
+        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
+    if sourcetype == 'workspace':
+        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'settings')
+    if settingsFile is None:
+        returndata['Error'] = 'Invalid file source type'
+        return returndata;
 
     try:
         if not os.path.exists(settingsFile):

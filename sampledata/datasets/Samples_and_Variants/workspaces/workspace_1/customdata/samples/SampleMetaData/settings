@@ -5,4 +5,4 @@ Properties:
   Description: The year the sample was collected
   DataType: Value
   ShowInTable: true
-  DecimDigits: 1
+  DecimDigits: 2
