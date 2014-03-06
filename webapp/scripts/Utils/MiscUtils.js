@@ -207,7 +207,49 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
 
-
+        MiscUtils.createHalfPlaneRestrictionQuery = function(origQuery, propidX, propidY, center, dir) {
+            var qry = null;
+            var selector = null;
+            if ( (Math.abs(dir.x)>0.001) && (Math.abs(dir.y)>0.001) ) {
+                var factor = dir.y/dir.x;
+                var offset = center.y - center.x*dir.y/dir.x;
+                if (dir.x>0) {
+                    var newStatement = SQL.WhereClause.CompareField('>FIELD');
+                    selector = function(x, y) { return y > offset + factor*x }
+                }
+                else {
+                    var newStatement = SQL.WhereClause.CompareField('<FIELD');
+                    selector = function(x, y) { return y < offset + factor*x }
+                }
+                newStatement.ColName = propidY;
+                newStatement.ColName2 = propidX;
+                newStatement.Factor = factor;
+                newStatement.Offset = offset;
+                var qry = SQL.WhereClause.createRestriction(origQuery, newStatement);
+            }
+            else {
+                if (dir.x>0) {
+                    qry = SQL.WhereClause.createValueRestriction(origQuery, propidY, center.y, '>');
+                    selector = function(x, y) { return y > center.y }
+                }
+                if (dir.x<0) {
+                    qry = SQL.WhereClause.createValueRestriction(origQuery, propidY, center.y, '<');
+                    selector = function(x, y) { return y < center.y }
+                }
+                if (dir.y>0) {
+                    qry = SQL.WhereClause.createValueRestriction(origQuery, propidX, center.x, '<');
+                    selector = function(x, y) { return x < center.x }
+                }
+                if (dir.y<0) {
+                    qry = SQL.WhereClause.createValueRestriction(origQuery, propidX, center.x, '>');
+                    selector = function(x, y) { return x > center.x }
+                }
+            }
+            return {
+                query: qry,
+                selector: selector
+            };
+        };
 
         MiscUtils.createDateScaleInfo = function(optimDist, zoomFact) {
             var dist,shear;

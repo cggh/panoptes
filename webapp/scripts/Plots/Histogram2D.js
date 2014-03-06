@@ -126,6 +126,22 @@ define([
                         that.reDraw();
                     });
 
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    var actions = [];
+                    actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startHalfPlaneSelection(function(center, dir) {
+                            center.x = (center.x-that.offsetX)/that.scaleX;
+                            center.y = (center.y-that.offsetY)/that.scaleY;
+                            dir.x = dir.x/that.scaleX;
+                            dir.y = dir.y/that.scaleY;
+                            var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.propidValueX, that.propidValueY, center, dir);
+
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', queryInfo.query, null);
+                        });
+                    }
+                    });
+                    ButtonChoiceBox.create('Select points','', [actions]);
+                });
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
@@ -138,7 +154,9 @@ define([
                     Controls.VerticalSeparator(20),
                     that.ctrlPalette,
                     Controls.VerticalSeparator(20),
-                    that.ctrl_Gamma
+                    that.ctrl_Gamma,
+                    Controls.VerticalSeparator(10),
+                    cmdPointSelection
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

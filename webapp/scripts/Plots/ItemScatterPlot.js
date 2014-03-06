@@ -95,45 +95,78 @@ define([
                     that.reDraw();
                 });
 
-                var cmdLassoSelection = Controls.Button(null, { content: 'Lasso select points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    that.panelPlot.startLassoSelection(function(selectedPoints) {
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
 
-                        function isPointInPoly(poly, pt) {
-                            for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
-                                ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
-                                    && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
-                                && (c = !c);
-                            return c;
-                        }
+                    var actions = [];
 
-                        if (!that.plotPresent) return;
-                        scaleX = that.scaleX; offsetX = that.offsetX;
-                        scaleY = that.scaleY; offsetY = that.offsetY;
-                        var ids =that.mapPlotAspects['id'].data;
-                        var aspectX = that.mapPlotAspects['xaxis'];
-                        var aspectY = that.mapPlotAspects['yaxis'];
-                        var valX = aspectX.data;
-                        var valY = aspectY.data;
-                        var selList = [];
-                        for (var i=0; i<valX.length; i++) {
-                            if ( (valX[i]!=null) && (valY[i]!=null) ) {
-                                var px = valX[i] * scaleX + offsetX;
-                                var py = valY[i] * scaleY + offsetY;
-                                if (isPointInPoly(selectedPoints, {x:px, y:py}))
-                                    selList.push(ids[i]);
+                    actions.push( { content:'Lasso selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startLassoSelection(function(selectedPoints) {
+
+                            function isPointInPoly(poly, pt) {
+                                for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+                                    ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
+                                        && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
+                                    && (c = !c);
+                                return c;
                             }
-                        }
-                        var selectionCreationFunction = function() { return selList; };
-                        var content = '';
-                        ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Scatterplot area', content, null, selectionCreationFunction);
+
+                            if (!that.plotPresent) return;
+                            scaleX = that.scaleX; offsetX = that.offsetX;
+                            scaleY = that.scaleY; offsetY = that.offsetY;
+                            var ids =that.mapPlotAspects['id'].data;
+                            var aspectX = that.mapPlotAspects['xaxis'];
+                            var aspectY = that.mapPlotAspects['yaxis'];
+                            var valX = aspectX.data;
+                            var valY = aspectY.data;
+                            var selList = [];
+                            for (var i=0; i<valX.length; i++) {
+                                if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                                    var px = valX[i] * scaleX + offsetX;
+                                    var py = valY[i] * scaleY + offsetY;
+                                    if (isPointInPoly(selectedPoints, {x:px, y:py}))
+                                        selList.push(ids[i]);
+                                }
+                            }
+                            var selectionCreationFunction = function() { return selList; };
+                            var content = '';
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatterplot area', content, null, selectionCreationFunction);
+                        });
+                    }
                     });
+
+                    actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startHalfPlaneSelection(function(center, dir) {
+                            center.x = (center.x-that.offsetX)/that.scaleX;
+                            center.y = (center.y-that.offsetY)/that.scaleY;
+                            dir.x = dir.x/that.scaleX;
+                            dir.y = dir.y/that.scaleY;
+                            var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.mapPlotAspects['xaxis'].propid, that.mapPlotAspects['yaxis'].propid, center, dir);
+
+                            var selectionCreationFunction = function() {
+                                var valX = that.mapPlotAspects['xaxis'].data;
+                                var valY = that.mapPlotAspects['yaxis'].data;
+                                var ids =that.mapPlotAspects['id'].data;
+                                var selector = queryInfo.selector;
+                                var selList = [];
+                                if (selector) {
+                                    for (var i=0; i<valX.length; i++) {
+                                        if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                                            if (selector(valX[i],valY[i]))
+                                                selList.push(ids[i]);
+                                        }
+                                    }
+                                }
+                                return selList;
+                            };
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', queryInfo.query, selectionCreationFunction);
+                        });
+                    }
+                    });
+
+                    ButtonChoiceBox.create('Select points','', [actions]);
+
                 });
 
-                var cmdHalfPlaneSelection = Controls.Button(null, { content: 'Half plane', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    that.panelPlot.startHalfPlaneSelection(function(center, dir) {
-                    });
-
-                });
 
                 that.colorLegend = Controls.Html(null,'');
 
@@ -144,7 +177,7 @@ define([
                     that.ctrl_SizeFactor,
                     that.ctrl_Opacity,
                     Controls.VerticalSeparator(10),
-                    cmdLassoSelection,cmdHalfPlaneSelection,
+                    cmdPointSelection,
                     Controls.VerticalSeparator(10),
                     that.colorLegend
                 ]);
