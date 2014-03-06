@@ -33,7 +33,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that.row_query.get(),
                     table_info.col_table.PositionField,
                     table_info.row_table.primkey,
-                    _.map(MetaData.chromosomes, DQX.attr('id'))
+                    _.map(MetaData.chromosomes, DQX.attr('id')),
+                    _.bind(that._draw,this)
                 );
                 //View parameters
                 that.view = {
@@ -99,15 +100,26 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 console.log(q);
             };
 
-            that.draw = function (drawInfo, args) {
+            that.draw = function (draw_info) {
+                that.draw_info = draw_info;
+                _.bind(that._draw, this)();
+            }
+
+            that._draw = function () {
+                var draw_info = that.draw_info;
+                if (!draw_info) return;
                 if (that.drawing == true)
                     return;
                 that.drawing = true;
-                var chrom = that.parent_browser.getCurrentChromoID();
-                if (!chrom) return;
 
-                var min_genomic_pos = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
-                var max_genomic_pos = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+                var chrom = that.parent_browser.getCurrentChromoID();
+                if (!chrom) {
+                    that.drawing = false;
+                    return;
+                }
+
+                var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
+                var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
 
                 //TODO Get height somehow... hmm
 //                if (that._height != 100+(10 * that.model.row_index.length)) {
@@ -117,22 +129,22 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
 
 //                drawInfo.sizeY = that._height;
-                this.drawStandardGradientCenter(drawInfo, 1);
-                this.drawStandardGradientLeft(drawInfo, 1);
-                this.drawStandardGradientRight(drawInfo, 1);
+                this.drawStandardGradientCenter(draw_info, 1);
 
-                that.model.change_col_range(chrom, min_genomic_pos, max_genomic_pos);
-                var ctx = drawInfo.centerContext;
+                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
+                that.model.change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
+                var ctx = draw_info.centerContext;
                 that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
                 that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
+                this.drawStandardGradientLeft(draw_info, 1);
+                this.drawStandardGradientRight(draw_info, 1);
 
-
-                this.drawMark(drawInfo);
+                this.drawMark(draw_info);
 //                this.drawXScale(drawInfo);
-                this.drawTitle(drawInfo);
+                this.drawTitle(draw_info);
                 that.drawing = false;
             };
-            
+
             that.init(table_info, controls_group, parent);
             return that;
         };

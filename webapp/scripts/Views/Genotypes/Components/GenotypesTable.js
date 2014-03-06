@@ -41,7 +41,6 @@ define(["_", "tween", "DQX/Utils"],
 //              });
 //          }
           var pos = model.col_positions;
-
           if (model.data_type == 'diploid') {
               model.row_index.forEach(function (r) {
                   var depth = model.depth[r];
@@ -54,7 +53,7 @@ define(["_", "tween", "DQX/Utils"],
                           ctx.fillStyle = 'rgba(255,0,0,' + (depth[i] / 100) + ')';
                       if (first[i] == -1 || second[i] == -1)
                           ctx.fillStyle = 'rgb(0,0,0)';
-                      ctx.fillRect(x_scale(pos[i]) - (snp_width * 0.01), (r * row_height) + y_off, Math.ceil(snp_width), row_height);
+                      ctx.fillRect(x_scale(pos[i]) - (snp_width * 0.51), (r * row_height) + y_off, Math.ceil(snp_width), row_height);
                   }
               });
           }

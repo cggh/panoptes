@@ -208,6 +208,7 @@ define(["Utils/RequestCounter"],
                         return i.elements !== null;
                     });
                 }
+                that.update_callback();
             };
 
             that.init(col_ordinal, provider, update_callback);

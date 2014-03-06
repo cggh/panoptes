@@ -5,20 +5,23 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                               row_query,
                               col_order,
                               row_order,
-                              chromosomes) {
+                              chromosomes,
+                              update_callback) {
             var that = {};
             that.init = function(table_info,
                                  col_query,
                                  row_query,
                                  col_order,
                                  row_order,
-                                 chromosomes) {
+                                 chromosomes,
+                                 update_callback) {
                 that.table = table_info;
                 that.row_query = row_query;
                 that.col_query = col_query;
                 that.row_order = row_order;
                 that.col_order = col_order;
                 that.chromosomes = chromosomes;
+                that.update_callback = update_callback;
 
                 that.first_col_ordinal = 0;
                 that.last_col_ordinal = 0;
@@ -49,7 +52,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                         that.col_order,
                         function(start, end, callback) {
                             that.data_provider(chrom, start, end, callback);
-                        }
+                        },
+                        that.update_callback
                     )
                 });
                 that.col_ordinal = [];
@@ -70,6 +74,33 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             };
 
+            that.position_columns  = function(ordinal, width) {
+                var result = new Float32Array(ordinal);
+                for (var cf = 0.1; cf <= 1; cf += 0.1) {
+                    var psxlast = -Infinity;
+                    for (var i = 0, ref = result.length; i < ref; i++) {
+                        if (result[i] < psxlast + cf * width)
+                            result[i] = psxlast + cf * width;
+                        psxlast = result[i];
+                    }
+                    cf += 0.1;
+                    psxlast = Infinity;
+                    for (i = result.length - 1; i >= 0; i--) {
+                        if (result[i] > psxlast - cf * width)
+                            result[i] = psxlast - cf * width;
+                        psxlast = result[i];
+                    }
+                }
+                psxlast = -Infinity;
+                for (i = 0, ref = result.length; i < result.length; i++) {
+                    result[i] = Math.round(result[i]);
+                    if (result[i] < psxlast + width)
+                        result[i] = psxlast + width;
+                    psxlast = result[i];
+                }
+                return result;
+            }
+
             that.change_col_range = function(chrom, start, end) {
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
                 that.col_ordinal = data.col[that.col_order] || [];
@@ -85,22 +116,24 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     that.ref_fraction = data.twoD[that.ref_fraction_property] || [];
                 }
 
-                //TODO Assign x locations for each col - for now just copy
-                that.col_positions = that.col_ordinal;
                 if (that.col_ordinal.length > 0)
-                    that.col_width = (that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length;
+                    //For now make it 0.75 of the width as we don't have equidistant blocks
+                    that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
                 else
                     that.col_width = 0;
+                //TODO Assign x locations for each col - for now just copy
+                that.col_positions = that.position_columns(that.col_ordinal, that.col_width);
+
 
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)
                     that.row_index = _.times(that.row_ordinal.length, function (i) {return i;});
                 else
-                    that.row_index = []
-
+                    that.row_index = [];
+                that.update_callback();
             };
             //Throttle this so that we don't clog the redraw
-            that.change_col_range = _.throttle(that.change_col_range, 500);
+            that.change_col_range = _.throttle(that.change_col_range, 200);
 
             that.data_provider = function(chrom, start, end, callback) {
                 var col_query = that.col_query;
@@ -141,7 +174,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 row_query,
                 col_order,
                 row_order,
-                chromosomes);
+                chromosomes,
+                update_callback);
             return that
         };
     }
