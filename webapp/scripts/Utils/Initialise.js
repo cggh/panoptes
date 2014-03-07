@@ -248,8 +248,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
 
-                if (prop.isFloat)
+
+
+                if (prop.isFloat) {
                     prop.toDisplayString = createFuncVal2Text(prop.settings.decimDigits);
+                    if (prop.settings.decimDigits == 0)
+                        prop.isInt = true;
+                }
 
                 if (prop.isBoolean)
                     prop.toDisplayString = function(vl) {

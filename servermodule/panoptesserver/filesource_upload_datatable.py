@@ -32,7 +32,7 @@ def response(returndata):
         dataFileName = os.path.join(destFolder, 'settings')
         if not os.path.exists(dataFileName):
             with open(dataFileName, 'w') as fp:
-                fp.write('NameSingle: item\nNamePlural: items\nPrimKey: AutoKey\n\nAutoScanProperties: true\n')
+                fp.write('NameSingle: item\nNamePlural: items\nPrimKey: AutoKey\nFetchRecordCount: True\n\nAutoScanProperties: true\n')
 
     except Exception as e:
         returndata['Error'] = str(e)

@@ -239,6 +239,8 @@ define([
                         var encoding='ST';
                         if (propInfo.isFloat)
                             encoding = 'F3';
+                        if (propInfo.isInt)
+                            encoding = 'IN';
                         if (propInfo.isBoolean)
                             encoding = 'GN';
                         fetcher.addColumn(aspectInfo.propid, encoding);
