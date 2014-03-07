@@ -10,6 +10,8 @@
     background: linear-gradient(to bottom, #ffffff 0%,#c7e4e5 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#c7e4e5',GradientType=0 ); /* IE6-9 */
 
+    border: 1px solid rgb(180, 180, 180);
+
     box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
 
 }
@@ -18,11 +20,11 @@
 .PnButtonLarge
 {
     cursor:pointer;
-    border-left:1px solid rgb(150,150,150);
-    border-top:1px solid rgb(150,150,150);
-    border-right:1px solid rgb(120,120,120);
-    border-bottom:1px solid rgb(120,120,120);
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+    /*border-left:1px solid rgb(150,150,150);*/
+    /*border-top:1px solid rgb(150,150,150);*/
+    /*border-right:1px solid rgb(120,120,120);*/
+    /*border-bottom:1px solid rgb(120,120,120);*/
+    /*box-shadow: 2px 2px 6px rgba(0,0,0,0.35);*/
     padding-top:3px;
     padding-bottom:4px;
     padding-left:4px;
@@ -43,13 +45,13 @@
 .PnButtonSmall
 {
     border-radius: 4px;
-    border:1px solid rgb(128,128,128);
+    /*border:1px solid rgb(128,128,128);*/
     display:inline-block;
     padding-top:4px;
     padding-bottom:4px;
     padding-left:6px;
     padding-right:6px;
-    box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.30);
+    /*box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.30);*/
     cursor:pointer;
 
 }

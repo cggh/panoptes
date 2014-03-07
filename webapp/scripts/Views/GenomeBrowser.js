@@ -117,6 +117,8 @@ define([
                             }
                         }
                     });
+                    if (!chromosomeField)
+                        chromosomeField = 'chrom';
 
                     //Browser configuration settings
                     var browserConfig = {

@@ -33,7 +33,54 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
 
-        CustomDataManager.upload = function(datasetid, workspaceid) {
+        CustomDataManager.uploadDataTable = function(datasetid, workspaceid) {
+
+            var content = CustomDataManager.getSourceFileDescription({datasetid: datasetid, workspaceid: workspaceid});
+
+            content += '<p>Select a local TAB-delimited file containing information<br>that you would like to add as a datatable:<p>';
+
+            var ctrl_uploadFile = Controls.FileUpload(null, { serverUrl: MetaData.serverUrl }).setOnChanged(function() {
+            });
+            content += ctrl_uploadFile.renderHtml() + '<p>';
+
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload data file</b>', width:140, height:35 }).setOnChanged(function() {
+                var fileid = ctrl_uploadFile.getValue();
+                var filename = ctrl_uploadFile.getFileName();
+                if (!fileid) {
+                    alert('Please select a file to upload.');
+                    return;
+                }
+                Popup.closeIfNeeded(popupid);
+                DQX.setProcessing();
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_upload_datatable',{
+                    database: datasetid,
+                    fileid: fileid,
+                    tableid:filename
+                },function(resp) {
+                    DQX.stopProcessing();
+                    if ('Error' in resp) {
+                        alert(resp.Error);
+                        return;
+                    }
+                    tableid = resp.tableid;
+                    Msg.send({type: 'RenderSourceDataInfo'}, {
+                        selectPath: {datasetid: datasetid, tableid:tableid},
+                        proceedFunction: function() {
+                            CustomDataManager.editSettings({ tpe:'datatable', datasetid:datasetid, tableid:tableid });
+                        }
+                    });
+                });
+            });
+
+            content += bt.renderHtml() + '<p>';
+
+            var popupid = Popup.create('Upload custom data', content);
+        };
+
+
+
+        CustomDataManager.uploadCustomData = function(datasetid, workspaceid) {
 
             var content = CustomDataManager.getSourceFileDescription({datasetid: datasetid, workspaceid: workspaceid});
 
@@ -64,7 +111,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 Popup.closeIfNeeded(popupid);
                 DQX.setProcessing();
-                DQX.customRequest(MetaData.serverUrl,PnServerModule,'customdata_upload',{
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_upload_customdata',{
                     database: datasetid,
                     workspaceid: workspaceid,
                     tableid: tableid,
@@ -80,7 +127,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Msg.send({type: 'RenderSourceDataInfo'}, {
                         selectPath: {datasetid: datasetid, workspaceid:workspaceid, tableid:tableid, sourceid:sourceid},
                         proceedFunction: function() {
-                            CustomDataManager.editSettings(datasetid, workspaceid, tableid, sourceid);
+                            CustomDataManager.editSettings({ tpe:'customdata', datasetid:datasetid, workspaceid:workspaceid, tableid:tableid, sourceid:sourceid });
                         }
                     });
                 });
@@ -182,14 +229,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        CustomDataManager.delCustomData = function(datasetid, workspaceid, tableid, sourceid) {
-            var content = CustomDataManager.getSourceFileDescription({datasetid: datasetid, workspaceid: workspaceid, tableid:tableid, sourceid: sourceid});
+        CustomDataManager.delData = function(sourceInfo) {
+            var content = CustomDataManager.getSourceFileDescription(sourceInfo);
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b><span style="color:red">Delete</span></b>', width:140, height:35 }).setOnChanged(function() {
-                DQX.customRequest(MetaData.serverUrl,PnServerModule,'customdata_del',{
-                    database: datasetid,
-                    workspaceid: workspaceid,
-                    tableid: tableid,
-                    sourceid:sourceid
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_del',{
+                    sourcetype: sourceInfo.tpe,
+                    database: sourceInfo.datasetid,
+                    workspaceid: sourceInfo.workspaceid,
+                    tableid: sourceInfo.tableid,
+                    sourceid: sourceInfo.sourceid
                 },function(resp) {
                     DQX.stopProcessing();
                     Popup.closeIfNeeded(popupid);
@@ -197,18 +245,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         alert(resp.Error);
                         return;
                     }
-                    alert('NOTE: please re-import the workspace to reflect the deleted custom data in the server database!');
+                    if (sourceInfo.workspaceid)
+                        alert('NOTE: please re-import the data source to reflect deleted custom data in the server database!');
                     Msg.send({type: 'RenderSourceDataInfo'}, {
                         selectPath: {
-                            datasetid: datasetid,
-                            workspaceid: workspaceid
+                            datasetid: sourceInfo.datasetid,
+                            workspaceid: sourceInfo.workspaceid
                         }
                     });
                 });
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>This will permanently remove these data on the server!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '<p>' ;
-            var popupid = Popup.create('Delete custom data', content);
+            var popupid = Popup.create('Delete data', content);
         }
 
 

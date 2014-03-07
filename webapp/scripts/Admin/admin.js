@@ -106,33 +106,45 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.editSettings(sourceFileInfo);
                         })
 
+                        var buttonDelData = Controls.Button(null, { content: 'Delete...', width:150, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if (!sourceFileInfo) {
+                                alert('Please select a data source from the tree');
+                                return;
+                            }
+                            CustomDataManager.delData(sourceFileInfo);
+                        })
+
+
+                        var buttonDataTable = Controls.Button(null, { content: 'Upload datatable...', width:150, height:40 }).setOnChanged(function() {
+                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                            if ((!sourceFileInfo) || (!sourceFileInfo.datasetid) ) {
+                                alert('Please select a dataset from the tree')
+                                return;
+                            }
+                            CustomDataManager.uploadDataTable(sourceFileInfo.datasetid);
+                        })
+
                         var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
                                 alert('Please select a workspace from the tree')
                                 return;
                             }
-                            CustomDataManager.upload(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
+                            CustomDataManager.uploadCustomData(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
                         })
 
 
-                        var buttonDelCustomData = Controls.Button(null, { content: 'Delete custom data...', width:150, height:40 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (!sourceFileInfo.sourceid) ) {
-                                alert('Please select a custom data source from the tree')
-                                return;
-                            }
-                            CustomDataManager.delCustomData(sourceFileInfo.datasetid, sourceFileInfo.workspaceid, sourceFileInfo.tableid, sourceFileInfo.sourceid);
-                        })
 
                         this.panelButtons.addControl(Controls.CompoundVert([
                             Controls.Static('Highlighted file source:'),
                             buttonLoadDataset,
                             buttonViewData,
                             buttonEditSettings,
+                            buttonDelData,
                             Controls.VerticalSeparator(20),
-                            buttonUploadCustomData,
-                            buttonDelCustomData
+                            buttonDataTable,
+                            buttonUploadCustomData
                         ]));
 
                         that.createPanelSourceData();
@@ -198,7 +210,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         that.panelSourceData.clear();
                         that.sourceFileInfoList = {};
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
-                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(datasetid, '<span class="DQXLarge">'+datasetid+'</span>'));
+                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(datasetid, '<div class="DQXLarge" style=" width:100%;padding-bottom:2px;border-bottom: 1px solid rgb(140,140,140);">'+datasetid+'</div>'));
                             that.sourceFileInfoList[datasetBranch.getID()] = {
                                 tpe: 'dataset',
                                 datasetid: datasetid
@@ -239,10 +251,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         if (selectItemPath) {
                             selectId = selectItemPath.datasetid;
-                            if (selectItemPath.workspaceid)
+                            if (selectItemPath.workspaceid) {
                                 selectId += '_' + selectItemPath.workspaceid;
-                            if (selectItemPath.sourceid)
-                                selectId += '_' + selectItemPath.sourceid;
+                                if (selectItemPath.sourceid)
+                                    selectId += '_' + selectItemPath.sourceid;
+                            }
                             that.panelSourceData.setActiveItem(selectId);
                         }
                     }
