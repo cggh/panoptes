@@ -27,15 +27,15 @@ def response(returndata):
     settingsFile = None
     if sourcetype == 'dataset':
         settingsFile = os.path.join(baseFolder, databaseName, 'settings')
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(config.DB, 'datasetindex'))
+        authorization.VerifyIsDataSetManager(credInfo, databaseName)
     if sourcetype == 'datatable':
         settingsFile = os.path.join(baseFolder, databaseName, 'datatables', tableid, 'settings')
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(config.DB, 'datasetindex'))
-    if sourcetype == 'customdata':
-        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
+        authorization.VerifyIsDataSetManager(credInfo, databaseName)
     if sourcetype == 'workspace':
         settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'settings')
+        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
+    if sourcetype == 'customdata':
+        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
         credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
     if settingsFile is None:
         returndata['Error'] = 'Invalid file source type'

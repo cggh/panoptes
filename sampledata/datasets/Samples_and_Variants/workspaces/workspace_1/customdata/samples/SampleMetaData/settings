@@ -1,7 +1,7 @@
 Properties:
 
 - Id: Year
-  Name: Year
+  Name: The Year
   Description: The year the sample was collected
   DataType: Value
   ShowInTable: true

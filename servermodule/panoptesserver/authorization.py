@@ -57,7 +57,11 @@ def CanDo(credInfo, operation):
 
 
 
-
+def VerifyIsDataSetManager(credInfo, databaseName):
+    authRules = PnAuthRuleSet()
+    if authRules.Match(credInfo, databaseName, PnAuthRule.manage):
+        return
+    raise DQXDbTools.CredentialException('No managament privileges for database ' + databaseName)
 
 
 class PnAuthRule:
