@@ -79,7 +79,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         this.panelButtons = Framework.Form(this.frameButtons);
                         this.panelButtons.setPadding(10);
 
-                        var buttonLoadDataset = Controls.Button(null, { content: 'Import highlighted file source...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonLoadDataset = Controls.Button(null, { content: 'Import...', width:150, height:40 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a source file set from the tree')
@@ -126,10 +126,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         })
 
                         this.panelButtons.addControl(Controls.CompoundVert([
+                            Controls.Static('Highlighted file source:'),
                             buttonLoadDataset,
                             buttonViewData,
                             buttonEditSettings,
-                            Controls.VerticalSeparator(10),
+                            Controls.VerticalSeparator(20),
                             buttonUploadCustomData,
                             buttonDelCustomData
                         ]));
@@ -173,18 +174,18 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.loadData = function() {
                         var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
-                        content += '<p>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:160, height:28 }).setOnChanged(function() {
+                        content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:180, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
                             that.execLoadData(false);
                         });
                         content += bt.renderHtml() + '<br>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:160, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:180, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
                             that.execLoadData(true);
                         });
                         content += bt.renderHtml() + '<br>';
-                        var popupid = Popup.create('Import source data', content);
+                        var popupid = Popup.create('Import file source data', content);
                     }
 
                     that.createPanelSourceData = function() {

@@ -20,13 +20,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += "</tr>";
             }
 
-            addRow('Dataset ID', sourceFileInfo.datasetid);
+            if (sourceFileInfo.datasetid)
+                addRow('Dataset ID', sourceFileInfo.datasetid);
             if (sourceFileInfo.workspaceid)
                 addRow('Workspace ID', sourceFileInfo.workspaceid);
-            if (sourceFileInfo.sourceid) {
-                addRow('Data table ID', sourceFileInfo.tableid);
+            if (sourceFileInfo.tableid)
+                addRow('Datatable ID', sourceFileInfo.tableid);
+            if (sourceFileInfo.sourceid)
                 addRow('Custom data ID', sourceFileInfo.sourceid);
-            }
             content += '</table>'
             return content;
         };
@@ -111,16 +112,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 var topdata = Base64.decode(resp.content);
                 var content = CustomDataManager.getSourceFileDescription({datasetid: sourceInfo.datasetid, workspaceid: sourceInfo.workspaceid, tableid:sourceInfo.tableid, sourceid: sourceInfo.sourceid});
-                content += '<div style="overflow-x: scroll; overflow-y: scroll; height:400px;resize:both"><table style="border-spacing: 0px;border-collapse:collapse">';
+                content += '<div style="overflow-x: scroll; overflow-y: scroll; height:400px;resize:both;background-color: white"><table style="border-spacing: 0px;border-collapse:collapse;background-color: white">';
                 $.each(topdata.split('\n'), function(idx, line) {
-                    content += '<tr>';
-                    $.each(line.split('\t'), function(idx2, cell) {
-                        if (idx==0)
-                            content += '<th style="white-space: nowrap;border:2px solid black;padding:5px">'+cell+'</th>';
-                        else
-                            content += '<td style="white-space: nowrap;border:1px solid rgb(150,150,150);padding:5px">'+cell+'</td>';
-                    });
-                    content += '</tr>';
+                    if (line.indexOf('\t')>0) {
+                        content += '<tr>';
+                        $.each(line.split('\t'), function(idx2, cell) {
+                            if (idx==0)
+                                content += '<th style="white-space: nowrap;border:2px solid black;padding:5px">'+cell+'</th>';
+                            else
+                                content += '<td style="white-space: nowrap;border:1px solid rgb(150,150,150);padding:5px">'+cell+'</td>';
+                        });
+                        content += '</tr>';
+                    }
                 });
                 content += '</table></div>'
                 //var edt = Controls.Textarea('', { size:65, linecount:20, value: topdata, fixedfont: true, noWrap: true});
