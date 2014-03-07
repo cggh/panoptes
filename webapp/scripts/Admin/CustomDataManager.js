@@ -94,7 +94,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             $.each(MetaData.sourceFileInfo[datasetid].datatables, function(tableid, tableInfo) {
                 states.push({id: tableid, name: tableid });
             });
-            ctrl_dataSetChoice = Controls.Combo(null,{label:'Upload to target dataset:', states: states});
+            ctrl_dataSetChoice = Controls.Combo(null,{label:'Upload to target datatable:', states: states});
             content += ctrl_dataSetChoice.renderHtml() + '<p>';
 
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload custom data file</b>', width:140, height:35 }).setOnChanged(function() {
@@ -106,7 +106,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     return;
                 }
                 if (!tableid) {
-                    alert('Please select a target dataset to upload to.');
+                    alert('Please select a target datatable to upload to.');
                     return;
                 }
                 Popup.closeIfNeeded(popupid);
@@ -232,6 +232,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         CustomDataManager.delData = function(sourceInfo) {
             var content = CustomDataManager.getSourceFileDescription(sourceInfo);
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b><span style="color:red">Delete</span></b>', width:140, height:35 }).setOnChanged(function() {
+                DQX.setProcessing();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_del',{
                     sourcetype: sourceInfo.tpe,
                     database: sourceInfo.datasetid,
@@ -258,8 +259,32 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>This will permanently remove these data on the server!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '<p>' ;
             var popupid = Popup.create('Delete data', content);
-        }
+        };
 
+        CustomDataManager.createDataSet = function() {
+            var datasetid = prompt('Enter dataset identifier', 'dataset');
+            if (datasetid) {
+                DQX.setProcessing();
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_create_dataset',{
+                    database: datasetid
+                },function(resp) {
+                    DQX.stopProcessing();
+                    if ('Error' in resp) {
+                        alert(resp.Error);
+                        return;
+                    }
+                    datasetid = resp.database;
+                    Msg.send({type: 'RenderSourceDataInfo'}, {
+                        selectPath: {
+                            datasetid: datasetid
+                        },
+                        proceedFunction: function() {
+                            Msg.send({type: 'ExecLoadDataFull'});
+                        }
+                    });
+                });
+            }
+        };
 
 
         return CustomDataManager;

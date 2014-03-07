@@ -64,6 +64,10 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         that.loadData();
                     });
 
+                    Msg.listen('',{ type: 'ExecLoadDataFull' }, function(scope) {
+                        that.execLoadData(false);
+                    });
+
                     //This function is called during the initialisation. Create the frame structure of the view here
                     that.createFrames = function(rootFrame) {
                         rootFrame.makeGroupHor();
@@ -79,7 +83,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         this.panelButtons = Framework.Form(this.frameButtons);
                         this.panelButtons.setPadding(10);
 
-                        var buttonLoadDataset = Controls.Button(null, { content: 'Import...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonCreateDataSet = Controls.Button(null, { content: 'Create dataset...', width:150, height:25 }).setOnChanged(function() {
+                            CustomDataManager.createDataSet();
+                        })
+
+                        var buttonLoadDataset = Controls.Button(null, { content: 'Import to Server...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a source file set from the tree')
@@ -88,7 +96,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             that.loadData();
                         })
 
-                        var buttonViewData = Controls.Button(null, { content: 'View data...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonViewData = Controls.Button(null, { content: 'View data...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a data source from the tree')
@@ -97,7 +105,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.viewData(sourceFileInfo);
                         })
 
-                        var buttonEditSettings = Controls.Button(null, { content: 'Edit settings...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonEditSettings = Controls.Button(null, { content: 'Edit settings...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a data source from the tree')
@@ -106,7 +114,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.editSettings(sourceFileInfo);
                         })
 
-                        var buttonDelData = Controls.Button(null, { content: 'Delete...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonDelData = Controls.Button(null, { content: 'Delete...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if (!sourceFileInfo) {
                                 alert('Please select a data source from the tree');
@@ -116,7 +124,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         })
 
 
-                        var buttonDataTable = Controls.Button(null, { content: 'Upload datatable...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonDataTable = Controls.Button(null, { content: 'Upload datatable...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.datasetid) ) {
                                 alert('Please select a dataset from the tree')
@@ -125,7 +133,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             CustomDataManager.uploadDataTable(sourceFileInfo.datasetid);
                         })
 
-                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:40 }).setOnChanged(function() {
+                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:25 }).setOnChanged(function() {
                             var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
                             if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
                                 alert('Please select a workspace from the tree')
@@ -137,6 +145,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
 
                         this.panelButtons.addControl(Controls.CompoundVert([
+                            buttonCreateDataSet,
+                            Controls.VerticalSeparator(20),
                             Controls.Static('Highlighted file source:'),
                             buttonLoadDataset,
                             buttonViewData,

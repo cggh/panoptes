@@ -56,6 +56,6 @@ def response(returndata):
         shutil.rmtree(dataFolder)
 
     except Exception as e:
-        returndata['Error'] = 'Failed to delete custom data: ' + str(e)
+        returndata['Error'] = 'Failed to delete data: ' + str(e)
 
     return returndata

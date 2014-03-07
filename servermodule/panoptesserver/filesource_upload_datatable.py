@@ -32,7 +32,6 @@ def response(returndata):
         dataFileName = os.path.join(destFolder, 'settings')
         if not os.path.exists(dataFileName):
             with open(dataFileName, 'w') as fp:
-                fp.write('Name: {0}\n'.format(tableid))
                 fp.write('NameSingle: item\nNamePlural: items\nPrimKey: AutoKey\n\nAutoScanProperties: true\n')
 
     except Exception as e:
