@@ -336,7 +336,7 @@ define([
                         tableInfo.primkey
                     );
                     theChannel
-                        .setTitle(tableInfo.tableCapNamePlural + ' - ' + propInfo.name)
+                        .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
                     theChannel.setSelectionStateHandler(tableInfo.isItemSelected);
