@@ -46,7 +46,7 @@ define(["_", "tween", "DQX/Utils"],
                   var depth = model.depth[r];
                   var first = model.first_allele[r];
                   var second = model.second_allele[r];
-                  for (var i = 0, end = model.col_ordinal.length; i < end; ++i) {
+                  for (var i = 0, end = pos.length; i < end; ++i) {
                       if (first[i] == second[i])
                           ctx.fillStyle = 'rgba(0,0,255,' + (depth[i] / 100) + ')';
                       else

@@ -1,9 +1,9 @@
 define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
     "Views/Genotypes/Components/TabContainer", "Views/Genotypes/Components/Container", "Views/Genotypes/ColourAllocator",
-    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/GenotypesTable"],
+    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/GenotypesTable", "Views/Genotypes/Components/Link"],
     function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
-              TabContainer, Container, ColourAllocator, ColumnHeader, GenotypesTable) {
+              TabContainer, Container, ColourAllocator, ColumnHeader, GenotypesTable, Link) {
 
         var GenotypeChannel = {};
 
@@ -16,6 +16,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that._toolTipHandler = null;
                 that._clickHandler = null;
                 that.parent_browser = parent;
+                that.col_header_height = 100;
+                that.link_height = 25;
 
                 //Create controls
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
@@ -50,8 +52,10 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                         TabContainer([
                             {name: 'genotypes', content:
                                 Container([
-                                    {name:'table', t: that.col_header_height, content:GenotypesTable(that.model, that.view)}
-//                                    {name:'column_header', content: col_header}
+                                    {name:'table', t: that.col_header_height + that.link_height, content:GenotypesTable(that.model, that.view)},
+                                    {name:'column_header', t: that.link_height, content: col_header},
+                                    {name:'link', content:Link(that.model, that.view, that.link_height)}
+
 //                                    {name:'row_header', t: that.col_header_height, content:RowHeader(that.model, that.view)}
                                 ])}
 //                            {name: 'bifurcation', content:
