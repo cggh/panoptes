@@ -26,7 +26,7 @@ def response(returndata):
 
     credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
     sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(tablename, uid, name, tableid, workspaceid)
-    cur.execute(sql, (content) )
+    cur.execute(sql, [content] )
 
     db.commit()
     db.close()
