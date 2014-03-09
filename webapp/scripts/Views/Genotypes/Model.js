@@ -71,7 +71,6 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.col_positions = [];
                 that.col_width = 0;
                 that.row_index = [];
-
             };
 
             that.position_columns  = function(ordinal, width) {
@@ -134,6 +133,16 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
             //Throttle this so that we don't clog the redraw
             that.change_col_range = _.throttle(that.change_col_range, 200);
+
+            that.new_col_query = function(q) {
+                that.col_query = q;
+                that.reset_cache();
+            };
+
+            that.new_row_query = function(q) {
+                that.row_query = q;
+                that.reset_cache();
+            };
 
             that.data_provider = function(chrom, start, end, callback) {
                 var col_query = that.col_query;

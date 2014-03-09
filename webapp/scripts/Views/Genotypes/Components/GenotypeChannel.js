@@ -96,12 +96,14 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that._myPlotter=iPlotter;
             };
 
-            that.new_col_query = function (q) {
-                console.log(q);
+            that.new_col_query = function () {
+                that.model.new_col_query(that.col_query.get());
+                that._draw();
             };
 
-            that.new_row_query = function (q) {
-                console.log(q);
+            that.new_row_query = function () {
+                that.model.new_row_query(that.row_query.get());
+                that._draw();
             };
 
             that.draw = function (draw_info) {

@@ -16,8 +16,41 @@ define(["Utils/RequestCounter"],
                 that.row_data = {};
             };
 
-            that.merge = function (array, other) {
-                return Array.prototype.push.apply(array, other);
+            that.merge = function (arrays) {
+                var length = _.map(arrays, DQX.attr('length')).reduce(function(sum, num) {
+                    return sum + num;
+                });
+                //Assumes all are the same type
+                var result = new arrays[0].constructor(length);
+                var pos = 0;
+                _.forEach(arrays, function(array) {
+                    result.set(array,pos);
+                    pos += array.length;
+                });
+                return result;
+            };
+
+            that.merge2D = function (arrays) {
+                arrays = _.filter(arrays, function(array) {
+                    return array.length > 0;
+                });
+                var col_length = _.map(arrays, function(array) {
+                    return array[0].length;
+                }).reduce(function(sum, num) {
+                    return sum + num;
+                });
+                var row_length = arrays[0].length;
+                //Assumes all are the same type
+                var result = _.times(row_length, function() {
+                    return new arrays[0][0].constructor(col_length);
+                });
+                var pos = 0;
+                _.forEach(arrays, function(array) {
+                    for(var i = 0; i < row_length; i++)
+                        result[i].set(array[i],pos);
+                    pos += array[0].length;
+                });
+                return result;
             };
 
             that.find_start = function(array, threshold) {
@@ -68,19 +101,58 @@ define(["Utils/RequestCounter"],
                     return interval.fetched == true;
                 });
                 var result = {'row':that.row_data, 'col':{}, 'twoD':{}};
+                var interval, col_ordinal_array, start_index, end_index;
                 if (matching_intervals_with_data.length == 1) {
-                    var interval = matching_intervals_with_data[0];
-                    var col_ordinal_array = interval.col[that.col_ordinal];
-                    var start_index = that.find_start(col_ordinal_array, start);
-                    var end_index = that.find_end(col_ordinal_array, end);
+                    interval = matching_intervals_with_data[0];
+                    col_ordinal_array = interval.col[that.col_ordinal];
+                    start_index = that.find_start(col_ordinal_array, start);
+                    end_index = that.find_end(col_ordinal_array, end);
                     _.forEach(interval.col, function(array, prop) {
                         result.col[prop] = that.slice(array, start_index, end_index);
                     });
                     _.forEach(interval.twoD, function(array, prop) {
                         result.twoD[prop] = that.twoD_col_slice(array, start_index, end_index);
                     });
-                } else if (matching_intervals_with_data.length != 0) {
-                    console.log('boom');
+                } else if (matching_intervals_with_data.length > 1) {
+                    //Take the matching from the first interval
+                    interval = matching_intervals_with_data[0];
+                    col_ordinal_array = interval.col[that.col_ordinal];
+                    start_index = that.find_start(col_ordinal_array, start);
+                    end_index = col_ordinal_array.length-1;
+                    _.forEach(interval.col, function(array, prop) {
+                        result.col[prop] = [that.slice(array, start_index, end_index)];
+                    });
+                    _.forEach(interval.twoD, function(array, prop) {
+                        result.twoD[prop] = [that.twoD_col_slice(array, start_index, end_index)];
+                    });
+                    //Then add in the intervals that are fully covered
+                    for (i=1; i < matching_intervals_with_data.length - 1; i++) {
+                        interval = matching_intervals_with_data[i];
+                        _.forEach(interval.col, function(array, prop) {
+                            result.col[prop].push(array);
+                        });
+                        _.forEach(interval.twoD, function(array, prop) {
+                            result.twoD[prop].push(array);
+                        });
+                    }
+                    //Take the matching from the last interval
+                    interval = matching_intervals_with_data[matching_intervals_with_data.length - 1];
+                    col_ordinal_array = interval.col[that.col_ordinal];
+                    start_index = 0;
+                    end_index = that.find_start(col_ordinal_array, end);
+                    _.forEach(interval.col, function(array, prop) {
+                        result.col[prop].push(that.slice(array, start_index, end_index));
+                    });
+                    _.forEach(interval.twoD, function(array, prop) {
+                        result.twoD[prop].push(that.twoD_col_slice(array, start_index, end_index));
+                    });
+                    //Merge the result
+                    _.forEach(interval.col, function(array, prop) {
+                        result.col[prop] = that.merge(result.col[prop]);
+                    });
+                    _.forEach(interval.twoD, function(array, prop) {
+                        result.twoD[prop] = that.merge2D(result.twoD[prop]);
+                    });
                 }
                 if (!retrieve_missing) return result;
                 missing_intervals = [];
