@@ -3,6 +3,7 @@ NamePlural: sample categories
 PrimKey: ID
 QuickFindFields: ID,Name
 
+
 Properties:
 
 - Id: ID

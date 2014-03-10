@@ -1,4 +1,5 @@
 import os
+import os
 import numpy
 import re
 import config
@@ -65,12 +66,30 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
                 if linect > 15:
                     calculationObject.LogSQLCommand('...')
                     break
-        cmd = config.mysqlcommand + " -u {0} -p{1} {2} --column-names=FALSE < {3}".format(config.DBUSER, config.DBPASS, databaseName, filename)
+        cmd = config.mysqlcommand
+        customlogin = False
+        cmdArguments = {}
+        try:
+            if len(config.DBUSER) > 0:
+                cmd += " -u {username}"
+                cmdArguments['username'] = config.DBUSER
+                try:
+                    if len(config.DBPASS) > 0:
+                        cmd += " -p'{password}'"
+                        cmdArguments['password'] = config.DBPASS
+                except:
+                    pass
+                customlogin = True
+        except:
+            pass
+        cmd +=" {database} --column-names=FALSE < {filename}".format(database=databaseName, filename=filename)
         if outputfilename is not None:
             cmd += ' > ' + outputfilename
         if calculationObject.logfilename is not None:
             cmd += ' 2>> ' + calculationObject.logfilename
         calculationObject.Log('COMMAND:' + cmd)
+        if customlogin:
+            cmd = cmd.format(**cmdArguments)
         rt = os.system(cmd)
         if (rt != 0) and (rt != 1):
             raise Exception('SQL script error; return code '+str(rt))
@@ -380,3 +399,11 @@ def mkdir(name):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
+
+
+def IsDatasetPresentInServer(credInfo, datasetId):
+    db = DQXDbTools.OpenDatabase(credInfo)
+    cur = db.cursor()
+    cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
+    return cur.fetchone()[0] > 0
+

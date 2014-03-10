@@ -41,7 +41,7 @@ require.config({
 
 
 require([
-    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/DataFetcher/DataFetchers",
+    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
@@ -49,7 +49,7 @@ require([
     "Utils/Serialise", "Utils/ButtonChoiceBox"
 ],
     function (
-        _, $, Application, Framework, Msg, DQX, SQL, DataFetchers,
+        _, $, Application, Framework, Msg, DQX, SQL, Popup, DataFetchers,
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
@@ -59,6 +59,18 @@ require([
         $(function () {
 
 
+            function Start_Part0() {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
+                    if ('issue' in resp) {
+                        var issueText = resp.issue;
+                        issueText = issueText.replace(/\n/g, "<br>");
+                        var content = '<div style="margin:30px"><p><h2>Server configuration problem</h2><p>' + issueText + '</div>';
+                        Popup.create('Fatal error', content, null, {canClose: false});
+                        return;
+                    }
+                    Start_Part1();
+                });
+            };
 
             function Start_Part1() {
                 PromptDataSet.execute(function() {
@@ -153,8 +165,8 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/logo.png" alt="MalariaGEN logo" align="top" style="border:0px;margin:7px"/></a>';
-                        headerContent += '<div style="font-size:11pt;display:inline-block;margin-top:8px;margin-left:8px"><b><i>Eyes on your data<i/><b/></div>';
+                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a>';
+//                        headerContent += '<div style="font-size:11pt;display:inline-block;margin-top:8px;margin-left:8px"><b><i>Eyes on your data<i/><b/></div>';
                         Application.setHeader(headerContent);
 
 
@@ -234,7 +246,7 @@ require([
                 });
             }
 
-            Start_Part1();
+            Start_Part0();
 
 
         });

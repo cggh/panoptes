@@ -18,6 +18,10 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         print('Importing custom data into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
 
         credInfo = calculationObject.credentialInfo
+
+        if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
+            raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
+
         db = DQXDbTools.OpenDatabase(credInfo, datasetId)
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'workspaces'))
@@ -25,6 +29,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         cur = db.cursor()
         cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
         row = cur.fetchone()
+        if row is None:
+            raise Exception('Unable to find table record for table {0} in dataset {1}'.format(tableid, datasetId))
         primkey = row[0]
         tableSettingsStr = row[1]
         db.close()
@@ -42,6 +48,9 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
+
+        # remove primary key, just in case
+        properties = [prop for prop in properties if prop['propid'] != primkey ]
 
         sourcetable=Utils.GetTableWorkspaceProperties(workspaceid, tableid)
         print('Source table: '+sourcetable)
@@ -91,6 +100,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
             print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
+            sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(workspaceid, propid, tableid)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
                 workspaceid,
                 settings['DataType'],
@@ -219,6 +230,9 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         settings.RequireTokens(['Name'])
         print(settings.ToJSON())
         workspaceName = settings['Name']
+
+        if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
+            raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
 
         db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()

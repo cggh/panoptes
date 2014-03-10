@@ -3,17 +3,17 @@
 # Configuration parameters for connecting to the MySQL database
 ###########################################################################################################
 
-# MYSQL Hostname
+# MySQL Hostname
 DBSRV = 'localhost'
 
-# MYSQL User
+# MySQL User
 DBUSER = 'root'
 
-# MYSQL Pass
+# MySQL Pass
 #todo: for production server data that also includes confidential information, this should be moved to a safer place outside the source code.
 DBPASS = '1234'
 
-# Name to use for the central panoptes MYSQL DB
+# Name to use for the central panoptes MySQL DB
 DB='datasetindex'
 
 ###########################################################################################################

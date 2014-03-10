@@ -1,0 +1,32 @@
+Properties:
+
+- Id: Custom1
+  Name: Custom Value 1
+  Description: An example of a custom numerical value
+  DataType: Value
+  ShowInTable: true
+  ShowInBrowser: true
+  MinVal: 0
+  MaxVal: 20
+  DecimDigits: 1
+  SummaryValues:
+     BlockSizeMin: 20
+     BlockSizeMax: 50000
+     ChannelColor: "rgb(0,100,0)"
+
+- Id: Custom2
+  Name: Custom value 2
+  Description: An example of a custom categorical text value
+  DataType: Text
+  ShowInTable: true
+  ShowInBrowser: false
+  IsCategorical: true
+
+
+
+- Id: EditBoolean1
+  Name: Editable boolean
+  Datatype: Boolean
+  ReadData: false
+  ShowInTable: true
+  CanUpdate: true

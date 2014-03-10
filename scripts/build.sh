@@ -132,6 +132,7 @@ echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
 mkdir -p $BASEDIR
 mkdir -p $BASEDIR/temp
 mkdir -p $BASEDIR/SummaryTracks
+mkdir -p $BASEDIR/Uploads
 if ! [ -w $BASEDIR ]; then
     echo -e "${red}  WARNING ${BASEDIR} is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
@@ -140,6 +141,9 @@ if ! [ -w $BASEDIR/temp ]; then
 fi
 if ! [ -w $BASEDIR/SummaryTracks ]; then
     echo -e "${red}  WARNING ${BASEDIR}/SummaryTracks is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/Uploads ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/Uploads is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
 
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`

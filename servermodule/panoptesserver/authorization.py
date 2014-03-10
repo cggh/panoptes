@@ -95,13 +95,15 @@ class PnAuthRuleSet:
 
     def __init__(self):
         self.rules = []
+        linenr = 0
         with open(authFileName) as fp:
             for line in fp:
                 line = line.strip()
+                linenr += 1
                 if (len(line) > 1) and (line[0] != '#'):
                     lineTokens = line.split(',')
                     if len(lineTokens) != 3:
-                        raise Exception('ERROR: Invalid authority file')
+                        raise Exception('ERROR: Invalid authority file: line '+str(linenr))
                     (userPattern, dataSetPattern, privToken) = lineTokens
                     self.rules.append(PnAuthRule(userPattern.strip(), dataSetPattern.strip(), privToken.strip()))
 

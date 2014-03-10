@@ -1,0 +1,7 @@
+ID	TestField1	TestField2	TestField3
+S0001	Ahsdhd	Cat1	12
+S0002	Udfbnfdnf	Cat1	89
+S0003	Odfnfnfd	Cat2	15
+S0004	Bsdffhf	Cat2	54
+S0005	Wdhjfh	Cat1	33
+
