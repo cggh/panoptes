@@ -151,6 +151,18 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 this.drawMark(draw_info);
 //                this.drawXScale(drawInfo);
                 this.drawTitle(draw_info);
+
+                ctx = draw_info.leftContext;
+                var row_labels = that.model.row_ordinal;
+                ctx.save();
+                ctx.fillStyle = '#000';
+                ctx.font = "" + (that.view.row_height) + "px sans-serif";
+                ctx.translate(0,that.col_header_height+that.link_height);
+                _.forEach(row_labels, function(label, i) {
+                    ctx.fillText(label, 0, (i+1) * (that.view.row_height));
+                });
+                ctx.restore();
+
                 that.drawing = false;
             };
 
