@@ -41,23 +41,43 @@ define(["_", "tween", "DQX/Utils"],
 //              });
 //          }
           var pos = model.col_positions;
+          var base_width = snp_width
+          if (snp_width > 40) {
+              base_width -= 22;
+          }
+          var col_len = DQX.niceColours.length;
           if (model.data_type == 'diploid') {
               model.row_index.forEach(function (r) {
                   var depth = model.depth[r];
                   var first = model.first_allele[r];
                   var second = model.second_allele[r];
                   for (var i = 0, end = pos.length; i < end; ++i) {
-                      if (first[i] == second[i])
-                          ctx.fillStyle = 'rgba(0,0,255,' + (depth[i] / 100) + ')';
+                      if (first[i] == second[i]) {
+                          if (first[i] == 0)
+                            ctx.fillStyle = 'rgba(0,0,255,' + (depth[i] / 100) + ')';
+                          else
+                            ctx.fillStyle = 'rgba(0,255,0,' + (depth[i] / 100) + ')';
+                      }
                       else
                           ctx.fillStyle = 'rgba(255,0,0,' + (depth[i] / 100) + ')';
                       if (first[i] == -1 || second[i] == -1)
                           ctx.fillStyle = 'rgb(0,0,0)';
-                      ctx.fillRect(x_scale(pos[i]) - (snp_width * 0.51), (r * row_height) + y_off, Math.ceil(snp_width), row_height);
+                      var spos = x_scale(pos[i]) - (snp_width * 0.5);
+                      var y = (r * row_height) + y_off;
+                      ctx.fillRect(spos, y, Math.ceil(base_width), row_height);
+                      if (snp_width > 40) {
+                          ctx.fillStyle = DQX.niceColours[first[i] % col_len];
+                          ctx.beginPath();
+                          ctx.arc(spos+snp_width-16, y+(row_height/2), 5, 0, 2 * Math.PI, false);
+                          ctx.fill();
+                          ctx.fillStyle = DQX.niceColours[second[i] % col_len];
+                          ctx.beginPath();
+                          ctx.arc(spos+snp_width-6, y+(row_height/2), 5, 0, 2 * Math.PI, false);
+                          ctx.fill();
+                      }
                   }
               });
           }
-
 
 //
 //
