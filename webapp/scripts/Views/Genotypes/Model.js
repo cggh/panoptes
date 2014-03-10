@@ -99,7 +99,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     psxlast = result[i];
                 }
                 return result;
-            }
+            };
 
             that.change_col_range = function(chrom, start, end) {
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
