@@ -1,14 +1,28 @@
 Installation and deployment guide
 =================================
 
-Dependencies
-------------
-Panoptes needs a running MYSQL with permission to create and remove databases. 
-Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
-USE A SEPERATE MYSQL INSTALL OR SET YOUR MYSQL PERMISSIONS CAREFULLY!
+.. note::
+  Panoptes is currently in an early stage of development, and does not yet come in a polished distribution. Successfully deploying it requires familiarity with the following technologies:
+  - MySQL
+  - Python
+  - WSGI
+  - Web servers (e.g. Apache2)
+  - Unix system administration
+
+Download & dependencies
+-----------------------
+The Panoptes project can be downloaded from the GitHub repository: `<https://github.com/malariagen/panoptes>`_.
+
+Panoptes needs a running MySQL with permission to create and remove databases.
+Note that the MySQL client tools also have to be installed on the machine running Panoptes.
+
+.. caution::
+  Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
+  **Use a separate MySQL install or set your MySQL permissions carefully!**
+
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based machines::
 
-	apt-get install gcc gfortran python-dev libblas-dev liblapack-dev cython libmysqlclient-dev
+	apt-get install gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
 
 You will also need libhdf5-dev. This is a virtual package satisfied by the several different install types of HDF5. The simplest solution is to::
 
@@ -18,11 +32,18 @@ unless you want a specific HDF5 setup.
 
 Build
 -----
-Copy 'config.py.example' to 'config.py'. Edit the file and specify the following components:
- - MySQL setup (DBSRV, DBUSER, DBPASS).
-   NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
- - A directory Panoptes can use for storing files (BASEDIR, see further).
- - A directory that will contain the source data files (SOURCEDATADIR, see further)
+In the directory where the Panoptes project was downloaded, copy 'config.py.example' to 'config.py'.
+Edit the file and specify the following components:
+
+- MySQL setup (DBSRV, DBUSER, DBPASS).
+  By default, Panoptes uses the MySQL defaults file ``~/.my.cnf`` to obtain the login credentials.
+   
+  * Make sure that the account used to run the Panoptes server has the right MySQL configuration file in the home directory.
+  * NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
+     
+- A directory Panoptes can use for storing files (BASEDIR, see further).
+- A directory that will contain the source data files (SOURCEDATADIR, see further)
+ 
 Note that changes in 'config.py' are used on build, so you will need to rebuild if they change.
 
 
@@ -31,6 +52,8 @@ To build run::
 	./scripts/build.sh
 
 to create a panoptes installation in 'build'. Note that this deletes any existing build.
+This build copies the different components of the application, and merges them into a single file structure.
+Note that, during this process, a copy of `config.py` is put in the build folder. This copy is used by the actual server process.
 This will attempt to install the needed python packages and link Panoptes into the DQXServer framework which serves the app.
 
 Server data file structure
@@ -38,11 +61,14 @@ Server data file structure
 Panoptes uses two file directories, and the location of both has to be specified in config.py.
 
 BASEDIR:
-This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks" and "temp".
-Both should have write privileges for the user that runs the service.
+This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks", "Uploads" and "temp".
+All should have write privileges for the user that runs the server.
 
 SOURCEDATADIR:
 This directory contains the file-bases data sources that are used to import into the Panoptes datasets.
+
+.. note::
+  Both paths have to be specified as absolute, starting from /. Do not use relative paths here.
 
 Simple Server
 -------------

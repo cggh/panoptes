@@ -40,7 +40,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         PromptDataSet.execute2 = function() {
-            var wiz=Wizard.Create('SelectDataSet', {title:'Panoptes - Select data set', sizeX:450, sizeY: 400, canCancel: false});
+            var wiz=Wizard.Create('SelectDataSet', {title:'Panoptes - Select dataset', sizeX:450, sizeY: 400, canCancel: false, noBackground: true});
 
             PromptDataSet.ctrl_datasetlist = Controls.List(null,{width:400, height:210 })
             var items=[];
@@ -52,7 +52,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 wiz.performFinish();
             });
 
-            var ctrl_admin = Controls.Hyperlink(null, {content:'Admin tool...'}).setOnChanged(function() {
+            var ctrl_admin = Controls.Hyperlink(null, {content:'Open admin page'}).setOnChanged(function() {
                 var hostname=window.location.hostname;
                 var pathname=window.location.pathname;
                 var protocol=window.location.protocol;
@@ -64,9 +64,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 window.open('admin.html');
             });
 
+            var ctrl_doc = Controls.Hyperlink(null, {content:'Documentation'}).setOnChanged(function() {
+                window.open('http://panoptes.readthedocs.org/en/latest/');
+            });
+
             var controls = Controls.CompoundVert([
                 PromptDataSet.ctrl_datasetlist,
-                ctrl_admin
+                ctrl_admin,
+                ctrl_doc
             ]);
 
             wiz.addPage({
@@ -74,7 +79,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 form: controls,
                 reportValidationError: function() {
                     if (!PromptDataSet.ctrl_datasetlist.getValue())
-                        return 'Please select a data set';
+                        return 'Please select a dataset';
                 }
             });
 

@@ -59,14 +59,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         Initialise.augmentTableInfo = function(table) {
-            table.tableNameSingle = table.name;
-            table.tableNamePlural = table.name;
-            if (table.settings.NameSingle)
-                table.tableNameSingle = table.settings.NameSingle;
-            if (table.settings.NamePlural)
-                table.tableNamePlural = table.settings.NamePlural;
-            table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
-            table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
 
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
@@ -76,6 +68,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (table.settings)
                 settings = $.extend(settings,JSON.parse(table.settings));
             table.settings = settings;
+
+            table.tableNameSingle = table.name;
+            table.tableNamePlural = table.name;
+            if (table.settings.NameSingle)
+                table.tableNameSingle = table.settings.NameSingle;
+            if (table.settings.NamePlural)
+                table.tableNamePlural = table.settings.NamePlural;
+            table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
+            table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
 
             table.fieldCache = TableFieldCache.Create(table);
 

@@ -1,3 +1,5 @@
+.. image:: PanoptesLarge.png
+
 .. panoptes documentation master file
 
 Panoptes - eyes on your data
@@ -22,6 +24,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   introduction
    deployment
    datasets
    roadmap

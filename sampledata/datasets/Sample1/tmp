@@ -1,3 +1,0 @@
-DELETE FROM datasetindex WHERE id="Sample";
-DROP DATABASE IF EXISTS Sample;
-CREATE DATABASE Sample;

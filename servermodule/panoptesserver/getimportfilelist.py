@@ -25,6 +25,13 @@ def response(returndata):
                                             for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
                                                 if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
                                                     workspace['sources'][sourceid] = { 'tableid': tableid }
+                    # Fetch info about datatables
+                    datatables = {}
+                    if os.path.exists(os.path.join(baseFolder, datasetid, 'datatables')):
+                        for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'datatables')):
+                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'datatables', tableid)):
+                                datatables[tableid] = {}
+                    datasets[datasetid]['datatables'] = datatables
         returndata['datasets'] = datasets
     except Exception as e:
         returndata['Error'] = str(e)

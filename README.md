@@ -1,3 +1,5 @@
+[![logo](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/)
+
 Panoptes
 ========
 
@@ -20,6 +22,10 @@ Links:
 
 Release Notes
 -------------
+
+**[1.0](https://github.com/malariagen/panoptes/releases/tag/Pn1.0
+"1.0 release")** Release - **[Issues addressed in this release](https://github.com/malariagen/panoptes/issues?milestone=2&page=1&state=closed
+"Issues addressed in this release")**
 
 **[0.1](https://github.com/malariagen/panoptes/issues?milestone=1&page=1&state=closed
 "0.1 closed issues")** - This release takes the initial prototype and
