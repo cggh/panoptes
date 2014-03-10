@@ -128,10 +128,13 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
 
                 //TODO Get height somehow... hmm
-//                if (that._height != 100+(10 * that.model.row_index.length)) {
-//                    that.modifyHeight(100+(10 * that.model.row_index.length));
-//                    that._myPlotter.handleResize();
-//                }
+                var height = that.link_height + that.col_header_height
+                if (that.model.row_ordinal.length)
+                    height += 10*that.model.row_ordinal.length;
+                if (that._height != height) {
+                    that.modifyHeight(height);
+                    that._myPlotter.handleResize();
+                }
 
 
 //                drawInfo.sizeY = that._height;
