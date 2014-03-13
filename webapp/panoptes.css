@@ -1,4 +1,17 @@
 
+
+.DQXTitleBar
+{
+    color:rgb(255,255,255);
+    font-size:18px;
+    font-variant:small-caps;
+    line-height:28px;
+    background: rgb(47, 137, 146);
+    /*background-image:url(Bitmaps/TitleBarBack.png);*/
+    background-repeat:repeat-x;
+}
+
+
 .DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3
 {
     background: #ffffff; /* Old browsers */
@@ -81,4 +94,39 @@
 {
     color:rgb(110,110,110);
     font-style: italic;
+}
+
+.AdminTreeRoot
+{
+    font-size:14pt;
+    font-weight:bold;
+    color:rgb(110,110,110);
+    font-style: italic;
+    padding-top:20px;
+    padding-bottom:5px;
+}
+
+.AdminTreeDataSet
+{
+    font-size:14pt;
+    font-weight:bold;
+    padding-top:20px;
+    padding-bottom:5px;
+}
+
+.AdminTreeSection
+{
+    font-size:11pt;
+    color:rgb(110,110,110);
+    font-style: italic;
+    padding-top:4px;
+    padding-bottom:4px;
+}
+
+.AdminTreeNormal
+{
+    font-size:11pt;
+    font-weight:bold;
+    padding-top:4px;
+   padding-bottom:4px;
 }

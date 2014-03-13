@@ -65,7 +65,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     tableid = resp.tableid;
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        selectPath: {datasetid: datasetid, tableid:tableid},
                         proceedFunction: function() {
                             CustomDataManager.editSettings({ tpe:'datatable', datasetid:datasetid, tableid:tableid });
                         }
@@ -125,7 +124,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     sourceid = resp.sourceid;
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        selectPath: {datasetid: datasetid, workspaceid:workspaceid, tableid:tableid, sourceid:sourceid},
                         proceedFunction: function() {
                             CustomDataManager.editSettings({ tpe:'customdata', datasetid:datasetid, workspaceid:workspaceid, tableid:tableid, sourceid:sourceid });
                         }
@@ -249,10 +247,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (sourceInfo.workspaceid)
                         alert('NOTE: please re-import the data source to reflect deleted custom data in the server database!');
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        selectPath: {
-                            datasetid: sourceInfo.datasetid,
-                            workspaceid: sourceInfo.workspaceid
-                        }
                     });
                 });
             });
@@ -275,11 +269,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     datasetid = resp.database;
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        selectPath: {
-                            datasetid: datasetid
-                        },
                         proceedFunction: function() {
-                            Msg.send({type: 'ExecLoadDataFull'});
+                            Msg.send({type: 'ExecLoadDataFull'}, { datasetid: datasetid});
+                        }
+                    });
+                });
+            }
+        };
+
+        CustomDataManager.createWorkspace = function(sourceInfo) {
+            var workspaceid = prompt('Enter workspace identifier', 'workspace');
+            if (workspaceid) {
+                DQX.setProcessing();
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_create_workspace',{
+                    database: sourceInfo.datasetid,
+                    workspaceid: workspaceid
+                },function(resp) {
+                    DQX.stopProcessing();
+                    if ('Error' in resp) {
+                        alert(resp.Error);
+                        return;
+                    }
+                    workspaceid = resp.workspaceid;
+                    Msg.send({type: 'RenderSourceDataInfo'}, {
+                        proceedFunction: function() {
+                            Msg.send({type: 'ExecLoadDataFull'}, { datasetid: sourceInfo.datasetid, workspaceid: workspaceid});
                         }
                     });
                 });

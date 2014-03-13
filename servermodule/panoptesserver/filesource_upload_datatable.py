@@ -3,6 +3,7 @@ import config
 import DQXDbTools
 import authorization
 import shutil
+import Utils
 
 
 def response(returndata):
@@ -17,6 +18,10 @@ def response(returndata):
 
     for char in ['.', ' ', ',', '/', '"', "'"]:
         tableid = tableid.replace(char, '_')
+
+    if tableid in Utils.reservedTableNames:
+        tableid += '_'
+
 
 
     baseFolder = config.SOURCEDATADIR + '/datasets'

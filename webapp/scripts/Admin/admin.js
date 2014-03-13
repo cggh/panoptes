@@ -51,21 +51,19 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     );
 
                     Msg.listen('',{ type: 'RenderSourceDataInfo' }, function(scope, settings) {
-                        var selectPath = null;
                         var proceedFunction = null;
                         if (settings) {
-                            selectPath = settings.selectPath;
                             proceedFunction = settings.proceedFunction;
                         }
-                        that.reloadInfo(selectPath, proceedFunction);
+                        that.reloadInfo(proceedFunction);
                     });
 
                     Msg.listen('',{ type: 'PromptLoadData' }, function(scope, info) {
                         that.loadData(info);
                     });
 
-                    Msg.listen('',{ type: 'ExecLoadDataFull' }, function(scope) {
-                        that.execLoadData(false);
+                    Msg.listen('',{ type: 'ExecLoadDataFull' }, function(scope, info) {
+                        that.execLoadData(info, false);
                     });
 
                     //This function is called during the initialisation. Create the frame structure of the view here
@@ -83,78 +81,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         this.panelButtons = Framework.Form(this.frameButtons);
                         this.panelButtons.setPadding(10);
 
-                        var buttonCreateDataSet = Controls.Button(null, { content: 'Create dataset...', width:150, height:25 }).setOnChanged(function() {
-                            CustomDataManager.createDataSet();
-                        })
-
-                        var buttonLoadDataset = Controls.Button(null, { content: 'Import to Server...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if (!sourceFileInfo) {
-                                alert('Please select a source file set from the tree')
-                                return;
-                            }
-                            that.loadData(sourceFileInfo);
-                        })
-
-                        var buttonViewData = Controls.Button(null, { content: 'View data...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if (!sourceFileInfo) {
-                                alert('Please select a data source from the tree')
-                                return;
-                            }
-                            CustomDataManager.viewData(sourceFileInfo);
-                        })
-
-                        var buttonEditSettings = Controls.Button(null, { content: 'Edit settings...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if (!sourceFileInfo) {
-                                alert('Please select a data source from the tree')
-                                return;
-                            }
-                            CustomDataManager.editSettings(sourceFileInfo);
-                        })
-
-                        var buttonDelData = Controls.Button(null, { content: 'Delete...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if (!sourceFileInfo) {
-                                alert('Please select a data source from the tree');
-                                return;
-                            }
-                            CustomDataManager.delData(sourceFileInfo);
-                        })
-
-
-                        var buttonDataTable = Controls.Button(null, { content: 'Upload datatable...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if ((!sourceFileInfo) || (!sourceFileInfo.datasetid) ) {
-                                alert('Please select a dataset from the tree')
-                                return;
-                            }
-                            CustomDataManager.uploadDataTable(sourceFileInfo.datasetid);
-                        })
-
-                        var buttonUploadCustomData = Controls.Button(null, { content: 'Upload custom data...', width:150, height:25 }).setOnChanged(function() {
-                            var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
-                            if ((!sourceFileInfo) || (!sourceFileInfo.workspaceid) || (sourceFileInfo.sourceid) ) {
-                                alert('Please select a workspace from the tree')
-                                return;
-                            }
-                            CustomDataManager.uploadCustomData(sourceFileInfo.datasetid, sourceFileInfo.workspaceid);
-                        })
-
-
 
                         this.panelButtons.addControl(Controls.CompoundVert([
-                            buttonCreateDataSet,
-                            Controls.VerticalSeparator(20),
-                            Controls.Static('Highlighted file source:'),
-                            buttonLoadDataset,
-                            buttonViewData,
-                            buttonEditSettings,
-                            buttonDelData,
-                            Controls.VerticalSeparator(20),
-                            buttonDataTable,
-                            buttonUploadCustomData
                         ]));
 
                         that.createPanelSourceData();
@@ -165,8 +93,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     }
 
 
-                    that.execLoadData = function(configOnly) {
-                        var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                    that.execLoadData = function(sourceFileInfo, configOnly) {
                         var data={};
                         data.ConfigOnly = configOnly?'1':'0';
                         if (sourceFileInfo.sourceid) {
@@ -206,12 +133,12 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
                         var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:180, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(false);
+                            that.execLoadData(sourceFileInfo, false);
                         });
                         content += bt.renderHtml() + '<br>';
                         var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:180, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(true);
+                            that.execLoadData(sourceFileInfo, true);
                         });
                         content += bt.renderHtml() + '<br>';
                         var popupid = Popup.create('Import file source data', content);
@@ -224,15 +151,15 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                     }
 
-                    that.renderInfo = function(selectItemPath) {
+                    that.renderInfo = function() {
 
-                        var createBranch = function(branchID, content, actionList) {
+                        var createBranch = function(branchID, content, clss, actionList) {
                             //return FrameTree.Branch(branchID, content);
                             var controllist1 = [];
                             var controllist2 = [];
                             $.each(actionList, function(idx, action) {
                                 //var actionButton = Controls.Hyperlink(null, {content:'<img src="'+action.bitmap+'"/>', hint:action.hint});
-                                var actionButton = Controls.ImageButton(null, { bitmap:action.bitmap, hint:action.hint})
+                                var actionButton = Controls.ImageButton(null, { bitmap:action.bitmap, hint:action.hint, vertShift:-2})
                                 actionButton.setOnChanged(action.actionHandler);
                                 if (!action.atend) {
                                     controllist1.push(actionButton);
@@ -243,7 +170,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 }
                             });
                             controllist1.push(Controls.HorizontalSeparator(5));
-                            controllist1.push(Controls.Static(content));
+                            controllist1.push(Controls.Static('<div class="{clss}">'.DQXformat({clss:clss}) + content + '</div>'));
                             controllist1.push(Controls.HorizontalSeparator(5));
                             $.each(controllist2, function(idx, control) {
                                 controllist1.push(control);
@@ -257,7 +184,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         var createActionEdit = function(branchid) {
                             return {
-                                bitmap:'Bitmaps/actionbuttons/settings.png',
+                                bitmap:'Bitmaps/actionbuttons/edit.png',
                                 hint:'Edit settings',
                                 actionHandler: function() {
                                     var sourceFileInfo = that.sourceFileInfoList[branchid];
@@ -296,7 +223,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                         var createActionLoad = function(branchid) {
                             return {
-                                bitmap:'Bitmaps/actionbuttons/import.png',
+                                bitmap:'Bitmaps/actionbuttons/run.png',
                                 hint:'Import to server',
                                 actionHandler: function() {
                                     var sourceFileInfo = that.sourceFileInfoList[branchid];
@@ -320,14 +247,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 }
                             }
                         ];
-                        var datasetsBranch = createBranch(null, '<span class="DQXExtraLarge AdminTreeNonClickable">Datasets</span>', actionList);
+                        var datasetsBranch = createBranch(null, "Datasets", "AdminTreeRoot", actionList);
                         datasetsBranch.showBracket = false;
                         that.panelSourceData.root.addItem(datasetsBranch);
 
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
                             var branchid = datasetid;
                             var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
-                            var datasetBranch = createBranch(branchid, '<div class="DQXExtraLarge" style=" width:100%;padding-bottom:2px;padding-top:20px;">'+datasetid+'</div>', actionList);
+                            var datasetBranch = createBranch(branchid, datasetid, "AdminTreeDataSet", actionList);
                             datasetsBranch.addItem(datasetBranch);
                             that.sourceFileInfoList[branchid] = {
                                 tpe: 'dataset',
@@ -344,7 +271,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                     }
                                 }
                             ];
-                            var datatablesBranch = createBranch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Datatables</div>', actionList);
+                            var datatablesBranch = createBranch(null, "Datatables", "AdminTreeSection", actionList);
                             datatablesBranch.setCanSelect(false);
                             datasetBranch.addItem(datatablesBranch);
 
@@ -352,7 +279,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             $.each(datasetInfo.datatables, function(datatableid, datatableInfo) {
                                 var branchid = 'datatable_'+datasetid+'_'+datatableid;
                                 var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
-                                var branch = createBranch(branchid, '<b>'+datatableid+'</b>', actionList);
+                                var branch = createBranch(branchid, datatableid, 'AdminTreeNormal', actionList );
                                 datatablesBranch.addItem(branch);
                                 that.sourceFileInfoList[branchid] = {
                                     tpe: 'datatable',
@@ -361,11 +288,26 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 };
                             });
 
-                            var workspacesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Workspaces</div>').setCanSelect(false));
+                            var actionList = [
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/new.png',
+                                    hint:"Add new workspace",
+                                    atend: true,
+                                    actionHandler: function() {
+                                        CustomDataManager.createWorkspace({datasetid: datasetid});
+                                    }
+                                }
+                            ];
+                            var workspacesBranch = createBranch(null, "Workspaces", "AdminTreeSection", actionList);
+                            workspacesBranch.setCanSelect(false);
+                            datasetBranch.addItem(workspacesBranch);
+
+                            //var workspacesBranch = datasetBranch.addItem(FrameTree.Branch(null, "Workspaces").setCanSelect(false));
+
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
                                 var branchid = datasetid+'_'+workspaceid;
                                 var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
-                                var workspaceBranch = createBranch(branchid, '<b>'+workspaceid+'</b>', actionList);
+                                var workspaceBranch = createBranch(branchid, workspaceid, 'AdminTreeNormal', actionList);
                                 workspacesBranch.addItem(workspaceBranch);
                                 that.sourceFileInfoList[branchid] = {
                                     tpe: 'workspace',
@@ -383,7 +325,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                         }
                                     }
                                 ];
-                                var customdataBranch = createBranch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Custom data</div>', actionList);
+                                var customdataBranch = createBranch(null, "Custom data", "AdminTreeSection", actionList);
                                 customdataBranch.setCanSelect(false);
                                 workspaceBranch.addItem(customdataBranch);
 
@@ -391,7 +333,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 $.each(workspaceInfo.sources, function(sourceid, sourceInfo) {
                                     var branchid = datasetid+'_'+workspaceid+'_'+sourceid;
                                     var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
-                                    var branch = createBranch(branchid, '<b>'+sourceid+'</b>', actionList);
+                                    var branch = createBranch(branchid, sourceid + ' ('+sourceInfo.tableid + ')', 'AdminTreeNormal', actionList);
                                     customdataBranch.addItem(branch);
                                     that.sourceFileInfoList[branchid] = {
                                         tpe: 'customdata',
@@ -405,16 +347,6 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         });
 
                         that.panelSourceData.render();
-
-                        if (selectItemPath) {
-                            selectId = selectItemPath.datasetid;
-                            if (selectItemPath.workspaceid) {
-                                selectId += '_' + selectItemPath.workspaceid;
-                                if (selectItemPath.sourceid)
-                                    selectId += '_' + selectItemPath.sourceid;
-                            }
-                            that.panelSourceData.setActiveItem(selectId);
-                        }
                     }
 
 
@@ -438,8 +370,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                     var color = DQX.Color(0,0,0);
                                     if (data.completed[i]&&(!data.failed[i]))
                                         color = DQX.Color(0.6,0.6,0.6);
-                                    var str = '<span style="color:{cl}">'.DQXformat({cl: color.toString()});
-                                    str += '<img SRC="{bmp}" style="float:left;margin-right:5px;margin-bottom:1px;margin-top:2px"/>'.DQXformat({bmp:DQX.BMP('link1.png')});
+                                    var str = '<div style="color:{cl};padding:6px">'.DQXformat({cl: color.toString()});
+                                    str += '<img SRC="{bmp}" style="opacity:0.7;float:left;margin-right:8px;margin-bottom:5px;margin-top:2px"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/open.png'});
                                     str += '<span style="font-size:75%">{usr}, {tme}</span><br>{name}<br>'.DQXformat({
                                         usr: data.user[i],
                                         tme: data.timestamp[i],
@@ -462,7 +394,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                             });
                                         }
                                     }
-                                    str += '</span>';
+                                    str += '</div>';
                                     calcs.push({id: data.id[i], content: str});
                                 }
                                 that.panelCalculations.setItems(calcs,'');
@@ -475,12 +407,12 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         );
                     }
 
-                    that.reloadInfo = function(selectPath, proceedFunction) {
+                    that.reloadInfo = function(proceedFunction) {
                         DQX.customRequest(MetaData.serverUrl,PnServerModule,'getimportfilelist',{},function(resp) {
                             if (resp.Error)
                                 alert(resp.Error);
                             MetaData.sourceFileInfo =resp.datasets;
-                            that.renderInfo(selectPath);
+                            that.renderInfo();
                             if (proceedFunction)
                                 proceedFunction()
                         });
@@ -509,6 +441,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
             Application.bootScheduler.add(['getimportfilelist'], function() {
                 IntroModule.init();
+                //Define the header content (visible in the top-left corner of the window)
+                var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a>';
+                Application.setHeader(headerContent);
                 Application.init('Panoptes Admin');
             });
 

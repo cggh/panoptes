@@ -3,6 +3,7 @@ import asyncresponder
 import os
 
 import importer.ImportDataTable
+import importer.ImportWorkspaces
 
 
 def ResponseExecute(data, calculationObject):
@@ -13,7 +14,9 @@ def ResponseExecute(data, calculationObject):
     if data['ConfigOnly'] == '1':
         importSettings['ConfigOnly'] = True
 
-    datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', tableid)
+    datasetFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid)
+
+    datatableFolder = os.path.join(datasetFolder, 'datatables', tableid)
     importer.ImportDataTable.ImportDataTable(
         calculationObject,
         datasetid,
@@ -21,6 +24,8 @@ def ResponseExecute(data, calculationObject):
         datatableFolder,
         importSettings
     )
+
+    importer.ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetid, importSettings)
 
 def response(returndata):
     retval = asyncresponder.RespondAsync(

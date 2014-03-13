@@ -1,5 +1,6 @@
 import uuid
 
+reservedTableNames = ['2D_propertycatalog', '2D_tablecatalog', 'annotation', 'chromosomes', 'externallinks', 'propertycatalog', 'relations', 'settings', 'storedqueries', 'summaryvalues', 'tablebasedsummaryvalues', 'tablecatalog', 'workspaces']
 
 def GetTempID():
     return 'TMP'+str(uuid.uuid1()).replace('-', '_')
