@@ -219,7 +219,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     }
                     Popup.closeIfNeeded(popupid);
-                    Msg.send({type: 'PromptLoadData'});
+                    Msg.send({type: 'PromptLoadData'}, sourceInfo);
 
                 });
             });

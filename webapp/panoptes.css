@@ -79,5 +79,6 @@
 
 .AdminTreeNonClickable
 {
-    color:rgb(128,128,128);
+    color:rgb(110,110,110);
+    font-style: italic;
 }

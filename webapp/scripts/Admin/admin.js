@@ -60,8 +60,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         that.reloadInfo(selectPath, proceedFunction);
                     });
 
-                    Msg.listen('',{ type: 'PromptLoadData' }, function(scope) {
-                        that.loadData();
+                    Msg.listen('',{ type: 'PromptLoadData' }, function(scope, info) {
+                        that.loadData(info);
                     });
 
                     Msg.listen('',{ type: 'ExecLoadDataFull' }, function(scope) {
@@ -93,7 +93,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 alert('Please select a source file set from the tree')
                                 return;
                             }
-                            that.loadData();
+                            that.loadData(sourceFileInfo);
                         })
 
                         var buttonViewData = Controls.Button(null, { content: 'View data...', width:150, height:25 }).setOnChanged(function() {
@@ -201,8 +201,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         });
                     }
 
-                    that.loadData = function() {
-                        var sourceFileInfo = that.sourceFileInfoList[that.panelSourceData.getActiveItem()];
+                    that.loadData = function(sourceFileInfo) {
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
                         var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:180, height:28 }).setOnChanged(function() {
@@ -220,41 +219,181 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                     that.createPanelSourceData = function() {
                         that.panelSourceData = FrameTree.Tree(this.frameSourceData);
+                        that.panelSourceData.canCollapse = false;
                         that.renderInfo();
 
                     }
 
                     that.renderInfo = function(selectItemPath) {
+
+                        var createBranch = function(branchID, content, actionList) {
+                            //return FrameTree.Branch(branchID, content);
+                            var controllist1 = [];
+                            var controllist2 = [];
+                            $.each(actionList, function(idx, action) {
+                                //var actionButton = Controls.Hyperlink(null, {content:'<img src="'+action.bitmap+'"/>', hint:action.hint});
+                                var actionButton = Controls.ImageButton(null, { bitmap:action.bitmap, hint:action.hint})
+                                actionButton.setOnChanged(action.actionHandler);
+                                if (!action.atend) {
+                                    controllist1.push(actionButton);
+                                    controllist1.push(Controls.HorizontalSeparator(5));
+                                } else {
+                                    controllist2.push(Controls.HorizontalSeparator(5));
+                                    controllist2.push(actionButton);
+                                }
+                            });
+                            controllist1.push(Controls.HorizontalSeparator(5));
+                            controllist1.push(Controls.Static(content));
+                            controllist1.push(Controls.HorizontalSeparator(5));
+                            $.each(controllist2, function(idx, control) {
+                                controllist1.push(control);
+                            });
+                            var bra = FrameTree.Control(Controls.CompoundHor(controllist1));
+                            if (branchID)
+                                bra.setID(branchID);
+                            //bra.showBracket = false;
+                            return bra;
+                        }
+
+                        var createActionEdit = function(branchid) {
+                            return {
+                                bitmap:'Bitmaps/actionbuttons/settings.png',
+                                hint:'Edit settings',
+                                actionHandler: function() {
+                                    var sourceFileInfo = that.sourceFileInfoList[branchid];
+                                    if (!sourceFileInfo)
+                                        return;
+                                    CustomDataManager.editSettings(sourceFileInfo);
+                                }
+                            }
+                        };
+
+                        var createActionView = function(branchid) {
+                            return {
+                                bitmap:'Bitmaps/actionbuttons/viewdata.png',
+                                hint:'View data',
+                                actionHandler: function() {
+                                    var sourceFileInfo = that.sourceFileInfoList[branchid];
+                                    if (!sourceFileInfo)
+                                        return;
+                                    CustomDataManager.viewData(sourceFileInfo);
+                                }
+                            }
+                        };
+
+                        var createActionDelete = function(branchid) {
+                            return {
+                                bitmap:'Bitmaps/actionbuttons/delete.png',
+                                hint:'Delete',
+                                actionHandler: function() {
+                                    var sourceFileInfo = that.sourceFileInfoList[branchid];
+                                    if (!sourceFileInfo)
+                                        return;
+                                    CustomDataManager.delData(sourceFileInfo);
+                                }
+                            }
+                        };
+
+                        var createActionLoad = function(branchid) {
+                            return {
+                                bitmap:'Bitmaps/actionbuttons/import.png',
+                                hint:'Import to server',
+                                actionHandler: function() {
+                                    var sourceFileInfo = that.sourceFileInfoList[branchid];
+                                    if (!sourceFileInfo)
+                                        return;
+                                    that.loadData(sourceFileInfo);
+                                }
+                            }
+                        };
+
                         that.panelSourceData.clear();
                         that.sourceFileInfoList = {};
+
+                        var actionList = [
+                            {
+                                bitmap:'Bitmaps/actionbuttons/new.png',
+                                hint:"Add new dataset",
+                                atend: true,
+                                actionHandler: function() {
+                                    CustomDataManager.createDataSet();
+                                }
+                            }
+                        ];
+                        var datasetsBranch = createBranch(null, '<span class="DQXExtraLarge AdminTreeNonClickable">Datasets</span>', actionList);
+                        datasetsBranch.showBracket = false;
+                        that.panelSourceData.root.addItem(datasetsBranch);
+
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
-                            var datasetBranch = that.panelSourceData.root.addItem(FrameTree.Branch(datasetid, '<div class="DQXLarge" style=" width:100%;padding-bottom:2px;border-bottom: 1px solid rgb(140,140,140);">'+datasetid+'</div>'));
-                            that.sourceFileInfoList[datasetBranch.getID()] = {
+                            var branchid = datasetid;
+                            var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                            var datasetBranch = createBranch(branchid, '<div class="DQXExtraLarge" style=" width:100%;padding-bottom:2px;padding-top:20px;">'+datasetid+'</div>', actionList);
+                            datasetsBranch.addItem(datasetBranch);
+                            that.sourceFileInfoList[branchid] = {
                                 tpe: 'dataset',
                                 datasetid: datasetid
                             };
 
-                            var datatablesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<span class="AdminTreeNonClickable">Datatables</span>').setCanSelect(false));
+                            var actionList = [
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/new.png',
+                                    hint:"Add new datatable",
+                                    atend: true,
+                                    actionHandler: function() {
+                                        CustomDataManager.uploadDataTable(datasetid);
+                                    }
+                                }
+                            ];
+                            var datatablesBranch = createBranch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Datatables</div>', actionList);
+                            datatablesBranch.setCanSelect(false);
+                            datasetBranch.addItem(datatablesBranch);
+
+
                             $.each(datasetInfo.datatables, function(datatableid, datatableInfo) {
-                                var branch = datatablesBranch.addItem(FrameTree.Branch('datatable_'+datasetid+'_'+datatableid, '<b>'+datatableid+'</b>'));
-                                that.sourceFileInfoList[branch.getID()] = {
+                                var branchid = 'datatable_'+datasetid+'_'+datatableid;
+                                var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                                var branch = createBranch(branchid, '<b>'+datatableid+'</b>', actionList);
+                                datatablesBranch.addItem(branch);
+                                that.sourceFileInfoList[branchid] = {
                                     tpe: 'datatable',
                                     datasetid: datasetid,
                                     tableid: datatableid
                                 };
                             });
 
-                            var workspacesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<span class="AdminTreeNonClickable">Workspaces</span>').setCanSelect(false));
+                            var workspacesBranch = datasetBranch.addItem(FrameTree.Branch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Workspaces</div>').setCanSelect(false));
                             $.each(datasetInfo.workspaces, function(workspaceid, workspaceInfo) {
-                                var workspaceBranch = workspacesBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid, '<b>'+workspaceid+'</b>'));
-                                that.sourceFileInfoList[workspaceBranch.getID()] = {
+                                var branchid = datasetid+'_'+workspaceid;
+                                var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                                var workspaceBranch = createBranch(branchid, '<b>'+workspaceid+'</b>', actionList);
+                                workspacesBranch.addItem(workspaceBranch);
+                                that.sourceFileInfoList[branchid] = {
                                     tpe: 'workspace',
                                     datasetid: datasetid,
                                     workspaceid: workspaceid
                                 };
+
+                                var actionList = [
+                                    {
+                                        bitmap:'Bitmaps/actionbuttons/new.png',
+                                        hint:"Add new custom data",
+                                        atend: true,
+                                        actionHandler: function() {
+                                            CustomDataManager.uploadCustomData(datasetid, workspaceid);
+                                        }
+                                    }
+                                ];
+                                var customdataBranch = createBranch(null, '<div class="AdminTreeNonClickable" style="padding-bottom:6px;padding-top:6px">Custom data</div>', actionList);
+                                customdataBranch.setCanSelect(false);
+                                workspaceBranch.addItem(customdataBranch);
+
+
                                 $.each(workspaceInfo.sources, function(sourceid, sourceInfo) {
-                                    var branch = workspaceBranch.addItem(FrameTree.Branch(datasetid+'_'+workspaceid+'_'+sourceid, sourceid+' ('+sourceInfo.tableid+')'));
-                                    that.sourceFileInfoList[branch.getID()] = {
+                                    var branchid = datasetid+'_'+workspaceid+'_'+sourceid;
+                                    var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                                    var branch = createBranch(branchid, '<b>'+sourceid+'</b>', actionList);
+                                    customdataBranch.addItem(branch);
+                                    that.sourceFileInfoList[branchid] = {
                                         tpe: 'customdata',
                                         datasetid: datasetid,
                                         workspaceid: workspaceid,
