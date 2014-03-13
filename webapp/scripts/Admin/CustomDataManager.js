@@ -74,7 +74,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             content += bt.renderHtml() + '<p>';
 
-            var popupid = Popup.create('Upload custom data', content);
+            var popupid = Popup.create('Upload Datatable', content);
         };
 
 

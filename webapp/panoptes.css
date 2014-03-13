@@ -1,4 +1,8 @@
 
+a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHeader, .DQXQueryTableSortHeader
+{
+    color:rgb(0,107,117) !important;
+}
 
 .DQXTitleBar
 {
@@ -6,10 +10,70 @@
     font-size:18px;
     font-variant:small-caps;
     line-height:28px;
-    background: rgb(47, 137, 146);
+    background-color: rgb(47, 137, 146);
     /*background-image:url(Bitmaps/TitleBarBack.png);*/
+    background-image: none;
     background-repeat:repeat-x;
 }
+
+
+.DQXWizardBoxHeader
+{
+    background-color: rgb(36, 105, 112);
+    height:22px;
+    padding:6px;
+    color:rgb(255,255,255);
+    font-size:11pt;
+    font-weight:bold;
+    background-image:url(Bitmaps/misc/barback1a.png);
+    /*background-image:none*/
+}
+
+
+.DQXPopupFrameHeader
+{
+    background-color: rgb(36, 105, 112);
+    padding:7px;
+    padding-left:12px;
+    cursor:move;
+    font-size:10pt;
+    font-weight:bold;
+    color:rgb(255,255,255);
+    background-image:url(Bitmaps/misc/barback1a.png);
+    /*background-image:none*/
+}
+
+
+
+
+.DQXLargeListItemSelected
+{
+    color:Black;
+    padding:4px;
+    padding-bottom:8px;
+    background: rgb(140,195,200);
+    /*background: rgb(223,175,30);*/
+    /*background: rgb(196,208,252); *//* Old browsers */
+    /*background: -moz-linear-gradient(top, rgba(200,215,255,1) 0%, rgba(164,181,234,1) 100%); *//* FF3.6+ */
+    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(200,215,255,1)), color-stop(100%,rgba(164,181,234,1))); *//* Chrome,Safari4+ */
+    /*background: -webkit-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* Chrome10+,Safari5.1+ */
+    /*background: -o-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* Opera 11.10+ */
+    /*background: -ms-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* IE10+ */
+    /*background: linear-gradient(to bottom, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* W3C */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4d0fc', endColorstr='#a4b5ea',GradientType=0 ); *//* IE6-9 */
+
+    /*font-size:8pt;*/
+    cursor:pointer;
+
+}
+
+
+.DQXPopupFrameResizer1, .DQXPopupFrameResizer2
+{
+    background-color:rgb(0,133,146);
+}
+
+
 
 
 .DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3
