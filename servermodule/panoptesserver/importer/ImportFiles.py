@@ -108,7 +108,16 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {'isRunningLocal':'True'}, '')
-    ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Samples_and_Variants',
+    # ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Samples_and_Variants',
+    #     {
+    #         'ConfigOnly': False
+    #     }
+    # )
+
+    datasetid = 'Samples_and_Variants'
+    datatable = 'sampletypes'
+    datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatable)
+    ImportDataTable.ImportDataTable(calc, datasetid, datatable, datatableFolder,
         {
             'ConfigOnly': False
         }

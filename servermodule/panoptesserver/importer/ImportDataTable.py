@@ -36,6 +36,10 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
 
+        # Drop existing tablecatalog record
+        sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
         # Add to tablecatalog
         extraSettings.ConvertStringsToSafeSQL()
         sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', {5})".format(
@@ -50,6 +54,11 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableOrder += 1
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, tableSettings, os.path.join(folder, 'data'))
+
+        sql = "DELETE FROM propertycatalog WHERE tableid='{0}'".format(tableid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+        sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
 
         ranknr = 0
         for property in properties:
@@ -71,7 +80,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 calculationObject.Log('Creating relation: '+relationSettings.ToJSON())
                 relationSettings.RequireTokens(['TableId'])
                 relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
-                relationSettings.AddTokenIfMissing('ForwardName', 'has')
+                relationSettings.AddTokenIfMissing('ReverseName', 'has')
                 sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                     tableid,
                     propid,
@@ -148,6 +157,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
 
 
         print('Creating summary values')
+        sql = "DELETE FROM summaryvalues WHERE tableid='{0}'".format(tableid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
         for property in properties:
             propid = property['propid']
             settings = property['Settings']
@@ -175,6 +186,9 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         dataFileName,
                         importSettings
                     )
+
+        sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
 
         if tableSettings.HasToken('TableBasedSummaryValues'):
             calculationObject.Log('Processing table-based summary values')

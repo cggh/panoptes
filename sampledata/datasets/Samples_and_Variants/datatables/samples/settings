@@ -47,7 +47,7 @@ Properties:
   DataType: Value
   MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
   MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
-  DecimDigits: 3                # For Value types, specifies the number of decmimal digits that should be used to display the value
+  DecimDigits: 5                # For Value types, specifies the number of decmimal digits that should be used to display the value
   ShowInTable: true
 
 - Id: SampleTypeID

@@ -187,6 +187,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             });
                             return;
                         }
+                        if (sourceFileInfo.tableid) {
+                            //Upload a single datatable
+                            data.datasetid = sourceFileInfo.datasetid;
+                            data.tableid = sourceFileInfo.tableid;
+                            ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_datatable', data, function(resp) {
+                            });
+                            return;
+                        }
                         //Upload a dataset
                         data.datasetid = sourceFileInfo.datasetid;
                         ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_dataset', data, function(resp) {
