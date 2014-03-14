@@ -172,6 +172,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var settings = {};
             if (table.settings)
                 settings = $.extend(settings,JSON.parse(table.settings));
+                settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
             table.settings = settings;
         };
 

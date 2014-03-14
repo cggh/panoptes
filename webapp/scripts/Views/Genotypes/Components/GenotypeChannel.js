@@ -118,6 +118,12 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     return;
                 that.drawing = true;
 
+                if (that.draw_info.needZoomIn) {
+                    this.drawMessage(draw_info, "Zoom in to see genotyes");
+                    that.drawing = false;
+                    return;
+                }
+
                 var chrom = that.parent_browser.getCurrentChromoID();
                 if (!chrom) {
                     that.drawing = false;
