@@ -44,7 +44,7 @@ def response(returndata):
 
     try:
         with open(settingsFile, 'w') as fp:
-            content = fp.write(content)
+            fp.write(content)
 
     except Exception as e:
         returndata['Error'] = str(e)

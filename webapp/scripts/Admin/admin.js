@@ -36,8 +36,8 @@ require.config({
 });
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Admin/CustomDataManager" ],
-    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData, CustomDataManager) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Admin/CustomDataManager", "Admin/RefGenomeManager" ],
+    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData, CustomDataManager, RefGenomeManager) {
         $(function () {
 
 
@@ -260,6 +260,34 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 tpe: 'dataset',
                                 datasetid: datasetid
                             };
+
+
+                            var actionList = [
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/import.png',
+                                    hint:"Upload data...",
+                                    actionHandler: function() {
+                                        RefGenomeManager.uploadData(datasetid);
+                                    }
+                                },
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/edit.png',
+                                    hint:"Edit settings...",
+                                    actionHandler: function() {
+                                        RefGenomeManager.editData(datasetid);
+                                    }
+                                },
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/run.png',
+                                    hint:"Import to server...",
+                                    actionHandler: function() {
+                                        RefGenomeManager.importData(datasetid);
+                                    }
+                                }
+                            ];
+                            var branch = createBranch(null, 'Reference genome', 'AdminTreeNormal', actionList );
+                            datasetBranch.addItem(branch);
+
 
                             var actionList = [
                                 {
