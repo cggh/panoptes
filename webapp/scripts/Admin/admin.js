@@ -276,14 +276,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                     actionHandler: function() {
                                         RefGenomeManager.editData(datasetid);
                                     }
-                                },
-                                {
-                                    bitmap:'Bitmaps/actionbuttons/run.png',
-                                    hint:"Import to server...",
-                                    actionHandler: function() {
-                                        RefGenomeManager.importData(datasetid);
-                                    }
                                 }
+//                                {
+//                                    bitmap:'Bitmaps/actionbuttons/run.png',
+//                                    hint:"Import to server...",
+//                                    actionHandler: function() {
+//                                        RefGenomeManager.importData(datasetid);
+//                                    }
+//                                }
                             ];
                             var branch = createBranch(null, 'Reference genome', 'AdminTreeNormal', actionList );
                             datasetBranch.addItem(branch);

@@ -206,7 +206,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         RefGenomeManager.importData = function(datasetid) {
-            alert('Import to be implemented');
+            alert('Please re-import the dataset to the server to reflect the changes performed.');
         };
 
 
