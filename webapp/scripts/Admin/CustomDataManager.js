@@ -269,9 +269,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     datasetid = resp.database;
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        proceedFunction: function() {
-                            Msg.send({type: 'ExecLoadDataFull'}, { datasetid: datasetid});
-                        }
+                        activeDataset: datasetid,
+//                        proceedFunction: function() {
+//                            Msg.send({type: 'ExecLoadDataFull'}, { datasetid: datasetid});
+//                        }
                     });
                 });
             }

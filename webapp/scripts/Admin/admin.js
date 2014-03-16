@@ -55,7 +55,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         if (settings) {
                             proceedFunction = settings.proceedFunction;
                         }
-                        that.reloadInfo(proceedFunction);
+                        that.reloadInfo(function() {
+                            if (proceedFunction) proceedFunction();
+                            if (settings && settings.activeDataset)
+                                that.panelSourceData.scrollToBranch(settings.activeDataset);
+                        });
                     });
 
                     Msg.listen('',{ type: 'PromptLoadData' }, function(scope, info) {
@@ -146,12 +150,21 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
                     that.createPanelSourceData = function() {
                         that.panelSourceData = FrameTree.Tree(this.frameSourceData);
-                        that.panelSourceData.canCollapse = false;
+                        //that.panelSourceData.canCollapse = false;
                         that.renderInfo();
 
                     }
 
                     that.renderInfo = function() {
+
+                        // Store info about dataset branch collapsedness
+                        var branchWasCollapsed = {};
+                        $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
+                            var branch = that.panelSourceData.findItem(datasetid);
+                            if (branch)
+                                branchWasCollapsed[datasetid] = branch.isCollapsed();
+                        });
+
 
                         var createBranch = function(branchID, content, clss, actionList) {
                             //return FrameTree.Branch(branchID, content);
@@ -249,12 +262,14 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         ];
                         var datasetsBranch = createBranch(null, "Datasets", "AdminTreeRoot", actionList);
                         datasetsBranch.showBracket = false;
+                        datasetsBranch.canCollapse = false;
                         that.panelSourceData.root.addItem(datasetsBranch);
 
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
                             var branchid = datasetid;
                             var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
                             var datasetBranch = createBranch(branchid, datasetid, "AdminTreeDataSet", actionList);
+                            datasetBranch.setCollapsed(branchWasCollapsed[datasetid]);
                             datasetsBranch.addItem(datasetBranch);
                             that.sourceFileInfoList[branchid] = {
                                 tpe: 'dataset',
@@ -286,6 +301,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 //                                }
                             ];
                             var branch = createBranch(null, 'Reference genome', 'AdminTreeNormal', actionList );
+                            branch.canCollapse = false;
                             datasetBranch.addItem(branch);
 
 
@@ -300,6 +316,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 }
                             ];
                             var datatablesBranch = createBranch(null, "Datatables", "AdminTreeSection", actionList);
+                            datatablesBranch.canCollapse = false;
                             datatablesBranch.setCanSelect(false);
                             datasetBranch.addItem(datatablesBranch);
 
@@ -308,6 +325,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 var branchid = 'datatable_'+datasetid+'_'+datatableid;
                                 var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
                                 var branch = createBranch(branchid, datatableid, 'AdminTreeNormal', actionList );
+                                branch.canCollapse = false;
                                 datatablesBranch.addItem(branch);
                                 that.sourceFileInfoList[branchid] = {
                                     tpe: 'datatable',
@@ -327,6 +345,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 }
                             ];
                             var workspacesBranch = createBranch(null, "Workspaces", "AdminTreeSection", actionList);
+                            workspacesBranch.canCollapse = false;
                             workspacesBranch.setCanSelect(false);
                             datasetBranch.addItem(workspacesBranch);
 
@@ -336,6 +355,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 var branchid = datasetid+'_'+workspaceid;
                                 var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
                                 var workspaceBranch = createBranch(branchid, workspaceid, 'AdminTreeNormal', actionList);
+                                workspaceBranch.canCollapse = false;
                                 workspacesBranch.addItem(workspaceBranch);
                                 that.sourceFileInfoList[branchid] = {
                                     tpe: 'workspace',
@@ -355,6 +375,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 ];
                                 var customdataBranch = createBranch(null, "Custom data", "AdminTreeSection", actionList);
                                 customdataBranch.setCanSelect(false);
+                                customdataBranch.canCollapse = false;
                                 workspaceBranch.addItem(customdataBranch);
 
 
@@ -362,6 +383,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                     var branchid = datasetid+'_'+workspaceid+'_'+sourceid;
                                     var actionList = [createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
                                     var branch = createBranch(branchid, sourceid + ' ('+sourceInfo.tableid + ')', 'AdminTreeNormal', actionList);
+                                    branch.canCollapse = false;
                                     customdataBranch.addItem(branch);
                                     that.sourceFileInfoList[branchid] = {
                                         tpe: 'customdata',
