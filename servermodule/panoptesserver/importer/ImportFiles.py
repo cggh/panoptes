@@ -14,6 +14,8 @@ import ImportDataTable
 import Import2DDataTable
 import ImportRefGenome
 import ImportWorkspaces
+import time
+import math
 
 
 
@@ -27,13 +29,15 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
 
+        # Remove current reference in the index first: if import fails, nothing will show up
+        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
+
         globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
         globalSettings.RequireTokens(['Name'])
         globalSettings.AddTokenIfMissing('Description','')
 
         print('Global settings: '+str(globalSettings.Get()))
 
-        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
 
         if not importSettings['ConfigOnly']:
             # Dropping existing database
@@ -92,7 +96,14 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Finalise: register dataset
         print('Registering dataset')
-        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}")'.format(datasetId, globalSettings['Name']))
+        importtime = 0
+        if not importSettings['ConfigOnly']:
+            importtime = time.time()
+        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}", "{2}")'.format(
+            datasetId,
+            globalSettings['Name'],
+            str(math.ceil(importtime))
+        ))
 
 
 

@@ -100,7 +100,8 @@ CREATE DATABASE IF NOT EXISTS ${DB};
 USE ${DB};
 CREATE TABLE IF NOT EXISTS datasetindex  (
    id  varchar(20) DEFAULT NULL,
-   name  varchar(50) DEFAULT NULL
+   name  varchar(50) DEFAULT NULL,
+   lastimport varchar(50) DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS calculations (
   id varchar(50) NOT NULL,

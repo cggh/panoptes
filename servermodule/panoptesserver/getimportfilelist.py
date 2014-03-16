@@ -1,4 +1,5 @@
 import os
+import time
 import config
 import DQXDbTools
 import authorization
@@ -6,7 +7,36 @@ import authorization
 
 def response(returndata):
 
+    def GetLastModifiedFileInTree(folder):
+        maxtime = 0
+        try:
+            for item in os.listdir(folder):
+                if os.path.isdir(os.path.join(folder, item)):
+                    maxtime = max(maxtime, GetLastModifiedFileInTree(os.path.join(folder, item)))
+                else:
+                    maxtime = max(maxtime, os.path.getmtime(os.path.join(folder, item)))
+        except Exception:
+            pass
+        return maxtime
+
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+
+    # Obtain info about last import actions for all datasets
+    db = DQXDbTools.OpenDatabase(credInfo)
+    cur = db.cursor()
+    datasetImportTimes = {}
+    try:
+        cur.execute('SELECT id,importtime FROM datasetindex')
+        for row in cur.fetchall():
+            if credInfo.CanDo(DQXDbTools.DbOperationRead(row[0])):
+                if (row[1] is not None) and (len(row[1]) > 0):
+                    datasetImportTimes[row[0]] = float(row[1])
+                else:
+                    datasetImportTimes[row[0]] = 0
+    except Exception as e:
+        returndata['Error'] = 'Unable to obtain import time data\n(' + str(e) +')'
+        return returndata
+
     try:
         baseFolder = config.SOURCEDATADIR + '/datasets'
         datasets = {}
@@ -32,6 +62,13 @@ def response(returndata):
                             if os.path.isdir(os.path.join(baseFolder, datasetid, 'datatables', tableid)):
                                 datatables[tableid] = {}
                     datasets[datasetid]['datatables'] = datatables
+                    importStatus = 'absent'
+                    lastModifiedTime = GetLastModifiedFileInTree(os.path.join(baseFolder, datasetid))
+                    if datasetid in datasetImportTimes:
+                        importStatus = 'outdated'
+                        if datasetImportTimes[datasetid] > lastModifiedTime:
+                            importStatus = 'ok'
+                    datasets[datasetid]['importstatus'] = importStatus
         returndata['datasets'] = datasets
     except Exception as e:
         returndata['Error'] = str(e)

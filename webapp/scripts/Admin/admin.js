@@ -128,8 +128,9 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         }
                         //Upload a dataset
                         data.datasetid = sourceFileInfo.datasetid;
-                        ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_dataset', data, function(resp) {
-                        });
+                        ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_dataset', data,
+                            function(resp) { Msg.send({type: 'RenderSourceDataInfo'}, {}); },
+                            function(resp) { Msg.send({type: 'RenderSourceDataInfo'}, {}); });
                     }
 
                     that.loadData = function(sourceFileInfo) {
@@ -268,6 +269,40 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         $.each(MetaData.sourceFileInfo, function(datasetid, datasetInfo) {
                             var branchid = datasetid;
                             var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                            var codebmp = 'codered';
+                            var codedescr = 'Dataset is currently not imported to the server';
+                            if (datasetInfo.importstatus == 'outdated') {
+                                var codebmp = 'codeorange';
+                                var codedescr = 'Served dataset may be outdated';
+                            }
+                            if (datasetInfo.importstatus == 'ok') {
+                                var codebmp = 'codegreen';
+                                var codedescr = 'Served dataset is up to date';
+                            }
+                            actionList.push(
+                                {
+                                    bitmap:'Bitmaps/actionbuttons/{bmp}.png'.DQXformat({bmp: codebmp}),
+                                    atend: true,
+                                    hint: codedescr,
+                                    actionHandler: function() {
+                                        if (datasetInfo.importstatus == 'ok')
+                                            Popup.create('Dataset server status', 'Served dataset is up to date.<br>No action required');
+                                        else {
+                                            var content = 'Dataset is currently not imported for serving.';
+                                            if (datasetInfo.importstatus == 'outdated')
+                                                content = 'Served dataset may be outdated.';
+                                            content += '<p>Dou you want to update and import the served dataset now?<br><i>Note: this may take a while!</i><p>';
+                                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Import now</b>', width:180, height:28 }).setOnChanged(function() {
+                                                Popup.closeIfNeeded(popupid);
+                                                that.execLoadData({datasetid: datasetid}, false);
+                                            });
+                                            content += bt.renderHtml() + '<br>';
+                                            var popupid =  Popup.create('Dataset server status', content);
+                                        }
+
+                                    }
+                                }
+                            );
                             var datasetBranch = createBranch(branchid, datasetid, "AdminTreeDataSet", actionList);
                             datasetBranch.setCollapsed(branchWasCollapsed[datasetid]);
                             datasetsBranch.addItem(datasetBranch);

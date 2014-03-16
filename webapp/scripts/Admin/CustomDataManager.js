@@ -60,6 +60,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 },function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
+                        Msg.send({type: 'RenderSourceDataInfo'}, {});
                         alert(resp.Error);
                         return;
                     }
@@ -118,6 +119,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     sourceid:filename
                 },function(resp) {
                     DQX.stopProcessing();
+                    Msg.send({type: 'RenderSourceDataInfo'}, {});
                     if ('Error' in resp) {
                         alert(resp.Error);
                         return;
@@ -217,7 +219,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     }
                     Popup.closeIfNeeded(popupid);
-                    Msg.send({type: 'PromptLoadData'}, sourceInfo);
+                    Msg.send({type: 'RenderSourceDataInfo'}, {});
+//                    Msg.send({type: 'PromptLoadData'}, sourceInfo);
 
                 });
             });
@@ -240,14 +243,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 },function(resp) {
                     DQX.stopProcessing();
                     Popup.closeIfNeeded(popupid);
+                    Msg.send({type: 'RenderSourceDataInfo'}, {});
                     if ('Error' in resp) {
                         alert(resp.Error);
                         return;
                     }
                     if (sourceInfo.workspaceid)
                         alert('NOTE: please re-import the data source to reflect deleted custom data in the server database!');
-                    Msg.send({type: 'RenderSourceDataInfo'}, {
-                    });
                 });
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>This will permanently remove these data on the server!</b></div></p>';
@@ -264,6 +266,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 },function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
+                        Msg.send({type: 'RenderSourceDataInfo'}, {});
                         alert(resp.Error);
                         return;
                     }
@@ -288,6 +291,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 },function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
+                        Msg.send({type: 'RenderSourceDataInfo'}, {});
                         alert(resp.Error);
                         return;
                     }

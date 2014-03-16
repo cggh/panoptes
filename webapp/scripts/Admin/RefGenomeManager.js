@@ -154,7 +154,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     }
                     Popup.closeIfNeeded(popupid);
-                    RefGenomeManager.importData(datasetid);
+                    Msg.send({type: 'RenderSourceDataInfo'}, {});
+//                    RefGenomeManager.importData(datasetid);
                 });
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
@@ -195,7 +196,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return;
                     }
                     Popup.closeIfNeeded(popupid);
-                    RefGenomeManager.importData(datasetid);
+                    Msg.send({type: 'RenderSourceDataInfo'}, {});
+//                    RefGenomeManager.importData(datasetid);
                 });
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
