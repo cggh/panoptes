@@ -129,7 +129,13 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     that.row_index = _.times(that.row_ordinal.length, function (i) {return i;});
                 else
                     that.row_index = [];
-                that.update_callback();
+                if (!that.callback_active) {
+                    that.callback_active = true;
+                    that.update_callback();
+                    that.callback_active = false;
+                }
+
+
             };
             //Throttle this so that we don't clog the redraw
             that.change_col_range = _.throttle(that.change_col_range, 200);
