@@ -72,4 +72,4 @@ ln -s /panoptes/source/build/DQXServer /var/www
 
 /etc/init.d/apache2 restart
 
-echo -e "${green}Serving from [ServerName]/DQXServer/app/main.html or [ServerName]/panoptes/main.html${NC}"
+echo -e "${green}Serving from [ServerName]/DQXServer/app/static/main.html or [ServerName]/panoptes/main.html${NC}"
