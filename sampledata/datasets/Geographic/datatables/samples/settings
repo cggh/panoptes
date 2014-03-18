@@ -43,11 +43,17 @@ Properties:
   Name: Numerical 1
   DataType: Value
   ShowInTable: true
+  MinVal: -10
+  MaxVal: 10
+  BarWidth: 200
 
 - Id: NumProp2
   Name: Numerical 2
   DataType: Value
   ShowInTable: true
+  MinVal: -10
+  MaxVal: 10
+  BarWidth: 200
 
 - Id: Filtrd
   Name: Filtered

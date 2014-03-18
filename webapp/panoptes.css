@@ -194,3 +194,10 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     padding-top:4px;
    padding-bottom:4px;
 }
+
+
+.QueryTableValueBar
+{
+    height:10px;
+    background-color: rgb(80,200,220);
+}
