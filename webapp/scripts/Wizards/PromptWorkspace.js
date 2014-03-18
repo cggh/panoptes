@@ -15,10 +15,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 MetaData.database,
                 function() {
                     PromptWorkspace.workspaces = getter.getTableRecords('workspaces');
-                    if (DQX.getUrlSearchString('workspace')) {
-                        MetaData.workspaceid  = DQX.getUrlSearchString('workspace');
+                    MetaData.workspaceid = '';
+                    if (DQX.getUrlSearchString('workspace'))
+                        MetaData.workspaceid = DQX.getUrlSearchString('workspace');
+                    if (PromptWorkspace.workspaces.length == 0)
+                        alert('ERROR: this dataset does not contain any workspace');
+                    if (PromptWorkspace.workspaces.length == 1)
+                        MetaData.workspaceid = PromptWorkspace.workspaces[0].id;
+                    if (MetaData.workspaceid)
                         Application.getChannelInfo(proceedFunction);
-                    }
                     else
                         PromptWorkspace.execute2();
                 }
@@ -29,7 +34,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         PromptWorkspace.execute2 = function() {
             var wiz=Wizard.Create('SelectWorkSpace', {title:'Panoptes - Select workspace', sizeX:450, sizeY: 400, canCancel: false, noBackground: true});
 
-            PromptWorkspace.ctrl_workspacelist = Controls.List(null,{width:400, height:210 })
+            PromptWorkspace.ctrl_workspacelist = Controls.List(null,{width:400, height:250 })
             var items=[];
             $.each(PromptWorkspace.workspaces,function(id,workspace) {
                 items.push({id: workspace.id, content:workspace.name});
@@ -39,35 +44,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 wiz.performFinish();
             });
 
-            var ctrl_add = Controls.Button(null, { content: "Create new..." } )
-            ctrl_add.setOnChanged(function() {
-                //var id = Popup.create('a','gfkjgfj gg jkgkj gkjgfkj gf jkfgjkg j gg f')
-                //setTimeout(function() {
-                //    DQX.ClosePopup(id);
-                //},2000);
-                //return;
-                var name = prompt('Enter a name for the workspace');
-                if (name!==null) {
-                    if (!name)
-                        alert('Please provide a name for the workspace');
-                    else
-                        PromptWorkspace.createNew(name);
-                }
-            });
-            var ctrl_del = Controls.Button(null, { content: "Delete selected..." } );
-            ctrl_del.setOnChanged(function() {
-                if (!PromptWorkspace.ctrl_workspacelist.getValue()) {
-                    alert('There is no workspace selected');
-                    return;
-                }
-                if (confirm('Are you sure you want to permanently delete this workspace?\nNOTE: all associated data will be removed!')) {
-                    PromptWorkspace.deleteWorkspace(PromptWorkspace.ctrl_workspacelist.getValue());
-                }
-            })
 
             var controls = Controls.CompoundVert([
-                PromptWorkspace.ctrl_workspacelist,
-                Controls.CompoundHor([ctrl_add,ctrl_del])
+                PromptWorkspace.ctrl_workspacelist
             ]);
 
             wiz.addPage({
@@ -75,7 +54,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 form: controls,
                 reportValidationError: function() {
                     if (!PromptWorkspace.ctrl_workspacelist.getValue())
-                        return 'Please select a workspace or create a new one';
+                        return 'Please select a workspace';
                 }
             });
 
