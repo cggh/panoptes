@@ -536,6 +536,7 @@ define([
                         var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
                         that.visibilityControlsGroup.addControl(controls_group);
                         var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
+                        the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
                         that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
                     });
 

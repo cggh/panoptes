@@ -1,5 +1,9 @@
-define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "Views/Genotypes/Components/Model"],
-    function (require, Framework, Controls, Msg, DQX, ChannelCanvas, QueryTool, Model) {
+define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
+    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
+    "Views/Genotypes/Components/TabContainer", "Views/Genotypes/Components/Container", "Views/Genotypes/ColourAllocator",
+    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/GenotypesTable", "Views/Genotypes/Components/Link"],
+    function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+              TabContainer, Container, ColourAllocator, ColumnHeader, GenotypesTable, Link) {
 
         var GenotypeChannel = {};
 
@@ -8,10 +12,14 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
             var that = ChannelCanvas.Base(id);
 
             that.init = function(table_info, controls_group, parent) {
-                that._height = 40;
+                that._height = 400;
                 that._toolTipHandler = null;
                 that._clickHandler = null;
+                that._always_call_draw = true;
                 that.parent_browser = parent;
+                that.col_header_height = 100;
+                that.link_height = 25;
+                that.table_info = table_info;
 
                 //Create controls
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
@@ -28,46 +36,141 @@ define(["require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX
                     that.col_query.get(),
                     that.row_query.get(),
                     table_info.col_table.PositionField,
-                    table_info.row_table.primkey
+                    table_info.row_table.primkey,
+                    _.map(MetaData.chromosomes, DQX.attr('id')),
+                    that._draw
                 );
+                //View parameters
+                that.view = {
+                    colours: ColourAllocator(),
+                    compress: false,
+                    row_height: 10,
+                    row_header_width: 150,
+                    col_scale: d3.scale.linear()
+                };
+                var col_header = ColumnHeader(that.model, that.view, that.col_header_height, that.clickSNP);
+                that.root_container = Container([
+                    {name: 'data_area', t:that.gene_map_height, content:
+                        TabContainer([
+                            {name: 'genotypes', content:
+                                Container([
+                                    {name:'table', t: that.col_header_height + that.link_height, content:GenotypesTable(that.model, that.view)},
+                                    {name:'column_header', t: that.link_height, content: col_header},
+                                    {name:'link', content:Link(that.model, that.view, that.link_height)}
+
+//                                    {name:'row_header', t: that.col_header_height, content:RowHeader(that.model, that.view)}
+                                ])}
+//                            {name: 'bifurcation', content:
+//                                Container([
+//                                    {name:'table', t: that.col_header_height, content:Bifurcation(that.model, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+//                            {name: 'ld', content:
+//                                Container([
+//                                    {name:'table', t: that.col_header_height, content: LDMap(that.model, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+//                            {name: 'network', content:
+//                                Container([
+//                                    {name:'network', t: that.col_header_height, content: Network(that.model, that.view)},
+//                                    {name:'column_header', content: col_header},
+//                                ])},
+                        ])}
+//                    {name: 'genome', content:GeneMap(that.model, that.view)},
+//                    {name: 'controls', content:Controls(that.model, that.view,
+//                        {w:that.view.row_header_width, h:that.gene_map_height})
+//                    },
+                ]);
+
             };
-            
-            //Provides a function that will be called when hovering over a position. The return string of this function will be displayed as tooltip
-            that.setToolTipHandler = function(handler) {
-                that._toolTipHandler = handler
+
+            that.new_col_query = function () {
+                that.model.new_col_query(that.col_query.get());
+                that._draw();
             };
 
-            //Provides a function that will be called when clicking on a position.
-            that.setClickHandler = function(handler) {
-                that._clickHandler = handler
+            that.new_row_query = function () {
+                that.model.new_row_query(that.row_query.get());
+                that._draw();
             };
 
-            that._setPlotter = function(iPlotter) {
-                that._myPlotter=iPlotter;
+            that.draw = function (draw_info) {
+                that.draw_info = draw_info;
+                that._draw();
             };
 
-            that.draw = function (drawInfo, args) {
-                var PosMin = Math.round((-50 + drawInfo.offsetX) / drawInfo.zoomFactX);
-                var PosMax = Math.round((drawInfo.sizeCenterX + 50 + drawInfo.offsetX) / drawInfo.zoomFactX);
+            that._draw = function () {
+                var draw_info = that.draw_info;
+                if (!draw_info) return;
+                if (that.drawing == true)
+                    return;
+                that.drawing = true;
 
-                this.drawStandardGradientCenter(drawInfo, 1);
-                this.drawStandardGradientLeft(drawInfo, 1);
-                this.drawStandardGradientRight(drawInfo, 1);
+                if (that.draw_info.needZoomIn) {
+                    that.drawing = false;
+                    return;
+                }
+                var chrom = that.parent_browser.getCurrentChromoID();
+                if (!chrom) {
+                    that.drawing = false;
+                    return;
+                }
 
-                var psx = 10, psy = 10;
-                drawInfo.centerContext.beginPath();
-                drawInfo.centerContext.moveTo(psx, psy);
-                drawInfo.centerContext.lineTo(psx + 4, psy + 8);
-                drawInfo.centerContext.lineTo(psx - 4, psy + 8);
-                drawInfo.centerContext.lineTo(psx, psy);
-                drawInfo.centerContext.fill();
-                drawInfo.centerContext.stroke();
+                var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
+                var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
 
-                this.drawMark(drawInfo);
+                //TODO Get height somehow... hmm
+                var height = that.link_height + that.col_header_height
+                if (that.model.row_ordinal.length)
+                    height += 10*that.model.row_ordinal.length;
+                if (that._height != height) {
+                    that.modifyHeight(height);
+                    that._myPlotter.handleResize();
+                }
+
+
+//                drawInfo.sizeY = that._height;
+                that.drawStandardGradientCenter(draw_info, 1);
+
+                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
+                that.model.change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
+                var ctx = draw_info.centerContext;
+                that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
+                that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
+                that.drawStandardGradientLeft(draw_info, 1);
+                that.drawStandardGradientRight(draw_info, 1);
+
+                that.drawMark(draw_info);
 //                this.drawXScale(drawInfo);
-                this.drawTitle(drawInfo);
+                that.drawTitle(draw_info);
+
+                ctx = draw_info.leftContext;
+                var row_labels = that.model.row_ordinal;
+                ctx.save();
+                ctx.fillStyle = '#000';
+                ctx.font = "" + (that.view.row_height) + "px sans-serif";
+                ctx.translate(0,that.col_header_height+that.link_height);
+                _.forEach(row_labels, function(label, i) {
+                    ctx.fillText(label, 0, (i+1) * (that.view.row_height));
+                });
+                ctx.restore();
+
+                that.drawing = false;
             };
-            
+
+            that.handleMouseClickedSide = function (px, py, area) {
+                if (area == 'left') {
+                    py -= that.col_header_height+that.link_height+4;
+                    py /= that.view.row_height;
+                    py = Math.floor(py);
+                    if (py >= 0 && py < that.model.row_ordinal.length) {
+                        var key = that.model.row_ordinal[py];
+                        Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
+                    }
+                }
+            }
+
+
             that.init(table_info, controls_group, parent);
             return that;
         };
