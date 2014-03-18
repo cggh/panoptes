@@ -45,7 +45,7 @@ Properties:
   ShowInTable: true
   MinVal: -10
   MaxVal: 10
-  BarWidth: 200
+  BarWidth: 100
 
 - Id: NumProp2
   Name: Numerical 2
@@ -53,7 +53,7 @@ Properties:
   ShowInTable: true
   MinVal: -10
   MaxVal: 10
-  BarWidth: 200
+  BarWidth: 100
 
 - Id: Filtrd
   Name: Filtered
