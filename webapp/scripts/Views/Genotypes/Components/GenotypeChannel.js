@@ -15,9 +15,11 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that._height = 400;
                 that._toolTipHandler = null;
                 that._clickHandler = null;
+                that._always_call_draw = true;
                 that.parent_browser = parent;
                 that.col_header_height = 100;
                 that.link_height = 25;
+                that.table_info = table_info;
 
                 //Create controls
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
@@ -36,7 +38,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     table_info.col_table.PositionField,
                     table_info.row_table.primkey,
                     _.map(MetaData.chromosomes, DQX.attr('id')),
-                    _.bind(that._draw,this)
+                    that._draw
                 );
                 //View parameters
                 that.view = {
@@ -81,20 +83,6 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 ]);
 
             };
-            
-            //Provides a function that will be called when hovering over a position. The return string of this function will be displayed as tooltip
-            that.setToolTipHandler = function(handler) {
-                that._toolTipHandler = handler
-            };
-
-            //Provides a function that will be called when clicking on a position.
-            that.setClickHandler = function(handler) {
-                that._clickHandler = handler
-            };
-
-            that._setPlotter = function(iPlotter) {
-                that._myPlotter=iPlotter;
-            };
 
             that.new_col_query = function () {
                 that.model.new_col_query(that.col_query.get());
@@ -108,8 +96,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
             that.draw = function (draw_info) {
                 that.draw_info = draw_info;
-                _.bind(that._draw, this)();
-            }
+                that._draw();
+            };
 
             that._draw = function () {
                 var draw_info = that.draw_info;
@@ -122,7 +110,6 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that.drawing = false;
                     return;
                 }
-
                 var chrom = that.parent_browser.getCurrentChromoID();
                 if (!chrom) {
                     that.drawing = false;
@@ -143,19 +130,19 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
 
 //                drawInfo.sizeY = that._height;
-                this.drawStandardGradientCenter(draw_info, 1);
+                that.drawStandardGradientCenter(draw_info, 1);
 
                 var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
                 that.model.change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
                 var ctx = draw_info.centerContext;
                 that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
                 that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
-                this.drawStandardGradientLeft(draw_info, 1);
-                this.drawStandardGradientRight(draw_info, 1);
+                that.drawStandardGradientLeft(draw_info, 1);
+                that.drawStandardGradientRight(draw_info, 1);
 
-                this.drawMark(draw_info);
+                that.drawMark(draw_info);
 //                this.drawXScale(drawInfo);
-                this.drawTitle(draw_info);
+                that.drawTitle(draw_info);
 
                 ctx = draw_info.leftContext;
                 var row_labels = that.model.row_ordinal;
@@ -170,6 +157,19 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
                 that.drawing = false;
             };
+
+            that.handleMouseClickedSide = function (px, py, area) {
+                if (area == 'left') {
+                    py -= that.col_header_height+that.link_height+4;
+                    py /= that.view.row_height;
+                    py = Math.floor(py);
+                    if (py >= 0 && py < that.model.row_ordinal.length) {
+                        var key = that.model.row_ordinal[py];
+                        Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
+                    }
+                }
+            }
+
 
             that.init(table_info, controls_group, parent);
             return that;
