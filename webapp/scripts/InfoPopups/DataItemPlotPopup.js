@@ -26,14 +26,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var plots = [];
 
-//            if (tableInfo.hasGeoCoord) {
-//                plots.push({
-//                    title: 'Geographic map',
-//                    plotter: GeoMapPoints,
-//                    settings: { zoomFit: true }
-//                })
-//            }
-
             if (tableInfo.hasGeoCoord) {
                 plots.push({
                     title: 'Geographic map',

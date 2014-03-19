@@ -8,6 +8,7 @@ def response(returndata):
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     propid = DQXDbTools.ToSafeIdentifier(returndata['propid'])
+    maxrecordcount = int(returndata['maxrecordcount'])
     encodedquery = returndata['qry']
 
     whc=DQXDbTools.WhereClause()
@@ -27,7 +28,12 @@ def response(returndata):
         binsize=float(returndata['binsize'])
     else:
         #Automatically determine bin size
-        sql = 'select min({0}) as _mn, max({0}) as _mx, count(*) as _cnt from {1} WHERE {2}'.format(propid, tableid,querystring)
+        sql = 'select min({propid}) as _mn, max({propid}) as _mx, count(*) as _cnt from (select {propid} from {tableid} WHERE {querystring} limit {maxrecordcount}) as tmplim'.format(
+            propid=propid,
+            tableid=tableid,
+            querystring=querystring,
+            maxrecordcount=maxrecordcount
+        )
         cur.execute(sql, whc.queryparams)
         rs = cur.fetchone()
         minval = rs[0]
@@ -58,11 +64,15 @@ def response(returndata):
     returndata['hasdata']=True
     returndata['binsize'] = binsize
 
+
     maxbincount = 5000
     buckets = []
     counts = []
-    sql = 'select floor({0}/{2}) as bucket, count(*) as _cnt from {1}'.format(propid, tableid, binsize)
+    totalcount = 0
+    sql = 'select floor({0}/{1}) as bucket, count(*) as _cnt'.format(propid, binsize)
+    sql += ' FROM (SELECT {1} FROM {0} '.format(tableid, propid)
     sql += " WHERE {0}".format(querystring)
+    sql += ' limit {0})  as tmplim'.format(maxrecordcount)
     sql += ' group by bucket'
     sql += ' limit {0}'.format(maxbincount)
     cur.execute(sql, whc.queryparams)
@@ -70,9 +80,15 @@ def response(returndata):
         if row[0] is not None:
             buckets.append(row[0])
             counts.append(row[1])
+            totalcount += row[1]
 
-    if len(buckets)>=maxbincount:
+    if len(buckets) >= maxbincount:
         returndata['Error'] = 'Too many bins in dataset'
+
+#    print(']]]]]]]] totalcount: '+str(totalcount)+' maxcount: '+str(maxrecordcount))
+    if totalcount >= maxrecordcount:
+#        print('=== issuing warning')
+        returndata['Warning'] = 'Number of data points exceeds the limit of {0}.\nData has been truncated'.format(maxrecordcount)
 
     returndata['buckets'] = coder.EncodeIntegers(buckets)
     returndata['counts'] = coder.EncodeIntegers(counts)

@@ -6,6 +6,12 @@ Description: A table containing a number of genomic variants     # A description
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: SnpName
 
+
+# The following tags set limits on the data volumes that can be queried
+MaxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)
+MaxCountQueryAggregated: 1000000  # Defines the maximum number of records that will be queried on the server for aggregation (e.g. for creating histograms)
+
+
 # The following set of tags is used to define the items in this data table as positions on the genome
 IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 Chromosome: chromosome            # Speficies the table column ID that contains the chromosome

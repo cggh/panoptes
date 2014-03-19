@@ -121,6 +121,7 @@ define([
                 data.workspaceid = MetaData.workspaceid;
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propid = that.propidValue;
+                data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
@@ -129,6 +130,9 @@ define([
                     if ('Error' in resp) {
                         alert(resp.Error);
                         return;
+                    }
+                    if ('Warning' in resp) {
+                        alert(resp.Warning);
                     }
 
                     if (!resp.hasdata) {

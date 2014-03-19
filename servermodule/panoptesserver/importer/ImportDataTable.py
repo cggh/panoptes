@@ -30,6 +30,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('IsRegionOnGenome', False)
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
+        tableSettings.AddTokenIfMissing('MaxCountQueryRecords', 200000)
+        tableSettings.AddTokenIfMissing('MaxCountQueryAggregated', 1000000)
         extraSettings = tableSettings.Clone()
         extraSettings.DropTokens(['PrimKey', 'Properties'])
 
