@@ -25,6 +25,21 @@ def response(returndata):
     if len(whc.querystring_params) > 0:
         querystring += " AND ({0})".format(whc.querystring_params)
 
+    if ('binsizex' not in returndata) or ('binsizey' not in returndata):
+        # Fetch ranges for both properties, because we will need this
+        sql = 'select min({propidx}) as _mnx, max({propidx}) as _mxx, min({propidy}) as _mny, max({propidy}) as _mxy, count(*) as _cnt from (select {propidx}, {propidy} FROM {tableid} WHERE {querystring} limit {maxrecordcount}) as tmp_table'.format(
+            propidx=propidx,
+            propidy=propidy,
+            tableid=tableid,
+            querystring=querystring,
+            maxrecordcount=maxrecordcount
+        )
+        cur.execute(sql, whc.queryparams)
+        rs = cur.fetchone()
+        minvals = [rs[0], rs[2]]
+        maxvals = [rs[1], rs[3]]
+        count = rs[4]
+
     for dimnr in range(2):
         binsizename = ['binsizex', 'binsizey'][dimnr]
         propid = [propidx, propidy][dimnr]
@@ -33,16 +48,8 @@ def response(returndata):
             binsize=float(returndata[binsizename])
         else:
             #Automatically determine bin size
-            sql = 'select min({propid}) as _mn, max({propid}) as _mx, count(*) as _cnt from (select {propid} FROM {tableid} WHERE {querystring}) as tmp_table'.format(
-                propid=propid,
-                tableid=tableid,
-                querystring=querystring
-            )
-            cur.execute(sql, whc.queryparams)
-            rs = cur.fetchone()
-            minval = rs[0]
-            maxval = rs[1]
-            count = rs[2]
+            minval = minvals[0]
+            maxval = maxvals[1]
             if (minval is None) or (maxval is None) or (maxval == minval) or (count == 0):
                 returndata['hasdata']=False
                 return returndata
