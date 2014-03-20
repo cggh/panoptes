@@ -85,9 +85,7 @@ def response(returndata):
     if len(buckets) >= maxbincount:
         returndata['Error'] = 'Too many bins in dataset'
 
-#    print(']]]]]]]] totalcount: '+str(totalcount)+' maxcount: '+str(maxrecordcount))
     if totalcount >= maxrecordcount:
-#        print('=== issuing warning')
         returndata['Warning'] = 'Number of data points exceeds the limit of {0}.\nData has been truncated'.format(maxrecordcount)
 
     returndata['buckets'] = coder.EncodeIntegers(buckets)

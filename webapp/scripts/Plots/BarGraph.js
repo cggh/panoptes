@@ -102,12 +102,17 @@ define([
                 if (that.catpropid2)
                     data.propid2 = that.catpropid2;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'categorycounts', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);
                         return;
                     }
+                    if ('Warning' in resp)
+                        that.setWarning(resp.Warning);
+                    else
+                        that.setWarning('');
                     if (!that.catpropid2)
                         that.prepareData1Cat(resp);
                     else
