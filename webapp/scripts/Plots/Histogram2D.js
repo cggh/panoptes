@@ -1,10 +1,10 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
         require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
+        EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
         var Histogram2D = {};
@@ -44,7 +44,7 @@ define([
         GenericPlot.registerPlotType('histogram2d', Histogram2D);
 
         Histogram2D.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'histogram2d', {title:'2D Histogram' }, startQuery);
+            var that = StandardLayoutPlot.Create(tableid, 'histogram2d', {title:'2D Histogram' }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -61,22 +61,15 @@ define([
             } );
 
 
-            that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
-                that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(true,false);
-            };
-
-            that.createPanels = function() {
+            that.createPanelPlot = function() {
                 that.panelPlot = FrameCanvas(that.framePlot);
                 that.panelPlot.draw = that.draw;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+            }
 
+            that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
                 var propList = [ {id:'', name:'-- None --'}];
