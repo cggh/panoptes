@@ -188,6 +188,7 @@ define([
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
+                data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue()) {
                     data.binsizex = that.ctrl_binsizeValueX.getValue();
@@ -201,10 +202,16 @@ define([
                     }
 
                     if (!resp.hasdata) {
-                        alert('No data in the result set');
+                        that.setWarning('No data in result set');
                         that.reDraw();
                         return;
                     }
+
+                    if ('Warning' in resp)
+                        that.setWarning(resp.Warning);
+                    else
+                        that.setWarning('');
+
 
                     var decoder = DataDecoders.ValueListDecoder();
                     var bucketsX = decoder.doDecode(resp.bucketsx);

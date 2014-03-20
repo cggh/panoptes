@@ -123,7 +123,7 @@ define([
                         that.setWarning('');
 
                     if (!resp.hasdata) {
-                        alert('No data in the result set');
+                        that.setWarning('No data in result set');
                         that.reDraw();
                         return;
                     }

@@ -9,6 +9,7 @@ def response(returndata):
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     propidx = DQXDbTools.ToSafeIdentifier(returndata['propidx'])
     propidy = DQXDbTools.ToSafeIdentifier(returndata['propidy'])
+    maxrecordcount = int(returndata['maxrecordcount'])
     encodedquery = returndata['qry']
 
     whc=DQXDbTools.WhereClause()
@@ -32,7 +33,11 @@ def response(returndata):
             binsize=float(returndata[binsizename])
         else:
             #Automatically determine bin size
-            sql = 'select min({0}) as _mn, max({0}) as _mx, count(*) as _cnt from {1} WHERE {2}'.format(propid, tableid, querystring)
+            sql = 'select min({propid}) as _mn, max({propid}) as _mx, count(*) as _cnt from (select {propid} FROM {tableid} WHERE {querystring}) as tmp_table'.format(
+                propid=propid,
+                tableid=tableid,
+                querystring=querystring
+            )
             cur.execute(sql, whc.queryparams)
             rs = cur.fetchone()
             minval = rs[0]
@@ -75,19 +80,36 @@ def response(returndata):
     bucketsx = []
     bucketsy = []
     counts = []
-    sql = 'select floor({1}/{2}) as bucketx, floor({3}/{4}) as buckety, count(*) as _cnt from {0}'.format(tableid, propidx, binsizex, propidy, binsizey)
-    sql += " WHERE {0}".format(querystring)
+    tablesource = 'select {propidx}, {propidy} from {tableid} where {querystring} limit {maxrecordcount}'.format(
+        propidx=propidx,
+        propidy=propidy,
+        tableid=tableid,
+        querystring=querystring,
+        maxrecordcount=maxrecordcount
+    )
+    sql = 'select floor({propidx}/{binsizex}) as bucketx, floor({propidy}/{binsizey}) as buckety, count(*) as _cnt from ({tablesource}) as tmp_table'.format(
+        tablesource=tablesource,
+        propidx=propidx,
+        binsizex=binsizex,
+        propidy=propidy,
+        binsizey=binsizey)
     sql += ' group by bucketx, buckety'
     sql += ' limit {0}'.format(maxbincount)
     cur.execute(sql, whc.queryparams)
+    totalcount = 0
     for row in cur.fetchall():
         if (row[0] is not None) and (row[1] is not None):
             bucketsx.append(row[0])
             bucketsy.append(row[1])
             counts.append(row[2])
+            totalcount += row[2]
 
     if len(bucketsx) >= maxbincount:
         returndata['Error'] = 'Too many bins in dataset'
+
+    if totalcount >= maxrecordcount:
+        returndata['Warning'] = 'Number of data points exceeds the limit of {0}.\nData has been truncated'.format(maxrecordcount)
+
 
     returndata['bucketsx'] = coder.EncodeIntegers(bucketsx)
     returndata['bucketsy'] = coder.EncodeIntegers(bucketsy)
