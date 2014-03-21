@@ -411,7 +411,7 @@ define([
                         };
                     }
 
-                    if ((inSeparateChannel) && (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid))) {
+                    if ((true) && (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid))) {
                         // There is a summary value associated to this datatable property, and we add it to this channel
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
                         summInfo.isDisplayed = true; // Set this flag so that it does not get added twice

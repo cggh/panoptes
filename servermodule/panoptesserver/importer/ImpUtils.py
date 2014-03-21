@@ -262,7 +262,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         settings = property['Settings']
         settings.AddTokenIfMissing('Index', False)
         settings.AddTokenIfMissing('Search', 'None')
-        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors', 'channelName', 'channelColor', 'connectLines'])
         settings.RequireTokens(['DataType'])
         settings.ConvertToken_Boolean('isCategorical')
         if settings.HasToken('isCategorical') and settings['isCategorical']:
