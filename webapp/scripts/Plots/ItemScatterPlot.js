@@ -18,6 +18,9 @@ define([
             var that = StandardLayoutPlot.Create(tableid, 'scatterplot', {title:'Scatter plot' }, startQuery);
             that.fetchCount = 0;
             that.propDataMap = {};
+            that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
+
+
 
             that.plotAspects = [
                 { id: 'id', name: 'ID', datatype: 'Text', propid: that.tableInfo.primkey, data: null, visible:false, required:true },
@@ -224,7 +227,7 @@ define([
                     }
                     else {
                         var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
-                        fetcher.setMaxResultCount(999999);
+                        fetcher.setMaxResultCount(that.maxrecordcount);
                         var encoding='ST';
                         if (propInfo.isFloat)
                             encoding = 'F3';
@@ -248,6 +251,10 @@ define([
                                 that.propDataMap[aspectInfo.propid] = aspectInfo.data;
                                 that.processAspectData(plotAspectID);
                                 that.panelPlot.invalidate();
+                                if (aspectInfo.data.length >= that.maxrecordcount)
+                                    that.setWarning('Number of points truncated to ' + that.maxrecordcount);
+                                else
+                                    that.setWarning('');
                             },
                             function (data) { //error
                                 that.fetchCount -= 1;

@@ -59,7 +59,7 @@ define([
 
             that.setWarning = function(warning) {
                 if (warning)
-                    that.warningContent.modifyValue('<div style="color:red;padding:2px;background-color:yellow">' + warning + '</div>');
+                    that.warningContent.modifyValue('<div style="color:red;padding:2px;background-color:yellow;border-bottom: 1px solid black">' + warning + '</div>');
                 else
                     that.warningContent.modifyValue('');
                 that.panelWarning.render();
