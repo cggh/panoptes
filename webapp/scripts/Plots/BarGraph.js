@@ -9,13 +9,19 @@ define([
 
         var BarGraph = {};
 
+        BarGraph.typeID = 'bargraph';
+        BarGraph.name = 'Bar graph';
+        BarGraph.description= 'Takes a <b>categorical property</b>, and plots the number of {items} for each state of this property. Optionally, a second categorical property can be used to overlay as a colour.';
+        BarGraph.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
 
-        GenericPlot.registerPlotType('bargraph', BarGraph);
+        GenericPlot.registerPlotType(BarGraph);
 
-        BarGraph.Create = function(tableid, settings, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, 'bargraph', {title:'Bar graph' }, startQuery);
+        BarGraph.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID, {title:BarGraph.name }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

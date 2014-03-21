@@ -9,13 +9,19 @@ define([
 
         var ItemScatterPlot = {};
 
+        ItemScatterPlot.typeID = 'scatterplot';
+        ItemScatterPlot.name = 'Scatter plot';
+        ItemScatterPlot.description= 'Takes <b>two numerical properties</b> and plot the {items} as points on a X-Y chart. Optionally, the colour and size of the points can be controlled by other properties.';
+        ItemScatterPlot.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
 
-        GenericPlot.registerPlotType('scatterplot', ItemScatterPlot);
+        GenericPlot.registerPlotType(ItemScatterPlot);
 
-        ItemScatterPlot.Create = function(tableid, settings, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, 'scatterplot', {title:'Scatter plot' }, startQuery);
+        ItemScatterPlot.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery);
             that.fetchCount = 0;
             that.propDataMap = {};
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;

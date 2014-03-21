@@ -9,6 +9,13 @@ define([
 
         var Histogram2D = {};
 
+        Histogram2D.typeID = 'histogram2d';
+        Histogram2D.name = '2D Histogram';
+        Histogram2D.description= 'Takes <b>two numerical properties</b>, bins the values, and plots the number of {items} in each cell as a colour density.';
+        Histogram2D.isCompatible = function(tableInfo) {
+            return true;
+        }
+
 
         var paletteList = ['Gray', 'Gray (inverted)', 'Rainbow 1', 'Rainbow 2', 'Heath'];
 
@@ -41,10 +48,10 @@ define([
         }
 
 
-        GenericPlot.registerPlotType('histogram2d', Histogram2D);
+        GenericPlot.registerPlotType(Histogram2D);
 
-        Histogram2D.Create = function(tableid, settings, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, 'histogram2d', {title:'2D Histogram' }, startQuery);
+        Histogram2D.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

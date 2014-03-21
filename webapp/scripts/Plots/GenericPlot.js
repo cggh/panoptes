@@ -11,9 +11,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         var GenericPlot = {};
 
         GenericPlot._registeredPlotTypes = {};
-        GenericPlot.registerPlotType = function(plotTypeID, creationObject) {
-            GenericPlot._registeredPlotTypes[plotTypeID] = creationObject;
+        GenericPlot.registerPlotType = function(creationObject) {
+            if (!creationObject.typeID)
+                DQX.reportError('Invalid plot type');
+            GenericPlot._registeredPlotTypes[creationObject.typeID] = creationObject;
         }
+
+        GenericPlot.getCompatiblePlotTypes = function(tableInfo) {
+            var plottypes = [];
+            $.each(GenericPlot._registeredPlotTypes, function(plottypeid, plottype) {
+                if (plottype.isCompatible(tableInfo))
+                    plottypes.push(plottype);
+            });
+            return plottypes;
+        };
 
         GenericPlot.activePlotList = [];
 

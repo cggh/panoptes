@@ -9,12 +9,18 @@ define([
 
         var Histogram = {};
 
+        Histogram.typeID = 'histogram';
+        Histogram.name = 'Histogram';
+        Histogram.description= 'Takes a <b>numerical property</b>, and plots the number of {items} for a set of bins defined over this value.';
+        Histogram.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
-        GenericPlot.registerPlotType('histogram', Histogram);
+        GenericPlot.registerPlotType(Histogram);
 
-        Histogram.Create = function(tableid, settings, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, 'histogram', {title:'Histogram' }, startQuery);
+        Histogram.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 
