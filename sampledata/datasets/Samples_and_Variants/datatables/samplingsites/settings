@@ -6,7 +6,6 @@ Description: Information about the sites where samples were collected     # A de
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: SiteID
 IsPositionOnGenome: false
-FetchRecordCount: true
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 QuickFindFields: SiteID,Country

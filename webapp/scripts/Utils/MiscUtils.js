@@ -125,6 +125,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableInfo.id + 'CMB_' + MetaData.workspaceid
             );
 
+            theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000)
+
+
             var panelTable = QueryTable.Panel(
                 frameTable,
                 theDataFetcher,
@@ -133,9 +136,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var theTable = panelTable.getTable();
             theTable.fetchBuffer = 300;
 
-            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.NONE;
-            if (tableInfo.settings.FetchRecordCount)
-                theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
 
             theTable.setQuery(query);
 
