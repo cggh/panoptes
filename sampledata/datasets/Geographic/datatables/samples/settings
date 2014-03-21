@@ -5,6 +5,9 @@ PrimKey: ID
 QuickFindFields: ID,CatId,RegionId
 FetchRecordCount: true
 
+MaxCountQueryRecords: 250000
+MaxCountQueryAggregated: 500000
+
 Properties:
 
 - Id: ID

@@ -49,7 +49,7 @@ define([
 
 
                 this.panelWarning = Framework.Form(this.frameWarning);
-                this.warningContent = Controls.Html('', '', 'aaa');
+                this.warningContent = Controls.Html('', '', '____');
                 this.panelWarning.addControl(this.warningContent);
                 this.panelWarning.render();
 
