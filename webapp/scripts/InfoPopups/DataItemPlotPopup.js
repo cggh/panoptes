@@ -22,45 +22,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var content = "";
 
-            content += '<table class="PlotTypeTable" style="max-width: 500px" cellspacing="0" cellpadding="0">';
-//            content += '<div style="max-width: 500px">';
+            content += '<table class="PlotTypeTable" style="max-width: 500px;padding:5px" cellspacing="0" cellpadding="0">';
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
                 content += '<tr id="{id}">'.DQXformat({id:id});
-                content += '<td class="DQXLarge"><div style="padding:10px">' + plottype.name + '</div></td>';
-                content += '<td><div style="padding:10px">' + plottype.description.DQXformat({item: tableInfo.tableNameSingle, items: tableInfo.tableNamePlural}) + "</div></td>";
+                content += '<td class="DQXLarge"><div style="padding:13px">' + plottype.name + '</div></td>';
+                content += '<td><div style="padding:13px">' + plottype.description.DQXformat({item: tableInfo.tableNameSingle, items: tableInfo.tableNamePlural}) + "</div></td>";
                 content += "</tr>";
-//
-//                content += '<div style="clear: both;padding:15px">';
-//                content += '<div class="DQXLarge" style="float:left;margin-right:10px;margin-bottom:7px">' + plottype.name + '</div>';
-//                content += plottype.description.DQXformat({item: tableInfo.tableNameSingle, items: tableInfo.tableNamePlural});
-//                content += '</div>';
             });
             content += '</div>';
             content += '</table>';
 
-
-//            content += '<div style="max-width: 500px">';
-//            $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
-//                content += '<div style="clear: both;padding:15px">';
-//                content += '<div class="DQXLarge" style="float:left;margin-right:10px;margin-bottom:7px">' + plottype.name + '</div>';
-//                content += plottype.description.DQXformat({item: tableInfo.tableNameSingle, items: tableInfo.tableNamePlural});
-//                content += '</div>';
-//            });
-//            content += '</div>';
-
-
-
-//            content += '<div style="max-width: 500px">';
-//            $.each(plots, function(idx, plot) {
-//                var button = Controls.Button(null, { content: plot.title, buttonClass: 'DQXToolButton2', width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png' });
-//                button.setOnChanged(function() {
-//                    plot.plotter.Create(tableInfo.id, info.query);
-//                    Popup.closeIfNeeded(popupID);
-//                });
-//                content += button.renderHtml();
-//            });
-//            content += '</div>';
 
             var popupID = Popup.create(tableInfo.tableCapNamePlural + ' plots', content);
 
