@@ -9,6 +9,7 @@ import DQXUtils
 import errno
 import SettingsLoader
 from DQXTableUtils import VTTable
+import customresponders.panoptesserver.Utils as Utils
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -288,6 +289,8 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     with calculationObject.LogDataDump():
         for property in properties:
             calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
+    for property in properties:
+        Utils.CheckSafeIdentifier(property['propid'])
     return properties
 
 

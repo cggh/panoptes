@@ -15,6 +15,7 @@ import customresponders.panoptesserver.Utils as Utils
 tableOrder = 0
 
 def ImportDataTable(calculationObject, datasetId, tableid, folder, importSettings):
+    Utils.CheckSafeIdentifier(tableid)
     global tableOrder
     with calculationObject.LogHeader('Importing datatable {0}'.format(tableid)):
         print('Source: ' + folder)

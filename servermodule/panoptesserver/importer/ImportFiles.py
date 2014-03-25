@@ -20,6 +20,7 @@ import math
 
 
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
+    Utils.CheckSafeIdentifier(datasetId)
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
         DQXUtils.CheckValidIdentifier(datasetId)
