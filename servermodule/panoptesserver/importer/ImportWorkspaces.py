@@ -224,6 +224,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
 
 def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSettings):
+    Utils.CheckSafeIdentifier(workspaceid)
     with calculationObject.LogHeader('Importing workspace {0}.{1}'.format(datasetId, workspaceid)):
         print('Source directory: '+folder)
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
@@ -237,6 +238,10 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
         cur = db.cursor()
 
+        def execSQL(cmd):
+            calculationObject.LogSQLCommand(cmd)
+            cur.execute(cmd)
+
         cur.execute('SELECT id, primkey FROM tablecatalog')
         tables = [ { 'id': row[0], 'primkey': row[1] } for row in cur.fetchall()]
         tableMap = {table['id']:table for table in tables}
@@ -245,25 +250,25 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
             for table in tables:
                 tableid = table['id']
                 print('Re-creating custom data table for '+tableid)
-                cur.execute("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
-                cur.execute("CREATE TABLE {0} (StoredSelection TINYINT) AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
-                cur.execute("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
-                cur.execute("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                execSQL("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
+                execSQL("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
+                execSQL("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
 
         print('Removing existing workspace properties')
-        cur.execute("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
+        execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
 
         calculationObject.Log('Creating StoredSelection columns')
         for table in tables:
             tableid = table['id']
             sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
             cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 9999, '{2}')".format(workspaceid, tableid, sett)
-            calculationObject.LogSQLCommand(cmd)
-            cur.execute(cmd)
+            execSQL(cmd)
 
         print('Re-creating workspaces record')
-        cur.execute("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
-        cur.execute("INSERT INTO workspaces VALUES (%s,%s)", (workspaceid, workspaceName) )
+        execSQL("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
+        execSQL('INSERT INTO workspaces VALUES ("{0}","{1}")'.format(workspaceid, workspaceName) )
+        print('Updating views')
         for table in tables:
             Utils.UpdateTableInfoView(workspaceid, table['id'], cur)
 

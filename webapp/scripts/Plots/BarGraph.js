@@ -1,21 +1,27 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox"
 ],
     function (
         require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox
+        EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox
         ) {
 
         var BarGraph = {};
 
+        BarGraph.typeID = 'bargraph';
+        BarGraph.name = 'Bar graph';
+        BarGraph.description= 'Takes a <b>categorical property</b>, and plots the number of {items} for each state of this property. Optionally, a second categorical property can be used to overlay as a colour.';
+        BarGraph.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
 
-        GenericPlot.registerPlotType('bargraph', BarGraph);
+        GenericPlot.registerPlotType(BarGraph);
 
-        BarGraph.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'bargraph', {title:'Bar graph' }, startQuery);
+        BarGraph.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID, {title:BarGraph.name }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -24,31 +30,15 @@ define([
             that.textH = 130;
 
 
-            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
-            Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
-                if (that.tableInfo.id==tableid)
-                    that.reDraw();
-            } );
-
-
-
-
-            that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
-                that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(true,false);
-            };
-
-            that.createPanels = function() {
+            that.createPanelPlot = function() {
                 that.panelPlot = FrameCanvas(that.framePlot);
                 that.panelPlot.draw = that.draw;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+            };
 
+            that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -118,12 +108,17 @@ define([
                 if (that.catpropid2)
                     data.propid2 = that.catpropid2;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'categorycounts', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);
                         return;
                     }
+                    if ('Warning' in resp)
+                        that.setWarning(resp.Warning);
+                    else
+                        that.setWarning('');
                     if (!that.catpropid2)
                         that.prepareData1Cat(resp);
                     else

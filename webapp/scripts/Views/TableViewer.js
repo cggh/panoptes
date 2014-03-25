@@ -117,6 +117,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         that.tableid + 'CMB_' + MetaData.workspaceid
                     );
 
+                    this.theTableFetcher.setMaxRecordCount(that.tableInfo.settings.MaxCountQueryAggregated || 1000000)
+
                     this.createPanelTableViewer();
                     this.createPanelControls();
 
@@ -158,9 +160,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     );
                     this.myTable = this.panelTable.getTable();// A shortcut variable
                     this.myTable.fetchBuffer = 300;
-                    this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.NONE;
-                    if (tableInfo.settings.FetchRecordCount)
-                        this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+                    this.myTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
                     this.myTable.preventFetch = true;
                     that.myTable.setQuery(that.theQuery.get());
 

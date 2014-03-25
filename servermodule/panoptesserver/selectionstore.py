@@ -13,7 +13,7 @@ def ResponseExecute(returndata, calculationObject):
     keyid = DQXDbTools.ToSafeIdentifier(returndata['keyid'])
     propid = DQXDbTools.ToSafeIdentifier(returndata['propid'])
     dataid = DQXDbTools.ToSafeIdentifier(returndata['dataid'])
-    iscustom = DQXDbTools.ToSafeIdentifier(returndata['iscustom'])
+    iscustom = int(returndata['iscustom']) > 0
 
     tableName =tableid
     if iscustom:

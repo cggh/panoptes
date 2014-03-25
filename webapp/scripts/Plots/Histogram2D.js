@@ -1,13 +1,20 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
         require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
+        EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
         var Histogram2D = {};
+
+        Histogram2D.typeID = 'histogram2d';
+        Histogram2D.name = '2D Histogram';
+        Histogram2D.description= 'Takes <b>two numerical properties</b>, bins the values, and plots the number of {items} in each cell as a colour density.';
+        Histogram2D.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
         var paletteList = ['Gray', 'Gray (inverted)', 'Rainbow 1', 'Rainbow 2', 'Heath'];
@@ -41,10 +48,10 @@ define([
         }
 
 
-        GenericPlot.registerPlotType('histogram2d', Histogram2D);
+        GenericPlot.registerPlotType(Histogram2D);
 
-        Histogram2D.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'histogram2d', {title:'2D Histogram' }, startQuery);
+        Histogram2D.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -61,22 +68,15 @@ define([
             } );
 
 
-            that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
-                that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(true,false);
-            };
-
-            that.createPanels = function() {
+            that.createPanelPlot = function() {
                 that.panelPlot = FrameCanvas(that.framePlot);
                 that.panelPlot.draw = that.draw;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+            }
 
+            that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -195,6 +195,7 @@ define([
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
+                data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue()) {
                     data.binsizex = that.ctrl_binsizeValueX.getValue();
@@ -208,10 +209,16 @@ define([
                     }
 
                     if (!resp.hasdata) {
-                        alert('No data in the result set');
+                        that.setWarning('No data in result set');
                         that.reDraw();
                         return;
                     }
+
+                    if ('Warning' in resp)
+                        that.setWarning(resp.Warning);
+                    else
+                        that.setWarning('');
+
 
                     var decoder = DataDecoders.ValueListDecoder();
                     var bucketsX = decoder.doDecode(resp.bucketsx);

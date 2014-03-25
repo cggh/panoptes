@@ -7,7 +7,6 @@ IsPositionOnGenome: true         #Requires that chrom and pos exist
 Chromosome: chrom
 Position: pos
 
-FetchRecordCount: false
 QuickFindFields: SnpName
 
 

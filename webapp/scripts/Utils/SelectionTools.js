@@ -52,7 +52,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         keyid: tableInfo.primkey,
                         propid: propid,
                         dataid: id,
-                        iscustom: propInfo.isCustom
+                        iscustom: propInfo.isCustom?1:0
                     },
                     function(resp) {
                         Msg.broadcast({ type: 'PropertyContentChanged'}, {

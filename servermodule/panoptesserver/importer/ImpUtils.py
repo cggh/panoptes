@@ -9,6 +9,7 @@ import DQXUtils
 import errno
 import SettingsLoader
 from DQXTableUtils import VTTable
+import customresponders.panoptesserver.Utils as Utils
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -262,7 +263,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         settings = property['Settings']
         settings.AddTokenIfMissing('Index', False)
         settings.AddTokenIfMissing('Search', 'None')
-        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors'])
+        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors', 'channelName', 'channelColor', 'connectLines'])
         settings.RequireTokens(['DataType'])
         settings.ConvertToken_Boolean('isCategorical')
         if settings.HasToken('isCategorical') and settings['isCategorical']:
@@ -288,6 +289,8 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     with calculationObject.LogDataDump():
         for property in properties:
             calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
+    for property in properties:
+        Utils.CheckSafeIdentifier(property['propid'])
     return properties
 
 

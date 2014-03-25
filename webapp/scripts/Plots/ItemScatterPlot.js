@@ -1,23 +1,32 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
-    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
+    "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
         require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
-        EditQuery, MetaData, QueryTool, GenericPlot, ButtonChoiceBox, MiscUtils
+        EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
         var ItemScatterPlot = {};
 
+        ItemScatterPlot.typeID = 'scatterplot';
+        ItemScatterPlot.name = 'Scatter plot';
+        ItemScatterPlot.description= 'Takes <b>two numerical properties</b> and plot the {items} as points on a X-Y chart. Optionally, the colour and size of the points can be controlled by other properties.';
+        ItemScatterPlot.isCompatible = function(tableInfo) {
+            return true;
+        }
 
 
 
-        GenericPlot.registerPlotType('scatterplot', ItemScatterPlot);
+        GenericPlot.registerPlotType(ItemScatterPlot);
 
-        ItemScatterPlot.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'scatterplot', {title:'Scatter plot' }, startQuery);
+        ItemScatterPlot.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery);
             that.fetchCount = 0;
             that.propDataMap = {};
+            that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
+
+
 
             that.plotAspects = [
                 { id: 'id', name: 'ID', datatype: 'Text', propid: that.tableInfo.primkey, data: null, visible:false, required:true },
@@ -34,29 +43,18 @@ define([
                 that.mapPlotAspects[aspect.id] = aspect;
             });
 
-            var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
-            Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
-                if (that.tableInfo.id==tableid)
-                    that.reDraw();
-            } );
 
-
-            that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.35))
-                    .setAllowScrollBars(false,true);
-                that.framePlot = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(false,false);
-            };
-
-            that.createPanels = function() {
+            that.createPanelPlot = function() {
                 that.panelPlot = FrameCanvas(that.framePlot);
                 that.panelPlot.draw = that.draw;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+            }
 
+
+
+            that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
                 var pickControls = Controls.CompoundGrid();
@@ -235,7 +233,7 @@ define([
                     }
                     else {
                         var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
-                        fetcher.setMaxResultCount(999999);
+                        fetcher.setMaxResultCount(that.maxrecordcount);
                         var encoding='ST';
                         if (propInfo.isFloat)
                             encoding = 'F3';
@@ -259,6 +257,10 @@ define([
                                 that.propDataMap[aspectInfo.propid] = aspectInfo.data;
                                 that.processAspectData(plotAspectID);
                                 that.panelPlot.invalidate();
+                                if (aspectInfo.data.length >= that.maxrecordcount)
+                                    that.setWarning('Number of points truncated to ' + that.maxrecordcount);
+                                else
+                                    that.setWarning('');
                             },
                             function (data) { //error
                                 that.fetchCount -= 1;

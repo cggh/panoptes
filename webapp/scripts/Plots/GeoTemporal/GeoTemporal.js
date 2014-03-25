@@ -11,10 +11,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         var GeoTemporal = {};
 
+        GeoTemporal.typeID = 'GeoTemporal';
+        GeoTemporal.name = 'Geographic map';
+        GeoTemporal.description= 'Takes a <b>geographic lattitude & longitude property pair</b>, and maps the {items} on a world map. Optionally, a date property can be used to add a time line.';
+        GeoTemporal.isCompatible = function(tableInfo) {
+            return tableInfo.hasGeoCoord;
+        }
 
 
 
-        GenericPlot.registerPlotType('GeoTemporal', GeoTemporal);
+        GenericPlot.registerPlotType(GeoTemporal);
 
 
 
@@ -23,10 +29,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
 
-        GeoTemporal.Create = function(tableid, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, 'GeoTemporal', {title:'Geographic map' }, startQuery);
+        GeoTemporal.Create = function(tableid, startQuery) {
+            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery);
 
             that.pointData = {};//first index: property id, second index: point nr
+            that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
 
             that.hasTimeLine = false;
             $.each(MetaData.customProperties, function(idx, propInfo) {
@@ -52,14 +59,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
-                var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7));
+
+                var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7))
+                    .setMargins(0).setSeparatorSize(0);
+
+                that.frameWarning = frameRight.addMemberFrame(Framework.FrameFinal('', 0.01))
+                    .setMargins(0).setAutoSize().setAllowScrollBars(false, false);
+
+                var frameRight2 = frameRight.addMemberFrame(Framework.FrameGroupVert('', 0.99));
 
                 if (that.hasTimeLine) {
-                    that.plotComponents.timeLine.frame = frameRight.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    that.plotComponents.timeLine.frame = frameRight2.addMemberFrame(Framework.FrameFinal('', 0.3))
                         .setAllowScrollBars(false,false);
                 }
 
-                that.frameGeoMap = frameRight.addMemberFrame(Framework.FrameFinal('', 0.7))
+                that.frameGeoMap = frameRight2.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(false,false);
             };
 
@@ -127,6 +141,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.createPanels = function() {
+
+                this.panelWarning = Framework.Form(this.frameWarning);
+                this.warningContent = Controls.Html('', '', '____');
+                this.panelWarning.addControl(this.warningContent);
+                this.panelWarning.render();
+
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
 
                 var ctrl_Query = that.theQuery.createControl();
@@ -195,10 +215,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
                 );
 
-                if (settings && settings.zoomFit)
-                    that.startZoomFit = true;
+                that.startZoomFit = true;
                 that.reloadAll();
             };
+
+            that.setWarning = function(warning) {
+                if (warning)
+                    that.warningContent.modifyValue('<div style="color:red;padding:2px;background-color:yellow;border-bottom: 1px solid black">' + warning + '</div>');
+                else
+                    that.warningContent.modifyValue('');
+                that.panelWarning.render();
+            };
+
 
 
             that.storeCustomSettings = function() {
@@ -225,7 +253,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.fetchData = function() {
                 var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
-                fetcher.setMaxResultCount(999999);
+                fetcher.setMaxResultCount(that.maxrecordcount);
 
                 that.pointSet.clearPoints();
 
@@ -278,14 +306,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     function (data) { //success
                         DQX.stopProcessing();
                         if (that.requestID == requestID) {
+                            var resultpointcount = 0;
                             $.each(data, function(id, values) {
                                 that.pointData[id] = values;
+                                resultpointcount = values.length;
                             });
                             that.setPoints();
                             if (that.startZoomFit) {
                                 that.pointSet.zoomFit(100);
                                 that.startZoomFit = false;
                             }
+                            if (resultpointcount >= that.maxrecordcount)
+                                that.setWarning('Number of points truncated to ' + that.maxrecordcount);
+                            else
+                                that.setWarning('');
                         }
                     },
                     function (data) { //error

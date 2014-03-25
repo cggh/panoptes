@@ -3,7 +3,9 @@ NamePlural: samples
 Description: A synthetic set of samples collected from a large area of Africa. The dataset contains GPS coordinates, collection datas, and some fictitious properties.
 PrimKey: ID
 QuickFindFields: ID,CatId,RegionId
-FetchRecordCount: true
+
+MaxCountQueryRecords: 250000
+MaxCountQueryAggregated: 500000
 
 Properties:
 
@@ -43,11 +45,17 @@ Properties:
   Name: Numerical 1
   DataType: Value
   ShowInTable: true
+  MinVal: -10
+  MaxVal: 10
+  BarWidth: 100
 
 - Id: NumProp2
   Name: Numerical 2
   DataType: Value
   ShowInTable: true
+  MinVal: -10
+  MaxVal: 10
+  BarWidth: 100
 
 - Id: Filtrd
   Name: Filtered

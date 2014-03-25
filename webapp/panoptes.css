@@ -194,3 +194,29 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     padding-top:4px;
    padding-bottom:4px;
 }
+
+
+.QueryTableValueBar
+{
+    height:15px;
+    background-color: rgb(140,230,255);
+    border-spacing: 20px;
+    border-collapse: collapse;
+    cursor: pointer;
+}
+
+.PlotTypeTable
+{
+}
+
+.PlotTypeTable tr
+{
+    cursor: pointer;
+}
+
+.PlotTypeTable tr:hover
+{
+    background-color: white;
+    outline: 1px solid rgb(0,188,205);
+    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+}

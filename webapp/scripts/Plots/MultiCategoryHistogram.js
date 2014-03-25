@@ -7,28 +7,22 @@ define([
         EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
-        var Histogram = {};
+        var MultiCategoryHistogram = {};
 
-        Histogram.typeID = 'histogram';
-        Histogram.name = 'Histogram';
-        Histogram.description= 'Takes a <b>numerical property</b>, and plots the number of {items} for a set of bins defined over this value.';
-        Histogram.isCompatible = function(tableInfo) {
+        MultiCategoryHistogram.typeID = 'MultiCategoryHistogram';
+        MultiCategoryHistogram.name = 'Multiple category histograms';
+        MultiCategoryHistogram.description= 'Takes a <b>numerical property</b> and a <b>categorical property</b>, and plots a separate histogram for each state of the categorical property.';
+        MultiCategoryHistogram.isCompatible = function(tableInfo) {
             return true;
         }
 
 
-        GenericPlot.registerPlotType(Histogram);
+        GenericPlot.registerPlotType(MultiCategoryHistogram);
 
-        Histogram.Create = function(tableid, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery);
+        MultiCategoryHistogram.Create = function(tableid, startQuery) {
+            var that = StandardLayoutPlot.Create(tableid, MultiCategoryHistogram.typeID, {title:MultiCategoryHistogram.name }, startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
-
-
-            that.barW = 16;
-            that.scaleW = 100;
-            that.textH = 130;
-
 
 
             that.createPanelPlot = function() {
@@ -42,16 +36,28 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
-                var propList = [ {id:'', name:'-- None --'}];
+                var numPropList = [ {id:'', name:'-- Select --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
-                    var included = false;
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
-                        propList.push({ id:prop.propid, name:prop.name });
+                        numPropList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: propList }).setClassID('value');
+
+                var catPropList = [ {id:'', name:'-- Select --'}];
+                $.each(MetaData.customProperties, function(idx, prop) {
+                    if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
+                        catPropList.push({ id:prop.propid, name:prop.name });
+                });
+                
+                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: numPropList }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
                     that.fetchData();
+            });
+
+                that.ctrlCatProperty = Controls.Combo(null,{ label:'Group by:', states: catPropList }).setClassID('groupby');
+                that.ctrlCatProperty.setOnChanged(function() {
+                    that.fetchData();
                 });
+                
 
                 that.ctrl_binsizeAutomatic = Controls.Check(null,{label:'Automatic', value:true}).setClassID('binsizeautomatic').setOnChanged(function() {
                     that.ctrl_binsizeValue.modifyEnabled(!that.ctrl_binsizeAutomatic.getValue());
@@ -76,6 +82,8 @@ define([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlValueProperty,
+                    Controls.VerticalSeparator(10),
+                    that.ctrlCatProperty,
                     Controls.VerticalSeparator(20),
                     binsizeGroup
                 ]);
@@ -99,10 +107,11 @@ define([
 
             that.fetchData = function() {
                 that.propidValue = that.ctrlValueProperty.getValue();
+                that.propidCat = that.ctrlCatProperty.getValue();
                 if (that.staging)
                     return;
                 that.bucketCounts = null;
-                if (!that.propidValue) {
+                if ((!that.propidValue) || (!that.propidCat)) {
                     that.reDraw();
                     return;
                 }
@@ -112,12 +121,13 @@ define([
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
-                data.propid = that.propidValue;
+                data.propidvalue = that.propidValue;
+                data.propidcat = that.propidCat;
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 data.qry = SQL.WhereClause.encode(that.theQuery.get());
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
-                DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogram', data, function(resp) {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogrammulticat', data, function(resp) {
                     DQX.stopProcessing();
                     if ('Error' in resp) {
                         alert(resp.Error);
@@ -135,6 +145,7 @@ define([
                     }
 
                     var decoder = DataDecoders.ValueListDecoder();
+                    var cats = decoder.doDecode(resp.cats);
                     var buckets = decoder.doDecode(resp.buckets);
                     var counts = decoder.doDecode(resp.counts);
                     that.bucketSize = resp.binsize;
@@ -149,13 +160,25 @@ define([
                             bucketMax=vl;
                     });
 
+                    that.numberOfBuckets = Math.round(bucketMax-bucketMin+1)
+                    that.categories = [];
+                    var catMap = {};
+                    $.each(cats, function(idx, cat) {
+                        if (!catMap[cat]) {
+                            var bucketCounts = [];
+                            for (var i=bucketMin; i<=bucketMax; i++)
+                                bucketCounts.push(0);
+                            var catInfo = { name:cat, bucketCounts:bucketCounts };
+                            that.categories.push(catInfo);
+                            catMap[cat] = catInfo;
+                        }
+                    });
+
                     that.bucketNrOffset = bucketMin;
-                    that.bucketCounts=[];
                     that.maxCount = 1;
-                    for (var i=bucketMin; i<=bucketMax; i++)
-                        that.bucketCounts.push(0);
                     for (var i=0; i<buckets.length; i++) {
-                        that.bucketCounts[buckets[i]-bucketMin] = counts[i];
+                        var catInfo = catMap[cats[i]]
+                        catInfo.bucketCounts[buckets[i]-bucketMin] += counts[i];
                         if (that.maxCount<counts[i])
                             that.maxCount=counts[i]
                     }
@@ -187,34 +210,29 @@ define([
 
             that.drawImpl = function(drawInfo) {
 
+                var barH = 90;
 
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
 
-                var marginX = 40;
+                    var marginX = 40;
                 var marginY = 40;
                 ctx.fillStyle="rgb(220,220,220)";
                 ctx.fillRect(0,0,marginX,drawInfo.sizeY);
                 ctx.fillRect(0,drawInfo.sizeY-marginY,drawInfo.sizeX,marginY);
 
-                if (!that.bucketCounts)
+                if (!that.numberOfBuckets)
                     return;
 
                 var XMin = that.bucketNrOffset*that.bucketSize;
-                var XMax = (that.bucketNrOffset+that.bucketCounts.length)*that.bucketSize;
+                var XMax = (that.bucketNrOffset+that.numberOfBuckets)*that.bucketSize;
                 var XRange = XMax - XMin;
                 XMin -= 0.1*XRange;
                 XMax += 0.1*XRange;
-                var YMin = 0;
-                var YMax = that.maxCount*1.1;
-                var scaleX = (drawInfo.sizeX-marginX) / (XMax - XMin);
-                var offsetX = marginX - XMin*scaleX;
-                var scaleY = - (drawInfo.sizeY-marginY) / (YMax - YMin);
-                var offsetY = (drawInfo.sizeY-marginY) - YMin*scaleY;
-                that.scaleX = scaleX; that.offsetX = offsetX;
-                that.scaleY = scaleY; that.offsetY = offsetY;
 
                 // Draw x scale
+                var scaleX = (drawInfo.sizeX-marginX) / (XMax - XMin);
+                var offsetX = marginX - XMin*scaleX;
                 ctx.save();
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
@@ -239,50 +257,66 @@ define([
                 });
                 ctx.restore();
 
-                // Draw y scale
-                ctx.save();
-                ctx.font="10px Arial";
-                ctx.fillStyle="rgb(0,0,0)";
-                ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(scaleY));
-                for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
-                    var vl = i*scale.Jump1;
-                    var py = Math.round(vl * scaleY + offsetY)-0.5;
-                    ctx.strokeStyle = "rgb(230,230,230)";
-                    if (i%scale.JumpReduc==0)
-                        ctx.strokeStyle = "rgb(190,190,190)";
-                    ctx.beginPath();
-                    ctx.moveTo(marginX,py);
-                    ctx.lineTo(drawInfo.sizeX,py);
-                    ctx.stroke();
-                    if (i%scale.JumpReduc==0) {
-                        ctx.save();
-                        ctx.translate(marginX-5,py);
-                        ctx.rotate(-Math.PI/2);
-                        ctx.fillText(scale.value2String(vl),0,0);
-                        ctx.restore();
+                var YMin = 0;
+                var YMax = that.maxCount*1.1;
+                $.each(that.categories, function(idx, catInfo) {
+                    var scaleY = - (barH-5) / (YMax - YMin);
+                    var offsetY = (barH-5) - YMin*barH + idx*barH;
+                    that.scaleX = scaleX; that.offsetX = offsetX;
+                    that.scaleY = scaleY; that.offsetY = offsetY;
+
+
+                    // Draw y scale
+                    ctx.save();
+                    ctx.font="10px Arial";
+                    ctx.fillStyle="rgb(0,0,0)";
+                    ctx.textAlign = 'center';
+                    var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(scaleY));
+                    for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
+                        var vl = i*scale.Jump1;
+                        var py = Math.round(vl * scaleY + offsetY)-0.5;
+                        ctx.strokeStyle = "rgb(230,230,230)";
+                        if (i%scale.JumpReduc==0)
+                            ctx.strokeStyle = "rgb(190,190,190)";
+                        ctx.beginPath();
+                        ctx.moveTo(marginX,py);
+                        ctx.lineTo(drawInfo.sizeX,py);
+                        ctx.stroke();
+                        if (i%scale.JumpReduc==0) {
+                            ctx.save();
+                            ctx.translate(marginX-5,py);
+                            ctx.rotate(-Math.PI/2);
+                            ctx.fillText(scale.value2String(vl),0,0);
+                            ctx.restore();
+                        }
                     }
-                }
-                ctx.restore();
+                    ctx.restore();
 
-                ctx.fillStyle="rgb(190,190,190)";
-                $.each(that.bucketCounts, function(bidx, val) {
-                    var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
-                    var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
-                    var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
-                    var px2 = Math.round(x2 * scaleX + offsetX)-0.5;
-                    var py1 = Math.round(0 * scaleY + offsetY)-0.5;
-                    var py2 = Math.round(val * scaleY + offsetY)-0.5;
-                    ctx.beginPath();
-                    ctx.moveTo(px1, py2);
-                    ctx.lineTo(px1, py1);
-                    ctx.lineTo(px2, py1);
-                    ctx.lineTo(px2, py2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
+                    var bucketCounts = catInfo.bucketCounts;
+                    ctx.fillStyle="rgb(190,190,190)";
+                    $.each(bucketCounts, function(bidx, val) {
+                        var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
+                        var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
+                        var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
+                        var px2 = Math.round(x2 * scaleX + offsetX)-0.5;
+                        var py1 = Math.round(0 * scaleY + offsetY)-0.5;
+                        var py2 = Math.round(val * scaleY + offsetY)-0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(px1, py2);
+                        ctx.lineTo(px1, py1);
+                        ctx.lineTo(px2, py1);
+                        ctx.lineTo(px2, py2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    ctx.font="11px Arial";
+                    ctx.fillStyle="rgba(0,0,0,0.6)";
+                    ctx.textAlign = 'left';
+                    ctx.fillText(catInfo.name,marginX+5,that.offsetY-barH+20);
+
                 });
-
 
                 that.plotPresent = true;
             };
@@ -321,7 +355,7 @@ define([
                     var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, tooltip.minval, tooltip.maxval);
                     var content = 'Number of items: '+tooltip.count;
                     content += '<br>Range: '+tooltip.minval+' - '+tooltip.maxval+'<br>';
-                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram bar', content, qry, null);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'MultiCategoryHistogram bar', content, qry, null);
                 }
             }
 
@@ -332,7 +366,7 @@ define([
 
                 var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
 
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'MultiCategoryHistogram range', content, qry, null);
             }
 
 
@@ -343,7 +377,7 @@ define([
 
 
 
-        return Histogram;
+        return MultiCategoryHistogram;
     });
 
 

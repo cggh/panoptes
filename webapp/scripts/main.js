@@ -46,7 +46,7 @@ require([
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
     "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
-    "Utils/Serialise", "Utils/ButtonChoiceBox"
+    "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
 ],
     function (
         _, $, Application, Framework, Msg, DQX, SQL, Popup, DataFetchers,
@@ -54,7 +54,7 @@ require([
         Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
         PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
-        Serialise, ButtonChoiceBox
+        Serialise, ButtonChoiceBox, PlotStarter
         ) {
         $(function () {
 

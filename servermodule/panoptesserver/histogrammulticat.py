@@ -7,7 +7,8 @@ def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
-    propid = DQXDbTools.ToSafeIdentifier(returndata['propid'])
+    propidvalue = DQXDbTools.ToSafeIdentifier(returndata['propidvalue'])
+    propidcat = DQXDbTools.ToSafeIdentifier(returndata['propidcat'])
     maxrecordcount = int(returndata['maxrecordcount'])
     encodedquery = returndata['qry']
 
@@ -20,7 +21,7 @@ def response(returndata):
     cur = db.cursor()
     coder = B64.ValueListCoder()
 
-    querystring = " ({0} is not null)".format(propid)
+    querystring = " ({0} is not null)".format(propidvalue)
     if len(whc.querystring_params) > 0:
         querystring += " AND ({0})".format(whc.querystring_params)
 
@@ -28,8 +29,8 @@ def response(returndata):
         binsize=float(returndata['binsize'])
     else:
         #Automatically determine bin size
-        sql = 'select min({propid}) as _mn, max({propid}) as _mx, count(*) as _cnt from (select {propid} from {tableid} WHERE {querystring} limit {maxrecordcount}) as tmplim'.format(
-            propid=propid,
+        sql = 'select min({propidvalue}) as _mn, max({propidvalue}) as _mx, count(*) as _cnt from (select {propidvalue} from {tableid} WHERE {querystring} limit {maxrecordcount}) as tmplim'.format(
+            propidvalue=propidvalue,
             tableid=tableid,
             querystring=querystring,
             maxrecordcount=maxrecordcount
@@ -43,7 +44,7 @@ def response(returndata):
             returndata['hasdata']=False
             return returndata
         jumpPrototypes = [1, 2, 5]
-        optimalbincount = int(math.sqrt(count))
+        optimalbincount = int(math.sqrt(count/10))
         optimalbincount = max(optimalbincount, 2)
         optimalbincount = min(optimalbincount, 200)
         optimalbinsize = (maxval-minval)*1.0/optimalbincount
@@ -65,22 +66,24 @@ def response(returndata):
     returndata['binsize'] = binsize
 
 
-    maxbincount = 5000
+    maxbincount = 50000
+    cats = []
     buckets = []
     counts = []
     totalcount = 0
-    sql = 'select floor({0}/{1}) as bucket, count(*) as _cnt'.format(propid, binsize)
-    sql += ' FROM (SELECT {1} FROM {0} '.format(tableid, propid)
+    sql = 'select {2} as _propidcat, floor({0}/{1}) as bucket, count(*) as _cnt'.format(propidvalue, binsize, propidcat)
+    sql += ' FROM (SELECT {1},{2} FROM {0} '.format(tableid, propidvalue,propidcat)
     sql += " WHERE {0}".format(querystring)
     sql += ' limit {0})  as tmplim'.format(maxrecordcount)
-    sql += ' group by bucket'
+    sql += ' group by bucket,_propidcat'
     sql += ' limit {0}'.format(maxbincount)
     cur.execute(sql, whc.queryparams)
     for row in cur.fetchall():
-        if row[0] is not None:
-            buckets.append(row[0])
-            counts.append(row[1])
-            totalcount += row[1]
+        if row[1] is not None:
+            cats.append(row[0] or '-None-')
+            buckets.append(row[1])
+            counts.append(row[2])
+            totalcount += row[2]
 
     if len(buckets) >= maxbincount:
         returndata['Error'] = 'Too many bins in dataset'
@@ -88,6 +91,7 @@ def response(returndata):
     if totalcount >= maxrecordcount:
         returndata['Warning'] = 'Number of data points exceeds the limit of {0}.\nData has been truncated'.format(maxrecordcount)
 
+    returndata['cats'] = coder.EncodeStrings(cats)
     returndata['buckets'] = coder.EncodeIntegers(buckets)
     returndata['counts'] = coder.EncodeIntegers(counts)
 

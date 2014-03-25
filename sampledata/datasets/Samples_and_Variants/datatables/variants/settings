@@ -6,6 +6,12 @@ Description: A table containing a number of genomic variants     # A description
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: SnpName
 
+
+# The following tags set limits on the data volumes that can be queried
+MaxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)
+MaxCountQueryAggregated: 1000000  # Defines the maximum number of records that will be queried on the server for aggregation (e.g. for creating histograms)
+
+
 # The following set of tags is used to define the items in this data table as positions on the genome
 IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 Chromosome: chromosome            # Speficies the table column ID that contains the chromosome
@@ -56,24 +62,31 @@ Properties:
   ShowInTable: true
   ShowInBrowser: true           # If true, this property will be displayed in the genome browser
   MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
-  MaxVal: 2                     # Optional: For Value types, specifies the maximum value that can be reached.
+  MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   DecimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
-  SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-     BlockSizeMin: 20               # Minimum summary block size (in bp)
-     BlockSizeMax: 50000            # Maximum summary block size (in bp)
-     ChannelColor: "rgb(0,100,0)"   # Colour of the channel
 
 - Id: Value1
   Name: Value 1
   Description: The first numerical value
+  BarWidth: 180                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
+  ChannelName: Channel A          # Name of the channel this property will be displayed in. Properties sharing the same channel name will be displayed in overlay
+  ChannelColor: "rgb(0,80,200)"  # Colour used to display this property
+  ConnectLines: True              # Indicate that the points will be connected with lines
 
 - Id: Value2
   Name: Value 2
   Description: The second numerical value
+  ChannelName: Channel A
+  ChannelColor: "rgb(200,80,0)"
+  ConnectLines: True
 
 - Id: Value3
   Name: Value 3
   Description: The third numerical value
+  SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
+     BlockSizeMin: 20               # Minimum summary block size (in bp)
+     BlockSizeMax: 50000            # Maximum summary block size (in bp)
+     ChannelColor: "rgb(0,100,0)"   # Colour of the channel
 
 - Id: Extra1
   Name: Extra 1

@@ -6,7 +6,6 @@ Description: A table containing a number of samples     # A description of this 
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: ID
 
-# Optionally, "FetchRecordCount: false" can be used to instruct Panoptes *not* to try to fetch total record counts in data table views. This can be used to speed up the software in case of large datasets (e.g. ﱅ6 records)
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 QuickFindFields: ID,SiteID,SampleTypeID

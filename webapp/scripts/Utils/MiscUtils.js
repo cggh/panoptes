@@ -96,8 +96,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             col.CellToText = propInfo.toDisplayString;
             col.CellToTextInv = propInfo.fromDisplayString;
 
-            if ( (propInfo.isFloat) && (propInfo.settings.hasValueRange) )
-                col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
+            if (propInfo.isFloat) {
+                if (propInfo.settings.minval || propInfo.settings.maxval) {
+                    col.minval = propInfo.settings.minval;
+                    col.maxval = propInfo.settings.maxval;
+                    if (propInfo.settings.BarWidth)
+                        col.barGraphWidth = propInfo.settings.BarWidth;
+                    else {
+                        if (propInfo.settings.hasValueRange)
+                            col.CellToColor = createFuncFraction2Color(propInfo.settings.minval, propInfo.settings.maxval); //Create a background color that reflects the value
+                    }
+                }
+            }
+
 
             if (propInfo.isBoolean)
                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
@@ -114,6 +125,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableInfo.id + 'CMB_' + MetaData.workspaceid
             );
 
+            theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000)
+
+
             var panelTable = QueryTable.Panel(
                 frameTable,
                 theDataFetcher,
@@ -122,9 +136,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var theTable = panelTable.getTable();
             theTable.fetchBuffer = 300;
 
-            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.NONE;
-            if (tableInfo.settings.FetchRecordCount)
-                theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
+            theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
 
             theTable.setQuery(query);
 
