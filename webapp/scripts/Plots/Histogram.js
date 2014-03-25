@@ -60,7 +60,7 @@ define([
                         that.fetchData();
                 });
 
-                that.ctrl_binsizeValue = Controls.Edit(null,{size:18}).setClassID('binsizevalue').setOnChanged(function() {
+                that.ctrl_binsizeValue = Controls.Edit(null,{size:12}).setClassID('binsizevalue').setOnChanged(function() {
 
                 });
                 that.ctrl_binsizeValue.modifyEnabled(false);
@@ -70,7 +70,11 @@ define([
                 });
                 that.ctrl_binsizeUpdate.modifyEnabled(false);
 
-                var binsizeGroup = Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValue, that.ctrl_binsizeUpdate]).setLegend('Bin size');
+                var binsizeGroup = Controls.CompoundHor([
+                    Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValue]).setAutoFillX(false),
+                    Controls.HorizontalSeparator(10),
+                    that.ctrl_binsizeUpdate
+                ]).setLegend('Bin size');
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,

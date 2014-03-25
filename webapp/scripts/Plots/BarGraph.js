@@ -21,7 +21,12 @@ define([
         GenericPlot.registerPlotType(BarGraph);
 
         BarGraph.Create = function(tableid, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID, {title:BarGraph.name }, startQuery);
+            var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID,
+                {
+                    title: BarGraph.name,
+                    scrollHorizontal: true
+                },
+                startQuery);
             that.fetchCount = 0;
             that.showRelative = false;
 

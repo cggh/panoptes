@@ -35,8 +35,10 @@ define([
                 that.frameWarning = frameRight.addMemberFrame(Framework.FrameFinal('', 0.01))
                     .setMargins(0).setAutoSize().setAllowScrollBars(false, false);
 
+                settings.scrollHorizontal = !!(settings.scrollHorizontal);
+                settings.scrollVertical = !!(settings.scrollVertical);
                 that.framePlot = frameRight.addMemberFrame(Framework.FrameFinal('', 0.99))
-                    .setAllowScrollBars(true,false);
+                    .setAllowScrollBars(settings.scrollHorizontal, settings.scrollVertical);
             };
 
             that.createPanels = function() {
