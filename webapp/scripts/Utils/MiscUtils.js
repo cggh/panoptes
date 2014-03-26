@@ -52,14 +52,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (propInfo.isPrimKey)
                 tablePart = 0;
             var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!=tableInfo.ChromosomeField) && (propInfo.propid!=tableInfo.PositionField) );
+            var sortByDefault = false;
+            if (sortable)
+                sortByDefault = propid == tableInfo.settings.SortDefault;
             var col = theTable.createTableColumn(
                 QueryTable.Column(propInfo.name,propInfo.propid,tablePart),
                 encoding,
-                sortable
+                sortable,
+                sortByDefault
             );
             if (propInfo.settings.Description)
                 col.setToolTip(propInfo.settings.Description);
-            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(tableInfo.ChromosomeField)) && (theTable.findColumn(tableInfo.PositionField)) ) {
+            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(tableInfo.ChromosomeField)) && (theTable.findColumn(tableInfo.PositionField) && (propid==tableInfo.PositionField) ) ) {
                 // Define a joint sort action on both columns chromosome+position, and set it as default
                 theTable.addSortOption("Position", SQL.TableSort([tableInfo.ChromosomeField, tableInfo.PositionField]),true);
             }

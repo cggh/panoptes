@@ -104,7 +104,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     rootFrame.makeGroupHor();
                     this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250);
                     this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
-                        .setAllowScrollBars(false,true);
+                        .setAllowScrollBars(false,false);
                 }
 
 

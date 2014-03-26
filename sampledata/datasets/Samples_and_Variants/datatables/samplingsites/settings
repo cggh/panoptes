@@ -10,6 +10,8 @@ IsPositionOnGenome: false
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
 QuickFindFields: SiteID,Country
 
+# Defines the default property to sort the table
+SortDefault: Country
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
