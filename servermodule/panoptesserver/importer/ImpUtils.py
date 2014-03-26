@@ -154,7 +154,7 @@ def RunConvertor(calculationObject, name, runpath, arguments):
     calculationObject.RunPythonScript(scriptFile, runpath, arguments)
 
 
-def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
+def ExecuteFilterbankSummary_Value(calculationObject, destFolder, id, settings):
     RunConvertor(calculationObject, '_CreateSimpleFilterBankData', destFolder,
                  [
                      id,
@@ -163,6 +163,17 @@ def ExecuteFilterbankSummary(calculationObject, destFolder, id, settings):
                      settings['BlockSizeMin'],
                      2,
                      settings['BlockSizeMax']
+                ]
+    )
+
+def ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, id, settings):
+    RunConvertor(calculationObject, '_CreateMultiCategoryDensityFilterBankData', destFolder,
+                 [
+                     id,
+                     settings['BlockSizeMin'],
+                     2,
+                     settings['BlockSizeMax'],
+                     ';'.join(settings['Categories'])
                 ]
     )
 
@@ -315,7 +326,7 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
                     destFile.write('\t'.join([columns[colindex] for colindex in colindices]) + '\n')
 
 
-def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
+def CreateSummaryValues_Value(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
     summSettings.RequireTokens(['BlockSizeMax'])
     summSettings.AddTokenIfMissing('MinVal', 0)
@@ -324,12 +335,9 @@ def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sou
     destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
     if not os.path.exists(destFolder):
         os.makedirs(destFolder)
-    # dataFileName = sourceFileName
-    # dataFileName = os.path.join(destFolder, propid)
-    # ExtractColumns(calculationObject, sourceFileName, dataFileName, ['chrom', 'pos', propid], False)
     if not importSettings['ConfigOnly']:
         calculationObject.Log('Executing filter bank')
-        ExecuteFilterbankSummary(calculationObject, destFolder, propid, summSettings)
+        ExecuteFilterbankSummary_Value(calculationObject, destFolder, propid, summSettings)
     extraSummSettings = summSettings.Clone()
     extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
     sql = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')".format(propid, tableid, sourceid, workspaceid)
@@ -343,6 +351,36 @@ def CreateSummaryValues(calculationObject, summSettings, datasetId, tableid, sou
         -1,
         extraSummSettings.ToJSON(),
         summSettings['MinVal'],
+        summSettings['MaxVal'],
+        summSettings['BlockSizeMin']
+    )
+    ExecuteSQL(calculationObject, datasetId, sql)
+
+
+
+def CreateSummaryValues_Categorical(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
+    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
+    summSettings.RequireTokens(['BlockSizeMin', 'BlockSizeMax'])
+    summSettings.AddTokenIfMissing('MaxVal', 1.0)
+    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
+    if not os.path.exists(destFolder):
+        os.makedirs(destFolder)
+    if not importSettings['ConfigOnly']:
+        calculationObject.Log('Executing filter bank')
+        ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, propid, summSettings)
+    extraSummSettings = summSettings.Clone()
+    extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+    sql = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')".format(propid, tableid, sourceid, workspaceid)
+    ExecuteSQL(calculationObject, datasetId, sql)
+    sql = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})".format(
+        workspaceid,
+        sourceid,
+        propid,
+        tableid,
+        name,
+        -1,
+        extraSummSettings.ToJSON(),
+        0,
         summSettings['MaxVal'],
         summSettings['BlockSizeMin']
     )

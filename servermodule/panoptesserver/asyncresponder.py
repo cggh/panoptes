@@ -223,7 +223,7 @@ class CalculationThread (threading.Thread):
         with self.LogSubHeader('Python script'):
             print('Run path: '+runPath)
             os.chdir(runPath)
-            cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join([str(a) for a in arguments])
+            cmd = config.pythoncommand + ' ' + scriptFile + ' ' + ' '.join(["'" + str(a) + "'" for a in arguments])
             if self.logfilename is not None:
                 cmd += ' >> ' + self.logfilename + ' 2>&1'
             print('COMMAND:'+cmd)

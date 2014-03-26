@@ -40,7 +40,7 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             print('SETTINGS: '+settings.ToJSON())
             if not importSettings['ConfigOnly']:
                 print('Executing filter bank')
-                ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid, settings)
+                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings)
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
             sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(

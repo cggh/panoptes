@@ -207,7 +207,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                         script.Execute(datasetId, dataFileName)
                         calculationObject.LogFileTop(dataFileName, 10)
 
-                    ImpUtils.CreateSummaryValues(
+                    ImpUtils.CreateSummaryValues_Value(
                         calculationObject,
                         summSettings,
                         datasetId,

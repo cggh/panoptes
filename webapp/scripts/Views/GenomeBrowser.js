@@ -1,11 +1,11 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup",
-    "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation",
+    "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation", "DQX/ChannelPlot/ChannelMultiCatDensity",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
     "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/Components/GenotypeChannel"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup,
-              GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation,
+              GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation, ChannelMultiCatDensity,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
               EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel
         ) {
@@ -367,7 +367,34 @@ define([
                         Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
                     })
                     that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
+
+
+                    if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
+                        // There is a summary value associated to this datatable property, and we add it to this channel
+                        var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
+                        summInfo.isDisplayed = true; // Set this flag so that it does not get added twice
+
+                        theFetcher = new DataFetcherSummary.Fetcher(MetaData.serverUrl,summInfo.minblocksize,500);
+                        theFetcher.usedChannelCount = 0;
+                        theFetcher.minblocksize=summInfo.minblocksize;
+                        that.listDataFetcherProfiles.push(theFetcher);
+                        var summFolder = that.summaryFolder+'/'+propInfo.propid;
+                        var colinfo = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_cats");
+                        theFetcher.activateFetchColumn(colinfo.myID);
+                        var denstrackid =tableInfo.id+'_'+propInfo.propid+'_dens';
+                        var densChannel = ChannelMultiCatDensity.Channel(denstrackid, theFetcher, colinfo);
+                        densChannel
+                            .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural + ' dens');
+                        that.panelBrowser.addChannel(densChannel, true);
+//                        var ctrl_onoff = theChannel.createVisibilityControl(true);
+//                        theChannel.controls.addControl(ctrl_onoff);
+                    }
+
                 }
+
+
+
+
 
                 //Map a numerical property
                 that.createPropertyChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {

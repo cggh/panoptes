@@ -12,11 +12,11 @@ Properties:
   SummaryValues:
      BlockSizeMin: 20
      BlockSizeMax: 50000
-     ChannelColor: "rgb(0,100,0)"
+     ChannelColor: rgb(0,0,100)
 
 - Id: Custom2
   Name: Custom value 2
-  Description: An example of a custom categorical text value
+  Description: An example of a custom text value
   DataType: Text
   ShowInTable: true
   ShowInBrowser: false

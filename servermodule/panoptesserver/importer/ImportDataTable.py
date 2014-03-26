@@ -165,19 +165,48 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         for property in properties:
             propid = property['propid']
             settings = property['Settings']
-            if settings.HasToken('SummaryValues'):
-                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
+
+            if (settings.HasToken('SummaryValues')) and (property['DataType'] == 'Value'):
+                with calculationObject.LogHeader('Creating numerical summary values for {0}.{1}'.format(tableid,propid)):
                     summSettings = settings.GetSubSettings('SummaryValues')
                     if settings.HasToken('minval'):
                         summSettings.AddTokenIfMissing('MinVal', settings['minval'])
-                    summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
+                    if settings.HasToken('maxval'):
+                        summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
                     sourceFileName = os.path.join(folder, 'data')
                     destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
                     ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
-                    ImpUtils.CreateSummaryValues(
+                    ImpUtils.CreateSummaryValues_Value(
+                        calculationObject,
+                        summSettings,
+                        datasetId,
+                        tableid,
+                        'fixed',
+                        '',
+                        propid,
+                        settings['Name'],
+                        dataFileName,
+                        importSettings
+                    )
+
+            if (settings.HasToken('SummaryValues')) and (property['DataType'] == 'Text'):
+                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
+                    summSettings = settings.GetSubSettings('SummaryValues')
+                    sourceFileName = os.path.join(folder, 'data')
+                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
+                    if not os.path.exists(destFolder):
+                        os.makedirs(destFolder)
+                    dataFileName = os.path.join(destFolder, propid)
+                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
+                    categories = []
+                    if settings.HasToken('categoryColors'):
+                        stt = settings.GetSubSettings('categoryColors')
+                        categories = [x for x in stt.Get()]
+                        summSettings.AddTokenIfMissing('Categories', categories)
+                    ImpUtils.CreateSummaryValues_Categorical(
                         calculationObject,
                         summSettings,
                         datasetId,
@@ -226,7 +255,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                             if not os.path.exists(destFolder):
                                 os.makedirs(destFolder)
                             shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
-                            ImpUtils.ExecuteFilterbankSummary(calculationObject, destFolder, summaryid+'_'+fileid, summSettings)
+                            ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid+'_'+fileid, summSettings)
 
 
 

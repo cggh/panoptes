@@ -127,7 +127,7 @@ if __name__ == "__main__":
     # )
 
     datasetid = 'Samples_and_Variants'
-    datatable = 'sampletypes'
+    datatable = 'variants'
     datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatable)
     ImportDataTable.ImportDataTable(calc, datasetid, datatable, datatableFolder,
         {
