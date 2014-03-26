@@ -41,7 +41,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (propInfo.settings.decimDigits ==0 )
                     encoding  = 'Int';
             }
-            if ((propInfo.datatype=='Value') && (propInfo.propid==MetaData.getTableInfo(tableid).PositionField) && (MetaData.getTableInfo(tableid).hasGenomePositions) )
+            if ((propInfo.datatype=='Value') && (propInfo.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
                 encoding  = 'Int';
             if (propInfo.datatype=='Boolean')
                 encoding  = 'Int';
@@ -51,7 +51,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Float4';
             if (propInfo.isPrimKey)
                 tablePart = 0;
-            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!=theTable.ChromosomeField) && (propInfo.propid!=theTable.PositionField) );
+            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!=tableInfo.ChromosomeField) && (propInfo.propid!=tableInfo.PositionField) );
             var col = theTable.createTableColumn(
                 QueryTable.Column(propInfo.name,propInfo.propid,tablePart),
                 encoding,
@@ -59,9 +59,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
             if (propInfo.settings.Description)
                 col.setToolTip(propInfo.settings.Description);
-            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(theTable.ChromosomeField)) && (theTable.findColumn(theTable.PositionField)) ) {
+            if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(tableInfo.ChromosomeField)) && (theTable.findColumn(tableInfo.PositionField)) ) {
                 // Define a joint sort action on both columns chromosome+position, and set it as default
-                theTable.addSortOption("Position", SQL.TableSort([theTable.ChromosomeField, theTable.PositionField]),true);
+                theTable.addSortOption("Position", SQL.TableSort([tableInfo.ChromosomeField, tableInfo.PositionField]),true);
             }
 
             if (propInfo.datatype=='Boolean')
