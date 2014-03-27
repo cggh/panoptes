@@ -333,41 +333,6 @@ define([
                 that.createPositionChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
                     var trackid =tableInfo.id+'_'+propInfo.propid;
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
-                    var theChannel = ChannelPositions.Channel(trackid,
-                        dataFetcher,
-                        tableInfo.primkey
-                    );
-                    theChannel
-                        .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural)
-                        .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
-
-                    theChannel.setSelectionStateHandler(tableInfo.isItemSelected);
-
-                    if (propInfo.settings.categoryColors) {
-                        var mapping = {};
-                        $.each(propInfo.settings.categoryColors, function(key, val) {
-                            mapping[key] = DQX.parseColorString(val);
-                        });
-                        theChannel.makeCategoricalColors(
-                            propInfo.propid,
-                            mapping
-                        );
-                    }
-                    else if (propInfo.isBoolean) {
-                        theChannel.makeCategoricalColors(
-                            propInfo.propid,
-                            { '0': DQX.Color(1,0.75,0.5), '1': DQX.Color(0,0.5,0.5) }
-                        );
-                    }
-
-                    //Define a custom tooltip
-                    theChannel.setToolTipHandler(function(id) { return id; })
-                    //Define a function that will be called when the user clicks a snp
-                    theChannel.setClickHandler(function(id) {
-                        Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
-                    })
-                    that.panelBrowser.addChannel(theChannel, false);//Add the channel to the browser
-
 
                     if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
                         // There is a summary value associated to this datatable property, and we add it to this channel
@@ -382,13 +347,54 @@ define([
                         var colinfo = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_cats");
                         theFetcher.activateFetchColumn(colinfo.myID);
                         var denstrackid =tableInfo.id+'_'+propInfo.propid+'_dens';
-                        var densChannel = ChannelMultiCatDensity.Channel(denstrackid, theFetcher, colinfo);
+                        var densChannel = ChannelMultiCatDensity.Channel(denstrackid, theFetcher, colinfo, {
+                            maxVal:0.1,
+                            categoryColors: propInfo.settings.categoryColors
+                        });
                         densChannel
-                            .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural + ' dens');
-                        that.panelBrowser.addChannel(densChannel, true);
+                            .setTitle(propInfo.name)
+                            .setSubTitle(tableInfo.tableCapNamePlural);
+                        that.panelBrowser.addChannel(densChannel, false);
 //                        var ctrl_onoff = theChannel.createVisibilityControl(true);
 //                        theChannel.controls.addControl(ctrl_onoff);
                     }
+
+                    var positionChannel = ChannelPositions.Channel(trackid,
+                        dataFetcher,
+                        tableInfo.primkey
+                    );
+                    positionChannel
+                        .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural)
+                        .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
+
+                    positionChannel.setSelectionStateHandler(tableInfo.isItemSelected);
+
+                    if (propInfo.settings.categoryColors) {
+                        var mapping = {};
+                        $.each(propInfo.settings.categoryColors, function(key, val) {
+                            mapping[key] = DQX.parseColorString(val);
+                        });
+                        positionChannel.makeCategoricalColors(
+                            propInfo.propid,
+                            mapping
+                        );
+                    }
+                    else if (propInfo.isBoolean) {
+                        positionChannel.makeCategoricalColors(
+                            propInfo.propid,
+                            { '0': DQX.Color(1,0.75,0.5), '1': DQX.Color(0,0.5,0.5) }
+                        );
+                    }
+
+                    //Define a custom tooltip
+                    positionChannel.setToolTipHandler(function(id) { return id; })
+                    //Define a function that will be called when the user clicks a snp
+                    positionChannel.setClickHandler(function(id) {
+                        Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
+                    })
+                    that.panelBrowser.addChannel(positionChannel, false);//Add the channel to the browser
+
+
 
                 }
 
