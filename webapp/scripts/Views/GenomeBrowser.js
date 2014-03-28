@@ -334,6 +334,7 @@ define([
                     var trackid =tableInfo.id+'_'+propInfo.propid;
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
 
+                    var densChannel = null;
                     if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
                         // There is a summary value associated to this datatable property, and we add it to this channel
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
@@ -347,16 +348,18 @@ define([
                         var colinfo = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_cats");
                         theFetcher.activateFetchColumn(colinfo.myID);
                         var denstrackid =tableInfo.id+'_'+propInfo.propid+'_dens';
+                        var maxVal = 1.0;
+                        if (propInfo.settings.SummaryValues.MaxVal)
+                            maxVal = propInfo.settings.SummaryValues.MaxVal;
                         var densChannel = ChannelMultiCatDensity.Channel(denstrackid, theFetcher, colinfo, {
-                            maxVal:0.1,
+                            maxVal:maxVal,
                             categoryColors: propInfo.settings.categoryColors
                         });
                         densChannel
                             .setTitle(propInfo.name)
                             .setSubTitle(tableInfo.tableCapNamePlural);
                         that.panelBrowser.addChannel(densChannel, false);
-//                        var ctrl_onoff = theChannel.createVisibilityControl(true);
-//                        theChannel.controls.addControl(ctrl_onoff);
+                        that.panelBrowser.channelModifyVisibility(densChannel.getID(), false, true);
                     }
 
                     var positionChannel = ChannelPositions.Channel(trackid,
@@ -369,14 +372,15 @@ define([
 
                     positionChannel.setSelectionStateHandler(tableInfo.isItemSelected);
 
+                    var colorMapping = null;
                     if (propInfo.settings.categoryColors) {
-                        var mapping = {};
+                        var colorMapping = {};
                         $.each(propInfo.settings.categoryColors, function(key, val) {
-                            mapping[key] = DQX.parseColorString(val);
+                            colorMapping[key] = DQX.parseColorString(val);
                         });
                         positionChannel.makeCategoricalColors(
                             propInfo.propid,
-                            mapping
+                            colorMapping
                         );
                     }
                     else if (propInfo.isBoolean) {
@@ -393,8 +397,40 @@ define([
                         Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
                     })
                     that.panelBrowser.addChannel(positionChannel, false);//Add the channel to the browser
+                    that.panelBrowser.channelModifyVisibility(positionChannel.getID(), false, true);
 
+                    // Define visibility control & color states
+                    var ctrl_onoff = Controls.Check(null, {label: propInfo.name}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
+                        that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
+                        if (densChannel) {
+                            that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
+                            densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
+                        }
+                    });
+                    controlsGroup.addControl(ctrl_onoff);
 
+                    if (colorMapping) {
+                        var controlsSubList = [];
+                        if (colorMapping) {
+                            var str = '';
+                            $.each(colorMapping, function(state, col) {
+                                if (state!='_other_') {
+                                    str += '<span style="background-color:{cl}">&nbsp;&nbsp;</span>&nbsp;'.DQXformat({cl: col.toString()}) + state+' &nbsp; ';
+                                }
+                            });
+                            controlsSubList.push(Controls.Html(null, str));
+                        }
+                        if (densChannel && colorMapping) {
+                            chk_densPercent = Controls.Check(null, {label: 'Show density as percentage'}).setClassID('denspercent'+propInfo.propid).setOnChanged(function(id, ctrl) {
+                                densChannel._scaleRelative = ctrl.getValue();
+                                that.panelBrowser.render();
+                            });
+                            chk_densPercent.modifyEnabled(false);
+                            controlsSubList.push(chk_densPercent);
+                            densChannel.chk_percent = chk_densPercent;
+                        }
+                        controlsGroup.addControl(Controls.CompoundHor([Controls.HorizontalSeparator(25), Controls.CompoundVert(controlsSubList).setTreatAsBlock(true)]));
+                    }
 
                 }
 

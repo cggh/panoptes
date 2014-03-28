@@ -48,8 +48,8 @@ def response(returndata):
             binsize=float(returndata[binsizename])
         else:
             #Automatically determine bin size
-            minval = minvals[0]
-            maxval = maxvals[1]
+            minval = minvals[dimnr]
+            maxval = maxvals[dimnr]
             if (minval is None) or (maxval is None) or (maxval == minval) or (count == 0):
                 returndata['hasdata']=False
                 return returndata

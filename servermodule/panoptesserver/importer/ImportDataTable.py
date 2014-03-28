@@ -68,7 +68,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             propid = property['propid']
             settings = property['Settings']
             extraSettings = settings.Clone()
-            extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
+            extraSettings.DropTokens(['Name', 'DataType', 'Order'])
             sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
                 settings['DataType'],
                 propid,
