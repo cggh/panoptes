@@ -415,7 +415,9 @@ define([
                             var str = '';
                             $.each(colorMapping, function(state, col) {
                                 if (state!='_other_') {
-                                    str += '<span style="background-color:{cl}">&nbsp;&nbsp;</span>&nbsp;'.DQXformat({cl: col.toString()}) + state+' &nbsp; ';
+                                    if (str)
+                                        str += ' &nbsp; ';
+                                    str += '<span style="background-color:{cl}">&nbsp;&nbsp;</span>&nbsp;'.DQXformat({cl: col.toString()}) + state;
                                 }
                             });
                             controlsSubList.push(Controls.Html(null, str));
@@ -429,7 +431,7 @@ define([
                             controlsSubList.push(chk_densPercent);
                             densChannel.chk_percent = chk_densPercent;
                         }
-                        controlsGroup.addControl(Controls.CompoundHor([Controls.HorizontalSeparator(25), Controls.CompoundVert(controlsSubList).setTreatAsBlock(true)]));
+                        controlsGroup.addControl(Controls.CompoundVert(controlsSubList).setTreatAsBlock(true).setLeftIndent(25));
                     }
 
                 }
