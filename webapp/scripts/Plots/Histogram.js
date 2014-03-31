@@ -76,12 +76,20 @@ define([
                     that.ctrl_binsizeUpdate
                 ]).setLegend('Bin size');
 
+                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Gamma correction', width: 200, minval:0.1, maxval:1, value:1, digits: 2})
+                    /*.setNotifyOnFinished()*/.setClassID('gamma')
+                    .setOnChanged(DQX.debounce(function() {
+                        that.reDraw();
+                    }, 10));
+
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
                     Controls.VerticalSeparator(20),
                     that.ctrlValueProperty,
                     Controls.VerticalSeparator(20),
-                    binsizeGroup
+                    binsizeGroup,
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_Gamma
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
@@ -204,6 +212,8 @@ define([
                 if (!that.bucketCounts)
                     return;
 
+                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
+
                 var XMin = that.bucketNrOffset*that.bucketSize;
                 var XMax = (that.bucketNrOffset+that.bucketCounts.length)*that.bucketSize;
                 var XRange = XMax - XMin;
@@ -217,6 +227,10 @@ define([
                 var offsetY = (drawInfo.sizeY-marginY) - YMin*scaleY;
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;
+
+                var applyGammaCorr = function(vl) {
+                    return Math.pow(vl/that.maxCount,gamma)*that.maxCount;
+                };
 
                 // Draw x scale
                 ctx.save();
@@ -248,10 +262,12 @@ define([
                 ctx.font="10px Arial";
                 ctx.fillStyle="rgb(0,0,0)";
                 ctx.textAlign = 'center';
-                var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(scaleY));
+                var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(scaleY)/applyGammaCorr(0.05*that.maxCount)*(0.05*that.maxCount));
+                var lastTextPos = 1.0e9;
                 for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
                     var vl = i*scale.Jump1;
-                    var py = Math.round(vl * scaleY + offsetY)-0.5;
+                    vlc = applyGammaCorr(vl);
+                    var py = Math.round(vlc * scaleY + offsetY)-0.5;
                     ctx.strokeStyle = "rgb(230,230,230)";
                     if (i%scale.JumpReduc==0)
                         ctx.strokeStyle = "rgb(190,190,190)";
@@ -263,7 +279,12 @@ define([
                         ctx.save();
                         ctx.translate(marginX-5,py);
                         ctx.rotate(-Math.PI/2);
-                        ctx.fillText(scale.value2String(vl),0,0);
+                        var txt = scale.value2String(vl);
+                        var tw =  ctx.measureText(txt).width;
+                        if (py+tw/2<lastTextPos) {
+                            ctx.fillText(txt,0,0);
+                            lastTextPos = py-(tw/2+7);
+                        }
                         ctx.restore();
                     }
                 }
@@ -271,6 +292,7 @@ define([
 
                 ctx.fillStyle="rgb(190,190,190)";
                 $.each(that.bucketCounts, function(bidx, val) {
+                    val = applyGammaCorr(val);
                     var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
                     var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
                     var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
