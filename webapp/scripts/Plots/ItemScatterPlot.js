@@ -323,36 +323,15 @@ define([
                     }
                 }
 
-
                 if (plotAspectID=='color') {// Create categorical data
                     aspectInfo.catData = null;
                     var legendStr = '';
                     if (values) {
-
-                        var maxCatCount = DQX.standardColors.length-1;
-                        var catMap = {};
-                        var cats = []
-                        for (var i=0; i<values.length; i++) {
-                            if (!catMap[values[i]]) {
-                                catMap[values[i]] = true;
-                                cats.push(values[i]);
-                            }
-                        }
-
-                        var colormapper = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid).category2Color;
-                        colormapper.map(cats);
-                        var catData = [];
-                        for (var i=0; i<values.length; i++) {
-                            var idx = colormapper.get(values[i]);
-                            if (idx<0)
-                                idx = colormapper.itemCount-1;
-                            catData.push(idx);
-                        }
-
-                        aspectInfo.catData = catData;
-                        $.each(cats,function(idx,value) {
-                            if ((colormapper.get(value)>=0)&&(colormapper.get(value)<colormapper.itemCount-1))
-                                legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
+                        var maprs = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid).mapColors(values);
+                        aspectInfo.catData = maprs.indices;
+                        that.mappedColors = maprs.colors;
+                        $.each(maprs.legend,function(idx, legendItem) {
+                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
                         });
                     }
                     that.colorLegend.modifyValue(legendStr);
@@ -468,11 +447,13 @@ define([
                 var sizeFactor =that.ctrl_SizeFactor.getValue();
                 var opacity = that.ctrl_Opacity.getValue();
 
-                //Prepare color category strings
-                var colorStrings = [];
-                $.each(DQX.standardColors, function(idx, color) {
-                    colorStrings.push(color.changeOpacity(opacity).toStringCanvas());
-                });
+                if (valColorCat) {
+                    //Prepare color category strings
+                    var colorStrings = [];
+                    $.each(that.mappedColors, function(idx, color) {
+                        colorStrings.push(color.changeOpacity(opacity).toStringCanvas());
+                    });
+                }
 
 
                 // Draw points
@@ -553,7 +534,7 @@ define([
                             var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
                             var rd = ((valSize[ii]-sizeMin)/(sizeMax-sizeMin)*10+2) * sizeFactor;
                             if (valColorCat) {
-                                ctx.fillStyle=DQX.standardColors[valColorCat[ii]].changeOpacity(opacity).toStringCanvas();
+                                ctx.fillStyle=colorStrings[valColorCat[ii]];
                             }
                             ctx.beginPath();
                             ctx.arc(px, py, rd, 0, 2 * Math.PI, false);

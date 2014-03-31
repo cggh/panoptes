@@ -76,8 +76,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.setPoints = function(points, settings) {
                 that.myTimeLine.setPoints(points, settings);
-
             };
+
+            that.setColorMap = function(mp) {
+                that.myTimeLine.setColorMap(mp);
+            };
+
 
             that.draw = function() {
                 that.myTimeLine.setDrawStyle({

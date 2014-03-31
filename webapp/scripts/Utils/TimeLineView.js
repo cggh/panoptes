@@ -16,7 +16,6 @@ define([
             that._height = 31;
             that.myTimeLine = itimeLine;
 
-
             that.draw = function (drawInfo) {
                 if ((!that.myTimeLine.minJD) && (!that.myTimeLine.maxJD))
                     return;
@@ -77,14 +76,13 @@ define([
             that.setAutoFillHeight(true);
             that.rateScale = 1.0e-99;
 
-
             that.draw = function (drawInfo) {
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 0.84);
                 this.drawStandardGradientRight(drawInfo, 0.84);
 
                 var colorStrings0 = [];
-                $.each(DQX.standardColors, function(idx, color) {
+                $.each(that.myTimeLine.colorMap, function(idx, color) {
                     colorStrings0.push(color.lighten(0.3).toStringCanvas());
                 });
 
@@ -193,6 +191,7 @@ define([
             var that = ChannelPlotter.Panel(iParentRef, { hasHeader: false, hasFooter: false, hasXScale: false, leftWidth:80});
             that.scaleConversionFactor = 1.0;
             that.myPointSet = [];
+            that.colorMap = DQX.standardColors;
 
             that.drawStyle = {
                 showTimeBarsAsPercentage: false
@@ -260,6 +259,11 @@ define([
                 that.rangeJD = that.maxJD - that.minJD;
                 that.setRange(0,that.rangeJD, that.rangeJD/4);
             }
+
+            that.setColorMap = function(mp) {
+                that.colorMap = mp;
+            };
+
 
             that.setPoints = function(ipointset, iSettings) {
                 that.myPointSet = ipointset;

@@ -180,16 +180,17 @@ define([
                 $.each(that.categories,function(idx, cat) {
                     that.maxcount = Math.max(that.maxcount,cat.count);
                 });
-                var colormapper = MetaData.findProperty(that.tableInfo.id,that.catpropid2).category2Color;
-                colormapper.map(subCats);
+
+                var dispSubCats = [];
+                $.each(subCats, function(idx, subcat) {
+                    dispSubCats.push(propInfo2.toDisplayString(subcat));
+                });
+                propInfo2.mapColors(dispSubCats);
 
                 var legendStr = '';
                 $.each(subCats,function(idx, subcat) {
-                    var color = DQX.Color(0.5,0.5,0.5);
-                    if (colormapper.get(subcat)>=0)
-                        color = DQX.standardColors[colormapper.get(subcat)];
                     legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({
-                        cl:color.toString(),
+                        cl:propInfo2.mapSingleColor(propInfo2.toDisplayString(subcat)).toString(),
                         name:propInfo2.toDisplayString(subcat)
                     });
                 });
@@ -300,18 +301,14 @@ define([
                      });
 
                     if (that.catpropid2) {
-                        var colorMapper = MetaData.findProperty(that.tableInfo.id,that.catpropid2).category2Color;
+//                        var colorMapper = propInfo2.category2Color;
                         var cumulcount = 0;
                         $.each(cat.subcats, function(idx, subcat) {
                             var h1 = cumulcount*1.0/sumcount * that.plotH;
                             var h2 = (cumulcount+subcat.count)*1.0/sumcount * that.plotH;
                             var py1 = drawInfo.sizeY-that.textH - Math.round(h1) + 0.5;
                             var py2 = drawInfo.sizeY-that.textH - Math.round(h2) + 0.5;
-                            var colNr = colorMapper.get(subcat.name);
-                            if (colNr>=0)
-                                ctx.fillStyle=DQX.standardColors[colNr].toStringCanvas();
-                            else
-                                ctx.fillStyle='rgb(100,100,100)';
+                            ctx.fillStyle = propInfo2.mapSingleColor(propInfo2.toDisplayString(subcat.name)).toString();
                             ctx.beginPath();
                             ctx.moveTo(px1, py2);
                             ctx.lineTo(px1, py1);

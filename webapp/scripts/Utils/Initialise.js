@@ -287,6 +287,79 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 prop.category2Color = DQX.PersistentAssociator(DQX.standardColors.length);
 
+                prop.mapSingleColor = function(value) {
+                    if (prop.settings.categoryColors) {
+                        var cl = prop.settings.categoryColors[value];
+                        if (cl) return cl;
+                        return DQX.Color(0.5,0.5,0.5);
+                    }
+                    else {
+                        //Create automatic map based on standard colors
+                        var colormapper = prop.category2Color;
+                        var idx = colormapper.get(value);
+                        if (idx>=0)
+                            return DQX.standardColors[idx];
+                        return DQX.Color(0.5,0.5,0.5);
+                    }
+                };
+
+                prop.mapColors = function(valueList) {
+                    if (prop.settings.categoryColors) {
+                        var colors = [];
+                        var colmap = {};
+                        var defaultColor = DQX.Color(0.5,0.5,0.5);
+                        if (prop.settings.categoryColors['_other_'])
+                            defaultColor = DQX.parseColorString(prop.settings.categoryColors['_other_'], DQX.Color(0.0,0.5,0.5));
+                        $.each(prop.settings.categoryColors, function(state, colorstr) {
+                            if (state!='_other_') {
+                                colors.push(DQX.parseColorString(colorstr, DQX.Color(0.5,0.5,0.5)));
+                                colmap[state] = colors.length;
+                            }
+                        });
+                        colors.push(defaultColor);
+                        var defaultindex = colors.length;
+                        var catData = [];
+                        for (var i=0; i<valueList.length; i++) {
+                            var clidx = colmap[valueList[i]];
+                            if (!clidx)
+                                clidx = defaultindex;
+                            catData.push(clidx-1);
+                        }
+                        var legend = [];
+                        $.each(prop.settings.categoryColors, function(state, color) {
+                            if (state!='_other_') {
+                                legend.push({ state: state, color: color });
+                            }
+                        });
+                        return { indices:catData, colors: colors, legend: legend };
+                    }
+                    else {
+                        //Create automatic map based on standard colors
+                        var uniqueCatMap = {};
+                        var uniqueCats = []
+                        for (var i=0; i<valueList.length; i++) {
+                            if (!uniqueCatMap[valueList[i]]) {
+                                uniqueCatMap[valueList[i]] = true;
+                                uniqueCats.push(valueList[i]);
+                            }
+                        }
+                        var colormapper = prop.category2Color;
+                        colormapper.map(uniqueCats);
+                        var catData = [];
+                        for (var i=0; i<valueList.length; i++) {
+                            var idx = colormapper.get(valueList[i]);
+                            if (idx<0)
+                                idx = colormapper.itemCount-1;
+                            catData.push(idx);
+                        }
+                        var legend = [];
+                        $.each(colormapper.getAssociations(), function(state, coloridx) {
+                            legend.push({ state: state, color: DQX.standardColors[coloridx] });
+                        });
+                        return { indices:catData, colors: DQX.standardColors, legend: legend };
+                    }
+                }
+
                 if (prop.settings.isCategorical) {
                     var getter = DataFetchers.ServerDataGetter();
                     getter.addTable(prop.tableid + 'CMB_' + MetaData.workspaceid,

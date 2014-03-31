@@ -336,36 +336,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var lattitudes = that.pointData[that.tableInfo.propIdGeoCoordLattit];
                 var selectionInfo = that.tableInfo.currentSelection;
 
+                that.mappedColors = DQX.standardColors;
+
                 if (that.catPropId) {
                     var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
                     var catProps = that.pointData[that.catPropId];
-                    var colormapper = MetaData.findProperty(that.tableInfo.id, that.catPropId).category2Color;
+//                    var colormapper = MetaData.findProperty(that.tableInfo.id, that.catPropId).category2Color;
 
                     for (var i=0; i<catProps.length; i++)
                         catProps[i] = catPropInfo.toDisplayString(catProps[i]);
 
-                    var catMap = {};
-                    var cats = []
-                    for (var i=0; i<catProps.length; i++) {
-                        if (!catMap[catProps[i]]) {
-                            catMap[catProps[i]] = true;
-                            cats.push(catProps[i]);
-                        }
-                    }
 
-                    colormapper.map(cats);
-                    var catData = [];
-                    for (var i=0; i<catProps.length; i++) {
-                        var idx = colormapper.get(catProps[i]);
-                        if (idx<0)
-                            idx = colormapper.itemCount-1;
-                        catData.push(idx);
-                    }
-
+                    var maprs = catPropInfo.mapColors(catProps);
+                    var catData = maprs.indices;
+                    that.mappedColors = maprs.colors;
                     var legendStr = '';
-                    $.each(cats,function(idx,value) {
-                        if ((colormapper.get(value)>=0)&&(colormapper.get(value)<colormapper.itemCount-1))
-                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:DQX.standardColors[colormapper.get(value)].toString(), name:value});
+                    $.each(maprs.legend,function(idx, legendItem) {
+                        legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
                     });
                     that.colorLegend.modifyValue(legendStr);
                 }
@@ -429,6 +416,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         catData: !!that.catPropId,
                         numData: !!that.numPropId
                     });
+                    that.pointSet.setColorMap(that.mappedColors);
+                    that.plotComponents.timeLine.setColorMap(that.mappedColors);
                 }
             }
 

@@ -63,3 +63,7 @@ Properties:
   ReadData: false
   ShowInTable: true
   CanUpdate: true
+  CategoryColors:
+    "No": rgb(255,128,60)
+    "Yes": rgb(0,180,0)
+    _other_: rgb(128, 128, 128)
