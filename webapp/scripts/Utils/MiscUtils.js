@@ -129,7 +129,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableInfo.id + 'CMB_' + MetaData.workspaceid
             );
 
-            theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000)
+            theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000);
+            theDataFetcher.setReportIfError(true);
 
 
             var panelTable = QueryTable.Panel(

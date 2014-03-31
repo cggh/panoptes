@@ -229,6 +229,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         MetaData.database,
                         relTab.childTableInfo.id + 'CMB_' + MetaData.workspaceid
                     );
+                    theDataFetcher.setReportIfError(true);
 
                     relTab.panelTable = QueryTable.Panel(
                         relTab.frameTable,

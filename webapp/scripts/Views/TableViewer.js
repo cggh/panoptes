@@ -116,6 +116,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         MetaData.database,
                         that.tableid + 'CMB_' + MetaData.workspaceid
                     );
+                    this.theTableFetcher.setReportIfError(true);
 
                     this.theTableFetcher.setMaxRecordCount(that.tableInfo.settings.MaxCountQueryAggregated || 1000000)
 

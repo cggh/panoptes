@@ -578,6 +578,7 @@ define([
                                 tableInfo.PositionField
                             );
                             dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
+                            dataFetcher.setReportIfError(true);
 
                             tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
                             dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");//add id column to the datafetcher, not plotted but needed for the tooltip & click actions
