@@ -90,7 +90,7 @@ define([
                 that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 200, minval:0, maxval:1, value:1, digits: 2})
                     .setNotifyOnFinished().setClassID('opacity')
                     .setOnChanged(function() {
-                    that.reDraw();
+                        that.reDraw();
                 });
 
                 var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
@@ -210,13 +210,6 @@ define([
 
             that.fetchData = function(plotAspectID) {
 
-                //If ID is missing, silently fetch this as well
-                if (plotAspectID!='id')
-                    if (!that.mapPlotAspects['id'].data)
-                        setTimeout(function(){
-                                that.fetchData('id');
-                            },
-                            150);
 
                 var aspectInfo = that.mapPlotAspects[plotAspectID];
                 aspectInfo.data = null;
@@ -224,6 +217,15 @@ define([
                     aspectInfo.propid = aspectInfo.picker.getValue();
                 if (that.staging)
                     return;
+
+                //If ID is missing, silently fetch this as well
+                if (plotAspectID == 'xaxis')
+                    if (!that.mapPlotAspects['id'].data)
+                        setTimeout(function(){
+                                that.fetchData('id');
+                            },
+                            150);
+
                 if (aspectInfo.propid) {
                     var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
                     if (that.propDataMap[aspectInfo.propid]) {
@@ -339,15 +341,14 @@ define([
             }
 
             that.draw = function(drawInfo) {
-                if (that.panelPlot._directRedraw)
-                    that.drawImpl(drawInfo);
-                else
-                    DQX.executeProcessing(function() { that.drawImpl(drawInfo); });
+                that.drawImpl(drawInfo);
             }
 
             that.drawImpl = function(drawInfo) {
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
+                ctx.fillStyle="#FFFFFF";
+                ctx.fillRect(0, 0, drawInfo.sizeX,  drawInfo.sizeY);
                 if (that.fetchCount > 0) {
                     ctx.font="20px Arial";
                     ctx.fillStyle="rgb(140,140,140)";
@@ -465,6 +466,8 @@ define([
                 var smallPoints = (!valSize)&&(sizeFactor<0.05);
                 var sortIndex = that.sortIndex;
                 var ptcount = valX.length;
+
+
 
                 if (smallPoints) {
                     for (var i=0; i<ptcount; i++) {

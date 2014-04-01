@@ -275,10 +275,7 @@ define([
 
 
             that.draw = function(drawInfo) {
-                if (that.panelPlot._directRedraw)
-                    that.drawImpl(drawInfo);
-                else
-                    DQX.executeProcessing(function() { that.drawImpl(drawInfo); });
+                that.drawImpl(drawInfo);
             }
 
             that.drawImpl = function(drawInfo) {
