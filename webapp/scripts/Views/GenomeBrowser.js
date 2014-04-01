@@ -628,22 +628,54 @@ define([
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
                             controlsGroup.addControl(ctrlQuery);
 
-                            states = [];
+                            states = [{id:'', name:'-None-'}];
                             $.each(MetaData.customProperties, function(idx, propInfo) {
                                 if (propInfo.tableid == tableInfo.id)
                                     states.push({id: propInfo.propid, name: propInfo.name});
                             });
-                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.primkey}).setClassID('genometrack_displayedfields_'+tableInfo.id);
+
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.primkey}).setClassID('region_name_'+tableInfo.id);
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.dataFetcher.field_name = tableInfo.genomeBrowserFieldChoice.getValue();
                                 tableInfo.genomeBrowserInfo.dataFetcher.clearData();
                                 that.panelBrowser.render();
                             });
 
+                            tableInfo.genomeBrowserColorChoice = Controls.Combo(null,{label:'Color: ', states: states, value:''}).setClassID('region_color_'+tableInfo.id);
+                            tableInfo.genomeBrowserColorChoice.setOnChanged(function() {
+                                tableInfo.genomeBrowserInfo.dataFetcher.extrafield1 = tableInfo.genomeBrowserColorChoice.getValue();
+                                tableInfo.genomeBrowserInfo.dataFetcher.clearData();
+                                tableInfo.genomeBrowserInfo.regionChannel.funcMapExtraField2Color = function(lst) {
+                                    var propInfo = MetaData.findProperty(tableInfo.id, tableInfo.genomeBrowserInfo.dataFetcher.extrafield1);
+                                    var rs = propInfo.mapColors(lst);
+                                    var indices = rs.indices;
+                                    var colorsidx = rs.colors;
+                                    var colors = [];
+                                    for (var regidx=0; regidx<indices.length; regidx++) {
+                                        colors.push(colorsidx[indices[regidx]]);
+                                    }
+                                    var legendStr = '';
+                                    $.each(rs.legend,function(idx, legendItem) {
+                                        if (legendStr)
+                                            legendStr += ' &nbsp; ';
+                                        legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
+                                    });
+                                    tableInfo.genomeBrowserColorLegend.modifyValue(legendStr);
+
+                                    return colors;
+                                }
+                                that.panelBrowser.render();
+                            });
+
+                            tableInfo.genomeBrowserColorLegend = Controls.Html(null, "");
+
                             controlsGroup.addControl(Controls.VerticalSeparator(12));
                             controlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
+                            controlsGroup.addControl(Controls.VerticalSeparator(8));
+                            controlsGroup.addControl(tableInfo.genomeBrowserColorChoice);
+                            controlsGroup.addControl(Controls.VerticalSeparator(8));
+                            controlsGroup.addControl(tableInfo.genomeBrowserColorLegend);
 
-                            //Create the repeats channel
                             var regionConfig = {
                                 database: MetaData.database,
                                 serverURL: MetaData.serverUrl,
@@ -659,7 +691,7 @@ define([
                             regionFetcher.field_name = tableInfo.primkey;
                             regionFetcher.fetchSubFeatures = false;
                             that.panelBrowser.addDataFetcher(regionFetcher);
-                            regionChannel = ChannelAnnotation.Channel('regions_'+tableInfo.id, regionFetcher);
+                            var regionChannel = ChannelAnnotation.Channel('regions_'+tableInfo.id, regionFetcher);
                             regionChannel.setHeight(60);
                             regionChannel.setTitle(tableInfo.tableCapNamePlural);
                             regionChannel.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
@@ -668,6 +700,7 @@ define([
                             regionChannel.handleFeatureClicked = function (itemid) {
                                 Msg.send({ type: 'ItemPopup' }, { tableid: tableInfo.id, itemid: itemid } );
                             };
+                            tableInfo.genomeBrowserInfo.regionChannel = regionChannel;
 
 
                         }
