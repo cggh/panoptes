@@ -15,9 +15,11 @@ def mkdir_p(path):
         else: raise
 
 vcf_file = "ag1000g.phase1.AR1.Y_unplaced.PASS.vcf.gz"
-variants = vcfnp.variants(vcf_file)
 
+print 'Parsing variants'
+variants = vcfnp.itervariants(vcf_file)
 
+#Recursivly get the names of the columns
 def names_from_dtype(dtype, path=''):
     if dtype.names:
         #dtypes don't support iter.... yes. I know.
@@ -31,8 +33,9 @@ def names_from_dtype(dtype, path=''):
 
 def flatten_numpy_line(line):
     for entry in line:
-        if type(entry) == numpy.void:
-            flatten_numpy_line(entry)
+        if type(entry) == numpy.void or type(entry) == numpy.ndarray:
+            for sub_entry in flatten_numpy_line(entry):
+                yield sub_entry
         else:
             yield entry
 
@@ -43,10 +46,35 @@ with open(out_file, 'w') as f:
     f.write('\t'.join(flatten(names_from_dtype(variants.dtype))))
     f.write('\n')
     for line in variants:
-        print line
-        print list(flatten_numpy_line(line))
         f.write('\t'.join(map(str, flatten_numpy_line(line))))
         f.write('\n')
+
+print 'Parsing variants'
+c = vcfnp.calldata_2d('ag1000g.phase1.AR1.Y_unplaced.PASS.vcf.gz', fields=['DP', 'GT'])
+
+
+variants_out = out.create_dataset("variant_index", variants.shape, 'S12', maxshape=variants.shape, compression='gzip', fletcher32=False, shuffle=False)
+#Fill woth chrom pos?
+
+depth_out = out.create_dataset("total_depth", depth.shape, depth.dtype, chunks=(1000,depth.shape[1]/4), maxshape=depth.shape, compression='szip', fletcher32=False, shuffle=False)
+genotype = f['calldata_2d']['genotype']
+first_allele = out.create_dataset("first_allele", genotype.shape, 'i1', chunks=(2000,depth.shape[1]/4), maxshape=genotype.shape, compression='szip', fletcher32=False, shuffle=False)
+#Parse "a/b"
+copy(genotype, first_allele, lambda array,: map(lambda inner: map(itemgetter(0), inner), array))
+second_allele = out.create_dataset("second_allele", genotype.shape, 'i1', chunks=(2000,depth.shape[1]/4), maxshape=genotype.shape, compression='szip', fletcher32=False, shuffle=False)
+copy(genotype, second_allele, lambda array,: map(lambda inner: map(itemgetter(1), inner), array))
+
+
+# mkdir_p('panoptes_ready_vcf_data/datatables/samples')
+# out_file = 'panoptes_ready_vcf_data/datatables/samples'
+# with open(out_file, 'w') as f:
+#     f.write('\t'.join(flatten(names_from_dtype(variants.dtype))))
+#     f.write('\n')
+#     for line in variants:
+#         f.write('\t'.join(map(str, flatten_numpy_line(line))))
+#         f.write('\n')
+
+
 
 
 
