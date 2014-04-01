@@ -32,7 +32,7 @@ define([
                 { id: 'id', name: 'ID', datatype: 'Text', propid: that.tableInfo.primkey, data: null, visible:false, required:true },
                 { id: 'xaxis', name: 'X axis', datatype: 'Value', propid: null, data: null, visible:true, required:true },
                 { id: 'yaxis', name: 'Y axis', datatype: 'Value', propid: null, data: null, visible:true, required:true },
-                { id: 'color', name: 'Point color', datatype: 'Category', propid: null, visible:true, data: null },
+                { id: 'color', name: 'Point color', datatype: '', propid: null, visible:true, data: null },
                 { id: 'size', name: 'Point size', datatype: 'Value', propid: null, visible:true, data: null },
                 { id: 'style', name: 'Point style', datatype: 'Category', propid: null, visible:true, data: null },
                 { id: 'label', name: 'Hover label', datatype: '', propid: null, visible:true, data: null },

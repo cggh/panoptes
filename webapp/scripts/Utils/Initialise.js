@@ -304,7 +304,43 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
 
                 prop.mapColors = function(valueList) {
+                    if (prop.isFloat&&(prop.settings.maxval!=prop.settings.minval)) {
+                        clCount = 100;
+                        var colors = []
+                        for (var i=0; i<clCount; i++) {
+                            fr = i*1.0/(clCount-1);
+                            colors.push(DQX.HSL2Color(0.5-fr*0.75,0.6,0.5));
+                        }
+                        colors.push(DQX.Color(0.5,0.5,0.5));
+                        var absentColIndex = colors.length-1;
+                        var catData = [];
+                        var range = prop.settings.maxval-prop.settings.minval;
+                        for (var i=0; i<valueList.length; i++) {
+                            if (valueList[i]!=null) {
+                                var fr = (valueList[i]-prop.settings.minval)/range;
+                                var clidx = Math.round(fr*(clCount-1));
+                                if (clidx<0) clidx = 0;
+                                if (clidx>=clCount) clidx = clCount-1;
+                            }
+                            else
+                                var clidx = absentColIndex;
+                            catData.push(clidx);
+                        }
+                        var legend = [];
+                        var scale = DQX.DrawUtil.getScaleJump(range/20);
+                        for (var i=Math.ceil(prop.settings.minval/scale.Jump1); i<=Math.floor(prop.settings.maxval/scale.Jump1); i++) {
+                            if (i%scale.JumpReduc==0) {
+                                var value = i*scale.Jump1;
+                                var fr = (value-prop.settings.minval)/range;
+                                legend.push({ state: scale.value2String(value), color: DQX.HSL2Color(0.5-fr*0.75,0.6,0.5) });
+                            }
+                        }
+                        return { indices:catData, colors: colors, legend: legend };
+                    }
+
+                    //For text data
                     if (prop.settings.categoryColors) {
+                        // Use pre-defined state colors from settings
                         var colors = [];
                         var colmap = {};
                         var defaultColor = DQX.Color(0.5,0.5,0.5);
@@ -320,7 +356,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var defaultindex = colors.length;
                         var catData = [];
                         for (var i=0; i<valueList.length; i++) {
-                            var clidx = colmap[valueList[i]];
+                            var clidx = colmap[prop.toDisplayString(valueList[i])];
                             if (!clidx)
                                 clidx = defaultindex;
                             catData.push(clidx-1);
@@ -354,7 +390,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                         var legend = [];
                         $.each(colormapper.getAssociations(), function(state, coloridx) {
-                            legend.push({ state: state, color: DQX.standardColors[coloridx] });
+                            legend.push({ state: prop.toDisplayString(state), color: DQX.standardColors[coloridx] });
                         });
                         return { indices:catData, colors: DQX.standardColors, legend: legend };
                     }
