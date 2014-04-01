@@ -126,7 +126,7 @@ define([
                 data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propid = that.propidValue;
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
-                data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.qry = SQL.WhereClause.encode(that.theQuery.getForFetching());
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogram', data, function(resp) {

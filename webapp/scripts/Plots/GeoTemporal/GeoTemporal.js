@@ -302,7 +302,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
                 DQX.setProcessing();
-                fetcher.getData(that.theQuery.get(), sortField,
+                fetcher.getData(that.theQuery.getForFetching(), sortField,
                     function (data) { //success
                         DQX.stopProcessing();
                         if (that.requestID == requestID) {

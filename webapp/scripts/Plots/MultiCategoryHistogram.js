@@ -166,7 +166,7 @@ define([
                 data.propidvalue = that.propidValue;
                 data.propidcat = that.propidCat;
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
-                data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.qry = SQL.WhereClause.encode(that.theQuery.getForFetching());
                 if (!that.ctrl_binsizeAutomatic.getValue())
                     data.binsize = that.ctrl_binsizeValue.getValue();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'histogrammulticat', data, function(resp) {

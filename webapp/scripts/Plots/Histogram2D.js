@@ -196,7 +196,7 @@ define([
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
-                data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.qry = SQL.WhereClause.encode(that.theQuery.getForFetching());
                 if (!that.ctrl_binsizeAutomatic.getValue()) {
                     data.binsizex = that.ctrl_binsizeValueX.getValue();
                     data.binsizey = that.ctrl_binsizeValueY.getValue();

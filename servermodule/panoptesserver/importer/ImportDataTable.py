@@ -145,7 +145,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 datasetId,
                 tableid,
                 columns,
-                tableSettings
+                tableSettings,
+                True
             )
             if tableSettings['IsPositionOnGenome']:
                 calculationObject.Log('Indexing chromosome')

@@ -11,12 +11,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var that={};
             that.tableInfo = MetaData.getTableInfo(tableid);
             that.query = SQL.WhereClause.Trivial();
+            that.hasSubSampler = false;
             if (that.tableInfo.currentQuery)
                 that.query = SQL.WhereClause.decode(SQL.WhereClause.encode(that.tableInfo.currentQuery));
             that.prevQueries = [];
 
             if (settings) {
                 that.includeCurrentQuery = settings.includeCurrentQuery;
+                that.hasSubSampler = settings.hasSubSampler;
             }
 
             that.setStartQuery = function(qry) {
@@ -27,13 +29,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return that.query;
             }
 
+            that.getForFetching = function() {
+                var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
+                if (frac>0.99)
+                    return that.query;
+                else
+                    return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareFixed('_randomval_', '<', frac) );
+            }
+
             that.store = function() {
-                return SQL.WhereClause.encode(that.query);
+                var obj = {
+                    query: SQL.WhereClause.encode(that.query)
+                };
+                if (that.hasSubSampler)
+                    obj.frac = that.ctrlSubSampler.getValue();
+                return obj;
             }
 
             that.recall = function(settObj, notify) {
-                that.query = SQL.WhereClause.decode(settObj);
+                that.query = SQL.WhereClause.decode(settObj.query);
                 that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
+                if (that.hasSubSampler)
+                    that.ctrlSubSampler.modifyValue(settObj.frac);
                 if (notify && that.notifyQueryUpdated)
                   that.notifyQueryUpdated();
             }
@@ -79,11 +96,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 
+
                 theControl.addControl(Controls.CompoundHor([buttonDefineQuery, Controls.HorizontalSeparator(10), that.buttonPrevQuery]));
                 theControl.addControl(Controls.VerticalSeparator(5));
                 theControl.addControl(that.ctrlPick);
 //                theControl.addControl();
                 theControl.addControl(that.ctrlQueryString);
+
+                if (that.hasSubSampler) {
+                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 150, minval:0, maxval:1, value:1, digits: 1, drawIndicators: false})
+                        .setNotifyOnFinished()
+                        .setOnChanged(function() {
+                            that.notifyQueryUpdated();
+                        });
+
+                    that.subSamplerMapper = function(frc) {
+                        return Math.max(1.0e-4, Math.min(1.0,Math.pow(frc*1.05,3)));
+                    }
+                    that.ctrlSubSampler.customValueMapper = function(vl) {
+                        return (that.subSamplerMapper(vl)*100.0).toFixed(2)+'%';
+                    };
+                    theControl.addControl(that.ctrlSubSampler);
+                }
 
 
                 that.updateStoredQueries();

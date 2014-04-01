@@ -248,7 +248,7 @@ define([
                         var requestID = DQX.getNextUniqueID();
                         aspectInfo.requestID = requestID;
                         that.fetchCount += 1;
-                        fetcher.getData(that.theQuery.get(), that.tableInfo.primkey,
+                        fetcher.getData(that.theQuery.getForFetching(), that.tableInfo.primkey,
                             function (data) { //success
                                 that.fetchCount -= 1;
                                 if (aspectInfo.requestID != requestID) {//request must be outdated, so we don't handle it

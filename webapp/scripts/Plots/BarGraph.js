@@ -112,7 +112,7 @@ define([
                 data.propid1 = that.catpropid1;
                 if (that.catpropid2)
                     data.propid2 = that.catpropid2;
-                data.qry = SQL.WhereClause.encode(that.theQuery.get());
+                data.qry = SQL.WhereClause.encode(that.theQuery.getForFetching());
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'categorycounts', data, function(resp) {
                     DQX.stopProcessing();
