@@ -151,6 +151,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
@@ -165,7 +167,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsList = [ctrl_Query,
-                    Controls.VerticalSeparator(2),
+                    Controls.VerticalSeparator(5),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(5),
                     Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>')];
 
                 $.each(that.plotComponents, function(key, plotComp) {
@@ -254,6 +258,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.fetchData = function() {
                 var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                 fetcher.setMaxResultCount(that.maxrecordcount);
+                that.ctrl_PointCount.modifyValue('--- data points');
 
                 that.pointSet.clearPoints();
 
@@ -311,6 +316,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                                 that.pointData[id] = values;
                                 resultpointcount = values.length;
                             });
+                            that.ctrl_PointCount.modifyValue(resultpointcount + ' data points');
                             that.setPoints();
                             if (that.startZoomFit) {
                                 that.pointSet.zoomFit(100);

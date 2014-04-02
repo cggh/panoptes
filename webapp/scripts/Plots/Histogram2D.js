@@ -79,6 +79,8 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
@@ -145,7 +147,9 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(20),
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(10),
                     that.ctrlValueXProperty,
                     Controls.VerticalSeparator(5),
                     that.ctrlValueYProperty,
@@ -189,6 +193,7 @@ define([
                 }
 
                 DQX.setProcessing();
+                that.ctrl_PointCount.modifyValue('--- data points');
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
@@ -246,9 +251,11 @@ define([
                         that.bucketDens.push(ar);
                     }
                     that.maxDens = 1;
+                    var totCount = 0;
                     for (var i=0; i<densities.length; i++) {
                         that.bucketDens[bucketsX[i]-bucketXMin][bucketsY[i]-bucketYMin] = densities[i];
                         that.maxDens = Math.max(that.maxDens,densities[i]);
+                        totCount += densities[i];
                     }
 
                     if (that.ctrl_binsizeAutomatic.getValue()) {
@@ -258,6 +265,7 @@ define([
 
                     that.panelPlot.setDirectDedraw(that.bucketCountX*that.bucketCountY<2000);
                     that.reDraw();
+                    that.ctrl_PointCount.modifyValue(totCount + ' data points');
                 });
 
             }

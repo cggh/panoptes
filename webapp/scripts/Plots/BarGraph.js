@@ -46,6 +46,8 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
@@ -79,7 +81,9 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(20),
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(10),
                     that.ctrlCatProperty1,
                     that.ctrlCatSort1,
                     Controls.VerticalSeparator(20),
@@ -105,6 +109,7 @@ define([
                 if (that.staging)
                     return;
                 DQX.setProcessing();
+                that.ctrl_PointCount.modifyValue('--- data points');
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
@@ -141,11 +146,14 @@ define([
                 var categorycounts = decoder.doDecode(resp.categorycounts);
                 that.maxcount = 0;
                 that.categories = [];
+                var totCount = 0;
                 $.each(categorycounts, function(idx, cnt) {
                     that.categories.push({ name:categories1[idx], count:cnt });
                     that.maxcount = Math.max(that.maxcount,cnt);
+                    totCount += cnt;
                 });
                 that.colorLegend.modifyValue('');
+                that.ctrl_PointCount.modifyValue(totCount + ' data points');
             }
 
             that.prepareData2Cat = function(resp) {
@@ -158,7 +166,9 @@ define([
                 var catMap = {}
                 var subCatMap = {}
                 var subCats = [];
+                var totCount = 0;
                 $.each(categorycounts, function(idx, cnt) {
+                    totCount += cnt;
                     if (!(categories1[idx] in catMap)) {
                         var cat = { name:categories1[idx], count:0, subcats:[] };
                         that.categories.push(cat);
@@ -195,6 +205,7 @@ define([
                     });
                 });
                 that.colorLegend.modifyValue(legendStr);
+                that.ctrl_PointCount.modifyValue(totCount + ' data points');
 
             }
 

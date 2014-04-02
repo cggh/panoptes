@@ -57,6 +57,8 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var pickControls = Controls.CompoundGrid();
                 $.each(that.plotAspects,function(aspectIdx, plotAspect) {
                     if (plotAspect.visible) {
@@ -170,7 +172,9 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(20),
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(10),
                     pickControls,
                     that.ctrl_SizeFactor,
                     that.ctrl_Opacity,
@@ -234,6 +238,7 @@ define([
                         that.panelPlot.invalidate();
                     }
                     else {
+                        that.ctrl_PointCount.modifyValue('--- data points');
                         var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
                         fetcher.setMaxResultCount(that.maxrecordcount);
                         var encoding='ST';
@@ -256,6 +261,7 @@ define([
                                     return;
                                 }
                                 aspectInfo.data = data[aspectInfo.propid];
+                                that.ctrl_PointCount.modifyValue(aspectInfo.data.length+' data points');
                                 that.propDataMap[aspectInfo.propid] = aspectInfo.data;
                                 that.processAspectData(plotAspectID);
                                 that.panelPlot.invalidate();

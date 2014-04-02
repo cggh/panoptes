@@ -41,6 +41,8 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var numPropList = [ {id:'', name:'-- Select --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
@@ -110,7 +112,9 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(20),
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(10),
                     that.ctrlValueProperty,
                     Controls.VerticalSeparator(10),
                     that.ctrlCatProperty,
@@ -159,6 +163,7 @@ define([
                 var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
 
                 DQX.setProcessing();
+                that.ctrl_PointCount.modifyValue('--- data points');
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
@@ -222,7 +227,9 @@ define([
 
                     that.bucketNrOffset = bucketMin;
                     that.maxCount = 1;
+                    var totCount = 0;
                     for (var i=0; i<buckets.length; i++) {
+                        totCount += counts[i];
                         var catInfo = catMap[cats[i]]
                         catInfo.bucketCounts[buckets[i]-bucketMin] += counts[i];
                         if (that.maxCount<counts[i])
@@ -248,6 +255,7 @@ define([
 
                     that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
                     that.reDraw();
+                    that.ctrl_PointCount.modifyValue(totCount + ' data points');
                 });
 
             }

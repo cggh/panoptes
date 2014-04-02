@@ -42,6 +42,8 @@ define([
             that.createPanelButtons = function() {
                 var ctrl_Query = that.theQuery.createControl();
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
@@ -84,7 +86,9 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(20),
+                    Controls.VerticalSeparator(10),
+                    that.ctrl_PointCount,
+                    Controls.VerticalSeparator(10),
                     that.ctrlValueProperty,
                     Controls.VerticalSeparator(20),
                     binsizeGroup,
@@ -120,6 +124,7 @@ define([
                 }
 
                 DQX.setProcessing();
+                that.ctrl_PointCount.modifyValue('--- data points');
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
@@ -164,9 +169,11 @@ define([
                     that.bucketNrOffset = bucketMin;
                     that.bucketCounts=[];
                     that.maxCount = 1;
+                    var totCount = 0;
                     for (var i=bucketMin; i<=bucketMax; i++)
                         that.bucketCounts.push(0);
                     for (var i=0; i<buckets.length; i++) {
+                        totCount += counts[i];
                         that.bucketCounts[buckets[i]-bucketMin] = counts[i];
                         if (that.maxCount<counts[i])
                             that.maxCount=counts[i]
@@ -175,6 +182,7 @@ define([
                     if (that.ctrl_binsizeAutomatic.getValue())
                         that.ctrl_binsizeValue.modifyValue(that.bucketSize);
 
+                    that.ctrl_PointCount.modifyValue(totCount + ' data points');
 
                     that.reDraw();
                 });
