@@ -25,7 +25,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
-                that.theQuery = QueryTool.Create(tableid);
+                that.theQuery = QueryTool.Create(tableid, {hasSubSampler: true});
                 MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
@@ -268,7 +268,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.updateQuery2 = function() {
                     if (that.myTable) {
-                        that.myTable.setQuery(that.theQuery.get());
+                        that.myTable.setQuery(that.theQuery.getForFetching());
                         that.myTable.reLoadTable();
                         var tableInfo = MetaData.getTableInfo(that.tableid);
                         tableInfo.currentQuery = that.theQuery.get();

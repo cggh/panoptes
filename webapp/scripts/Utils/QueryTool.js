@@ -33,24 +33,34 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
                 if (frac>0.99)
                     return that.query;
-                else
-                    return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareFixed('_randomval_', '<', frac) );
+                else {
+                    var sliceCount = Math.floor(1.0/frac);
+                    var sliceNr = that.reSampleSliceIndex % sliceCount;
+                    var fr1 = sliceNr * frac;
+                    var fr2 = (sliceNr+1) * frac;
+                    return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareBetween('_randomval_', fr1, fr2) );
+                }
             }
 
             that.store = function() {
                 var obj = {
                     query: SQL.WhereClause.encode(that.query)
                 };
-                if (that.hasSubSampler)
+                if (that.hasSubSampler) {
                     obj.frac = that.ctrlSubSampler.getValue();
+                    obj.sliceidx = that.reSampleSliceIndex;
+                }
                 return obj;
             }
 
             that.recall = function(settObj, notify) {
                 that.query = SQL.WhereClause.decode(settObj.query);
                 that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
-                if (that.hasSubSampler)
+                if (that.hasSubSampler) {
                     that.ctrlSubSampler.modifyValue(settObj.frac);
+                    if (settObj.sliceidx != null)
+                        that.reSampleSliceIndex = settObj.sliceidx;
+                }
                 if (notify && that.notifyQueryUpdated)
                   that.notifyQueryUpdated();
             }
@@ -104,7 +114,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 theControl.addControl(that.ctrlQueryString);
 
                 if (that.hasSubSampler) {
-                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 150, minval:0, maxval:1, value:1, digits: 1, drawIndicators: false})
+                    that.reSampleSliceIndex = 0;
+                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 140, height: 18, minval:0, maxval:1, value:1, digits: 1, drawIndicators: false})
                         .setNotifyOnFinished()
                         .setOnChanged(function() {
                             that.notifyQueryUpdated();
@@ -114,9 +125,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return Math.max(1.0e-4, Math.min(1.0,Math.pow(frc*1.05,3)));
                     }
                     that.ctrlSubSampler.customValueMapper = function(vl) {
-                        return (that.subSamplerMapper(vl)*100.0).toFixed(2)+'%';
+                        var frac = that.subSamplerMapper(vl);
+                        var st = (frac*100.0).toFixed(2)+'%';
+                        if (frac<0.999)
+                            st = '<span style="color:red;background-color:yellow"><b>' + st + '</b></span>';
+                        return st;
                     };
-                    theControl.addControl(that.ctrlSubSampler);
+
+                    that.ctrlReSample = Controls.ImageButton(null, { bitmap:"Bitmaps/actionbuttons/reload.png", hint:"Resample", vertShift:18})
+                    that.ctrlReSample.setOnChanged(function() {
+                        that.reSampleSliceIndex += 1;
+                        that.notifyQueryUpdated();
+                    });
+
+                    theControl.addControl(Controls.CompoundHor([that.ctrlSubSampler, Controls.HorizontalSeparator(4), that.ctrlReSample]));
                 }
 
 
