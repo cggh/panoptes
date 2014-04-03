@@ -17,7 +17,7 @@ def mkdir_p(path):
 vcf_file = "ag1000g.phase1.AR1.Y_unplaced.PASS.vcf.gz"
 
 print 'Parsing variants'
-variants = vcfnp.itervariants(vcf_file)
+variants = vcfnp.variants(vcf_file)
 
 #Recursivly get the names of the columns
 def names_from_dtype(dtype, path=''):
@@ -49,21 +49,41 @@ with open(out_file, 'w') as f:
         f.write('\t'.join(map(str, flatten_numpy_line(line))))
         f.write('\n')
 
-print 'Parsing variants'
+import h5py
+out = h5py.File('data.hdf5', 'w')
+variants_out = out.create_dataset("variant_index", variants.shape, 'S20', maxshape=variants.shape, compression='gzip', fletcher32=False, shuffle=False)
+for i in xrange(len(variants)):
+    variants_out[i] = variants['CHROM'][i] + '_' + str(variants['POS'][i]).zfill(10)
+
+print 'Parsing genotypes'
 c = vcfnp.calldata_2d('ag1000g.phase1.AR1.Y_unplaced.PASS.vcf.gz', fields=['DP', 'GT'])
+depth = c['DP']
+genotypes = c['GT']
+try:
+    depth_out = out.create_dataset("total_depth", depth.shape, depth.dtype, maxshape=depth.shape, compression='szip', fletcher32=False, shuffle=False)
+    first_allele = out.create_dataset("first_allele", genotypes.shape, 'i1', maxshape=genotypes.shape, compression='szip', fletcher32=False, shuffle=False)
+    second_allele = out.create_dataset("second_allele", genotypes.shape, 'i1', maxshape=genotypes.shape, compression='szip', fletcher32=False, shuffle=False)
+except ValueError:
+    depth_out = out.create_dataset("total_depth", depth.shape, depth.dtype, maxshape=depth.shape, compression='gzip', fletcher32=False, shuffle=False)
+    first_allele = out.create_dataset("first_allele", genotypes.shape, 'i1', maxshape=genotypes.shape, compression='gzip', fletcher32=False, shuffle=False)
+    second_allele = out.create_dataset("second_allele", genotypes.shape, 'i1', maxshape=genotypes.shape, compression='gzip', fletcher32=False, shuffle=False)
 
-
-variants_out = out.create_dataset("variant_index", variants.shape, 'S12', maxshape=variants.shape, compression='gzip', fletcher32=False, shuffle=False)
-#Fill woth chrom pos?
-
-depth_out = out.create_dataset("total_depth", depth.shape, depth.dtype, chunks=(1000,depth.shape[1]/4), maxshape=depth.shape, compression='szip', fletcher32=False, shuffle=False)
-genotype = f['calldata_2d']['genotype']
-first_allele = out.create_dataset("first_allele", genotype.shape, 'i1', chunks=(2000,depth.shape[1]/4), maxshape=genotype.shape, compression='szip', fletcher32=False, shuffle=False)
 #Parse "a/b"
-copy(genotype, first_allele, lambda array,: map(lambda inner: map(itemgetter(0), inner), array))
-second_allele = out.create_dataset("second_allele", genotype.shape, 'i1', chunks=(2000,depth.shape[1]/4), maxshape=genotype.shape, compression='szip', fletcher32=False, shuffle=False)
-copy(genotype, second_allele, lambda array,: map(lambda inner: map(itemgetter(1), inner), array))
+for i in xrange(genotypes.shape[0]):
+    for j in xrange(genotypes.shape[1]):
+        a,b = genotypes[i,j].split('/')
+        try:
+            a = int(a)
+        except ValueError:
+            a = -1
+        try:
+            b = int(b)
+        except ValueError:
+            b = -1
+        first_allele[i,j] = a
+        second_allele[i,j] = b
 
+out.close()
 
 # mkdir_p('panoptes_ready_vcf_data/datatables/samples')
 # out_file = 'panoptes_ready_vcf_data/datatables/samples'
