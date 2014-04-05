@@ -104,7 +104,7 @@ define([
 
                 that.createPanels = function() {
                     this.panelControls = Framework.Form(this.frameControls);
-                    this.panelControls.setPadding(10);
+                    //this.panelControls.setPadding(10);
 
                     var chromosomeField = null;
                     $.each(MetaData.mapTableCatalog, function(idx, tableInfo) {
@@ -162,7 +162,7 @@ define([
 
                     }
 
-                    that.visibilityControlsGroup = Controls.CompoundVert([]);
+                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(0);
 
                     //Create controls for each table that has genome summary tracks defined
                     that.buttonsGroup = Controls.CompoundVert([]);
@@ -188,18 +188,21 @@ define([
                                 chk.trackid = summaryValue.trackid;
                                 activeTrackList.push(chk);
                             });
-                            that.buttonsGroup.addControl(Controls.CompoundVert([
+                            that.buttonsGroup.addControl(Controls.Section(Controls.CompoundVert([
                                 bt,
                                 tableInfo.genomeBrowserFieldChoice,
                                 Controls.CompoundVert(activeTrackList)
-                            ]).setLegend('<h3>'+tableInfo.tableCapNameSingle+' tracks</h3>')).setLegendClass('GenomeBrowserControlGroup');
+                            ]).setMargin(10), {
+                                title: tableInfo.tableCapNameSingle+' tracks',
+                                headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                                bodyStyleClass: 'ControlsSectionBody'
+                            }));
                         }
                     });
 
 
                     this.panelControls.addControl(Controls.CompoundVert([
                         that.visibilityControlsGroup,
-                        Controls.VerticalSeparator(12),
                         that.buttonsGroup
                     ]));
 
@@ -274,7 +277,13 @@ define([
                     if (MetaData.summaryValues.length==0)
                         return;
 
-                    that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(10));
+                    var generalSummaryChannelsControls = Controls.CompoundVert([]).setMargin(10);
+
+                    that.visibilityControlsGroup.addControl(Controls.Section(generalSummaryChannelsControls, {
+                        title: 'Summary tracks',
+                        headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }));
 
                     //Iterate over all summary profiles shown by the app
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
@@ -321,7 +330,7 @@ define([
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
 
                             var ctrl_onoff = SummChannel.createVisibilityControl(true);
-                            that.visibilityControlsGroup.addControl(ctrl_onoff);
+                            generalSummaryChannelsControls.addControl(ctrl_onoff);
 
                         }
                     })
@@ -466,8 +475,10 @@ define([
                         that.panelBrowser.addChannel(theChannel, false);
                         that.channelMap[channelId] = theChannel;
                         theChannel.controls = Controls.CompoundVert([]);
-                        if (propInfo.settings.channelName)
-                            theChannel.controls.setLegend(channelName).setAutoFillX(false);
+                        if (propInfo.settings.channelName) {
+                            controlsGroup.addControl(Controls.Static(channelName + ':'));
+                            theChannel.controls.setTreatAsBlock(true).setLeftIndent(20);
+                        }
                         controlsGroup.addControl(theChannel.controls);
 
                         theChannel.getToolTipContent = function(compID, pointIndex) {
@@ -558,8 +569,11 @@ define([
                                 that.panelBrowser.delDataFetcher(tableInfo.genomeBrowserInfo.dataFetcher);
                             }
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
-                            that.visibilityControlsGroup.addControl(controlsGroup);
+                            var controlsGroup = Controls.CompoundVert([]).setMargin(0);
+                            that.visibilityControlsGroup.addControl(Controls.Section(controlsGroup, {
+                                title: tableInfo.tableCapNamePlural,
+                                headerStyleClass: 'GenomeBrowserMainSectionHeader'
+                            }));
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
                             tableInfo.genomeBrowserInfo.theQuery.notifyQueryUpdated = function() {
@@ -568,7 +582,12 @@ define([
                             };
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
                             controlsGroup.addControl(ctrlQuery);
-                            controlsGroup.addControl(Controls.VerticalSeparator(12));
+
+                            var channelControlsGroup = Controls.CompoundVert([]).setMargin(8);
+                            controlsGroup.addControl(Controls.Section(channelControlsGroup, {
+                                title: 'Visible properties',
+                                bodyStyleClass: 'ControlsSectionBody'
+                            }));
 
                             //Initialise the data fetcher that will download the data for the table
                             var dataFetcher = new DataFetchers.Curve(
@@ -589,10 +608,10 @@ define([
                             tableInfo.genomeBrowserInfo.currentCustomProperties = [];
                             $.each(MetaData.customProperties,function(idx,propInfo) {
                                 if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
-                                    that.createPropertyChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
+                                    that.createPropertyChannel(tableInfo, propInfo, channelControlsGroup, dataFetcher);
                                 }
                                 if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) && (propInfo.settings.showInBrowser)) {
-                                    that.createPositionChannel(tableInfo, propInfo, controlsGroup, dataFetcher);
+                                    that.createPositionChannel(tableInfo, propInfo, channelControlsGroup, dataFetcher);
                                 }
                             });
                         }
@@ -605,8 +624,11 @@ define([
                         if (!table_info.settings.ShowInGenomeBrowser) {
                             return;
                         }
-                        var controls_group = Controls.CompoundVert([]).setLegend('<h3>'+table_info.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
-                        that.visibilityControlsGroup.addControl(controls_group);
+                        var controls_group = Controls.CompoundVert([]).setMargin(0);
+                        that.visibilityControlsGroup.addControl(Controls.Section(controls_group, {
+                            title: table_info.tableCapNamePlural,
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader'
+                        }));
                         var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
                         the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
                         that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
@@ -616,9 +638,11 @@ define([
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomeRegions) {
 
-                            var controlsGroup = Controls.CompoundVert([]).setLegend('<h3>'+tableInfo.tableCapNamePlural+'</h3>').setLegendClass('GenomeBrowserControlGroup');
-                            that.visibilityControlsGroup.addControl(Controls.VerticalSeparator(12));
-                            that.visibilityControlsGroup.addControl(controlsGroup);
+                            var controlsGroup = Controls.CompoundVert([]).setMargin(0);
+                            that.visibilityControlsGroup.addControl(Controls.Section(controlsGroup, {
+                                title: tableInfo.tableCapNamePlural,
+                                headerStyleClass: 'GenomeBrowserMainSectionHeader'
+                            }));
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
                             tableInfo.genomeBrowserInfo.theQuery.notifyQueryUpdated = function() {
@@ -669,12 +693,16 @@ define([
 
                             tableInfo.genomeBrowserColorLegend = Controls.Html(null, "");
 
-                            controlsGroup.addControl(Controls.VerticalSeparator(12));
-                            controlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
-                            controlsGroup.addControl(Controls.VerticalSeparator(8));
-                            controlsGroup.addControl(tableInfo.genomeBrowserColorChoice);
-                            controlsGroup.addControl(Controls.VerticalSeparator(8));
-                            controlsGroup.addControl(tableInfo.genomeBrowserColorLegend);
+                            dispSettingsControlsGroup = Controls.CompoundVert([]).setMargin(8);
+
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorChoice);
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorLegend);
+
+                            controlsGroup.addControl(Controls.Section(dispSettingsControlsGroup, {
+                                title: 'Display settings',
+                                bodyStyleClass: 'ControlsSectionBody'
+                            }));
 
                             var regionConfig = {
                                 database: MetaData.database,

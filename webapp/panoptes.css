@@ -68,6 +68,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
+
 .DQXPopupFrameResizer1, .DQXPopupFrameResizer2
 {
     background-color:rgb(0,133,146);
@@ -138,21 +139,11 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 .GenomeBrowserControlBackground
 {
     color:Black;
-    background-color: rgb(240,240,240);
+    background-color: rgb(255,255,255);
     border-width:0px;
 }
 
 
-.GenomeBrowserControlGroup
-{
-    border:1px solid rgb(75,75,75);
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
-    background-color:rgb(255,255,255);
-    padding:10px;
-    margin-right:6px;
-    margin-top:10px;
-    margin-bottom:5px;
-}
 
 .AdminTreeNonClickable
 {
@@ -219,4 +210,45 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     background-color: white;
     outline: 1px solid rgb(0,188,205);
     box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+}
+
+
+
+.DQXControlSectionHeader {
+    background-color: rgb(206,234,237);
+    font-weight: bold;
+    border: none;
+    padding:7px;
+    padding-top:5px;
+    padding-bottom:5px;
+    border-top:1px solid rgb(169,211,215);
+    border-bottom:1px solid rgb(169,211,215);
+    color: rgb(61,104,108);
+}
+
+.ControlsSectionBody {
+    margin-left:9px;
+    margin-top:20px;
+    margin-right:4px;
+    margin-bottom:20px;
+}
+
+
+.GenomeBrowserMainSectionHeader {
+    background-color: rgb(140,195,200);
+    font-size: 11pt;
+    font-weight: bold;
+    padding:7px;
+    padding-top:7px;
+    padding-bottom:7px;
+    border: none;
+    border-top:1px solid rgb(112,169,174);
+    border-bottom:1px solid rgb(112,169,174);
+    color: rgb(0,55,60);
+    /*font-size: 12pt;*/
+    /*font-weight: bold;*/
+    /*background-color: rgb(47, 137, 146);*/
+    /*color: white;*/
+    /*padding:5px;*/
+    /*border:none*/
 }

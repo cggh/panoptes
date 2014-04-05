@@ -80,8 +80,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createControl = function() {
 
-                var theControl = Controls.BaseCustom(true);
-                theControl.setLegend("<h4>Active "+that.tableInfo.name+'</h4>').setAutoFillX(true);
+                var theControl = Controls.BaseCustom(true).setMargin(0);
+
+                var group = Controls.CompoundVert().setMargin(12);
 
                 var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'PnButtonLarge', width:100, height:35, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
@@ -107,11 +108,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
 
 
-                theControl.addControl(Controls.CompoundHor([buttonDefineQuery, Controls.HorizontalSeparator(10), that.buttonPrevQuery]));
-                theControl.addControl(Controls.VerticalSeparator(5));
-                theControl.addControl(that.ctrlPick);
-//                theControl.addControl();
-                theControl.addControl(that.ctrlQueryString);
+                group.addControl(Controls.CompoundHor([buttonDefineQuery, Controls.HorizontalSeparator(10), that.buttonPrevQuery]));
+                group.addControl(that.ctrlPick);
+                group.addControl(that.ctrlQueryString);
 
                 if (that.hasSubSampler) {
                     that.reSampleSliceIndex = 0;
@@ -138,7 +137,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.notifyQueryUpdated();
                     });
 
-                    theControl.addControl(Controls.CompoundHor([that.ctrlSubSampler, Controls.HorizontalSeparator(4), that.ctrlReSample]));
+                    group.addControl(Controls.CompoundHor([that.ctrlSubSampler, Controls.HorizontalSeparator(4), that.ctrlReSample]));
                 }
 
 
@@ -149,8 +148,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.updateStoredQueries();
                 });
 
+                theControl.addControl(Controls.Section(group, {
+                    title: "Active "+that.tableInfo.name,
+                    bodyStyleClass: 'ControlsSectionBody'
+                }));
+
                 return theControl;
-                //return group;
             }
 
             that.updateStoredQueries = function() {
