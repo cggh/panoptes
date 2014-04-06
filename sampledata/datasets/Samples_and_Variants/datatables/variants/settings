@@ -6,6 +6,10 @@ Description: A table containing a number of genomic variants     # A description
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: SnpName
 
+SortDefault: SnpName
+
+AllowSubSampling: Yes
+
 
 # The following tags set limits on the data volumes that can be queried
 MaxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)

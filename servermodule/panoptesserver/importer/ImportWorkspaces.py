@@ -38,6 +38,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         tableSettings = SettingsLoader.SettingsLoader()
         tableSettings.LoadDict(simplejson.loads(tableSettingsStr))
 
+        allowSubSampling = tableSettings['AllowSubSampling']
+
         isPositionOnGenome = False
         if tableSettings.HasToken('IsPositionOnGenome') and tableSettings['IsPositionOnGenome']:
             isPositionOnGenome = True
@@ -172,7 +174,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
             print('Cleaning up')
             cur.execute("DROP TABLE {0}".format(tmptable))
 
-        Utils.UpdateTableInfoView(workspaceid, tableid, cur)
+        Utils.UpdateTableInfoView(workspaceid, tableid, allowSubSampling, cur)
 
         db.commit()
         db.close()
@@ -242,9 +244,14 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
             calculationObject.LogSQLCommand(cmd)
             cur.execute(cmd)
 
-        cur.execute('SELECT id, primkey FROM tablecatalog')
-        tables = [ { 'id': row[0], 'primkey': row[1] } for row in cur.fetchall()]
+        cur.execute('SELECT id, primkey, settings FROM tablecatalog')
+        tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
         tableMap = {table['id']:table for table in tables}
+
+        for table in tables:
+            tableSettings = SettingsLoader.SettingsLoader()
+            tableSettings.LoadDict(simplejson.loads(table['settingsStr']))
+            table['settings'] = tableSettings
 
         if not importSettings['ConfigOnly']:
             for table in tables:
@@ -270,7 +277,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         execSQL('INSERT INTO workspaces VALUES ("{0}","{1}")'.format(workspaceid, workspaceName) )
         print('Updating views')
         for table in tables:
-            Utils.UpdateTableInfoView(workspaceid, table['id'], cur)
+            Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
 
         db.commit()
         db.close()

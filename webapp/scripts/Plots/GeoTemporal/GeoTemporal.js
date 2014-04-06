@@ -256,7 +256,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             };
 
             that.fetchData = function() {
-                var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
+                var fetcher = DataFetchers.RecordsetFetcher(
+                    MetaData.serverUrl,
+                    MetaData.database,
+                    that.tableInfo.getQueryTableName(that.theQuery.isSubSampling())
+                );
                 fetcher.setMaxResultCount(that.maxrecordcount);
                 that.ctrl_PointCount.modifyValue('--- data points');
 

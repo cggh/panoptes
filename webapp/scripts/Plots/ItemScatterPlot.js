@@ -239,7 +239,11 @@ define([
                     }
                     else {
                         that.ctrl_PointCount.modifyValue('--- data points');
-                        var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, that.tableInfo.id + 'CMB_' + MetaData.workspaceid);
+                        var fetcher = DataFetchers.RecordsetFetcher(
+                            MetaData.serverUrl,
+                            MetaData.database,
+                            that.tableInfo.getQueryTableName(that.theQuery.isSubSampling())
+                        );
                         fetcher.setMaxResultCount(that.maxrecordcount);
                         var encoding='ST';
                         if (propInfo.isFloat)

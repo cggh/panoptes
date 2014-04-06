@@ -64,8 +64,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (propInfo.settings.Description)
                 col.setToolTip(propInfo.settings.Description);
             if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(tableInfo.ChromosomeField)) && (theTable.findColumn(tableInfo.PositionField) && (propid==tableInfo.PositionField) ) ) {
-                // Define a joint sort action on both columns chromosome+position, and set it as default
-                theTable.addSortOption("Position", SQL.TableSort([tableInfo.ChromosomeField, tableInfo.PositionField]),true);
+                // Define a joint sort action on both columns chromosome+position, and set it as default if no other
+                var sortByDefault = false;
+                if (!tableInfo.settings.SortDefault)
+                    var sortByDefault = true;
+                theTable.addSortOption("Position", SQL.TableSort([tableInfo.ChromosomeField, tableInfo.PositionField]),sortByDefault);
             }
 
             if (propInfo.datatype=='Boolean')
@@ -168,7 +171,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (['replace', 'add', 'restrict', 'exclude'].indexOf(method)<0)
                 DQX.reportError('Invalid selection method');
             var maxcount = 100000;
-            var fetcher = DataFetchers.RecordsetFetcher(MetaData.serverUrl, MetaData.database, tableInfo.id + 'CMB_' + MetaData.workspaceid);
+            var fetcher = DataFetchers.RecordsetFetcher(
+                MetaData.serverUrl,
+                MetaData.database,
+                tableInfo.getQueryTableName(false)
+            );
             fetcher.setMaxResultCount(maxcount);
             fetcher.addColumn(tableInfo.primkey, 'ST');
             DQX.setProcessing();

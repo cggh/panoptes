@@ -151,6 +151,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         table.genomeTrackSelectionManager.recallSettings(settObj.tableBasedSummaryValues.selection);
                 }
             }
+
+            table.getQueryTableName = function(forSubSampling) {
+                if (!forSubSampling) {
+                    return table.id  + 'CMB_' + MetaData.workspaceid;
+//                    return table.id;
+                }
+                else {
+                    return table.id  + 'CMBSORTRAND_' + MetaData.workspaceid;
+//                    return table.id+'_SORTRAND';
+                }
+            }
         }
 
         Initialise.augment2DTableInfo = function(table) {

@@ -25,7 +25,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
-                that.theQuery = QueryTool.Create(tableid, {hasSubSampler: true});
+                that.theQuery = QueryTool.Create(tableid, {hasSubSampler: false});
                 MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {

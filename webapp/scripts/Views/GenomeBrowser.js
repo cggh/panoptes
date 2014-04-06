@@ -593,7 +593,7 @@ define([
                             var dataFetcher = new DataFetchers.Curve(
                                 MetaData.serverUrl,
                                 MetaData.database,
-                                tableInfo.id + 'CMB_' + MetaData.workspaceid,
+                                tableInfo.getQueryTableName(false),
                                 tableInfo.PositionField
                             );
                             dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
@@ -707,7 +707,7 @@ define([
                             var regionConfig = {
                                 database: MetaData.database,
                                 serverURL: MetaData.serverUrl,
-                                annotTableName: tableInfo.id + 'CMB_' + MetaData.workspaceid
+                                annotTableName: tableInfo.getQueryTableName(false)
                             };
                             var regionFetcher = new DataFetcherAnnotation.Fetcher(regionConfig);
                             tableInfo.genomeBrowserInfo.dataFetcher = regionFetcher;

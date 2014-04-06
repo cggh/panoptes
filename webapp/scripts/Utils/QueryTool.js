@@ -30,6 +30,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             that.getForFetching = function() {
+                if (!that.hasSubSampler)
+                    return that.get();
                 var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
                 if (frac>0.99)
                     return that.query;
@@ -41,6 +43,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareBetween('_randomval_', fr1, fr2) );
                 }
             }
+
+            that.isSubSampling = function() {
+                if (!that.hasSubSampler)
+                    return false;
+                var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
+                return (frac<0.99);
+            };
 
             that.store = function() {
                 var obj = {

@@ -113,7 +113,7 @@ define([
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
-                data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
+                data.tableid = that.tableInfo.getQueryTableName(that.theQuery.isSubSampling());
                 data.propid1 = that.catpropid1;
                 if (that.catpropid2)
                     data.propid2 = that.catpropid2;

@@ -31,7 +31,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.tableInfo =MetaData.mapTableCatalog[itemInfo.tableid];
-            that.theQuery = QueryTool.Create(that.tableInfo.id, {includeCurrentQuery:true, hasSubSampler:true });
+            that.theQuery = QueryTool.Create(that.tableInfo.id, {includeCurrentQuery:true, hasSubSampler:false });
             that.theQuery.setStartQuery(itemInfo.query);
             that.theQuery.notifyQueryUpdated = that.updateQuery;
 

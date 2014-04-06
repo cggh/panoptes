@@ -48,7 +48,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             });
 
 
-            that.theQuery = QueryTool.Create(tableid, {includeCurrentQuery:true, hasSubSampler:true });
+            that.theQuery = QueryTool.Create(tableid, {
+                includeCurrentQuery:true,
+                hasSubSampler:that.tableInfo.settings.AllowSubSampling
+            });
             if (startQuery)
                 that.theQuery.setStartQuery(startQuery);
 

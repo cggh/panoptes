@@ -13,7 +13,7 @@ import dateutil.parser
 #       name
 #       DataType: Value, Boolean, Text
 
-def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, createRandomColumn=False):
+def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, allowSubSampling=False):
 
     def DecoId(id):
         return '`' + id + '`'
@@ -135,7 +135,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     colTokens = []
     if autoPrimKey:
         colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(primkey))
-    if createRandomColumn:
+    if allowSubSampling:
         colTokens.append("_randomval_ double")
     for col in columns:
         st = DecoId(col['name'])
@@ -162,12 +162,19 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     calculationObject.Log('Importing data')
     ImpUtils.ExecuteSQLScript(calculationObject, destFileName, databaseid)
 
-    if createRandomColumn:
-        calculationObject.Log('Creating random data column')
-        sql = "UPDATE {0} SET _randomval_=RAND()".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-        sql = "CREATE INDEX {0}_randomindex ON {0}(_randomval_)".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+    if allowSubSampling:
+        with calculationObject.LogHeader('Create subsampling table'):
+            calculationObject.Log('Creating random data column')
+            sql = "UPDATE {0} SET _randomval_=RAND()".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            sql = "CREATE INDEX {0}_randomindex ON {0}(_randomval_)".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            sql = "CREATE TABLE {0}_SORTRAND LIKE {0}".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            sql = "alter table {0}_SORTRAND add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            sql = "insert into {0}_SORTRAND select *,0 from {0} order by _randomval_".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
 
 
     os.remove(destFileName)

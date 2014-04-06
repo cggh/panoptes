@@ -197,9 +197,9 @@ define([
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
-                data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
                 data.propidx = that.propidValueX;
                 data.propidy = that.propidValueY;
+                data.tableid = that.tableInfo.getQueryTableName(that.theQuery.isSubSampling());
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
                 data.qry = SQL.WhereClause.encode(that.theQuery.getForFetching());
                 if (!that.ctrl_binsizeAutomatic.getValue()) {

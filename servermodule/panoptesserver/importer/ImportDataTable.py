@@ -33,6 +33,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('MaxTableSize', None)
         tableSettings.AddTokenIfMissing('MaxCountQueryRecords', 200000)
         tableSettings.AddTokenIfMissing('MaxCountQueryAggregated', 1000000)
+        tableSettings.AddTokenIfMissing('AllowSubSampling', False)
         extraSettings = tableSettings.Clone()
         extraSettings.DropTokens(['PrimKey', 'Properties'])
 
@@ -146,7 +147,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 tableid,
                 columns,
                 tableSettings,
-                True
+                tableSettings['AllowSubSampling']
             )
             if tableSettings['IsPositionOnGenome']:
                 calculationObject.Log('Indexing chromosome')

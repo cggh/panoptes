@@ -167,7 +167,7 @@ define([
                 var data ={};
                 data.database = MetaData.database;
                 data.workspaceid = MetaData.workspaceid;
-                data.tableid = that.tableInfo.id + 'CMB_' + MetaData.workspaceid;
+                data.tableid = that.tableInfo.getQueryTableName(that.theQuery.isSubSampling());
                 data.propidvalue = that.propidValue;
                 data.propidcat = that.propidCat;
                 data.maxrecordcount = that.tableInfo.settings.MaxCountQueryAggregated || 1000000;
