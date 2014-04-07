@@ -28,7 +28,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         GenericPlot.activePlotList = [];
 
-        GenericPlot.Create = function(tableid, plotTypeID, settings, startQuery) {
+        GenericPlot.Create = function(tableid, plotTypeID, settings, startQuery, querySettings) {
             settings.blocking = false;
             settings.sizeX = 750;
             settings.sizeY = 600;
@@ -47,10 +47,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 }
             });
 
+            var subSamplingOptions = null;
+            if (querySettings && querySettings.subSamplingOptions) {
+                subSamplingOptions = querySettings.subSamplingOptions;
+            }
+
 
             that.theQuery = QueryTool.Create(tableid, {
                 includeCurrentQuery:true,
-                hasSubSampler:that.tableInfo.settings.AllowSubSampling
+                hasSubSampler:that.tableInfo.settings.AllowSubSampling,
+                subSamplingOptions: subSamplingOptions
             });
             if (startQuery)
                 that.theQuery.setStartQuery(startQuery);

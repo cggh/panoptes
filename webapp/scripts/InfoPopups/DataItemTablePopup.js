@@ -24,14 +24,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             );
 
+            that.tableInfo =MetaData.mapTableCatalog[itemInfo.tableid];
+
+            if ((that.tableInfo.settings.AllowSubSampling) && (!itemInfo.subSamplingOptions)) {
+                // No explicit subsampling mentioned - getting all
+                itemInfo.subSamplingOptions = QueryTool.getSubSamplingOptions_All();
+            }
+
             that.updateQuery = function() {
                 that.myTable.setQuery(that.theQuery.getForFetching());
+                that.myTable.setTable(that.tableInfo.getQueryTableName(that.theQuery.isSubSampling()));
                 that.myTable.reLoadTable();
             }
 
 
-            that.tableInfo =MetaData.mapTableCatalog[itemInfo.tableid];
-            that.theQuery = QueryTool.Create(that.tableInfo.id, {includeCurrentQuery:true, hasSubSampler:false });
+            that.theQuery = QueryTool.Create(that.tableInfo.id, {
+                includeCurrentQuery:true,
+                hasSubSampler:that.tableInfo.settings.AllowSubSampling,
+                subSamplingOptions: itemInfo.subSamplingOptions
+            });
             that.theQuery.setStartQuery(itemInfo.query);
             that.theQuery.notifyQueryUpdated = that.updateQuery;
 
@@ -68,21 +79,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query
-//                    Controls.VerticalSeparator(10),
-//                    that.ctrl_PointCount,
-//                    Controls.VerticalSeparator(10),
-//                    that.ctrlValueProperty,
-//                    Controls.VerticalSeparator(20),
-//                    binsizeGroup,
-//                    Controls.VerticalSeparator(10),
-//                    that.ctrl_Gamma
                 ]);
                 //that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelControls = Framework.Form(that.frameControls).setPadding(0);
                 that.panelControls.addControl(controlsGroup);
 
 
-                that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.theQuery.getForFetching(), {hasSelection: true });
+                that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.theQuery.getForFetching(), {
+                    hasSelection: true,
+                    subSampling: that.theQuery.isSubSampling()
+                });
                 that.myTable = that.panelTable.getTable();
 
                 var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
@@ -94,7 +100,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
-                    Msg.send({type: 'CreateDataItemPlot'}, { query: that.theQuery.get() , tableid: that.tableInfo.id });
+                    Msg.send({type: 'CreateDataItemPlot'}, {
+                        query: that.theQuery.get(),
+                        tableid: that.tableInfo.id,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    });
                 });
 
                 that.panelButtons = Framework.Form(that.frameButtons);

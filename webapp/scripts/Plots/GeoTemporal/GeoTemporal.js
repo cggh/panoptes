@@ -29,8 +29,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
 
-        GeoTemporal.Create = function(tableid, startQuery) {
-            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery);
+        GeoTemporal.Create = function(tableid, startQuery, querySettings) {
+            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery, querySettings);
 
             that.pointData = {};//first index: property id, second index: point nr
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
@@ -494,7 +494,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     return selList;
                 };
 
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Geographic range', '', qry, selectionCreationFunction);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Geographic range', '', {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, selectionCreationFunction);
             }
 
 

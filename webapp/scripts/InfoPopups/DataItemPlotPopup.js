@@ -39,7 +39,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
                 $('#'+id).click(function() {
-                    plottype.Create(tableInfo.id, info.query);
+                    plottype.Create(tableInfo.id, info.query, {
+                        subSamplingOptions: info.subSamplingOptions
+                    });
                     Popup.closeIfNeeded(popupID);
                 });
             });

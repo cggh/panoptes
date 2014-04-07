@@ -134,7 +134,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var datePropInfo = MetaData.findProperty(that.tableInfo.id, datePropId);
                 var content = datePropInfo.name+' between '+datePropInfo.toDisplayString(JDmin)+' and '+datePropInfo.toDisplayString(JDmax);
-                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Date range', content, qry, selectionCreationFunction);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Date range', content, {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, selectionCreationFunction);
             }
 
             that.storeSettings = function() {

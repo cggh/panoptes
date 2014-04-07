@@ -129,7 +129,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var theDataFetcher = DataFetchers.Table(
                 MetaData.serverUrl,
                 MetaData.database,
-                tableInfo.id + 'CMB_' + MetaData.workspaceid
+                tableInfo.getQueryTableName(settings.subSampling)
             );
 
             theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000);

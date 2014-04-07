@@ -20,13 +20,13 @@ define([
 
         GenericPlot.registerPlotType(BarGraph);
 
-        BarGraph.Create = function(tableid, startQuery) {
+        BarGraph.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID,
                 {
                     title: BarGraph.name,
                     scrollHorizontal: true
                 },
-                startQuery);
+                startQuery, querySettings);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -390,7 +390,10 @@ define([
                         qry.addComponent(SQL.WhereClause.CompareFixed(key,'=',value));
                     });
                     var content = tooltip.content;
-                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Bargraph bar', content, qry, null);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Bargraph bar', content, {
+                        query: qry,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    }, null);
                 }
             }
 

@@ -20,8 +20,8 @@ define([
 
         GenericPlot.registerPlotType(ItemScatterPlot);
 
-        ItemScatterPlot.Create = function(tableid, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery);
+        ItemScatterPlot.Create = function(tableid, startQuery, querySettings) {
+            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery, querySettings);
             that.fetchCount = 0;
             that.propDataMap = {};
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
@@ -158,7 +158,10 @@ define([
                                 }
                                 return selList;
                             };
-                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', queryInfo.query, selectionCreationFunction);
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', {
+                                query: queryInfo.query,
+                                subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                            }, selectionCreationFunction);
                         });
                     }
                     });
@@ -699,7 +702,10 @@ define([
                     return sellist;
                 };
 
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatter plot area', content, qry, selectionCreationFunction);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatter plot area', content, {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, selectionCreationFunction);
 
 /*
                 var doSelect = function(tpe) {

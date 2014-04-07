@@ -34,7 +34,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-        ButtonChoiceBox.createPlotItemSelectionOptions = function(thePlot, tableInfo, title, header, newQuery, selectionListGenerator) {
+        ButtonChoiceBox.createPlotItemSelectionOptions = function(thePlot, tableInfo, title, header, newQueryInfo, selectionListGenerator) {
 
             var choices = [];
 
@@ -94,16 +94,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
 
-            if (newQuery) {
+            if (newQueryInfo) {
                 var choicesRow = [];
                 choicesRow.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
-                    thePlot.theQuery.modify(newQuery);
+                    thePlot.theQuery.modify(newQueryInfo.query);
                 }
                 } );
                 choicesRow.push( { content:'Show items in query', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: tableInfo.id,
-                        query: newQuery,
+                        query: newQueryInfo.query,
+                        subSamplingOptions: newQueryInfo.subSamplingOptions,
                         title: title
                     });
                 }

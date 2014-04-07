@@ -50,8 +50,8 @@ define([
 
         GenericPlot.registerPlotType(Histogram2D);
 
-        Histogram2D.Create = function(tableid, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery);
+        Histogram2D.Create = function(tableid, startQuery, querySettings) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery, querySettings);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -148,7 +148,10 @@ define([
                             dir.y = dir.y/that.scaleY;
                             var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.propidValueX, that.propidValueY, center, dir);
 
-                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', queryInfo.query, null);
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', {
+                                query: queryInfo.query,
+                                subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                            }, null);
                         });
                     }
                     });
@@ -458,7 +461,10 @@ define([
                     var content = 'X Range: '+tooltip.minvalX+' - '+tooltip.maxvalX+'<br>';
                     content += 'Y Range: '+tooltip.minvalY+' - '+tooltip.maxvalY+'<br>';
                     content += 'Number of items: '+tooltip.count;
-                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, {
+                        query: qry,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    }, null);
                 }
             }
 
@@ -476,7 +482,10 @@ define([
 
                 var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
                 content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, null);
             }
 
 

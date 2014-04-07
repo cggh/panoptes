@@ -12,8 +12,8 @@ define([
 
 
 
-        StandardLayoutPlot.Create = function(tableid, plotTypeID, settings, startQuery) {
-            var that = GenericPlot.Create(tableid, plotTypeID, settings, startQuery);
+        StandardLayoutPlot.Create = function(tableid, plotTypeID, settings, startQuery, querySettings) {
+            var that = GenericPlot.Create(tableid, plotTypeID, settings, startQuery, querySettings);
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);

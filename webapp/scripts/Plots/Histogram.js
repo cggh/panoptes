@@ -19,8 +19,8 @@ define([
 
         GenericPlot.registerPlotType(Histogram);
 
-        Histogram.Create = function(tableid, startQuery) {
-            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery);
+        Histogram.Create = function(tableid, startQuery, querySettings) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery, querySettings);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -366,7 +366,10 @@ define([
                     var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, tooltip.minval, tooltip.maxval);
                     var content = 'Number of items: '+tooltip.count;
                     content += '<br>Range: '+tooltip.minval+' - '+tooltip.maxval+'<br>';
-                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram bar', content, qry, null);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram bar', content, {
+                        query: qry,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    }, null);
                 }
             }
 
@@ -377,7 +380,10 @@ define([
 
                 var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
 
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, qry, null);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Histogram range', content, {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, null);
             }
 
 

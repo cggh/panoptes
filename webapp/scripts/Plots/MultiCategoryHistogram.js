@@ -19,13 +19,13 @@ define([
 
         GenericPlot.registerPlotType(MultiCategoryHistogram);
 
-        MultiCategoryHistogram.Create = function(tableid, startQuery) {
+        MultiCategoryHistogram.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, MultiCategoryHistogram.typeID,
                 {
                     title:MultiCategoryHistogram.name,
                     scrollVertical:true
                 },
-                startQuery);
+                startQuery, querySettings);
             that.fetchCount = 0;
             that.showRelative = false;
 
@@ -441,7 +441,10 @@ define([
                     content += '<br>Range: '+tooltip.minval+' - '+tooltip.maxval+'<br>';
                     var propInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
                     content += propInfo.name+'= ' + propInfo.toDisplayString(tooltip.cat)+ '<br>';
-                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Multiple Category Histogram bar', content, qry, null);
+                    ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Multiple Category Histogram bar', content, {
+                        query: qry,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    }, null);
                 }
             }
 
@@ -452,7 +455,10 @@ define([
 
                 var qry = SQL.WhereClause.createRangeRestriction(that.theQuery.get(), that.propidValue, rangeMin, rangeMax);
 
-                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'MultiCategoryHistogram range', content, qry, null);
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'MultiCategoryHistogram range', content, {
+                    query: qry,
+                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                }, null);
             }
 
 
