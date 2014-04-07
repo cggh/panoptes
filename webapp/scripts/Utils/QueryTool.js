@@ -32,15 +32,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.getForFetching = function() {
                 if (!that.hasSubSampler)
                     return that.get();
-                var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
-                if (frac>0.99)
+                var cnt = that.subSamplerMapper(that.ctrlSubSampler.getValue());
+                if (cnt<0)
                     return that.query;
                 else {
-                    var sliceCount = Math.floor(1.0/frac);
-                    var sliceNr = that.reSampleSliceIndex % sliceCount;
-                    var fr1 = sliceNr * frac;
-                    var fr2 = (sliceNr+1) * frac;
-                    return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareBetween('_randomval_', fr1, fr2) );
+//                    var sliceCount = Math.floor(1.0/frac);
+                    var sliceNr = that.reSampleSliceIndex;// % sliceCount;
+                    var fr1 = sliceNr * cnt;
+                    var fr2 = (sliceNr+1) * cnt;
+                    return SQL.WhereClause.createRestriction(that.query, SQL.WhereClause.CompareBetween('RandPrimKey', fr1, fr2) );
                 }
             }
 
@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (!that.hasSubSampler)
                     return false;
                 var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
-                return (frac<0.99);
+                return (frac>0);
             };
 
             that.store = function() {
@@ -123,20 +123,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.hasSubSampler) {
                     that.reSampleSliceIndex = 0;
-                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 140, height: 18, minval:0, maxval:1, value:1, digits: 1, drawIndicators: false})
+                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 140, height: 18, minval:0, maxval:1, value:0.4, digits: 10, drawIndicators: false})
                         .setNotifyOnFinished()
                         .setOnChanged(function() {
                             that.notifyQueryUpdated();
                         });
 
                     that.subSamplerMapper = function(frc) {
-                        return Math.max(1.0e-4, Math.min(1.0,Math.pow(frc*1.05,3)));
+                        if (frc>0.9)
+                            return -1;
+                        return Math.pow(1.0e6,(frc+1)/2);
+                        //return Math.max(1.0e-4, Math.min(1.0,Math.pow(frc*1.05,3)));
                     }
                     that.ctrlSubSampler.customValueMapper = function(vl) {
                         var frac = that.subSamplerMapper(vl);
-                        var st = (frac*100.0).toFixed(2)+'%';
-                        if (frac<0.999)
-                            st = '<span style="color:red;background-color:yellow"><b>' + st + '</b></span>';
+                        if (frac<0)
+                            return 'All';
+                        var st = (frac).toFixed(0);
+                        if (frac>10000)
+                            var st = (frac/1000.0).toFixed(2)+'K';
+                        st = '<span style="color:red;background-color:yellow"><b>' + st + '</b></span>';
                         return st;
                     };
 
