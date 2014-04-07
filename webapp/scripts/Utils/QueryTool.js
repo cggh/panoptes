@@ -253,7 +253,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (state=='_manage_') {
                     newValue = null;
                     if (that.query)
-                        newValue = that.store();
+                        newValue = that.store().query;
                     ManageStoredEntities.manage('storedqueries', that.tableInfo.id, 'stored query', 'stored queries', newValue);
                     return;
                 }
