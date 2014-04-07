@@ -129,10 +129,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             that.notifyQueryUpdated();
                         });
 
+                    var subSampleValues = [1000,2000,5000,10000,20000,50000,100000,200000,500000,1000000];
                     that.subSamplerMapper = function(frc) {
                         if (frc>0.9)
                             return -1;
-                        return Math.pow(1.0e6,(frc+1)/2);
+                        var vl  = Math.pow(1.0e6,(frc+1)/2);
+                        var dst = 1.0e9;
+                        var bestval=1;
+                        $.each(subSampleValues, function(idx, tryval) {
+                            if (dst>Math.abs(tryval-vl)) {
+                                bestval = tryval;
+                                dst = Math.abs(tryval-vl);
+                            }
+                        });
+                        return bestval;
                         //return Math.max(1.0e-4, Math.min(1.0,Math.pow(frc*1.05,3)));
                     }
                     that.ctrlSubSampler.customValueMapper = function(vl) {
@@ -141,7 +151,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             return 'All';
                         var st = (frac).toFixed(0);
                         if (frac>10000)
-                            var st = (frac/1000.0).toFixed(2)+'K';
+                            var st = (frac/1000.0).toFixed(0)+'K';
                         st = '<span style="color:red;background-color:yellow"><b>' + st + '</b></span>';
                         return st;
                     };
