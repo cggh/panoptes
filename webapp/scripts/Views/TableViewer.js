@@ -170,7 +170,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.createPanelControls = function () {
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
-                    this.panelSimpleQuery.setPadding(10);
+                    this.panelSimpleQuery.setPadding(0);
 
                     var ctrlQuery = that.theQuery.createControl();
                     var tableInfo = MetaData.getTableInfo(that.tableid);
@@ -200,15 +200,18 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         SelectionTools.cmdStore(that.tableInfo);
                     });
 
-                    var groupSelection = Controls.CompoundVert([
+                    var groupSelection = Controls.Section(Controls.CompoundVert([
                         that.selectedItemCountText,
                         Controls.CompoundHor([selectionClear, selectionAll, selectionStore])
-                    ]).setLegend('Current selection');
+                    ]), {
+                        title: 'Current selection',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    });
 
 
 
 
-                    that.visibilityControlsGroup = Controls.CompoundVert([]);
+                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(10);
 
                     var cmdHideAllColumns = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2' }).setOnChanged(function() {
                         if (that.columnVisibilityChecks) {
@@ -221,14 +224,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
-                        Controls.VerticalSeparator(15),
                         groupSelection,
                         Controls.VerticalSeparator(15),
                         buttonCreatePlot,
-                        Controls.CompoundVert([
+                        Controls.Section(Controls.CompoundVert([
                             cmdHideAllColumns,
                             that.visibilityControlsGroup
-                        ]).setLegend('Visible columns')
+                        ]).setMargin(10), {
+                            title: 'Visible columns',
+                            bodyStyleClass: 'ControlsSectionBody'
+                        })
 
                     ]));
                 }
