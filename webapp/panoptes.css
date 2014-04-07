@@ -254,6 +254,13 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     margin-bottom:20px;
 }
 
+.ControlsSectionBodyIntro {
+    margin-left:15px;
+    margin-top:20px;
+    margin-right:15px;
+    margin-bottom:20px;
+    min-height: 75px;
+}
 
 .GenomeBrowserMainSectionHeader {
     background-color: rgb(140,195,200);

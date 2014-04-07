@@ -17,11 +17,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 //This function is called during the initialisation. Create the frame structure of the view here
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    rootFrame.setSeparatorSize(0);
+                    rootFrame.setSeparatorSize(5);
 
                     this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.45));
                     this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.55))/*.setFixedSize(Framework.dimX, 400)*/;
-                    this.frameButtons.setMargins(15);
+                    this.frameButtons.setMargins(0);
                     this.frameButtons2.setMargins(15);
                     //this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                 }
@@ -29,7 +29,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 // This function is called during the initialisation. Create the panels that will populate the frames here
                 that.createPanels = function() {
                     this.panelButtons = Framework.Form(this.frameButtons);
-                    this.panelButtons.setPadding(10);
+                    this.panelButtons.setPadding(0);
                     this.panelButtons2 = Framework.Form(this.frameButtons2);
                     this.panelButtons2.setPadding(10);
 
@@ -72,9 +72,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         var grp = Controls.CompoundHor([
                             info,
                             Controls.AlignRight(Controls.CompoundHor([tableViewerButton, button_Showplots]))
-                        ]).setAutoFillX(true).setLegend('<h2>' + tableInfo.tableCapNamePlural + '</h2>');
-                        tableButtons.push(grp);
-                        tableButtons.push(Controls.VerticalSeparator(10));
+                        ]);;
+                        tableButtons.push(Controls.Section(grp, {
+                            title: tableInfo.tableCapNamePlural,
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                            bodyStyleClass: 'ControlsSectionBodyIntro'
+                        }));
                     })
 
 //                    var bt_addprops = Controls.Button(null, { content: 'Upload custom properties...', width:120, height:40 });
