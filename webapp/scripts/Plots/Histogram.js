@@ -105,7 +105,7 @@ define([
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
                     }),
-                ]);
+                ]).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 

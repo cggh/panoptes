@@ -234,7 +234,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             bodyStyleClass: 'ControlsSectionBody'
                         })
 
-                    ]));
+                    ]).setMargin(0));
                 }
 
                 //Returns a user-friendly text description of a query
