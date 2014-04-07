@@ -78,7 +78,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 //                    that.ctrl_Gamma
                 ]);
                 //that.addPlotSettingsControl('controls',controlsGroup);
-                that.panelControls = Framework.Form(that.frameControls).setPadding(5);
+                that.panelControls = Framework.Form(that.frameControls).setPadding(0);
                 that.panelControls.addControl(controlsGroup);
 
 
