@@ -40,9 +40,10 @@ define([
             };
 
             that.createPanelButtons = function() {
-                var ctrl_Query = that.theQuery.createControl();
-
                 that.ctrl_PointCount = Controls.Html(null, '');
+
+                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -50,7 +51,7 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:', states: propList }).setClassID('value');
+                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: propList }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -76,9 +77,9 @@ define([
                     Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValue]).setAutoFillX(false),
                     Controls.HorizontalSeparator(10),
                     that.ctrl_binsizeUpdate
-                ]).setLegend('Bin size');
+                ]);
 
-                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Gamma correction', width: 200, minval:0.1, maxval:1, value:1, digits: 2})
+                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Gamma correction', width: 180, minval:0.1, maxval:1, value:1, digits: 2})
                     /*.setNotifyOnFinished()*/.setClassID('gamma')
                     .setOnChanged(DQX.debounce(function() {
                         that.reDraw();
@@ -86,14 +87,24 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(10),
-                    that.ctrl_PointCount,
-                    Controls.VerticalSeparator(10),
-                    that.ctrlValueProperty,
-                    Controls.VerticalSeparator(20),
-                    binsizeGroup,
-                    Controls.VerticalSeparator(10),
-                    that.ctrl_Gamma
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrlValueProperty
+                    ]).setMargin(10), {
+                            title: 'Plot data',
+                            bodyStyleClass: 'ControlsSectionBody'
+                        }),
+                    Controls.Section(Controls.CompoundVert([
+                        binsizeGroup,
+                    ]), {
+                        title: 'Bin size',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrl_Gamma
+                    ]).setMargin(10), {
+                        title: 'Layout',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

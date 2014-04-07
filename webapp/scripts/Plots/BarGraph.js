@@ -44,9 +44,10 @@ define([
             };
 
             that.createPanelButtons = function() {
-                var ctrl_Query = that.theQuery.createControl();
 
                 that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -54,17 +55,17 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:', states: propList }).setClassID('groupby');
+                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:<br>', states: propList }).setClassID('groupby');
                 that.ctrlCatProperty1.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrlCatSort1 = Controls.Combo(null,{ label:'Sort by:', states: [{id:'cat', name:'Category'}, {id:'count', name:'Count'}] }).setClassID('sortby');
+                that.ctrlCatSort1 = Controls.Combo(null,{ label:'Sort by:<br>', states: [{id:'cat', name:'Category'}, {id:'count', name:'Count'}] }).setClassID('sortby');
                 that.ctrlCatSort1.setOnChanged(function() {
                     that.fetchData();
                 });
 
-                that.ctrlCatProperty2 = Controls.Combo(null, { label:'Secondary group:', states: propList }).setClassID('secgroup');
+                that.ctrlCatProperty2 = Controls.Combo(null, { label:'Secondary group:<br>', states: propList }).setClassID('secgroup');
                 that.ctrlCatProperty2.setOnChanged(function() {
                     that.ctrlCatType.modifyEnabled(that.ctrlCatProperty2.getValue()!='');
                     that.fetchData();
@@ -81,16 +82,24 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(10),
-                    that.ctrl_PointCount,
-                    Controls.VerticalSeparator(10),
-                    that.ctrlCatProperty1,
-                    that.ctrlCatSort1,
-                    Controls.VerticalSeparator(20),
-                    that.ctrlCatProperty2,
-                    that.ctrlCatType,
-                    Controls.VerticalSeparator(10),
-                    that.colorLegend
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrlCatProperty1,
+                        that.ctrlCatSort1,
+                        that.ctrlCatProperty2,
+                        that.ctrlCatType,
+                    ]).setMargin(10), {
+                        title: 'Plot data',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.colorLegend
+                    ]), {
+                        title: 'Color legend',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

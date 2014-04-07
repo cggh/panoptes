@@ -55,9 +55,9 @@ define([
 
 
             that.createPanelButtons = function() {
-                var ctrl_Query = that.theQuery.createControl();
-
                 that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+
 
                 var pickControls = Controls.CompoundGrid();
                 $.each(that.plotAspects,function(aspectIdx, plotAspect) {
@@ -83,13 +83,13 @@ define([
                     }
                 });
 
-                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Size factor', width: 200, minval:0, maxval:2, value:1, digits: 2})
+                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Size factor', width: 180, minval:0, maxval:2, value:1, digits: 2})
                     .setNotifyOnFinished().setClassID('sizefactor')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 200, minval:0, maxval:1, value:1, digits: 2})
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 180, minval:0, maxval:1, value:1, digits: 2})
                     .setNotifyOnFinished().setClassID('opacity')
                     .setOnChanged(function() {
                         that.reDraw();
@@ -172,16 +172,28 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(10),
-                    that.ctrl_PointCount,
-                    Controls.VerticalSeparator(10),
-                    pickControls,
-                    that.ctrl_SizeFactor,
-                    that.ctrl_Opacity,
-                    Controls.VerticalSeparator(10),
-                    cmdPointSelection,
-                    Controls.VerticalSeparator(10),
-                    that.colorLegend
+
+                    Controls.Section(pickControls, {
+                        title: 'Plot data',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrl_SizeFactor,
+                        that.ctrl_Opacity,
+                        cmdPointSelection
+                    ]).setMargin(10), {
+                        title: 'Layout',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.colorLegend
+                    ]), {
+                        title: 'Color legend',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    })
+
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

@@ -172,13 +172,14 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var ctrlQuery = that.theQuery.createControl();
-                    var tableInfo = MetaData.getTableInfo(that.tableid);
-
                     var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         Msg.send({type: 'CreateDataItemPlot'}, { tableid: that.tableid });
                     });
+
+                    var ctrlQuery = that.theQuery.createControl([buttonCreatePlot]);
+                    var tableInfo = MetaData.getTableInfo(that.tableid);
+
 
 
 
@@ -225,8 +226,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery.addControl(Controls.CompoundVert([
                         ctrlQuery,
                         groupSelection,
-                        Controls.VerticalSeparator(15),
-                        buttonCreatePlot,
                         Controls.Section(Controls.CompoundVert([
                             cmdHideAllColumns,
                             that.visibilityControlsGroup

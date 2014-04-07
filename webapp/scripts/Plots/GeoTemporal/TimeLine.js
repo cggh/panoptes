@@ -49,10 +49,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.thePlot.reDraw();
                 });
 
-                var groupTimeControls = Controls.CompoundVert([that.ctrlDateProperty, that.ctrl_showTimeBarsAsPercentage, that.ctrl_restrictToTimeViewPort]).setLegend('<h4>Time line</h4>');
+                var groupTimeControls = Controls.CompoundVert([
+                    that.ctrlDateProperty,
+                    that.ctrl_showTimeBarsAsPercentage,
+                    that.ctrl_restrictToTimeViewPort
+                ]);
 
 
-                return groupTimeControls;
+                return Controls.Section(groupTimeControls, {
+                    title: 'Time line',
+                    bodyStyleClass: 'ControlsSectionBody'
+                });
             }
 
 

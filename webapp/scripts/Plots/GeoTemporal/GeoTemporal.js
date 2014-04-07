@@ -128,7 +128,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
 
                 var grp = Controls.CompoundVert([
-//                    cmdZoomToFit,
                     cmdLassoSelection,
                     Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
@@ -136,8 +135,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     that.ctrl_Opacity,
                     Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points')
                     ]);
-                grp.setLegend('<h4>Map</h4>');
-                return grp;
+                return Controls.Section(grp, {
+                    title: 'Map',
+                    bodyStyleClass: 'ControlsSectionBody'
+                });
             }
 
             that.createPanels = function() {
@@ -147,11 +148,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 this.panelWarning.addControl(this.warningContent);
                 this.panelWarning.render();
 
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
-
-                var ctrl_Query = that.theQuery.createControl();
+                that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
                 that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -166,11 +167,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.colorLegend = Controls.Html(null,'');
 
-                var controlsList = [ctrl_Query,
-                    Controls.VerticalSeparator(5),
-                    that.ctrl_PointCount,
-                    Controls.VerticalSeparator(5),
-                    Controls.CompoundVert([that.ctrlColorProperty, that.colorLegend]).setLegend('<h4>Overlay</h4>')];
+                var controlsList = [
+                    ctrl_Query,
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrlColorProperty,
+                        that.colorLegend
+                    ]).setMargin(10), {
+                        title: 'Color overlay',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+                ];
 
                 $.each(that.plotComponents, function(key, plotComp) {
                     controlsList.push(Controls.VerticalSeparator(2));

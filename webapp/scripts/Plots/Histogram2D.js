@@ -77,9 +77,9 @@ define([
             }
 
             that.createPanelButtons = function() {
-                var ctrl_Query = that.theQuery.createControl();
-
                 that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+
 
                 var propList = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
@@ -87,11 +87,11 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:', states: propList }).setClassID('xvalue');
+                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:<br>', states: propList }).setClassID('xvalue');
                 that.ctrlValueXProperty.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:', states: propList }).setClassID('yvalue');
+                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:<br>', states: propList }).setClassID('yvalue');
                 that.ctrlValueYProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -104,15 +104,25 @@ define([
                         that.fetchData();
                 });
 
-                that.ctrl_binsizeValueX = Controls.Edit(null,{size:12, label:'X:'}).setClassID('binsizex').modifyEnabled(false);
-                that.ctrl_binsizeValueY = Controls.Edit(null,{size:12, label:'Y:'}).setClassID('binsizey').modifyEnabled(false);
+                that.ctrl_binsizeValueX = Controls.Edit(null,{size:10, label:'X:'}).setClassID('binsizex').modifyEnabled(false);
+                that.ctrl_binsizeValueY = Controls.Edit(null,{size:10, label:'Y:'}).setClassID('binsizey').modifyEnabled(false);
 
                 that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update'}).setOnChanged(function() {
                     that.fetchData();
                 });
                 that.ctrl_binsizeUpdate.modifyEnabled(false);
 
-                var binsizeGroup = Controls.CompoundVert([that.ctrl_binsizeAutomatic, that.ctrl_binsizeValueX, that.ctrl_binsizeValueY, that.ctrl_binsizeUpdate]).setLegend('Bin size');
+                var binsizeGroup = Controls.CompoundVert([
+                    that.ctrl_binsizeAutomatic,
+                    Controls.CompoundHor([
+                        Controls.CompoundVert([
+                            that.ctrl_binsizeValueX,
+                            that.ctrl_binsizeValueY
+                        ]).setTreatAsBlock(true),
+                        Controls.HorizontalSeparator(5),
+                        that.ctrl_binsizeUpdate
+                    ])
+                    ]);
 
                 var colormaplist = [];
                 $.each(paletteList, function(idx,name) {
@@ -122,7 +132,7 @@ define([
                     that.reDraw();
                 });
 
-                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Intensity correction', width: 200, minval:0.1, maxval:1, value:0.75, digits: 2})
+                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Intensity correction', width: 180, minval:0.1, maxval:1, value:0.75, digits: 2})
                     .setNotifyOnFinished().setClassID('gamma')
                     .setOnChanged(function() {
                         that.reDraw();
@@ -147,20 +157,32 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query,
-                    Controls.VerticalSeparator(10),
-                    that.ctrl_PointCount,
-                    Controls.VerticalSeparator(10),
-                    that.ctrlValueXProperty,
-                    Controls.VerticalSeparator(5),
-                    that.ctrlValueYProperty,
-                    Controls.VerticalSeparator(20),
-                    binsizeGroup,
-                    Controls.VerticalSeparator(20),
-                    that.ctrlPalette,
-                    Controls.VerticalSeparator(20),
-                    that.ctrl_Gamma,
-                    Controls.VerticalSeparator(10),
-                    cmdPointSelection
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrlValueXProperty,
+                        that.ctrlValueYProperty,
+                    ]).setMargin(10), {
+                        title: 'Plot data',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        binsizeGroup,
+                    ]), {
+                        title: 'Bin size',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrlPalette,
+                        that.ctrl_Gamma,
+                        cmdPointSelection
+                    ]).setMargin(10), {
+                        title: 'Layout',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+
                 ]);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);

@@ -87,7 +87,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-            that.createControl = function() {
+            that.createControl = function(extraControlsList) {
 
                 var theControl = Controls.BaseCustom(true).setMargin(0);
 
@@ -147,6 +147,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
 
                     group.addControl(Controls.CompoundHor([that.ctrlSubSampler, Controls.HorizontalSeparator(4), that.ctrlReSample]));
+                }
+
+                if (extraControlsList) {
+                    $.each(extraControlsList, function(idx, ctrl) {
+                        group.addControl(ctrl);
+                    });
                 }
 
 

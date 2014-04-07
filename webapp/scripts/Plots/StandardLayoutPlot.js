@@ -44,7 +44,7 @@ define([
             that.createPanels = function() {
                 that.panelPlot = FrameCanvas(that.framePlot);
 
-                that.panelButtons = Framework.Form(that.frameButtons).setPadding(5);
+                that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
                 that.createPanelPlot();
                 that.createPanelButtons();
