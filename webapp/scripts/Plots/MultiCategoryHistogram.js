@@ -464,8 +464,6 @@ define([
                         });
                     };
 
-                    var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
-                    var first = true;
                     var vals_x = [];
                     var vals_y = [];
                     $.each(bucketCounts, function(bidx, val) {
@@ -511,6 +509,7 @@ define([
             that.drawImpl_Separate = function(drawInfo) {
 
                 var barH = that.getVertSize();
+                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
 
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
