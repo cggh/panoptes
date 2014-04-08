@@ -91,7 +91,7 @@ define([
 
 
                 that.ctrlOverlap = Controls.Check(null, { label:'Show in single plot'  }).setClassID('singleplot').setOnChanged(function() {
-                    that.reDraw();
+                    that.fetchData();
                 });
 
                 that.isSinglePlot = function() {
@@ -122,6 +122,7 @@ define([
                         that.reDraw();
                     }, 20));
 
+                that.colorLegend = Controls.Html(null,'');
 
 
                 var controlsGroup = Controls.CompoundVert([
@@ -147,7 +148,8 @@ define([
                         that.ctrlNormalised,
                         that.ctrlSort,
                         that.ctrl_VertSize,
-                        that.ctrl_Gamma
+                        that.ctrl_Gamma,
+                        that.colorLegend
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -170,7 +172,10 @@ define([
 
             that.getVertSize = function() {
                 var fr = (3+that.ctrl_VertSize.getValue())/13.0;
-                return 200*fr*fr;
+                var vl = 200*fr*fr;
+                if (that.isSinglePlot())
+                    vl *= 3;
+                return vl;
             }
 
 
@@ -281,14 +286,24 @@ define([
 
                     that.sortCategories();
 
-                    //var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
-                    var catnames = [];
-                    $.each(that.categories, function(idx, cat) {
-                        catnames.push(cat.name);
-                    });
-                    catPropInfo.mapColors(catnames);
 
-                    that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
+                    if (that.isSinglePlot()) {
+                        var catnames = [];
+                        $.each(that.categories, function(idx, cat) {
+                            catnames.push(cat.name);
+                        });
+                        var maprs = catPropInfo.mapColors(catnames);
+                        var legendStr = '';
+                        $.each(maprs.legend,function(idx, legendItem) {
+                            legendStr += '<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
+                        });
+                        that.colorLegend.modifyValue(legendStr);
+                        that.panelPlot.setFixedHeight(that.getVertSize()+50);
+                    }
+                    else {
+                        that.colorLegend.modifyValue('');
+                        that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
+                    }
                     that.reDraw();
                     that.ctrl_PointCount.modifyValue(totCount + ' data points');
                 });
@@ -315,8 +330,12 @@ define([
             }
 
             that.reDraw = function() {
-                if (that.categories && (that.categories.length>0))
-                    that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
+                if (that.categories && (that.categories.length>0)) {
+                    if (that.isSinglePlot())
+                        that.panelPlot.setFixedHeight(that.getVertSize()+50);
+                    else
+                        that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
+                }
                 that.panelPlot.invalidate();
             }
 
@@ -355,6 +374,9 @@ define([
                 XMin -= 0.1*XRange;
                 XMax += 0.1*XRange;
 
+                var offsetY = (barH);
+                var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
+
                 // Draw x scale
                 var scaleX = (drawInfo.sizeX-marginX) / (XMax - XMin);
                 var offsetX = marginX - XMin*scaleX;
@@ -383,8 +405,49 @@ define([
                 });
                 ctx.restore();
 
-                var offsetY = (barH-5) + barH;
-                var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
+
+                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
+                var applyGammaCorr = function(vl) {
+                    return Math.pow(vl/that.maxCount,gamma)*that.maxCount;
+                };
+
+                if (!that.ctrlNormalised.getValue()) {
+                    // Draw y scale
+                    ctx.save();
+                    ctx.font="10px Arial";
+                    ctx.fillStyle="rgb(0,0,0)";
+                    ctx.textAlign = 'center';
+                    var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(barH/that.maxCount)/applyGammaCorr(0.05*that.maxCount)*(0.05*that.maxCount));
+                    var lastTextPos = 1.0e9;
+                    for (var i=Math.ceil(0); i<=Math.floor(that.maxCount/scale.Jump1); i++) {
+                        var vl = i*scale.Jump1;
+                        var fr  = Math.pow(vl/that.maxCount, gamma);
+                        var py = Math.round(-fr*(barH-7) + offsetY)-0.5;
+                        ctx.strokeStyle = "rgb(230,230,230)";
+                        if (i%scale.JumpReduc==0)
+                            ctx.strokeStyle = "rgb(190,190,190)";
+                        ctx.beginPath();
+                        ctx.moveTo(marginX,py);
+                        ctx.lineTo(drawInfo.sizeX,py);
+                        ctx.stroke();
+                        if (i%scale.JumpReduc==0) {
+                            ctx.save();
+                            ctx.translate(marginX-5,py);
+                            ctx.rotate(-Math.PI/2);
+                            var txt = scale.value2String(vl);
+                            var tw =  ctx.measureText(txt).width;
+                            if (py+tw/2<lastTextPos) {
+                                ctx.fillText(txt,0,0);
+                                lastTextPos = py-(tw/2+7);
+                            }
+                            ctx.restore();
+                        }
+                    }
+                    ctx.restore();
+                }
+
+
+                that._clickDataPoints = [];
                 $.each(that.categories, function(idx, catInfo) {
                     var bucketCounts = catInfo.bucketCounts;
 
@@ -406,20 +469,28 @@ define([
                     var vals_x = [];
                     var vals_y = [];
                     $.each(bucketCounts, function(bidx, val) {
-                        if (val>0) {
-                            fr  = Math.pow(val/freqscale,gamma);
+                        var fr  = Math.pow(val/freqscale,gamma);
 
-                            var x1 = (that.bucketNrOffset+bidx+0.5)*that.bucketSize;
-                            var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
-                            var py2 = Math.round(-fr*(barH-7) + offsetY)-0.5;
-                            vals_x.push(px1);
-                            vals_y.push(py2);
-                            ctx.beginPath();
-                            ctx.arc(px1, py2, 2, 0, 2 * Math.PI, false);
-                            ctx.closePath();
-                            ctx.stroke();
-                            ctx.fill();
-                        }
+                        var x1 = (that.bucketNrOffset+bidx+0.0)*that.bucketSize;
+                        var x2 = (that.bucketNrOffset+bidx+1.0)*that.bucketSize;
+                        var px1 = Math.round((x1+x2)/2 * scaleX + offsetX)-0.5;
+                        var py2 = Math.round(-fr*(barH-7) + offsetY)-0.5;
+                        vals_x.push(px1);
+                        vals_y.push(py2);
+                        that._clickDataPoints.push({
+                            x: px1,
+                            y: py2,
+                            catval: catInfo.name,
+                            bidx: bidx,
+                            freq: val,
+                            minval: x1,
+                            maxval: x2
+                        });
+                        ctx.beginPath();
+                        ctx.arc(px1, py2, 2, 0, 2 * Math.PI, false);
+                        ctx.closePath();
+                        ctx.stroke();
+                        ctx.fill();
                     });
                     ctx.beginPath();
                     $.each(bucketCounts, function(bidx, val) {
@@ -487,6 +558,7 @@ define([
                 });
                 ctx.restore();
 
+
                 $.each(that.categories, function(idx, catInfo) {
                     var bucketCounts = catInfo.bucketCounts;
                     var offsetY = (barH-5) + idx * barH;
@@ -505,7 +577,6 @@ define([
                         });
                     };
 
-                    var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
                     ctx.fillStyle="rgb(190,190,190)";
                     ctx.strokeStyle = "rgb(0, 0, 0)";
                     $.each(bucketCounts, function(bidx, val) {
@@ -543,33 +614,62 @@ define([
                 if (!that.plotPresent) return null;
                 var tooltip = null;
                 var barH = that.getVertSize();
-                var catNr = Math.floor(py0/barH);
-                var catInfo = that.categories[catNr];
-                if (!catInfo) {
-                    return null;
-                }
 
-                $.each(catInfo.bucketCounts, function(bidx, val) {
-                    var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
-                    var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
-                    var px1 = Math.round(x1 * that.scaleX + that.offsetX)-0.5;
-                    var px2 = Math.round(x2 * that.scaleX + that.offsetX)-0.5;
-                    if ( (px0>=px1) && (px0<=px2) && (val>0) ) {
-                        var str = '';
-                        str += 'Count: '+val;
-                        tooltip = {
-                            ID: 'IDX'+bidx,
-                            px: (px1+px2)/2,
-                            py: (catNr+1)*barH-20,
+                var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
+                if (that.isSinglePlot()) {
+                    var mindst = 15;
+                    var bestpt = null;
+                    $.each(that._clickDataPoints, function(idx, pt) {
+                        var dst = Math.abs(pt.x - px0) + Math.abs(pt.y - py0);
+                        if (dst<mindst) {
+                            mindst = dst;
+                            bestpt = pt;
+                        }
+                    });
+                    if (bestpt)
+                        return {
+                            ID: 'IDX'+bestpt.catval+'_'+bestpt.bidx,
+                            px: bestpt.x,
+                            py: bestpt.y,
                             showPointer:true,
-                            content: str,
-                            count: val,
-                            cat: catInfo.name,
-                            minval:x1,
-                            maxval:x2
+                            content: catPropInfo.toDisplayString(bestpt.catval)+'<br>'+bestpt.freq,
+                            cat: bestpt.catval,
+                            count: bestpt.freq,
+                            minval: bestpt.minval,
+                            maxval: bestpt.maxval
                         };
+                    else
+                        return null;
+
+                }
+                else {
+                    var catNr = Math.floor(py0/barH);
+                    var catInfo = that.categories[catNr];
+                    if (!catInfo) {
+                        return null;
                     }
-                });
+                    $.each(catInfo.bucketCounts, function(bidx, val) {
+                        var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
+                        var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;
+                        var px1 = Math.round(x1 * that.scaleX + that.offsetX)-0.5;
+                        var px2 = Math.round(x2 * that.scaleX + that.offsetX)-0.5;
+                        if ( (px0>=px1) && (px0<=px2) && (val>0) ) {
+                            var str = '';
+                            str += 'Count: '+val;
+                            tooltip = {
+                                ID: 'IDX'+bidx,
+                                px: (px1+px2)/2,
+                                py: (catNr+1)*barH-20,
+                                showPointer:true,
+                                content: str,
+                                count: val,
+                                cat: catInfo.name,
+                                minval:x1,
+                                maxval:x2
+                            };
+                        }
+                    });
+                }
                 return tooltip;
             };
 

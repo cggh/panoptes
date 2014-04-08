@@ -285,7 +285,7 @@ define([
                 var lastTextPos = 1.0e9;
                 for (var i=Math.ceil(YMin/scale.Jump1); i<=Math.floor(YMax/scale.Jump1); i++) {
                     var vl = i*scale.Jump1;
-                    vlc = applyGammaCorr(vl);
+                    var vlc = applyGammaCorr(vl);
                     var py = Math.round(vlc * scaleY + offsetY)-0.5;
                     ctx.strokeStyle = "rgb(230,230,230)";
                     if (i%scale.JumpReduc==0)
