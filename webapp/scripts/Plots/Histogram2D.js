@@ -186,7 +186,7 @@ define([
                     }),
 
 
-                ]);
+                ]).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 

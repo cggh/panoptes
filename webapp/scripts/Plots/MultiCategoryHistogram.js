@@ -89,6 +89,11 @@ define([
                     that.ctrl_binsizeUpdate
                 ]);
 
+                that.ctrlNormalised = Controls.Check(null, { label:'Normalise per category'  }).setClassID('normcategories').setOnChanged(function() {
+                    that.reDraw();
+                });
+
+
                 var sortlist = [{id:'state', name:'Name'}, {id:'count', name:'Size'}, {id:'mean', name:'Average value'}];
                 that.ctrlSort = Controls.Combo(null,{label:'Sort by', states:sortlist, value:'state'}).setClassID('sortby').setOnChanged(function() {
                     that.sortCategories();
@@ -129,6 +134,7 @@ define([
                     }),
 
                     Controls.Section(Controls.CompoundVert([
+                        that.ctrlNormalised,
                         that.ctrlSort,
                         that.ctrl_VertSize,
                         that.ctrl_Gamma
@@ -138,7 +144,7 @@ define([
                     }),
 
 
-                ]);
+                ]).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
@@ -354,6 +360,7 @@ define([
                 ctx.restore();
 
                 $.each(that.categories, function(idx, catInfo) {
+                    var bucketCounts = catInfo.bucketCounts;
                     var offsetY = (barH-5) + idx * barH;
                     ctx.strokeStyle = "rgb(200,200,200)";
                     ctx.beginPath();
@@ -361,15 +368,21 @@ define([
                     ctx.lineTo(drawInfo.sizeX, offsetY);
                     ctx.stroke();
 
-
+                    var freqscale = that.maxCount;
+                    if (that.ctrlNormalised.getValue()) {
+                        freqscale = 1;
+                        $.each(bucketCounts, function(bidx, val) {
+                            if (val>freqscale)
+                                freqscale = val;
+                        });
+                    };
 
                     var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
-                    var bucketCounts = catInfo.bucketCounts;
                     ctx.fillStyle="rgb(190,190,190)";
                     ctx.strokeStyle = "rgb(0, 0, 0)";
                     $.each(bucketCounts, function(bidx, val) {
                         if (val>0) {
-                            fr  = Math.pow(val/that.maxCount,gamma);
+                            fr  = Math.pow(val/freqscale,gamma);
 
                             var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
                             var x2 = (that.bucketNrOffset+bidx+1)*that.bucketSize;

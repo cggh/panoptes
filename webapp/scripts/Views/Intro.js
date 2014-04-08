@@ -76,7 +76,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         tableButtons.push(Controls.Section(grp, {
                             title: tableInfo.tableCapNamePlural,
                             headerStyleClass: 'GenomeBrowserMainSectionHeader',
-                            bodyStyleClass: 'ControlsSectionBodyIntro'
+                            bodyStyleClass: 'ControlsSectionBodyIntro',
+                            canCollapse: false
                         }));
                     })
 

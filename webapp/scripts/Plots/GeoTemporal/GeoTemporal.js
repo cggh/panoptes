@@ -180,20 +180,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 ];
 
                 $.each(that.plotComponents, function(key, plotComp) {
-                    controlsList.push(Controls.VerticalSeparator(2));
                     controlsList.push(plotComp.createControls());
                 });
 
                 var groupMapControls = that.createControlsMap();
 
-                controlsList.push(Controls.VerticalSeparator(2));
                 controlsList.push(groupMapControls);
 
 
 
 
 
-                var controlsGroup = Controls.CompoundVert(controlsList);
+                var controlsGroup = Controls.CompoundVert(controlsList).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
