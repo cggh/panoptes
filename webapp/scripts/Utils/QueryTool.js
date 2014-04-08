@@ -120,23 +120,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (that.hasSubSampler) {
                     that.reSampleSliceIndex = 0;
 
-                    var subSampleFrac = 0.4;
+                    var subSampleFrac = 0.65;
                     if (settings.subSamplingOptions) {
                         that.reSampleSliceIndex = settings.subSamplingOptions.sliceidx;
                         subSampleFrac = settings.subSamplingOptions.frac;
                     }
 
-                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 140, height: 18, minval:0, maxval:1, value:subSampleFrac, digits: 10, drawIndicators: false})
+                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 165, height: 18, minval:0, maxval:1, value:subSampleFrac, digits: 10, drawIndicators: false})
                         .setNotifyOnFinished()
                         .setOnChanged(function() {
+                            that.reSampleSliceIndex = 0;
                             that.notifyQueryUpdated();
                         });
 
-                    var subSampleValues = [1000,2000,5000,10000,20000,50000,100000,200000,500000,1000000];
+                    var subSampleValues = [20,50,100,200,500,1000,2000,5000,10000,20000,50000,100000,200000,500000,1000000];
                     that.subSamplerMapper = function(frc) {
-                        if (frc>0.9)
+                        if (frc>0.95)
                             return -1;
-                        var vl  = Math.pow(1.0e6,(frc+1)/2);
+                        var vl  = Math.pow(1.0e6,(frc+0.3)/1.3);
                         var dst = 1.0e9;
                         var bestval=1;
                         $.each(subSampleValues, function(idx, tryval) {
@@ -150,12 +151,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     that.ctrlSubSampler.customValueMapper = function(vl) {
                         var frac = that.subSamplerMapper(vl);
-                        if (frac<0)
-                            return 'All';
-                        var st = (frac).toFixed(0);
-                        if (frac>10000)
-                            var st = (frac/1000.0).toFixed(0)+'K';
-                        st = '<span style="color:red;background-color:yellow;font-size:13pt;"><b>' + st + '</b></span>';
+                        var st = '';
+                        if (frac<0) {
+                            st = 'All';
+                            st = '<span style="color:rgb(0,128,0);font-size:13pt;"><b>' + st + '</b></span>';
+                        }
+                        else {
+                            st = (frac).toFixed(0);
+                            if (frac>10000)
+                                var st = (frac/1000.0).toFixed(0)+'K';
+                            st = '<span style="color:red;background-color:yellow;font-size:13pt;"><b>' + st + '</b></span>';
+                        }
                         return st;
                     };
 
@@ -169,7 +175,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'PnButtonLarge', width:100, height:35, bitmap: DQX.BMP('filter1.png') });
+                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'PnButtonLarge', width:110, height:35, bitmap: DQX.BMP('filter1.png') });
                 buttonDefineQuery.setOnChanged(function() {
                     EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
                         that.modify(query);

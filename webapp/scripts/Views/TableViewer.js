@@ -25,7 +25,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
-                that.theQuery = QueryTool.Create(tableid, {hasSubSampler: false});
+                that.theQuery = QueryTool.Create(tableid, {
+                    hasSubSampler:that.tableInfo.settings.AllowSubSampling,
+                    subSamplingOptions: QueryTool.getSubSamplingOptions_All()
+                });
                 MetaData.getTableInfo(that.tableid).tableViewer = that;
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
@@ -72,12 +75,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 Msg.listen('',{type: 'ShowItemsInQuery', tableid: that.tableid}, function(scope, info) {
                     that.activateState();
+                    if (info.subSamplingOptions)
+                        that.theQuery.setSubSamplingOptions(info.subSamplingOptions);
                     that.theQuery.modify(info.query);
                 });
 
                 that.storeSettings = function() {
                     var obj= {};
+                    obj.tableSettings  = that.myTable.storeSettings();
                     obj.query = SQL.WhereClause.encode(that.theQuery.get());
+                    obj.subsampling = that.theQuery.getSubSamplingOptions();
                     if (that.visibilityControlsGroup)
                         obj.activecolumns = Controls.storeSettings(that.visibilityControlsGroup);
                     return obj;
@@ -85,6 +92,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.recallSettings = function(settObj) {
                     var qry = SQL.WhereClause.decode(settObj.query);
+                    if (settObj.tableSettings) {
+                        that.myTable.recallSettings(settObj.tableSettings);
+                        that._storedTableSettings = settObj.tableSettings;
+                    }
+                    if (settObj.subsampling)
+                        that.theQuery.setSubSamplingOptions(settObj.subsampling);
                     that.theQuery.modify(qry);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
                     tableInfo.currentQuery = qry;
@@ -174,7 +187,13 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
-                        Msg.send({type: 'CreateDataItemPlot'}, { tableid: that.tableid });
+                        var subSamplingOptions = null;
+                        if (that.theQuery.isSubSampling())
+                            subSamplingOptions = that.theQuery.getSubSamplingOptions();
+                        Msg.send({type: 'CreateDataItemPlot'}, {
+                            tableid: that.tableid,
+                            subSamplingOptions: subSamplingOptions
+                        });
                     });
 
                     var ctrlQuery = that.theQuery.createControl([buttonCreatePlot]);
@@ -212,7 +231,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
 
-                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(10);
+                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(5);
 
                     var cmdHideAllColumns = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2' }).setOnChanged(function() {
                         if (that.columnVisibilityChecks) {
@@ -273,6 +292,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 that.updateQuery2 = function() {
                     if (that.myTable) {
                         that.myTable.setQuery(that.theQuery.getForFetching());
+                        that.myTable.setTable(that.tableInfo.getQueryTableName(that.theQuery.isSubSampling()));
                         that.myTable.reLoadTable();
                         var tableInfo = MetaData.getTableInfo(that.tableid);
                         tableInfo.currentQuery = that.theQuery.get();
@@ -347,19 +367,31 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 that.createColumnPopup(id);
                             })
 
-                            // Create checkbox that controls the visibility of the column
-                            var chk = Controls.Check(null,{label:propInfo.name, value:tableInfo.isPropertyColumnVisible(col.myCompID) }).setClassID(propInfo.propid).setOnChanged(function() {
-                                that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
-                                that.myTable.render();
-                                tableInfo.setPropertyColumnVisible(chk.colID, chk.getValue());
-                            });
-                            chk.colID = col.myCompID;
-                            if (!tableInfo.isPropertyColumnVisible(col.myCompID))
-                                col.setVisible(false);
-                            that.visibilityControlsGroup.addControl(chk);
-                            that.columnVisibilityChecks.push(chk);
+                            var canHide = true;
+                            if (propInfo.isPrimKey) canHide = false;
+                            if (propInfo.propid == that.tableInfo.ChromosomeField) canHide = false;
+                            if (propInfo.propid == that.tableInfo.PositionField) canHide = false;
+
+                            if (canHide) {
+                                // Create checkbox that controls the visibility of the column
+                                var chk = Controls.Check(null,{label:propInfo.name, value:tableInfo.isPropertyColumnVisible(col.myCompID) }).setClassID(propInfo.propid).setOnChanged(function() {
+                                    that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
+                                    that.myTable.render();
+                                    tableInfo.setPropertyColumnVisible(chk.colID, chk.getValue());
+                                });
+                                chk.colID = col.myCompID;
+                                if (!tableInfo.isPropertyColumnVisible(col.myCompID))
+                                    col.setVisible(false);
+                                that.visibilityControlsGroup.addControl(chk);
+                                that.columnVisibilityChecks.push(chk);
+                            }
                         }
                     });
+
+                    if (that._storedTableSettings) {
+                        that.myTable.recallSettings(that._storedTableSettings);
+                        that._storedTableSettings = null;
+                    }
 
                     that.myTable.reLoadTable();
                     this.panelSimpleQuery.render();

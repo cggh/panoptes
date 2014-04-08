@@ -51,7 +51,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Float4';
             if (propInfo.isPrimKey)
                 tablePart = 0;
-            var sortable = (!tableInfo.hasGenomePositions) || ( (propInfo.propid!=tableInfo.ChromosomeField) && (propInfo.propid!=tableInfo.PositionField) );
+            var sortable = true;
+            if (tableInfo.hasGenomePositions)
+                if ( (propInfo.propid==tableInfo.ChromosomeField) || (propInfo.propid===tableInfo.PositionField) )
+                    sortable = false;
+            if (tableInfo.hasGenomeRegions)
+                if ( (propInfo.propid==tableInfo.settings.Chromosome) || (propInfo.propid===tableInfo.settings.RegionStart) || (propInfo.propid===tableInfo.settings.RegionStop) )
+                    sortable = false;
             var sortByDefault = false;
             if (sortable)
                 sortByDefault = propid == tableInfo.settings.SortDefault;
@@ -65,10 +71,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 col.setToolTip(propInfo.settings.Description);
             if ( (tableInfo.hasGenomePositions) && (theTable.findColumn(tableInfo.ChromosomeField)) && (theTable.findColumn(tableInfo.PositionField) && (propid==tableInfo.PositionField) ) ) {
                 // Define a joint sort action on both columns chromosome+position, and set it as default if no other
-                var sortByDefault = false;
+//                var sortByDefault = false;
                 if (!tableInfo.settings.SortDefault)
                     var sortByDefault = true;
                 theTable.addSortOption("Position", SQL.TableSort([tableInfo.ChromosomeField, tableInfo.PositionField]),sortByDefault);
+            }
+
+            if (tableInfo.hasGenomeRegions && (propInfo.propid===tableInfo.settings.RegionStart)) {
+                sortByDefault = propid == tableInfo.settings.SortDefault;
+                theTable.addSortOption("Position", SQL.TableSort([tableInfo.settings.Chromosome, tableInfo.settings.RegionStart]),sortByDefault);
             }
 
             if (propInfo.datatype=='Boolean')

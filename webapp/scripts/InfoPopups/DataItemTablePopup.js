@@ -96,7 +96,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
-                    Msg.send({type: 'ShowItemsInQuery', tableid: that.tableInfo.id}, { query: that.theQuery.get() });
+                    Msg.send({type: 'ShowItemsInQuery', tableid: that.tableInfo.id}, {
+                        query: that.theQuery.get(),
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    });
                 });
 
                 var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {

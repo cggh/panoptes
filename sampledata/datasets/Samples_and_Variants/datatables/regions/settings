@@ -5,6 +5,7 @@ Description: Contains a number of regions defined on the genome     # A descript
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: regid
+SortDefault: regionstart            # Set the start position as default sort field
 
 # The following set of tags is used to define the items in this data table as regions on the genome
 IsRegionOnGenome: true              # Tells Panoptes that this should be interpreted as genomic regions
