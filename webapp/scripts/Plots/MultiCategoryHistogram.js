@@ -89,6 +89,15 @@ define([
                     that.ctrl_binsizeUpdate
                 ]);
 
+
+                that.ctrlOverlap = Controls.Check(null, { label:'Show in single plot'  }).setClassID('singleplot').setOnChanged(function() {
+                    that.reDraw();
+                });
+
+                that.isSinglePlot = function() {
+                    return that.ctrlOverlap.getValue();
+                }
+
                 that.ctrlNormalised = Controls.Check(null, { label:'Normalise per category'  }).setClassID('normcategories').setOnChanged(function() {
                     that.reDraw();
                 });
@@ -134,6 +143,7 @@ define([
                     }),
 
                     Controls.Section(Controls.CompoundVert([
+                        that.ctrlOverlap,
                         that.ctrlNormalised,
                         that.ctrlSort,
                         that.ctrl_VertSize,
@@ -310,6 +320,117 @@ define([
             }
 
             that.drawImpl = function(drawInfo) {
+                if (that.isSinglePlot())
+                    that.drawImpl_Overlap(drawInfo);
+                else
+                    that.drawImpl_Separate(drawInfo);
+            }
+
+
+            that.drawImpl_Overlap = function(drawInfo) {
+                var barH = that.getVertSize();
+
+                that.plotPresent = false;
+                var ctx = drawInfo.ctx;
+
+                var marginX = 40;
+                var marginY = 40;
+                ctx.fillStyle="rgb(220,220,220)";
+                ctx.fillRect(0,0,marginX,drawInfo.sizeY);
+                ctx.fillRect(0,drawInfo.sizeY-marginY,drawInfo.sizeX,marginY);
+
+                if (!that.numberOfBuckets)
+                    return;
+
+                var XMin = that.bucketNrOffset*that.bucketSize;
+                var XMax = (that.bucketNrOffset+that.numberOfBuckets)*that.bucketSize;
+                var XRange = XMax - XMin;
+                XMin -= 0.1*XRange;
+                XMax += 0.1*XRange;
+
+                // Draw x scale
+                var scaleX = (drawInfo.sizeX-marginX) / (XMax - XMin);
+                var offsetX = marginX - XMin*scaleX;
+                that.scaleX = scaleX; that.offsetX = offsetX;
+                ctx.save();
+                ctx.font="10px Arial";
+                ctx.fillStyle="rgb(0,0,0)";
+                ctx.textAlign = 'center';
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, that.propidValue, scaleX, XMin, XMax);
+                $.each(scaleTicks, function(idx, tick) {
+                    var px = Math.round(tick.value * scaleX + offsetX)-0.5;
+                    if (tick.label) {
+                        ctx.fillText(tick.label,px,drawInfo.sizeY-marginY+13);
+                        if (tick.label2)
+                            ctx.fillText(tick.label2,px,drawInfo.sizeY-marginY+23);
+                        ctx.strokeStyle = "rgb(190,190,190)";
+                    }
+                    else {
+                        ctx.strokeStyle = "rgb(230,230,230)";
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(px,0);
+                    ctx.lineTo(px,drawInfo.sizeY-marginY);
+                    ctx.stroke();
+
+                });
+                ctx.restore();
+
+                var offsetY = (barH-5) + barH;
+                var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
+                $.each(that.categories, function(idx, catInfo) {
+                    var bucketCounts = catInfo.bucketCounts;
+
+                    var col = catPropInfo.mapSingleColor(catInfo.name);
+                    ctx.strokeStyle = col.toString();
+                    ctx.fillStyle = col.toString();
+
+                    var freqscale = that.maxCount;
+                    if (that.ctrlNormalised.getValue()) {
+                        freqscale = 1;
+                        $.each(bucketCounts, function(bidx, val) {
+                            if (val>freqscale)
+                                freqscale = val;
+                        });
+                    };
+
+                    var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
+                    var first = true;
+                    var vals_x = [];
+                    var vals_y = [];
+                    $.each(bucketCounts, function(bidx, val) {
+                        if (val>0) {
+                            fr  = Math.pow(val/freqscale,gamma);
+
+                            var x1 = (that.bucketNrOffset+bidx+0.5)*that.bucketSize;
+                            var px1 = Math.round(x1 * scaleX + offsetX)-0.5;
+                            var py2 = Math.round(-fr*(barH-7) + offsetY)-0.5;
+                            vals_x.push(px1);
+                            vals_y.push(py2);
+                            ctx.beginPath();
+                            ctx.arc(px1, py2, 2, 0, 2 * Math.PI, false);
+                            ctx.closePath();
+                            ctx.stroke();
+                            ctx.fill();
+                        }
+                    });
+                    ctx.beginPath();
+                    $.each(bucketCounts, function(bidx, val) {
+                        var px1 = vals_x[bidx];
+                        var py2 = vals_y[bidx];
+                        if (bidx==0)
+                                ctx.moveTo(px1, py2);
+                            else
+                                ctx.lineTo(px1, py2);
+                    });
+                    ctx.stroke();
+
+                });
+
+                that.plotPresent = true;
+            }
+
+            that.drawImpl_Separate = function(drawInfo) {
 
                 var barH = that.getVertSize();
 
