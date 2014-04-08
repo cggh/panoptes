@@ -281,6 +281,13 @@ define([
 
                     that.sortCategories();
 
+                    //var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.propidCat);
+                    var catnames = [];
+                    $.each(that.categories, function(idx, cat) {
+                        catnames.push(cat.name);
+                    });
+                    catPropInfo.mapColors(catnames);
+
                     that.panelPlot.setFixedHeight(that.categories.length*that.getVertSize()+50);
                     that.reDraw();
                     that.ctrl_PointCount.modifyValue(totCount + ' data points');
