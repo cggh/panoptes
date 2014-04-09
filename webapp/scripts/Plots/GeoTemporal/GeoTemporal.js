@@ -224,7 +224,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
                 );
 
-                that.startZoomFit = true;
+                //that.startZoomFit = true;
                 that.reloadAll();
             };
 
