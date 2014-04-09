@@ -280,3 +280,42 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     /*padding:5px;*/
     /*border:none*/
 }
+
+.IntroPanelInfo {
+    padding:20px;
+}
+
+.IntroViewSection {
+    padding-top:9px;
+    padding-bottom:12px
+}
+
+.IntroViewItem {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.IntroViewItemImage {
+    opacity:0.5;
+    float:left;
+    margin-right:8px;
+    margin-bottom:5px;
+    margin-top:2px
+}
+
+.IntroViewItem:hover .IntroViewItemImage {
+    opacity: 1
+}
+
+
+.IntroViewItemDelete, .IntroViewItemEdit {
+    opacity:0.0;
+    float:right;
+    margin-left:8px;
+    margin-bottom:5px;
+    margin-top:2px
+}
+
+.IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit {
+    opacity: 1
+}

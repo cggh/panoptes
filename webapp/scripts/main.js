@@ -87,6 +87,12 @@ require([
 
 
             function Start_Part2() {
+                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'datasetinfo', {
+                        database: MetaData.database
+                    }, function(resp) {
+                        if (resp.manager)
+                            MetaData.isManager = true;
+                    });
 
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');

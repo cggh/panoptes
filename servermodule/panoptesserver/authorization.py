@@ -56,6 +56,10 @@ def CanDo(credInfo, operation):
     return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to perform this change.')
 
 
+def IsDataSetManager(credInfo, databaseName):
+    authRules = PnAuthRuleSet()
+    return authRules.Match(credInfo, databaseName, PnAuthRule.manage)
+
 
 def VerifyIsDataSetManager(credInfo, databaseName):
     authRules = PnAuthRuleSet()

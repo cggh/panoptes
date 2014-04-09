@@ -1,10 +1,10 @@
 define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "DQX/HistoryManager",
-    "Wizards/EditQuery", "MetaData", "Plots/GenericPlot", "InfoPopups/ItemPopup"
+    "Wizards/EditQuery", "MetaData", "Plots/GenericPlot", "InfoPopups/ItemPopup",  "Utils/IntroViews"
 ],
     function (
         require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, HistoryManager,
-        EditQuery, MetaData, GenericPlot, ItemPopup
+        EditQuery, MetaData, GenericPlot, ItemPopup, IntroViews
         ) {
 
         var Serialise = {};
@@ -52,11 +52,19 @@ define([
                         var btOpen = Controls.Button(null, {  content: 'Open in browser' }).setOnChanged(function() {
                             window.open(url,'_blank');
                         });
+                        str += btOpen.renderHtml();
 
-                        str += btOpen.renderHtml()+'<p></p>';
+                        if (MetaData.isManager) {
+                            var btCreateIntroView = Controls.Button(null, {  content: 'Add to start page' }).setOnChanged(function() {
+                                IntroViews.createIntroView(url, id, theState);
+                            });
+                            str += btCreateIntroView.renderHtml();
+                        }
+
+                        str += '<p></p>';
 
                         Popup.create('Permanent link to view',str);
-                        //alert(url);
+
                     });
             });
         };
@@ -122,6 +130,7 @@ define([
                 ItemPopup.recall(obj.itemPopupData);
 
         }
+
 
 
         return Serialise;

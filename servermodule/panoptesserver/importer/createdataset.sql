@@ -123,3 +123,18 @@ CREATE TABLE `workspaces` (
   `id` varchar(50),
   `name` varchar(50)
 );
+
+
+CREATE TABLE `introviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `workspaceid` varchar(100),
+  `name` varchar(100),
+  `section` varchar(100),
+  `description` varchar(500),
+  `ordr` int(11),
+  `url` varchar(1000),
+  `storedviewid` varchar(50),
+  `activetab` varchar(50),
+  PRIMARY KEY (`id`)
+);
+
