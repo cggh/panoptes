@@ -68,6 +68,7 @@ require([
                         Popup.create('Fatal error', content, null, {canClose: false});
                         return;
                     }
+                    MetaData.userId = resp.userid;
                     Start_Part1();
                 });
             };

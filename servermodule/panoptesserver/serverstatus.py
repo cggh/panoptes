@@ -46,6 +46,7 @@ def response(returndata):
         authorization.PnAuthRuleSet()
 
         print('PANOPTES CLIENT APP START: ' + credInfo.GetAuthenticationInfo())
+        returndata['userid'] = credInfo.GetUserId()
 
 
     except Exception as e:

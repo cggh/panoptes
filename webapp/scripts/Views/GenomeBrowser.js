@@ -342,6 +342,8 @@ define([
                 that.createPositionChannel = function(tableInfo, propInfo, controlsGroup, dataFetcher) {
                     var trackid =tableInfo.id+'_'+propInfo.propid;
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
+                    var channelDefaultVisible = !!(propInfo.settings.BrowserDefaultVisible);
+                    var channelShowOnTop = !!(propInfo.settings.BrowserShowOnTop);
 
                     var densChannel = null;
                     if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
@@ -368,7 +370,7 @@ define([
                             .setTitle(propInfo.name)
                             .setSubTitle(tableInfo.tableCapNamePlural);
                         that.panelBrowser.addChannel(densChannel, false);
-                        that.panelBrowser.channelModifyVisibility(densChannel.getID(), false, true);
+                        that.panelBrowser.channelModifyVisibility(densChannel.getID(), channelDefaultVisible, true);
                     }
 
                     var positionChannel = ChannelPositions.Channel(trackid,
@@ -405,11 +407,11 @@ define([
                     positionChannel.setClickHandler(function(id) {
                         Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
                     })
-                    that.panelBrowser.addChannel(positionChannel, false);//Add the channel to the browser
-                    that.panelBrowser.channelModifyVisibility(positionChannel.getID(), false, true);
+                    that.panelBrowser.addChannel(positionChannel, channelShowOnTop);//Add the channel to the browser
+                    that.panelBrowser.channelModifyVisibility(positionChannel.getID(), channelDefaultVisible, true);
 
                     // Define visibility control & color states
-                    var ctrl_onoff = Controls.Check(null, {label: propInfo.name}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
+                    var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
                         that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
                         if (densChannel) {
                             that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
@@ -522,11 +524,12 @@ define([
                     var label = propInfo.name;
                     if (!plotcomp.myPlotHints.color.isBlack())
                         label = '&nbsp;<span style="background-color:{cl}">&nbsp;&nbsp;</span>&nbsp;'.DQXformat({cl:plotcomp.myPlotHints.color.toString()}) + label;
+                    var channelDefaultVisible = propInfo.settings.BrowserDefaultVisible;
                     if (inSeparateChannel) {
-                        var ctrl_onoff = theChannel.createVisibilityControl(true);
+                        var ctrl_onoff = theChannel.createVisibilityControl(!channelDefaultVisible);
                     }
                     else {
-                        var ctrl_onoff = theChannel.createComponentVisibilityControl(propInfo.propid, label, false, true);
+                        var ctrl_onoff = theChannel.createComponentVisibilityControl(propInfo.propid, label, false, !channelDefaultVisible);
                     }
                     theChannel.controls.addControl(ctrl_onoff);
                 }

@@ -59,6 +59,8 @@ Properties:
   DataType: Boolean
   ShowInTable: true
   ShowInBrowser: true
+  BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
+  BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser
 
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
   DataType: Value
@@ -76,6 +78,7 @@ Properties:
   ChannelName: Channel A          # Name of the channel this property will be displayed in. Properties sharing the same channel name will be displayed in overlay
   ChannelColor: "rgb(0,80,200)"  # Colour used to display this property
   ConnectLines: True              # Indicate that the points will be connected with lines
+  BrowserDefaultVisible: true
 
 - Id: Value2
   Name: Value 2
@@ -87,6 +90,7 @@ Properties:
 - Id: Value3
   Name: Value 3
   Description: The third numerical value
+  BrowserDefaultVisible: true
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
      BlockSizeMin: 20               # Minimum summary block size (in bp)
      BlockSizeMax: 50000            # Maximum summary block size (in bp)
@@ -107,3 +111,4 @@ Properties:
      BlockSizeMin: 20
      BlockSizeMax: 50000
      MaxVal: 0.2
+  BrowserDefaultVisible: true
