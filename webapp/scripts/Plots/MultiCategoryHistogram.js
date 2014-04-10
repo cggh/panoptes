@@ -130,14 +130,14 @@ define([
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlValueProperty,
-                        that.ctrlCatProperty,
+                        that.ctrlCatProperty
                     ]).setMargin(10), {
                         title: 'Plot data',
                         bodyStyleClass: 'ControlsSectionBody'
                     }),
 
                     Controls.Section(Controls.CompoundVert([
-                        binsizeGroup,
+                        binsizeGroup
                     ]), {
                         title: 'Bin size',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -153,7 +153,7 @@ define([
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
-                    }),
+                    })
 
 
                 ]).setMargin(0);
@@ -355,6 +355,7 @@ define([
 
             that.drawImpl_Overlap = function(drawInfo) {
                 var barH = that.getVertSize();
+                var isNormalised = that.ctrlNormalised.getValue();
 
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
@@ -406,67 +407,83 @@ define([
                 ctx.restore();
 
 
-                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
-                var applyGammaCorr = function(vl) {
-                    return Math.pow(vl/that.maxCount,gamma)*that.maxCount;
+                var freqscale = that.maxCount;
+                if (isNormalised) {
+                    freqscale = 1.0e-9;
+                    $.each(that.categories, function(idx, catInfo) {
+                        var bucketCounts = catInfo.bucketCounts;
+                        var totBucketCount = 0;
+                        $.each(bucketCounts, function(bidx, val) {
+                            totBucketCount += val;
+                        });
+                        if (totBucketCount == 0)
+                            totBucketCount = 1;
+                        var bucketFracs = [];
+                        $.each(bucketCounts, function(bidx, val) {
+                            bucketFracs.push(val/totBucketCount);
+                            freqscale = Math.max(freqscale, val/totBucketCount);
+                        });
+                        catInfo.bucketFracs = bucketFracs;
+                    });
                 };
 
-                if (!that.ctrlNormalised.getValue()) {
-                    // Draw y scale
-                    ctx.save();
-                    ctx.font="10px Arial";
-                    ctx.fillStyle="rgb(0,0,0)";
-                    ctx.textAlign = 'center';
-                    var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(barH/that.maxCount)/applyGammaCorr(0.05*that.maxCount)*(0.05*that.maxCount));
-                    var lastTextPos = 1.0e9;
-                    for (var i=Math.ceil(0); i<=Math.floor(that.maxCount/scale.Jump1); i++) {
-                        var vl = i*scale.Jump1;
-                        var fr  = Math.pow(vl/that.maxCount, gamma);
-                        var py = Math.round(-fr*(barH-7) + offsetY)-0.5;
-                        ctx.strokeStyle = "rgb(230,230,230)";
-                        if (i%scale.JumpReduc==0)
-                            ctx.strokeStyle = "rgb(190,190,190)";
-                        ctx.beginPath();
-                        ctx.moveTo(marginX,py);
-                        ctx.lineTo(drawInfo.sizeX,py);
-                        ctx.stroke();
-                        if (i%scale.JumpReduc==0) {
-                            ctx.save();
-                            ctx.translate(marginX-5,py);
-                            ctx.rotate(-Math.PI/2);
-                            var txt = scale.value2String(vl);
-                            var tw =  ctx.measureText(txt).width;
-                            if (py+tw/2<lastTextPos) {
-                                ctx.fillText(txt,0,0);
-                                lastTextPos = py-(tw/2+7);
-                            }
-                            ctx.restore();
+
+                var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
+                var applyGammaCorr = function(vl) {
+                    return Math.pow(vl/freqscale,gamma)*freqscale;
+                };
+
+
+
+                // Draw y scale
+                ctx.save();
+                ctx.font="10px Arial";
+                ctx.fillStyle="rgb(0,0,0)";
+                ctx.textAlign = 'center';
+                var scale = DQX.DrawUtil.getScaleJump(30/Math.abs(barH/freqscale)/applyGammaCorr(0.05*freqscale)*(0.05*freqscale));
+                var lastTextPos = 1.0e9;
+                for (var i=Math.ceil(0); i<=Math.floor(freqscale/scale.Jump1); i++) {
+                    var vl = i*scale.Jump1;
+                    var fr  = Math.pow(vl/freqscale, gamma);
+                    var py = Math.round(-fr*(barH-7) + offsetY)-0.5;
+                    ctx.strokeStyle = "rgb(230,230,230)";
+                    if (i%scale.JumpReduc==0)
+                        ctx.strokeStyle = "rgb(190,190,190)";
+                    ctx.beginPath();
+                    ctx.moveTo(marginX,py);
+                    ctx.lineTo(drawInfo.sizeX,py);
+                    ctx.stroke();
+                    if (i%scale.JumpReduc==0) {
+                        ctx.save();
+                        ctx.translate(marginX-5,py);
+                        ctx.rotate(-Math.PI/2);
+                        var txt = scale.value2String(vl);
+                        var tw =  ctx.measureText(txt).width;
+                        if (py+tw/2<lastTextPos) {
+                            ctx.fillText(txt,0,0);
+                            lastTextPos = py-(tw/2+7);
                         }
+                        ctx.restore();
                     }
-                    ctx.restore();
                 }
+                ctx.restore();
 
 
                 that._clickDataPoints = [];
                 $.each(that.categories, function(idx, catInfo) {
                     var bucketCounts = catInfo.bucketCounts;
+                    var bucketVals = catInfo.bucketCounts;
+                    if (isNormalised)
+                        bucketVals = catInfo.bucketFracs;
 
                     var col = catPropInfo.mapSingleColor(catInfo.name);
                     ctx.strokeStyle = col.toString();
                     ctx.fillStyle = col.toString();
 
-                    var freqscale = that.maxCount;
-                    if (that.ctrlNormalised.getValue()) {
-                        freqscale = 1;
-                        $.each(bucketCounts, function(bidx, val) {
-                            if (val>freqscale)
-                                freqscale = val;
-                        });
-                    };
 
                     var vals_x = [];
                     var vals_y = [];
-                    $.each(bucketCounts, function(bidx, val) {
+                    $.each(bucketVals, function(bidx, val) {
                         var fr  = Math.pow(val/freqscale,gamma);
 
                         var x1 = (that.bucketNrOffset+bidx+0.0)*that.bucketSize;
@@ -480,7 +497,7 @@ define([
                             y: py2,
                             catval: catInfo.name,
                             bidx: bidx,
-                            freq: val,
+                            freq: bucketCounts[bidx],
                             minval: x1,
                             maxval: x2
                         });
@@ -491,7 +508,7 @@ define([
                         ctx.fill();
                     });
                     ctx.beginPath();
-                    $.each(bucketCounts, function(bidx, val) {
+                    $.each(bucketVals, function(bidx, val) {
                         var px1 = vals_x[bidx];
                         var py2 = vals_y[bidx];
                         if (bidx==0)
