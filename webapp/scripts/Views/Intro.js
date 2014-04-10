@@ -69,9 +69,9 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             descr += '</div>';
                         }
                         var info = Controls.Static(descr);
-                        var grp = Controls.CompoundHor([
+                        var grp = Controls.CompoundVert([
                             info,
-                            Controls.AlignRight(Controls.CompoundHor([tableViewerButton, button_Showplots]))
+                            Controls.CompoundHor([tableViewerButton, button_Showplots])
                         ]);;
                         tableButtons.push(Controls.Section(grp, {
                             title: tableInfo.tableCapNamePlural,
