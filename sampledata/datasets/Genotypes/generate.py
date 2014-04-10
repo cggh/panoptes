@@ -101,6 +101,15 @@ second_allele[0, 0:min(10, NUM_VARIANTS)] = -1
 for i in range(10):
     first_allele[i, i] = -1
     second_allele[i, i] = -1
+#Then some text that will check we are not flipped
+coords = [(5, 5), (5, 6), (5, 7), (5, 8), (5, 9), (6, 5), (7, 5), (6, 7), (7, 7), (6, 9), (7, 9), (9, 6), (10, 6),
+          (11, 6), (9, 8), (10, 8), (11, 8), (13, 5), (13, 6), (13, 7), (13, 8), (13, 9), (17, 5), (17, 6), (17, 7),
+          (17, 8), (17, 9), (14, 6), (15, 7), (16, 6), (19, 6), (19, 7), (19, 8), (20, 5), (21, 5), (22, 5), (23, 5),
+          (20, 9), (21, 9), (22, 9), (23, 9), (25, 5), (26, 5), (27, 5), (25, 7), (26, 7), (27, 7), (26, 6)]
+for (x, y) in coords:
+    first_allele[x+9, y] = -1
+    second_allele[x+9, y] = -1
+
 #Then an ellipse of non-ref on both alleles
 for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 1)):
     genotype = (count % 9) + 1
