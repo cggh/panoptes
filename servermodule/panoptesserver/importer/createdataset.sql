@@ -104,6 +104,7 @@ CREATE TABLE `2D_tablecatalog` (
   `name` varchar(50),
   `col_table` varchar(20),
   `row_table` varchar(20),
+  `first_dimension` varchar(20),
   `settings` text,
   `ordr` int
 );
