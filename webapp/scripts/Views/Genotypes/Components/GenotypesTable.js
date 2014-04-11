@@ -41,7 +41,7 @@ define(["_", "tween", "DQX/Utils"],
 //              });
 //          }
           var pos = model.col_positions;
-          var base_width = snp_width
+          var base_width = snp_width;
           if (snp_width > 40) {
               base_width -= 22;
           }

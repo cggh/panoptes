@@ -90,17 +90,17 @@ define(["Utils/RequestCounter"],
             //TODO Chunk requests to a multiple of 10 boundary or something to prevent small intervals
             that.get_by_ordinal = function (start, end, retrieve_missing) {
                 var bisect, i, last_match, matching_intervals, missing_intervals, ref;
+                var result = {'row':that.row_data, 'col':{}, 'twoD':{}};
                 if (retrieve_missing == null) retrieve_missing = true;
                 if (start < 0) start = 0;
                 if (end < 0) end = 0;
-                if (start == end) return [];
+                if (start == end) return result;
                 matching_intervals = that.intervals.filter(function (interval) {
                     return interval.start <= end && start <= interval.end;
                 });
                 var matching_intervals_with_data = matching_intervals.filter(function (interval) {
                     return interval.fetched == true;
                 });
-                var result = {'row':that.row_data, 'col':{}, 'twoD':{}};
                 var interval, col_ordinal_array, start_index, end_index;
                 if (matching_intervals_with_data.length == 1) {
                     interval = matching_intervals_with_data[0];
