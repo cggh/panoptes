@@ -55,6 +55,31 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 
 
+.DQXFloatBox
+{
+    border-color:rgb(4,81,88);
+}
+
+.DQXFloatBoxHeader
+{
+    color:rgb(255,255,255);
+    background-image:url(Bitmaps/misc/barback1a.png);
+}
+
+
+.DQXFloatBoxContent
+{
+    background: rgb(218,240,242); /* Old browsers */
+    background: -moz-linear-gradient(top, rgb(218,240,242) 0%, rgb(192,224,226) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(218,240,242)), color-stop(100%,rgb(192,224,226))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgb(218,240,242) 0%,rgb(192,224,226) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgb(218,240,242) 0%,rgb(192,224,226) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgb(218,240,242) 0%,rgb(192,224,226) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgb(218,240,242) 0%,rgb(192,224,226) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#daf0f2', endColorstr='#c0e0e2',GradientType=0 ); /* IE6-9 */
+}
+
+
 
 .DQXLargeListItemSelected
 {
