@@ -97,7 +97,7 @@ require([
 
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
-                getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'settings'],'ordr');
+                getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'first_dimension', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching

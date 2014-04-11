@@ -133,7 +133,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that.drawStandardGradientCenter(draw_info, 1);
 
                 var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
-                that.model.change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
+                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
                 var ctx = draw_info.centerContext;
                 that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
                 that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
