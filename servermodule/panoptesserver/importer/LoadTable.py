@@ -169,6 +169,8 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "CREATE INDEX {0}_randomindex ON {0}(_randomval_)".format(tableid)
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            sql = "DROP TABLE IF EXISTS {0}_SORTRAND".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "CREATE TABLE {0}_SORTRAND LIKE {0}".format(tableid)
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "alter table {0}_SORTRAND add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(tableid)

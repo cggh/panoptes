@@ -1,8 +1,12 @@
 import os
-import DQXDbTools
+import sys
+try:
+    import DQXDbTools
+except:
+    print('Failed to import DQXDbTools. Please add the DQXServer base directory to the Python path')
+    sys.exit()
 import DQXUtils
 import config
-import sys
 from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
@@ -119,18 +123,47 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
-    calc = asyncresponder.CalculationThread('', None, {'isRunningLocal':'True'}, '')
-    # ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', 'Samples_and_Variants',
-    #     {
-    #         'ConfigOnly': False
-    #     }
-    # )
+    calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
-    datasetid = 'Samples_and_Variants'
-    datatable = 'variants'
-    datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatable)
-    ImportDataTable.ImportDataTable(calc, datasetid, datatable, datatableFolder,
-        {
-            'ConfigOnly': False
-        }
-    )
+    if len(sys.argv) < 4:
+        print('Arguments: DataType ImportType DataSetId [...]')
+        print('DataType: "dataset", "datatable"')
+        print('ImportType: "full", "config"')
+        sys.exit()
+
+    ImportDataType = sys.argv[1]
+    if ImportDataType not in ['dataset', 'datatable']:
+        print('First argument (DataType) has to be "dataset" or "datatable"')
+        sys.exit()
+
+    ImportMethod = sys.argv[2]
+    if ImportMethod not in ['full', 'config']:
+        print('Second argument (ImportType) has to be "full" or "config"')
+        sys.exit()
+    configOnly = (ImportMethod == 'config')
+
+    datasetid = sys.argv[3]
+
+    if ImportDataType == 'dataset':
+        print('Start importing dataset "{0}"...'.format(datasetid))
+        ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', datasetid,
+            {
+                'ConfigOnly': configOnly
+            }
+        )
+        sys.exit()
+
+    if ImportDataType == 'datatable':
+        if len(sys.argv) < 6:
+            print('Missing argument "datatableid"')
+            sys.exit()
+        datatableid = sys.argv[4]
+        print('Start importing datatable "{0}.{1}"...'.format(datasetid, datatableid))
+        datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatableid)
+        ImportDataTable.ImportDataTable(calc, datasetid, datatableid, datatableFolder,
+            {
+                'ConfigOnly': configOnly
+            }
+        )
+        sys.exit()
+
