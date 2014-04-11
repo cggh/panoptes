@@ -10,6 +10,8 @@ RowDataTable: samples                #The 1D datatable where each entry correspo
 RowIndexField: ID                    #The column name in RowDataTable that maps into RowIndexArray
 RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowDataField for each row
 
+FirstArrayDimension: row             #Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
+
 Properties:
     -  Id: first_allele                            #Name of dataset in HDF5
        Name: First Allele
@@ -33,4 +35,4 @@ ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionO
 #    RefFraction:  ref_fraction
 #    Depth:        total_depth
 
-GenomeMaxViewportSizeX: 750
+GenomeMaxViewportSizeX: 5000

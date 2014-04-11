@@ -100,7 +100,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 return result;
             };
 
-            that.change_col_range = function(chrom, start, end) {
+            that._change_col_range = function(chrom, start, end) {
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
                 that.col_ordinal = data.col[that.col_order] || [];
                 that.row_ordinal = data.row[that.row_order] || [];
@@ -138,7 +138,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             };
             //Throttle this so that we don't clog the redraw
-            that.change_col_range = _.throttle(that.change_col_range, 200);
+            that.change_col_range = _.throttle(that._change_col_range, 200);
 
             that.new_col_query = function(q) {
                 that.col_query = q;
@@ -171,6 +171,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(row_query));
                 myurl.addUrlQueryItem("col_order", that.col_order);
                 myurl.addUrlQueryItem("row_order", that.row_order);
+                myurl.addUrlQueryItem("first_dimension", that.table.first_dimension);
                 myurl.addUrlQueryItem("col_properties", that.col_order);
                 myurl.addUrlQueryItem("row_properties", that.row_order);
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));

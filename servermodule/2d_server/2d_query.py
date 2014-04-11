@@ -51,7 +51,7 @@ def index_table_query(db, table, fields, query, order):
     return result
 
 
-def select_by_list(properties, col_idx, row_idx):
+def select_by_list(properties, row_idx, col_idx):
     num_cells = len(col_idx) * len(row_idx)
     coords = ((row, col) for row in row_idx for col in col_idx)
     result = {}
@@ -98,6 +98,7 @@ def handler(start_response, request_data):
     col_order = request_data['col_order']
     row_qry = request_data['row_qry']
     row_order = request_data['row_order']
+    first_dimension = request_data['first_dimension']
 
     db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), dataset)
     col_table, row_table = get_table_names(db, datatable)
@@ -131,7 +132,10 @@ def handler(start_response, request_data):
         for prop in two_d_properties.keys():
             two_d_result[prop] = np.array([], dtype=two_d_properties[prop].id.dtype)
     else:
-        two_d_result = select_by_list(two_d_properties, col_idx, row_idx)
+        if first_dimension == 'row':
+            two_d_result = select_by_list(two_d_properties, col_idx, row_idx)
+        else:
+            two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
 
     result_set = []
     for name, array in col_result.items():

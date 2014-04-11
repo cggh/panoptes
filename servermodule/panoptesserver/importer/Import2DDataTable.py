@@ -21,7 +21,7 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         DQXUtils.CheckValidIdentifier(tableid)
 
         table_settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
-        table_settings.RequireTokens(['NameSingle', 'NamePlural'])
+        table_settings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])
         table_settings.AddTokenIfMissing('ShowInGenomeBrowser', False)
         table_settings.AddTokenIfMissing('ColumnDataTable', '')
         table_settings.AddTokenIfMissing('RowDataTable', '')
@@ -66,15 +66,17 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
             is_position = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)[0][0]
             if not is_position:
                 raise Exception(table_settings['ColumnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
-
+        if table_settings['FirstArrayDimension'] not in ['column', 'row']:
+            raise Exception("FirstArrayDimension must be column or row")
 
         # Add to tablecatalog
         extra_settings.ConvertStringsToSafeSQL()
-        sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5})".format(
+        sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', {6})".format(
             tableid,
             table_settings['NamePlural'],
             table_settings['ColumnDataTable'],
             table_settings['RowDataTable'],
+            table_settings['FirstArrayDimension'],
             extra_settings.ToJSON(),
             tableOrder
         )
@@ -107,6 +109,9 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     column_index = remote_hdf5[table_settings['ColumnIndexArray']]
                 except KeyError:
                     raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['ColumnIndexArray']))
+                for property in table_settings['Properties']:
+                    if len(column_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'column' else 1]:
+                        raise Exception("Property {0} has a different column length to the column index".format(property))
                 sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index)
                 ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
 
@@ -133,6 +138,9 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     row_index = remote_hdf5[table_settings['RowIndexArray']]
                 except KeyError:
                     raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['RowIndexArray']))
+                for property in table_settings['Properties']:
+                    if len(row_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'row' else 1]:
+                        raise Exception("Property {0} has a different row length to the row index".format(property))
                 sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
                 ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
 

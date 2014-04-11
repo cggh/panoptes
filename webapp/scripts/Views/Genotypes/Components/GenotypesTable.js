@@ -41,7 +41,7 @@ define(["_", "tween", "DQX/Utils"],
 //              });
 //          }
           var pos = model.col_positions;
-          var base_width = snp_width
+          var base_width = snp_width;
           if (snp_width > 40) {
               base_width -= 22;
           }
@@ -66,11 +66,11 @@ define(["_", "tween", "DQX/Utils"],
                       var y = (r * row_height) + y_off;
                       ctx.fillRect(spos, y, Math.ceil(base_width), row_height);
                       if (snp_width > 40) {
-                          ctx.fillStyle = DQX.niceColours[first[i] % col_len];
+                          ctx.fillStyle = first[i] == -1 ? '#000000' : DQX.niceColours[first[i] % col_len];
                           ctx.beginPath();
                           ctx.arc(spos+snp_width-16, y+(row_height/2), 5, 0, 2 * Math.PI, false);
                           ctx.fill();
-                          ctx.fillStyle = DQX.niceColours[second[i] % col_len];
+                          ctx.fillStyle = second[i] == -1 ? '#000000' : DQX.niceColours[second[i] % col_len];
                           ctx.beginPath();
                           ctx.arc(spos+snp_width-6, y+(row_height/2), 5, 0, 2 * Math.PI, false);
                           ctx.fill();
