@@ -134,8 +134,10 @@ def handler(start_response, request_data):
     else:
         if first_dimension == 'row':
             two_d_result = select_by_list(two_d_properties, col_idx, row_idx)
-        else:
+        elif first_dimension == 'column':
             two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
+        else:
+            print "first dimension is incorrect"
 
     result_set = []
     for name, array in col_result.items():
