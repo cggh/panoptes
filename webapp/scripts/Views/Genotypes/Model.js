@@ -117,10 +117,10 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
                 if (that.col_ordinal.length > 0)
                     //For now make it 0.75 of the width as we don't have equidistant blocks
-                    that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
+                    //that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
+                    that.col_width = 3;
                 else
                     that.col_width = 0;
-                //TODO Assign x locations for each col - for now just copy
                 that.col_positions = that.position_columns(that.col_ordinal, that.col_width);
 
 
