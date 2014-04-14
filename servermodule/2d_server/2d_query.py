@@ -51,9 +51,14 @@ def index_table_query(db, table, fields, query, order):
     return result
 
 
-def select_by_list(properties, row_idx, col_idx):
+def select_by_list(properties, row_idx, col_idx, first_dimension):
     num_cells = len(col_idx) * len(row_idx)
-    coords = ((row, col) for row in row_idx for col in col_idx)
+    if first_dimension == 'row':
+        coords = ((row, col) for row in row_idx for col in col_idx)
+    elif first_dimension == 'column':
+        coords = ((col, row) for row in row_idx for col in col_idx)
+    else:
+        print "Bad first_dimension"
     result = {}
     for prop, array in properties.items():
         result[prop] = np.empty((num_cells,), dtype=array.id.dtype)
@@ -132,12 +137,7 @@ def handler(start_response, request_data):
         for prop in two_d_properties.keys():
             two_d_result[prop] = np.array([], dtype=two_d_properties[prop].id.dtype)
     else:
-        if first_dimension == 'row':
-            two_d_result = select_by_list(two_d_properties, col_idx, row_idx)
-        elif first_dimension == 'column':
-            two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
-        else:
-            print "first dimension is incorrect"
+        two_d_result = select_by_list(two_d_properties, row_idx, col_idx, first_dimension)
 
     result_set = []
     for name, array in col_result.items():
