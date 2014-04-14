@@ -34,6 +34,9 @@ define(["Utils/RequestCounter"],
                 arrays = _.filter(arrays, function(array) {
                     return array.length > 0;
                 });
+                if (arrays.length == 0) {
+                    return [];
+                }
                 var col_length = _.map(arrays, function(array) {
                     return array[0].length;
                 }).reduce(function(sum, num) {
