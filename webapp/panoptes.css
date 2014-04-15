@@ -112,7 +112,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 
 
-.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3
+.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid
 {
 /*
     background: #ffffff;
@@ -157,6 +157,8 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
+
+
 .DQXToolButton0:hover, .DQXToolButton1:hover, .DQXToolButton2:hover, .DQXToolButton3:hover, .PnButtonLarge:hover, .PnButtonSmall:hover
 {
     /*border:2px solid rgb(0,0,0);*/
@@ -164,6 +166,15 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
+.DQXToolButton0 img, .DQXToolButton1 img, .DQXToolButton2 img, .DQXToolButton3 img, .PnButtonLarge img, .PnButtonSmall img, .PnButtonGrid img
+{
+    opacity:0.7;
+}
+
+.DQXToolButton0:hover img, .DQXToolButton1:hover img, .DQXToolButton2:hover img, .DQXToolButton3:hover img, .PnButtonLarge:hover img, .PnButtonSmall:hover img, .PnButtonGrid:hover img
+{
+    opacity:1;
+}
 
 
 .PnButtonSmall
@@ -180,7 +191,28 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 }
 
+.PnButtonGrid
+{
+    display:inline-block;
+    padding-top:4px;
+    padding-bottom:4px;
+    padding-left:6px;
+    padding-right:6px;
+    cursor:pointer;
+    box-shadow: none;
+}
 
+
+.PnButtonGrid:hover
+{
+    color: rgb(0,94,102);
+    border: 1px solid rgb(0,122,132);
+}
+
+.PnGridCheckWrapper
+{
+    padding:7px;
+}
 
 .GenomeBrowserControlBackground
 {

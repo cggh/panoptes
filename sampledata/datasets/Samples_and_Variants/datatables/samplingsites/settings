@@ -39,3 +39,8 @@ Properties:
   Name: Lattitude
   DataType: GeoLattitude     # Specifies a geographic lattitude property
 
+
+ExternalLinks:
+- Url: http://maps.google.com/maps?q={Lattitude},{Longitude}
+  Name: Show on Google Maps
+

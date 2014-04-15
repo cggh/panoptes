@@ -68,3 +68,9 @@ Properties:
     "No": rgb(255,128,60)
     "Yes": rgb(0,180,0)
     _other_: rgb(128, 128, 128)
+
+
+
+ExternalLinks:
+- Url: http://maps.google.com/maps?q={Lattitude},{Longitude}
+  Name: Show on Google Maps

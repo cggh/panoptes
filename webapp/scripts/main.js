@@ -166,7 +166,7 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link...',DQX.BMP("/Icons/Small/Link.png"), 80, function(){
+                        Application.addNavigationButton('Get link...',DQX.BMP("Icons/Small/Link.png"), 80, function(){
                             Serialise.createLink();
                         });
 

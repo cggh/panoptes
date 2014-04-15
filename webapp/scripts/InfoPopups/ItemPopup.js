@@ -94,7 +94,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 90).setFrameClassClient('DQXGrayClient');
+                    .setFixedSize(Framework.dimY, 83).setFrameClassClient('DQXGrayClient').setAllowScrollBars(false, false).setMargins(0);
 
                 if (that.tableInfo.hasGeoCoord) {
                     that.frameMap = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
@@ -131,14 +131,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.frameFields.setContentHtml(content);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
+                that.buttonWidth = 160;
+                that.buttonHeight = 30;
+
 
                 var buttons = [];
 
                 if (that.tableInfo.hasGenomePositions) {
                     var genome_chromosome = data.fields[that.tableInfo.ChromosomeField];
                     var genome_position = parseInt(data.fields[that.tableInfo.PositionField]);
-                    buttons.push(Controls.HorizontalSeparator(7));
-                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'DQXToolButton2', width:140, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
                         //that.close();//!!!todo: only when blocking
                         Msg.send({ type: 'JumpgenomePosition' }, {
                             chromoID: genome_chromosome,
@@ -150,7 +152,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     // Create buttons to show genomic regions spanning this position
                     $.each(MetaData.tableCatalog, function(idx, oTableInfo) {
                         if (oTableInfo.hasGenomeRegions) {
-                            var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                            var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/datagrid2Small.png'}).setOnChanged(function() {
                                 var qry = SQL.WhereClause.AND([
                                     SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', genome_chromosome),
                                     SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', genome_position),
@@ -168,8 +170,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
                 if (that.tableInfo.hasGenomeRegions) {
-                    buttons.push(Controls.HorizontalSeparator(7));
-                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'DQXToolButton2', width:140, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
                         //that.close();//!!!todo: only when blocking
                         Msg.send({ type: 'JumpgenomeRegion' }, {
                             chromoID: data.fields[that.tableInfo.settings.Chromosome],
@@ -181,8 +182,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     $.each(MetaData.tableCatalog,  function(idx, tableInfo) {
                         if (tableInfo.hasGenomePositions) {
-                            buttons.push(Controls.HorizontalSeparator(7));
-                            var bt = Controls.Button(null, { content: 'Show '+tableInfo.tableNamePlural+' in range', buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                            var bt = Controls.Button(null, { content: 'Show '+tableInfo.tableNamePlural+' in range', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/datagrid2Small.png'}).setOnChanged(function() {
                                 Msg.send({type: 'ShowItemsInGenomeRange', tableid:tableInfo.id}, {
                                     preservecurrentquery:false,
                                     chrom: data.fields[that.tableInfo.settings.Chromosome],
@@ -196,11 +196,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
                 if (that.tableInfo.tableBasedSummaryValues.length>0) {
-                    buttons.push(Controls.HorizontalSeparator(7));
-                    var bt = Controls.Button(null, { content: 'Show genome tracks...', buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/GenomeBrowser.png'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, { content: 'Show genome tracks...', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
                         ItemGenomeTracksPopup.show(that.tableInfo, that.itemid);
                     })
                     buttons.push(bt)
+                }
+
+                if (that.tableInfo.settings.ExternalLinks) {
+                    $.each(that.tableInfo.settings.ExternalLinks, function(idx, linkInfo) {
+                        var bt = Controls.Button(null, { content: linkInfo.Name, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:"Bitmaps/circle_cyan_small.png"}).setOnChanged(function() {
+                            var url = linkInfo.Url.DQXformat(data.fields);
+                            window.open(url,'_blank');
+                        })
+                        buttons.push(bt)
+                    });
                 }
 
                 that._selchk = Controls.Check(null, {
@@ -210,11 +219,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.tableInfo.selectItem(that.itemid, that._selchk.getValue());
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
                 })
-                buttons.push(Controls.HorizontalSeparator(7));
-                buttons.push(Controls.CompoundVert([Controls.VerticalSeparator(20), that._selchk]).setTreatAsBlock());
+                buttons.push(Controls.Wrapper(that._selchk,'PnGridCheckWrapper'));
 
+                var currentCol = null;
+                var cols = [];
+                var rowNr = 99;
+                $.each(buttons, function(idx, button) {
+                    if (rowNr>1) {
+//                        if (cols.length>0)
+//                            cols.push(Controls.HorizontalSeparator(7));
+                        currentCol = Controls.CompoundVert([]).setTreatAsBlock().setMargin(0);
+                        cols.push(currentCol);
+                        rowNr = 0;
+                    }
+//                    if (rowNr>0)
+//                        currentCol.addControl(Controls.VerticalSeparator(1));
+                    currentCol.addControl(button);
+                    rowNr += 1;
+                });
 
-                that.panelButtons.addControl(Controls.CompoundHor(buttons));
+                that.panelButtons.addControl(Controls.CompoundHor(cols));
 
 
                 that.createPanelsRelations();
@@ -259,7 +283,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     relTab.panelTable.onResize();
 
                     var buttons = [];
-                    buttons.push(Controls.HorizontalSeparator(7));
 
 
                     relTab.panelButtons = Framework.Form(relTab.frameButtons);

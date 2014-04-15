@@ -112,3 +112,11 @@ Properties:
      BlockSizeMax: 50000
      MaxVal: 0.2
   BrowserDefaultVisible: true
+
+ExternalLinks:
+- Url: https://www.google.co.uk/search?q={SnpName}
+  Name: Google search
+
+- Url: http://en.wikipedia.org/wiki/{SnpName}
+  Name: Wikipedia
+
