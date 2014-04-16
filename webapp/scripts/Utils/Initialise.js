@@ -261,6 +261,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
 
+                // Determine table name where the column is originally defined
+                if (prop.source == 'fixed') {
+                    prop.originalTableName = prop.tableid;
+                }
+                else {
+                    prop.originalTableName = prop.tableid + 'INFO_' + MetaData.workspaceid;
+                }
+
 
 
                 if (prop.isFloat) {
@@ -410,7 +418,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (prop.settings.isCategorical) {
                     var getter = DataFetchers.ServerDataGetter();
-                    getter.addTable(prop.tableid + 'CMB_' + MetaData.workspaceid,
+                    getter.addTable(prop.originalTableName,
                         [prop.propid],
                         prop.propid,
                         SQL.WhereClause.Trivial(), { distinct:true }
@@ -419,7 +427,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Initialise.incrWait();
                     getter.execute(MetaData.serverUrl,MetaData.database,
                         function() {
-                            var records = getter.getTableRecords(prop.tableid + 'CMB_' + MetaData.workspaceid);
+                            var records = getter.getTableRecords(prop.originalTableName);
                             $.each(records, function(idx, rec) {
                                 prop.propCategories.push(rec[prop.propid]);
                             });

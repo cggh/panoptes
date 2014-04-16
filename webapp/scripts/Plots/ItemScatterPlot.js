@@ -272,7 +272,10 @@ define([
                         var requestID = DQX.getNextUniqueID();
                         aspectInfo.requestID = requestID;
                         that.fetchCount += 1;
-                        fetcher.getData(that.theQuery.getForFetching(), that.tableInfo.primkey,
+                        var orderField = that.tableInfo.primkey;
+                        if (that.theQuery.isSubSampling())
+                            orderField = 'RandPrimKey';
+                        fetcher.getData(that.theQuery.getForFetching(), orderField,
                             function (data) { //success
                                 that.fetchCount -= 1;
                                 if (aspectInfo.requestID != requestID) {//request must be outdated, so we don't handle it
