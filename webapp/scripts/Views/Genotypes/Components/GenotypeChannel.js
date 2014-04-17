@@ -22,6 +22,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that.table_info = table_info;
 
                 //Create controls
+                controls_group.addControl(that.createVisibilityControl());
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
                 var col_query_tool = that.col_query.createControl();
@@ -168,8 +169,20 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                         Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
                     }
                 }
-            }
+            };
 
+            that.createVisibilityControl = function() {
+                var chk=Controls.Check(null,{ label:"Display", value:(true) }).setClassID(that._myID).setOnChanged(function() {
+                    that.modifyVisibility(chk.getValue());
+                });
+                return chk;
+            };
+
+            that.modifyVisibility = function(isVisible, preventReDraw) {
+                that._myPlotter.channelModifyVisibility(that.getID(), isVisible, preventReDraw);
+                if (!preventReDraw)
+                    that._myPlotter.render();
+            };
 
             that.init(table_info, controls_group, parent);
             return that;
