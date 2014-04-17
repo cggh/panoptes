@@ -173,7 +173,8 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<div id="PanoptesAppHeader"><a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a><div class="DQXThumbNailBox"></div></div>';
+                        var headerContent = '<div id="PanoptesAppHeader"><a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a><div class="DQXThumbNailBox"></div></div>';
+                        Application.setHeaderHeight(48);
                         Application.setHeader(headerContent);
 
 

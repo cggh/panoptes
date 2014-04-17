@@ -136,7 +136,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var content = datePropInfo.name+' between '+datePropInfo.toDisplayString(JDmin)+' and '+datePropInfo.toDisplayString(JDmax);
                 ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Date range', content, {
                     query: qry,
-                    subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    subSamplingOptions: that.thePlot.theQuery.getSubSamplingOptions()
                 }, selectionCreationFunction);
             }
 
