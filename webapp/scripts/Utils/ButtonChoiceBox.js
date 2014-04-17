@@ -105,7 +105,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         tableid: tableInfo.id,
                         query: newQueryInfo.query,
                         subSamplingOptions: newQueryInfo.subSamplingOptions,
-                        title: title
+                        title: title + ' (' + tableInfo.tableCapNamePlural+ ')'
                     });
                 }
                 } );

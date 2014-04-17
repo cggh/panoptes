@@ -41,7 +41,7 @@ require.config({
 
 
 require([
-    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/DataFetcher/DataFetchers",
+    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
@@ -49,7 +49,7 @@ require([
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
 ],
     function (
-        _, $, Application, Framework, Msg, DQX, SQL, Popup, DataFetchers,
+        _, $, Application, Framework, Msg, DQX, SQL, Popup, PopupFrame, DataFetchers,
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
@@ -60,6 +60,7 @@ require([
 
 
             function Start_Part0() {
+                PopupFrame.setHasThumbNails();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
                     if ('issue' in resp) {
                         var issueText = resp.issue;
@@ -172,7 +173,7 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a>';
+                        var headerContent = '<div id="PanoptesAppHeader"><a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesSmall.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a><div class="DQXThumbNailBox"></div></div>';
                         Application.setHeader(headerContent);
 
 

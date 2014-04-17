@@ -13,6 +13,11 @@ define([
 
 
         StandardLayoutPlot.Create = function(tableid, plotTypeID, settings, startQuery, querySettings) {
+
+            var tableInfo = MetaData.getTableInfo(tableid);
+            settings.title += ' (' + tableInfo.tableCapNamePlural + ')';
+
+
             var that = GenericPlot.Create(tableid, plotTypeID, settings, startQuery, querySettings);
 
 

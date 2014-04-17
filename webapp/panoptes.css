@@ -50,6 +50,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     font-weight:bold;
     color:rgb(255,255,255);
     background-image:url(Bitmaps/misc/barback1a.png);
+    /*width:50px;*/
     /*background-image:none*/
 }
 
@@ -375,4 +376,33 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit {
     opacity: 1
+}
+
+
+.DQXThumbNail
+{
+    display: inline-block;
+    width:100px;
+    height:43px;
+    color: rgb(0,94,102);
+    background: rgb(206,234,237); /* Old browsers */
+    background: -moz-linear-gradient(left, rgb(206,234,237) 0%, rgb(140,195,200) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(206,234,237)), color-stop(100%,rgb(140,195,200))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* IE10+ */
+    background: linear-gradient(to right, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ceeaed', endColorstr='#8cc3c8',GradientType=1 ); /* IE6-9 */    border: 2px solid black;
+    padding:4px;
+    border: 1px solid rgb(140,195,200);
+
+    border-radius: 4px;
+    margin-top:3px;
+    margin-left:6px;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.45);
+}
+
+.DQXThumbNail:hover {
+    color: rgb(0,0,0);
+    border: 1px solid rgb(0,122,132);
 }
