@@ -5,3 +5,4 @@ MinVal: 0
 MaxVal: 200
 BlockSizeMin: 20
 BlockSizeMax: 50000
+DefaultVisible: true

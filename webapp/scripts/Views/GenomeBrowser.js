@@ -331,7 +331,7 @@ define([
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
 
-                            var ctrl_onoff = SummChannel.createVisibilityControl(true);
+                            var ctrl_onoff = SummChannel.createVisibilityControl(!summaryValue.settings.DefaultVisible);
                             controlsList.push(ctrl_onoff);
 
                         }
