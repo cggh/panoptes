@@ -88,8 +88,8 @@ define([
 
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
-                    this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.25)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
+                    this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.75));//Create frame that will contain the genome browser panel
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
                     Msg.listen("", { type: 'JumpgenomePosition' }, that.onJumpGenomePosition);
@@ -355,6 +355,7 @@ define([
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
                     var channelDefaultVisible = !!(propInfo.settings.BrowserDefaultVisible);
                     var channelShowOnTop = !!(propInfo.settings.BrowserShowOnTop);
+                    if (channelShowOnTop) channelDefaultVisible = true;
 
                     var densChannel = null;
                     if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
@@ -421,15 +422,17 @@ define([
                     that.panelBrowser.addChannel(positionChannel, channelShowOnTop);//Add the channel to the browser
                     that.panelBrowser.channelModifyVisibility(positionChannel.getID(), channelDefaultVisible, true);
 
-                    // Define visibility control & color states
-                    var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
-                        that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
-                        if (densChannel) {
-                            that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
-                            densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
-                        }
-                    });
-                    controlsGroup.addControl(ctrl_onoff);
+                    if (!channelShowOnTop) {
+                        // Define visibility control & color states
+                        var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
+                            that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
+                            if (densChannel) {
+                                that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
+                                densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
+                            }
+                        });
+                        controlsGroup.addControl(ctrl_onoff);
+                    }
 
                     if (colorMapping) {
                         var controlsSubList = [];

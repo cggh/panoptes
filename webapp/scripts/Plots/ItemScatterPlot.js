@@ -59,7 +59,7 @@ define([
                 var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
-                var pickControls = Controls.CompoundGrid();
+                var pickControls = Controls.CompoundVert([]).setMargin(10);
                 $.each(that.plotAspects,function(aspectIdx, plotAspect) {
                     if (plotAspect.visible) {
                         var propList = [ {id:'', name:'-- None --'}];
@@ -76,10 +76,8 @@ define([
                             if (included)
                                 propList.push({ id:prop.propid, name:prop.name });
                         });
-                        plotAspect.picker = Controls.Combo(null, { label:'', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
-                        pickControls.setItem(aspectIdx, 0, Controls.Static(plotAspect.name+':'));
-                        pickControls.setItem(aspectIdx, 1, plotAspect.picker);
-                        //controls.push(Controls.VerticalSeparator(7));
+                        plotAspect.picker = Controls.Combo(null, { label:plotAspect.name+':<br>', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
+                        pickControls.addControl(plotAspect.picker);
                     }
                 });
 
