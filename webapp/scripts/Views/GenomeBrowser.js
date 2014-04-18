@@ -277,17 +277,19 @@ define([
                     if (MetaData.summaryValues.length==0)
                         return;
 
-                    var generalSummaryChannelsControls = Controls.CompoundVert([]).setMargin(10);
+                    var controlsList = [];
 
-                    that.visibilityControlsGroup.addControl(Controls.Section(generalSummaryChannelsControls, {
-                        title: 'Summary tracks',
-                        headerStyleClass: 'GenomeBrowserMainSectionHeader',
-                        bodyStyleClass: 'ControlsSectionBody'
-                    }));
-
-                    //Iterate over all summary profiles shown by the app
+                    //Iterate over all summary profiles shown by the app ....
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
-                        if (!summaryValue.isDisplayed) {//Notr: this flag is set if that summary value was associated with a datatable property
+
+                        //Verify if this summary channel corresponds to a datatable property
+                        var isTableProperty = false;
+                        $.each(MetaData.customProperties,function(idx,propInfo) {
+                            if ((propInfo.tableid==summaryValue.tableid) && (propInfo.propid==summaryValue.propid) && (propInfo.settings.showInBrowser))
+                                isTableProperty = true;
+                        });
+
+                        if (!isTableProperty) {
                             var trackid ='smm'+summaryValue.tableid+'_'+summaryValue.propid;
                             var theFetcher = that.getSummaryFetcher(summaryValue.minblocksize);
                             var channelid=trackid;
@@ -330,11 +332,20 @@ define([
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
 
                             var ctrl_onoff = SummChannel.createVisibilityControl(true);
-                            generalSummaryChannelsControls.addControl(ctrl_onoff);
+                            controlsList.push(ctrl_onoff);
 
                         }
                     })
 
+                    if (controlsList.length>0) {
+                        var generalSummaryChannelsControls = Controls.CompoundVert(controlsList).setMargin(10);
+
+                        that.visibilityControlsGroup.addControlTop(Controls.Section(generalSummaryChannelsControls, {
+                            title: 'Genome tracks',
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                            bodyStyleClass: 'ControlsSectionBody'
+                        }));
+                    }
                 }
 
 
@@ -561,6 +572,9 @@ define([
                     that.listSummaryChannels = [];
 
                     that.summaryFolder = 'SummaryTracks/' + MetaData.database;
+
+                    that.createSummaryChannels();
+
 
                     // Loop over all datatables that contain genomic positions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
@@ -905,7 +919,6 @@ define([
                     };
 
 
-                    that.createSummaryChannels();
 
                     this.panelControls.render();
 
