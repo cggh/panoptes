@@ -408,7 +408,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     opacity: 0;
 }
 .DQXThumbNail:hover img {
-    opacity: 0.5;
+    opacity: 0.35;
 }
 .DQXThumbNail img:hover {
     opacity: 1.0;
