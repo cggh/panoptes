@@ -597,7 +597,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             var channelControlsGroup = Controls.CompoundVert([]).setMargin(8);
@@ -666,7 +666,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             states = [{id:'', name:'-None-'}];

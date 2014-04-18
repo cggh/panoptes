@@ -78,7 +78,7 @@ define([
 
             that.createPanelButtons = function() {
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
