@@ -165,7 +165,7 @@ define([
                     that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(0);
 
                     //Create controls for each table that has genome summary tracks defined
-                    that.buttonsGroup = Controls.CompoundVert([]);
+                    that.buttonsGroup = Controls.CompoundVert([]).setMargin(0);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.tableNamePlural+"...",  width:140 }).setOnChanged(function() {
@@ -204,7 +204,7 @@ define([
                     this.panelControls.addControl(Controls.CompoundVert([
                         that.visibilityControlsGroup,
                         that.buttonsGroup
-                    ]));
+                    ]).setMargin(0));
 
                     that.reLoad();
 
