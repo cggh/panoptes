@@ -111,7 +111,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-            that.createQueryControl = function(settings, extraControlsList) {
+            that.createQueryControl = function(controlSettings, extraControlsList) {
 
                 var theControl = Controls.BaseCustom(true).setMargin(0);
 
@@ -219,7 +219,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var defaultHidden = false;
-                if (settings && settings.defaultHidden)
+                if (controlSettings && controlSettings.defaultHidden)
                     defaultHidden = true;
 
                 theControl.addControl(Controls.Section(group, {
