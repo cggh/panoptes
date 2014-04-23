@@ -245,7 +245,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         MiscUtils.createHalfPlaneRestrictionQuery = function(origQuery, propidX, propidY, center, dir) {
             var qry = null;
             var selector = null;
-            if ( (Math.abs(dir.x)>0.001) && (Math.abs(dir.y)>0.001) ) {
+            var dirSz = Math.abs(dir.x) + Math.abs(dir.y);
+            if ( (Math.abs(dir.x/dirSz)>0.001) && (Math.abs(dir.y/dirSz)>0.001) ) {
                 var factor = dir.y/dir.x;
                 var offset = center.y - center.x*dir.y/dir.x;
                 if (dir.x>0) {
