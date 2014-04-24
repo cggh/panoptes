@@ -23,18 +23,9 @@ cd build
 
 echo -e "${green}  Fetching dependancies${NC}"
 cd $PROJECT_ROOT/build
-ret=0
-ssh git@github.com > /dev/null 2>&1 || ret=$?
-if [ "$ret" -ne "255" ]; then
-    use_ssh=1
-    echo -e "    Using ssh checkout${NC}"
-else
-    use_ssh=0
-    echo -e "    Using http checkout${NC}"
-fi
-echo -e "${green}    DQX${NC}"
 
-if [ "$use_ssh" -eq "1" ]; then
+echo -e "${green}    DQX${NC}"
+if [ -z "$GITSSH" ]; then
     git clone git@github.com:malariagen/DQX.git
 else
     git clone https://github.com/malariagen/DQX.git
@@ -44,7 +35,7 @@ git checkout `cat $PROJECT_ROOT/dependencies/DQX_Version`
 cd ..
 
 echo -e "${green}    DQXServer${NC}"
-if [ "$use_ssh" -eq "1" ]; then
+if [ -z "$GITSSH" ]; then
     git clone git@github.com:malariagen/DQXServer.git
 else
     git clone https://github.com/malariagen/DQXServer.git
