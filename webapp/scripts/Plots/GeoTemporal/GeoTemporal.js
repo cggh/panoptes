@@ -224,7 +224,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     }
                 );
 
-                //that.startZoomFit = true;
+                that.startZoomFit = true;
                 that.reloadAll();
             };
 
@@ -250,6 +250,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             };
 
             that.recallCustomSettings = function(sett) {
+                that.startZoomFit = false;
                 that.theMap.recallSettings(sett.mapSettings);
                 $.each(that.plotComponents, function(key, plotComp) {
                     plotComp.recallSettings(sett[key]);
