@@ -88,8 +88,8 @@ define([
 
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
-                    this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.7));//Create frame that will contain the genome browser panel
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.25)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
+                    this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.75));//Create frame that will contain the genome browser panel
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
                     Msg.listen("", { type: 'JumpgenomePosition' }, that.onJumpGenomePosition);
@@ -165,7 +165,7 @@ define([
                     that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(0);
 
                     //Create controls for each table that has genome summary tracks defined
-                    that.buttonsGroup = Controls.CompoundVert([]);
+                    that.buttonsGroup = Controls.CompoundVert([]).setMargin(0);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.tableNamePlural+"...",  width:140 }).setOnChanged(function() {
@@ -204,7 +204,7 @@ define([
                     this.panelControls.addControl(Controls.CompoundVert([
                         that.visibilityControlsGroup,
                         that.buttonsGroup
-                    ]));
+                    ]).setMargin(0));
 
                     that.reLoad();
 
@@ -277,17 +277,19 @@ define([
                     if (MetaData.summaryValues.length==0)
                         return;
 
-                    var generalSummaryChannelsControls = Controls.CompoundVert([]).setMargin(10);
+                    var controlsList = [];
 
-                    that.visibilityControlsGroup.addControl(Controls.Section(generalSummaryChannelsControls, {
-                        title: 'Summary tracks',
-                        headerStyleClass: 'GenomeBrowserMainSectionHeader',
-                        bodyStyleClass: 'ControlsSectionBody'
-                    }));
-
-                    //Iterate over all summary profiles shown by the app
+                    //Iterate over all summary profiles shown by the app ....
                     $.each(MetaData.summaryValues,function(idx,summaryValue) {
-                        if (!summaryValue.isDisplayed) {//Notr: this flag is set if that summary value was associated with a datatable property
+
+                        //Verify if this summary channel corresponds to a datatable property
+                        var isTableProperty = false;
+                        $.each(MetaData.customProperties,function(idx,propInfo) {
+                            if ((propInfo.tableid==summaryValue.tableid) && (propInfo.propid==summaryValue.propid) && (propInfo.settings.showInBrowser))
+                                isTableProperty = true;
+                        });
+
+                        if (!isTableProperty) {
                             var trackid ='smm'+summaryValue.tableid+'_'+summaryValue.propid;
                             var theFetcher = that.getSummaryFetcher(summaryValue.minblocksize);
                             var channelid=trackid;
@@ -329,12 +331,21 @@ define([
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
 
-                            var ctrl_onoff = SummChannel.createVisibilityControl(true);
-                            generalSummaryChannelsControls.addControl(ctrl_onoff);
+                            var ctrl_onoff = SummChannel.createVisibilityControl(!summaryValue.settings.DefaultVisible);
+                            controlsList.push(ctrl_onoff);
 
                         }
                     })
 
+                    if (controlsList.length>0) {
+                        var generalSummaryChannelsControls = Controls.CompoundVert(controlsList).setMargin(10);
+
+                        that.visibilityControlsGroup.addControlTop(Controls.Section(generalSummaryChannelsControls, {
+                            title: 'Genome tracks',
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                            bodyStyleClass: 'ControlsSectionBody'
+                        }));
+                    }
                 }
 
 
@@ -344,6 +355,7 @@ define([
                     tableInfo.genomeBrowserInfo.currentCustomProperties.push(trackid);
                     var channelDefaultVisible = !!(propInfo.settings.BrowserDefaultVisible);
                     var channelShowOnTop = !!(propInfo.settings.BrowserShowOnTop);
+                    if (channelShowOnTop) channelDefaultVisible = true;
 
                     var densChannel = null;
                     if (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid)) {
@@ -410,15 +422,17 @@ define([
                     that.panelBrowser.addChannel(positionChannel, channelShowOnTop);//Add the channel to the browser
                     that.panelBrowser.channelModifyVisibility(positionChannel.getID(), channelDefaultVisible, true);
 
-                    // Define visibility control & color states
-                    var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
-                        that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
-                        if (densChannel) {
-                            that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
-                            densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
-                        }
-                    });
-                    controlsGroup.addControl(ctrl_onoff);
+                    if (!channelShowOnTop) {
+                        // Define visibility control & color states
+                        var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
+                            that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
+                            if (densChannel) {
+                                that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
+                                densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
+                            }
+                        });
+                        controlsGroup.addControl(ctrl_onoff);
+                    }
 
                     if (colorMapping) {
                         var controlsSubList = [];
@@ -562,6 +576,9 @@ define([
 
                     that.summaryFolder = 'SummaryTracks/' + MetaData.database;
 
+                    that.createSummaryChannels();
+
+
                     // Loop over all datatables that contain genomic positions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomePositions) {
@@ -583,7 +600,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             var channelControlsGroup = Controls.CompoundVert([]).setMargin(8);
@@ -652,7 +669,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createControl();
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             states = [{id:'', name:'-None-'}];
@@ -905,7 +922,6 @@ define([
                     };
 
 
-                    that.createSummaryChannels();
 
                     this.panelControls.render();
 

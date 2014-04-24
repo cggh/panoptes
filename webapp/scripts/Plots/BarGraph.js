@@ -46,7 +46,7 @@ define([
             that.createPanelButtons = function() {
 
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
+                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -115,6 +115,17 @@ define([
                 that.catpropid2 = that.ctrlCatProperty2.getValue();
                 if (!that.catpropid1)
                     return;
+
+                if (that.catpropid2) {
+                    if (that.catpropid2==that.catpropid1) {
+                        that.maxcount = 0;
+                        that.categories = [];
+                        that.reDraw();
+                        alert('Secondary category should be different from first');
+                        return;
+                    }
+                }
+
                 if (that.staging)
                     return;
                 DQX.setProcessing();

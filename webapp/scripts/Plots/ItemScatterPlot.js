@@ -1,9 +1,9 @@
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvasXYPlot", "DQX/DataFetcher/DataFetchers",
     "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
-        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvasXYPlot, DataFetchers,
         EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
@@ -45,8 +45,10 @@ define([
 
 
             that.createPanelPlot = function() {
-                that.panelPlot = FrameCanvas(that.framePlot);
-                that.panelPlot.draw = that.draw;
+                that.panelPlot = FrameCanvasXYPlot(that.framePlot);
+                that.panelPlot.drawXScale = that.drawXScale;
+                that.panelPlot.drawYScale = that.drawYScale;
+                that.panelPlot.drawCenter = that.drawCenter;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
@@ -55,45 +57,6 @@ define([
 
 
             that.createPanelButtons = function() {
-                that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createControl([that.ctrl_PointCount]);
-
-
-                var pickControls = Controls.CompoundGrid();
-                $.each(that.plotAspects,function(aspectIdx, plotAspect) {
-                    if (plotAspect.visible) {
-                        var propList = [ {id:'', name:'-- None --'}];
-                        $.each(MetaData.customProperties, function(idx, prop) {
-                            var included = false;
-                            if (prop.tableid==that.tableInfo.id) {
-                                if ( (prop.datatype==plotAspect.datatype) || (!plotAspect.datatype) )
-                                    included = true;
-                                if ( (plotAspect.datatype=='Value') && (prop.isFloat) )
-                                    included = true;
-                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.isBoolean) ) )
-                                    included = true;
-                            }
-                            if (included)
-                                propList.push({ id:prop.propid, name:prop.name });
-                        });
-                        plotAspect.picker = Controls.Combo(null, { label:'', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
-                        pickControls.setItem(aspectIdx, 0, Controls.Static(plotAspect.name+':'));
-                        pickControls.setItem(aspectIdx, 1, plotAspect.picker);
-                        //controls.push(Controls.VerticalSeparator(7));
-                    }
-                });
-
-                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Size factor', width: 180, minval:0, maxval:2, value:1, digits: 2})
-                    .setNotifyOnFinished().setClassID('sizefactor')
-                    .setOnChanged(function() {
-                        that.reDraw();
-                    });
-
-                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 180, minval:0, maxval:1, value:1, digits: 2})
-                    .setNotifyOnFinished().setClassID('opacity')
-                    .setOnChanged(function() {
-                        that.reDraw();
-                });
 
                 var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
 
@@ -170,6 +133,45 @@ define([
 
                 });
 
+                that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount, cmdPointSelection]);
+
+
+                var pickControls = Controls.CompoundVert([]).setMargin(10);
+                $.each(that.plotAspects,function(aspectIdx, plotAspect) {
+                    if (plotAspect.visible) {
+                        var propList = [ {id:'', name:'-- None --'}];
+                        $.each(MetaData.customProperties, function(idx, prop) {
+                            var included = false;
+                            if (prop.tableid==that.tableInfo.id) {
+                                if ( (prop.datatype==plotAspect.datatype) || (!plotAspect.datatype) )
+                                    included = true;
+                                if ( (plotAspect.datatype=='Value') && (prop.isFloat) )
+                                    included = true;
+                                if ((plotAspect.datatype=='Category') && ( (prop.datatype=='Text') || (prop.isBoolean) ) )
+                                    included = true;
+                            }
+                            if (included)
+                                propList.push({ id:prop.propid, name:prop.name });
+                        });
+                        plotAspect.picker = Controls.Combo(null, { label:plotAspect.name+':<br>', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
+                        pickControls.addControl(plotAspect.picker);
+                    }
+                });
+
+                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Size factor', width: 180, minval:0, maxval:2, value:1, digits: 2})
+                    .setNotifyOnFinished().setClassID('sizefactor')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Opacity', width: 180, minval:0, maxval:1, value:1, digits: 2})
+                    .setNotifyOnFinished().setClassID('opacity')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                });
+
+
 
                 that.colorLegend = Controls.Html(null,'');
 
@@ -183,8 +185,7 @@ define([
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrl_SizeFactor,
-                        that.ctrl_Opacity,
-                        cmdPointSelection
+                        that.ctrl_Opacity
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -329,6 +330,14 @@ define([
                     aspectInfo.safeRange = aspectInfo.maxval - aspectInfo.minval;
                 }
 
+                if (plotAspectID == 'xaxis') {
+                    that.panelPlot.setXRange(aspectInfo.minval, aspectInfo.minval + aspectInfo.safeRange);
+                }
+
+                if (plotAspectID == 'yaxis') {
+                    that.panelPlot.setYRange(aspectInfo.minval, aspectInfo.minval + aspectInfo.safeRange);
+                }
+
                 if ( (aspectInfo.datatype == 'Category') && (values) ) {
                     for (var i=0; i<values.length; i++)
                         values[i] = propInfo.toDisplayString(values[i]);
@@ -368,11 +377,90 @@ define([
                 }
             }
 
-            that.draw = function(drawInfo) {
-                that.drawImpl(drawInfo);
+            that.drawXScale = function(drawInfo) {
+                var aspectX = that.mapPlotAspects['xaxis'];
+                if ((!aspectX.propid) || (!aspectX.data))
+                    return;
+                var ctx = drawInfo.ctx;
+                var scaleX = that.panelPlot.getXScale();
+                var offsetX = that.panelPlot.getXOffset();
+                var plotLimitXMin = that.panelPlot.xScaler.getMinVisibleRange();
+                var plotLimitXMax = that.panelPlot.xScaler.getMaxVisibleRange();
+                ctx.save();
+                ctx.font="10px Arial";
+                ctx.fillStyle="rgb(0,0,0)";
+                ctx.textAlign = 'center';
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, aspectX.propid, scaleX, aspectX.minval, aspectX.maxval);
+                $.each(scaleTicks, function(idx, tick) {
+                    if ((tick.value>=plotLimitXMin) && (tick.value<=plotLimitXMax)) {
+                        var px = Math.round(tick.value * scaleX + offsetX)-0.5;
+                        if (tick.label) {
+                            ctx.fillText(tick.label,px,drawInfo.sizeY-that.panelPlot.scaleMarginY+13);
+                            if (tick.label2)
+                                ctx.fillText(tick.label2,px,drawInfo.sizeY-that.panelPlot.scaleMarginY+23);
+                            ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                        }
+                        else {
+                            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                        }
+                        if (!drawInfo.scaleBorderOnly) {
+                            ctx.beginPath();
+                            ctx.moveTo(px,0);
+                            ctx.lineTo(px,drawInfo.sizeY-that.panelPlot.scaleMarginY);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                ctx.restore();
             }
 
-            that.drawImpl = function(drawInfo) {
+            that.drawYScale = function(drawInfo) {
+                var aspectY = that.mapPlotAspects['yaxis'];
+                if ((!aspectY.propid) || (!aspectY.data))
+                    return;
+                var ctx = drawInfo.ctx;
+                var scaleY = that.panelPlot.getYScale();
+                var offsetY = that.panelPlot.getYOffset();
+                var plotLimitYMin = that.panelPlot.yScaler.getMinVisibleRange();
+                var plotLimitYMax = that.panelPlot.yScaler.getMaxVisibleRange();
+
+                ctx.save();
+                ctx.font="10px Arial";
+                ctx.fillStyle="rgb(0,0,0)";
+                ctx.textAlign = 'center';
+                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, aspectY.propid, Math.abs(scaleY), aspectY.minval, aspectY.maxval);
+                $.each(scaleTicks, function(idx, tick) {
+                    if ((tick.value>=plotLimitYMin) && (tick.value<=plotLimitYMax)) {
+                        var py = Math.round(tick.value * scaleY + offsetY)-0.5;
+                        if (tick.label) {
+                            ctx.save();
+                            ctx.translate(that.panelPlot.scaleMarginX-5,py);
+                            ctx.rotate(-Math.PI/2);
+                            if (!tick.label2)
+                                ctx.fillText(tick.label,0,0);
+                            else {
+                                ctx.fillText(tick.label,0,-10);
+                                ctx.fillText(tick.label2,0,0);
+                            }
+                            ctx.restore();
+                            ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                        }
+                        else {
+                            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                        }
+                        if (!drawInfo.scaleBorderOnly) {
+                            ctx.beginPath();
+                            ctx.moveTo(that.panelPlot.scaleMarginX,py);
+                            ctx.lineTo(drawInfo.sizeX,py);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                ctx.restore();
+
+            }
+
+            that.drawCenter = function(drawInfo) {
                 that.plotPresent = false;
                 var ctx = drawInfo.ctx;
                 ctx.fillStyle="#FFFFFF";
@@ -392,15 +480,10 @@ define([
                 if (missingAspects.length>0) {
                     ctx.font="italic 14px Arial";
                     ctx.fillStyle="rgb(0,0,0)";
-                    ctx.fillText("Please provide data for "+missingAspects.join(', '),10,50);
+                    ctx.fillText("Please provide data for "+missingAspects.join(', '),50,50);
                     return;
                 }
 
-                var marginX = 40;
-                var marginY = 40;
-                ctx.fillStyle="rgb(220,220,220)";
-                ctx.fillRect(0,0,marginX,drawInfo.sizeY);
-                ctx.fillRect(0,drawInfo.sizeY-marginY,drawInfo.sizeX,marginY);
 
                 var ids = that.mapPlotAspects['id'].data;
                 var aspectX = that.mapPlotAspects['xaxis'];
@@ -409,69 +492,18 @@ define([
                 var valY = aspectY.data;
                 var valColorCat = that.mapPlotAspects['color'].catData;
                 var valSize = that.mapPlotAspects['size'].data;
-                var scaleX = (drawInfo.sizeX-marginX) / aspectX.safeRange;
-                var offsetX = marginX - aspectX.minval*scaleX;
-                var scaleY = - (drawInfo.sizeY-marginY) / aspectY.safeRange;
-                var offsetY = (drawInfo.sizeY-marginY) - aspectY.minval*scaleY;
+                var scaleX = that.panelPlot.getXScale();
+                var offsetX = that.panelPlot.getXOffset();
+                var scaleY = that.panelPlot.getYScale();
+                var offsetY = that.panelPlot.getYOffset();
                 that.scaleX = scaleX; that.offsetX = offsetX;
                 that.scaleY = scaleY; that.offsetY = offsetY;
+                var plotLimitXMin = that.panelPlot.xScaler.getMinVisibleRange();
+                var plotLimitXMax = that.panelPlot.xScaler.getMaxVisibleRange();
+                var plotLimitYMin = that.panelPlot.yScaler.getMinVisibleRange();
+                var plotLimitYMax = that.panelPlot.yScaler.getMaxVisibleRange();
 
-                // Draw x scale
-                ctx.save();
-                ctx.font="10px Arial";
-                ctx.fillStyle="rgb(0,0,0)";
-                ctx.textAlign = 'center';
-                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, aspectX.propid, scaleX, aspectX.minval, aspectX.maxval);
-                $.each(scaleTicks, function(idx, tick) {
-                    var px = Math.round(tick.value * scaleX + offsetX)-0.5;
-                    if (tick.label) {
-                        ctx.fillText(tick.label,px,drawInfo.sizeY-marginY+13);
-                        if (tick.label2)
-                            ctx.fillText(tick.label2,px,drawInfo.sizeY-marginY+23);
-                        ctx.strokeStyle = "rgb(190,190,190)";
-                    }
-                    else {
-                        ctx.strokeStyle = "rgb(230,230,230)";
-                    }
-                    ctx.beginPath();
-                    ctx.moveTo(px,0);
-                    ctx.lineTo(px,drawInfo.sizeY-marginY);
-                    ctx.stroke();
 
-                });
-                ctx.restore();
-
-                // Draw y scale
-                ctx.save();
-                ctx.font="10px Arial";
-                ctx.fillStyle="rgb(0,0,0)";
-                ctx.textAlign = 'center';
-                var scaleTicks = MiscUtils.createPropertyScale(that.tableInfo.id, aspectY.propid, Math.abs(scaleY), aspectY.minval, aspectY.maxval);
-                $.each(scaleTicks, function(idx, tick) {
-                    var py = Math.round(tick.value * scaleY + offsetY)-0.5;
-                    if (tick.label) {
-                        ctx.save();
-                        ctx.translate(marginX-5,py);
-                        ctx.rotate(-Math.PI/2);
-                        if (!tick.label2)
-                            ctx.fillText(tick.label,0,0);
-                        else {
-                            ctx.fillText(tick.label,0,-10);
-                            ctx.fillText(tick.label2,0,0);
-                        }
-                        ctx.restore();
-                        ctx.strokeStyle = "rgb(190,190,190)";
-                    }
-                    else {
-                        ctx.strokeStyle = "rgb(230,230,230)";
-                    }
-                    ctx.beginPath();
-                    ctx.moveTo(marginX,py);
-                    ctx.lineTo(drawInfo.sizeX,py);
-                    ctx.stroke();
-
-                });
-                ctx.restore();
 
                 var sizeFactor =that.ctrl_SizeFactor.getValue();
                 var opacity = that.ctrl_Opacity.getValue();
@@ -500,9 +532,11 @@ define([
                 if (smallPoints) {
                     for (var i=0; i<ptcount; i++) {
                         var ii = sortIndex[i];
-                        if ( (valX[ii]!=null) && (valY[ii]!=null) ) {
-                            var px = Math.round(valX[ii] * scaleX + offsetX);
-                            var py = Math.round(valY[ii] * scaleY + offsetY);
+                        var vlx = valX[ii];
+                        var vly = valY[ii];
+                        if ( (vlx!=null) && (vly!=null) && (vlx>=plotLimitXMin) && (vlx<=plotLimitXMax) && (vly>=plotLimitYMin) && (vly<=plotLimitYMax) ) {
+                            var px = Math.round(vlx * scaleX + offsetX);
+                            var py = Math.round(vly * scaleY + offsetY);
                             if (valColorCat) {
                                 ctx.strokeStyle = colorStrings[valColorCat[ii]];
                             }
@@ -524,9 +558,11 @@ define([
                     var pointSize = 2*sizeFactor;
                     for (var i=0; i<ptcount; i++) {
                         var ii = sortIndex[i];
-                        if ( (valX[ii]!=null) && (valY[ii]!=null) ) {
-                            var px = /*Math.round*/(valX[ii] * scaleX + offsetX);
-                            var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
+                        var vlx = valX[ii];
+                        var vly = valY[ii];
+                        if ( (vlx!=null) && (vly!=null) && (vlx>=plotLimitXMin) && (vlx<=plotLimitXMax) && (vly>=plotLimitYMin) && (vly<=plotLimitYMax) ) {
+                            var px = /*Math.round*/(vlx * scaleX + offsetX);
+                            var py = /*Math.round*/(vly * scaleY + offsetY);
                             if (valColorCat) {
                                 ctx.fillStyle = ctx.strokeStyle = colorStrings[valColorCat[ii]];
                             }
@@ -580,6 +616,22 @@ define([
             };
 
 
+            that.storeCustomSettings = function() {
+//                var sett = {};
+//                if (that.plotPresent) {
+//                    sett.xScaler = that.panelPlot.xScaler.store();
+//                    sett.yScaler = that.panelPlot.yScaler.store();
+//                }
+//                return sett;
+            };
+
+            that.recallCustomSettings = function(sett) {
+//  does not work because scaler info is reset after retrieval of data...
+//                if (sett.xScaler)
+//                    that.panelPlot.xScaler.recall(sett.xScaler);
+//                if (sett.yScaler)
+//                    that.panelPlot.yScaler.recall(sett.yScaler);
+            };
 
             that.getToolTipInfo = function(px0 ,py0) {
                 if (!that.plotPresent) return;

@@ -25,11 +25,11 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 controls_group.addControl(that.createVisibilityControl());
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
-                var col_query_tool = that.col_query.createControl();
+                var col_query_tool = that.col_query.createQueryControl({defaultHidden: true});
                 controls_group.addControl(col_query_tool);
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
                 that.row_query.notifyQueryUpdated = that.new_row_query;
-                var row_query_tool = that.row_query.createControl();
+                var row_query_tool = that.row_query.createQueryControl({});
                 controls_group.addControl(row_query_tool);
 
                 //Fix order to by position for col and primary key for row

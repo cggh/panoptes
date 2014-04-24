@@ -75,7 +75,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createPanels = function() {
 
-                var ctrl_Query = that.theQuery.createControl();
+                var ctrl_Query = that.theQuery.createQueryControl({});
 
                 var controlsGroup = Controls.CompoundVert([
                     ctrl_Query

@@ -4,6 +4,17 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     color:rgb(0,107,117) !important;
 }
 
+.PanoptesLogoBox
+{
+    opacity:0.7;
+    cursor:pointer;
+}
+
+.PanoptesLogoBox:hover
+{
+    opacity:1.0;
+}
+
 .DQXSelectWrapper
 {
 /*    border:1px solid rgb(190,190,190);*/
@@ -305,6 +316,14 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     color: rgb(61,104,108);
 }
 
+.DQXControlSectionHeader, .GenomeBrowserMainSectionHeader {
+    opacity: 0.8;
+}
+
+.DQXControlSectionHeader:hover, .GenomeBrowserMainSectionHeader:hover {
+    opacity: 1;
+}
+
 .ControlsSectionBody {
     margin-left:9px;
     margin-top:20px;
@@ -331,6 +350,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     border-top:1px solid rgb(112,169,174);
     border-bottom:1px solid rgb(112,169,174);
     color: rgb(0,55,60);
+
     /*font-size: 12pt;*/
     /*font-weight: bold;*/
     /*background-color: rgb(47, 137, 146);*/
@@ -381,17 +401,18 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .DQXThumbNail
 {
+    opacity:0.5;
     display: inline-block;
     width:100px;
     height:31px;
     color: rgb(0,94,102);
-    background: rgb(206,234,237); /* Old browsers */
-    background: -moz-linear-gradient(left, rgb(206,234,237) 0%, rgb(140,195,200) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(206,234,237)), color-stop(100%,rgb(140,195,200))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(left, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* IE10+ */
-    background: linear-gradient(to right, rgb(206,234,237) 0%,rgb(140,195,200) 100%); /* W3C */
+    background: rgb(182,230,235); /* Old browsers */
+    background: -moz-linear-gradient(left, rgb(182,230,235) 0%, rgb(123,181,186) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(182,230,235)), color-stop(100%,rgb(123,181,186))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* IE10+ */
+    background: linear-gradient(to right, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ceeaed', endColorstr='#8cc3c8',GradientType=1 ); /* IE6-9 */    border: 2px solid black;
     padding:5px;
     padding-top:2px;
@@ -404,11 +425,17 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     box-shadow: 1px 1px 2px rgba(0,0,0,0.45);
 }
 
+.DQXThumbNailMinimised
+{
+    opacity:1 !important;
+}
+
+
 .DQXThumbNail img {
     opacity: 0;
 }
 .DQXThumbNail:hover img {
-    opacity: 0.5;
+    opacity: 0.35;
 }
 .DQXThumbNail img:hover {
     opacity: 1.0;

@@ -59,8 +59,8 @@ Properties:
   DataType: Boolean
   ShowInTable: true
   ShowInBrowser: true
-  BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
-  BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser
+  #BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
+  BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
   DataType: Value
@@ -102,7 +102,7 @@ Properties:
   DataType: Text
   ShowInTable: true
   ShowInBrowser: true
-  IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+#  IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   CategoryColors:                   # Specifies display colours for the categorical states of this property
     A: rgb(255,128,60)
     B: rgb(0,180,0)
@@ -114,7 +114,7 @@ Properties:
   BrowserDefaultVisible: true
 
 ExternalLinks:
-- Url: https://www.google.co.uk/search?q={SnpName}
+- Url: https://www.google.co.uk/searchﱽ{SnpName}
   Name: Google search
 
 - Url: http://en.wikipedia.org/wiki/{SnpName}

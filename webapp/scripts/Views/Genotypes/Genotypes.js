@@ -99,8 +99,8 @@ define(["require", "DQX/ArrayBufferClient", "DQX/base64", "DQX/Application", "DQ
           this.panelControls = Framework.Form(this.frameControls);
           this.panelControls.setPadding(10);
 
-          var ctrlQuerySamples = that.querySamples.createControl();
-          var ctrlQueryVariants = that.queryVariants.createControl();
+          var ctrlQuerySamples = that.querySamples.createQueryControl({});
+          var ctrlQueryVariants = that.queryVariants.createQueryControl({defaultHidden: true});
           this.panelControls.addControl(Controls.CompoundVert([
             ctrlQuerySamples,
             ctrlQueryVariants

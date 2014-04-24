@@ -173,7 +173,7 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<div id="PanoptesAppHeader"><a href="http://www.malariagen.net" target="_blank"><img src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/></a><div class="DQXThumbNailBox"></div></div>';
+                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div class="DQXThumbNailBox"></div></div>';
                         Application.setHeaderHeight(48);
                         Application.setHeader(headerContent);
 
@@ -252,6 +252,29 @@ require([
                     if (view.postLoadAction)
                         view.postLoadAction();
                 });
+                $(".PanoptesLogoBox").click(PanoptesActions);
+            }
+
+            function PanoptesActions() {
+                var actions = [];
+                actions.push( { content:'Documentation', bitmap:'Bitmaps/Icons/Small/documentation.png', handler:function() {
+                    window.open('http://panoptes.readthedocs.org/en/latest/');
+                }
+                });
+                actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
+                    var hostname=window.location.hostname;
+                    var pathname=window.location.pathname;
+                    var protocol=window.location.protocol;
+                    var url='{protocol}//{hostname}{pathname}'.DQXformat({
+                        protocol:protocol,
+                        hostname:hostname,
+                        pathname:pathname
+                    });
+                    window.open('admin.html');
+                }
+                });
+
+                ButtonChoiceBox.create('Panoptes','', [actions]);
             }
 
             Start_Part0();

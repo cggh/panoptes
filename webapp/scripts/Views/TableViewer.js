@@ -196,7 +196,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         });
                     });
 
-                    var ctrlQuery = that.theQuery.createControl([buttonCreatePlot]);
+                    var ctrlQuery = that.theQuery.createQueryControl({}, [buttonCreatePlot]);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
 

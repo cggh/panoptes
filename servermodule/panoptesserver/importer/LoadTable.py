@@ -21,19 +21,22 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     def EncodeCell(icontent, col):
         content = icontent
         if col['IsString']:
-            try:
-                content = content.encode('ascii', 'ignore')
-            except UnicodeDecodeError:
-                print('Unable to encode '+content)
-                content='*failed encoding*'
-            content = content.replace("\x92", "'")
-            content = content.replace("\xC2", "'")
-            content = content.replace("\x91", "'")
-            #filter(lambda x: x in string.printable, val)
-            content = content.replace("'", "\\'")
-            content = content.replace('\r\n', '\\n')
-            content = content.replace('\n\r', '\\n')
-            content = '\'' + content + '\''
+            if len(icontent) == 0:
+                content = "''"
+            else:
+                try:
+                    content = content.encode('ascii', 'ignore')
+                except UnicodeDecodeError:
+                    print('Unable to encode '+content)
+                    content='*failed encoding*'
+                content = content.replace("\x92", "'")
+                content = content.replace("\xC2", "'")
+                content = content.replace("\x91", "'")
+                #filter(lambda x: x in string.printable, val)
+                content = content.replace("'", "\\'")
+                content = content.replace('\r\n', '\\n')
+                content = content.replace('\n\r', '\\n')
+                content = '\'' + content + '\''
 
         if col['IsValue']:
             if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf'):

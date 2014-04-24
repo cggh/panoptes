@@ -17,8 +17,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         MetaData.database = DQX.getUrlSearchString('dataset');
                         PromptDataSet.proceedFunction();
                     }
-                    else
-                        PromptDataSet.execute2();
+                    else {
+                        if (PromptDataSet.datasets.length == 1) {
+                            MetaData.database = PromptDataSet.datasets[0].id;
+                            PromptDataSet.proceedFunction();
+                        }
+                        else
+                            PromptDataSet.execute2();
+                    }
                 }
             );
 

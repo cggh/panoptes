@@ -111,7 +111,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-            that.createControl = function(extraControlsList) {
+            that.createQueryControl = function(controlSettings, extraControlsList) {
 
                 var theControl = Controls.BaseCustom(true).setMargin(0);
 
@@ -218,9 +218,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.updateStoredQueries();
                 });
 
+                var defaultHidden = false;
+                if (controlSettings && controlSettings.defaultHidden)
+                    defaultHidden = true;
+
                 theControl.addControl(Controls.Section(group, {
-                    title: "Active "+that.tableInfo.name,
-                    bodyStyleClass: 'ControlsSectionBody'
+                    title: that.tableInfo.tableCapNamePlural + ' filter',
+                    bodyStyleClass: 'ControlsSectionBody',
+                    defaultCollapsed: defaultHidden
                 }));
 
                 return theControl;
