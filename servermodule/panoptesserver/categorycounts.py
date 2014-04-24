@@ -58,6 +58,7 @@ def response(returndata):
         sourcetable +=  ' limit {0}'.format(maxrecordcount)
         sql = 'select {1}, {2}, count({1}) as _cnt from ({0}) as tmp_table'.format(sourcetable, propid1, propid2)
         sql += ' group by {1}, {2} limit 10000;'.format(tableid, propid1, propid2)
+#        print(sql+' '+str(whc.queryparams))
         cur.execute(sql, whc.queryparams)
         totalcount = 0
         for row in cur.fetchall():

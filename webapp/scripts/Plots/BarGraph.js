@@ -115,6 +115,17 @@ define([
                 that.catpropid2 = that.ctrlCatProperty2.getValue();
                 if (!that.catpropid1)
                     return;
+
+                if (that.catpropid2) {
+                    if (that.catpropid2==that.catpropid1) {
+                        that.maxcount = 0;
+                        that.categories = [];
+                        that.reDraw();
+                        alert('Secondary category should be different from first');
+                        return;
+                    }
+                }
+
                 if (that.staging)
                     return;
                 DQX.setProcessing();
