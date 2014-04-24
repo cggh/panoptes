@@ -11,41 +11,45 @@ Installation and deployment guide
 
 Download & dependencies
 -----------------------
-The Panoptes project can be downloaded from the GitHub repository: `<https://github.com/malariagen/panoptes>`_.
+Download the code from the GitHub repository::
 
-Panoptes needs a running MySQL with permission to create and remove databases.
-Note that the MySQL client tools also have to be installed on the machine running Panoptes.
+    wget https://github.com/malariagen/panoptes/archive/master.zip
+    unzip master.zip
+    cd panoptes-master
+
+Panoptes needs a running MySQL with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
+
+    sudo apt-get install mysql-server mysql-client
 
 .. caution::
   Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
   **Use a separate MySQL install or set your MySQL permissions carefully!**
 
-You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based machines::
+You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
-	apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
+	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
 
 You will also need libhdf5-dev. This is a virtual package satisfied by the several different install types of HDF5. The simplest solution is to::
 
-    apt-get install libhdf5-serial-dev
+    sudo apt-get install libhdf5-serial-dev
 
 unless you want a specific HDF5 setup.
 
 Build
 -----
-In the directory where the Panoptes project was downloaded, copy 'config.py.example' to 'config.py'.
+In the directory where the code was unzipped, copy 'config.py.example' to 'config.py'.
 Edit the file and specify the following components:
 
 - MySQL setup (DBSRV, DBUSER, DBPASS).
-  By default, Panoptes uses the MySQL defaults file ``~/.my.cnf`` to obtain the login credentials.
-   
-  * Make sure that the account used to run the Panoptes server has the right MySQL configuration file in the home directory.
-  * NOTE: the login credentials used need to have sufficient privileges to perform alterations such as database creation.
-     
+
+.. note::
+  The login credentials used need to have sufficient privileges to perform alterations such as database creation.
+
 - A directory Panoptes can use for storing files (BASEDIR, see further).
 - A directory that will contain the source data files (SOURCEDATADIR, see further)
- 
-Note that changes in 'config.py' are used on build, so you will need to rebuild if they change.
 
+.. note::
+  Changes in 'config.py' are used on build, so you will need to rebuild if they change.
 
 To build run::
 
@@ -142,6 +146,7 @@ Authorization
 -------------
 Panoptes contains a simple authorization mechanism that can be used to grant or deny certain privileges on datasets.
 There are three levels of privileges:
+
  - Read: View the data in a dataset.
  - Edit: Add custom data properties to a workspace.
  - Manage: All actions, including loading the dataset from the file source.
