@@ -62,6 +62,49 @@ define([
 
                     var actions = [];
 
+                    actions.push( { content:'Rectangle selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startRectangleSelection(function(pt1, pt2) {
+                            //var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.mapPlotAspects['xaxis'].propid, that.mapPlotAspects['yaxis'].propid, center, dir);
+                            var rangeXMin = (Math.min(pt1.x,pt2.x)-that.offsetX)/that.scaleX;
+                            var rangeXMax = (Math.max(pt1.x,pt2.x)-that.offsetX)/that.scaleX;
+                            var rangeYMin = (Math.max(pt1.y,pt2.y)-that.offsetY)/that.scaleY;
+                            var rangeYMax = (Math.min(pt1.y,pt2.y)-that.offsetY)/that.scaleY;
+
+                            var qry = that.theQuery.get();
+                            qry = SQL.WhereClause.createRangeRestriction(qry, that.mapPlotAspects['xaxis'].propid, rangeXMin, rangeXMax);
+                            qry = SQL.WhereClause.createRangeRestriction(qry, that.mapPlotAspects['yaxis'].propid, rangeYMin, rangeYMax);
+
+                            var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
+                            content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
+
+                            if (!that.plotPresent) return;
+                            var ids =that.mapPlotAspects['id'].data;
+                            var aspectX = that.mapPlotAspects['xaxis'];
+                            var aspectY = that.mapPlotAspects['yaxis'];
+                            var valX = aspectX.data;
+                            var valY = aspectY.data;
+
+                            var selectionCreationFunction = function() {
+                                var sellist = [];
+                                for (var i=0; i<valX.length; i++) {
+                                    if ( (valX[i]!=null) && (valY[i]!=null) ) {
+                                        if ((valX[i]>=rangeXMin) && (valX[i]<=rangeXMax) && (valY[i]>rangeYMin) && (valY[i]<=rangeYMax)) {
+                                            sellist.push(ids[i]);
+                                        }
+                                    }
+                                }
+                                return sellist;
+                            };
+
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Rectangular area', content, {
+                                query: qry,
+                                subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                            }, selectionCreationFunction);
+                        });
+                    }
+                    });
+
+
                     actions.push( { content:'Lasso selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
                         that.panelPlot.startLassoSelection(function(selectedPoints) {
 
@@ -700,44 +743,6 @@ define([
                 qry = SQL.WhereClause.createRangeRestriction(qry, aspectX.propid, rangeXMin, rangeXMax);
                 qry = SQL.WhereClause.createRangeRestriction(qry, aspectY.propid, rangeYMin, rangeYMax);
 
-/*
-                var bt1 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Show items in range in table",  width:120, height:30 }).setOnChanged(function() {
-                    var tableView = Application.getView('table_'+that.tableInfo.id);
-                    tableView.activateWithQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
-
-                var bt2 = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Restrict plot dataset to range",  width:120, height:30 }).setOnChanged(function() {
-                    that.setActiveQuery(qry);
-                    Popup.closeIfNeeded(popupid);
-                });
-
-                */
-/*
-                buttonsRow1 = [];
-
-                buttonsRow1.push( { content:'Select<br>(REPLACE)', bitmap:'Bitmaps/venn2.png', handler:function() {
-                    doSelect(0);
-                }
-                });
-
-                buttonsRow1.push( { content:'Select<br>(ADD)', bitmap:'Bitmaps/venn3.png', handler:function() {
-                    doSelect(2);
-                }
-                });
-
-                buttonsRow1.push( { content:'Select<br>(NARROW)', bitmap:'Bitmaps/venn1.png', handler:function() {
-                    doSelect(3);
-                }
-                });
-
-                buttonsRow2 = [];
-
-                buttonsRow2.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
-                    that.setActiveQuery(qry);
-                }
-                } );
-*/
 
                 var content = 'X Range: '+rangeXMin+' - '+rangeXMax+'<br>';
                 content += 'Y Range: '+rangeYMin+' - '+rangeYMax+'<br>';
