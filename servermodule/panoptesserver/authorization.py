@@ -113,7 +113,11 @@ class PnAuthRuleSet:
                     if len(lineTokens) != 3:
                         raise Exception('ERROR: Invalid authority file: line '+str(linenr))
                     (userPattern, dataSetPattern, privToken) = lineTokens
-                    self.rules.append(PnAuthRule(userPattern.strip(), dataSetPattern.strip(), privToken.strip()))
+                    try:
+                        self.rules.append(PnAuthRule(userPattern.strip(), dataSetPattern.strip(), privToken.strip()))
+                    except Exception as e:
+                        raise Exception('Invalid authorization file line: {line} ({error})'.format(line=line, error=str(e)))
+
 
     def Match(self, credInfo, databaseName, level):
         for rule in self.rules:
