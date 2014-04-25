@@ -16,10 +16,8 @@ def response(returndata):
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
     encodedstr = returndata['content']
-    encodedstr=encodedstr.replace("-", "+")
-    encodedstr=encodedstr.replace("_", "/")
 
-    content = base64.b64decode(encodedstr)
+    content = base64.b64decode_var2(encodedstr)
 
 
 

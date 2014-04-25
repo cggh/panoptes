@@ -114,7 +114,7 @@ Properties:
   BrowserDefaultVisible: true
 
 ExternalLinks:
-- Url: https://www.google.co.uk/searchﱽ{SnpName}
+- Url: https://www.google.co.uk/search?q={SnpName}
   Name: Google search
 
 - Url: http://en.wikipedia.org/wiki/{SnpName}

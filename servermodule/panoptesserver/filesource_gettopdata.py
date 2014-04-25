@@ -40,7 +40,7 @@ def response(returndata):
                     if linecount > 100:
                         break
                     linecount += 1
-                returndata['content'] = base64.b64encode(content)
+                returndata['content'] = base64.b64encode_var2(content)
 
     except Exception as e:
         returndata['Error'] = str(e)

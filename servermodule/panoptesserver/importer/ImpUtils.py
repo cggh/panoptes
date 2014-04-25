@@ -10,6 +10,7 @@ import errno
 import SettingsLoader
 from DQXTableUtils import VTTable
 import customresponders.panoptesserver.Utils as Utils
+import simplejson
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -180,7 +181,11 @@ def ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, id, sett
 def ImportGlobalSettings(calculationObject, datasetId, settings):
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))
     for token in settings.GetTokenList():
-        ExecuteSQL(calculationObject, datasetId, 'INSERT INTO settings VALUES ("{0}", "{1}")'.format(token, settings[token]))
+        st = simplejson.dumps(settings[token])
+        ExecuteSQL(calculationObject, datasetId, "INSERT INTO settings VALUES ('{0}', '{1}')".format(
+            token,
+            st
+            ))
 
 
 def LoadPropertyInfo(calculationObject, impSettings, datafile):

@@ -1,2 +1,7 @@
 AnnotMaxViewPortSize: 750000  # Maximum viewport (in bp) the genome browser can have in order to show the annotation track
 RefSequenceSumm: Yes          # Include a summary track displaying the reference sequence
+
+
+ExternalGeneLinks:
+- Url: https://www.google.co.uk/search?q={Id}
+  Name: Google search

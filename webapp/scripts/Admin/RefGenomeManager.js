@@ -186,6 +186,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += edt.renderHtml();
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update reference genome settings</b>', width:140, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();
+
+                var enc = Base64.encode(settingsStr);
+                var dec= Base64.decode(enc);
+
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_rgsetsettings',{
                     database: datasetid,
                     content: Base64.encode(settingsStr)

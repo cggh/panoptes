@@ -62,7 +62,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             // Create buttons to show genomic regions spanning this position
             $.each(MetaData.tableCatalog, function(idx, oTableInfo) {
                 if (oTableInfo.hasGenomeRegions) {
-                    var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:55, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:50, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
                         var qry = SQL.WhereClause.AND([
                             SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', data.chromid),
                             SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', data.fstop),
@@ -78,6 +78,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     content += bt.renderHtml();
                 }
             });
+
+            if (MetaData.generalSettings.ExternalGeneLinks) {
+                var linkArray = JSON.parse(MetaData.generalSettings.ExternalGeneLinks);
+                $.each(linkArray, function(idx, linkInfo) {
+                    var bt = Controls.Button(null, { content: linkInfo.Name, buttonClass: 'DQXToolButton2', width:150, height:50, bitmap:"Bitmaps/circle_cyan_small.png"}).setOnChanged(function() {
+                        Popup.closeIfNeeded(popupid);
+                        var url = linkInfo.Url.DQXformat({Id: data.fid});
+                        window.open(url,'_blank');
+                    })
+                    content += bt.renderHtml();
+                });
+            }
+
 
 
 
