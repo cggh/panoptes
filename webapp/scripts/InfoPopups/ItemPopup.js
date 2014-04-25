@@ -87,17 +87,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.createFrames = function() {
-                that.frameRoot.makeGroupTab();
+                that.frameRoot.makeGroupVert();
 
+                var frameTabGroup = that.frameRoot.addMemberFrame(Framework.FrameGroupTab('', 0.7));
 
-                that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Information fields');
-                that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setAllowScrollBars(true,true);
-                that.frameButtons = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.3))
+                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setFixedSize(Framework.dimY, 83).setFrameClassClient('DQXGrayClient').setAllowScrollBars(false, false).setMargins(0);
 
+
+
+
+                that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Information fields');
+                that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
+                    .setAllowScrollBars(true,true);
+
                 if (that.tableInfo.hasGeoCoord) {
-                    that.frameMap = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
+                    that.frameMap = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
                         .setAllowScrollBars(false,false).setDisplayTitle('On map').setInitialiseFunction(function() {
                             that.theMap = Map.GMap(that.frameMap);
                             var pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
@@ -117,12 +122,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var relTab = {};
                     relTab.relationInfo = relationInfo;
                     relTab.childTableInfo = MetaData.mapTableCatalog[relationInfo.childtableid];
-                    var frameRelation = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7))
+                    var frameRelation = frameTabGroup.addMemberFrame(Framework.FrameGroupHor('', 0.7))
                         .setDisplayTitle(relationInfo.reversename + ' ' + relTab.childTableInfo.tableNamePlural);
+                    relTab.frameButtons = frameRelation.addMemberFrame(Framework.FrameFinal('', 0.3))
+                        .setFixedSize(Framework.dimX, 150)/*.setFrameClassClient('DQXGrayClient')*/;
                     relTab.frameTable = frameRelation.addMemberFrame(Framework.FrameFinal('', 0.7))
                         .setAllowScrollBars(true,true);
-                    relTab.frameButtons = frameRelation.addMemberFrame(Framework.FrameFinal('', 0.3))
-                        .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
                     that.childRelationTabs.push(relTab);
                 });
             };
