@@ -241,12 +241,70 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             );
         };
 
+        MiscUtils.createPolygonRestrictionQuery = function(origQuery, propidX, propidY, polygonPoints) {
+            var qry = origQuery;
+
+            var sign = 0;
+            var notconvex = false;
+            $.each(polygonPoints, function(idx, pt1) {
+                pt2 = polygonPoints[(idx+1)%polygonPoints.length];
+                pt3 = polygonPoints[(idx+2)%polygonPoints.length];
+                var dx1 = pt2.x-pt1.x;var dy1 = pt2.y-pt1.y;
+                var dx2 = pt3.x-pt2.x;var dy2 = pt3.y-pt2.y;
+                var crss = dx1*dy2 - dy1*dx2;
+                if (Math.abs(crss)>0) {
+                    if (crss>0) {
+                        if (sign<0) notconvex = true;
+                        sign = 1;
+                    }
+                    if (crss<0) {
+                        if (sign>0) notconvex = true;
+                        sign = -1;
+                    }
+                }
+            });
+
+            if (notconvex) {
+                qry = null;
+            }
+             else {
+                $.each(polygonPoints, function(idx, pt1) {
+                    pt2 = polygonPoints[(idx+1)%polygonPoints.length];
+                    var dir = {
+                        x: pt2.x-pt1.x,
+                        y: pt2.y-pt1.y
+                    };
+                    qry = MiscUtils.createHalfPlaneRestrictionQuery(qry, propidX, propidY, pt1, dir).query;
+//                    var newStatement = SQL.WhereClause.CompareField('>FIELD');
+//                    newStatement.ColName = propidY;
+//                    newStatement.ColName2 = propidX;
+//                    newStatement.Factor = factor;
+//                    newStatement.Offset = offset;
+//                    qry = SQL.WhereClause.createRestriction(qry, newStatement);
+                });
+            }
+
+//            if (dir.x>0) {
+//                selector = function(x, y) { return y > offset + factor*x }
+//            }
+//            else {
+//                var newStatement = SQL.WhereClause.CompareField('<FIELD');
+//                selector = function(x, y) { return y < offset + factor*x }
+//            }
+//
+
+
+            return {
+                query: qry
+            };
+
+        };
 
         MiscUtils.createHalfPlaneRestrictionQuery = function(origQuery, propidX, propidY, center, dir) {
             var qry = null;
             var selector = null;
             var dirSz = Math.abs(dir.x) + Math.abs(dir.y);
-            if ( (Math.abs(dir.x/dirSz)>0.001) && (Math.abs(dir.y/dirSz)>0.001) ) {
+            if ( (Math.abs(dir.x/dirSz)>0.00001) && (Math.abs(dir.y/dirSz)>0.00001) ) {
                 var factor = dir.y/dir.x;
                 var offset = center.y - center.x*dir.y/dir.x;
                 if (dir.x>0) {

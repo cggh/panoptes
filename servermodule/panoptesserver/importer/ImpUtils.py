@@ -181,7 +181,9 @@ def ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, id, sett
 def ImportGlobalSettings(calculationObject, datasetId, settings):
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))
     for token in settings.GetTokenList():
-        st = simplejson.dumps(settings[token])
+        st =settings[token]
+        if (type(st) is list) or (type(st) is dict):
+            st = simplejson.dumps(st)
         ExecuteSQL(calculationObject, datasetId, "INSERT INTO settings VALUES ('{0}', '{1}')".format(
             token,
             st

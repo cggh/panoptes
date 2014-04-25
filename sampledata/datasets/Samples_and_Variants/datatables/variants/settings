@@ -8,8 +8,6 @@ PrimKey: SnpName
 
 SortDefault: Value1               # Specify this property as the default sort field
 
-AllowSubSampling: Yes
-
 
 # The following tags set limits on the data volumes that can be queried
 MaxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)

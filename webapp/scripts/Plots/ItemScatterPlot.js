@@ -116,6 +116,16 @@ define([
                                 return c;
                             }
 
+                            var polygonPoints = [];
+                            $.each(selectedPoints, function(idx, pt) {
+                                polygonPoints.push({
+                                    x: (pt.x-that.offsetX)/that.scaleX,
+                                    y: (pt.x-that.offsetY)/that.scaleY
+                                });
+                            });
+                            var queryInfo = MiscUtils.createPolygonRestrictionQuery(that.theQuery.get(),that.mapPlotAspects['xaxis'].propid, that.mapPlotAspects['yaxis'].propid, polygonPoints);
+
+
                             if (!that.plotPresent) return;
                             scaleX = that.scaleX; offsetX = that.offsetX;
                             scaleY = that.scaleY; offsetY = that.offsetY;
@@ -135,7 +145,7 @@ define([
                             }
                             var selectionCreationFunction = function() { return selList; };
                             var content = '';
-                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatterplot area', content, null, selectionCreationFunction);
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Scatterplot area', content, queryInfo.query, selectionCreationFunction);
                         });
                     }
                     });
