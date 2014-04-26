@@ -76,6 +76,11 @@ define([
             that.setAutoFillHeight(true);
             that.rateScale = 1.0e-99;
 
+
+            that.reset = function() {
+                that.rateScale = 1.0e-99;
+            };
+
             that.draw = function (drawInfo) {
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 0.84);
@@ -219,7 +224,8 @@ define([
             };
 
 
-            that.addChannel(TimeLineView.ChannelData(that), true);
+            that.channelData = TimeLineView.ChannelData(that);
+            that.addChannel(that.channelData, true);
             that.addChannel(TimeLineView.ChannelScale(that), true);
 
             Msg.listen('',{ type: 'PosOrZoomFactorXChanged', id: that.myID }, function() {
@@ -281,6 +287,7 @@ define([
 
             that.clearPoints = function() {
                 this.myPointSet = [];
+                that.channelData.reset();
             };
 
             that.setDrawStyle = function(drawStyle) {
