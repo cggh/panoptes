@@ -266,33 +266,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             if (notconvex) {
                 qry = null;
+//                alert('Not convex');
             }
              else {
                 $.each(polygonPoints, function(idx, pt1) {
-                    pt2 = polygonPoints[(idx+1)%polygonPoints.length];
+                    var pt2 = polygonPoints[(idx+1)%polygonPoints.length];
                     var dir = {
-                        x: pt2.x-pt1.x,
-                        y: pt2.y-pt1.y
+                        x: sign*(pt2.x-pt1.x),
+                        y: sign*(pt2.y-pt1.y)
                     };
                     qry = MiscUtils.createHalfPlaneRestrictionQuery(qry, propidX, propidY, pt1, dir).query;
-//                    var newStatement = SQL.WhereClause.CompareField('>FIELD');
-//                    newStatement.ColName = propidY;
-//                    newStatement.ColName2 = propidX;
-//                    newStatement.Factor = factor;
-//                    newStatement.Offset = offset;
-//                    qry = SQL.WhereClause.createRestriction(qry, newStatement);
                 });
             }
-
-//            if (dir.x>0) {
-//                selector = function(x, y) { return y > offset + factor*x }
-//            }
-//            else {
-//                var newStatement = SQL.WhereClause.CompareField('<FIELD');
-//                selector = function(x, y) { return y < offset + factor*x }
-//            }
-//
-
 
             return {
                 query: qry
@@ -304,7 +289,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var qry = null;
             var selector = null;
             var dirSz = Math.abs(dir.x) + Math.abs(dir.y);
-            if ( (Math.abs(dir.x/dirSz)>0.00001) && (Math.abs(dir.y/dirSz)>0.00001) ) {
+            if ( (Math.abs(dir.x/dirSz)>1.0e-9) && (Math.abs(dir.y/dirSz)>1.0e-9) ) {
                 var factor = dir.y/dir.x;
                 var offset = center.y - center.x*dir.y/dir.x;
                 if (dir.x>0) {
