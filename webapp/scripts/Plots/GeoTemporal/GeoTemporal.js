@@ -1,11 +1,11 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/Map", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "DQX/GMaps/PointSet",
     "MetaData",
-    "Utils/QueryTool", "Utils/ButtonChoiceBox", "Plots/GenericPlot",
+    "Utils/QueryTool", "Utils/ButtonChoiceBox", "Plots/GenericPlot", "Utils/MiscUtils",
     "Plots/GeoTemporal/TimeLine"
 ],
     function (require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, Map, DataFetchers, EditQuery, PointSet,
               MetaData,
-              QueryTool, ButtonChoiceBox, GenericPlot,
+              QueryTool, ButtonChoiceBox, GenericPlot, MiscUtils,
               TimeLine
         ) {
 
@@ -83,21 +83,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createControlsMap = function() {
 
-                var cmdLassoSelection = Controls.Button(null, { content: 'Select points', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
-                    var actions = [];
-
-                    actions.push( { content:'Rectangular latt-long area', handler:function() {
-                        that.theMap.startRectSelection(that.fetchRectSelection);
-                    }
-                    });
-
-                    actions.push( { content:'Lasso tool', handler:function() {
-                        that.theMap.startLassoSelection(that.fetchLassoSelection);
-                    }
-                    });
-
-                    ButtonChoiceBox.create('Select points','', [actions]);
-                });
 
                 that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}], value:'rectangle' }).setClassID('pointShape')
                     .setOnChanged(function() {
@@ -128,8 +113,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     });
 
                 var grp = Controls.CompoundVert([
-                    cmdLassoSelection,
-                    Controls.VerticalSeparator(10),
                     that.ctrl_PointShape,
                     that.ctrl_PointSize,
                     that.ctrl_Opacity,
@@ -150,8 +133,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                    var actions = [];
+
+                    actions.push( { content:'Rectangular latt-long area', handler:function() {
+                        that.theMap.startRectSelection(that.fetchRectSelection);
+                    }
+                    });
+
+                    actions.push( { content:'Lasso tool', handler:function() {
+                        that.theMap.startLassoSelection(that.fetchLassoSelection);
+                    }
+                    });
+
+                    ButtonChoiceBox.create('Select points','', [actions]);
+                });
+
+
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
+                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount, cmdPointSelection]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -465,8 +465,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     return selList;
                 };
 
+                var polygonGeoPoints = [];
+                $.each(that.theMap.selectionPolygonLattLongPoints, function(idx, geopt) {
+                    polygonGeoPoints.push({
+                        x: geopt.longit,
+                        y: geopt.lattit
+                    });
+                });
+
+                var queryInfo = MiscUtils.createPolygonRestrictionQuery(that.theQuery.get(),that.tableInfo.propIdGeoCoordLongit, that.tableInfo.propIdGeoCoordLattit, polygonGeoPoints);
+
+
                 var content = '';
-                ButtonChoiceBox.createPlotItemSelectionOptions(that.thePlot, that.tableInfo, 'Geographic area', content, null, selectionCreationFunction);
+                var queryData = null;
+                if (queryInfo.query)
+                    queryData = {
+                        query: queryInfo.query,
+                        subSamplingOptions: that.theQuery.getSubSamplingOptions()
+                    };
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Geographic area', content, queryData, selectionCreationFunction);
             }
 
 
