@@ -110,6 +110,21 @@ Properties:
      BlockSizeMax: 50000
      MaxVal: 0.2
   BrowserDefaultVisible: true
+  
+- Id: NRAF_WAF, NRAF_EAF, NRAF_SAF
+  DataType: Value
+  ShowInTable: true
+  MinVal: 0
+  MaxVal: 1
+  
+- Id: NRAF_WAF
+  Description: Non-reference allele frequency in West Africa
+
+- Id: NRAF_EAF
+  Description: Non-reference allele frequency in East Africa
+
+- Id: NRAF_SAF
+  Description: Non-reference allele frequency in South Africa
 
 ExternalLinks:
 - Url: https://www.google.co.uk/search?q={SnpName}
@@ -117,4 +132,20 @@ ExternalLinks:
 
 - Url: http://en.wikipedia.org/wiki/{SnpName}
   Name: Wikipedia
+  
+DataItemVisualisations:
+- Type: PieChartMap
+  Name: Allele frequencies map
+  PieChartSize: 1000
+  DataType: Fraction
+  MapCenter: { Longitude: 10, Lattitude: 0 }
+  MapZoom: 3
+  LocationDataTable: populations
+  LocationSizeProperty: SampleCount
+  LocationNameProperty: Name
+  ComponentColumns:
+  - Pattern: NRAF_{locid}
+    Name: Non-reference allele frequency
+    Color: rgb(128,28,0)
+
 

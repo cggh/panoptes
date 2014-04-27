@@ -452,3 +452,9 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     background-color:white;
     color:rgb(0,0,0);
 }
+
+.QueryTableValueBar
+{
+    background-color: rgb(140,220,230);
+    height:14px;
+}

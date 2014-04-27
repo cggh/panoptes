@@ -1,10 +1,12 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
-    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup"
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
+    "InfoPopups/DataItemVisualisations/PieChartMap"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
-              MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup
+              MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup,
+              ItemVis_PieChartMap
         ) {
 
         var ItemPopup = {};
@@ -97,7 +99,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Information fields');
+                that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Info fields');
                 that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
 
@@ -130,6 +132,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         .setAllowScrollBars(true,true);
                     that.childRelationTabs.push(relTab);
                 });
+
+                that.visualisationObjects = [];
+                if (that.tableInfo.settings.DataItemVisualisations)
+                    $.each(that.tableInfo.settings.DataItemVisualisations, function(idx,visInfo) {
+                        var visObject = null;
+                        if (visInfo.Type == 'PieChartMap') {
+                            visObject = ItemVis_PieChartMap.create(visInfo, data);
+                        }
+                        if (!visObject)
+                            DQX.reportError("Invalid dataitem visualisation "+visInfo.Type);
+                        that.visualisationObjects.push(visObject);
+                        frameTabGroup.addMemberFrame(visObject.createFrames())
+                            .setDisplayTitle(visInfo.Name);
+                    });
             };
 
             that.createPanels = function() {
@@ -245,8 +261,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons.addControl(Controls.CompoundHor(cols));
 
-
                 that.createPanelsRelations();
+
+                $.each(that.visualisationObjects, function(idx, visObject) {
+                    visObject.createPanels();
+                });
             }
 
             that.createPanelsRelations = function() {

@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "Utils/TableRecordSelectionManager", "Utils/TableFieldCache", "MetaData"],
-    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, TableRecordSelectionManager, TableFieldCache, MetaData) {
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "Utils/TableRecordSelectionManager", "Utils/TableFieldCache", "Utils/TableFullDataItemInfo", "MetaData"],
+    function (require, Base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, TableRecordSelectionManager, TableFieldCache, TableFullDataItemInfo, MetaData) {
 
         var Initialise = {};
 
@@ -79,6 +79,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
 
             table.fieldCache = TableFieldCache.Create(table);
+
+            table._fullDataItemInfo = TableFullDataItemInfo.create(table);
+
+            // Use the following function to download the full content of the datatable, and be notified on completion
+            table.loadFullDataItemInfo = function(onCompleted) {
+                table._fullDataItemInfo.get(onCompleted);
+            };
 
             table.hasGenomeRegions = !!(table.settings.IsRegionOnGenome);
 
