@@ -137,6 +137,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         chart);
                     if (visualisationSettings.PositionOffsetFraction)
                         pie.setOrigCoord(Map.Coord(pieChartInfo.longit0, pieChartInfo.lattit0));
+                    pie.onClick = function(chart, pieNr) {
+                        if (that.locationTable) {
+                            Msg.send({ type: 'ItemPopup' }, {
+                                tableid: that.locationTable.id,
+                                itemid: pieChartInfo.locid
+                            } );
+                        }
+                    };
                 });
             }
 
