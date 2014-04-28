@@ -15,10 +15,12 @@ def response(returndata):
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
-    encodedstr = returndata['content']
-
+    contentid = returndata['contentid']
+    filename = os.path.join(config.BASEDIR, 'temp', 'store_'+contentid)
+    with open(filename, 'r') as fp:
+        encodedstr = fp.read()
+    os.remove(filename)
     content = DQXbase64.b64decode_var2(encodedstr)
-
 
 
     baseFolder = config.SOURCEDATADIR + '/datasets'

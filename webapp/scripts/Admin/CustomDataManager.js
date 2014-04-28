@@ -205,24 +205,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += edt.renderHtml();
             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update settings</b>', width:140, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();
-                DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_setsettings',{
-                    sourcetype: sourceInfo.tpe,
-                    database: sourceInfo.datasetid,
-                    workspaceid: sourceInfo.workspaceid,
-                    tableid: sourceInfo.tableid,
-                    sourceid: sourceInfo.sourceid,
-                    content: Base64.encode(settingsStr)
-                },function(resp) {
-                    DQX.stopProcessing();
-                    if ('Error' in resp) {
-                        alert(resp.Error);
-                        return;
-                    }
-                    Popup.closeIfNeeded(popupid);
-                    Msg.send({type: 'RenderSourceDataInfo'}, {});
-//                    Msg.send({type: 'PromptLoadData'}, sourceInfo);
 
+                DQX.serverDataStoreLong(MetaData.serverUrl,Base64.encode(settingsStr),function(id) {
+                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_setsettings',{
+                        sourcetype: sourceInfo.tpe,
+                        database: sourceInfo.datasetid,
+                        workspaceid: sourceInfo.workspaceid,
+                        tableid: sourceInfo.tableid,
+                        sourceid: sourceInfo.sourceid,
+                        contentid: id
+                    },function(resp) {
+                        DQX.stopProcessing();
+                        if ('Error' in resp) {
+                            alert(resp.Error);
+                            return;
+                        }
+                        Popup.closeIfNeeded(popupid);
+                        Msg.send({type: 'RenderSourceDataInfo'}, {});
+                    });
                 });
+
             });
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '<p>' ;
