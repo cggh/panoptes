@@ -133,20 +133,22 @@ ExternalLinks:
 - Url: http://en.wikipedia.org/wiki/{SnpName}
   Name: Wikipedia
   
-DataItemVisualisations:
-- Type: PieChartMap
-  Name: Allele frequencies map
-  PieChartSize: 1000
-  DataType: Fraction
-  MapCenter: { Longitude: 10, Lattitude: 0 }
-  MapZoom: 3
-  ResidualFractionName: Reference allele frequency
-  LocationDataTable: populations
-  LocationSizeProperty: SampleCount
-  LocationNameProperty: Name
-  ComponentColumns:
-  - Pattern: NRAF_{locid}
-    Name: Non-reference allele frequency
-    Color: rgb(128,28,0)
+DataItemVisualisations: # Lists all the custom views that should appear in the popup for an individual datatable item
+
+- Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
+  Name: Allele frequencies map                         # Name of the view
+  PieChartSize: 1000                                   # Size of the largest pie chart
+  MapCenter: { Longitude: 10, Lattitude: 0 }           # Start location of the map
+  MapZoom: 2                                           # Start zoom factor of the map
+  DataType: Fraction                                   # Type of values used to create the pie chart
+  PositionOffsetFraction: 0.5                          # An offset between the pie chart location and the actual chart, used to achieve a nice (nonoverlapping) view
+  LocationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
+  LocationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
+  LocationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
+  ComponentColumns:                                    # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
+  - Pattern: NRAF_{locid}                              # Column name providing the data ({locid} will be replaced by the location primary key values)
+    Name: Non-reference allele frequency               # Name of the pie
+    Color: rgb(128,28,0)                               # Color of the pie
+  ResidualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
 
 

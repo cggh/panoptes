@@ -74,6 +74,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     $.each(visualisationSettings.pieCharts, function(idx, pieChart) {
                         pieChart.sizeFac *= (pieChartSize/maxSizeFac);
                     });
+
+                    if (visualisationSettings.PositionOffsetFraction) {
+                        var layouter = Map.MapItemLayouter(that.theMap, '', visualisationSettings.PositionOffsetFraction);
+                        $.each(visualisationSettings.pieCharts, function(idx, pieChart) {
+                            layouter.addItem(pieChart.longit, pieChart.lattit, pieChart.sizeFac);
+                        });
+                        layouter.calculatePositions();
+                        $.each(visualisationSettings.pieCharts, function(idx, pieChart) {
+                            pieChart.longit0 = pieChart.longit;
+                            pieChart.lattit0 = pieChart.lattit;
+                            pieChart.longit = layouter.items[idx].longit2;
+                            pieChart.lattit = layouter.items[idx].lattit2;
+                        });
+                    }
+
                 }
 
 
@@ -120,6 +135,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         Map.Coord(pieChartInfo.longit, pieChartInfo.lattit),
                         pieChartInfo.sizeFac,
                         chart);
+                    if (visualisationSettings.PositionOffsetFraction)
+                        pie.setOrigCoord(Map.Coord(pieChartInfo.longit0, pieChartInfo.lattit0));
                 });
             }
 
