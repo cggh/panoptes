@@ -1,12 +1,12 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
-    "InfoPopups/DataItemVisualisations/PieChartMap"
+    "InfoPopups/DataItemViews/PieChartMap"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup,
-              ItemVis_PieChartMap
+              ItemView_PieChartMap
         ) {
 
         var ItemPopup = {};
@@ -138,18 +138,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.childRelationTabs.push(relTab);
                 });
 
-                that.visualisationObjects = [];
-                if (that.tableInfo.settings.DataItemVisualisations)
-                    $.each(that.tableInfo.settings.DataItemVisualisations, function(idx,visInfo) {
-                        var visObject = null;
-                        if (visInfo.Type == 'PieChartMap') {
-                            visObject = ItemVis_PieChartMap.create(visInfo, data);
+                that.itemViewObjects = [];
+                if (that.tableInfo.settings.DataItemViews)
+                    $.each(that.tableInfo.settings.DataItemViews, function(idx, dtViewInfo) {
+                        var dtViewObject = null;
+                        if (dtViewInfo.Type == 'PieChartMap') {
+                            dtViewObject = ItemView_PieChartMap.create(dtViewInfo, data);
                         }
-                        if (!visObject)
-                            DQX.reportError("Invalid dataitem visualisation "+visInfo.Type);
-                        that.visualisationObjects.push(visObject);
-                        frameTabGroup.addMemberFrame(visObject.createFrames())
-                            .setDisplayTitle(visInfo.Name);
+                        if (!dtViewObject)
+                            DQX.reportError("Invalid dataitem view type "+dtViewInfo.Type);
+                        that.itemViewObjects.push(dtViewObject);
+                        frameTabGroup.addMemberFrame(dtViewObject.createFrames())
+                            .setDisplayTitle(dtViewInfo.Name);
                     });
             };
 
@@ -268,8 +268,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.createPanelsRelations();
 
-                $.each(that.visualisationObjects, function(idx, visObject) {
-                    visObject.createPanels();
+                $.each(that.itemViewObjects, function(idx, dtViewObject) {
+                    dtViewObject.createPanels();
                 });
             }
 
@@ -350,6 +350,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 else
                     DQX.reportError('Plot not found!');
+
+                $.each(that.itemViewObjects, function(idx, dtViewObj) {
+                    dtViewObj.onClose();
+                });
 
                 $.each(that.eventids,function(idx,eventid) {
                     Msg.delListener(eventid);

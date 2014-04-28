@@ -133,7 +133,7 @@ ExternalLinks:
 - Url: http://en.wikipedia.org/wiki/{SnpName}
   Name: Wikipedia
   
-DataItemVisualisations: # Lists all the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
   Name: Allele frequencies map                         # Name of the view
