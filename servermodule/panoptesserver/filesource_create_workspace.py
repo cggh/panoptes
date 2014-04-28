@@ -2,7 +2,7 @@ import os
 import config
 import DQXDbTools
 import authorization
-import base64
+import DQXbase64
 import shutil
 import importer.ImpUtils as ImpUtils
 import asyncresponder

@@ -2,7 +2,7 @@ import os
 import config
 import DQXDbTools
 import authorization
-import base64
+import DQXbase64
 
 
 def response(returndata):
@@ -31,7 +31,7 @@ def response(returndata):
         settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'settings')
     if settingsFile is None:
         returndata['Error'] = 'Invalid file source type'
-        return returndata;
+        return returndata
 
     try:
         if not os.path.exists(settingsFile):
@@ -39,7 +39,7 @@ def response(returndata):
         else:
             with open(settingsFile, 'r') as fp:
                 content = fp.read()
-                returndata['content'] = base64.b64encode_var2(content)
+                returndata['content'] = DQXbase64.b64encode_var2(content)
 
     except Exception as e:
         returndata['Error'] = str(e)
