@@ -103,11 +103,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             }
                         });
                         if (totFrac<0.99999)
+                            var residualName = 'Other';
+                            if (visualisationSettings.ResidualFractionName)
+                                residualName = visualisationSettings.ResidualFractionName;
                             chart.addPart(
                                 1-totFrac,
                                 DQX.Color(0.75,0.75,0.75),
                                 pieChartInfo.locid + '_rem_',
-                                pieChartInfo.name
+                                pieChartInfo.name + '\n' +residualName +': ' + (1.0-totFrac).toFixed(3)
                             );
                     }
 
