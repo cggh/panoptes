@@ -140,6 +140,7 @@ DataItemVisualisations:
   DataType: Fraction
   MapCenter: { Longitude: 10, Lattitude: 0 }
   MapZoom: 3
+  ResidualFractionName: Reference allele frequency
   LocationDataTable: populations
   LocationSizeProperty: SampleCount
   LocationNameProperty: Name

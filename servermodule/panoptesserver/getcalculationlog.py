@@ -1,7 +1,7 @@
 import os
 import config
 from DQXTableUtils import VTTable
-import base64
+import DQXbase64
 import unicodedata
 
 

@@ -2,7 +2,7 @@ import os
 import config
 import DQXDbTools
 import authorization
-import base64
+import DQXbase64
 
 
 def response(returndata):
@@ -17,7 +17,7 @@ def response(returndata):
 
     encodedstr = returndata['content']
 
-    content = base64.b64decode_var2(encodedstr)
+    content = DQXbase64.b64decode_var2(encodedstr)
 
 
 

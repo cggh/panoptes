@@ -2,7 +2,7 @@ import os
 import config
 import DQXDbTools
 import authorization
-import base64
+import DQXbase64
 
 
 def response(returndata):
@@ -40,7 +40,7 @@ def response(returndata):
                     if linecount > 100:
                         break
                     linecount += 1
-                returndata['content'] = base64.b64encode_var2(content)
+                returndata['content'] = DQXbase64.b64encode_var2(content)
 
     except Exception as e:
         returndata['Error'] = str(e)

@@ -79,6 +79,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
+            if (itemInfo.frameSettings) {
+                // Popupframe settings were stored; recall & set as new history, so that settings will be picked up during creation
+                PopupFrame.setFrameSettingsHistory(that.typeID, itemInfo.frameSettings);
+            }
+
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
             Msg.listen(eventid, { type: 'SelectionUpdated'}, function(scope,tableid) {
@@ -355,6 +360,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var obj = {};
                 obj.itemid = that.itemid;
                 obj.tableid = that.tableInfo.id;
+                obj.frameSettings = that.frameRoot.settingsStreamOut();
                 return obj;
             };
 
