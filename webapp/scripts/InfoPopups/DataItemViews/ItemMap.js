@@ -53,7 +53,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.onClose = function() {
-                that.theMap.tearDown();
+                if (that.theMap)
+                    that.theMap.tearDown();
             }
 
             return that;

@@ -135,6 +135,9 @@ ExternalLinks:
   
 DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
 
+- Type: Overview                                       # Specifies the default view of all fields
+  Name: Overview
+
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
   Name: Allele frequencies map                         # Name of the view
   PieChartSize: 1000                                   # Size of the largest pie chart
