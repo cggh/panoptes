@@ -180,7 +180,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
-                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
+                    if not importSettings['ConfigOnly']:
+                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
                     ImpUtils.CreateSummaryValues_Value(
                         calculationObject,
                         summSettings,
@@ -202,7 +203,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
-                    ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
+                    if not importSettings['ConfigOnly']:
+                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
                     categories = []
                     if settings.HasToken('categoryColors'):
                         stt = settings.GetSubSettings('categoryColors')
