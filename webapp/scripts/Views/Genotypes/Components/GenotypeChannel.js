@@ -17,7 +17,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that._clickHandler = null;
                 that._always_call_draw = true;
                 that.parent_browser = parent;
-                that.col_header_height = 100;
+                that.col_header_height = 30;
                 that.link_height = 25;
                 that.table_info = table_info;
 
@@ -121,7 +121,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
 
                 //TODO Get height somehow... hmm
-                var height = that.link_height + that.col_header_height
+                var height = that.link_height + that.col_header_height;
                 if (that.model.row_ordinal.length)
                     height += 10*that.model.row_ordinal.length;
                 if (that._height != height) {
