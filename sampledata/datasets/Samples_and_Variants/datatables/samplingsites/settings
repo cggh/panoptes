@@ -40,7 +40,16 @@ Properties:
   DataType: GeoLattitude     # Specifies a geographic lattitude property
 
 
+
+
 ExternalLinks:
 - Url: http://maps.google.com/maps?q={Lattitude},{Longitude}
   Name: Show on Google Maps
 
+
+
+DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
+
+- Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
+  Name: Location                                       # Name of the view
+  MapZoom: 9                                           # Start zoom factor of the map

@@ -1,12 +1,12 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
-    "InfoPopups/DataItemViews/PieChartMap"
+    "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup,
-              ItemView_PieChartMap
+              ItemView_ItemMap, ItemView_PieChartMap
         ) {
 
         var ItemPopup = {};
@@ -103,26 +103,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-
                 that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Info fields');
                 that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
 
-                if (that.tableInfo.hasGeoCoord) {
-                    that.frameMap = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
-                        .setAllowScrollBars(false,false).setDisplayTitle('On map').setInitialiseFunction(function() {
-                            that.theMap = Map.GMap(that.frameMap);
-                            var pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
-                            pointSet.setPoints([{
-                                id: '',
-                                longit: data.fields[that.tableInfo.propIdGeoCoordLongit],
-                                lattit: data.fields[that.tableInfo.propIdGeoCoordLattit]
-                            }])
-                            setTimeout(function() {
-                                pointSet.zoomFit(100);
-                            }, 50);
-                        });
-                }
+                that.itemViewObjects = [];
+                if (that.tableInfo.settings.DataItemViews)
+                    $.each(that.tableInfo.settings.DataItemViews, function(idx, dtViewInfo) {
+                        var dtViewObject = null;
+                        if (dtViewInfo.Type == 'PieChartMap') {
+                            dtViewObject = ItemView_PieChartMap.create(dtViewInfo, that.tableInfo, data);
+                        }
+                        if (dtViewInfo.Type == 'ItemMap') {
+                            dtViewObject = ItemView_ItemMap.create(dtViewInfo, that.tableInfo, data);
+                        }
+                        if (!dtViewObject)
+                            DQX.reportError("Invalid dataitem view type "+dtViewInfo.Type);
+                        that.itemViewObjects.push(dtViewObject);
+                        frameTabGroup.addMemberFrame(dtViewObject.createFrames())
+                            .setDisplayTitle(dtViewInfo.Name);
+                    });
 
                 that.childRelationTabs = [];
                 $.each(that.tableInfo.relationsParentOf, function(idx,relationInfo) {
@@ -138,19 +138,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.childRelationTabs.push(relTab);
                 });
 
-                that.itemViewObjects = [];
-                if (that.tableInfo.settings.DataItemViews)
-                    $.each(that.tableInfo.settings.DataItemViews, function(idx, dtViewInfo) {
-                        var dtViewObject = null;
-                        if (dtViewInfo.Type == 'PieChartMap') {
-                            dtViewObject = ItemView_PieChartMap.create(dtViewInfo, data);
-                        }
-                        if (!dtViewObject)
-                            DQX.reportError("Invalid dataitem view type "+dtViewInfo.Type);
-                        that.itemViewObjects.push(dtViewObject);
-                        frameTabGroup.addMemberFrame(dtViewObject.createFrames())
-                            .setDisplayTitle(dtViewInfo.Name);
-                    });
             };
 
             that.createPanels = function() {

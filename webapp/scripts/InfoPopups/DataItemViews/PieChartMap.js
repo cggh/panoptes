@@ -9,11 +9,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var PieChartMap = {};
 
-        PieChartMap.create = function(viewSettings, itemData) {
+        PieChartMap.create = function(viewSettings, tableInfo, itemData) {
             var that = {};
 
             that.createFrames = function() {
-                that.frameMap = Framework.FrameFinal('', 1).setInitialiseFunction(that.initialise);
+                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise);
                 return that.frameMap;
             };
 
