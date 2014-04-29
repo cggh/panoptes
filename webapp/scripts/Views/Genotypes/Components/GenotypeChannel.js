@@ -130,9 +130,9 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that.modifyHeight(height);
                     that._myPlotter.handleResize();
                 }
-//                that.drawStandardGradientCenter(draw_info, 1);
 
                 var ctx = draw_info.centerContext;
+                ctx.clearRect ( 0 , 0 , draw_info.sizeCenterX , draw_info.sizeY );
                 that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
                 that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
                 that.drawStandardGradientLeft(draw_info, 1);
