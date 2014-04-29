@@ -96,6 +96,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
             };
 
             that.draw = function (draw_info) {
+                //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
                 that.draw_info = draw_info;
                 that._draw();
             };
@@ -120,7 +121,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
                 var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
 
-                //TODO Get height somehow... hmm
+                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
+                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
                 var height = that.link_height + that.col_header_height;
                 if (that.model.row_ordinal.length)
                     height += 10*that.model.row_ordinal.length;
@@ -128,13 +130,8 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that.modifyHeight(height);
                     that._myPlotter.handleResize();
                 }
+//                that.drawStandardGradientCenter(draw_info, 1);
 
-
-//                drawInfo.sizeY = that._height;
-                that.drawStandardGradientCenter(draw_info, 1);
-
-                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
-                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
                 var ctx = draw_info.centerContext;
                 that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
                 that.root_container.draw(ctx, {t:0, b:ctx.canvas.clientHeight, l:0, r:ctx.canvas.clientWidth});
