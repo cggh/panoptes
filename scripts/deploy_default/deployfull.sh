@@ -4,8 +4,8 @@ red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m'
 
-#release='Pn1.0.2'
-release='master'
+release='Pn1.1'
+#release='master'
 
 
 # target: ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9)
