@@ -3,6 +3,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var Initialise = {};
 
+        Initialise.colorFalse = DQX.Color(0.85,0.25,0);
+        Initialise.colorTrue = DQX.Color(0.0,0.5,1.0);
+
 //        alert('a');
 //        var barcodecount = 2000;
 //        var markercount = 40;
@@ -320,14 +323,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (cl) return cl;
                         return DQX.Color(0.5,0.5,0.5);
                     }
-                    else {
-                        //Create automatic map based on standard colors
-                        var colormapper = prop.category2Color;
-                        var idx = colormapper.get(value);
-                        if (idx>=0)
-                            return DQX.standardColors[idx];
-                        return DQX.Color(0.5,0.5,0.5);
+                    if (prop.isBoolean) {
+                        if ((!value)||(value=='No')||(value=='0'))
+                            return Initialise.colorFalse;
+                        else
+                            return Initialise.colorTrue;
                     }
+                    //Create automatic map based on standard colors
+                    var colormapper = prop.category2Color;
+                    var idx = colormapper.get(value);
+                    if (idx>=0)
+                        return DQX.standardColors[idx];
+                    return DQX.Color(0.5,0.5,0.5);
                 };
 
                 prop.mapColors = function(valueList) {
@@ -396,31 +403,44 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                         return { indices:catData, colors: colors, legend: legend };
                     }
-                    else {
-                        //Create automatic map based on standard colors
-                        var uniqueCatMap = {};
-                        var uniqueCats = []
-                        for (var i=0; i<valueList.length; i++) {
-                            if (!uniqueCatMap[valueList[i]]) {
-                                uniqueCatMap[valueList[i]] = true;
-                                uniqueCats.push(valueList[i]);
-                            }
-                        }
-                        var colormapper = prop.category2Color;
-                        colormapper.map(uniqueCats);
+
+                    if (prop.isBoolean) {
                         var catData = [];
                         for (var i=0; i<valueList.length; i++) {
-                            var idx = colormapper.get(valueList[i]);
-                            if (idx<0)
-                                idx = colormapper.itemCount-1;
-                            catData.push(idx);
+                            if ((!valueList[i])||(valueList[i]=='No'))
+                                catData.push(0);
+                            else
+                                catData.push(1);
                         }
-                        var legend = [];
-                        $.each(colormapper.getAssociations(), function(state, coloridx) {
-                            legend.push({ state: prop.toDisplayString(state), color: DQX.standardColors[coloridx] });
-                        });
-                        return { indices:catData, colors: DQX.standardColors, legend: legend };
+                        return {
+                            indices:catData,
+                            colors: [Initialise.colorFalse, Initialise.colorTrue],
+                            legend: [ {state:'No', color:Initialise.colorFalse}, {state:'Yes', color:Initialise.colorTrue} ] };
                     }
+
+                    //Create automatic map based on standard colors
+                    var uniqueCatMap = {};
+                    var uniqueCats = []
+                    for (var i=0; i<valueList.length; i++) {
+                        if (!uniqueCatMap[valueList[i]]) {
+                            uniqueCatMap[valueList[i]] = true;
+                            uniqueCats.push(valueList[i]);
+                        }
+                    }
+                    var colormapper = prop.category2Color;
+                    colormapper.map(uniqueCats);
+                    var catData = [];
+                    for (var i=0; i<valueList.length; i++) {
+                        var idx = colormapper.get(valueList[i]);
+                        if (idx<0)
+                            idx = colormapper.itemCount-1;
+                        catData.push(idx);
+                    }
+                    var legend = [];
+                    $.each(colormapper.getAssociations(), function(state, coloridx) {
+                        legend.push({ state: prop.toDisplayString(state), color: DQX.standardColors[coloridx] });
+                    });
+                    return { indices:catData, colors: DQX.standardColors, legend: legend };
                 }
 
                 if (prop.settings.isCategorical) {
