@@ -28,45 +28,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         ItemPopup.show_sub1 = function(itemInfo, data) {
-//            var content='';//JSON.stringify(data);
-//            var propertyMap = {};
-//            $.each(MetaData.customProperties, function(idx,propInfo) {
-//                if (propInfo.tableid == itemInfo.tableid) {
-//                    propertyMap[propInfo.name] = propInfo.toDisplayString(data[propInfo.propid]);
-//                }
-//            });
-//
-//            function addLevelToContent(levelInfo) {
-//                var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
-//                content += "<table>";
-//                $.each(MetaData.customProperties,function(idx, propInfo) {
-//                    if (propInfo.tableid == tableInfo.id) {
-//                        var fieldContent = levelInfo.fields[propInfo.propid];
-//                        content += '<tr>';
-//                        content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + propInfo.name + "</b></td>";
-//                        content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
-//                        content += "</tr>";
-//                    }
-//                });
-//                content += "</table>";
-//                $.each(levelInfo.parents, function(idx, parentInfo) {
-//                    var parentTableInfo = MetaData.mapTableCatalog[parentInfo.tableid];
-//                    content += '<div style="padding-left:30px">';
-//                    content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px;padding-left:8px"><i>';
-//                    content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
-//                    content += '</i>&nbsp;&nbsp;';
-//                    var lnk = Controls.Hyperlink(null,{ content: 'Open'});
-//                    lnk.setOnChanged(function() {
-//                        Msg.send({type: 'ItemPopup'}, {tableid: parentInfo.tableid, itemid: parentInfo.fields[parentTableInfo.primkey]});
-//                    });
-//                    content += lnk.renderHtml();
-//                    content += '</div>';
-//                    addLevelToContent(parentInfo);
-//                    content += '</div>';
-//                });
-//            }
-//
-//            addLevelToContent(data);
 
 
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
@@ -103,9 +64,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-//                that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Info fields');
-//                that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
-//                    .setAllowScrollBars(true,true);
 
                 that.itemViewObjects = [];
                 if (that.tableInfo.settings.DataItemViews)
@@ -151,7 +109,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
-//                that.frameFields.setContentHtml(content);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
                 that.buttonWidth = 160;
