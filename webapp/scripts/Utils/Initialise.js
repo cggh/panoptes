@@ -36,7 +36,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         var createFuncVal2Text = function(digits) {
             return function(vl) {
                 if ( (vl==null) || (vl=='None') )
-                    return '-';
+                    return '';
                 else {
                     vl = parseFloat(vl);
                     if (isNaN(vl))
