@@ -138,7 +138,9 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
                 datasetId,
                 tmptable,
                 columns,
-                {'PrimKey': primkey}
+                {'PrimKey': primkey},
+                importSettings,
+                False
             )
 
 

@@ -17,8 +17,9 @@ def ResponseExecute(data, calculationObject):
     tableid = data['tableid']
     importSettings = {}
     importSettings['ConfigOnly'] = False
-    if data['ConfigOnly'] == '1':
+    if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
+    importSettings['ScopeStr'] = data['ScopeStr']
     importer.ImportWorkspaces.ImportCustomData(
         calculationObject,
         datasetid,

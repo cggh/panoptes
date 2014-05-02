@@ -67,7 +67,8 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
         ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
         # Import reference genome
-        if not importSettings['ConfigOnly']:
+        #if not importSettings['ConfigOnly']:
+        if importSettings['ScopeStr'] == 'all':
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
@@ -100,7 +101,8 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
             os.remove(sqlfile)
 
-        if not importSettings['ConfigOnly']:
+#        if not importSettings['ConfigOnly']:
+        if importSettings['ScopeStr'] == 'all':
             # Import annotation
             with calculationObject.LogHeader('Converting annotation'):
                 tempgfffile = ImpUtils.GetTempFileName()

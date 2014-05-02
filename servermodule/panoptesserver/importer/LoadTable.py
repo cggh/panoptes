@@ -13,7 +13,7 @@ import dateutil.parser
 #       name
 #       DataType: Value, Boolean, Text
 
-def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, allowSubSampling=False):
+def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, importSettings, allowSubSampling):
 
     def DecoId(id):
         return '`' + id + '`'
@@ -75,6 +75,14 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
 
     destFileName = ImpUtils.GetTempFileName()
 
+    maxLineCount = -1
+    if importSettings['ScopeStr'] == '1k':
+        maxLineCount = 1000
+    if importSettings['ScopeStr'] == '10k':
+        maxLineCount = 10000
+    if importSettings['ScopeStr'] == '100k':
+        maxLineCount = 100000
+
     with open(sourceFileName, 'r') as ifp:
         if ifp is None:
             raise Exception('Unable to read file '+sourceFileName)
@@ -128,6 +136,9 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                     lineCount += 1
                     if lineCount % 250000 == 0:
                         calculationObject.Log('Line '+str(lineCount))
+                    if (maxLineCount>0) and (lineCount >= maxLineCount):
+                        calculationObject.Log('Terminating import at {0} lines'.format(lineCount))
+                        break
 
     calculationObject.Log('Column sizes: '+str({col['name']: col['MaxLen'] for col in columns}))
 

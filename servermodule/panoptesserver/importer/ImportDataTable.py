@@ -147,6 +147,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 tableid,
                 columns,
                 tableSettings,
+                importSettings,
                 tableSettings['AllowSubSampling']
             )
             if tableSettings['IsPositionOnGenome']:

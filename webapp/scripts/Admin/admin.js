@@ -67,7 +67,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     });
 
                     Msg.listen('',{ type: 'ExecLoadDataFull' }, function(scope, info) {
-                        that.execLoadData(info, false);
+                        that.execLoadData(info, 'all');
                     });
 
                     //This function is called during the initialisation. Create the frame structure of the view here
@@ -97,9 +97,10 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     }
 
 
-                    that.execLoadData = function(sourceFileInfo, configOnly) {
+                    that.execLoadData = function(sourceFileInfo, scopeStr) {
                         var data={};
-                        data.ConfigOnly = configOnly?'1':'0';
+                        //data.ConfigOnly = (scopeStr=='none')?'1':'0';
+                        data.ScopeStr = scopeStr;
                         if (sourceFileInfo.sourceid) {
                             //Upload a specific custom data source
                             data.datasetid = sourceFileInfo.datasetid;
@@ -136,16 +137,25 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.loadData = function(sourceFileInfo) {
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import all data', width:180, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import', width:155, height:28 }).setOnChanged(function() {
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(sourceFileInfo, false);
+                            that.execLoadData(sourceFileInfo, ctrlLoadScope.getValue());
                         });
-                        content += bt.renderHtml() + '<br>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:180, height:28 }).setOnChanged(function() {
-                            Popup.closeIfNeeded(popupid);
-                            that.execLoadData(sourceFileInfo, true);
-                        });
-                        content += bt.renderHtml() + '<br>';
+                        content += bt.renderHtml() + '<p>';
+
+                        var ctrlLoadScope = Controls.Combo(null,{label:'Load data:', value: 'all', states: [{id:'all', name:'All'}, {id:'none', name:'Update configuation only'}, {id:'1k', name:'Top 1K preview'}, {id:'10k', name:'Top 10K preview'}]});
+                        content += ctrlLoadScope.renderHtml();
+
+//                        content +='<p>&nbsp;<p>';
+//
+//                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:180, height:28 }).setOnChanged(function() {
+//                            Popup.closeIfNeeded(popupid);
+//                            that.execLoadData(sourceFileInfo, 'none');
+//                        });
+
+
+//                        content += bt.renderHtml() + '<br>';
+
                         var popupid = Popup.create('Import file source data', content);
                     }
 
@@ -294,7 +304,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                             content += '<p>Dou you want to update and import the served dataset now?<br><i>Note: this may take a while!</i><p>';
                                             var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Import now</b>', width:180, height:28 }).setOnChanged(function() {
                                                 Popup.closeIfNeeded(popupid);
-                                                that.execLoadData({datasetid: datasetid}, false);
+                                                that.execLoadData({datasetid: datasetid}, 'all');
                                             });
                                             content += bt.renderHtml() + '<br>';
                                             var popupid =  Popup.create('Dataset server status', content);
