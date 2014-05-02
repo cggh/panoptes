@@ -213,7 +213,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     });
                     var selectionAll = Controls.Button(null, { content: 'Select...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionAll.setOnChanged(function() {
-                        ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery.get());
+                        ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                     });
                     var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {

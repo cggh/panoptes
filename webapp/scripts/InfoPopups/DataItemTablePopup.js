@@ -92,7 +92,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.myTable = that.panelTable.getTable();
 
                 var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
-                    ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery.get());
+                    ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 
                 var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {

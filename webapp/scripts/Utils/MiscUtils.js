@@ -178,19 +178,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        MiscUtils.selectQuery = function(tableInfo, query, method) {
+        MiscUtils.selectQuery = function(tableInfo, theQueryObject, method) {
             if (['replace', 'add', 'restrict', 'exclude'].indexOf(method)<0)
                 DQX.reportError('Invalid selection method');
             var maxcount = 100000;
             var fetcher = DataFetchers.RecordsetFetcher(
                 MetaData.serverUrl,
                 MetaData.database,
-                tableInfo.getQueryTableName(false)
+                tableInfo.getQueryTableName(theQueryObject.isSubSampling())
             );
             fetcher.setMaxResultCount(maxcount);
+
+            var orderField = tableInfo.primkey;
+            if (theQueryObject.isSubSampling())
+                orderField = 'RandPrimKey';
+
             fetcher.addColumn(tableInfo.primkey, 'ST');
             DQX.setProcessing();
-            fetcher.getData(query, tableInfo.primkey,
+            fetcher.getData(theQueryObject.getForFetching(), orderField,
                 function (data) { //success
                     DQX.stopProcessing();
                     var items = data[tableInfo.primkey];

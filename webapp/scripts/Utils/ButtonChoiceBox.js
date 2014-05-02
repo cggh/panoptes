@@ -117,35 +117,35 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-        ButtonChoiceBox.createQuerySelectionOptions = function(tableInfo, query) {
+        ButtonChoiceBox.createQuerySelectionOptions = function(tableInfo, theQueryObject) {
 
             var choices = [];
 
             var choicesRow = [];
 
             choicesRow.push( { content:'REPLACE', bitmap:'Bitmaps/venn2.png', handler:function() {
-                MiscUtils.selectQuery(tableInfo, query, 'replace');
+                MiscUtils.selectQuery(tableInfo, theQueryObject, 'replace');
             }
             });
 
             choicesRow.push( { content:'ADD', bitmap:'Bitmaps/venn3.png', handler:function() {
-                MiscUtils.selectQuery(tableInfo, query, 'add');
+                MiscUtils.selectQuery(tableInfo, theQueryObject, 'add');
             }
             });
 
             choicesRow.push( { content:'RESTRICT', bitmap:'Bitmaps/venn1.png', handler:function() {
-                MiscUtils.selectQuery(tableInfo, query, 'restrict');
+                MiscUtils.selectQuery(tableInfo, theQueryObject, 'restrict');
             }
             });
 
             choicesRow.push( { content:'EXCLUDE', bitmap:'Bitmaps/venn4.png', handler:function() {
-                MiscUtils.selectQuery(tableInfo, query, 'exclude');
+                MiscUtils.selectQuery(tableInfo, theQueryObject, 'exclude');
             }
             });
 
             choices.push(choicesRow);
 
-            var queryDescription = tableInfo.tableViewer.getQueryDescription(query);
+            var queryDescription = tableInfo.tableViewer.getQueryDescription(theQueryObject.get());
 
             ButtonChoiceBox.create('Select '+tableInfo.tableNamePlural, queryDescription, choices);
         }
