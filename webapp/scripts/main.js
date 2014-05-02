@@ -261,15 +261,19 @@ require([
                     window.open('http://panoptes.readthedocs.org/en/latest/');
                 }
                 });
+                actions.push( { content:'Load new instance', bitmap:'Bitmaps/actionbuttons/reload.png', handler:function() {
+                    window.open('main.html');
+                }
+                });
                 actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
-                    var hostname=window.location.hostname;
-                    var pathname=window.location.pathname;
-                    var protocol=window.location.protocol;
-                    var url='{protocol}//{hostname}{pathname}'.DQXformat({
-                        protocol:protocol,
-                        hostname:hostname,
-                        pathname:pathname
-                    });
+//                    var hostname=window.location.hostname;
+//                    var pathname=window.location.pathname;
+//                    var protocol=window.location.protocol;
+//                    var url='{protocol}//{hostname}{pathname}'.DQXformat({
+//                        protocol:protocol,
+//                        hostname:hostname,
+//                        pathname:pathname
+//                    });
                     window.open('admin.html');
                 }
                 });
