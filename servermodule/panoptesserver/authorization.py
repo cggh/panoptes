@@ -3,8 +3,12 @@ import config
 import re
 import os
 
-
-authFileName = os.path.join(os.path.dirname(__file__), 'PanoptesAuthDb')
+try:
+    # Try to get authorisation file from config.py
+    authFileName = config.AUTHORISATIONFILE
+except:
+    # Use default location
+    authFileName = os.path.join(os.path.dirname(__file__), 'PanoptesAuthDb')
 
 # Authorization managed by Panoptes
 # Takes a DQXDbTools.CredentialInformation and DQXDbTools.DbOperation instance
