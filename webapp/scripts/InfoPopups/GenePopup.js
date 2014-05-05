@@ -36,6 +36,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var content='';//JSON.stringify(data);
             content += '<b>Id</b>: '+data.fid+'<br/>';
             content += '<b>Name</b>: '+data.fname+'<br/>';
+            content += '<b>Alternatives</b>: '+data.fnames.split(',').join(', ')+'<br/>';
+            content += '<b>Description</b>: '+data.descr+'<br/>';
             content += '<b>Position</b>: '+data.chromid+':'+data.fstart+'-'+data.fstop+'<br/>';
 
             var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show in genome browser', width:140, height:50, bitmap:'Bitmaps/GenomeBrowser.png' }).setOnChanged(function() {
