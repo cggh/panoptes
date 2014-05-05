@@ -1,5 +1,6 @@
 import os
 import os
+import sys
 import numpy
 import re
 import config
@@ -312,8 +313,16 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     return properties
 
 
-def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, writeHeader):
+def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, writeHeader, importSettings):
+    maxLineCount = -1
+    if importSettings['ScopeStr'] == '1k':
+        maxLineCount = 1000
+    if importSettings['ScopeStr'] == '10k':
+        maxLineCount = 10000
+    if importSettings['ScopeStr'] == '100k':
+        maxLineCount = 100000
     calculationObject.Log('Extracting columns {0} from {1} to {2}'.format(','.join(colList), sourceFileName, destFileName))
+    lineNr = 0
     with open(sourceFileName, 'r') as sourceFile:
         with open(destFileName, 'w') as destFile:
             if writeHeader:
@@ -331,6 +340,10 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
                 if len(line) > 0:
                     columns = line.split('\t')
                     destFile.write('\t'.join([columns[colindex] for colindex in colindices]) + '\n')
+                lineNr += 1
+                if (maxLineCount > 0) and (lineNr >= maxLineCount):
+                    calculationObject.Log('WARNING: limiting at line ' + str(lineNr))
+                    break
 
 
 def CreateSummaryValues_Value(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):

@@ -128,7 +128,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 4:
         print('Arguments: DataType ImportType DataSetId [...]')
         print('DataType: "dataset", "datatable"')
-        print('ImportType: "all", "none", "1k", "10k"')
+        print('ImportType: "all", "none", "1k", "10k", "100k"')
         sys.exit()
 
     ImportDataType = sys.argv[1]
@@ -137,8 +137,8 @@ if __name__ == "__main__":
         sys.exit()
 
     ImportMethod = sys.argv[2]
-    if ImportMethod not in ["all", "none", "1k", "10k"]:
-        print('Second argument (ImportType) has to be "all", "none", "1k", "10k"')
+    if ImportMethod not in ["all", "none", "1k", "10k", "100k"]:
+        print('Second argument (ImportType) has to be "all", "none", "1k", "10k", "100k"')
         sys.exit()
     configOnly = (ImportMethod == 'none')
 
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', datasetid,
             {
                 'ConfigOnly': configOnly,
-                 'ScopeStr': ImportDataType
+                 'ScopeStr': ImportMethod
             }
         )
         sys.exit()

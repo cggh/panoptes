@@ -143,18 +143,8 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         });
                         content += bt.renderHtml() + '<p>';
 
-                        var ctrlLoadScope = Controls.Combo(null,{label:'Load data:', value: 'all', states: [{id:'all', name:'All'}, {id:'none', name:'Update configuation only'}, {id:'1k', name:'Top 1K preview'}, {id:'10k', name:'Top 10K preview'}]});
+                        var ctrlLoadScope = Controls.RadioGroup(null,{label:'Load data:', value: 'all', states: [{id:'all', name:'All'}, {id:'none', name:'Update configuation only'}, {id:'1k', name:'Top 1K preview'}, {id:'10k', name:'Top 10K preview'}, {id:'100k', name:'Top 100K preview'}]});
                         content += ctrlLoadScope.renderHtml();
-
-//                        content +='<p>&nbsp;<p>';
-//
-//                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Update configuration only', width:180, height:28 }).setOnChanged(function() {
-//                            Popup.closeIfNeeded(popupid);
-//                            that.execLoadData(sourceFileInfo, 'none');
-//                        });
-
-
-//                        content += bt.renderHtml() + '<br>';
 
                         var popupid = Popup.create('Import file source data', content);
                     }

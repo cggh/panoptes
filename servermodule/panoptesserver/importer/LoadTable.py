@@ -137,7 +137,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                     if lineCount % 250000 == 0:
                         calculationObject.Log('Line '+str(lineCount))
                     if (maxLineCount>0) and (lineCount >= maxLineCount):
-                        calculationObject.Log('Terminating import at {0} lines'.format(lineCount))
+                        calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
                         break
 
     calculationObject.Log('Column sizes: '+str({col['name']: col['MaxLen'] for col in columns}))

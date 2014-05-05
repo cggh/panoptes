@@ -37,10 +37,13 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
             settings.AddTokenIfMissing('Order', 99999)
             settings.DefineKnownTokens(['channelColor'])
+            settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
             print('SETTINGS: '+settings.ToJSON())
-            if not importSettings['ConfigOnly']:
+            if importSettings['ScopeStr'] == 'all':
                 print('Executing filter bank')
                 ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings)
+            else:
+                calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
             extraSettings = settings.Clone()
             extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
             sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
@@ -67,7 +70,6 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
         ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
         # Import reference genome
-        #if not importSettings['ConfigOnly']:
         if importSettings['ScopeStr'] == 'all':
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
@@ -80,6 +82,8 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
                     ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
             else:
                 calculationObject.Log('WARNING: missing reference sequence file')
+        else:
+            calculationObject.Log('WARNING: Skipping converting reference genome')
 
 
         # Import chromosomes
@@ -101,7 +105,6 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
             os.remove(sqlfile)
 
-#        if not importSettings['ConfigOnly']:
         if importSettings['ScopeStr'] == 'all':
             # Import annotation
             with calculationObject.LogHeader('Converting annotation'):
@@ -115,4 +118,6 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
                 os.remove(os.path.join(temppath, 'annotation.txt'))
                 os.remove(os.path.join(temppath, 'annotation_dump.sql'))
                 os.remove(os.path.join(temppath, 'annotation_create.sql'))
+        else:
+            calculationObject.Log('WARNING: Skipping converting annotation')
 
