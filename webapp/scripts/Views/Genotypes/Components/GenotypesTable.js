@@ -161,7 +161,8 @@ define(["_", "tween", "DQX/Utils"],
           if (pos.x < 0 || pos.x > clip.r || pos.y < 0 || pos.y > clip.b)
             return false;
           var delta = DQX.getMouseWheelDelta(ev);
-          that.view.rescaleSNPic(that.view.snp_scale.scale_clamp(that.view.snp_scale.zoom(delta, pos.x), 0, that.data.snp_cache.snp_positions.length));
+          if (delta != 0)
+            that.view.rescaleSNPic(that.view.snp_scale.scale_clamp(that.view.snp_scale.zoom(delta, pos.x), 0, that.data.snp_cache.snp_positions.length));
           return true;
         }
       };
