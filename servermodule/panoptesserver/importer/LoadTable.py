@@ -43,10 +43,17 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                 content = 'NULL'
 
         if col['IsDate']:
-            dt = dateutil.parser.parse(content)
-            tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
-            tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
-            content = str(tmdiff)
+            if len(content)>=5:
+                try:
+                    dt = dateutil.parser.parse(content)
+                    tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
+                    tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
+                    content = str(tmdiff)
+                except:
+                    print('ERROR: date parsing string '+content)
+                    content = 'NULL'
+            else:
+                content = 'NULL'
 
         if col['IsBoolean']:
             vl = content
