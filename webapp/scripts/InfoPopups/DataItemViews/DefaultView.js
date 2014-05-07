@@ -22,6 +22,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.createPanels = function() {
 
                 var content = '';
+                var content = '<div style="padding:8px">';
                 function addLevelToContent(levelInfo) {
                     var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
                     content += "<table>";
@@ -57,6 +58,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 addLevelToContent(itemData);
                 that.frameFields.setContentHtml(content);
+                content += '</div>';
 
             };
 

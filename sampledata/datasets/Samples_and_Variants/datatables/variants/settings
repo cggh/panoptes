@@ -133,10 +133,27 @@ ExternalLinks:
 - Url: http://en.wikipedia.org/wiki/{SnpName}
   Name: Wikipedia
   
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists the custom views that should appear in the popup for an individual datatable item
 
-- Type: Overview                                       # Specifies the default view of all fields
-  Name: Overview
+- Type: FieldList                                      # Specifies a list of properties to be shown
+  Name: Variant properties                             # Name of the view
+  Fields:                                              # List of the fields to be included
+  - chromosome
+  - position
+  - SnpName
+  - HighQuality
+  - Value1
+  - Value2
+  - Value3
+  - Extra1
+
+- Type: FieldList
+  Name: Allele frequencies
+  Introduction: A list of the allele frequencies (as fractions) over the different populations
+  Fields:
+  - NRAF_WAF
+  - NRAF_EAF
+  - NRAF_SAF
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
   Name: Allele frequencies map                         # Name of the view
@@ -154,4 +171,5 @@ DataItemViews: # Lists all the custom views that should appear in the popup for 
     Color: rgb(128,28,0)                               # Color of the pie
   ResidualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
 
-
+- Type: Overview                                       # Specifies the default view of all fields
+  Name: Overview

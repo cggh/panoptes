@@ -30,3 +30,11 @@ Properties:
   ReadData: false
   ShowInTable: true
   CanUpdate: true
+
+DataItemViews:
+
+- Type: FieldList
+  Name: Custom values
+  Fields:
+  - Custom1
+  - Custom2
