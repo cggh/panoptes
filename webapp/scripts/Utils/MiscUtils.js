@@ -38,7 +38,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var tablePart = 1;
             if (propInfo.datatype=='Value') {
                 encoding  = 'Float3';
-                if (propInfo.settings.decimDigits ==0 )
+                if ((propInfo.settings.decimDigits ==0 ) || (propInfo.isPrimKey))
                     encoding  = 'Int';
             }
             if ((propInfo.datatype=='Value') && (propInfo.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
