@@ -137,13 +137,26 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.loadData = function(sourceFileInfo) {
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Import', width:155, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Import</b>', width:155, height:28 }).setOnChanged(function() {
+                            var scopeStr = ctrlLoadScope.getValue();
+                            if (!scopeStr) {
+                                alert('Please select a data load option.');
+                                return;
+                            }
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(sourceFileInfo, ctrlLoadScope.getValue());
+                            that.execLoadData(sourceFileInfo, scopeStr);
                         });
                         content += bt.renderHtml() + '<p>';
 
-                        var ctrlLoadScope = Controls.RadioGroup(null,{label:'Load data:', value: 'all', states: [{id:'all', name:'All'}, {id:'none', name:'Update configuation only'}, {id:'1k', name:'Top 1K preview'}, {id:'10k', name:'Top 10K preview'}, {id:'100k', name:'Top 100K preview'}]});
+                        var ctrlLoadScope = Controls.RadioGroup(null,{label:'Load data:', value: '', states: [
+                            {id:'all', name:'All'},
+                            {id:'none', name:'Update configuration only'},
+                            {id:'1k', name:'Top 1K preview'},
+                            {id:'10k', name:'Top 10K preview'},
+                            {id:'100k', name:'Top 100K preview'},
+                            {id:'1M', name:'Top 1M preview'},
+                            {id:'10M', name:'Top 10M preview'}
+                        ]});
                         content += ctrlLoadScope.renderHtml();
 
                         var popupid = Popup.create('Import file source data', content);

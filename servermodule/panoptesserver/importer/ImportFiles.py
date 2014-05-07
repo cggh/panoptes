@@ -125,10 +125,12 @@ if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
+    scopeOptions = ["all", "none", "1k", "10k", "100k"]
+
     if len(sys.argv) < 4:
         print('Arguments: DataType ImportType DataSetId [...]')
         print('DataType: "dataset", "datatable"')
-        print('ImportType: "all", "none", "1k", "10k", "100k"')
+        print('ImportType: '+', '.join(scopeOptions))
         sys.exit()
 
     ImportDataType = sys.argv[1]
@@ -137,8 +139,8 @@ if __name__ == "__main__":
         sys.exit()
 
     ImportMethod = sys.argv[2]
-    if ImportMethod not in ["all", "none", "1k", "10k", "100k"]:
-        print('Second argument (ImportType) has to be "all", "none", "1k", "10k", "100k"')
+    if ImportMethod not in scopeOptions:
+        print('Second argument (ImportType) has to be '+', '.join(scopeOptions))
         sys.exit()
     configOnly = (ImportMethod == 'none')
 

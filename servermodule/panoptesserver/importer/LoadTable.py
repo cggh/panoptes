@@ -89,6 +89,10 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         maxLineCount = 10000
     if importSettings['ScopeStr'] == '100k':
         maxLineCount = 100000
+    if importSettings['ScopeStr'] == '1M':
+        maxLineCount = 1000000
+    if importSettings['ScopeStr'] == '10M':
+        maxLineCount = 10000000
 
     with open(sourceFileName, 'r') as ifp:
         if ifp is None:

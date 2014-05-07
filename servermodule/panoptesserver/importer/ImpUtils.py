@@ -321,6 +321,10 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
         maxLineCount = 10000
     if importSettings['ScopeStr'] == '100k':
         maxLineCount = 100000
+    if importSettings['ScopeStr'] == '1M':
+        maxLineCount = 1000000
+    if importSettings['ScopeStr'] == '10M':
+        maxLineCount = 10000000
     calculationObject.Log('Extracting columns {0} from {1} to {2}'.format(','.join(colList), sourceFileName, destFileName))
     lineNr = 0
     with open(sourceFileName, 'r') as sourceFile:
