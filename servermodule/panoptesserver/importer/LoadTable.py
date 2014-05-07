@@ -197,6 +197,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             sql = "alter table {0}_SORTRAND add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(tableid)
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "insert into {0}_SORTRAND select *,0 from {0} order by _randomval_".format(tableid)
+            sql += ' LIMIT 5000000' # NOTE: there is little point in importing more than that!
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
 
 
