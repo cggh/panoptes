@@ -34,7 +34,7 @@ Properties:
 DataItemViews:
 
 - Type: FieldList
-  Name: Custom values
+  Name: Custom
   Fields:
   - Custom1
   - Custom2

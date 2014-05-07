@@ -6,3 +6,16 @@ Properties:
   DataType: Value
   ShowInTable: true
   DecimDigits: 2
+
+
+DataItemViews:
+
+- Type: Overview
+  Name: Overview
+
+- Type: FieldList
+  Name: Custom
+  Introduction: A custom field view
+  Fields:
+  - Year
+  - Comment

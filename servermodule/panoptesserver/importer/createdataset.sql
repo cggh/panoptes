@@ -90,6 +90,12 @@ CREATE TABLE `tablecatalog` (
   `ordr` int
 );
 
+CREATE TABLE `customdatacatalog` (
+  `tableid` varchar(20),
+  `sourceid` varchar(50),
+  `settings` text
+);
+
 CREATE TABLE `relations` (
   `childtableid` varchar(40),
   `childpropid` varchar(40),

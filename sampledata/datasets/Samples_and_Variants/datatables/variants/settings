@@ -156,7 +156,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   - NRAF_SAF
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
-  Name: Allele frequencies map                         # Name of the view
+  Name: Map                                            # Name of the view
   PieChartSize: 1000                                   # Size of the largest pie chart
   MapCenter: { Longitude: 10, Lattitude: 0 }           # Start location of the map
   MapZoom: 2                                           # Start zoom factor of the map

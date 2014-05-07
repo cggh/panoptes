@@ -25,6 +25,7 @@ def ResponseExecute(data, calculationObject):
         datasetid,
         workspaceid,
         tableid,
+        sourceid,
         os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'workspaces', workspaceid, 'customdata', tableid, sourceid),
         importSettings
     )

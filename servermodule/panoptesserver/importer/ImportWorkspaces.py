@@ -12,7 +12,7 @@ import shutil
 import customresponders.panoptesserver.Utils as Utils
 import simplejson
 
-def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder, importSettings):
+def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourceid, folder, importSettings):
 
     with calculationObject.LogHeader('Importing custom data'):
         print('Importing custom data into {0}, {1}, {2} FROM {3}'.format(datasetId, workspaceid, tableid, folder))
@@ -35,6 +35,12 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
         tableSettingsStr = row[1]
         db.close()
 
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog WHERE tableid="{tableid}" and sourceid="{sourceid}"'.format(
+            tableid=tableid,
+            sourceid=sourceid
+        ))
+
+
         tableSettings = SettingsLoader.SettingsLoader()
         tableSettings.LoadDict(simplejson.loads(tableSettingsStr))
 
@@ -48,6 +54,13 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, folder,
 
 
         settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
+
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, "INSERT INTO customdatacatalog VALUES ('{tableid}', '{sourceid}', '{settings}')".format(
+            tableid=tableid,
+            sourceid=sourceid,
+            settings=settings.ToJSON()
+        ))
+
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
 
@@ -292,7 +305,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
                         raise Exception('Invalid table id '+tableid)
                     for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
                         if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
-                            ImportCustomData(calculationObject, datasetId, workspaceid, tableid, os.path.join(folder, 'customdata', tableid, customid),  importSettings)
+                            ImportCustomData(calculationObject, datasetId, workspaceid, tableid, customid, os.path.join(folder, 'customdata', tableid, customid),  importSettings)
         else:
             print('Directory not present')
 
