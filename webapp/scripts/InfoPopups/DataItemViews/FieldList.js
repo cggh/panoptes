@@ -21,13 +21,30 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createPanels = function() {
 
+                var parentFieldsMap = {};
+                if (itemData.parents)
+                    $.each(itemData.parents, function(idx, parentInfo) {
+                        parentFieldsMap[parentInfo.tableid] = parentInfo.fields;
+                    });
+
                 var content = '<div style="padding:8px">';
                 if (viewSettings.Introduction)
                     content += viewSettings.Introduction+'<p>';
                 content += "<table>";
+                var fieldContent = '';
                 $.each(viewSettings.Fields, function(idx, propid) {
-                    var propInfo = MetaData.findProperty(tableInfo.id, propid);
-                    var fieldContent = itemData.fields[propid];
+                    if (propid.indexOf('@')<0) {//property from this table
+                        var propInfo = MetaData.findProperty(tableInfo.id, propid);
+                        fieldContent = itemData.fields[propid];
+                    }
+                    else {//property from a parent table
+                        var parenttableid = propid.split('@')[1];
+                        propid = propid.split('@')[0];
+                        var propInfo = MetaData.findProperty(parenttableid, propid);
+                        if (!parentFieldsMap[parenttableid])
+                            DQX.reportError('Missing parent item data for '+parenttableid);
+                        fieldContent = parentFieldsMap[parenttableid][propid];
+                    }
                     content += '<tr>';
                     content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b></td>'.DQXformat({
                         hint: (propInfo.settings.Description)||'',
@@ -41,40 +58,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-//                function addLevelToContent(levelInfo) {
-//                    var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
-//                    content += "<table>";
-//                    $.each(MetaData.customProperties,function(idx, propInfo) {
-//                        if (propInfo.tableid == tableInfo.id) {
-//                            var fieldContent = levelInfo.fields[propInfo.propid];
-//                            content += '<tr>';
-//                            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b></td>'.DQXformat({
-//                                hint: (propInfo.settings.Description)||'',
-//                                name: propInfo.name
-//                            });
-//                            content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
-//                            content += "</tr>";
-//                        }
-//                    });
-//                    content += "</table>";
-//                    $.each(levelInfo.parents, function(idx, parentInfo) {
-//                        var parentTableInfo = MetaData.mapTableCatalog[parentInfo.tableid];
-//                        content += '<div style="padding-left:30px">';
-//                        content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px;padding-left:8px"><i>';
-//                        content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
-//                        content += '</i>&nbsp;&nbsp;';
-//                        var lnk = Controls.Hyperlink(null,{ content: 'Open'});
-//                        lnk.setOnChanged(function() {
-//                            Msg.send({type: 'ItemPopup'}, {tableid: parentInfo.tableid, itemid: parentInfo.fields[parentTableInfo.primkey]});
-//                        });
-//                        content += lnk.renderHtml();
-//                        content += '</div>';
-//                        addLevelToContent(parentInfo);
-//                        content += '</div>';
-//                    });
-//                }
-//
-//                addLevelToContent(itemData);
                 that.frameFields.setContentHtml(content);
 
             };

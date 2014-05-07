@@ -19,3 +19,5 @@ DataItemViews:
   Fields:
   - Year
   - Comment
+  - Country@samplingsites
+  - TypeName@sampletypes
