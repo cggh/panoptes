@@ -278,8 +278,10 @@ define([
                 var minJD = 1.0E99;
                 var maxJD = -1.0E99;
                 $.each(that.myPointSet, function(idx, pt) {
-                    minJD = Math.min(minJD, pt.dateJD-0.5);
-                    maxJD = Math.max(maxJD, pt.dateJD+0.5);
+                    if (pt.dateJD!=null) {
+                        minJD = Math.min(minJD, pt.dateJD-0.5);
+                        maxJD = Math.max(maxJD, pt.dateJD+0.5);
+                    }
                 })
                 if ( (!that.minJD) || (!that.maxJD) || (Math.abs(that.minJD-minJD)>0.001) || (Math.abs(that.maxJD-maxJD)>0.001) )
                     that.setRangeJD(minJD, maxJD);

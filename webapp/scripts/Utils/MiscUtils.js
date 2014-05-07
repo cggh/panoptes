@@ -400,7 +400,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             })
 
             // try year multiples
-            $.each([1,2,5,10], function(idx, mult) {
+            $.each([1,2,5,10,20,50,100,200,500,1000], function(idx, mult) {
                 dist = mult*365*zoomFact;
                 shear = calcShear(dist)
                 if (shear<minShear) {
