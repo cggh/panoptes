@@ -61,7 +61,6 @@ Properties:
   BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
-  DataType: Value
   Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
   ShowInTable: true
   ShowInBrowser: true           # If true, this property will be displayed in the genome browser
@@ -71,6 +70,7 @@ Properties:
 
 - Id: Value1
   Name: Value 1
+  DataType: HighPrecisionValue
   Description: The first numerical value
   BarWidth: 180                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
   ChannelName: Channel A          # Name of the channel this property will be displayed in. Properties sharing the same channel name will be displayed in overlay
@@ -80,6 +80,7 @@ Properties:
 
 - Id: Value2
   Name: Value 2
+  DataType: Value
   Description: The second numerical value
   ChannelName: Channel A
   ChannelColor: "rgb(200,80,0)"
@@ -87,6 +88,7 @@ Properties:
 
 - Id: Value3
   Name: Value 3
+  DataType: Value
   Description: The third numerical value
   BrowserDefaultVisible: true
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level

@@ -27,6 +27,7 @@ def IsValueDataTypeIdenfifier(datatypeIdentifier):
            (datatypeIdentifier == 'GeoLongitude') or\
            (datatypeIdentifier == 'GeoLattitude') or\
            (datatypeIdentifier == 'LowPrecisionValue') or\
+           (datatypeIdentifier == 'HighPrecisionValue') or\
            (datatypeIdentifier == 'Date')
 
 def IsDateDataTypeIdenfifier(datatypeIdentifier):

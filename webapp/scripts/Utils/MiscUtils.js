@@ -31,15 +31,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        MiscUtils.createItemTableViewerColumn = function(theTable, tableid, propid) {
+        MiscUtils.createEncoderId = function(tableid, propid) {
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var propInfo = MetaData.findProperty(tableid, propid);
             var encoding  = 'String';
-            var tablePart = 1;
             if (propInfo.datatype=='Value') {
                 encoding  = 'Float3';
                 if ((propInfo.settings.decimDigits ==0 ) || (propInfo.isPrimKey))
                     encoding  = 'Int';
+            }
+            if (propInfo.datatype=='HighPrecisionValue') {
+                encoding  = 'FloatH';
             }
             if ((propInfo.datatype=='Value') && (propInfo.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
                 encoding  = 'Int';
@@ -49,6 +51,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Float4';
             if ( (propInfo.datatype=='Date') )
                 encoding  = 'Float4';
+            return encoding;
+        }
+
+        MiscUtils.createItemTableViewerColumn = function(theTable, tableid, propid) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var propInfo = MetaData.findProperty(tableid, propid);
+            var encoding  = MiscUtils.createEncoderId(tableid, propid);
+            var tablePart = 1;
             if (propInfo.isPrimKey)
                 tablePart = 0;
             var sortable = true;

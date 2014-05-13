@@ -2,7 +2,9 @@
 Name: Samples & Variants
 
 # A description of the dataset that will appear on the start page
-Description: This is a sample dataset
+Description: >
+  This is a sample dataset<br>
+  <div style="color:red">A second line, html formatted</div>
 
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder banes in [datatables]

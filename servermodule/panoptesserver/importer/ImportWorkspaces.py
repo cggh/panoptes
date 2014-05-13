@@ -42,7 +42,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
 
 
         tableSettings = SettingsLoader.SettingsLoader()
-        tableSettings.LoadDict(simplejson.loads(tableSettingsStr))
+        tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
 
         allowSubSampling = tableSettings['AllowSubSampling']
 
@@ -265,7 +265,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
 
         for table in tables:
             tableSettings = SettingsLoader.SettingsLoader()
-            tableSettings.LoadDict(simplejson.loads(table['settingsStr']))
+            tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
             table['settings'] = tableSettings
 
         if not importSettings['ConfigOnly']:
