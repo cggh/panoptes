@@ -61,16 +61,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             dowait();
         }
 
+        Initialise.parseTableSettings = function(table) {
+            var settings = { GenomeMaxViewportSizeX:50000 };
+            if (table.settings)
+                settings = $.extend(settings,JSON.parse(table.settings));
+            table.settings = settings;
+        }
+
         Initialise.augmentTableInfo = function(table) {
 
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
             table.currentSelection = {};
 
-            var settings = { GenomeMaxViewportSizeX:50000 };
-            if (table.settings)
-                settings = $.extend(settings,JSON.parse(table.settings));
-            table.settings = settings;
 
             table.tableNameSingle = table.name;
             table.tableNamePlural = table.name;
@@ -172,6 +175,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 //                    return table.id+'_SORTRAND';
                 }
             }
+
+            table.propertyGroups = [];
+            table.propertyGroupMap = {};
+            if (table.settings.PropertyGroups) {
+                $.each(table.settings.PropertyGroups, function(idx, groupInfo) {
+                    groupInfo.properties = [];
+                    table.propertyGroups.push(groupInfo);
+                    table.propertyGroupMap[groupInfo.Id] = groupInfo;
+                });
+            }
         }
 
         Initialise.augment2DTableInfo = function(table) {
@@ -270,6 +283,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
+
+                //Assign grouperty group
+                prop.group = null;
+                if (prop.settings.GroupId)
+                    if (tableInfo.propertyGroupMap[prop.settings.GroupId]) {
+                        prop.group = tableInfo.propertyGroupMap[prop.settings.GroupId];
+                        tableInfo.propertyGroupMap[prop.settings.GroupId].properties.push(prop);
+                    }
+                if (!prop.group) {
+                    if (!tableInfo.propertyGroupMap['']) {
+                        var grp = {Id:'', Name: 'Properties', properties: []};
+                        tableInfo.propertyGroupMap[''] = grp;
+                        tableInfo.propertyGroups.push(grp);
+                    }
+                    prop.group = tableInfo.propertyGroupMap[''];
+                    tableInfo.propertyGroupMap[''].properties.push(prop);
+                }
 
                 // Determine table name where the column is originally defined
                 if (prop.source == 'fixed') {

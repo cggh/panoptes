@@ -438,7 +438,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         numData: !!that.numPropId
                     });
                     that.pointSet.setColorMap(that.mappedColors);
-                    that.plotComponents.timeLine.setColorMap(that.mappedColors);
+                    if (that.plotComponents.timeLine)
+                        that.plotComponents.timeLine.setColorMap(that.mappedColors);
                 }
             }
 

@@ -215,7 +215,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     selectionAll.setOnChanged(function() {
                         ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                     });
-                    var selectionStore = Controls.Button(null, { content: 'Store & display...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionStore.setOnChanged(function() {
                         SelectionTools.cmdStore(that.tableInfo);
                     });
@@ -231,29 +231,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
 
-                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(5);
+                    that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(0);
 
-                    var cmdHideAllColumns = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2' }).setOnChanged(function() {
-                        if (that.columnVisibilityChecks) {
-                            $.each(that.columnVisibilityChecks, function(idx, chk) {
-                                if (chk.getValue())
-                                    chk.modifyValue(false);
-                            });
-                        }
-                    });
-
-                    this.panelSimpleQuery.addControl(Controls.CompoundVert([
+                    that.controlsGroup = Controls.CompoundVert([
                         ctrlQuery,
                         groupSelection,
-                        Controls.Section(Controls.CompoundVert([
-                            cmdHideAllColumns,
-                            that.visibilityControlsGroup
-                        ]).setMargin(10), {
-                            title: 'Visible columns',
-                            bodyStyleClass: 'ControlsSectionBody'
-                        })
+                        that.visibilityControlsGroup
 
-                    ]).setMargin(0));
+                    ]).setMargin(0);
+
+                    this.panelSimpleQuery.addControl(that.controlsGroup);
                 }
 
                 //Returns a user-friendly text description of a query
@@ -358,6 +345,41 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     that.columnVisibilityChecks = [];
                     that.visibilityControlsGroup.clear();
 
+                    //Create sections for each property group
+                    var propertyGroupSectionMap = {};
+                    $.each(tableInfo.propertyGroups, function(idx, groupInfo) {
+                        var showInTable = false;
+                        $.each(groupInfo.properties, function(idx, propInfo) {
+                            if (propInfo.settings.showInTable)
+                                showInTable = true;
+                        });
+                        if (showInTable) {
+                            var sctControls = Controls.CompoundVert([]).setMargin(5);
+                            var sct = Controls.Section(sctControls, {
+                                title: groupInfo.Name,
+                                headerStyleClass: 'DQXControlSectionHeader',
+                                bodyStyleClass: 'ControlsSectionBodySubSection'
+                            });
+                            sct.checkboxes = [];
+                            sct.onCollapsing = function() {
+                                sct.memChkStates = {};
+                                $.each(sct.checkboxes, function(idx, chk) {
+                                    sct.memChkStates[chk.getID()] = chk.getValue();
+                                    chk.modifyValue(false);
+                                });
+                            }
+                            sct.onExpanding = function() {
+                                if (sct.memChkStates) {
+                                    $.each(sct.checkboxes, function(idx, chk) {
+                                        chk.modifyValue(sct.memChkStates[chk.getID()]);
+                                    });
+                                }
+                            }
+                            that.visibilityControlsGroup.addControl(sct);
+                            propertyGroupSectionMap[groupInfo.Id] = {theList: sctControls, theSection: sct };
+                        }
+                    });
+
                     //Create a column for each property
                     $.each(MetaData.customProperties,function(idx,propInfo) {
                         if ((propInfo.tableid == that.tableid) && (propInfo.settings.showInTable)) {
@@ -382,7 +404,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 chk.colID = col.myCompID;
                                 if (!tableInfo.isPropertyColumnVisible(col.myCompID))
                                     col.setVisible(false);
-                                that.visibilityControlsGroup.addControl(chk);
+                                propertyGroupSectionMap[propInfo.group.Id].theList.addControl(chk);
+                                propertyGroupSectionMap[propInfo.group.Id].theSection.checkboxes.push(chk);
                                 that.columnVisibilityChecks.push(chk);
                             }
                         }

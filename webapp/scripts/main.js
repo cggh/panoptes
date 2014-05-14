@@ -90,7 +90,7 @@ require([
 
             // adds extra settings from a custom data source to the table settings
             var mapExtraTableSettings = function(tableInfo, customDataCatalog) {
-                var tokensList = ['DataItemViews']; //List of all settings tokens for which this mechanism applies
+                var tokensList = ['DataItemViews', 'PropertyGroups']; //List of all settings tokens for which this mechanism applies
                 $.each(customDataCatalog, function(idx, customData) {
                     if (customData.tableid == tableInfo.id) {
                         var customSettings = JSON.parse(customData.settings);
@@ -138,9 +138,10 @@ require([
                         });
                         MetaData.mapTableCatalog = {};
                         $.each(MetaData.tableCatalog, function(idx, table) {
+                            Initialise.parseTableSettings(table);
+                            mapExtraTableSettings(table, customDataCatalog);
                             Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
-                            mapExtraTableSettings(table, customDataCatalog);
                         });
                         MetaData.map2DTableCatalog = {};
                         $.each(MetaData.twoDTableCatalog, function(idx, table) {

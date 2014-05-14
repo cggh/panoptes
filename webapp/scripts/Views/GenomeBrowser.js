@@ -603,11 +603,8 @@ define([
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
-                            var channelControlsGroup = Controls.CompoundVert([]).setMargin(8);
-                            controlsGroup.addControl(Controls.Section(channelControlsGroup, {
-                                title: 'Visible properties',
-                                bodyStyleClass: 'ControlsSectionBody'
-                            }));
+                            var channelControlsGroup = Controls.CompoundVert([]).setMargin(0);
+                            controlsGroup.addControl(channelControlsGroup);
 
                             //Initialise the data fetcher that will download the data for the table
                             var dataFetcher = new DataFetchers.Curve(
@@ -626,13 +623,28 @@ define([
 
                             //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
                             tableInfo.genomeBrowserInfo.currentCustomProperties = [];
-                            $.each(MetaData.customProperties,function(idx,propInfo) {
-                                if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser)) {
-                                    that.createPropertyChannel(tableInfo, propInfo, channelControlsGroup, dataFetcher);
-                                }
-                                if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) && (propInfo.settings.showInBrowser)) {
-                                    that.createPositionChannel(tableInfo, propInfo, channelControlsGroup, dataFetcher);
-                                }
+                            $.each(tableInfo.propertyGroups, function(idx0, groupInfo) {
+                                var groupSection = null;
+                                var groupList = null;
+                                $.each(groupInfo.properties, function(idx1, propInfo) {
+                                    var creatorFunc = null;
+                                    if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser))
+                                        creatorFunc = that.createPropertyChannel;
+                                    if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) && (propInfo.settings.showInBrowser))
+                                        creatorFunc = that.createPositionChannel;
+                                    if (creatorFunc) {
+                                        if (!groupList) {
+                                            groupList = Controls.CompoundVert([]).setMargin(5);
+                                            groupSection = Controls.Section(groupList, {
+                                                title: groupInfo.Name,
+                                                headerStyleClass: 'DQXControlSectionHeader',
+                                                bodyStyleClass: 'ControlsSectionBodySubSection'
+                                            });
+                                            channelControlsGroup.addControl(groupSection);
+                                        }
+                                        creatorFunc(tableInfo, propInfo, groupList, dataFetcher);
+                                    }
+                                })
                             });
                         }
 
