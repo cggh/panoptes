@@ -1,12 +1,12 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
-    "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap", "InfoPopups/DataItemViews/FieldList"
+    "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap", "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup,
-              ItemView_DefaultView, ItemView_ItemMap, ItemView_PieChartMap, ItemView_FieldList
+              ItemView_DefaultView, ItemView_ItemMap, ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup
         ) {
 
         var ItemPopup = {};
@@ -87,6 +87,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     if (dtViewInfo.Type == 'FieldList') {
                         dtViewObject = ItemView_FieldList.create(dtViewInfo, that.tableInfo, data);
+                    }
+                    if (dtViewInfo.Type == 'PropertyGroup') {
+                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, that.tableInfo, data);
+                        dtViewInfo.Name = '-Absent-';
+                        var groupInfo = that.tableInfo.propertyGroupMap[dtViewInfo.GroupId];
+                        if (groupInfo)
+                            dtViewInfo.Name = groupInfo.Name;
                     }
                     if (!dtViewObject)
                         DQX.reportError("Invalid dataitem view type "+dtViewInfo.Type);

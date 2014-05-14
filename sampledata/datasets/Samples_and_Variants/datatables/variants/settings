@@ -29,7 +29,7 @@ PropertyGroups:
 - Id: Info
   Name: Variant Info
 - Id: AlleleFreq
-  Name: Allele frequencies
+  Name: Allele freqs.
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
@@ -165,13 +165,8 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   - Value3
   - Extra1
 
-- Type: FieldList
-  Name: Allele frequencies
-  Introduction: A list of the allele frequencies (as fractions) over the different populations
-  Fields:
-  - NRAF_WAF
-  - NRAF_EAF
-  - NRAF_SAF
+- Type: PropertyGroup
+  GroupId: AlleleFreq
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
   Name: Map                                            # Name of the view
