@@ -53,7 +53,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
-            that.theQuery = QueryTool.Create(tableid, {
+            that.hasProvidedAspects = function() {
+                return !!querySettings.aspects;
+            }
+
+            that.providedAspect2Property = function(aspectid) {
+                if (!querySettings.aspects)
+                    return '';
+                if (!querySettings.aspects[aspectid])
+                    return '';
+                return querySettings.aspects[aspectid];
+            };
+
+
+                that.theQuery = QueryTool.Create(tableid, {
                 includeCurrentQuery:true,
                 hasSubSampler:that.tableInfo.settings.AllowSubSampling,
                 subSamplingOptions: subSamplingOptions
@@ -83,6 +96,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.addPlotSettingsControl = function(id, ctrl) {
                 that.plotSettingsControls[id] = ctrl;
             }
+
 
 
             that.store = function() {

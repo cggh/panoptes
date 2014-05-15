@@ -16,6 +16,13 @@ define([
             return true;
         }
 
+        ItemScatterPlot.plotAspects = [
+            { id:'xaxis', name:'X value', dataType:'Value', requiredLevel: 2 },
+            { id:'yaxis', name:'Y value', dataType:'Value', requiredLevel: 2 },
+            { id:'color', name:'Point color', dataType:'', requiredLevel: 0 },
+            { id:'size', name:'Point size', dataType:'Value', requiredLevel: 0 },
+            { id:'label', name:'Hover label', dataType:'', requiredLevel: 0 }
+        ];
 
 
         GenericPlot.registerPlotType(ItemScatterPlot);
@@ -213,7 +220,8 @@ define([
                             if (included)
                                 propList.push({ id:prop.propid, name:prop.name });
                         });
-                        plotAspect.picker = Controls.Combo(null, { label:plotAspect.name+':<br>', states: propList }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
+                        plotAspect.picker = Controls.Combo(null, { label:plotAspect.name+':<br>', states: propList, value:that.providedAspect2Property(plotAspect.id) }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
+                        plotAspect.propid = that.providedAspect2Property(plotAspect.id);
                         pickControls.addControl(plotAspect.picker);
                     }
                 });
@@ -261,7 +269,8 @@ define([
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
-                //that.fetchData('id');
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
             };
 
 
@@ -661,7 +670,7 @@ define([
                         if ( (valX[ii]!=null) && (valY[ii]!=null) ) {
                             var px = /*Math.round*/(valX[ii] * scaleX + offsetX);
                             var py = /*Math.round*/(valY[ii] * scaleY + offsetY);
-                            var rd = ((valSize[ii]-sizeMin)/(sizeMax-sizeMin)*10+2) * sizeFactor;
+                            var rd = Math.max(0.1, ((valSize[ii]-sizeMin)/(sizeMax-sizeMin)*10+2) * sizeFactor);
                             if (valColorCat) {
                                 ctx.fillStyle=colorStrings[valColorCat[ii]];
                             }

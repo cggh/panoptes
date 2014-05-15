@@ -16,6 +16,10 @@ define([
             return true;
         }
 
+        BarGraph.plotAspects = [
+            { id:'groupby', name:'Group by', dataType:'Category', requiredLevel: 2 },
+            { id:'secgroup', name:'Secondary group', dataType:'Category', requiredLevel: 0 }
+        ];
 
 
         GenericPlot.registerPlotType(BarGraph);
@@ -55,7 +59,7 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:<br>', states: propList }).setClassID('groupby');
+                that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:<br>', states: propList, value:that.providedAspect2Property('groupby') }).setClassID('groupby');
                 that.ctrlCatProperty1.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -65,7 +69,7 @@ define([
                     that.fetchData();
                 });
 
-                that.ctrlCatProperty2 = Controls.Combo(null, { label:'Secondary group:<br>', states: propList }).setClassID('secgroup');
+                that.ctrlCatProperty2 = Controls.Combo(null, { label:'Secondary group:<br>', states: propList, value:that.providedAspect2Property('secgroup') }).setClassID('secgroup');
                 that.ctrlCatProperty2.setOnChanged(function() {
                     that.ctrlCatType.modifyEnabled(that.ctrlCatProperty2.getValue()!='');
                     that.fetchData();
@@ -104,6 +108,8 @@ define([
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
             };
 
             that.reloadAll = function() {

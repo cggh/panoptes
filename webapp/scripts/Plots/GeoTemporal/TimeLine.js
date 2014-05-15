@@ -28,7 +28,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
                         propList.push({id:propInfo.propid, name:propInfo.name});
                 });
-                that.ctrlDateProperty = Controls.Combo(null,{ label:'Date:', states: propList, value:propList[0].id }).setClassID('dateprop');
+                that.ctrlDateProperty = Controls.Combo(null,{ label:'Date:', states: propList, value:propList[0].id, value:that.thePlot.providedAspect2Property('dateprop') }).setClassID('dateprop');
                 that.ctrlDateProperty.setOnChanged(function() {
                     that.fetchData();
                 });

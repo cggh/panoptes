@@ -16,6 +16,10 @@ define([
             return true;
         }
 
+        Histogram2D.plotAspects = [
+            { id:'xvalue', name:'X value', dataType:'Value', requiredLevel: 2 },
+            { id:'yvalue', name:'Y value', dataType:'Value', requiredLevel: 2 }
+        ];
 
         var paletteList = ['Gray', 'Gray (inverted)', 'Rainbow 1', 'Rainbow 2', 'Heath'];
 
@@ -87,11 +91,11 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:<br>', states: propList }).setClassID('xvalue');
+                that.ctrlValueXProperty = Controls.Combo(null,{ label:'X Value:<br>', states: propList, value:that.providedAspect2Property('xvalue') }).setClassID('xvalue');
                 that.ctrlValueXProperty.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:<br>', states: propList }).setClassID('yvalue');
+                that.ctrlValueYProperty = Controls.Combo(null,{ label:'Y Value:<br>', states: propList, value:that.providedAspect2Property('yvalue') }).setClassID('yvalue');
                 that.ctrlValueYProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -190,6 +194,8 @@ define([
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
             };
 
 

@@ -39,14 +39,125 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
                 $('#'+id).click(function() {
-                    plottype.Create(tableInfo.id, info.query, {
-                        subSamplingOptions: info.subSamplingOptions
-                    });
                     Popup.closeIfNeeded(popupID);
+                    DataItemPlotPopup.createAspectSelector(plottype, info);
                 });
             });
 
+        }
 
+
+        DataItemPlotPopup.createAspectSelector = function(plottype, info) {
+
+
+            var isCompatibleProperty = function(dataType, propInfo) {
+                if (!dataType)
+                    return true;
+                if (dataType==propInfo.datatype)
+                    return true;
+                if (dataType=='Value')
+                    return propInfo.isFloat;
+                if (dataType=='Category') {
+                    if (propInfo.isText) return true;
+                    if (propInfo.isBoolean) return true;
+                }
+                return false;
+            }
+
+
+            var content = '';
+
+            var controls = Controls.CompoundVert([]).setMargin(0);
+
+            var requiredAspects = [];
+            var optionalAspects = [];
+            $.each(plottype.plotAspects, function(idx, aspectInfo) {
+                if (aspectInfo.requiredLevel == 2)
+                    requiredAspects.push('"'+aspectInfo.name+'"');
+                else
+                    optionalAspects.push('"'+aspectInfo.name+'"');
+            });
+            var str = '<b>Select {lst}:</b>'.DQXformat({lst:requiredAspects.join(', ')});
+            if (optionalAspects.length>0)
+                str += '<br>(Optional: {lst})'.DQXformat({lst:optionalAspects.join(', ')});
+            var headerCtrl = Controls.Html(null, str);
+
+            var tableInfo = MetaData.mapTableCatalog[info.tableid];
+
+            //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
+            var selectors = [];
+            $.each(tableInfo.propertyGroups, function(idx0, groupInfo) {
+                var groupSection = null;
+                var groupList = null;
+                var rowNr = 0;
+                $.each(groupInfo.properties, function(idx1, propInfo) {
+                    var creatorFunc = null;
+                    if (propInfo.settings.showInTable) {
+                        states = [{id:'', name:''}];
+                        $.each(plottype.plotAspects, function(idx, aspectInfo) {
+                            if (isCompatibleProperty(aspectInfo.dataType, propInfo))
+                                states.push({id: aspectInfo.id, name: aspectInfo.name+' :' });
+                        });
+                        if (states.length>1) {
+                            if (!groupList) {
+                                groupList = Controls.CompoundGrid().setSeparation(4,0);
+                                groupSection = Controls.Section(groupList, {
+                                    title: groupInfo.Name,
+                                    headerStyleClass: 'DQXControlSectionHeader',
+                                    bodyStyleClass: 'ControlsSectionBodySubSection'
+                                });
+                                controls.addControl(groupSection);
+                            }
+                            var cmb = Controls.Combo(null, {label: '', states: states, width:130});
+                            cmb.setOnChanged(function() {
+                                $.each(selectors, function(idx, selector) {
+                                    if (selector.propInfo.propid!=propInfo.propid) {
+                                        if (selector.cmb.getValue()==cmb.getValue())
+                                            selector.cmb.modifyValue('');
+                                    }
+                                });
+                            });
+                            selectors.push({ cmb: cmb, propInfo: propInfo});
+                            groupList.setItem(rowNr, 0, cmb);
+                            groupList.setItem(rowNr, 1, Controls.Static(propInfo.name));
+                            rowNr += 1;
+                        }
+                    }
+                })
+            });
+
+            content += headerCtrl.renderHtml() + '<br>';
+            content += '<div style="background-color:white; border:none; min-width: 450px; max-height:450px; overflow-y:auto">';
+            content += controls.renderHtml() + '</div><p>';
+            var buttonCreatePlot = Controls.Button(null, { content: '<b>Create plot</b>', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
+            buttonCreatePlot.setOnChanged(function() {
+                var aspects = {};
+                $.each(selectors, function(idx, selector) {
+                    if (selector.cmb.getValue())
+                        aspects[selector.cmb.getValue()] = selector.propInfo.propid;
+                });
+
+                //Check for missing required aspects
+                var missingAspects = [];
+                $.each(plottype.plotAspects, function(idx, aspectInfo) {
+                    if ((aspectInfo.requiredLevel == 2) && (!aspects[aspectInfo.id]) ) {
+                        missingAspects.push(aspectInfo.name);
+                    }
+                });
+                if (missingAspects.length>0) {
+                    alert('Please associate the following plot aspect(s) to data properties: \n\n'+missingAspects.join(', '));
+                    return;
+                }
+
+                Popup.closeIfNeeded(popupID);
+                    plottype.Create(tableInfo.id, info.query, {
+                        subSamplingOptions: info.subSamplingOptions,
+                        aspects: aspects
+                    });
+            });
+            content += buttonCreatePlot.renderHtml() + '<p>';
+            var popupID = Popup.create(plottype.name+' aspects', content);
+            controls.postCreateHtml();
         }
 
         return DataItemPlotPopup;

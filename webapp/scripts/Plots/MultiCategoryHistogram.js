@@ -16,6 +16,10 @@ define([
             return true;
         }
 
+        MultiCategoryHistogram.plotAspects = [
+            { id:'value', name:'Value', dataType:'Value', requiredLevel: 2 },
+            { id:'groupby', name:'Group by', dataType:'Category', requiredLevel: 2 }
+        ];
 
         GenericPlot.registerPlotType(MultiCategoryHistogram);
 
@@ -55,12 +59,12 @@ define([
                         catPropList.push({ id:prop.propid, name:prop.name });
                 });
                 
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: numPropList }).setClassID('value');
+                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: numPropList, value:that.providedAspect2Property('value') }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
                     that.fetchData();
             });
 
-                that.ctrlCatProperty = Controls.Combo(null,{ label:'Group by:<br>', states: catPropList }).setClassID('groupby');
+                that.ctrlCatProperty = Controls.Combo(null,{ label:'Group by:<br>', states: catPropList, value:that.providedAspect2Property('groupby') }).setClassID('groupby');
                 that.ctrlCatProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -160,6 +164,8 @@ define([
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
             };
 
             that.setActiveQuery = function(qry) {

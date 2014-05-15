@@ -185,7 +185,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:40, bitmap:'Bitmaps/chart.png' });
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         var subSamplingOptions = null;
                         if (that.theQuery.isSubSampling())

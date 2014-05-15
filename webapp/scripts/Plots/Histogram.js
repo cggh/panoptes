@@ -16,6 +16,10 @@ define([
             return true;
         }
 
+        Histogram.plotAspects = [
+            { id:'value', name:'Value', dataType:'Value', requiredLevel: 2 }
+        ];
+
 
         GenericPlot.registerPlotType(Histogram);
 
@@ -23,6 +27,8 @@ define([
             var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery, querySettings);
             that.fetchCount = 0;
             that.showRelative = false;
+
+
 
 
             that.barW = 16;
@@ -51,7 +57,7 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: propList }).setClassID('value');
+                that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: propList, value:that.providedAspect2Property('value') }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -108,6 +114,9 @@ define([
                 ]).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
+
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
 
             };
 

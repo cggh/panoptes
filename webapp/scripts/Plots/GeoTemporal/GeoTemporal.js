@@ -18,6 +18,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             return tableInfo.hasGeoCoord;
         }
 
+        GeoTemporal.plotAspects = [
+//            { id:'longit', name:'Longitude', dataType:'GeoLongitude', requiredLevel: 2 },
+//            { id:'lattit', name:'Latitude', dataType:'GeoLattitude', requiredLevel: 2 },
+            { id:'dateprop', name:'Date', dataType:'Date', requiredLevel: 1 },
+            { id:'pointcolor', name:'Color', dataType:'', requiredLevel: 0 }
+
+        ];
 
 
         GenericPlot.registerPlotType(GeoTemporal);
@@ -40,6 +47,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
                     that.hasTimeLine = true;
             });
+
+            if (that.hasProvidedAspects() && (!that.providedAspect2Property('dateprop')))
+                that.hasTimeLine = false;
 
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
@@ -160,7 +170,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') || (prop.datatype=='Date') ) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
-                that.ctrlColorProperty = Controls.Combo(null,{ label:'Color:', states: propList }).setClassID('pointcolor');
+                that.ctrlColorProperty = Controls.Combo(null,{ label:'Color:', states: propList, value:that.providedAspect2Property('pointcolor') }).setClassID('pointcolor');
                 that.ctrlColorProperty.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -225,7 +235,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 );
 
                 that.startZoomFit = true;
-                that.reloadAll();
+                if (that.hasProvidedAspects())
+                    that.reloadAll();
             };
 
             that.setWarning = function(warning) {
