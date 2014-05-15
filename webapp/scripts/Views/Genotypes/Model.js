@@ -1,25 +1,16 @@
 define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
     function (TwoDCache, MetaData, ArrayBufferClient, SQL) {
         return function Model(table_info,
-                              col_query,
-                              row_query,
-                              col_order,
-                              row_order,
+                              query,
                               chromosomes,
                               update_callback) {
             var that = {};
             that.init = function(table_info,
-                                 col_query,
-                                 row_query,
-                                 col_order,
-                                 row_order,
+                                 query,
                                  chromosomes,
                                  update_callback) {
                 that.table = table_info;
-                that.row_query = row_query;
-                that.col_query = col_query;
-                that.row_order = row_order;
-                that.col_order = col_order;
+                that.query = query;
                 that.chromosomes = chromosomes;
                 that.update_callback = update_callback;
 
@@ -49,7 +40,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.cache_for_chrom = {};
                 _.each(that.chromosomes, function (chrom) {
                     that.cache_for_chrom[chrom] = TwoDCache(
-                        that.col_order,
+                        that.query.col_order,
                         function(start, end, callback) {
                             that.data_provider(chrom, start, end, callback);
                         },
@@ -102,8 +93,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that._change_col_range = function(chrom, start, end) {
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
-                that.col_ordinal = data.col[that.col_order] || [];
-                that.row_ordinal = data.row[that.row_order] || [];
+                that.col_ordinal = data.col[that.query.col_order] || [];
+                that.row_ordinal = data.row[that.query.row_order] || [];
 
                 if (that.data_type == 'diploid') {
                     that.depth = data.twoD[that.depth_property] || [];
@@ -141,25 +132,25 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             that.change_col_range = _.throttle(that._change_col_range, 200);
 
             that.new_col_query = function(q) {
-                that.col_query = q;
+                that.query.col_query = q;
                 that.reset_cache();
             };
 
             that.new_row_query = function(q) {
-                that.row_query = q;
+                that.query.row_query = q;
                 that.reset_cache();
             };
 
             that.data_provider = function(chrom, start, end, callback) {
-                var col_query = that.col_query;
+                //Modify the horizontal query to just the requested window
+                var col_query = that.query.col_query;
                 if (col_query.isTrivial)
                     col_query = [];
                 else
                     col_query = [col_query];
-                //TODO Dynamic chrom field
                 col_query.push(SQL.WhereClause.CompareFixed('chrom', '=', chrom));
-                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '>=', start));
-                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '<', end));
+                col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '>=', start));
+                col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '<', end));
                 col_query = SQL.WhereClause.AND(col_query);
                 var myurl = DQX.Url(MetaData.serverUrl);
                 myurl.addUrlQueryItem("datatype", "custom");
@@ -168,12 +159,12 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem('dataset', MetaData.database);
                 myurl.addUrlQueryItem('datatable', that.table.id);
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
-                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.row_query));
-                myurl.addUrlQueryItem("col_order", that.col_order);
-                myurl.addUrlQueryItem("row_order", that.row_order);
+                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.query.row_query));
+                myurl.addUrlQueryItem("col_order", that.query.col_order);
+                myurl.addUrlQueryItem("row_order", that.query.row_order);
                 myurl.addUrlQueryItem("first_dimension", that.table.first_dimension);
-                myurl.addUrlQueryItem("col_properties", that.col_order);
-                myurl.addUrlQueryItem("row_properties", that.row_order);
+                myurl.addUrlQueryItem("col_properties", that.query.col_order);
+                myurl.addUrlQueryItem("row_properties", that.query.row_order);
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
@@ -186,12 +177,9 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.init(table_info,
-                col_query,
-                row_query,
-                col_order,
-                row_order,
-                chromosomes,
-                update_callback);
+                      query,
+                      chromosomes,
+                      update_callback);
             return that
         };
     }

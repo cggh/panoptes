@@ -34,12 +34,14 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
                 //Fix order to by position for col and primary key for row
                 that.model = Model(table_info,
-                    that.col_query.get(),
-                    that.row_query.get(),
-                    table_info.col_table.PositionField,
-                    table_info.row_table.primkey,
-                    _.map(MetaData.chromosomes, DQX.attr('id')),
-                    that._draw
+                                   {
+                                       col_query: that.col_query.get(),
+                                       row_query: that.row_query.get(),
+                                       col_order: table_info.col_table.PositionField,
+                                       row_order: table_info.row_table.primkey
+                                   },
+                                   _.map(MetaData.chromosomes, DQX.attr('id')),
+                                   that._draw
                 );
                 //View parameters
                 that.view = {
