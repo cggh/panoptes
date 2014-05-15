@@ -321,8 +321,11 @@ define([
                         );
                         fetcher.setMaxResultCount(that.maxrecordcount);
                         var encoding='ST';
-                        if (propInfo.isFloat)
+                        if (propInfo.isFloat) {
                             encoding = 'F3';
+                            if (propInfo.datatype=='HighPrecisionValue')
+                                encoding = 'FH';
+                        }
                         if (propInfo.isInt)
                             encoding = 'IN';
                         if (propInfo.isBoolean)

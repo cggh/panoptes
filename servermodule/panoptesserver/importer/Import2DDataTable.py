@@ -104,63 +104,87 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         if not import_settings['ConfigOnly']:
             #Insert an index column into the index tables
             if table_settings['ColumnDataTable']:
-                #Firstly create a temporay table with the index array
-                try:
-                    column_index = remote_hdf5[table_settings['ColumnIndexArray']]
-                except KeyError:
-                    raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['ColumnIndexArray']))
-                for property in table_settings['Properties']:
-                    if len(column_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'column' else 1]:
-                        raise Exception("Property {0} has a different column length to the column index".format(property))
-                sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index)
-                ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
+                if table_settings.HasToken('ColumnIndexArray'):
+                    #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
+                    #Firstly create a temporay table with the index array
+                    try:
+                        column_index = remote_hdf5[table_settings['ColumnIndexArray']]
+                    except KeyError:
+                        raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['ColumnIndexArray']))
+                    for property in table_settings['Properties']:
+                        if len(column_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'column' else 1]:
+                            raise Exception("Property {0} has a different column length to the column index".format(property))
+                    sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index)
+                    ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
 
-                #We have a datatable - add an index to it then copy that index across to the data table
-                sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
-                         SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
-                         ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
-                         UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
-                         DROP TABLE `TempColIndex`""".format(
-                    table_settings['ColumnDataTable'],
-                    table_settings['ColumnIndexField'],
-                    tableid)
-                ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
-                #Now check we have no NULLS
-                sql = "SELECT `{1}_column_index` from `{0}` where `{1}_column_index` IS NULL".format(
-                    table_settings['ColumnDataTable'],
-                    tableid)
-                nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
-                if len(nulls) > 0:
-                    raise Exception("Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
+                    #We have a datatable - add an index to it then copy that index across to the data table
+                    sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
+                             SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
+                             ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
+                             UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
+                             DROP TABLE `TempColIndex`""".format(
+                        table_settings['ColumnDataTable'],
+                        table_settings['ColumnIndexField'],
+                        tableid)
+                    ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    #Now check we have no NULLS
+                    sql = "SELECT `{1}_column_index` from `{0}` where `{1}_column_index` IS NULL".format(
+                        table_settings['ColumnDataTable'],
+                        tableid)
+                    nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
+                    if len(nulls) > 0:
+                        raise Exception("Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
+                else:
+                    #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
+                    sql = """ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
+                             SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;
+                             """.format(
+                        table_settings['ColumnDataTable'],
+                        table_settings['ColumnIndexField'],
+                        tableid)
+                    ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+
             if table_settings['RowDataTable']:
-                #Firstly create a temporay table with the index array
-                try:
-                    row_index = remote_hdf5[table_settings['RowIndexArray']]
-                except KeyError:
-                    raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['RowIndexArray']))
-                for property in table_settings['Properties']:
-                    if len(row_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'row' else 1]:
-                        raise Exception("Property {0} has a different row length to the row index".format(property))
-                sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
-                ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
+                if table_settings.HasToken('RowIndexArray'):
+                    #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
+                    #Firstly create a temporay table with the index array
+                    try:
+                        row_index = remote_hdf5[table_settings['RowIndexArray']]
+                    except KeyError:
+                        raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['RowIndexArray']))
+                    for property in table_settings['Properties']:
+                        if len(row_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'row' else 1]:
+                            raise Exception("Property {0} has a different row length to the row index".format(property))
+                    sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
+                    ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
 
-                #We have a datatable - add an index to it then copy that index across to the data table
-                sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
-                         SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
-                         ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
-                         UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
-                         DROP TABLE `TempRowIndex`""".format(
-                    table_settings['RowDataTable'],
-                    table_settings['RowIndexField'],
-                    tableid)
-                ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
-                #Now check we have no NULLS
-                sql = "SELECT `{1}_row_index` from `{0}` where `{1}_row_index` IS NULL".format(
-                    table_settings['RowDataTable'],
-                    tableid)
-                nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
-                if len(nulls) > 0:
-                    raise Exception("Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
+                    #We have a datatable - add an index to it then copy that index across to the data table
+                    sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
+                             SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
+                             ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
+                             UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
+                             DROP TABLE `TempRowIndex`""".format(
+                        table_settings['RowDataTable'],
+                        table_settings['RowIndexField'],
+                        tableid)
+                    ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    #Now check we have no NULLS
+                    sql = "SELECT `{1}_row_index` from `{0}` where `{1}_row_index` IS NULL".format(
+                        table_settings['RowDataTable'],
+                        tableid)
+                    nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
+                    if len(nulls) > 0:
+                        raise Exception("Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
+                else:
+                    #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "RowIndexField" so we index by that column in order
+                    sql = """ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
+                             SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;
+                             """.format(
+                        table_settings['RowDataTable'],
+                        table_settings['RowIndexField'],
+                        tableid)
+                    ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+
 
             #We have the indexes - now we need a local copy of the HDF5 data for each property
             ImpUtils.mkdir(os.path.join(config.BASEDIR, '2D_data'))

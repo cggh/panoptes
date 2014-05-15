@@ -13,7 +13,7 @@ import dateutil.parser
 #       name
 #       DataType: Value, Boolean, Text
 
-def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, allowSubSampling=False):
+def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, importSettings, allowSubSampling):
 
     def DecoId(id):
         return '`' + id + '`'
@@ -43,10 +43,17 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                 content = 'NULL'
 
         if col['IsDate']:
-            dt = dateutil.parser.parse(content)
-            tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
-            tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
-            content = str(tmdiff)
+            if len(content)>=5:
+                try:
+                    dt = dateutil.parser.parse(content)
+                    tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
+                    tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
+                    content = str(tmdiff)
+                except:
+                    print('ERROR: date parsing string '+content)
+                    content = 'NULL'
+            else:
+                content = 'NULL'
 
         if col['IsBoolean']:
             vl = content
@@ -74,6 +81,18 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         col['MaxLen'] = 0
 
     destFileName = ImpUtils.GetTempFileName()
+
+    maxLineCount = -1
+    if importSettings['ScopeStr'] == '1k':
+        maxLineCount = 1000
+    if importSettings['ScopeStr'] == '10k':
+        maxLineCount = 10000
+    if importSettings['ScopeStr'] == '100k':
+        maxLineCount = 100000
+    if importSettings['ScopeStr'] == '1M':
+        maxLineCount = 1000000
+    if importSettings['ScopeStr'] == '10M':
+        maxLineCount = 10000000
 
     with open(sourceFileName, 'r') as ifp:
         if ifp is None:
@@ -128,6 +147,9 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                     lineCount += 1
                     if lineCount % 250000 == 0:
                         calculationObject.Log('Line '+str(lineCount))
+                    if (maxLineCount>0) and (lineCount >= maxLineCount):
+                        calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
+                        break
 
     calculationObject.Log('Column sizes: '+str({col['name']: col['MaxLen'] for col in columns}))
 
@@ -176,9 +198,18 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "CREATE TABLE {0}_SORTRAND LIKE {0}".format(tableid)
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+            if autoPrimKey:
+                calculationObject.Log('Restructuring AutoKey')
+                sql = "alter table {0}_SORTRAND drop column AutoKey".format(tableid)
+                ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+                sql = "alter table {0}_SORTRAND add column AutoKey int FIRST".format(tableid)
+                ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
+                sql = "create index idx_autokey on {0}_SORTRAND(AutoKey)".format(tableid)
+                ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "alter table {0}_SORTRAND add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(tableid)
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             sql = "insert into {0}_SORTRAND select *,0 from {0} order by _randomval_".format(tableid)
+            sql += ' LIMIT 5000000' # NOTE: there is little point in importing more than that!
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
 
 

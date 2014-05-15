@@ -1,12 +1,12 @@
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
-    "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap"
+    "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap", "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup,
-              ItemView_DefaultView, ItemView_ItemMap, ItemView_PieChartMap
+              ItemView_DefaultView, ItemView_ItemMap, ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup
         ) {
 
         var ItemPopup = {};
@@ -28,45 +28,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         ItemPopup.show_sub1 = function(itemInfo, data) {
-//            var content='';//JSON.stringify(data);
-//            var propertyMap = {};
-//            $.each(MetaData.customProperties, function(idx,propInfo) {
-//                if (propInfo.tableid == itemInfo.tableid) {
-//                    propertyMap[propInfo.name] = propInfo.toDisplayString(data[propInfo.propid]);
-//                }
-//            });
-//
-//            function addLevelToContent(levelInfo) {
-//                var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
-//                content += "<table>";
-//                $.each(MetaData.customProperties,function(idx, propInfo) {
-//                    if (propInfo.tableid == tableInfo.id) {
-//                        var fieldContent = levelInfo.fields[propInfo.propid];
-//                        content += '<tr>';
-//                        content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + propInfo.name + "</b></td>";
-//                        content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
-//                        content += "</tr>";
-//                    }
-//                });
-//                content += "</table>";
-//                $.each(levelInfo.parents, function(idx, parentInfo) {
-//                    var parentTableInfo = MetaData.mapTableCatalog[parentInfo.tableid];
-//                    content += '<div style="padding-left:30px">';
-//                    content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px;padding-left:8px"><i>';
-//                    content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
-//                    content += '</i>&nbsp;&nbsp;';
-//                    var lnk = Controls.Hyperlink(null,{ content: 'Open'});
-//                    lnk.setOnChanged(function() {
-//                        Msg.send({type: 'ItemPopup'}, {tableid: parentInfo.tableid, itemid: parentInfo.fields[parentTableInfo.primkey]});
-//                    });
-//                    content += lnk.renderHtml();
-//                    content += '</div>';
-//                    addLevelToContent(parentInfo);
-//                    content += '</div>';
-//                });
-//            }
-//
-//            addLevelToContent(data);
 
 
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
@@ -103,9 +64,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-//                that.frameBody = frameTabGroup.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setDisplayTitle('Info fields');
-//                that.frameFields = that.frameBody.addMemberFrame(Framework.FrameFinal('', 0.7))
-//                    .setAllowScrollBars(true,true);
 
                 that.itemViewObjects = [];
                 if (that.tableInfo.settings.DataItemViews)
@@ -126,6 +84,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     if (dtViewInfo.Type == 'ItemMap') {
                         dtViewObject = ItemView_ItemMap.create(dtViewInfo, that.tableInfo, data);
+                    }
+                    if (dtViewInfo.Type == 'FieldList') {
+                        dtViewObject = ItemView_FieldList.create(dtViewInfo, that.tableInfo, data);
+                    }
+                    if (dtViewInfo.Type == 'PropertyGroup') {
+                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, that.tableInfo, data);
+                        dtViewInfo.Name = '-Absent-';
+                        var groupInfo = that.tableInfo.propertyGroupMap[dtViewInfo.GroupId];
+                        if (groupInfo)
+                            dtViewInfo.Name = groupInfo.Name;
                     }
                     if (!dtViewObject)
                         DQX.reportError("Invalid dataitem view type "+dtViewInfo.Type);
@@ -151,7 +119,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
-//                that.frameFields.setContentHtml(content);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
                 that.buttonWidth = 160;
@@ -312,7 +279,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                     relTab.panelButtons = Framework.Form(relTab.frameButtons);
-                    var button_OpenInTable = Controls.Button(null, { content: 'Show in table view'}).setOnChanged(function() {
+                    var button_OpenInTable = Controls.Button(null, { content: 'Show in table view', width:120, height:35}).setOnChanged(function() {
                         Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
                             { propid:relTab.relationInfo.childpropid, value:data.fields[that.tableInfo.primkey] }
                         );

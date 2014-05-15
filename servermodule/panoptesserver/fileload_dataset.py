@@ -14,8 +14,9 @@ def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     importSettings = {}
     importSettings['ConfigOnly'] = False
-    if data['ConfigOnly'] == '1':
+    if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
+    importSettings['ScopeStr'] = data['ScopeStr']
     importer.ImportFiles.ImportDataSet(
         calculationObject,
         config.SOURCEDATADIR + '/datasets',

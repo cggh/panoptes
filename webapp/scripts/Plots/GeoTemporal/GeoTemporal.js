@@ -317,7 +317,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.requestID = requestID;
                 var selectionInfo = that.tableInfo.currentSelection;
                 DQX.setProcessing();
-                fetcher.getData(that.theQuery.getForFetching(), sortField,
+                var qry = that.theQuery.getForFetching();
+
+                var qryIsPresentGenerator = SQL.WhereClause.whcClassGenerator['ispresent'];
+                qry = SQL.WhereClause.createRestriction(qry,qryIsPresentGenerator({ColName: that.tableInfo.propIdGeoCoordLongit}));
+                qry = SQL.WhereClause.createRestriction(qry,qryIsPresentGenerator({ColName: that.tableInfo.propIdGeoCoordLattit}));
+                fetcher.getData(qry, sortField,
                     function (data) { //success
                         DQX.stopProcessing();
                         if (that.requestID == requestID) {
@@ -433,7 +438,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         numData: !!that.numPropId
                     });
                     that.pointSet.setColorMap(that.mappedColors);
-                    that.plotComponents.timeLine.setColorMap(that.mappedColors);
+                    if (that.plotComponents.timeLine)
+                        that.plotComponents.timeLine.setColorMap(that.mappedColors);
                 }
             }
 

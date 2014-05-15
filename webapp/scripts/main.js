@@ -88,6 +88,30 @@ require([
             }
 
 
+            // adds extra settings from a custom data source to the table settings
+            var mapExtraTableSettings = function(tableInfo, customDataCatalog) {
+                var tokensList = ['DataItemViews', 'PropertyGroups']; //List of all settings tokens for which this mechanism applies
+                $.each(customDataCatalog, function(idx, customData) {
+                    if (customData.tableid == tableInfo.id) {
+                        var customSettings = JSON.parse(customData.settings);
+                        $.each(tokensList, function(idx2, token) {
+                            if (customSettings[token]) {
+                                if (!tableInfo.settings[token]) {
+                                    tableInfo.settings[token] = customSettings[token];
+                                }
+                                else {
+                                    $.each(customSettings[token], function(idx3, extraItem) {
+                                        tableInfo.settings[token].push(extraItem);
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+
+
             function Start_Part2() {
                     DQX.customRequest(MetaData.serverUrl,PnServerModule,'datasetinfo', {
                         database: MetaData.database
@@ -98,11 +122,13 @@ require([
 
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
+                getter.addTable('customdatacatalog',['tableid','sourceid', 'settings'],'tableid');
                 getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'first_dimension', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching
                         MetaData.tableCatalog = getter.getTableRecords('tablecatalog');
+                        var customDataCatalog = getter.getTableRecords('customdatacatalog');
                         MetaData.twoDTableCatalog = getter.getTableRecords('2D_tablecatalog');
                         MetaData.generalSettings = {};
                         $.each(getter.getTableRecords('settings'), function(idx,sett) {
@@ -112,6 +138,8 @@ require([
                         });
                         MetaData.mapTableCatalog = {};
                         $.each(MetaData.tableCatalog, function(idx, table) {
+                            Initialise.parseTableSettings(table);
+                            mapExtraTableSettings(table, customDataCatalog);
                             Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
                         });
@@ -261,15 +289,19 @@ require([
                     window.open('http://panoptes.readthedocs.org/en/latest/');
                 }
                 });
+                actions.push( { content:'Load new instance', bitmap:'Bitmaps/actionbuttons/reload.png', handler:function() {
+                    window.open('main.html');
+                }
+                });
                 actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
-                    var hostname=window.location.hostname;
-                    var pathname=window.location.pathname;
-                    var protocol=window.location.protocol;
-                    var url='{protocol}//{hostname}{pathname}'.DQXformat({
-                        protocol:protocol,
-                        hostname:hostname,
-                        pathname:pathname
-                    });
+//                    var hostname=window.location.hostname;
+//                    var pathname=window.location.pathname;
+//                    var protocol=window.location.protocol;
+//                    var url='{protocol}//{hostname}{pathname}'.DQXformat({
+//                        protocol:protocol,
+//                        hostname:hostname,
+//                        pathname:pathname
+//                    });
                     window.open('admin.html');
                 }
                 });

@@ -25,6 +25,11 @@ GenomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewpor
 QuickFindFields: SnpName
 
 
+PropertyGroups:
+- Id: Info
+  Name: Variant Info
+- Id: AlleleFreq
+  Name: Allele freqs.
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
@@ -33,12 +38,14 @@ Properties:
 
 - Id: chromosome                 # Identifier of the property, corresponding to the column header in the [data] file
   Name: Chromosome               # Display name of the property
+  GroupId: Info
   Description: Chromosome name   # Description of the property
   DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
   ShowInTable: true              # If true, this property will appear by default in data table grids in the application
 
 - Id: position
   Name: Position
+  GroupId: Info
   Description: Genomic position of the variant on the chromosome (1-based)
   DataType: Value
   ShowInTable: true
@@ -46,6 +53,7 @@ Properties:
 
 - Id: SnpName
   Name: Variant name
+  GroupId: Info
   Description: Unique name of the variant
   DataType: Text
   ShowInTable: true
@@ -53,6 +61,7 @@ Properties:
 
 - Id: HighQuality
   Name: High Quality
+  GroupId: Info
   Description: Variant Quality filter
   DataType: Boolean
   ShowInTable: true
@@ -61,7 +70,7 @@ Properties:
   BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
 - Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
-  DataType: Value
+  GroupId: Info
   Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
   ShowInTable: true
   ShowInBrowser: true           # If true, this property will be displayed in the genome browser
@@ -71,6 +80,7 @@ Properties:
 
 - Id: Value1
   Name: Value 1
+  DataType: HighPrecisionValue
   Description: The first numerical value
   BarWidth: 180                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
   ChannelName: Channel A          # Name of the channel this property will be displayed in. Properties sharing the same channel name will be displayed in overlay
@@ -80,6 +90,7 @@ Properties:
 
 - Id: Value2
   Name: Value 2
+  DataType: Value
   Description: The second numerical value
   ChannelName: Channel A
   ChannelColor: "rgb(200,80,0)"
@@ -87,6 +98,7 @@ Properties:
 
 - Id: Value3
   Name: Value 3
+  DataType: Value
   Description: The third numerical value
   BrowserDefaultVisible: true
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
@@ -96,6 +108,7 @@ Properties:
 
 - Id: Extra1
   Name: Extra 1
+  GroupId: Info
   Description: An example categorical property
   DataType: Text
   ShowInTable: true
@@ -113,6 +126,7 @@ Properties:
   
 - Id: NRAF_WAF, NRAF_EAF, NRAF_SAF
   DataType: Value
+  GroupId: AlleleFreq
   ShowInTable: true
   MinVal: 0
   MaxVal: 1
@@ -126,6 +140,10 @@ Properties:
 - Id: NRAF_SAF
   Description: Non-reference allele frequency in South Africa
 
+
+
+
+
 ExternalLinks:
 - Url: https://www.google.co.uk/search?q={SnpName}
   Name: Google search
@@ -133,13 +151,25 @@ ExternalLinks:
 - Url: http://en.wikipedia.org/wiki/{SnpName}
   Name: Wikipedia
   
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists the custom views that should appear in the popup for an individual datatable item
 
-- Type: Overview                                       # Specifies the default view of all fields
-  Name: Overview
+- Type: FieldList                                      # Specifies a list of properties to be shown
+  Name: Variant properties                             # Name of the view
+  Fields:                                              # List of the fields to be included
+  - chromosome
+  - position
+  - SnpName
+  - HighQuality
+  - Value1
+  - Value2
+  - Value3
+  - Extra1
+
+- Type: PropertyGroup
+  GroupId: AlleleFreq
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
-  Name: Allele frequencies map                         # Name of the view
+  Name: Map                                            # Name of the view
   PieChartSize: 1000                                   # Size of the largest pie chart
   MapCenter: { Longitude: 10, Lattitude: 0 }           # Start location of the map
   MapZoom: 2                                           # Start zoom factor of the map
@@ -154,4 +184,5 @@ DataItemViews: # Lists all the custom views that should appear in the popup for 
     Color: rgb(128,28,0)                               # Color of the pie
   ResidualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
 
-
+- Type: Overview                                       # Specifies the default view of all fields
+  Name: Overview

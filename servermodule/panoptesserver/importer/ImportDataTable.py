@@ -147,6 +147,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 tableid,
                 columns,
                 tableSettings,
+                importSettings,
                 tableSettings['AllowSubSampling']
             )
             if tableSettings['IsPositionOnGenome']:
@@ -181,7 +182,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
                     if not importSettings['ConfigOnly']:
-                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
+                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False, importSettings)
                     ImpUtils.CreateSummaryValues_Value(
                         calculationObject,
                         summSettings,
@@ -204,7 +205,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         os.makedirs(destFolder)
                     dataFileName = os.path.join(destFolder, propid)
                     if not importSettings['ConfigOnly']:
-                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False)
+                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False, importSettings)
                     categories = []
                     if settings.HasToken('categoryColors'):
                         stt = settings.GetSubSettings('categoryColors')

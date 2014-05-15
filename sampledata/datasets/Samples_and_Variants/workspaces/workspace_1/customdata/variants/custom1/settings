@@ -1,7 +1,12 @@
+PropertyGroups:
+- Id: Custom
+  Name: Custom data
+
 Properties:
 
 - Id: Custom1
   Name: Custom Value 1
+  GroupId: Custom
   Description: An example of a custom numerical value
   DataType: Value
   ShowInTable: true
@@ -16,6 +21,7 @@ Properties:
 
 - Id: Custom2
   Name: Custom value 2
+  GroupId: Custom
   Description: An example of a custom text value
   DataType: Text
   ShowInTable: true
@@ -26,7 +32,16 @@ Properties:
 
 - Id: EditBoolean1
   Name: Editable boolean
+  GroupId: Info
   Datatype: Boolean
   ReadData: false
   ShowInTable: true
   CanUpdate: true
+
+DataItemViews:
+
+- Type: FieldList
+  Name: Custom view
+  Fields:
+  - Custom1
+  - Custom2

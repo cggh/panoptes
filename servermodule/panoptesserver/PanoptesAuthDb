@@ -4,14 +4,11 @@
 #    Patterns are regex
 #    UserNamePattern can also include CAS groups
 ###############################################################################
-
+#
+# NOTE: location of this file can be specified in config.py, AUTHORISATIONFILE
+#
+###############################################################################
 
 # The following line grants universal privileges to everybody:
 .*, .*, manage
 
-
-
-# anonymous, Sample1, edit
-# anonymous, Markers, read
-
-# dev.panoptes.groups.malariagen.net, Geographic, manage

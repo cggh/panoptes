@@ -316,11 +316,25 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     color: rgb(61,104,108);
 }
 
-.DQXControlSectionHeader, .GenomeBrowserMainSectionHeader {
+
+.DQXControlSectionSubHeader {
+    /*background-color: rgb(206,234,237);*/
+    font-weight: bold;
+    border: none;
+    padding:7px;
+    padding-top:5px;
+    padding-bottom:5px;
+    /*border-top:1px solid rgb(169,211,215);*/
+    border-bottom:1px solid rgb(169,211,215);
+    color: rgb(61,104,108);
+}
+
+
+.DQXControlSectionHeader, .GenomeBrowserMainSectionHeader, .DQXControlSectionSubHeader {
     opacity: 0.8;
 }
 
-.DQXControlSectionHeader:hover, .GenomeBrowserMainSectionHeader:hover {
+.DQXControlSectionHeader:hover, .GenomeBrowserMainSectionHeader:hover, .DQXControlSectionSubHeader:hover {
     opacity: 1;
 }
 
@@ -329,6 +343,18 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     margin-top:20px;
     margin-right:4px;
     margin-bottom:20px;
+}
+
+.ControlsSectionBodySubSection {
+    margin-left:9px;
+    margin-top:13px;
+    margin-right:4px;
+    margin-bottom:13px;
+}
+
+.ControlsSectionBodyNoMargin {
+    margin-top:10px;
+    margin-bottom:10px;
 }
 
 .ControlsSectionBodyIntro {

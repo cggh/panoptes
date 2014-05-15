@@ -63,6 +63,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings')
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog')
 
         datatables = []
 
@@ -125,10 +127,12 @@ if __name__ == "__main__":
     import customresponders.panoptesserver.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
+    scopeOptions = ["all", "none", "1k", "10k", "100k"]
+
     if len(sys.argv) < 4:
         print('Arguments: DataType ImportType DataSetId [...]')
         print('DataType: "dataset", "datatable"')
-        print('ImportType: "full", "config"')
+        print('ImportType: '+', '.join(scopeOptions))
         sys.exit()
 
     ImportDataType = sys.argv[1]
@@ -137,10 +141,10 @@ if __name__ == "__main__":
         sys.exit()
 
     ImportMethod = sys.argv[2]
-    if ImportMethod not in ['full', 'config']:
-        print('Second argument (ImportType) has to be "full" or "config"')
+    if ImportMethod not in scopeOptions:
+        print('Second argument (ImportType) has to be '+', '.join(scopeOptions))
         sys.exit()
-    configOnly = (ImportMethod == 'config')
+    configOnly = (ImportMethod == 'none')
 
     datasetid = sys.argv[3]
 
@@ -148,7 +152,8 @@ if __name__ == "__main__":
         print('Start importing dataset "{0}"...'.format(datasetid))
         ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', datasetid,
             {
-                'ConfigOnly': configOnly
+                'ConfigOnly': configOnly,
+                 'ScopeStr': ImportMethod
             }
         )
         sys.exit()

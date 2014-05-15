@@ -48,6 +48,7 @@
                             var txt = descrs[i];
                             txt = DQX.highlightText(txt, pattern);
                             var descr = txt + ' ({id}; {chrom}:{p1}-{p2})'.DQXformat({ id: ids[i], chrom: chromidlist[i], p1: startlist[i], p2: endlist[i] });
+                            descr = '<span style="word-wrap:break-word">'+descr+'</span>'
                             items.push({ id: 'id' + i, content: descr });
                             this.idMap['id' + i] = ids[i];
                         }

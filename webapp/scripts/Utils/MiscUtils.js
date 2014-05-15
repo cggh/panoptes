@@ -31,15 +31,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        MiscUtils.createItemTableViewerColumn = function(theTable, tableid, propid) {
+        MiscUtils.createEncoderId = function(tableid, propid) {
             var tableInfo = MetaData.mapTableCatalog[tableid];
             var propInfo = MetaData.findProperty(tableid, propid);
             var encoding  = 'String';
-            var tablePart = 1;
             if (propInfo.datatype=='Value') {
                 encoding  = 'Float3';
-                if (propInfo.settings.decimDigits ==0 )
+                if ((propInfo.settings.decimDigits ==0 ) || (propInfo.isPrimKey))
                     encoding  = 'Int';
+            }
+            if (propInfo.datatype=='HighPrecisionValue') {
+                encoding  = 'FloatH';
             }
             if ((propInfo.datatype=='Value') && (propInfo.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
                 encoding  = 'Int';
@@ -49,6 +51,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 encoding  = 'Float4';
             if ( (propInfo.datatype=='Date') )
                 encoding  = 'Float4';
+            return encoding;
+        }
+
+        MiscUtils.createItemTableViewerColumn = function(theTable, tableid, propid) {
+            var tableInfo = MetaData.mapTableCatalog[tableid];
+            var propInfo = MetaData.findProperty(tableid, propid);
+            var encoding  = MiscUtils.createEncoderId(tableid, propid);
+            var tablePart = 1;
             if (propInfo.isPrimKey)
                 tablePart = 0;
             var sortable = true;
@@ -178,19 +188,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
 
-        MiscUtils.selectQuery = function(tableInfo, query, method) {
+        MiscUtils.selectQuery = function(tableInfo, theQueryObject, method) {
             if (['replace', 'add', 'restrict', 'exclude'].indexOf(method)<0)
                 DQX.reportError('Invalid selection method');
             var maxcount = 100000;
             var fetcher = DataFetchers.RecordsetFetcher(
                 MetaData.serverUrl,
                 MetaData.database,
-                tableInfo.getQueryTableName(false)
+                tableInfo.getQueryTableName(theQueryObject.isSubSampling())
             );
             fetcher.setMaxResultCount(maxcount);
+
+            var orderField = tableInfo.primkey;
+            if (theQueryObject.isSubSampling())
+                orderField = 'RandPrimKey';
+
             fetcher.addColumn(tableInfo.primkey, 'ST');
             DQX.setProcessing();
-            fetcher.getData(query, tableInfo.primkey,
+            fetcher.getData(theQueryObject.getForFetching(), orderField,
                 function (data) { //success
                     DQX.stopProcessing();
                     var items = data[tableInfo.primkey];
@@ -395,7 +410,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             })
 
             // try year multiples
-            $.each([1,2,5,10], function(idx, mult) {
+            $.each([1,2,5,10,20,50,100,200,500,1000], function(idx, mult) {
                 dist = mult*365*zoomFact;
                 shear = calcShear(dist)
                 if (shear<minShear) {

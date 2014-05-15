@@ -22,6 +22,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.createPanels = function() {
 
                 var content = '';
+                var content = '<div style="padding:8px">';
                 function addLevelToContent(levelInfo) {
                     var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
                     content += "<table>";
@@ -29,7 +30,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (propInfo.tableid == tableInfo.id) {
                             var fieldContent = levelInfo.fields[propInfo.propid];
                             content += '<tr>';
-                            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap"><b>' + propInfo.name + "</b></td>";
+                            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b></td>'.DQXformat({
+                                hint: (propInfo.settings.Description)||'',
+                                name: propInfo.name
+                            });
                             content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
                             content += "</tr>";
                         }
@@ -54,6 +58,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 addLevelToContent(itemData);
                 that.frameFields.setContentHtml(content);
+                content += '</div>';
 
             };
 

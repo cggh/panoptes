@@ -3,6 +3,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var Initialise = {};
 
+        Initialise.colorFalse = DQX.Color(0.85,0.25,0);
+        Initialise.colorTrue = DQX.Color(0.0,0.5,1.0);
+
 //        alert('a');
 //        var barcodecount = 2000;
 //        var markercount = 40;
@@ -33,7 +36,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         var createFuncVal2Text = function(digits) {
             return function(vl) {
                 if ( (vl==null) || (vl=='None') )
-                    return '-';
+                    return '';
                 else {
                     vl = parseFloat(vl);
                     if (isNaN(vl))
@@ -58,16 +61,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             dowait();
         }
 
+        Initialise.parseTableSettings = function(table) {
+            var settings = { GenomeMaxViewportSizeX:50000 };
+            if (table.settings)
+                settings = $.extend(settings,JSON.parse(table.settings));
+            table.settings = settings;
+        }
+
         Initialise.augmentTableInfo = function(table) {
 
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
             table.currentQuery = SQL.WhereClause.Trivial();
             table.currentSelection = {};
 
-            var settings = { GenomeMaxViewportSizeX:50000 };
-            if (table.settings)
-                settings = $.extend(settings,JSON.parse(table.settings));
-            table.settings = settings;
 
             table.tableNameSingle = table.name;
             table.tableNamePlural = table.name;
@@ -169,6 +175,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 //                    return table.id+'_SORTRAND';
                 }
             }
+
+            table.propertyGroups = [];
+            table.propertyGroupMap = {};
+            if (table.settings.PropertyGroups) {
+                $.each(table.settings.PropertyGroups, function(idx, groupInfo) {
+                    groupInfo.properties = [];
+                    table.propertyGroups.push(groupInfo);
+                    table.propertyGroupMap[groupInfo.Id] = groupInfo;
+                });
+            }
         }
 
         Initialise.augment2DTableInfo = function(table) {
@@ -222,7 +238,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.isCustom = (prop.source=='custom');
                 if (prop.datatype=='Text')
                     prop.isText = true;
-                if ((prop.datatype=='Value') || (prop.datatype=='LowPrecisionValue') || (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') || (prop.datatype=='Date') )
+                if ((prop.datatype=='Value') || (prop.datatype=='LowPrecisionValue')|| (prop.datatype=='HighPrecisionValue') || (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') || (prop.datatype=='Date') )
                     prop.isFloat = true;
                 if (prop.datatype=='Boolean')
                     prop.isBoolean = true;
@@ -268,6 +284,23 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
 
+                //Assign grouperty group
+                prop.group = null;
+                if (prop.settings.GroupId)
+                    if (tableInfo.propertyGroupMap[prop.settings.GroupId]) {
+                        prop.group = tableInfo.propertyGroupMap[prop.settings.GroupId];
+                        tableInfo.propertyGroupMap[prop.settings.GroupId].properties.push(prop);
+                    }
+                if (!prop.group) {
+                    if (!tableInfo.propertyGroupMap['']) {
+                        var grp = {Id:'', Name: 'Properties', properties: []};
+                        tableInfo.propertyGroupMap[''] = grp;
+                        tableInfo.propertyGroups.push(grp);
+                    }
+                    prop.group = tableInfo.propertyGroupMap[''];
+                    tableInfo.propertyGroupMap[''].properties.push(prop);
+                }
+
                 // Determine table name where the column is originally defined
                 if (prop.source == 'fixed') {
                     prop.originalTableName = prop.tableid;
@@ -293,6 +326,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (prop.isDate) {
                     tableInfo.hasDate = true;
                     prop.toDisplayString = function(vl) {
+                        if (vl==null)
+                            return '';
                         var dt = DQX.JD2DateTime(parseFloat(vl));
                         if (isNaN(dt.getTime()))
                             return "2000-01-01";
@@ -320,14 +355,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         if (cl) return cl;
                         return DQX.Color(0.5,0.5,0.5);
                     }
-                    else {
-                        //Create automatic map based on standard colors
-                        var colormapper = prop.category2Color;
-                        var idx = colormapper.get(value);
-                        if (idx>=0)
-                            return DQX.standardColors[idx];
-                        return DQX.Color(0.5,0.5,0.5);
+                    if (prop.isBoolean) {
+                        if ((!value)||(value=='No')||(value=='0'))
+                            return Initialise.colorFalse;
+                        else
+                            return Initialise.colorTrue;
                     }
+                    //Create automatic map based on standard colors
+                    var colormapper = prop.category2Color;
+                    var idx = colormapper.get(value);
+                    if (idx>=0)
+                        return DQX.standardColors[idx];
+                    return DQX.Color(0.5,0.5,0.5);
                 };
 
                 prop.mapColors = function(valueList) {
@@ -396,31 +435,44 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                         return { indices:catData, colors: colors, legend: legend };
                     }
-                    else {
-                        //Create automatic map based on standard colors
-                        var uniqueCatMap = {};
-                        var uniqueCats = []
-                        for (var i=0; i<valueList.length; i++) {
-                            if (!uniqueCatMap[valueList[i]]) {
-                                uniqueCatMap[valueList[i]] = true;
-                                uniqueCats.push(valueList[i]);
-                            }
-                        }
-                        var colormapper = prop.category2Color;
-                        colormapper.map(uniqueCats);
+
+                    if (prop.isBoolean) {
                         var catData = [];
                         for (var i=0; i<valueList.length; i++) {
-                            var idx = colormapper.get(valueList[i]);
-                            if (idx<0)
-                                idx = colormapper.itemCount-1;
-                            catData.push(idx);
+                            if ((!valueList[i])||(valueList[i]=='No'))
+                                catData.push(0);
+                            else
+                                catData.push(1);
                         }
-                        var legend = [];
-                        $.each(colormapper.getAssociations(), function(state, coloridx) {
-                            legend.push({ state: prop.toDisplayString(state), color: DQX.standardColors[coloridx] });
-                        });
-                        return { indices:catData, colors: DQX.standardColors, legend: legend };
+                        return {
+                            indices:catData,
+                            colors: [Initialise.colorFalse, Initialise.colorTrue],
+                            legend: [ {state:'No', color:Initialise.colorFalse}, {state:'Yes', color:Initialise.colorTrue} ] };
                     }
+
+                    //Create automatic map based on standard colors
+                    var uniqueCatMap = {};
+                    var uniqueCats = []
+                    for (var i=0; i<valueList.length; i++) {
+                        if (!uniqueCatMap[valueList[i]]) {
+                            uniqueCatMap[valueList[i]] = true;
+                            uniqueCats.push(valueList[i]);
+                        }
+                    }
+                    var colormapper = prop.category2Color;
+                    colormapper.map(uniqueCats);
+                    var catData = [];
+                    for (var i=0; i<valueList.length; i++) {
+                        var idx = colormapper.get(valueList[i]);
+                        if (idx<0)
+                            idx = colormapper.itemCount-1;
+                        catData.push(idx);
+                    }
+                    var legend = [];
+                    $.each(colormapper.getAssociations(), function(state, coloridx) {
+                        legend.push({ state: prop.toDisplayString(state), color: DQX.standardColors[coloridx] });
+                    });
+                    return { indices:catData, colors: DQX.standardColors, legend: legend };
                 }
 
                 if (prop.settings.isCategorical) {
