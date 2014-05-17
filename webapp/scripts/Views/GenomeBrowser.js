@@ -784,7 +784,7 @@ define([
 
                             var SummChannel = ChannelYVals.Channel(channelid, { minVal: summaryValue.minval, maxVal: summaryValue.maxval });//Create the channel
                             SummChannel
-                                .setTitle(channelid).setHeight(120, true)
+                                .setTitle(channelid).setHeight(50, true)
                                 .setChangeYScale(true,true);//makes the scale adjustable by dragging it
                             SummChannel.controls = Controls.CompoundVert([]);
                             SummChannel.fromTable_tableid = tableid;
