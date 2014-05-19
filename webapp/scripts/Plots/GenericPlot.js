@@ -54,10 +54,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.hasProvidedAspects = function() {
+                if (!querySettings)
+                    return false;
                 return !!querySettings.aspects;
             }
 
             that.providedAspect2Property = function(aspectid) {
+                if (!querySettings)
+                    return '';
                 if (!querySettings.aspects)
                     return '';
                 if (!querySettings.aspects[aspectid])
