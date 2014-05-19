@@ -127,7 +127,7 @@ def handler(start_response, request_data):
     del col_result[datatable + '_column_index']
     del row_result[datatable + '_row_index']
     db.close()
-    hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', datatable + '.hdf5'), 'r')
+    hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset+'_' + datatable + '.hdf5'), 'r')
 
     two_d_properties = dict((prop, None) for prop in two_d_properties)
     for prop in two_d_properties.keys():
