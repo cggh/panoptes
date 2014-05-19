@@ -650,22 +650,6 @@ define([
 
                     });
 
-                    // Loop over all 2D data tables that have genotypes to show
-                    // TODO - Could be for all that have genomic columns
-                    $.each(MetaData.map2DTableCatalog,function(tableid,table_info) {
-                        if (!table_info.settings.ShowInGenomeBrowser) {
-                            return;
-                        }
-                        var controls_group = Controls.CompoundVert([]).setMargin(0);
-                        that.visibilityControlsGroup.addControl(Controls.Section(controls_group, {
-                            title: table_info.tableCapNamePlural,
-                            headerStyleClass: 'GenomeBrowserMainSectionHeader'
-                        }));
-                        var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
-                        the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
-                        that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
-                    });
-
                     // Loop over all datatables that contain genomic regions
                     $.each(MetaData.mapTableCatalog,function(tableid,tableInfo) {
                         if (tableInfo.hasGenomeRegions) {
@@ -765,6 +749,22 @@ define([
 
                         }
 
+                    });
+
+                    // Loop over all 2D data tables that have genotypes to show
+                    // TODO - Could be for all that have genomic columns
+                    $.each(MetaData.map2DTableCatalog,function(tableid,table_info) {
+                        if (!table_info.settings.ShowInGenomeBrowser) {
+                            return;
+                        }
+                        var controls_group = Controls.CompoundVert([]).setMargin(0);
+                        that.visibilityControlsGroup.addControl(Controls.Section(controls_group, {
+                            title: table_info.tableCapNamePlural,
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader'
+                        }));
+                        var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
+                        the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
+                        that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
                     });
 
 
