@@ -130,7 +130,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     height += 10*that.model.row_ordinal.length;
                 if (that._height != height) {
                     that.modifyHeight(height);
-                    that._myPlotter.handleResize();
+                    that._myPlotter.resizeHeight();
                 }
 
                 var ctx = draw_info.centerContext;
