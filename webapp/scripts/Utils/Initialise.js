@@ -356,7 +356,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         return DQX.Color(0.5,0.5,0.5);
                     }
                     if (prop.isBoolean) {
-                        if ((!value)||(value=='No')||(value=='0'))
+                        if ((!value)||(value=='No')||(value=='0')||(value=='-None-'))
                             return Initialise.colorFalse;
                         else
                             return Initialise.colorTrue;
