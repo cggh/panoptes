@@ -84,7 +84,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var tableInfo = MetaData.mapTableCatalog[info.tableid];
 
-            //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
             var selectors = [];
             $.each(tableInfo.propertyGroups, function(idx0, groupInfo) {
                 var groupSection = null;
@@ -119,7 +118,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             });
                             selectors.push({ cmb: cmb, propInfo: propInfo});
                             groupList.setItem(rowNr, 0, cmb);
-                            groupList.setItem(rowNr, 1, Controls.Static(propInfo.name));
+                            groupList.setItem(rowNr, 1, Controls.Static('{name} <span style="color:rgb(170,170,170)">({datatype})</span>'.DQXformat({
+                                name: propInfo.name,
+                                datatype: propInfo.dispDataType
+                            })));
                             rowNr += 1;
                         }
                     }

@@ -284,6 +284,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.settings = settings;
                 prop.toDisplayString = function(vl) { return vl; }
 
+                // Human friendly data type string
+                prop.dispDataType = 'Text';
+                if (prop.settings.isCategorical)
+                    prop.dispDataType = 'Categorical';
+                if (prop.isFloat)
+                    prop.dispDataType = 'Value';
+                if (prop.isBoolean)
+                    prop.dispDataType = 'Boolean';
+                if (prop.isDate)
+                    prop.dispDataType = 'Date';
+                if (prop.datatype=='GeoLongitude')
+                    prop.dispDataType = 'Longitude';
+                if (prop.datatype=='GeoLattitude')
+                    prop.dispDataType = 'Latitude';
+
                 //Assign grouperty group
                 prop.group = null;
                 if (prop.settings.GroupId)
