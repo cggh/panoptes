@@ -11,6 +11,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var DataItemPlotPopup = {};
 
+        DataItemPlotPopup.promptAspects = true;
+
         DataItemPlotPopup.init = function() {
             Msg.listen('', {type:'CreateDataItemPlot'}, function(scope, info) {
                 DataItemPlotPopup.create(info);
@@ -33,14 +35,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += '</div>';
             content += '</table>';
 
+            var chk_promptAspects = Controls.Check(null,{ label: '<span style="color:rgb(80,80,80)"><i>Prompt for plot data before showing plot</i></span>', value: DataItemPlotPopup.promptAspects});
+
+            content += chk_promptAspects.renderHtml();
+
+
 
             var popupID = Popup.create(tableInfo.tableCapNamePlural + ' plots', content);
 
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
                 $('#'+id).click(function() {
+                    DataItemPlotPopup.promptAspects = chk_promptAspects.getValue();
                     Popup.closeIfNeeded(popupID);
-                    DataItemPlotPopup.createAspectSelector(plottype, info);
+                    if (DataItemPlotPopup.promptAspects)
+                        DataItemPlotPopup.createAspectSelector(plottype, info);
+                    else
+                        plottype.Create(tableInfo.id, info.query, {
+                            subSamplingOptions: info.subSamplingOptions
+                        });
                 });
             });
 

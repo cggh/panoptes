@@ -424,7 +424,11 @@ define([
 
                     if (!channelShowOnTop) {
                         // Define visibility control & color states
-                        var ctrl_onoff = Controls.Check(null, {label: propInfo.name, value: channelDefaultVisible}).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
+                        var ctrl_onoff = Controls.Check(null, {
+                            label: propInfo.name,
+                            hint: propInfo.settings.Description,
+                            value: channelDefaultVisible
+                        }).setClassID('compvisib_'+propInfo.propid).setOnChanged(function() {
                             that.panelBrowser.channelModifyVisibility(positionChannel.getID(), ctrl_onoff.getValue());
                             if (densChannel) {
                                 that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
