@@ -396,7 +396,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                             if (canHide) {
                                 // Create checkbox that controls the visibility of the column
-                                var chk = Controls.Check(null,{label:propInfo.name, value:tableInfo.isPropertyColumnVisible(col.myCompID) }).setClassID(propInfo.propid).setOnChanged(function() {
+                                var chk = Controls.Check(null,{
+                                    label:propInfo.name,
+                                    value:tableInfo.isPropertyColumnVisible(col.myCompID),
+                                    hint: propInfo.settings.Description
+                                }).setClassID(propInfo.propid).setOnChanged(function() {
                                     that.myTable.findColumnRequired(chk.colID).setVisible(chk.getValue());
                                     that.myTable.render();
                                     tableInfo.setPropertyColumnVisible(chk.colID, chk.getValue());
