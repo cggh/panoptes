@@ -75,7 +75,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 propid,
                 tableid,
                 settings['Name'],
-                ranknr,
+                0,
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
