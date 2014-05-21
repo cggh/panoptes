@@ -39,7 +39,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                 content = '\'' + content + '\''
 
         if col['IsValue']:
-            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf'):
+            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-'):
                 content = 'NULL'
 
         if col['IsDate']:
