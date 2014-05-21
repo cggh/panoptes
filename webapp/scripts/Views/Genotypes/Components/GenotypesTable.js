@@ -48,6 +48,10 @@ define(["_", "tween", "DQX/Utils"],
           var col_len = DQX.niceColours.length;
           if (model.data_type == 'diploid') {
               model.row_index.forEach(function (r) {
+                  var y = (r * row_height) + y_off;
+                  //Don't draw off screen genotypes
+                  if ((y+(row_height*10) < clip.t) || (y-(row_height*10) > clip.b))
+                    return
                   var depth = model.depth[r];
                   var first = model.first_allele[r];
                   var second = model.second_allele[r];
@@ -63,7 +67,6 @@ define(["_", "tween", "DQX/Utils"],
                       if (first[i] == -1 || second[i] == -1)
                           ctx.fillStyle = 'rgb(0,0,0)';
                       var spos = x_scale(pos[i]) - (snp_width * 0.5);
-                      var y = (r * row_height) + y_off;
                       ctx.fillRect(spos, y, Math.ceil(base_width), row_height);
                       if (snp_width > 40) {
                           ctx.fillStyle = first[i] == -1 ? '#000000' : DQX.niceColours[first[i] % col_len];
