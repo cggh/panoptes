@@ -303,9 +303,28 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
                 if os.path.isdir(os.path.join(folder, 'customdata', tableid)):
                     if not tableid in tableMap:
                         raise Exception('Invalid table id '+tableid)
-                    for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
-                        if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
-                            ImportCustomData(calculationObject, datasetId, workspaceid, tableid, customid, os.path.join(folder, 'customdata', tableid, customid),  importSettings)
+
+                    #Read optional settings file
+                    customdatalist = None
+                    settingsfilename = os.path.join(folder, 'customdata', tableid, 'settings')
+                    if os.path.isfile(settingsfilename):
+                        with open(settingsfilename) as settingsfile:
+                            cSettings = SettingsLoader.SettingsLoader(settingsfilename)
+                            if cSettings.HasToken('CustomData'):
+                                if not type(cSettings['CustomData']) is list:
+                                    raise Exception('CustomData token should be a list')
+                                customdatalist = cSettings['CustomData']
+                                print('Custom data list taken from settings')
+                    if customdatalist is None:# Alternatively, just use list of folders
+                        customdatalist = []
+                        for customid in os.listdir(os.path.join(folder, 'customdata', tableid)):
+                            if os.path.isdir(os.path.join(folder, 'customdata', tableid, customid)):
+                                customdatalist.append(customid)
+                        print('Custom data list taken from folders')
+                    print('Custom data list: '+str(customdatalist))
+                    for customid in customdatalist:
+                        ImportCustomData(calculationObject, datasetId, workspaceid, tableid, customid, os.path.join(folder, 'customdata', tableid, customid),  importSettings)
+
         else:
             print('Directory not present')
 
