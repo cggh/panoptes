@@ -36,8 +36,9 @@ CREATE TABLE `externallinks` (
   `propid` varchar(50),
   `tableid` varchar(20),
   `name` varchar(50),
-  `ordr` int,
-  `settings` text
+  `ordr`  int(11) NOT NULL AUTO_INCREMENT,
+  `settings` text,
+  PRIMARY KEY (`ordr`)
 );
 
 

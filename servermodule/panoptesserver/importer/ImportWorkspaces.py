@@ -123,7 +123,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                 propid,
                 tableid,
                 settings['Name'],
-                ranknr + 1000,
+                0,
                 extraSettings.ToJSON()
             )
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
@@ -284,7 +284,7 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         for table in tables:
             tableid = table['id']
             sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
-            cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 9999, '{2}')".format(workspaceid, tableid, sett)
+            cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tableid, sett)
             execSQL(cmd)
 
         print('Re-creating workspaces record')
