@@ -258,7 +258,7 @@ define([
                     //Try to find suitable existing fetcher
                     var theFetcher = null;
                     $.each(that.listDataFetcherProfiles,function(idx,fetcher) {
-                        if ( (fetcher.minblocksize==minblocksize) && (fetcher.usedChannelCount<30) )
+                        if ( (fetcher.minblocksize==minblocksize) && (fetcher.usedChannelCount<12) )
                             theFetcher = fetcher;
                     });
                     if (!theFetcher) {
