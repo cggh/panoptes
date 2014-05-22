@@ -38,15 +38,31 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
 
                     var miscButtonList = [];
 
+                    var tableButtons = [];
+
                     if (MetaData.generalSettings.hasGenomeBrowser) {
                         var browserButton = Application.getView('genomebrowser').createActivationButton({
                             content: "Genome browser",
+                            buttonClass: "DQXToolButton2",
                             bitmap: 'Bitmaps/GenomeBrowser.png'
                         });
-                        miscButtonList.push(browserButton);
+                        //miscButtonList.push(browserButton);
+
+                        var descr = MetaData.generalSettings.GenomeBrowserDescription||'<i>No description</i>';
+
+                        var grp = Controls.CompoundVert([
+                            Controls.Static(descr),
+                            browserButton
+                        ]);
+                        tableButtons.push(Controls.Section(grp, {
+                            title: "Genome browser",
+                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                            bodyStyleClass: 'ControlsSectionBodyIntro',
+                            canCollapse: false
+                        }));
+
                     }
 
-                    var tableButtons = [];
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                         var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
                             content: "Show table",

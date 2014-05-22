@@ -159,14 +159,16 @@ require([
 
                         // Initialise all the views in the application
                         Intro.init();
+
+                        if (MetaData.generalSettings.hasGenomeBrowser) {
+                            GenomeBrowser.init();
+                        }
+
                         $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                             TableViewer.init(tableInfo.id);
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
 
-                        if (MetaData.generalSettings.hasGenomeBrowser) {
-                            GenomeBrowser.init();
-                        }
 
                         if (MetaData.hasTable('SMP') && MetaData.hasTable('SNP'))
                           Genotypes.init();
