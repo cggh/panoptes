@@ -242,7 +242,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                 with calculationObject.LogHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
                     extraSummSettings = summSettings.Clone()
                     extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6})".format(
+                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)".format(
                         tableid,
                         summaryid,
                         summSettings['Name'],

@@ -242,7 +242,7 @@ require([
                                     SQL.WhereClause.CompareFixed('tableid','<>','')
                                 ])
                             );
-                            getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'trackid',
+                            getter.addTable('tablebasedsummaryvalues',['tableid', 'trackid', 'trackname','minval','maxval','minblocksize','settings'],'ordr',
                                 SQL.WhereClause.Trivial()
                             );
                             getter.addTable('relations',['childtableid', 'childpropid', 'parenttableid','parentpropid','forwardname','reversename'],'childtableid',

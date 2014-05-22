@@ -78,7 +78,9 @@ CREATE TABLE `tablebasedsummaryvalues` (
   `settings` varchar(5000),
   `minval` float,
   `maxval` float,
-  `minblocksize` int
+  `minblocksize` int,
+  `ordr` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`ordr`)
 );
 
 
