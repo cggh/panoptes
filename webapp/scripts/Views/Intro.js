@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         });
                         //miscButtonList.push(browserButton);
 
-                        var descr = MetaData.generalSettings.GenomeBrowserDescription||'<i>No description</i>';
+                        var descr = MetaData.generalSettings.GenomeBrowserDescr||'<i>No description</i>';
 
                         var grp = Controls.CompoundVert([
                             Controls.Static(descr),
