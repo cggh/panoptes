@@ -425,12 +425,21 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
+.PnTitleBox
+{
+    font-weight: bold;
+    color:rgb(0,120,140);
+    margin-left:6px;
+    padding-top:3px;
+}
+
 .DQXThumbNail
 {
+    font-size: 9px;
     opacity:0.5;
     display: inline-block;
-    width:100px;
-    height:31px;
+    width:80px;
+    height:18px;
     color: rgb(0,94,102);
     background: rgb(182,230,235); /* Old browsers */
     background: -moz-linear-gradient(left, rgb(182,230,235) 0%, rgb(123,181,186) 100%); /* FF3.6+ */
@@ -441,8 +450,8 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     background: linear-gradient(to right, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ceeaed', endColorstr='#8cc3c8',GradientType=1 ); /* IE6-9 */    border: 2px solid black;
     padding:5px;
-    padding-top:2px;
-    padding-bottom:5px;
+    padding-top:1px;
+    padding-bottom:3px;
     border: 1px solid rgb(140,195,200);
 
     border-radius: 4px;

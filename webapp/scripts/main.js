@@ -201,7 +201,9 @@ require([
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div class="DQXThumbNailBox"></div></div>';
+                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div><div class="DQXThumbNailBox"></div></div></div>'.DQXformat({
+                            datasetname: MetaData.generalSettings.Name
+                        });
                         Application.setHeaderHeight(48);
                         Application.setHeader(headerContent);
 
