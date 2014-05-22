@@ -9,7 +9,7 @@ define([],
       });
       that.contents_by_name = DQX.attrMap(that.contents, 'name');
 
-      that.draw = function(ctx, clip) {
+      that.draw = function(ctx, clip, model, view) {
         that.contents.forEach(function (element) {
           ctx.save();
           ctx.translate(element.l, element.t);
@@ -18,7 +18,7 @@ define([],
             l:clip.l - element.l,
             b:clip.b - element.t,
             r:clip.r - element.l
-          });
+          }, model, view);
           ctx.restore();
         })
 

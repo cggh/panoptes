@@ -1,16 +1,12 @@
 define(["tween", "DQX/Utils"],
     function (tween, DQX) {
-        return function ColumnHeader(model, view, height, clickSNPCallback) {
+        return function ColumnHeader(height, clickSNPCallback) {
             var that = {};
-            that.model = model;
-            that.view = view;
             that.height = height;
             that.clickSNPCallback = clickSNPCallback;
             that.last_clip = {l: 0, t: 0, r: 0, b: 0};
 
-            that.draw = function (ctx, clip) {
-                var model = that.model;
-                var view = that.view;
+            that.draw = function (ctx, clip, model, view) {
                 that.last_clip = clip;
                 var scale = view.col_scale;
                 var snp_width = scale(model.col_width) - scale(0);

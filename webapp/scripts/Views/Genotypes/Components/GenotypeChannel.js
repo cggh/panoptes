@@ -1,10 +1,8 @@
 define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
-    "Views/Genotypes/Components/TabContainer", "Views/Genotypes/Components/Container", "Views/Genotypes/ColourAllocator",
-    "Views/Genotypes/Components/ColumnHeader", "Views/Genotypes/Components/GenotypesTable", "Views/Genotypes/Components/Link",
-    "Views/Genotypes/Components/Gradient"    ],
+     "Views/Genotypes/View"],
     function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
-              TabContainer, Container, ColourAllocator, ColumnHeader, GenotypesTable, Link, Gradient) {
+               View) {
 
         var GenotypeChannel = {};
 
@@ -18,8 +16,6 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                 that._clickHandler = null;
                 that._always_call_draw = true;
                 that.parent_browser = parent;
-                that.col_header_height = 30;
-                that.link_height = 25;
                 that.table_info = table_info;
 
                 //Create controls
@@ -45,31 +41,7 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                                    that._draw
                 );
                 //View parameters
-                that.view = {
-                    colours: ColourAllocator(),
-                    compress: false,
-                    row_height: 10,
-                    row_header_width: 150,
-                    col_scale: d3.scale.linear()
-                };
-                that.root_container = Container([
-                    {name: 'data_area', t:that.gene_map_height, content:
-                        Container([
-                            {name: 'body', t: that.col_header_height + that.link_height, content:
-                                Container([
-                                    {name:'table', content:GenotypesTable(that.model, that.view)}
-                                ])
-                            },
-                            {name: 'moving_header', content:
-                                Container([
-                                    {name:'gradient', content:Gradient('rgba(255,255,255,0.8)', 'rgba(255,255,255,0)', 1, that.link_height+that.col_header_height)},
-                                    {name:'column_header', t: that.link_height, content:ColumnHeader(that.model, that.view, that.col_header_height, that.clickSNP)},
-                                    {name:'link', content:Link(that.model, that.view, that.link_height)}
-                                ])
-                            }
-                        ])
-                    }
-                ]);
+                that.view = View();
             };
 
             that.new_col_query = function () {
@@ -110,7 +82,9 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
                 var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
                 that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
-                var height = that.link_height + that.col_header_height;
+
+                //Modify the height of the channel
+                var height = that.view.link_height + that.view.col_header_height;
                 if (that.model.row_ordinal.length)
                     height += 10*that.model.row_ordinal.length;
                 if (that._height != height) {
@@ -118,28 +92,15 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     that._myPlotter.resizeHeight();
                 }
 
-                var ctx = draw_info.centerContext;
-                ctx.clearRect ( 0 , 0 , draw_info.sizeCenterX , draw_info.sizeY );
-                that.view.col_scale.domain([min_genomic_pos, max_genomic_pos]).range([0,ctx.canvas.clientWidth]);
-                that.root_container.contents_by_name['data_area'].content.contents_by_name['moving_header'].t = Math.max(0, draw_info.top_visible);
-                that.root_container.draw(ctx, {t:draw_info.top_visible, b:draw_info.bottom_visible, l:0, r:ctx.canvas.clientWidth});
                 that.drawStandardGradientLeft(draw_info, 1);
                 that.drawStandardGradientRight(draw_info, 1);
 
+                that.view.draw(draw_info.centerContext,
+                               draw_info.leftContext,
+                               {t:draw_info.top_visible, b:draw_info.bottom_visible, l:0, r:draw_info.centerContext.canvas.clientWidth},
+                               that.model);
                 that.drawMark(draw_info);
-//                this.drawXScale(drawInfo);
                 that.drawTitle(draw_info);
-
-                ctx = draw_info.leftContext;
-                var row_labels = that.model.row_ordinal;
-                ctx.save();
-                ctx.fillStyle = '#000';
-                ctx.font = "" + (that.view.row_height) + "px sans-serif";
-                ctx.translate(0,that.col_header_height+that.link_height);
-                _.forEach(row_labels, function(label, i) {
-                    ctx.fillText(label, 0, (i+1) * (that.view.row_height));
-                });
-                ctx.restore();
 
                 that.drawing = false;
             };

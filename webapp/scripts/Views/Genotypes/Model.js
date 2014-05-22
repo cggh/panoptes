@@ -62,6 +62,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.col_positions = [];
                 that.col_width = 0;
                 that.row_index = [];
+                that.genomic_start = 0;
+                that.genomic_end = 0;
             };
 
             that.position_columns  = function(ordinal, width) {
@@ -92,6 +94,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that._change_col_range = function(chrom, start, end) {
+                that.genomic_start = start;
+                that.genomic_end = end;
                 var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
