@@ -189,8 +189,11 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
             #We have the indexes - now we need a local copy of the HDF5 data for each property
             ImpUtils.mkdir(os.path.join(config.BASEDIR, '2D_data'))
             local_hdf5 = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset_id+'_'+tableid+'.hdf5'), 'w', libver='latest')
+            print "Copying HDF5 datasets"
             for property in table_settings['Properties']:
+                print "..", property
                 local_hdf5.copy(remote_hdf5[property['Id']], property['Id'])
-
+                print "done"
+            print "all copies complete"
             local_hdf5.close()
             remote_hdf5.close()
