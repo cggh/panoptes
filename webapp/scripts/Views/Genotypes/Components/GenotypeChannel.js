@@ -1,7 +1,7 @@
-define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
+define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],
-    function (require, _, d3, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+    function (require, _, d3, DQXModel, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
                View) {
 
         var GenotypeChannel = {};
@@ -20,13 +20,26 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
 
                 //Create controls
                 controls_group.addControl(that.createVisibilityControl());
+
+//                var view_controls = Controls.CompoundHor([]);
+//                var view_params = DQXModel({width_mode:'fill_width'});
+//                var states = [ {id:'fill_width', name:'Fill Width'}, {id:'fixed_width', name:'Fixed Width'}];
+//                var width_mode = Controls.Combo(null, { label:'', states:states, width:90 })
+//                    .bindToModel(view_params, 'width_mode');
+//                view_controls.addControl(width_mode);
+//                view_params.on({}, function() {
+//                    //None of these controls change the horizontal region so it is safe to just call the internal redraw.
+//                    that._draw();
+//                });
+//                controls_group.addControl(view_controls);
+
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
                 var col_query_tool = that.col_query.createQueryControl({defaultHidden: true});
                 controls_group.addControl(col_query_tool);
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
                 that.row_query.notifyQueryUpdated = that.new_row_query;
-                var row_query_tool = that.row_query.createQueryControl({});
+                var row_query_tool = that.row_query.createQueryControl({defaultHidden: true});
                 controls_group.addControl(row_query_tool);
 
                 //Fix order to by position for col and primary key for row
@@ -55,33 +68,23 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
             };
 
             that.draw = function (draw_info) {
+                if (!draw_info) return;
                 //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
                 that.draw_info = draw_info;
-                that._draw();
+                //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.
+                var chrom = that.parent_browser.getCurrentChromoID();
+                if (!chrom) return;
+                var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
+                var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
+                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
+                //Changing the col range will cause a redraw
+                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
             };
 
             that._draw = function () {
                 var draw_info = that.draw_info;
                 if (!draw_info) return;
-                if (that.drawing == true)
-                    return;
-                that.drawing = true;
-
-                if (that.draw_info.needZoomIn) {
-                    that.drawing = false;
-                    return;
-                }
-                var chrom = that.parent_browser.getCurrentChromoID();
-                if (!chrom) {
-                    that.drawing = false;
-                    return;
-                }
-
-                var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
-                var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
-
-                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
-                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
+                if (that.draw_info.needZoomIn) return;
 
                 //Modify the height of the channel
                 var height = that.view.link_height + that.view.col_header_height;
@@ -89,7 +92,9 @@ define(["require", "_", "d3", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Con
                     height += 10*that.model.row_ordinal.length;
                 if (that._height != height) {
                     that.modifyHeight(height);
-                    that._myPlotter.resizeHeight();
+                    that._myPlotter.resizeHeight(true);
+                    //The last call will result in the framework calling draw, so we should end here.
+                    return;
                 }
 
                 that.drawStandardGradientLeft(draw_info, 1);
