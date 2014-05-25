@@ -7,15 +7,17 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
         "Views/Genotypes/Components/Gradient"
     ],
     function (d3, ColourAllocator, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
-        return function View() {
+        return function View(initial_params) {
             var that = {};
-            that.init = function() {
+            that.init = function(inital_params) {
                 that.col_header_height = 30;
                 that.link_height = 25;
                 that.colours = ColourAllocator();
-                that.row_height = 10;
                 that.row_header_width = 150;
                 that.col_scale =  d3.scale.linear();
+
+                //Vars set by params
+                _.extend(that, initial_params);
 
                 that.root_container = Container([
                     {name: 'data_area', t:that.gene_map_height, content:
@@ -37,8 +39,11 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
                 ]);
             };
 
-            that.draw = function(ctx, ctx_left, clip, model) {
+            that.update_params = function(view_params){
+                _.extend(that, view_params);
+            };
 
+            that.draw = function(ctx, ctx_left, clip, model) {
                 ctx.clearRect ( clip.l , clip.t , clip.r-clip.l , clip.b - clip.t );
                 that.root_container.contents_by_name['data_area'].content.contents_by_name['moving_header'].t = Math.max(0, clip.t);
                 that.col_scale.domain([model.genomic_start, model.genomic_end]).range([0,clip.r - clip.l]);
@@ -57,7 +62,7 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
 
             };
 
-            that.init();
+            that.init(initial_params);
             return that
         };
     }

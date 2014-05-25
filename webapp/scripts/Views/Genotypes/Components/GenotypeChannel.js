@@ -21,17 +21,31 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                 //Create controls
                 controls_group.addControl(that.createVisibilityControl());
 
-//                var view_controls = Controls.CompoundHor([]);
-//                var view_params = DQXModel({width_mode:'fill_width'});
-//                var states = [ {id:'fill_width', name:'Fill Width'}, {id:'fixed_width', name:'Fixed Width'}];
-//                var width_mode = Controls.Combo(null, { label:'', states:states, width:90 })
-//                    .bindToModel(view_params, 'width_mode');
-//                view_controls.addControl(width_mode);
-//                view_params.on({}, function() {
-//                    //None of these controls change the horizontal region so it is safe to just call the internal redraw.
-//                    that._draw();
-//                });
-//                controls_group.addControl(view_controls);
+                var view_controls = Controls.CompoundHor([]);
+                var view_params = DQXModel({width_mode:'fill_width',
+                                            row_height:10,
+                                            column_width:1
+                                           });
+                view_params.on({}, function() {
+                    that.view.update_params(this.get());
+                    //None of these controls change the horizontal region so it is safe to just call the internal redraw.
+                    that._draw();
+                });
+
+                var states = [ {id:'fill_width', name:'Fill Width'}, {id:'fixed_width', name:'Fixed Width'}];
+                var width_mode = Controls.Combo(null, { label:'', states:states, width:90 })
+                    .bindToModel(view_params, 'width_mode');
+                //view_controls.addControl(width_mode);
+
+                var column_width = Controls.ValueSlider(null, {label: 'Column Width', minval:1, maxval:10, value:view_params.get('column_width')})
+                    .bindToModel(view_params, 'column_width');
+                //view_controls.addControl(column_width);
+
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:10, value:view_params.get('row_height')})
+                    .bindToModel(view_params, 'row_height');
+                view_controls.addControl(row_height);
+
+                controls_group.addControl(view_controls);
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
@@ -53,8 +67,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                                    _.map(MetaData.chromosomes, DQX.attr('id')),
                                    that._draw
                 );
-                //View parameters
-                that.view = View();
+                that.view = View(view_params.get());
             };
 
             that.new_col_query = function () {
@@ -89,7 +102,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                 //Modify the height of the channel
                 var height = that.view.link_height + that.view.col_header_height;
                 if (that.model.row_ordinal.length)
-                    height += 10*that.model.row_ordinal.length;
+                    height += that.view.row_height * that.model.row_ordinal.length;
                 if (that._height != height) {
                     that.modifyHeight(height);
                     that._myPlotter.resizeHeight(true);
