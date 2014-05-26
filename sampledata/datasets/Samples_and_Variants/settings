@@ -5,6 +5,7 @@ Name: Samples & Variants
 Description: >
   This is a sample dataset<br>
   <div style="color:red">A second line, html formatted</div>
+  <a href="http://panoptes.readthedocs.org/en/latest//" target="_blank">A hyperlink</a>
 
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder banes in [datatables]

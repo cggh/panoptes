@@ -324,7 +324,8 @@ define([
                             var colinfo_avg = theFetcher.addFetchColumn(folder, 'Summ', summaryValue.propid + "_avg");//get the avg value from the fetcher
                             var comp_avg = SummChannel.addComponent(ChannelYVals.Comp(null,//Add the profile to the channel
                                 theFetcher,               // data fetcher containing the profile information
-                                colinfo_avg.myID                        // fetcher column id containing the average profile
+                                colinfo_avg.myID,                        // fetcher column id containing the average profile
+                                false                                    //No high precison
                             ), true);
                             comp_avg.setColor(theColor);//set the color of the profile
                             comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
@@ -526,14 +527,17 @@ define([
                         var comp_minmax = theChannel.addComponent(ChannelYVals.YRange(null,theFetcher,colinfo_min.myID,colinfo_max.myID,theColor.changeOpacity(0.25)), true );
                         //Create the average value profile
                         var colinfo_avg = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_avg");//get the avg value from the fetcher
-                        var comp_avg = theChannel.addComponent(ChannelYVals.Comp(null,theFetcher,colinfo_avg.myID), true);
+                        var comp_avg = theChannel.addComponent(ChannelYVals.Comp(null,theFetcher,colinfo_avg.myID,false), true);
                         comp_avg.setColor(theColor);//set the color of the profile
                         comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
                         comp_avg.myPlotHints.interruptLineAtAbsent = true;
                         comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
                     }
 
-                    var plotcomp = theChannel.addComponent(ChannelYVals.Comp(null, dataFetcher, propInfo.propid), true);//Create the component
+                    var highPrecision = false;
+                    if (propInfo.datatype == 'HighPrecisionValue')
+                        highPrecision = true;
+                    var plotcomp = theChannel.addComponent(ChannelYVals.Comp(null, dataFetcher, propInfo.propid, highPrecision), true);//Create the component
                     plotcomp.myPlotHints.pointStyle = 1;//chose a sensible way of plotting the points
                     plotcomp.myPlotHints.color = DQX.parseColorString(propInfo.settings.channelColor);
                     plotcomp.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
