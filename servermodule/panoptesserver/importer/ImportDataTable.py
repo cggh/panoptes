@@ -169,7 +169,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             propid = property['propid']
             settings = property['Settings']
 
-            if (settings.HasToken('SummaryValues')) and (property['DataType'] == 'Value'):
+            if (settings.HasToken('SummaryValues')) and ImpUtils.IsValueDataTypeIdenfifier(property['DataType']):
                 with calculationObject.LogHeader('Creating numerical summary values for {0}.{1}'.format(tableid,propid)):
                     summSettings = settings.GetSubSettings('SummaryValues')
                     if settings.HasToken('minval'):
