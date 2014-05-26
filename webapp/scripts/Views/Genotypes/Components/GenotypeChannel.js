@@ -82,6 +82,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
 
             that.draw = function (draw_info) {
                 if (!draw_info) return;
+                if (draw_info.needZoomIn) return;
                 //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
                 that.draw_info = draw_info;
                 //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.
@@ -97,7 +98,6 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
             that._draw = function () {
                 var draw_info = that.draw_info;
                 if (!draw_info) return;
-                if (that.draw_info.needZoomIn) return;
 
                 //Modify the height of the channel
                 var height = that.view.link_height + that.view.col_header_height;
