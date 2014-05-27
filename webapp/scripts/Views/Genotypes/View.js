@@ -46,7 +46,7 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
             that.draw = function(ctx, ctx_left, clip, model) {
                 ctx.clearRect ( clip.l , clip.t , clip.r-clip.l , clip.b - clip.t );
                 that.root_container.contents_by_name['data_area'].content.contents_by_name['moving_header'].t = Math.max(0, clip.t);
-                that.col_scale.domain([model.genomic_start, model.genomic_end]).range([0,clip.r - clip.l]);
+                that.col_scale.domain([model.col_start, model.col_end]).range([0,clip.r - clip.l]);
                 that.root_container.draw(ctx, clip, model, that);
 
                 ctx = ctx_left;

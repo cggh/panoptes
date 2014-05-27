@@ -46,8 +46,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                         },
                         function () {
                             //Grab the new data from the cache
-                            that.change_col_range(that.chrom, that.genomic_start, that.genomic_end);
-                            that.update_callback();
+                            that.refresh_data();
                         }
                     )
                 });
@@ -97,11 +96,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 return result;
             };
 
-            that._change_col_range = function(chrom, start, end) {
-                that.genomic_start = start;
-                that.genomic_end = end;
-                that.chrom = chrom;
-                var data = that.cache_for_chrom[chrom].get_by_ordinal(start, end);
+            that.refresh_data = function() {
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal((Math.floor(that.col_start/1000)*1000)-1000, (Math.ceil(that.col_end/1000)*1000)+1000);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
 
@@ -116,29 +112,28 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 }
 
                 if (that.col_ordinal.length > 0)
-                    //For now make it 0.75 of the width as we don't have equidistant blocks
-                    //that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
+                //For now make it 0.75 of the width as we don't have equidistant blocks
+                //that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
                     that.col_width = 3;
                 else
                     that.col_width = 0;
-                that.col_positions = that.position_columns(that.col_ordinal, that.col_width);
 
+                that.col_positions = that.position_columns(that.col_ordinal, that.col_width);
 
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)
                     that.row_index = _.times(that.row_ordinal.length, function (i) {return i;});
                 else
                     that.row_index = [];
-                if (!that.callback_active) {
-                    that.callback_active = true;
-                    that.update_callback();
-                    that.callback_active = false;
-                }
+                that.update_callback();
+            }
 
-
+            that.change_col_range = function(chrom, start, end) {
+                that.chrom = chrom;
+                that.col_start = start;
+                that.col_end = end;
+                that.refresh_data();
             };
-            //Throttle this so that we don't clog the redraw
-            that.change_col_range = _.throttle(that._change_col_range, 200);
 
             that.new_col_query = function(q) {
                 that.query.col_query = q;

@@ -88,11 +88,11 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                 //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.
                 var chrom = that.parent_browser.getCurrentChromoID();
                 if (!chrom) return;
-                var min_genomic_pos = Math.round((draw_info.offsetX) / draw_info.zoomFactX);
-                var max_genomic_pos = Math.round((draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX);
-                var genomic_length_overdraw = 0.2*(max_genomic_pos - min_genomic_pos);
-                //Changing the col range will cause a redraw
-                that.model._change_col_range(chrom, min_genomic_pos - genomic_length_overdraw, max_genomic_pos + genomic_length_overdraw);
+                var min_genomic_pos = draw_info.offsetX / draw_info.zoomFactX;
+                var max_genomic_pos = (draw_info.sizeCenterX + draw_info.offsetX) / draw_info.zoomFactX;
+
+                //Changing the col range will cause a redraw by calling _draw below
+                that.model.change_col_range(chrom, min_genomic_pos, max_genomic_pos);
             };
 
             that._draw = function () {
