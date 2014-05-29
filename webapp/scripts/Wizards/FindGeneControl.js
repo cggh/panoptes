@@ -36,7 +36,7 @@
                     var endlist = vallistdecoder.doDecode(keylist['Ends']);
                     var ids = vallistdecoder.doDecode(keylist['IDs']);
                     var descrs = vallistdecoder.doDecode(keylist['Descrs']);
-                    if (genelist.length == 0) {
+                    if (ids.length == 0) {
                         this.setSearchResultMessage('<b>No hits were found</b>');
                         this.resultList.setItems([], '');
                         this._hasValidGeneList = false;

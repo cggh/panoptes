@@ -16,11 +16,11 @@ define(["tween", "DQX/Utils"],
 
                 var alpha = tween.manual(snp_width, 5, 20);
                 //Little hat and area fill
-                ctx.strokeStyle = DQX.getRGB(0, 0, 0, 1);//0.5 * alpha);
+                ctx.strokeStyle = DQX.getRGB(120, 120, 120, 1);//0.5 * alpha);
                 ctx.lineWidth = 1;
                 for (var i = 0, end = pos.length; i < end; ++i) {
                    var p = pos[i];
-                    var colour = '#000000';
+                    var colour = '#686868';
                     if (alpha > 0) {
                         ctx.save();
                         ctx.translate(scale(p) - 0.5 * snp_width, 20);

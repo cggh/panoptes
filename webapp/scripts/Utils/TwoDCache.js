@@ -73,7 +73,7 @@ define(["Utils/RequestCounter"],
                         break;
                     }
                 }
-                return index;
+                return index+1;
             };
             that.slice = function(array, start, end) {
                 if (array.slice) {
@@ -161,14 +161,14 @@ define(["Utils/RequestCounter"],
                 missing_intervals = [];
                 if (matching_intervals.length === 0) {
                     missing_intervals.push({
-                        'start': start,
-                        'end': end
+                        'start': Math.floor(start/1000)*1000,
+                        'end': Math.ceil(end/1000)*1000
                     });
                 }
                 if (matching_intervals.length > 0) {
                     if (start < matching_intervals[0].start) {
                         missing_intervals.push({
-                            'start': start,
+                            'start': Math.floor(start/1000)*1000,
                             'end': matching_intervals[0].start
                         });
                     }
@@ -188,7 +188,7 @@ define(["Utils/RequestCounter"],
                     if (end > last_match.end) {
                         missing_intervals.push({
                             'start': last_match.end,
-                            'end': end
+                            'end': Math.ceil(end/1000)*1000
                         });
                     }
                 }

@@ -90,11 +90,20 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                         result[i] = psxlast + width;
                     psxlast = result[i];
                 }
+                var avg_shift = 0;
+                for (i = 0, ref = result.length; i < result.length; i++) {
+                    avg_shift += result[i] - ordinal[i];
+                }
+                avg_shift /= result.length;
+                for (i = 0, ref = result.length; i < result.length; i++) {
+                    result[i] -= avg_shift;
+                }
                 return result;
             };
 
             that.refresh_data = function() {
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal((Math.floor(that.col_start/1000)*1000)-1000, (Math.ceil(that.col_end/1000)*1000)+1000);
+                var overdraw = (that.col_end - that.col_start)*0.05;
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
                 _.each(that.properties, function(prop) {
