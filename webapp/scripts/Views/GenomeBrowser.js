@@ -514,21 +514,33 @@ define([
                         };
                     }
 
+                    var plotcomp = null;
                     if ((true) && (MetaData.hasSummaryValue(propInfo.tableid,propInfo.propid))) {
+                        var getOpacity = function() {// function dynamically changes opacity when individual points are visible
+                            if (plotcomp) {
+                                if ( comp_minmax._drawViewportSize > plotcomp._maxViewportSizeX )
+                                    return 1;
+                                else
+                                    return 0.2;
+                            }
+                            return 1;
+                        };
                         // There is a summary value associated to this datatable property, and we add it to this channel
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
                         summInfo.isDisplayed = true; // Set this flag so that it does not get added twice
-                        var theColor = DQX.parseColorString(summInfo.settings.channelColor);;
+                        var theColor = DQX.parseColorString(summInfo.settings.channelColor);//.lighten(0.5).changeOpacity(0.5);
                         var theFetcher = that.getSummaryFetcher(summInfo.minblocksize);
                         var summFolder = that.summaryFolder+'/'+propInfo.propid;
                         //Create the min-max range
                         var colinfo_min = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_min");
                         var colinfo_max = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_max");
                         var comp_minmax = theChannel.addComponent(ChannelYVals.YRange(null,theFetcher,colinfo_min.myID,colinfo_max.myID,theColor.changeOpacity(0.25)), true );
+                        comp_minmax.myPlotHints.getOpacity = getOpacity;
                         //Create the average value profile
                         var colinfo_avg = theFetcher.addFetchColumn(summFolder, 'Summ', propInfo.propid + "_avg");//get the avg value from the fetcher
                         var comp_avg = theChannel.addComponent(ChannelYVals.Comp(null,theFetcher,colinfo_avg.myID,false), true);
                         comp_avg.setColor(theColor);//set the color of the profile
+                        comp_avg.myPlotHints.getOpacity = getOpacity;
                         comp_avg.myPlotHints.makeDrawLines(3000000.0); //that causes the points to be connected with lines
                         comp_avg.myPlotHints.interruptLineAtAbsent = true;
                         comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
@@ -537,7 +549,7 @@ define([
                     var highPrecision = false;
                     if (propInfo.datatype == 'HighPrecisionValue')
                         highPrecision = true;
-                    var plotcomp = theChannel.addComponent(ChannelYVals.Comp(null, dataFetcher, propInfo.propid, highPrecision), true);//Create the component
+                    plotcomp = theChannel.addComponent(ChannelYVals.Comp(null, dataFetcher, propInfo.propid, highPrecision), true);//Create the component
                     plotcomp.myPlotHints.pointStyle = 1;//chose a sensible way of plotting the points
                     plotcomp.myPlotHints.color = DQX.parseColorString(propInfo.settings.channelColor);
                     plotcomp.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
