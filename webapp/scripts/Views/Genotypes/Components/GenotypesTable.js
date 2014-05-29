@@ -31,10 +31,10 @@ define(["_", "tween", "DQX/Utils"],
                           if (first[i] == 0)
                             ctx.fillStyle = 'rgba(0,0,255,' + (depth[i] / 100) + ')';
                           else
-                            ctx.fillStyle = 'rgba(0,255,0,' + (depth[i] / 100) + ')';
+                            ctx.fillStyle = 'rgba(255,0,0,' + (depth[i] / 100) + ')';
                       }
                       else
-                          ctx.fillStyle = 'rgba(255,0,0,' + (depth[i] / 100) + ')';
+                          ctx.fillStyle = 'rgba(0,255,0,' + (depth[i] / 100) + ')';
                       if (first[i] == -1 || second[i] == -1)
                           ctx.fillStyle = 'rgb(0,0,0)';
                       var spos = x_scale(pos[i]) - (snp_width * 0.5);
