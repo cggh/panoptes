@@ -410,7 +410,7 @@ define([
                     else if (propInfo.isBoolean) {
                         positionChannel.makeCategoricalColors(
                             propInfo.propid,
-                            { '0': DQX.Color(0.85,0.25,0), '1': DQX.Color(0.0,0.5,1.0) }
+                            { '': DQX.Color(0.85,0.25,0), '0': DQX.Color(0.85,0.25,0), '1': DQX.Color(0.0,0.5,1.0) }
                         );
                     }
 
