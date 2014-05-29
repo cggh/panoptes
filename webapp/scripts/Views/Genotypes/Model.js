@@ -18,10 +18,10 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.last_col_ordinal = 0;
 
                 that.data = {};
-                that.data_type = table_info.settings.ShowInGenomeBrowser.Type;
+                that.settings = table_info.settings.ShowInGenomeBrowser;
+                that.data_type = that.settings.Type;
                 if (that.data_type != 'diploid' && that.data_type != 'fractional')
                     DQX.reportError("Genotype data type is not diploid or fractional");
-                that.settings = table_info.settings.ShowInGenomeBrowser
                 if (that.data_type == 'diploid') {
                     that.properties = [that.settings.FirstAllele, that.settings.SecondAllele];
                     _.each(that.settings.ExtraProperties, function(prop) {

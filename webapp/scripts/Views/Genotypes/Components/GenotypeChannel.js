@@ -1,7 +1,7 @@
-define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
+define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],
-    function (require, _, d3, DQXModel, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+    function (require, _, d3, DQXModel, SQL, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
                View) {
 
         var GenotypeChannel = {};
@@ -18,19 +18,43 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                 that.parent_browser = parent;
                 that.table_info = table_info;
 
+                that.model = Model(table_info,
+                                   {
+                                       col_query: SQL.WhereClause.Trivial(),
+                                       row_query: SQL.WhereClause.Trivial(),
+                                       col_order: table_info.col_table.PositionField,
+                                       row_order: table_info.row_table.primkey
+                                   },
+                                   _.map(MetaData.chromosomes, DQX.attr('id')),
+                                   that._draw
+                );
+
                 //Create controls
                 controls_group.addControl(that.createVisibilityControl());
 
                 var view_controls = Controls.CompoundHor([]);
                 var view_params = DQXModel({width_mode:'fill_width',
                                             row_height:10,
-                                            column_width:1
+                                            column_width:1,
+                                            alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
+                                            height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
                                            });
                 view_params.on({}, function() {
                     that.view.update_params(this.get());
                     //None of these controls change the horizontal region so it is safe to just call the internal redraw.
                     that._draw();
                 });
+
+                var states = _.map(that.model.settings.ExtraProperties, function(prop) {
+                    return {id:prop, name:prop};
+                });
+                states.push({id:'__null', name:'None'});
+                var alpha_channel = Controls.Combo(null, { label:'Alpha:', states:states, width:90 })
+                    .bindToModel(view_params, 'alpha_channel');
+                view_controls.addControl(alpha_channel);
+                var height_channel = Controls.Combo(null, { label:'Height:', states:states, width:90 })
+                    .bindToModel(view_params, 'height_channel');
+                view_controls.addControl(height_channel);
 
                 var states = [ {id:'fill_width', name:'Fill Width'}, {id:'fixed_width', name:'Fixed Width'}];
                 var width_mode = Controls.Combo(null, { label:'', states:states, width:90 })
@@ -41,7 +65,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                     .bindToModel(view_params, 'column_width');
                 //view_controls.addControl(column_width);
 
-                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:10, value:view_params.get('row_height')})
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:100, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height');
                 view_controls.addControl(row_height);
 
@@ -57,16 +81,6 @@ define(["require", "_", "d3", "DQX/Model", "DQX/Framework", "DQX/ArrayBufferClie
                 controls_group.addControl(row_query_tool);
 
                 //Fix order to by position for col and primary key for row
-                that.model = Model(table_info,
-                                   {
-                                       col_query: that.col_query.get(),
-                                       row_query: that.row_query.get(),
-                                       col_order: table_info.col_table.PositionField,
-                                       row_order: table_info.row_table.primkey
-                                   },
-                                   _.map(MetaData.chromosomes, DQX.attr('id')),
-                                   that._draw
-                );
                 that.view = View(view_params.get());
             };
 

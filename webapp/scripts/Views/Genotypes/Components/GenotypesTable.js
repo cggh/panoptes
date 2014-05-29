@@ -23,11 +23,17 @@ define(["_", "tween", "DQX/Utils"],
                   //Don't draw off screen genotypes
                   if ((y+(row_height*10) < clip.t) || (y-(row_height*10) > clip.b))
                     return;
-                  var depth = model.data.total_depth[r];
-                  var first = model.data.first_allele[r];
-                  var second = model.data.second_allele[r];
+                  var alphas = (view.alpha_channel == '__null') ? false: model.data[view.alpha_channel][r];
+                  var heights = (view.height_channel == '__null') ? false: model.data[view.height_channel][r];
+                  var first = model.data[model.settings.FirstAllele][r];
+                  var second = model.data[model.settings.SecondAllele][r];
                   for (var i = 0, end = pos.length; i < end; ++i) {
-                      var alpha = (depth[i]/80)+0.2;
+                      var alpha = alphas ? (alphas[i]/80)+0.2 : 1;
+                      var height = heights ? (heights[i]/80)+0.2 : 1;
+                      if (height > 1)
+                        height = 1;
+                      if (height < 0)
+                        height = 0;
                       if (first[i] == second[i]) {
                           if (first[i] == 0)
                             ctx.fillStyle = 'rgba(0,55,135,' + alpha + ')';
@@ -39,7 +45,7 @@ define(["_", "tween", "DQX/Utils"],
                       if (first[i] == -1 || second[i] == -1)
                           ctx.fillStyle = 'rgb(80,80,80)';
                       var spos = x_scale(pos[i]) - (snp_width * 0.5);
-                      ctx.fillRect(spos, y, Math.ceil(base_width), row_height);
+                      ctx.fillRect(spos, y+((1-height)*row_height*0.5), Math.ceil(base_width), height*row_height);
                       if (snp_width > 40) {
                           ctx.fillStyle = first[i] == -1 ? '#000000' : DQX.niceColours[first[i] % col_len];
                           ctx.beginPath();
