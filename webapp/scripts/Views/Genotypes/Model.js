@@ -97,7 +97,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.refresh_data = function() {
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal((Math.floor(that.col_start/1000)*1000)-1000, (Math.ceil(that.col_end/1000)*1000)+1000);
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start,  that.col_end);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
 
