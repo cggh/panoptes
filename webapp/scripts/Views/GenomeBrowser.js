@@ -633,7 +633,7 @@ define([
                                 tableInfo.getQueryTableName(false),
                                 tableInfo.PositionField
                             );
-                            dataFetcher.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
+                            dataFetcher.setMaxViewportSizeX(1.2*tableInfo.settings.GenomeMaxViewportSizeX);
                             dataFetcher.setReportIfError(true);
 
                             tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
