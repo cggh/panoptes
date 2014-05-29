@@ -22,10 +22,10 @@ define(["_", "tween", "DQX/Utils"],
                   var y = (r * row_height) + y_off;
                   //Don't draw off screen genotypes
                   if ((y+(row_height*10) < clip.t) || (y-(row_height*10) > clip.b))
-                    return
-                  var depth = model.depth[r];
-                  var first = model.first_allele[r];
-                  var second = model.second_allele[r];
+                    return;
+                  var depth = model.data.total_depth[r];
+                  var first = model.data.first_allele[r];
+                  var second = model.data.second_allele[r];
                   for (var i = 0, end = pos.length; i < end; ++i) {
                       if (first[i] == second[i]) {
                           if (first[i] == 0)
@@ -42,11 +42,11 @@ define(["_", "tween", "DQX/Utils"],
                       if (snp_width > 40) {
                           ctx.fillStyle = first[i] == -1 ? '#000000' : DQX.niceColours[first[i] % col_len];
                           ctx.beginPath();
-                          ctx.arc(spos+snp_width-16, y+(row_height/2), 5, 0, 2 * Math.PI, false);
+                          ctx.arc(spos+snp_width-16, y+(row_height/2), (row_height/2), 0, 2 * Math.PI, false);
                           ctx.fill();
                           ctx.fillStyle = second[i] == -1 ? '#000000' : DQX.niceColours[second[i] % col_len];
                           ctx.beginPath();
-                          ctx.arc(spos+snp_width-6, y+(row_height/2), 5, 0, 2 * Math.PI, false);
+                          ctx.arc(spos+snp_width-6, y+(row_height/2), (row_height/2), 0, 2 * Math.PI, false);
                           ctx.fill();
                       }
                   }

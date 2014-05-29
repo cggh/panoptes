@@ -17,19 +17,23 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.first_col_ordinal = 0;
                 that.last_col_ordinal = 0;
 
+                that.data = {};
                 that.data_type = table_info.settings.ShowInGenomeBrowser.Type;
                 if (that.data_type != 'diploid' && that.data_type != 'fractional')
                     DQX.reportError("Genotype data type is not diploid or fractional");
+                that.settings = table_info.settings.ShowInGenomeBrowser
                 if (that.data_type == 'diploid') {
-                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
-                    that.first_allele_property = table_info.settings.ShowInGenomeBrowser.FirstAllele;
-                    that.second_allele_property = table_info.settings.ShowInGenomeBrowser.SecondAllele;
-                    that.properties = [that.depth_property, that.first_allele_property, that.second_allele_property];
+                    that.properties = [that.settings.FirstAllele, that.settings.SecondAllele];
+                    _.each(that.settings.ExtraProperties, function(prop) {
+                        that.properties.push(prop);
+                    });
                 }
                 if (that.data_type == 'fractional') {
-                    that.ref_fraction_property = table_info.settings.ShowInGenomeBrowser.RefFraction;
-                    that.depth_property = table_info.settings.ShowInGenomeBrowser.Depth;
-                    that.properties = [that.depth_property, that.ref_fraction_property];
+                    that.properties = [that.settings.RefFraction];
+                    _.each(that.settings.ExtraProperties, function(prop) {
+                        that.properties.push(prop);
+                    });
+
                 }
                 that.reset_cache();
 
@@ -52,16 +56,9 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 });
                 that.col_ordinal = [];
                 that.row_ordinal = [];
-                if (that.data_type == 'diploid') {
-                    that.depth = [];
-                    that.first_allele = [];
-                    that.second_allele = [];
-                }
-                if (that.data_type == 'fractional') {
-                    that.ref_fraction = [];
-                    that.depth = [];
-                }
-
+                _.each(that.properties, function(prop) {
+                  that.data[prop] = [];
+                });
                 that.col_positions = [];
                 that.col_width = 0;
                 that.row_index = [];
@@ -100,17 +97,9 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 var data = that.cache_for_chrom[that.chrom].get_by_ordinal((Math.floor(that.col_start/1000)*1000)-1000, (Math.ceil(that.col_end/1000)*1000)+1000);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
-
-                if (that.data_type == 'diploid') {
-                    that.depth = data.twoD[that.depth_property] || [];
-                    that.first_allele = data.twoD[that.first_allele_property] || [];
-                    that.second_allele = data.twoD[that.second_allele_property] || [];
-                }
-                if (that.data_type == 'fractional') {
-                    that.depth = data.twoD[that.depth_property] || [];
-                    that.ref_fraction = data.twoD[that.ref_fraction_property] || [];
-                }
-
+                _.each(that.properties, function(prop) {
+                    that.data[prop] = data.twoD[prop];
+                });
                 if (that.col_ordinal.length > 0)
                 //For now make it 0.75 of the width as we don't have equidistant blocks
                 //that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
