@@ -189,7 +189,9 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
             print('Cleaning up')
             cur.execute("DROP TABLE {0}".format(tmptable))
 
-        Utils.UpdateTableInfoView(workspaceid, tableid, allowSubSampling, cur)
+        if not importSettings['ConfigOnly']:
+            print('Updating view')
+            Utils.UpdateTableInfoView(workspaceid, tableid, allowSubSampling, cur)
 
         db.commit()
         db.close()
@@ -290,9 +292,10 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         print('Re-creating workspaces record')
         execSQL("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
         execSQL('INSERT INTO workspaces VALUES ("{0}","{1}")'.format(workspaceid, workspaceName) )
-        print('Updating views')
-        for table in tables:
-            Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
+        if not importSettings['ConfigOnly']:
+            print('Updating views')
+            for table in tables:
+                Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
 
         db.commit()
         db.close()

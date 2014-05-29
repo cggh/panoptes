@@ -52,7 +52,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         keyid: tableInfo.primkey,
                         propid: propid,
                         dataid: id,
-                        iscustom: propInfo.isCustom?1:0
+                        iscustom: propInfo.isCustom?1:0,
+                        hassubsampling: tableInfo.settings.AllowSubSampling?1:0,
+                        cachedworkspace: tableInfo.settings.CacheWorkspaceData?1:0
                     },
                     function(resp) {
                         Msg.broadcast({ type: 'PropertyContentChanged'}, {
