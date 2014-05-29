@@ -11,7 +11,7 @@ define(["tween", "DQX/Utils"],
                 var pos = model.col_positions;
                 var ord = model.col_ordinal;
 
-                ctx.strokeStyle = '#000';//TODODQX.getRGB(snp.rgb.r, snp.rgb.g, snp.rgb.b, alpha);
+                ctx.strokeStyle = 'rgb(130,130,130)';//TODODQX.getRGB(snp.rgb.r, snp.rgb.g, snp.rgb.b, alpha);
                 ctx.lineWidth = 1;//snp && snp.selected ? 2 : 1;
                 var mid = that.height * 0.5;
                 for (var i = 0, end = pos.length; i < end; ++i) {
