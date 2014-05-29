@@ -141,6 +141,7 @@ for i,s in enumerate(sample_shuffle):
         shuffled_first_allele[i,j] = first_allele[s,v]
         shuffled_second_allele[i,j] = second_allele[s,v]
 shuffled_total_depth = np.array(np.random.randint(0,1000,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
+shuffled_gq = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
 
 with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
@@ -153,3 +154,5 @@ with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     second_allele[:, :] = shuffled_second_allele
     total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
     total_depth[:, :] = shuffled_total_depth
+    gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
+    gq[:, :] = shuffled_gq

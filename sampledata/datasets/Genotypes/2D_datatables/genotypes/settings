@@ -28,12 +28,22 @@ Properties:
     -  Id: total_depth
        Name: Total Depth
        Description: Total number of reads for this variant
+       MinVal: 0
+       MaxVal: 1000
+
+    -  Id: gq
+       Name: Genotype Quality
+       Description: Quality of the call
+       MinVal: 0
+       MaxVal: 100
 
 ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionOnGenome"
     Type: diploid                    #Either 'diploid' or 'fractional'
     FirstAllele:  first_allele       #Reference to property that is first allele
     SecondAllele: second_allele
-    Depth:        total_depth
+    ExtraProperties:
+    - total_depth
+    - gq
 
 #    Type: fractional                    #Either 'diploid' or 'fractional'
 #    RefFraction:  ref_fraction
