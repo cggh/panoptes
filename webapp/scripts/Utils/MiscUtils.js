@@ -141,6 +141,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (propInfo.isBoolean)
                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
 
+            col.checkCanSort = function() {
+                var q = tableInfo;
+                var isGenomePosition = false;
+                if (tableInfo.hasGenomePositions)
+                    if (tableInfo.PositionField == propInfo.propid)
+                        isGenomePosition = true;
+                if ( (!propInfo.settings.Index) && (!isGenomePosition) ) {
+                    var recordCount = theTable.getRecordCount();
+                    if (recordCount>1.0e6) {
+                        alert('Unable to sort this column: data set is too large');
+                        return false;
+                    }
+                    if ( (recordCount===null) || (theTable.getIsTruncatedRecordCount()) ) {
+                        alert('Unable to sort this column: unknown data set size');
+                        return false;
+                    }
+                    return true;
+                }
+                else
+                return true;
+            }
+
             return col;
         }
 
