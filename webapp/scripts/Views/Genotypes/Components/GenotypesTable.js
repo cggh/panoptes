@@ -27,16 +27,17 @@ define(["_", "tween", "DQX/Utils"],
                   var first = model.first_allele[r];
                   var second = model.second_allele[r];
                   for (var i = 0, end = pos.length; i < end; ++i) {
+                      var alpha = (depth[i]/80)+0.2;
                       if (first[i] == second[i]) {
                           if (first[i] == 0)
-                            ctx.fillStyle = 'rgba(0,0,255,' + (depth[i] / 100) + ')';
+                            ctx.fillStyle = 'rgba(0,55,135,' + alpha + ')';
                           else
-                            ctx.fillStyle = 'rgba(255,0,0,' + (depth[i] / 100) + ')';
+                            ctx.fillStyle = 'rgba(180,0,0,' + alpha + ')';
                       }
                       else
-                          ctx.fillStyle = 'rgba(0,255,0,' + (depth[i] / 100) + ')';
+                          ctx.fillStyle = 'rgba(78,154,0,' + alpha + ')';
                       if (first[i] == -1 || second[i] == -1)
-                          ctx.fillStyle = 'rgb(0,0,0)';
+                          ctx.fillStyle = 'rgb(80,80,80)';
                       var spos = x_scale(pos[i]) - (snp_width * 0.5);
                       ctx.fillRect(spos, y, Math.ceil(base_width), row_height);
                       if (snp_width > 40) {
