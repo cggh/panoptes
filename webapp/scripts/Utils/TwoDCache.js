@@ -73,7 +73,7 @@ define(["Utils/RequestCounter"],
                         break;
                     }
                 }
-                return index;
+                return index+1;
             };
             that.slice = function(array, start, end) {
                 if (array.slice) {

@@ -11,7 +11,7 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
             var that = {};
             that.init = function(inital_params) {
                 that.col_header_height = 30;
-                that.link_height = 25;
+                that.link_height = 50;
                 that.colours = ColourAllocator();
                 that.row_header_width = 150;
                 that.col_scale =  d3.scale.linear();
