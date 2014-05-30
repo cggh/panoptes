@@ -9,29 +9,31 @@ define([],
       });
       that.contents_by_name = DQX.attrMap(that.contents, 'name');
 
-      that.draw = function(ctx, clip, model, view) {
+      that.draw = function (ctx, clip, model, view) {
         that.contents.forEach(function (element) {
           ctx.save();
           ctx.translate(element.l, element.t);
           element.content.draw(ctx, {
-            t:clip.t - element.t,
-            l:clip.l - element.l,
-            b:clip.b - element.t,
-            r:clip.r - element.l
+            t: clip.t - element.t,
+            l: clip.l - element.l,
+            b: clip.b - element.t,
+            r: clip.r - element.l
           }, model, view);
           ctx.restore();
         })
 
       };
 
-      that.event = function(type, ev, offset) {
+      that.event = function (type, ev, offset, model, view) {
         var done = false;
         //Go in reverse to get top elements first
-        for (var i = contents.length-1; i >= 0; --i) {
+        for (var i = contents.length - 1; i >= 0; --i) {
           done = that.contents[i].content.event(
             type,
             ev,
-            {x:that.contents[i].l + offset.x, y:that.contents[i].t+offset.y});
+            {x: that.contents[i].l + offset.x, y: that.contents[i].t + offset.y},
+            model,
+            view);
           if (done)
             return done;
         }

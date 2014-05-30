@@ -137,15 +137,17 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that.drawing = false;
             };
 
-            that.handleMouseClickedSide = function (px, py, area) {
+            that.handleMouseClicked = function (px, py, area) {
                 if (area == 'left') {
-                    py -= that.col_header_height+that.link_height+4;
+                    py -= that.view.col_header_height+that.view.link_height+4;
                     py /= that.view.row_height;
                     py = Math.floor(py);
                     if (py >= 0 && py < that.model.row_ordinal.length) {
                         var key = that.model.row_ordinal[py];
                         Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
                     }
+                } else if (area == 'center') {
+                  that.view.event('click', {x:px, y:py}, that.model);
                 }
             };
 
