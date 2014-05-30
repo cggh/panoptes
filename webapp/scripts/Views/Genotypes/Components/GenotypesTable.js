@@ -27,11 +27,12 @@ define(["_", "tween", "DQX/Utils"],
         var height_scale = (view.height_channel == '__null') ? 1 : model.table.properties[view.height_channel].settings.MaxVal - height_offset;
 
         if (model.data_type == 'diploid') {
-          model.row_index.forEach(function (r) {
+          for (var j = 0, ref = model.row_index.length; j < ref; j++) {
+            var r = model.row_index[j];
             var y = (r * row_height) + y_off;
             //Don't draw off screen genotypes
             if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
-              return;
+              continue;
             var firsts = firsts_rows[r];
             var seconds = second_rows[r];
             var alphas = alpha_rows[r];
@@ -70,7 +71,7 @@ define(["_", "tween", "DQX/Utils"],
                 ctx.fill();
               }
             }
-          });
+          }
         }
 
         return model.row_index.length * row_height;
