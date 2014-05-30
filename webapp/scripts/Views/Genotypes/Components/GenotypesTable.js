@@ -18,13 +18,17 @@ define(["_", "tween", "DQX/Utils"],
         }
         var col_len = DQX.niceColours.length;
         var firsts_rows = model.data[model.settings.FirstAllele];
-        var second_rows = model.data[model.settings.SecondAllele];
+        var seconds_rows = model.data[model.settings.SecondAllele];
         var alpha_rows = (view.alpha_channel == '__null') ? false : model.data[view.alpha_channel];
         var height_rows = (view.height_channel == '__null') ? false : model.data[view.height_channel];
         var alpha_offset = (view.alpha_channel == '__null') ? 0 : model.table.properties[view.alpha_channel].settings.MinVal;
         var alpha_scale = (view.alpha_channel == '__null') ? 1 : model.table.properties[view.alpha_channel].settings.MaxVal - alpha_offset;
         var height_offset = (view.height_channel == '__null') ? 0 : model.table.properties[view.height_channel].settings.MinVal;
         var height_scale = (view.height_channel == '__null') ? 1 : model.table.properties[view.height_channel].settings.MaxVal - height_offset;
+
+        if (firsts_rows==undefined || seconds_rows==undefined || alpha_rows==undefined || height_rows==undefined)
+          return model.row_index.length * row_height;
+
 
         if (model.data_type == 'diploid') {
           for (var j = 0, ref = model.row_index.length; j < ref; j++) {
@@ -34,7 +38,7 @@ define(["_", "tween", "DQX/Utils"],
             if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
               continue;
             var firsts = firsts_rows[r];
-            var seconds = second_rows[r];
+            var seconds = seconds_rows[r];
             var alphas = alpha_rows[r];
             var heights = height_rows[r];
             for (var i = 0, end = pos.length; i < end; ++i) {
