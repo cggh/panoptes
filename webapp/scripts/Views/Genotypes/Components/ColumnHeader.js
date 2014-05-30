@@ -61,14 +61,11 @@ define(["tween", "DQX/Utils"],
         if (type == 'click') {
           if (pos.x < clip.l || pos.x > clip.r || pos.y < 0 || pos.y > that.height)
             return false;
-          var col_pos = model.col_positions;
-          var col_ord = model.col_ordinal;
-          var scale = view.col_scale;
-          var columnic_pos = scale.invert(pos.x);
-          for (var i = 0, end = col_pos.length; i < end; ++i) {
-            var p = col_pos[i];
+          var columnic_pos = view.col_scale.invert(pos.x);
+          for (var i = 0, end = model.col_positions.length; i < end; ++i) {
+            var p = model.col_positions[i];
             if (columnic_pos > (p-model.col_width/2) && columnic_pos < (p+model.col_width/2))
-              return {type: 'click_col', ordinal_key: col_ord[i]};
+              return {type: 'click_col', col_key: model.col_primary_key[i]};
           }
 
         }

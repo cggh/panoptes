@@ -147,7 +147,9 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                         Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
                     }
                 } else if (area == 'center') {
-                  that.view.event('click', {x:px, y:py}, that.model);
+                  var result = that.view.event('click', {x:px, y:py}, that.model);
+                  if (result.type == 'click_col')
+                    Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.col_table.id, itemid:result.col_key } );
                 }
             };
 

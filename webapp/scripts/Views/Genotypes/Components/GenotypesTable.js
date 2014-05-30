@@ -9,7 +9,6 @@ define(["_", "tween", "DQX/Utils"],
         that.last_clip = clip;
         var x_scale = view.col_scale;
         var snp_width = x_scale(model.col_width) - x_scale(0);
-        var y_off = 0;//view.scroll_pos;
         var row_height = Math.ceil(view.row_height);
         var pos = model.col_positions;
         var base_width = snp_width;
@@ -33,7 +32,7 @@ define(["_", "tween", "DQX/Utils"],
         if (model.data_type == 'diploid') {
           for (var j = 0, ref = model.row_index.length; j < ref; j++) {
             var r = model.row_index[j];
-            var y = (r * row_height) + y_off;
+            var y = (r * row_height);
             //Don't draw off screen genotypes
             if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
               continue;
@@ -81,15 +80,27 @@ define(["_", "tween", "DQX/Utils"],
         return model.row_index.length * row_height;
       };
 
-      that.event = function (type, pos, offset) {
-        pos = {x: pos.x - offset.x, y: pos.y - offset.y};
-        var clip = that.last_clip;
-        if (type == 'click') {
-          if (pos.x < clip.l || pos.x > clip.r || pos.y < 0 || pos.y > that.height)
-            return false;
-          return {type:'click_cell', data:'ID'};
-        }
-        return false;
+      that.event = function (type, pos, offset, model, view) {
+          pos = {x: pos.x - offset.x, y: pos.y - offset.y};
+          var clip = that.last_clip;
+          if (type == 'click') {
+              if (pos.x < clip.l || pos.x > clip.r || pos.y < 0 || pos.y > that.height)
+                  return false;
+              var columnic_pos = view.col_scale.invert(pos.x);
+              for (var i = 0, end = model.col_positions.length; i < end; ++i) {
+                  var p = model.col_positions[i];
+                  if (columnic_pos > (p-model.col_width/2) && columnic_pos < (p+model.col_width/2)) {
+                      var picked_col_ord = model.col_primary_key[i];
+                      break;
+                  }
+              }
+              if (picked_col_ord) {
+                  var row_height = Math.ceil(view.row_height);
+                  var row_num =  Math.floor(pos.y/row_height);
+                  return {type:'click_cell', col_key:picked_col_ord, row_key:model.row_primary_key[row_num]};
+              }
+          }
+          return false;
       };
       return that;
     };
