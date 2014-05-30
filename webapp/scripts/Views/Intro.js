@@ -109,15 +109,15 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         //Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
                         Controls.Wrapper(
                             Controls.CompoundVert([
-                                Controls.Static('<h1>'+MetaData.generalSettings.Name+'</h1>'),
+                                Controls.Static('<div style="font-weight:bold;font-size:17px;">'+MetaData.generalSettings.Name+'</div><p>'),
                                 Controls.Static(MetaData.generalSettings.Description||'<i>No description</i>'),
-                                Controls.VerticalSeparator(20),
-                                Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
-                                Controls.VerticalSeparator(5)
-                            ])
+                                //Controls.VerticalSeparator(20),
+                                //Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
+                                //Controls.VerticalSeparator(5)
+                            ]).setMargin(0)
                             ,'IntroPanelInfo'),
                         that.storedViews
-                    ]));
+                    ])).setMargin(0);
 
                     Msg.listen('', {type: 'LoadIntroViews'}, function() {
                         IntroViews.loadIntroViews();
