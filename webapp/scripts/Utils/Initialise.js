@@ -199,7 +199,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             table.col_table = MetaData.mapTableCatalog[table.col_table];
             table.row_table = MetaData.mapTableCatalog[table.row_table];
-            table.first_dimension = table.first_dimension;
             table.hasGenomePositions = table.col_table.hasGenomePositions;
             if (table.hasGenomePositions)
                 table.genomeBrowserInfo = {};
@@ -537,9 +536,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     settings = $.extend(settings,settingsObj);
                 }
                 prop.settings = settings;
-                prop.toDisplayString = function(vl) { return vl; }
-            });
+                prop.toDisplayString = function(vl) { return vl; };
+                var table = MetaData.map2DTableCatalog[prop.tableid];
+                table.properties = table.properties || {};
+                table.properties[prop.id] = prop;
 
+            });
         };
 
         Initialise.parseRelations = function(data) {
