@@ -46,13 +46,13 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 });
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
-                    return {id:prop, name:prop};
+                    return {id:prop, name:that.table_info.properties[prop].name};
                 });
                 states.push({id:'__null', name:'None'});
-                var alpha_channel = Controls.Combo(null, { label:'Alpha:', states:states, width:90 })
+                var alpha_channel = Controls.Combo(null, { label:'Alpha:', states:states})
                     .bindToModel(view_params, 'alpha_channel');
                 view_controls.addControl(alpha_channel);
-                var height_channel = Controls.Combo(null, { label:'Height:', states:states, width:90 })
+                var height_channel = Controls.Combo(null, { label:'Height:', states:states })
                     .bindToModel(view_params, 'height_channel');
                 view_controls.addControl(height_channel);
 
@@ -65,7 +65,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     .bindToModel(view_params, 'column_width');
                 //view_controls.addControl(column_width);
 
-                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:100, value:view_params.get('row_height')})
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:20, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height');
                 view_controls.addControl(row_height);
 
