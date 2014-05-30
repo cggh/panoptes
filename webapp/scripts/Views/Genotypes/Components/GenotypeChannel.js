@@ -15,6 +15,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that._toolTipHandler = null;
                 that._clickHandler = null;
                 that._always_call_draw = true;
+                that._title = table_info.name;
                 that.parent_browser = parent;
                 that.table_info = table_info;
 
@@ -132,7 +133,6 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                                {t:draw_info.top_visible, b:draw_info.bottom_visible, l:0, r:draw_info.centerContext.canvas.clientWidth},
                                that.model);
                 that.drawMark(draw_info);
-                that.drawTitle(draw_info);
 
                 that.drawing = false;
             };
