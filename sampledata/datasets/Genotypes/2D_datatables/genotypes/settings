@@ -42,8 +42,8 @@ ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionO
     FirstAllele:  first_allele       #Reference to property that is first allele
     SecondAllele: second_allele
     ExtraProperties:
-    - total_depth
     - gq
+    - total_depth
 
 #    Type: fractional                    #Either 'diploid' or 'fractional'
 #    RefFraction:  ref_fraction
