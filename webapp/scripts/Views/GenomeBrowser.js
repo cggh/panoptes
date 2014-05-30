@@ -648,12 +648,14 @@ define([
                                 var groupList = null;
                                 $.each(groupInfo.properties, function(idx1, propInfo) {
                                     var creatorFunc = null;
-                                    if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) && (propInfo.settings.showInBrowser))
-                                        creatorFunc = that.createPropertyChannel;
-                                    if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) && (propInfo.settings.showInBrowser))
-                                        creatorFunc = that.createPositionChannel;
+                                    if (propInfo.settings.showInBrowser) {
+                                        if ((propInfo.tableid==tableInfo.id) && (propInfo.isFloat) )
+                                            creatorFunc = that.createPropertyChannel;
+                                        if ((propInfo.tableid==tableInfo.id) && ((propInfo.isText)||(propInfo.isBoolean)) )
+                                            creatorFunc = that.createPositionChannel;
+                                    }
                                     if (creatorFunc) {
-                                        if (!groupList) {
+                                        if ( (!groupList) && (!propInfo.settings.BrowserShowOnTop) ) {
                                             groupList = Controls.CompoundVert([]).setMargin(5);
                                             groupSection = Controls.Section(groupList, {
                                                 title: groupInfo.Name,
