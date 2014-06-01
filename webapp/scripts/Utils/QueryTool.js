@@ -223,7 +223,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     defaultHidden = true;
 
                 theControl.addControl(Controls.Section(group, {
-                    title: that.tableInfo.tableCapNamePlural + ' filter',
+                    title: /*that.tableInfo.tableCapNamePlural + */'Query',
                     bodyStyleClass: 'ControlsSectionBody',
                     defaultCollapsed: defaultHidden
                 }));
