@@ -2,7 +2,7 @@
 
 .. panoptes documentation master file
 
-Panoptes - eyes on your data
+Panoptes
 ============================
 
 Panoptes is a web application for exploration and visualisation of
