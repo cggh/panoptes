@@ -19,8 +19,8 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     rootFrame.makeGroupHor();
                     rootFrame.setSeparatorSize(7);
 
-                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5));
-                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5))/*.setFixedSize(Framework.dimX, 400)*/;
+                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.57));
+                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.43))/*.setFixedSize(Framework.dimX, 400)*/;
                     this.frameButtons.setMargins(0);
                     this.frameButtons2.setMargins(0);
                     //this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
