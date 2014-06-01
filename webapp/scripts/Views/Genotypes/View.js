@@ -62,6 +62,10 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
 
             };
 
+            that.event = function(type, pos, model) {
+              return that.root_container.event(type, pos, {x:0, y:0}, model, that);
+            };
+
             that.init(initial_params);
             return that
         };

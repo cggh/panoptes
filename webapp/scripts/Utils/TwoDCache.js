@@ -24,7 +24,11 @@ define(["Utils/RequestCounter"],
                 var result = new arrays[0].constructor(length);
                 var pos = 0;
                 _.forEach(arrays, function(array) {
-                    result.set(array,pos);
+                    if (result.set)
+                      result.set(array,pos);
+                    else
+                      for (var i = 0; i < array.length;i++)
+                        result[i+pos] = array[i];
                     pos += array.length;
                 });
                 return result;
@@ -50,7 +54,11 @@ define(["Utils/RequestCounter"],
                 var pos = 0;
                 _.forEach(arrays, function(array) {
                     for(var i = 0; i < row_length; i++)
+                      if (result[i].set)
                         result[i].set(array[i],pos);
+                      else
+                        for (var j = 0; j < array[i].length;j++)
+                          result[i][j+pos] = array[i][j];
                     pos += array[0].length;
                 });
                 return result;

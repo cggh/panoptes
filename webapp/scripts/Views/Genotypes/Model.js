@@ -106,8 +106,10 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
+                that.row_primary_key = data.row[that.table.row_table.primkey] || [];
+                that.col_primary_key = data.col[that.table.col_table.primkey] || [];
                 _.each(that.properties, function(prop) {
-                    that.data[prop] = data.twoD[prop];
+                    that.data[prop] = data.twoD[prop] || [];
                 });
                 if (that.col_ordinal.length > 0)
                 //For now make it 0.75 of the width as we don't have equidistant blocks
@@ -165,8 +167,14 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("col_order", that.query.col_order);
                 myurl.addUrlQueryItem("row_order", that.query.row_order);
                 myurl.addUrlQueryItem("first_dimension", that.table.first_dimension);
-                myurl.addUrlQueryItem("col_properties", that.query.col_order);
-                myurl.addUrlQueryItem("row_properties", that.query.row_order);
+                if (that.table.col_table.primkey == that.query.col_order)
+                  myurl.addUrlQueryItem("col_properties", that.query.col_order);
+                else
+                  myurl.addUrlQueryItem("col_properties", that.query.col_order+'~'+that.table.col_table.primkey);
+                if (that.table.row_table.primkey == that.query.row_order)
+                  myurl.addUrlQueryItem("row_properties", that.query.row_order);
+                else
+                  myurl.addUrlQueryItem("row_properties", that.query.row_order+'~'+that.table.row_table.primkey);
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {

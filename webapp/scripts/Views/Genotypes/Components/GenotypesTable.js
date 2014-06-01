@@ -9,7 +9,6 @@ define(["_", "tween", "DQX/Utils"],
         that.last_clip = clip;
         var x_scale = view.col_scale;
         var snp_width = x_scale(model.col_width) - x_scale(0);
-        var y_off = 0;//view.scroll_pos;
         var row_height = Math.ceil(view.row_height);
         var pos = model.col_positions;
         var base_width = snp_width;
@@ -33,7 +32,7 @@ define(["_", "tween", "DQX/Utils"],
         if (model.data_type == 'diploid') {
           for (var j = 0, ref = model.row_index.length; j < ref; j++) {
             var r = model.row_index[j];
-            var y = (r * row_height) + y_off;
+            var y = (r * row_height);
             //Don't draw off screen genotypes
             if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
               continue;
@@ -81,48 +80,27 @@ define(["_", "tween", "DQX/Utils"],
         return model.row_index.length * row_height;
       };
 
-      that.event = function (type, ev, offset) {
-        var pos = ev.center;
-        pos = {x: pos.x - offset.x, y: pos.y - offset.y};
-        var clip = that.last_clip;
-        if (type == "dragStart") {
-          //Check that the event is occuring within our area
-          if (pos.x < 0 || pos.x > clip.r || pos.y < 0 || pos.y > clip.b)
-            return false;
-          that.drag = true;
-          that.startDragScrollPos = that.view.scroll_pos;
-          that.startDragScrollY = ev.center.y;
-          that.view.snp_scale.startDrag(ev.touches);
-          return true;
-        }
-        if (type == "dragMove") {
-          if (that.drag) {
-            that.view.rescaleSNPic(that.view.snp_scale.dragMove(ev.touches));
-            // Y Scroll
-            var dist = that.startDragScrollY - ev.center.y;
-            that.view.scroll_pos = that.startDragScrollPos - dist;
-            if (that.view.scroll_pos > 0)
-              that.view.scroll_pos = 0;
-//            if (that.view.scroll_pos < that.max_scroll())
-            //             that.view.scroll_pos = that.max_scroll();
+      that.event = function (type, pos, offset, model, view) {
+          pos = {x: pos.x - offset.x, y: pos.y - offset.y};
+          var clip = that.last_clip;
+          if (type == 'click') {
+              if (pos.x < clip.l || pos.x > clip.r || pos.y < 0 || pos.y > that.height)
+                  return false;
+              var columnic_pos = view.col_scale.invert(pos.x);
+              for (var i = 0, end = model.col_positions.length; i < end; ++i) {
+                  var p = model.col_positions[i];
+                  if (columnic_pos > (p-model.col_width/2) && columnic_pos < (p+model.col_width/2)) {
+                      var picked_col_ord = model.col_primary_key[i];
+                      break;
+                  }
+              }
+              if (picked_col_ord) {
+                  var row_height = Math.ceil(view.row_height);
+                  var row_num =  Math.floor(pos.y/row_height);
+                  return {type:'click_cell', col_key:picked_col_ord, row_key:model.row_primary_key[row_num]};
+              }
           }
-          //Return false so that other elements get a drag move even if they moved onto us mid-drag
           return false;
-        }
-        if (type == "dragEnd") {
-          that.drag = false;
-          //Return false so that other elements get a drag end even if they moved onto us mid-drag
-          return false;
-        }
-        if (type == "mouseWheel") {
-          //Check that the event is occurring within our area
-          if (pos.x < 0 || pos.x > clip.r || pos.y < 0 || pos.y > clip.b)
-            return false;
-          var delta = DQX.getMouseWheelDelta(ev);
-          if (delta != 0)
-            that.view.rescaleSNPic(that.view.snp_scale.scale_clamp(that.view.snp_scale.zoom(delta, pos.x), 0, that.data.snp_cache.snp_positions.length));
-          return true;
-        }
       };
       return that;
     };
