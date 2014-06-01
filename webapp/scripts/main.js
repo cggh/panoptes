@@ -187,10 +187,19 @@ require([
                             }
 
                             $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                                actions.push( { content:'Find '+tableInfo.tableNameSingle+'...', bitmap:'Bitmaps/datagrid2.png', handler:function() {
-                                    FindDataItem.execute(tableInfo.id);
-                                }
+                                var canPerformSearch = false;
+                                $.each(MetaData.customProperties, function(idx, propInfo) {
+                                    if (propInfo.tableid == tableInfo.id) {
+                                        if ( (propInfo.settings.Search) && (propInfo.settings.Search != 'None') )
+                                            canPerformSearch = true;
+                                    }
                                 });
+                                if (canPerformSearch) {
+                                    actions.push( { content:'Find '+tableInfo.tableNameSingle+'...', bitmap:'Bitmaps/datagrid2.png', handler:function() {
+                                        FindDataItem.execute(tableInfo.id);
+                                    }
+                                    });
+                                }
                             });
 
                             ButtonChoiceBox.create('Find item','', [actions]);

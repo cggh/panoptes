@@ -50,7 +50,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (propInfo.tableid == that.tableInfo.id) {
                         if ( propInfo.settings.Search == 'StartPattern' )
                             queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'STARTSWITH', st) );
-                        if ( (propInfo.settings.Search == 'Pattern') || ( (propInfo.settings.Search == 'None') && (propInfo.propid == that.tableInfo.primkey))  )
+                        if ( (propInfo.settings.Search == 'Pattern') )
                             queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'CONTAINS', st) );
                         if ( propInfo.settings.Search == 'Match' )
                             queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'=', st) );
@@ -75,7 +75,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var findstr = '';
                 $.each(MetaData.customProperties, function(idx, propInfo) {
                     if (propInfo.tableid == that.tableInfo.id) {
-                        if ( (propInfo.settings.Search != 'None') || (propInfo.propid == that.tableInfo.primkey) ) {
+                        if ( (propInfo.settings.Search != 'None')) {
                             if (findstr)
                                 findstr+=', ';
                             findstr += propInfo.name
