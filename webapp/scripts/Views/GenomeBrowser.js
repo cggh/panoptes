@@ -390,8 +390,12 @@ define([
                         dataFetcher,
                         tableInfo.primkey
                     );
+                    if (!channelShowOnTop)
+                        var theTitle = propInfo.name + '-' + tableInfo.tableCapNamePlural;
+                    else
+                        var theTitle = tableInfo.tableCapNamePlural;
                     positionChannel
-                        .setTitle(propInfo.name + '-' + tableInfo.tableCapNamePlural)
+                        .setTitle(theTitle)
                         .setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
 
                     positionChannel.setSelectionStateHandler(tableInfo.isItemSelected);
