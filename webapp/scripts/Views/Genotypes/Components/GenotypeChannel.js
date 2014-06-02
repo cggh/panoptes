@@ -31,9 +31,11 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 );
 
                 //Create controls
-                controls_group.addControl(that.createVisibilityControl());
 
-                var view_controls = Controls.CompoundHor([]);
+                var view_controls = Controls.CompoundVert([]);
+                view_controls.addControl(that.createVisibilityControl());
+                view_controls.addControl(Controls.VerticalSeparator(3));
+
                 var view_params = DQXModel({width_mode:'fill_width',
                                             row_height:10,
                                             column_width:1,
@@ -62,15 +64,14 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     .bindToModel(view_params, 'width_mode');
                 //view_controls.addControl(width_mode);
 
-                var column_width = Controls.ValueSlider(null, {label: 'Column Width', minval:1, maxval:10, value:view_params.get('column_width')})
+                var column_width = Controls.ValueSlider(null, {label: 'Column Width', width:220, minval:1, maxval:10, value:view_params.get('column_width')})
                     .bindToModel(view_params, 'column_width');
                 //view_controls.addControl(column_width);
 
-                var row_height = Controls.ValueSlider(null, {label: 'Row Height', minval:1, maxval:20, value:view_params.get('row_height')})
+                view_controls.addControl(Controls.VerticalSeparator(3));
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height');
                 view_controls.addControl(row_height);
-
-                controls_group.addControl(view_controls);
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
@@ -80,6 +81,12 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that.row_query.notifyQueryUpdated = that.new_row_query;
                 var row_query_tool = that.row_query.createQueryControl({defaultHidden: true});
                 controls_group.addControl(row_query_tool);
+
+                controls_group.addControl(Controls.Section(view_controls, {
+                    title: 'Display settings',
+                    bodyStyleClass: 'ControlsSectionBody'
+                }));
+
 
                 //Fix order to by position for col and primary key for row
                 that.view = View(view_params.get());

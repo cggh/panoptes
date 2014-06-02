@@ -120,7 +120,7 @@ define([
                         that.reDraw();
                     }, 20));
 
-                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Gamma correction', width: 180, minval:0.1, maxval:1, value:1, digits: 2})
+                that.ctrl_Gamma = Controls.ValueSlider(null, {label: 'Gamma correction', width: 180, minval:0.1, maxval:1, value:1, digits: 2, scaleDistance: 0.2})
                     /*.setNotifyOnFinished()*/.setClassID('gamma')
                     .setOnChanged(DQX.debounce(function() {
                         that.reDraw();

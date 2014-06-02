@@ -788,6 +788,7 @@ define([
                             title: table_info.tableCapNamePlural,
                             headerStyleClass: 'GenomeBrowserMainSectionHeader'
                         }));
+
                         var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
                         the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
                         that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
