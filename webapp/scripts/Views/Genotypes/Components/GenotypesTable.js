@@ -47,6 +47,10 @@ define(["_", "tween", "DQX/Utils"],
               height = Math.min(Math.max(height, 0), 1);
               var first = firsts[i];
               var second = seconds[i];
+              if (first == -1 && second == -1) {
+                height = 0.2;
+                alpha = 0.2;
+              }
               if (height > 1)
                 height = 1;
               if (height < 0)
@@ -60,7 +64,7 @@ define(["_", "tween", "DQX/Utils"],
               else
                 ctx.fillStyle = 'rgba(78,154,0,' + alpha + ')';
               if (first == -1 || second == -1)
-                ctx.fillStyle = 'rgb(80,80,80)';
+                ctx.fillStyle = 'rgb(40,40,40)';
               var spos = x_scale(pos[i]) - (snp_width * 0.5);
               ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(base_width), height * row_height);
               if (snp_width > 40) {
