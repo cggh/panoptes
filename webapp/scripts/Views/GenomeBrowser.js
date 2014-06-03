@@ -135,7 +135,7 @@ define([
 
                     //Initialise a genome browser panel
                     this.panelBrowser = GenomePlotter.Panel(this.frameBrowser, browserConfig);
-                    this.panelBrowser.setMaxXZoomFactor(30.0,12000);
+                    this.panelBrowser.setMaxXZoomFactor(30.0,100000);
 
                     //Define chromosomes
                     $.each(MetaData.chromosomes,function(idx,chromosome) {
