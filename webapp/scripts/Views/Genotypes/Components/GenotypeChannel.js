@@ -37,7 +37,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 view_controls.addControl(Controls.VerticalSeparator(3));
 
                 var view_params = DQXModel({width_mode:'fill_width',
-                                            row_height:10,
+                                            row_height:11,
                                             column_width:1,
                                             alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
                                             height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
