@@ -50,6 +50,7 @@ define([
                 };
 
                 that.recallSettings = function(settObj) {
+                    that.recallingSettings = true;
                     if ( (settObj.chromoid) && (that.panelBrowser) ) {
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
@@ -75,6 +76,8 @@ define([
                             }
                         });
                     }
+
+                    that.recallingSettings = false;
 
                     //Initialise all the table based summary values
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
@@ -858,6 +861,8 @@ define([
 
                     // For a specific datatable, (re)builds all the tracks that correspond to that datatable records
                     that.rebuildTableBasedSummaryValues = function(tableid) {
+                        if (that.recallingSettings)
+                            return;
                         var tableInfo=MetaData.getTableInfo(tableid);
 
                         //remove tracks that are not visible anymore
@@ -880,11 +885,13 @@ define([
                         });
 
                         //Add new tracks
-                        $.each(tableInfo.genomeTrackSelectionManager.getSelectedList(), function(idx, recordid) {
+                        var selectedList = tableInfo.genomeTrackSelectionManager.getSelectedList();
+                        $.each(selectedList, function(idx, recordid) {
                             $.each(tableInfo.tableBasedSummaryValues, function(idx2, summaryValue) {
                                 if (summaryValue.isVisible) {
-                                    if (!presentMap[summaryValue.trackid+'_'+recordid])
+                                    if (!presentMap[summaryValue.trackid+'_'+recordid]) {
                                         that.tableBasedSummaryValue_Add(tableid, summaryValue.trackid, recordid);
+                                    }
                                 }
                             });
                         });
