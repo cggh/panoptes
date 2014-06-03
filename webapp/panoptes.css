@@ -402,15 +402,19 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 .IntroViewItemImage {
-    opacity:0.5;
+    opacity:0.75;
     float:left;
     margin-right:8px;
     margin-bottom:5px;
     margin-top:2px
 }
 
+.IntroViewItem:hover {
+    background-color: rgb(255,240,210);
+}
+
 .IntroViewItem:hover .IntroViewItemImage {
-    opacity: 1
+    opacity: 1;
 }
 
 

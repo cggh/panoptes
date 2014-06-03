@@ -1,5 +1,5 @@
-define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Popup", "DQX/DocEl", "DQX/Utils", "DQX/FrameTree", "DQX/FrameList", "DQX/DataFetcher/DataFetchers", "DQX/SQL", "MetaData", "Utils/IntroViews"],
-    function (require, Base64, Msg, Application, Framework, Controls, Msg, Popup, DocEl, DQX, FrameTree, FrameList, DataFetchers, SQL, MetaData, IntroViews) {
+define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/Popup", "DQX/DocEl", "DQX/Utils", "DQX/FrameTree", "DQX/FrameList", "DQX/DataFetcher/DataFetchers", "DQX/SQL", "MetaData", "Utils/IntroViews", "Wizards/FindGene"],
+    function (require, Base64, Msg, Application, Framework, Controls, Msg, Popup, DocEl, DQX, FrameTree, FrameList, DataFetchers, SQL, MetaData, IntroViews, FindGene) {
 
         ////////////// Utilities for async server communication in case of lengthy operations
 
@@ -46,13 +46,31 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             buttonClass: "DQXToolButton2",
                             bitmap: 'Bitmaps/GenomeBrowser.png'
                         });
+//                        var findGeneButton = Application.getView('genomebrowser').createActivationButton({
+//                            content: "Fine gene...",
+//                            buttonClass: "DQXToolButton1",
+//                            bitmap: 'Bitmaps/Find.png'
+//                        });
+
+                        var findGeneButton = Controls.Button(null,
+                            {
+                                buttonClass: 'DQXToolButton1',
+                                content: "Find gene...",
+                                bitmap: 'Bitmaps/Find.png',
+                                width:120, height:50
+                            });
+                        findGeneButton.setOnChanged(function() {
+                            FindGene.execute()
+                        })
+
                         //miscButtonList.push(browserButton);
 
                         var descr = MetaData.generalSettings.GenomeBrowserDescr||'<i>No description</i>';
 
                         var grp = Controls.CompoundVert([
                             Controls.Static(descr),
-                            browserButton
+                            Controls.CompoundHor([browserButton, Controls.HorizontalSeparator(8), findGeneButton])
+//                            browserButton
                         ]);
                         tableButtons.push(Controls.Section(grp, {
                             title: "Genome browser",
@@ -87,7 +105,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         var info = Controls.Static(descr);
                         var grp = Controls.CompoundVert([
                             info,
-                            Controls.CompoundHor([tableViewerButton, button_Showplots])
+                            Controls.CompoundHor([tableViewerButton, Controls.HorizontalSeparator(8), button_Showplots])
                         ]);;
                         tableButtons.push(Controls.Section(grp, {
                             title: tableInfo.tableCapNamePlural,
