@@ -1,5 +1,8 @@
 # The displayed name of this dataset
+
 Name: Samples & Variants
+
+NameBanner: Samples and Variants # Name as it appears in the top banner of the app
 
 # A description of the dataset that will appear on the start page
 Description: >
