@@ -129,7 +129,7 @@ define(["Utils/RequestCounter"],
                     interval = matching_intervals_with_data[0];
                     col_ordinal_array = interval.col[that.col_ordinal];
                     start_index = that.find_start(col_ordinal_array, start);
-                    end_index = col_ordinal_array.length-1;
+                    end_index = col_ordinal_array.length;
                     _.forEach(interval.col, function(array, prop) {
                         result.col[prop] = [that.slice(array, start_index, end_index)];
                     });
