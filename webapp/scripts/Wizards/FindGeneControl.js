@@ -46,8 +46,9 @@
                         var items = [];
                         for (var i = 0; i < descrs.length; i++) {
                             var txt = descrs[i];
+                            txt = txt.replace(/;/g, '; ');
                             txt = DQX.highlightText(txt, pattern);
-                            var descr = txt + ' ({id}; {chrom}:{p1}-{p2})'.DQXformat({ id: ids[i], chrom: chromidlist[i], p1: startlist[i], p2: endlist[i] });
+                            var descr = txt + ' <span style="color:rgb(160,140,110)">({id}; {chrom}:{p1}-{p2})</span>'.DQXformat({ id: ids[i], chrom: chromidlist[i], p1: startlist[i], p2: endlist[i] });
                             descr = '<span style="word-wrap:break-word">'+descr+'</span>'
                             items.push({ id: 'id' + i, content: descr });
                             this.idMap['id' + i] = ids[i];

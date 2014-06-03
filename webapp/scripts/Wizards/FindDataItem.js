@@ -45,27 +45,36 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.updateQuery = function() {
                 var st = that.ctrl_searchString.getValue();
-                var queryElements = []
-                $.each(MetaData.customProperties, function(idx, propInfo) {
-                    if (propInfo.tableid == that.tableInfo.id) {
-                        if ( propInfo.settings.Search == 'StartPattern' )
-                            queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'STARTSWITH', st) );
-                        if ( (propInfo.settings.Search == 'Pattern') )
-                            queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'CONTAINS', st) );
-                        if ( propInfo.settings.Search == 'Match' )
-                            queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'=', st) );
-
-                    }
-                });
-                if (queryElements.length == 0) {
-                    alert('No searchable properties defined for this data table');
+                if (!st) {
+                    that.myTable.setQuery(SQL.WhereClause.Trivial());
                 }
-                that.myTable.setQuery(SQL.WhereClause.OR(queryElements));
+                else {
+                    var queryElements = []
+                    $.each(MetaData.customProperties, function(idx, propInfo) {
+                        if (propInfo.tableid == that.tableInfo.id) {
+                            if ( propInfo.settings.Search == 'StartPattern' )
+                                queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'STARTSWITH', st) );
+                            if ( (propInfo.settings.Search == 'Pattern') )
+                                queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'CONTAINS', st) );
+                            if ( propInfo.settings.Search == 'Match' )
+                                queryElements.push( SQL.WhereClause.CompareFixed(propInfo.propid,'=', st) );
+
+                        }
+                    });
+                    if (queryElements.length == 0) {
+                        alert('No searchable properties defined for this data table');
+                    }
+                    that.myTable.setQuery(SQL.WhereClause.OR(queryElements));
+                }
                 that.myTable.reLoadTable();
             };
 
             that.createPanels = function() {
-                that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.query, {hasSelection: false });
+                that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.query,
+                    {
+                        hasSelection: false,
+                        maxResultSet: 100
+                    });
                 that.myTable = that.panelTable.getTable();
 
                 that.ctrl_searchString = Controls.Edit(null,{ size: 20, value: '' }).setOnChanged(DQX.debounce(that.updateQuery,200)).setHasDefaultFocus();

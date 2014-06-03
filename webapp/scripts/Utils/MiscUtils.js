@@ -175,7 +175,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 tableInfo.getQueryTableName(settings.subSampling)
             );
 
-            theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000);
+            if (settings.maxResultSet) {
+                theDataFetcher.setMaxRecordCount(settings.maxResultSet);
+            } else {
+                theDataFetcher.setMaxRecordCount(tableInfo.settings.MaxCountQueryAggregated || 1000000);
+            }
+
             theDataFetcher.setReportIfError(true);
 
 
