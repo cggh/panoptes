@@ -122,7 +122,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 if (!draw_info) return;
 
                 //Modify the height of the channel
-                var height = that.view.link_height + that.view.col_header_height;
+                var height = 5 + that.view.link_height + that.view.col_header_height;
                 if (that.model.row_ordinal.length)
                     height += that.view.row_height * that.model.row_ordinal.length;
                 if (that._height != height) {
