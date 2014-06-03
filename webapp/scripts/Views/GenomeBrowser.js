@@ -364,7 +364,7 @@ define([
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
                         summInfo.isDisplayed = true; // Set this flag so that it does not get added twice
 
-                        theFetcher = new DataFetcherSummary.Fetcher(MetaData.serverUrl,summInfo.minblocksize,500);
+                        var theFetcher = new DataFetcherSummary.Fetcher(MetaData.serverUrl,summInfo.minblocksize,500);
                         theFetcher.usedChannelCount = 0;
                         theFetcher.minblocksize=summInfo.minblocksize;
                         that.listDataFetcherProfiles.push(theFetcher);
@@ -419,7 +419,11 @@ define([
                     }
 
                     //Define a custom tooltip
-                    positionChannel.setToolTipHandler(function(id) { return id; })
+                    positionChannel.setToolTipHandler(function(id, index)
+                    {
+                        var posit = dataFetcher.getPosition(index);
+                        return 'Position: '+posit+'<br>Id: '+id;
+                    })
                     //Define a function that will be called when the user clicks a snp
                     positionChannel.setClickHandler(function(id) {
                         Msg.send({ type: 'ItemPopup' }, { tableid:tableInfo.id, itemid:id } );//Send a message that should trigger showing the snp popup
