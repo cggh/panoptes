@@ -495,6 +495,7 @@ define([
                         );
                         theChannel
                             .setTitle(channelName)
+                            .setSubTitle(tableInfo.tableCapNamePlural)
                             .setHeight(150,true)
                             .setChangeYScale(true,true);
                         that.panelBrowser.addChannel(theChannel, false);
