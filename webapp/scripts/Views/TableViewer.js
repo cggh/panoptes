@@ -408,9 +408,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                 chk.colID = col.myCompID;
                                 if (!tableInfo.isPropertyColumnVisible(col.myCompID))
                                     col.setVisible(false);
-                                propertyGroupSectionMap[propInfo.group.Id].theList.addControl(chk);
                                 propertyGroupSectionMap[propInfo.group.Id].theSection.checkboxes.push(chk);
                                 that.columnVisibilityChecks.push(chk);
+                                var chk_compound = chk;
+                                if (propInfo.settings.Description) {
+                                    var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/question.png', vertShift:-2}).setOnChanged(function() {
+                                        propInfo.createInfoPopup();
+                                    });
+                                    chk_compound = Controls.CompoundHor([chk, Controls.HorizontalSeparator(8), ctrl_hint]);
+                                }
+                                propertyGroupSectionMap[propInfo.group.Id].theList.addControl(chk_compound);
                             }
                         }
                     });

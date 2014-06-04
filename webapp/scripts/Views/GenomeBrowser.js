@@ -577,7 +577,15 @@ define([
                     else {
                         var ctrl_onoff = theChannel.createComponentVisibilityControl(propInfo.propid, label, false, !channelDefaultVisible);
                     }
-                    theChannel.controls.addControl(ctrl_onoff);
+                    if (propInfo.settings.Description) {
+                        var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/question.png', vertShift:-2}).setOnChanged(function() {
+                            propInfo.createInfoPopup();
+                        });
+                        theChannel.controls.addControl(Controls.CompoundHor([ctrl_onoff, Controls.HorizontalSeparator(8), ctrl_hint]));
+                    }
+                    else {
+                        theChannel.controls.addControl(ctrl_onoff);
+                    }
                 }
 
 
