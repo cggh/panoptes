@@ -19,6 +19,12 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that.parent_browser = parent;
                 that.table_info = table_info;
 
+                var model_params = DQXModel({
+                  width_mode:'auto',
+                  auto_width: true,
+                  user_column_width:3
+                });
+
                 that.model = Model(table_info,
                                    {
                                        col_query: SQL.WhereClause.Trivial(),
@@ -27,7 +33,8 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                                        row_order: table_info.row_table.primkey
                                    },
                                    _.map(MetaData.chromosomes, DQX.attr('id')),
-                                   that._draw
+                                   that._draw,
+                                   model_params.get()
                 );
 
                 //Create controls
@@ -36,16 +43,21 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 view_controls.addControl(that.createVisibilityControl());
                 view_controls.addControl(Controls.VerticalSeparator(3));
 
-                var view_params = DQXModel({width_mode:'fill_width',
-                                            row_height:11,
-                                            column_width:1,
-                                            alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
-                                            height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
-                                           });
+                var view_params = DQXModel({
+                  row_height:11,
+                  alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
+                  height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
+                });
+
                 view_params.on({}, function() {
                     that.view.update_params(this.get());
                     //None of these controls change the horizontal region so it is safe to just call the internal redraw.
                     that._draw();
+                });
+                model_params.on({}, function() {
+                    that.model.update_params(this.get());
+                    //Call the full draw as we need to refresh data and column placement
+                    that.draw(that.draw_info);
                 });
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
@@ -59,14 +71,20 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     .bindToModel(view_params, 'height_channel');
                 view_controls.addControl(height_channel);
 
-                var states = [ {id:'fill_width', name:'Fill Width'}, {id:'fixed_width', name:'Fixed Width'}];
-                var width_mode = Controls.Combo(null, { label:'', states:states, width:90 })
-                    .bindToModel(view_params, 'width_mode');
-                //view_controls.addControl(width_mode);
+                var states = [{id:'auto', name:'Automatic'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
+                var width_mode = Controls.Combo(null, { label:'Column Mode', states:states, width:90 })
+                    .bindToModel(model_params, 'width_mode');
+                view_controls.addControl(width_mode);
 
-                var column_width = Controls.ValueSlider(null, {label: 'Column Width', width:220, minval:1, maxval:10, value:view_params.get('column_width')})
-                    .bindToModel(view_params, 'column_width');
-                //view_controls.addControl(column_width);
+                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:220, minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
+                    .bindToModel(model_params, 'user_column_width');
+                var show_hide_width = Controls.ShowHide(column_width);
+                view_controls.addControl(show_hide_width);
+                model_params.on({change:'width_mode'}, function() {
+                  show_hide_width.setVisible(this.get('width_mode') == 'manual');
+                });
+                show_hide_width.setVisible(false);
+
 
                 view_controls.addControl(Controls.VerticalSeparator(3));
                 var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
