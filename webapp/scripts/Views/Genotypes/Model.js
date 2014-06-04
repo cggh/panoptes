@@ -95,6 +95,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     avg_shift += result[i] - ordinal[i];
                 }
                 avg_shift /= result.length;
+                avg_shift = Math.floor(avg_shift);
                 for (i = 0, ref = result.length; i < result.length; i++) {
                     result[i] -= avg_shift;
                 }
