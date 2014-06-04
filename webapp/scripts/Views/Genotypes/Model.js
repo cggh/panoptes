@@ -66,44 +66,50 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.genomic_end = 0;
             };
 
-            that.position_columns  = function(ordinal, width) {
-                var result = new Float32Array(ordinal);
-                for (var cf = 0.1; cf <= 1; cf += 0.1) {
-                    var psxlast = -Infinity;
-                    for (var i = 0, ref = result.length; i < ref; i++) {
-                        if (result[i] < psxlast + cf * width)
-                            result[i] = psxlast + cf * width;
-                        psxlast = result[i];
-                    }
-                    cf += 0.1;
-                    psxlast = Infinity;
-                    for (i = result.length - 1; i >= 0; i--) {
-                        if (result[i] > psxlast - cf * width)
-                            result[i] = psxlast - cf * width;
-                        psxlast = result[i];
-                    }
+            that.position_columns = function (ordinal, width) {
+              var result = new Float64Array(ordinal);
+              var mid_index = Math.floor(result.length/2);
+              for (var cf = 0.1; cf <= 1; cf += 0.1) {
+                //Sweep middle out
+                var psxlast = result[mid_index];
+                for (var i = mid_index+1, ref = result.length; i < ref; i++) {
+                  if (result[i] < psxlast + cf * width)
+                    result[i] = psxlast + cf * width;
+                  psxlast = result[i];
                 }
+                psxlast = result[mid_index];
+                for (i = mid_index-1; i >= 0; i--) {
+                  if (result[i] > psxlast - cf * width)
+                    result[i] = psxlast - cf * width;
+                  psxlast = result[i];
+                }
+                cf += 0.1;
+                //Sweep edges in
                 psxlast = -Infinity;
-                for (i = 0, ref = result.length; i < result.length; i++) {
-                    result[i] = Math.round(result[i]);
-                    if (result[i] < psxlast + width)
-                        result[i] = psxlast + width;
-                    psxlast = result[i];
+                for (i = 0, ref = mid_index; i < ref; i++) {
+                  if (result[i] < psxlast + cf * width)
+                    result[i] = psxlast + cf * width;
+                  psxlast = result[i];
                 }
-                var avg_shift = 0;
-                for (i = 0, ref = result.length; i < result.length; i++) {
-                    avg_shift += result[i] - ordinal[i];
+                psxlast = Infinity;
+                for (i = result.length - 1; i >= mid_index; i--) {
+                  if (result[i] > psxlast - cf * width)
+                    result[i] = psxlast - cf * width;
+                  psxlast = result[i];
                 }
-                avg_shift /= result.length;
-                avg_shift = Math.floor(avg_shift);
-                for (i = 0, ref = result.length; i < result.length; i++) {
-                    result[i] -= avg_shift;
-                }
-                return result;
+              }
+
+              psxlast = -Infinity;
+              for (i = 0, ref = result.length; i < result.length; i++) {
+                if (result[i] < psxlast + width)
+                  result[i] = psxlast + width;
+                psxlast = result[i];
+              }
+              return result;
             };
 
             that.refresh_data = function() {
-                var overdraw = (that.col_end - that.col_start)*0.05;
+                var overdraw = (that.col_end - that.col_start)*0.00;
                 var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw);
                 that.col_ordinal = data.col[that.query.col_order] || [];
                 that.row_ordinal = data.row[that.query.row_order] || [];
@@ -114,8 +120,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 });
                 if (that.col_ordinal.length > 0)
                 //For now make it 0.75 of the width as we don't have equidistant blocks
-                //that.col_width = 0.75*((that.col_ordinal[that.col_ordinal.length-1] - that.col_ordinal[0]) / that.col_ordinal.length);
-                    that.col_width = 3;
+                    that.col_width = Math.max(3,(0.80*((that.col_end - that.col_start) / that.col_ordinal.length)));
+                    //that.col_width = 3;
                 else
                     that.col_width = 0;
 
