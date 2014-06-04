@@ -21,7 +21,6 @@ define([
             { id:'groupby', name:'Group by', dataType:'Category', requiredLevel: 2 }
         ];
 
-        GenericPlot.registerPlotType(MultiCategoryHistogram);
 
         MultiCategoryHistogram.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, MultiCategoryHistogram.typeID,

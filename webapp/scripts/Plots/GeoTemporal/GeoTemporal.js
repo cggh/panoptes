@@ -27,7 +27,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         ];
 
 
-        GenericPlot.registerPlotType(GeoTemporal);
 
 
 

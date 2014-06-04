@@ -22,8 +22,6 @@ define([
         ];
 
 
-        GenericPlot.registerPlotType(BarGraph);
-
         BarGraph.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID,
                 {

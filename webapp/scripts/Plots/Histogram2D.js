@@ -52,7 +52,6 @@ define([
         }
 
 
-        GenericPlot.registerPlotType(Histogram2D);
 
         Histogram2D.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery, querySettings);

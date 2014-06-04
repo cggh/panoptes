@@ -21,7 +21,6 @@ define([
         ];
 
 
-        GenericPlot.registerPlotType(Histogram);
 
         Histogram.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery, querySettings);
