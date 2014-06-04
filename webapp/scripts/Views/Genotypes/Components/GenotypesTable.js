@@ -54,14 +54,14 @@ define(["_", "tween", "DQX/Utils"],
               if (first == -1 || second == -1)
                 ctx.fillStyle = 'rgb(40,40,40)';
               var spos = x_scale(pos[i]) - (snp_width * 0.5);
-              if (snp_width > text_width+40 && row_height >= 6)
+              if (snp_width > text_width+38 && row_height >= 6)
                 ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width-text_width), height * row_height);
               else
                 ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
             }
           }
           //Genotype text
-          if (snp_width > text_width+40 && row_height >= 6) {
+          if (snp_width > text_width+38 && row_height >= 6) {
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
             ctx.strokeStyle = 'rgb(0,55,135)';
