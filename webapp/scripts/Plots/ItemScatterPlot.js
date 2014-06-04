@@ -25,7 +25,6 @@ define([
         ];
 
 
-        GenericPlot.registerPlotType(ItemScatterPlot);
 
         ItemScatterPlot.Create = function(tableid, startQuery, querySettings) {
             var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery, querySettings);
