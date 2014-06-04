@@ -70,7 +70,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.frameBody = frameTop.addMemberFrame(Framework.FrameFinal('', 0.7));
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
+                    .setFixedSize(Framework.dimY, 65).setFrameClassClient('DQXGrayClient');
             };
 
             that.createPanels = function() {
@@ -102,7 +102,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonLarge', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, {
                         query: that.theQuery.get(),
                         tableid: that.tableInfo.id,
