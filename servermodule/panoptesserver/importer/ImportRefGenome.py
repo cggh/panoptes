@@ -102,6 +102,7 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
                 tb.PrintRows(0, 99)
             sqlfile = ImpUtils.GetTempFileName()
             tb.SaveSQLDump(sqlfile, 'chromosomes')
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM chromosomes')
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
             os.remove(sqlfile)
 
