@@ -54,18 +54,18 @@ define(["_", "tween", "DQX/Utils"],
               if (first == -1 || second == -1)
                 ctx.fillStyle = 'rgb(40,40,40)';
               var spos = x_scale(pos[i]) - (snp_width * 0.5);
-              if (snp_width > text_width+40 && row_height >= 6)
+              if (snp_width > text_width+38 && row_height >= 6)
                 ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width-text_width), height * row_height);
               else
                 ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
             }
           }
           //Genotype text
-          if (snp_width > text_width+40 && row_height >= 6) {
+          if (snp_width > text_width+38 && row_height >= 6) {
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
-            ctx.strokeStyle = 'rgb(0,55,135)';
             ctx.fillStyle = 'rgb(40,40,40)';
+            var style = 1;
             for ( j = 0, ref = model.row_index.length; j < ref; j++) {
                r = model.row_index[j], y = ((r+0.5) * row_height);
               if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
@@ -73,13 +73,20 @@ define(["_", "tween", "DQX/Utils"],
                firsts = firsts_rows[r], seconds = seconds_rows[r];
               for ( i = 0, end = pos.length; i < end; ++i) {
                 first = firsts[i], second = seconds[i];
-                if (first == -1 || second == -1)
-                  continue;
                 var x = x_scale(pos[i]) + (snp_width/2) - (text_width/2);
-                if (first == second && first == 0)
+                if (first == -1 || second == -1) {
+                  if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
                   ctx.fillText('●', x, y);
-                else
-                  ctx.fillText(first +'/'+second, x, y);
+                  continue;
+                }
+                if (first == second && first == 0) {
+                  if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
+                  ctx.fillText(first + '/' + second, x, y);
+                }
+                else {
+                  if (style != 1) ctx.fillStyle = 'rgb(40,40,40)', style = 1;
+                  ctx.fillText(first + '/' + second, x, y);
+                }
               }
             }
           }
