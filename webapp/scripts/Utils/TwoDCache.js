@@ -274,13 +274,13 @@ define(["Utils/RequestCounter"],
                         var type = full_prop.split('_')[0];
                         var prop = full_prop.substring(full_prop.indexOf('_')+1);
                         if (type == 'col')
-                            match.col[prop] = data[full_prop];
+                            match.col[prop] = data[full_prop].array;
                         if (type == 'row')
-                            that.row_data[prop] = data[full_prop];
+                            that.row_data[prop] = data[full_prop].array;
                         if (type == '2D') {
                             var packed = data[full_prop];
                             match.twoD[prop] = _.times(packed.shape[0], function(i) {
-                                return that.slice(packed, i*packed.shape[1], (i+1)*packed.shape[1]);
+                                return that.slice(packed.array, i*packed.shape[1], (i+1)*packed.shape[1]);
                             });
                         }
 
