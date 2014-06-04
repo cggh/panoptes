@@ -392,6 +392,10 @@ define([
                     ctx.stroke();
 
                 });
+                if (that.propidValueX) {
+                    ctx.font="bold 11px Arial";
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValueX).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
+                }
                 ctx.restore();
 
                 // Draw y scale
@@ -423,6 +427,14 @@ define([
                     ctx.lineTo(drawInfo.sizeX,py);
                     ctx.stroke();
                 });
+                if (that.propidValueY) {
+                    ctx.font="bold 11px Arial";
+                    ctx.save();
+                    ctx.translate(17,drawInfo.sizeY/2);
+                    ctx.rotate(-Math.PI/2);
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValueY).name,0,0);
+                    ctx.restore();
+                }
 
                 ctx.restore();
 

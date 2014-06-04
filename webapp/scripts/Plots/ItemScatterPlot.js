@@ -481,6 +481,12 @@ define([
                         }
                     }
                 });
+                var aspectXpropid = that.mapPlotAspects['xaxis'].propid;
+                if (aspectXpropid) {
+                    ctx.font="bold 11px Arial";
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, aspectXpropid).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
+                }
+
                 ctx.restore();
             }
 
@@ -526,8 +532,18 @@ define([
                         }
                     }
                 });
-                ctx.restore();
 
+                var aspectYpropid = that.mapPlotAspects['yaxis'].propid;
+                if (aspectYpropid) {
+                    ctx.font="bold 11px Arial";
+                    ctx.save();
+                    ctx.translate(17,drawInfo.sizeY/2);
+                    ctx.rotate(-Math.PI/2);
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, aspectYpropid).name,0,0);
+                    ctx.restore();
+                }
+
+                ctx.restore();
             }
 
             that.drawCenter = function(drawInfo) {

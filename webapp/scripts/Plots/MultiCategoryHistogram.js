@@ -409,6 +409,10 @@ define([
                     ctx.stroke();
 
                 });
+                if (that.propidValue) {
+                    ctx.font="bold 11px Arial";
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValue).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
+                }
                 ctx.restore();
 
 
@@ -470,6 +474,14 @@ define([
                         }
                         ctx.restore();
                     }
+                }
+                if (true) {
+                    ctx.font="bold 11px Arial";
+                    ctx.save();
+                    ctx.translate(17,drawInfo.sizeY/2);
+                    ctx.rotate(-Math.PI/2);
+                    ctx.fillText(isNormalised?'Relative count':'Count',0,0);
+                    ctx.restore();
                 }
                 ctx.restore();
 
@@ -577,6 +589,10 @@ define([
                     ctx.stroke();
 
                 });
+                if (that.propidValue) {
+                    ctx.font="bold 11px Arial";
+                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValue).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
+                }
                 ctx.restore();
 
 
