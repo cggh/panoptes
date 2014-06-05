@@ -1,4 +1,4 @@
-define(['d3', 'Views/Genotypes/ColourAllocator',
+define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
         "Views/Genotypes/Components/Container",
         "Views/Genotypes/Components/TabContainer",
         "Views/Genotypes/Components/ColumnHeader",
@@ -6,7 +6,7 @@ define(['d3', 'Views/Genotypes/ColourAllocator',
         "Views/Genotypes/Components/Link",
         "Views/Genotypes/Components/Gradient"
     ],
-    function (d3, ColourAllocator, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
+    function (_, d3, ColourAllocator, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
         return function View(initial_params) {
             var that = {};
             that.init = function(inital_params) {

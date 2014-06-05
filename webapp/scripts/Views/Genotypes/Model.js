@@ -1,14 +1,16 @@
-define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
-    function (TwoDCache, MetaData, ArrayBufferClient, SQL) {
+define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
+    function (_, TwoDCache, MetaData, ArrayBufferClient, SQL) {
         return function Model(table_info,
                               query,
                               chromosomes,
-                              update_callback) {
+                              update_callback,
+                              initial_params) {
             var that = {};
             that.init = function(table_info,
                                  query,
                                  chromosomes,
-                                 update_callback) {
+                                 update_callback,
+                                 initial_params) {
                 that.table = table_info;
                 that.query = query;
                 that.chromosomes = chromosomes;
@@ -16,7 +18,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
                 that.first_col_ordinal = 0;
                 that.last_col_ordinal = 0;
-
+                //Vars set by params
+                _.extend(that, initial_params);
                 that.data = {};
                 that.settings = table_info.settings.ShowInGenomeBrowser;
                 that.data_type = that.settings.Type;
@@ -37,6 +40,10 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 }
                 that.reset_cache();
 
+            };
+
+            that.update_params = function(view_params){
+              _.extend(that, view_params);
             };
 
             that.reset_cache = function() {
@@ -66,46 +73,68 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.genomic_end = 0;
             };
 
-            that.position_columns = function (ordinal, width) {
+            that.position_columns = function (ordinal) {
               var result = new Float64Array(ordinal);
-              var mid_index = Math.floor(result.length/2);
-              for (var cf = 0.1; cf <= 1; cf += 0.1) {
-                //Sweep middle out
-                var psxlast = result[mid_index];
-                for (var i = mid_index+1, ref = result.length; i < ref; i++) {
-                  if (result[i] < psxlast + cf * width)
-                    result[i] = psxlast + cf * width;
-                  psxlast = result[i];
+
+              if (that.width_mode == 'manual')
+                that.col_width = that.user_column_width;
+              if (that.width_mode == 'auto') {
+                if (that.col_ordinal.length > 0)
+                  that.col_width = Math.max(3, (0.70 * ((that.col_end - that.col_start) / that.col_ordinal.length)));
+                else
+                  that.col_width = 0;
+              }
+              var width = that.col_width;
+
+              if (that.width_mode == 'auto' || that.width_mode == 'manual') {
+                var mid_index = Math.floor(result.length / 2);
+                for (var cf = 0.1; cf <= 1; cf += 0.1) {
+                  //Sweep middle out
+                  var psxlast = result[mid_index];
+                  for (var i = mid_index + 1, ref = result.length; i < ref; i++) {
+                    if (result[i] < psxlast + cf * width)
+                      result[i] = psxlast + cf * width;
+                    psxlast = result[i];
+                  }
+                  psxlast = result[mid_index];
+                  for (i = mid_index - 1; i >= 0; i--) {
+                    if (result[i] > psxlast - cf * width)
+                      result[i] = psxlast - cf * width;
+                    psxlast = result[i];
+                  }
+                  cf += 0.1;
+                  //Sweep edges in
+                  psxlast = -Infinity;
+                  for (i = 0, ref = mid_index; i < ref; i++) {
+                    if (result[i] < psxlast + cf * width)
+                      result[i] = psxlast + cf * width;
+                    psxlast = result[i];
+                  }
+                  psxlast = Infinity;
+                  for (i = result.length - 1; i >= mid_index; i--) {
+                    if (result[i] > psxlast - cf * width)
+                      result[i] = psxlast - cf * width;
+                    psxlast = result[i];
+                  }
                 }
-                psxlast = result[mid_index];
-                for (i = mid_index-1; i >= 0; i--) {
-                  if (result[i] > psxlast - cf * width)
-                    result[i] = psxlast - cf * width;
-                  psxlast = result[i];
-                }
-                cf += 0.1;
-                //Sweep edges in
+
                 psxlast = -Infinity;
-                for (i = 0, ref = mid_index; i < ref; i++) {
-                  if (result[i] < psxlast + cf * width)
-                    result[i] = psxlast + cf * width;
+                for (i = 0, ref = result.length; i < result.length; i++) {
+                  if (result[i] < psxlast + width)
+                    result[i] = psxlast + width;
                   psxlast = result[i];
                 }
-                psxlast = Infinity;
-                for (i = result.length - 1; i >= mid_index; i--) {
-                  if (result[i] > psxlast - cf * width)
-                    result[i] = psxlast - cf * width;
-                  psxlast = result[i];
-                }
+                return result;
               }
 
-              psxlast = -Infinity;
-              for (i = 0, ref = result.length; i < result.length; i++) {
-                if (result[i] < psxlast + width)
-                  result[i] = psxlast + width;
-                psxlast = result[i];
+              if (that.width_mode == 'fill') {
+                that.col_width = (that.col_end - that.col_start) / that.col_ordinal.length;
+                for (i = 0, ref = result.length; i < result.length; i++) {
+                  result[i] = that.col_start + (i*that.col_width) + that.col_width/2;
+                }
+                return result;
               }
-              return result;
+              DQX.reportError("Invalid width_mode")
             };
 
             that.refresh_data = function() {
@@ -118,14 +147,7 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 _.each(that.properties, function(prop) {
                     that.data[prop] = data.twoD[prop] || [];
                 });
-                if (that.col_ordinal.length > 0)
-                //For now make it 0.75 of the width as we don't have equidistant blocks
-                    that.col_width = Math.max(3,(0.80*((that.col_end - that.col_start) / that.col_ordinal.length)));
-                    //that.col_width = 3;
-                else
-                    that.col_width = 0;
-
-                that.col_positions = that.position_columns(that.col_ordinal, that.col_width);
+                that.col_positions = that.position_columns(that.col_ordinal);
 
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)
@@ -196,7 +218,8 @@ define(["Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             that.init(table_info,
                       query,
                       chromosomes,
-                      update_callback);
+                      update_callback,
+                      initial_params);
             return that
         };
     }
