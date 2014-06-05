@@ -14,7 +14,7 @@ Panoptes is a new project and in an early phase of development. For
 more information about the project please send an email to the public
 mailing list <panoptes-dev@googlegroups.com>.
 
-* Source code: https://github.com/malariagen/panoptes
+* Source code: https://github.com/cggh/panoptes
 * Documentation: http://panoptes.readthedocs.org
 * Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 

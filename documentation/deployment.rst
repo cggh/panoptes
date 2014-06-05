@@ -13,7 +13,7 @@ Download & dependencies
 -----------------------
 Download the code from the GitHub repository::
 
-    wget https://github.com/malariagen/panoptes/archive/master.zip
+    wget https://github.com/cggh/panoptes/archive/master.zip
     unzip master.zip
     cd panoptes-master
 
@@ -136,7 +136,7 @@ For testing purposes, a script is provided that performs a full deployment on a 
 The following steps will create a fully working Panoptes instance on a Amazon EC2 ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9) image::
 
   cd /
-  sudo wget https://raw.github.com/malariagen/panoptes/master/scripts/deploy_default/deployfull.sh
+  sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
   sudo chmod +x deployfull.sh
   sudo ./deployfull.sh
 
@@ -157,6 +157,6 @@ by reading the REMOTE_USER environment variable.
 Specifically, Panoptes can integrate with a CAS Single Sign-On service. To enable this, specify the CAS service
 url in the `CAS_SERVICE` variable in `config.py`. In this case, authentication can also be based on user groups.
 
-The file PanoptesAuthDb (https://raw2.github.com/malariagen/panoptes/master/servermodule/panoptesserver/PanoptesAuthDb)
+The file PanoptesAuthDb (https://raw2.github.com/cggh/panoptes/master/servermodule/panoptesserver/PanoptesAuthDb)
 is used to link user authentication information to privileges on specific datasets.
 The default installation grants all rights to everybody.

@@ -1,7 +1,7 @@
 Introduction
 ============
-Panoptes is a web application for exploration and visualisation of data. It was created by the `MalariaGEN 
-<http://www.malariagen.net/>`_ software development team to assist with the visualisation of various types of data created by the project. It has a strong focus on population genetics data, but most of its tools are generic and can be used on a wide range of data.
+Panoptes is a web application for exploration and visualisation of data. It was created by the `CGGH
+<http://www.cggh.org/>`_ software development team to assist with the visualisation of various types of data created by the project. It has a strong focus on population genetics data, but most of its tools are generic and can be used on a wide range of data.
 
 List of basic features
 ----------------------

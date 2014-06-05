@@ -26,9 +26,9 @@ cd $PROJECT_ROOT/build
 
 echo -e "${green}    DQX${NC}"
 if [ -z "$GITSSH" ]; then
-    git clone https://github.com/malariagen/DQX.git
+    git clone https://github.com/cggh/DQX.git
 else
-    git clone git@github.com:malariagen/DQX.git
+    git clone git@github.com:cggh/DQX.git
 fi
 cd DQX
 git checkout `cat $PROJECT_ROOT/dependencies/DQX_Version`
@@ -36,9 +36,9 @@ cd ..
 
 echo -e "${green}    DQXServer${NC}"
 if [ -z "$GITSSH" ]; then
-    git clone https://github.com/malariagen/DQXServer.git
+    git clone https://github.com/cggh/DQXServer.git
 else
-    git clone git@github.com:malariagen/DQXServer.git
+    git clone git@github.com:cggh/DQXServer.git
 fi
 cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`

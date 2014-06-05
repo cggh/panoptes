@@ -53,7 +53,7 @@ chmod a+w basedir/Uploads
 mkdir sourcedata
 chmod a+w sourcedata
 
-wget --output-document=panoptes.zip https://github.com/malariagen/panoptes/archive/${release}.zip
+wget --output-document=panoptes.zip https://github.com/cggh/panoptes/archive/${release}.zip
 unzip panoptes.zip
 mv panoptes-${release} source
 

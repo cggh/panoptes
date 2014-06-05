@@ -1,4 +1,4 @@
-[![logo](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/malariagen/panoptes/master/webapp/Bitmaps/)
+[![logo](https://raw2.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/cggh/panoptes/master/webapp/Bitmaps/)
 
 Panoptes
 ========
@@ -15,11 +15,11 @@ mailing list <panoptes-dev@googlegroups.com>.
 
 Links:
 
-* Source code: https://github.com/malariagen/panoptes
+* Source code: https://github.com/cggh/panoptes
 * Documentation: http://panoptes.readthedocs.org
 * Mailing list:	 https://groups.google.com/forum/#!forum/panoptes-dev
 
 
 Release Notes
 -------------
-See https://github.com/malariagen/panoptes/releases
+See https://github.com/cggh/panoptes/releases
