@@ -58,7 +58,7 @@
 
             FindGene.theWizard.addPage({
                 id: 'init',
-                helpUrl: 'Doc/FindGene.theWizard/Help.htm',
+                //helpUrl: 'Doc/FindGene.theWizard/Help.htm',
                 form: Controls.CompoundVert([Controls.CompoundVert(buttonList), Controls.CompoundHor([])]),
                 hideNext: true
             });
@@ -77,7 +77,7 @@
             FindGene.theWizard.addPage({
                 id: 'choice1',
                 form: Controls.CompoundVert([FindGene.theWizard.controlFindByKeyword]),
-                helpUrl: 'Doc/FindGene.theWizard/Help.htm',
+                //helpUrl: 'Doc/FindGene.theWizard/Help.htm',
                 reportValidationError: function () {
                     var id = FindGene.theWizard.controlFindByKeyword.getValue();
                     if (!id) return "There is no gene selected";
@@ -102,7 +102,7 @@
             FindGene.theWizard.searchRegionStatus = Controls.Html('SearchRegionStatus', '');
             FindGene.theWizard.addPage({
                 id: 'choice3',
-                helpUrl: 'Doc/FindGene.theWizard/Help.htm',
+                //helpUrl: 'Doc/FindGene.theWizard/Help.htm',
                 form: Controls.CompoundVert([
                     Controls.Static('Select a genomic region:').makeComment(),
                     Controls.CompoundHor([
