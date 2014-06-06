@@ -27,7 +27,7 @@ See https://github.com/cggh/panoptes/releases
 
 License
 -------
-Panoptes Copyright (C) 2014 CGGH <info@cggh.org>
+Panoptes © Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
