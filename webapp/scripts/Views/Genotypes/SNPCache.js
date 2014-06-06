@@ -1,3 +1,6 @@
+// This file is part of Panoptes - Copyright (C) 2014 CGGH <info@cggh.org>
+// This program is free software licensed under the GNU Affero General Public License. 
+// You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["_", "d3", "MetaData", "DQX/SVG"],
   function (_, d3, MetaData, SVG) {
     return function SNPCache(providers, update_callback, x_index_update_callback, samples) {

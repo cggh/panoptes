@@ -1,3 +1,6 @@
+// This file is part of Panoptes - Copyright (C) 2014 CGGH <info@cggh.org>
+// This program is free software licensed under the GNU Affero General Public License. 
+// You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],

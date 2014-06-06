@@ -1,3 +1,6 @@
+// This file is part of Panoptes - Copyright (C) 2014 CGGH <info@cggh.org>
+// This program is free software licensed under the GNU Affero General Public License. 
+// You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 ﻿define(["require", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/DocEl", "DQX/Controls", "DQX/SQL", "DQX/DataFetcher/DataFetchers"],
     function (require, Framework, Msg, DQX, DocEl, Controls, SQL, DataFetcher) {
         FindGeneControlModule = {

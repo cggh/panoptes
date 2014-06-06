@@ -1,3 +1,6 @@
+// This file is part of Panoptes - Copyright (C) 2014 CGGH <info@cggh.org>
+// This program is free software licensed under the GNU Affero General Public License. 
+// You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "Utils/QueryTool", "MetaData"],
     function (require, base64, Application, Framework, Controls, Msg, SQL, QueryTable, QueryBuilder, DataFetchers, DocEl, DQX, Wizard, Popup, PopupFrame, QueryTool, MetaData) {
 
