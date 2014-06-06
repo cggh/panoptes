@@ -292,10 +292,10 @@ require([
 
             function PanoptesActions() {
                 var actions = [];
-//                actions.push( { content:'Documentation', bitmap:'Bitmaps/Icons/Small/documentation.png', handler:function() {
-//                    window.open('http://panoptes.readthedocs.org/en/latest/');
-//                }
-//                });
+                actions.push( { content:'Documentation', bitmap:'Bitmaps/Icons/Small/documentation.png', handler:function() {
+                    window.open('http://panoptes.readthedocs.org/en/latest/');
+                }
+                });
                 actions.push( { content:'Load new instance', bitmap:'Bitmaps/actionbuttons/reload.png', handler:function() {
                     window.open('main.html');
                 }
