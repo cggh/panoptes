@@ -14,7 +14,6 @@ require.config({
         markdown: "DQX/Externals/markdown",
         DQX: "DQX",
         _:"DQX/Externals/lodash",
-        easel: "Externals/createjs-2013.05.14.min",
         tween: "Externals/Tween",
         datastream: "DQX/Externals/DataStream"
     },
@@ -24,9 +23,6 @@ require.config({
         },
         handlebars: {
             exports: 'Handlebars'
-        },
-        easel: {
-          exports: 'createjs'
         },
         tween: {
           exports: 'TWEEN'
@@ -43,7 +39,7 @@ require.config({
 require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer", "Views/Genotypes/Genotypes",
+    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
     "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
@@ -51,7 +47,7 @@ require([
     function (
         _, $, Application, Framework, Msg, DQX, SQL, Popup, PopupFrame, DataFetchers,
         MetaData,
-        Initialise, Intro, GenomeBrowser, TableViewer, Genotypes,
+        Initialise, Intro, GenomeBrowser, TableViewer,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
         PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
         Serialise, ButtonChoiceBox, PlotStarter
@@ -168,10 +164,6 @@ require([
                             TableViewer.init(tableInfo.id);
                             tableInfo.tableViewId = 'table_'+tableInfo.id;
                         })
-
-
-                        if (MetaData.hasTable('SMP') && MetaData.hasTable('SNP'))
-                          Genotypes.init();
 
                         Application.showViewsAsTabs();
 

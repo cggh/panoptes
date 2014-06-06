@@ -14,7 +14,6 @@ require.config({
         markdown: "DQX/Externals/markdown",
         DQX: "DQX",
         _:"DQX/Externals/lodash",
-        easel: "Externals/createjs-2013.05.14.min",
         tween: "Externals/Tween"
     },
     shim: {
@@ -23,9 +22,6 @@ require.config({
         },
         handlebars: {
             exports: 'Handlebars'
-        },
-        easel: {
-            exports: 'createjs'
         },
         tween: {
             exports: 'TWEEN'
