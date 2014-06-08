@@ -65,7 +65,7 @@ define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
                 ctx.save();
               ctx.fillStyle = 'rgb(40,40,40)';
                 ctx.font = '11px sans serif';
-                ctx.fillText(model.table.tableCapNamePlural, 5 ,15);
+                ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." :model.table.tableCapNamePlural, 5 ,15);
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgb(0,55,135)';
                 ctx.fillRect(5,25,10,10);

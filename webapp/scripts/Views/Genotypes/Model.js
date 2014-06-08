@@ -151,6 +151,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     that.data[prop] = data.twoD[prop] || [];
                 });
                 that.col_positions = that.position_columns(that.col_ordinal);
+                that.intervals_being_fetched = data.intervals_being_fetched;
 
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)
