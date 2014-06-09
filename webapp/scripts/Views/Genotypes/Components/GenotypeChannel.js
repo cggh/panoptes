@@ -125,7 +125,15 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
 
             that.draw = function (draw_info) {
                 if (!draw_info) return;
-                if (draw_info.needZoomIn) return;
+                if (draw_info.needZoomIn) {
+                  var height = 100;
+                  if (that._height != height) {
+                    that.modifyHeight(height);
+                    that._myPlotter.resizeHeight(true);
+                    //The last call will result in the framework calling draw, so we should end here.
+                  }
+                  return;
+                }
                 //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
                 that.draw_info = draw_info;
                 //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.
