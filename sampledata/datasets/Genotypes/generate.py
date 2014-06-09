@@ -160,3 +160,13 @@ with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     total_depth[:, :] = shuffled_total_depth
     gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
     gq[:, :] = shuffled_gq
+
+with h5py.File('2D_datatables/genotypes_frac/data.hdf5', 'w') as f:
+    col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
+    col_index[:] = shuffled_var_ids
+    row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
+    row_index[:] = shuffled_sample_ids
+    ref = f.create_dataset("ref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
+    ref[:, :] = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")
+    ref = f.create_dataset("nonref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
+    ref[:, :] = np.array(np.random.randint(0,50,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")

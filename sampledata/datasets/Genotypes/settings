@@ -6,3 +6,4 @@ DataTables:
 #List the 2D datatables that should be exposed in the app.
 2D_DataTables:
     - genotypes
+    - genotypes_frac

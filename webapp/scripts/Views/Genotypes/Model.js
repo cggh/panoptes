@@ -35,7 +35,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     });
                 }
                 if (that.data_type == 'fractional') {
-                    that.properties = [that.settings.RefFraction];
+                    that.properties = [that.settings.Ref, that.settings.NonRef];
                     _.each(that.settings.ExtraProperties, function(prop) {
                         that.properties.push(prop);
                     });

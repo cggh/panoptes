@@ -48,8 +48,12 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
 
                 var view_params = DQXModel({
                   row_height:11,
-                  alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
-                  height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
+                  alpha_channel:(that.model.settings.ExtraProperties &&
+                    that.model.settings.ExtraProperties[0] ?
+                    that.model.settings.ExtraProperties[0] : '__null'),
+                  height_channel:(that.model.settings.ExtraProperties &&
+                    that.model.settings.ExtraProperties[1] ?
+                    that.model.settings.ExtraProperties[1] : '__null')
                 });
 
                 view_params.on({}, function() {
