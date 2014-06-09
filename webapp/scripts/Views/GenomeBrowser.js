@@ -5,12 +5,12 @@ define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame",
     "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation", "DQX/ChannelPlot/ChannelMultiCatDensity",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
-    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/GenotypeChannel"
+    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/GenotypeChannel", "Views/Genotypes/Components/AssemblyChannel"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame,
               GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation, ChannelMultiCatDensity,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
-              EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel
+              EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel, AssemblyChannel
         ) {
 
         var GenomeBrowserModule = {
@@ -838,6 +838,21 @@ define([
 
                     });
 
+                    //Add assembly channel
+                    $.each(MetaData.mapTableCatalog,function(tableid,table_info) {
+                      if (!table_info.settings.Assembly) {
+                        return;
+                      }
+                      var controls_group = Controls.CompoundVert([]).setMargin(0);
+                      that.visibilityControlsGroup.addControl(Controls.Section(controls_group, {
+                        title: table_info.tableCapNameSingle + ' Assembly',
+                        headerStyleClass: 'GenomeBrowserMainSectionHeader'
+                      }));
+                      var the_channel = AssemblyChannel.Channel(table_info, 'AC0090_C', controls_group, that.panelBrowser);
+                      that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
+                    });
+
+
                     // Loop over all 2D data tables that have genotypes to show
                     // TODO - Could be for all that have genomic columns
                     $.each(MetaData.map2DTableCatalog,function(tableid,table_info) {
@@ -855,8 +870,6 @@ define([
                         that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
                         that.serialisableComponents['genotypes_'+tableid] = the_channel;
                     });
-
-
 
                     that.tableBasedSummaryValue_Add = function(tableid, trackid, recordid) {
                         var summaryValue = MetaData.getTableInfo(tableid).mapTableBasedSummaryValues[trackid];
