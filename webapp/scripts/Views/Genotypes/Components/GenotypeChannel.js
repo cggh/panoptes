@@ -126,12 +126,13 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
             that.draw = function (draw_info) {
                 if (!draw_info) return;
                 if (draw_info.needZoomIn) {
-                  var height = 100;
-                  if (that._height != height) {
-                    that.modifyHeight(height);
-                    that._myPlotter.resizeHeight(true);
-                    //The last call will result in the framework calling draw, so we should end here.
-                  }
+                  //comment out for now as one loses scroll pos
+//                  var height = 100;
+//                  if (that._height != height) {
+//                    that.modifyHeight(height);
+//                    that._myPlotter.resizeHeight(true);
+//                    //The last call will result in the framework calling draw, so we should end here.
+//                  }
                   return;
                 }
                 //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
