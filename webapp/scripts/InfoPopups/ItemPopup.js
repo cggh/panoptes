@@ -134,7 +134,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var genome_chromosome = data.fields[that.tableInfo.ChromosomeField];
                     var genome_position = parseInt(data.fields[that.tableInfo.PositionField]);
                     var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
-                        //that.close();//!!!todo: only when blocking
+                        PopupFrame.minimiseAll({ slow: true});
                         Msg.send({ type: 'JumpgenomePosition' }, {
                             chromoID: genome_chromosome,
                             position: genome_position
@@ -164,7 +164,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.hasGenomeRegions) {
                     var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
-                        //that.close();//!!!todo: only when blocking
+                        PopupFrame.minimiseAll({ slow: true});
                         Msg.send({ type: 'JumpgenomeRegion' }, {
                             chromoID: data.fields[that.tableInfo.settings.Chromosome],
                             start: parseInt(data.fields[that.tableInfo.settings.RegionStart]),
