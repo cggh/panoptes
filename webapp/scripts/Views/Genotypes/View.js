@@ -1,7 +1,7 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
+define(['_', 'd3',
         "Views/Genotypes/Components/Container",
         "Views/Genotypes/Components/TabContainer",
         "Views/Genotypes/Components/ColumnHeader",
@@ -9,13 +9,12 @@ define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
         "Views/Genotypes/Components/Link",
         "Views/Genotypes/Components/Gradient"
     ],
-    function (_, d3, ColourAllocator, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
+    function (_, d3, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
         return function View(initial_params) {
             var that = {};
             that.init = function(inital_params) {
                 that.col_header_height = 30;
                 that.link_height = 40;
-                that.colours = ColourAllocator();
                 that.row_header_width = 150;
                 that.col_scale =  d3.scale.linear();
 
