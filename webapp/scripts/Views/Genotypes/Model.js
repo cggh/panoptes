@@ -74,6 +74,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.row_index = [];
                 that.genomic_start = 0;
                 that.genomic_end = 0;
+                that.intervals_being_fetched = [];
             };
 
             that.position_columns = function (ordinal) {
