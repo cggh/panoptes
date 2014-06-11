@@ -22,6 +22,9 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that.parent_browser = parent;
                 that.table_info = table_info;
 
+                that.rowTableInfo = that.table_info.row_table;
+
+
                 var model_params = DQXModel({
                   width_mode:'auto',
                   auto_width: true,
@@ -47,6 +50,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 view_controls.addControl(Controls.VerticalSeparator(3));
 
                 var view_params = DQXModel({
+                  samples_property:that.rowTableInfo.primkey,
                   row_height:11,
                   alpha_channel:(that.model.settings.ExtraProperties &&
                     that.model.settings.ExtraProperties[0] ?
@@ -66,6 +70,18 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     //Call the full draw as we need to refresh data and column placement
                     that.draw(that.draw_info);
                 });
+
+
+                var states = [];
+                $.each(that.rowTableInfo.propertyGroups, function(idx1, propertyGroup) {
+                    $.each(propertyGroup.properties, function(idx2, propInfo) {
+                        if (propInfo.settings.showInTable || propInfo.isPrimKey)
+                            states.push({id: propInfo.propid, name: propInfo.name})
+                    });
+                });
+                var sampleProperty_channel = Controls.Combo(null, { label:'Samples label:', states:states})
+                    .bindToModel(view_params, 'samples_property');
+                view_controls.addControl(sampleProperty_channel);
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
