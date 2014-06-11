@@ -7,9 +7,10 @@ define(['_', 'd3',
         "Views/Genotypes/Components/ColumnHeader",
         "Views/Genotypes/Components/GenotypesTable",
         "Views/Genotypes/Components/Link",
-        "Views/Genotypes/Components/Gradient"
+        "Views/Genotypes/Components/Gradient",
+        "Views/Genotypes/Components/SamplesHeader"
     ],
-    function (_, d3, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
+    function (_, d3, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient, SamplesHeader) {
         return function View(initial_params) {
             var that = {};
             that.init = function(inital_params) {
@@ -39,6 +40,8 @@ define(['_', 'd3',
                         ])
                     }
                 ]);
+
+                that.samplesHeader = SamplesHeader();
             };
 
             that.update_params = function(view_params){
@@ -51,18 +54,14 @@ define(['_', 'd3',
                 that.col_scale.domain([model.col_start, model.col_end]).range([0,clip.r - clip.l]);
                 that.root_container.draw(ctx, clip, model, that);
 
+                ctx_left.save();
+                ctx_left.translate(0,that.col_header_height+that.link_height);
+                that.samplesHeader.draw(ctx_left, clip, model, that);
+                ctx_left.restore();
+
                 ctx = ctx_left;
-                var row_labels = model.row_ordinal;
                 ctx.save();
                 ctx.fillStyle = 'rgb(40,40,40)';
-                ctx.font = "" + (that.row_height) + "px sans-serif";
-                ctx.translate(0,that.col_header_height+that.link_height);
-                _.forEach(row_labels, function(label, i) {
-                    ctx.fillText(label, 0, (i+1) * (that.row_height));
-                });
-                ctx.restore();
-                ctx.save();
-              ctx.fillStyle = 'rgb(40,40,40)';
                 ctx.font = '11px sans serif';
                 ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." :model.table.tableCapNamePlural, 5 ,15);
                 ctx.textBaseline = 'top';
