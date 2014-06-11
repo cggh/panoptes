@@ -12,5 +12,11 @@ Properties:
   Name: Sample ID
   Description: Sample identifier
   DataType: Text
-  ShowInTable: true
 
+- Id: Name
+  Name: Name
+  DataType: Text
+
+- Id: Field2
+  Name: Field 2
+  DataType: Text
