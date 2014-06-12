@@ -10,6 +10,10 @@ define([
         return function SamplesHeader() {
             var that = {};
 
+//            that.sortByField = function() {
+//                debugger;
+//            };
+
             that.draw = function (ctx, clip, model, view) {
 
                 var width = ctx.canvas.clientWidth;
@@ -19,7 +23,7 @@ define([
                 var dispPropId = view.samples_property;
                 var dispPropInfo = MetaData.findProperty(samplesTableInfo.id, dispPropId);
 
-                var row_keys = model.row_ordinal;
+                var row_keys = model.row_primary_key;
 
                 if (samplesTableInfo.primkey == dispPropId) {
                     var labelMapper = function(key) { return key; };

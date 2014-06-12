@@ -81,7 +81,14 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 });
                 var sampleProperty_channel = Controls.Combo(null, { label:'Samples label:', states:states})
                     .bindToModel(view_params, 'samples_property');
-                view_controls.addControl(sampleProperty_channel);
+                //var buttonSortSamplesByField = Controls.Button(null, {content:'Sort'});
+                var buttonSortSamplesByField = Controls.ImageButton(null, {bitmap:DQX.BMP("arrow4down.png"), vertShift:-2}).setOnChanged(function() {
+                    var sortPropId = sampleProperty_channel.getValue();
+                    that.model.query.row_order = sortPropId;
+                    that.model.reset_cache();
+                    that._draw();
+                });
+                view_controls.addControl(Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(5), buttonSortSamplesByField]));
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
