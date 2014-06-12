@@ -175,9 +175,16 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              that.getToolTipInfo = function (px, py, model, view) {
 
                  var row_height = Math.ceil(view.row_height);
-                 var rowNr = Math.floor(py / row_height);
                  var x_scale = view.col_scale;
                  var snp_width = x_scale(model.col_width) - x_scale(0);
+
+                 var rowNr = -1;
+                 for (j = 0, ref = model.row_index.length; j < ref; j++) {
+                     r = model.row_index[j], y = (r * row_height);
+                     if ( (py>=y) && (py<=y+row_height) )
+                        rowNr = j;
+                 }
+
 
                  var pos = model.col_positions;
 
@@ -197,9 +204,18 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  var content = 'Sample ID: ' + model.row_primary_key[rowNr];
                  content += '<br>Variant ID: ' + model.col_primary_key[colNr];
 
+                 if (model.data_type == 'diploid') {
+                    var firsts_rows = model.data[model.settings.FirstAllele];
+                    var seconds_rows = model.data[model.settings.SecondAllele];
+                    if (firsts_rows && seconds_rows)
+                        content += '<br>Call:' + firsts_rows[rowNr][colNr] + '/' + seconds_rows[rowNr][colNr];
+                 }
+
                  if (model.data_type == 'fractional') {
                      var ref_rows = model.data[model.settings.Ref];
                      var non_rows = model.data[model.settings.NonRef];
+                     if (ref_rows &&  non_rows)
+                        content += '<br>Ref:' + ref_rows[rowNr][colNr] + ', Alt:' + non_rows[rowNr][colNr];
                  }
 
                  return {
