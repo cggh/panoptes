@@ -17,6 +17,16 @@ Properties:
   Name: Name
   DataType: Text
 
-- Id: Field2
-  Name: Field 2
+- Id: Category1
+  Name: Category 1
   DataType: Text
+
+- Id: Category2
+  Name: Category 2
+  DataType: Text
+
+- Id: Value1
+  Name: Value 1
+  DataType: Value
+  DecimDigits: 4
+

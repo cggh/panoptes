@@ -71,9 +71,16 @@ var_ids = ['VAR_' + str(i).zfill(6) for i in range(NUM_VARIANTS)]
 
 with open('datatables/samples/data', 'w') as tabfile:
     writer = csv.writer(tabfile, delimiter='\t')
-    writer.writerow(('ID', ))
+    writer.writerow(('ID', 'Name', 'Category1', 'Category2', 'Value1'))
+    ctr = 0
     for id in sample_ids:
-        writer.writerow((id, ))
+        ctr += 1
+        writer.writerow((id, 
+                         'Sample' + str(ctr),
+                         'Group '+str(1+ctr/10),
+                         random.choice(['Cat A', 'Cat B', 'Cat C']),
+                         random.random()
+    ))
 
 gaps = list(np.random.poisson(10,(NUM_VARIANTS)))
 pos = 10
