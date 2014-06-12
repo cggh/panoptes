@@ -13,6 +13,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var that = {};
             that.tableInfo = tableInfo;
             that.cache = {};
+            that._fieldStatus = {};
 
             that.add = function(key) {
                 if (!that.cache[key]) {
@@ -28,6 +29,50 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         function(error,b) {
                         }
                     );
+                }
+            };
+
+            that.requestAll = function(fieldid, notifyReady) {
+                if (!that._fieldStatus[fieldid]) {//not yet fetched - initiate now
+                    that._fieldStatus[fieldid] = {
+                        fetched: false,
+                        notifyList: [notifyReady]
+                    }
+                    var fetcher = DataFetchers.RecordsetFetcher(
+                        MetaData.serverUrl,
+                        MetaData.database,
+                        that.tableInfo.getQueryTableName(false)
+                    );
+                    //fetcher.setMaxResultCount(that.maxrecordcount);
+                    fetcher.addColumn(that.tableInfo.primkey, 'ST');
+                    fetcher.addColumn(fieldid, 'ST');
+                    fetcher.getData(SQL.WhereClause.Trivial(), that.tableInfo.primkey,
+                        function (data) { //success
+                            var keys = data[that.tableInfo.primkey];
+                            var fieldvalues = data[fieldid];
+                            $.each(keys, function(idx, key) {
+                                if (!that.cache[key])
+                                    that.cache[key] = {}
+                                that.cache[key][fieldid] = fieldvalues[idx];
+                            });
+                            that._fieldStatus[fieldid].fetched = true;
+                            $.each(that._fieldStatus[fieldid].notifyList, function(idx, fnc) {
+                                fnc();
+                            });
+                        },
+                        function (data) { //error
+                            that._fieldStatus[fieldid] = null;
+                        }
+
+                    );
+
+                } else {
+                    if (that._fieldStatus[fieldid].fetched)
+                        return true;
+                    else {
+                        return false;
+                        that._fieldStatus[fieldid].notifyList.push(notifyReady);
+                    }
                 }
             };
 

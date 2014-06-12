@@ -12,9 +12,10 @@ define([],
 
                 var dispPropId = view.samples_property;
 
-                if (samplesTableInfo.primkey == dispPropId) {
-                    var row_labels = model.row_ordinal;
+                var row_keys = model.row_ordinal;
 
+                if (samplesTableInfo.primkey == dispPropId) {
+                    var labelMapper = function(key) { return key; };
                 }
                 else {
                     if (!samplesTableInfo.fieldCache.requestAll(dispPropId, function() {
@@ -23,14 +24,16 @@ define([],
                         //todo: draw waiting message
                         return;
                     }
-                    //todo: get fields into row_labels
+                    var labelMapper = function(key) {
+                        return samplesTableInfo.fieldCache.getField(key, dispPropId);
+                    };
                 }
 
                 ctx.fillStyle = 'rgb(0,0,0)';
                 ctx.font = "" + (view.row_height) + "px sans-serif";
 
-                _.forEach(row_labels, function(label, i) {
-                    ctx.fillText(label, 0, (i+1) * (view.row_height));
+                _.forEach(row_keys, function(key, i) {
+                    ctx.fillText(labelMapper(key), 0, (i+1) * (view.row_height));
                 });
             };
 
