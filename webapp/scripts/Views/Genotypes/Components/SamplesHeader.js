@@ -17,6 +17,7 @@ define([
             that.draw = function (ctx, clip, model, view) {
 
                 var width = ctx.canvas.clientWidth;
+                var height = ctx.canvas.clientHeight;
 
                 var samplesTableInfo = model.table.row_table;
 
@@ -75,7 +76,12 @@ define([
                         if (yposBottom>yposTop+5) {
                             var fontSize = Math.min(12, yposBottom-yposTop-1);
                             ctx.font = "" + (fontSize) + "px sans-serif";
-                            ctx.fillText(labelName, 2, (yposBottom+yposTop)/2 -1 + fontSize/2);
+                            var textYPos = (yposBottom+yposTop)/2 -1 + fontSize/2;
+                            if ((textYPos<clip.t+fontSize) && (yposBottom>clip.t+fontSize) )
+                                textYPos = clip.t+fontSize;
+                            if ((textYPos>clip.b-2) && (yposTop<clip.b-fontSize) )
+                                textYPos = clip.b-2;
+                            ctx.fillText(labelName, 2, textYPos);
                         }
                     }
                 };

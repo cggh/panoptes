@@ -79,10 +79,10 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                             states.push({id: propInfo.propid, name: propInfo.name})
                     });
                 });
-                var sampleProperty_channel = Controls.Combo(null, { label:'Samples label:', states:states})
+                var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
                     .bindToModel(view_params, 'samples_property');
                 //var buttonSortSamplesByField = Controls.Button(null, {content:'Sort'});
-                var buttonSortSamplesByField = Controls.ImageButton(null, {bitmap:DQX.BMP("arrow4down.png"), vertShift:-2}).setOnChanged(function() {
+                var buttonSortSamplesByField = Controls.ImageButton(null, {bitmap:DQX.BMP("arrow4down.png"), vertShift:-2, hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural})}).setOnChanged(function() {
                     var sortPropId = sampleProperty_channel.getValue();
                     that.model.query.row_order = sortPropId;
                     that.model.reset_cache();
