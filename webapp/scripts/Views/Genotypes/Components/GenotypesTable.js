@@ -208,7 +208,9 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                     var firsts_rows = model.data[model.settings.FirstAllele];
                     var seconds_rows = model.data[model.settings.SecondAllele];
                     if (firsts_rows && seconds_rows)
-                        content += '<br>Call:' + firsts_rows[rowNr][colNr] + '/' + seconds_rows[rowNr][colNr];
+                        content += '<br>Call: ' + firsts_rows[rowNr][colNr] + '/' + seconds_rows[rowNr][colNr];
+                     if (model.data.gq)
+                         content += '<br>GQ: ' + model.data.gq[rowNr][colNr];
                  }
 
                  if (model.data_type == 'fractional') {
