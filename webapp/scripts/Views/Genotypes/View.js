@@ -55,8 +55,12 @@ define(['_', 'd3',
                 that.root_container.draw(ctx, clip, model, that);
 
                 ctx_left.save();
-                ctx_left.translate(0,that.col_header_height+that.link_height);
-                that.samplesHeader.draw(ctx_left, clip, model, that);
+                var leftPanelVertOffset = that.col_header_height+that.link_height;
+                ctx_left.translate(0,leftPanelVertOffset);
+                var leftPanelClip = $.extend({}, clip);
+                leftPanelClip.t -= leftPanelVertOffset;
+                leftPanelClip.b -= leftPanelVertOffset;
+                that.samplesHeader.draw(ctx_left, leftPanelClip, model, that);
                 ctx_left.restore();
 
                 ctx = ctx_left;

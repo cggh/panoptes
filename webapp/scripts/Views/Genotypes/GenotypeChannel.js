@@ -79,28 +79,35 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                             states.push({id: propInfo.propid, name: propInfo.name})
                     });
                 });
-                var sampleProperty_channel = Controls.Combo(null, { label:'Samples label:', states:states})
-                    .bindToModel(view_params, 'samples_property');
-                view_controls.addControl(sampleProperty_channel);
+                var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
+                    .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
+                //var buttonSortSamplesByField = Controls.Button(null, {content:'Sort'});
+                var buttonSortSamplesByField = Controls.ImageButton(null, {bitmap:DQX.BMP("arrow4down.png"), vertShift:-2, hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural})}).setOnChanged(function() {
+                    var sortPropId = sampleProperty_channel.getValue();
+                    that.model.query.row_order = sortPropId;
+                    that.model.reset_cache();
+                    that._draw();
+                });
+                view_controls.addControl(Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(5), buttonSortSamplesByField]));
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
                 });
                 states.push({id:'__null', name:'None'});
                 var alpha_channel = Controls.Combo(null, { label:'Alpha:', states:states})
-                    .bindToModel(view_params, 'alpha_channel');
+                    .bindToModel(view_params, 'alpha_channel').setClassID(that.table_info.id + 'ChannelAlpha');
                 view_controls.addControl(alpha_channel);
                 var height_channel = Controls.Combo(null, { label:'Height:', states:states })
-                    .bindToModel(view_params, 'height_channel');
+                    .bindToModel(view_params, 'height_channel').setClassID(that.table_info.id + 'ChannelHeight');
                 view_controls.addControl(height_channel);
 
                 var states = [{id:'auto', name:'Automatic'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
                 var width_mode = Controls.Combo(null, { label:'Column Mode', states:states, width:90 })
-                    .bindToModel(model_params, 'width_mode');
+                    .bindToModel(model_params, 'width_mode').setClassID(that.table_info.id + 'ColumnMode');
                 view_controls.addControl(width_mode);
 
                 var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:220, minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
-                    .bindToModel(model_params, 'user_column_width');
+                    .bindToModel(model_params, 'user_column_width').setClassID(that.table_info.id + 'ColumnWidth');
                 var show_hide_width = Controls.ShowHide(column_width);
                 view_controls.addControl(show_hide_width);
                 model_params.on({change:'width_mode'}, function() {
@@ -111,7 +118,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
 
                 view_controls.addControl(Controls.VerticalSeparator(3));
                 var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
-                    .bindToModel(view_params, 'row_height');
+                    .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
