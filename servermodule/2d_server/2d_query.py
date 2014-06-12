@@ -84,13 +84,16 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
     return result
 
 
-def get_table_names(db, datatable):
+def get_table_ids(db, datatable):
     cur = db.cursor()
     sql = 'SELECT col_table, row_table FROM 2D_tablecatalog WHERE id=%s'
     cur.execute(sql, (datatable,))
     result = cur.fetchall()[0]
     cur.close()
     return result
+
+def GetWorkspaceTableName(tableid, workspaceid):
+    return "{0}CMB_{1}".format(tableid, workspaceid)
 
 
 def response(request_data):
@@ -100,6 +103,7 @@ def response(request_data):
 def handler(start_response, request_data):
     datatable = request_data['datatable']
     dataset = request_data['dataset']
+    workspace = request_data['workspace']
     two_d_properties = request_data['2D_properties'].split('~')
     col_properties = request_data['col_properties'].split('~')
     row_properties = request_data['row_properties'].split('~')
@@ -110,19 +114,22 @@ def handler(start_response, request_data):
     first_dimension = request_data['first_dimension']
 
     db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), dataset)
-    col_table, row_table = get_table_names(db, datatable)
+    col_tableid, row_tableid = get_table_ids(db, datatable)
+
+    col_tablename = GetWorkspaceTableName(col_tableid, workspace)
+    row_tablename = GetWorkspaceTableName(row_tableid, workspace)
 
     col_properties.append(datatable + '_column_index')
     row_properties.append(datatable + '_row_index')
 
     col_result = index_table_query(db,
-                                   col_table,
+                                   col_tablename,
                                    col_properties,
                                    col_qry,
                                    col_order)
 
     row_result = index_table_query(db,
-                                   row_table,
+                                   row_tablename,
                                    row_properties,
                                    row_qry,
                                    row_order)

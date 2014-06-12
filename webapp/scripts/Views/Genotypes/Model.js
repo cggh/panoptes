@@ -196,6 +196,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("respid", "2d_query");
                 myurl.addUrlQueryItem('dataset', MetaData.database);
                 myurl.addUrlQueryItem('datatable', that.table.id);
+                myurl.addUrlQueryItem('workspace', MetaData.workspaceid);
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
                 myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.query.row_query));
                 myurl.addUrlQueryItem("col_order", that.query.col_order);
