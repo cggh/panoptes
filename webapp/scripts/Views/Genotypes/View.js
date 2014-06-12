@@ -44,8 +44,8 @@ define(['_', 'd3',
                 that.samplesHeader = SamplesHeader();
             };
 
-            that.update_params = function(view_params){
-                _.extend(that, view_params);
+            that.update_params = function (view_params) {
+              _.extend(that, view_params);
             };
 
             that.draw = function(ctx, ctx_left, clip, model) {
@@ -67,31 +67,42 @@ define(['_', 'd3',
                 ctx.save();
                 ctx.fillStyle = 'rgb(40,40,40)';
                 ctx.font = '11px sans serif';
-                ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." :model.table.tableCapNamePlural, 5 ,15);
+                ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." : model.table.tableCapNamePlural, 5, 15);
                 ctx.textBaseline = 'top';
+
+                if (model.data_type == 'diploid') {
                 ctx.fillStyle = 'rgb(0,55,135)';
-                ctx.fillRect(5,25,10,10);
+                ctx.fillRect(5, 25, 10, 10);
                 ctx.fillStyle = 'rgb(180,0,0)';
-                ctx.fillRect(5,40,10,10);
+                ctx.fillRect(5, 40, 10, 10);
                 ctx.fillStyle = 'rgb(78,154,0)';
-                ctx.fillRect(5,55,10,10);
+                ctx.fillRect(5, 55, 10, 10);
                 ctx.fillStyle = 'rgb(40,40,40)';
-                ctx.fillText('Hom - Ref', 20 ,25);
-                ctx.fillText('Hom - Alt', 20 ,40);
-                ctx.fillText('Het', 20 ,55);
+                ctx.fillText('Hom - Ref', 20, 25);
+                ctx.fillText('Hom - Alt', 20, 40);
+                ctx.fillText('Het', 20, 55);
+                }
+                if (model.data_type == 'fractional'){
+                ctx.fillText('Ref fraction:', 5, 25);
+                ctx.textAlign = 'center';
+                ctx.fillText('1', 5, 49);
+                ctx.fillText('0.5', 5+((ctx.canvas.width-10)/2), 49);
+                ctx.fillText('0', ctx.canvas.width-5, 49);
+                var grd = ctx.createLinearGradient(0, 0, ctx.canvas.width-10, 10);
+                grd.addColorStop(0, 'hsl(216,100%,35%');
+                grd.addColorStop(1, 'hsl(360,100%,35%');
+                ctx.fillStyle = grd;
+                ctx.fillRect(5,37,ctx.canvas.width-10, 10);
+                }
 
+                ctx.restore();
+          };
 
+          that.event = function (type, pos, model) {
+            return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
+          };
 
-
-              ctx.restore();
-            };
-
-            that.event = function(type, pos, model) {
-              return that.root_container.event(type, pos, {x:0, y:0}, model, that);
-            };
-
-            that.init(initial_params);
-            return that
+          that.init(initial_params);
+          return that
         };
-    }
-);
+    });
