@@ -18,6 +18,34 @@ import customresponders.panoptesserver.Utils as Utils
 tableOrder = 0
 property_order = 0
 
+def hdf5_copy(src, dest, func = None):
+        #Process in chunk sized (at least on the primary dimension) pieces
+        try:
+            step_size = src.chunks[0]
+            print 'oldchunk:', src.chunks
+            print 'newchunk:', dest.chunks
+        except TypeError:
+            step_size = 10000
+        shape = src.shape
+        if func:
+            for start in xrange(0, len(src), step_size):
+                 end = min(start + step_size, len(src))
+                 if len(shape) == 2:
+                     dest[start:end, :] = func(src[start:end, :])
+                 elif len(shape) == 1:
+                     dest[start:end] = func(src[start:end])
+                 else:
+                     print "shape", shape, "not of dimension 1 or 2"
+        else:
+            for start in xrange(0, len(src), step_size):
+                 end = min(start + step_size, len(src))
+                 if len(shape) == 2:
+                     dest[start:end, :] = src[start:end, :]
+                 elif len(shape) == 1:
+                     dest[start:end] = src[start:end]
+                 else:
+                     print "shape", shape, "not of dimension 1 or 2"
+
 def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_settings):
     global tableOrder, property_order
     with calculation_object.LogHeader('Importing 2D datatable {0}'.format(tableid)):
@@ -192,11 +220,23 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
 
             #We have the indexes - now we need a local copy of the HDF5 data for each property
             ImpUtils.mkdir(os.path.join(config.BASEDIR, '2D_data'))
-            local_hdf5 = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset_id+'_'+tableid+'.hdf5'), 'w', libver='latest')
+            path_join = os.path.join(config.BASEDIR, '2D_data', dataset_id + '_' + tableid + '.hdf5')
+            try:
+                os.remove(path_join)
+            except OSError:
+                pass
+            local_hdf5 = h5py.File(path_join, 'w', libver='latest')
             print "Copying HDF5 datasets"
             for property in table_settings['Properties']:
                 print "..", property
-                local_hdf5.copy(remote_hdf5[property['Id']], property['Id'])
+                prop_in = remote_hdf5[property['Id']]
+                #Make some choices assuming data is variants/samples
+                if prop_in.shape[0] > prop_in.shape[1]:
+                    chunks = (min(1000, prop_in.shape[0]), min(10, prop_in.shape[1]))
+                else:
+                    chunks = (min(10, prop_in.shape[0]), min(1000, prop_in.shape[1]))
+                prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=chunks, maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
+                hdf5_copy(prop_in, prop_out)
                 print "done"
             print "all copies complete"
             local_hdf5.close()
