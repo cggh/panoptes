@@ -230,6 +230,24 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     that._myPlotter.render();
             };
 
+            that.storeSettings = function() {
+                return {
+                    rowOrderField: that.model.query.row_order
+                };
+            };
+
+            that.recallSettings = function(settObj) {
+                var needRefresh = false;
+                if (settObj.rowOrderField) {
+                    that.model.query.row_order = settObj.rowOrderField;
+                    needRefresh = true;
+                }
+                if (needRefresh) {
+                    that.model.reset_cache();
+                    that._draw();
+                }
+            };
+
             that.init(table_info, controls_group, parent);
             return that;
         };

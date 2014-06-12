@@ -23,6 +23,8 @@ define([
                 );
                 that.setEarlyInitialisation();
 
+                that.serialisableComponents = {};
+
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if ((MetaData.mapTableCatalog[tableid].hasGenomePositions) || (MetaData.mapTableCatalog[tableid].hasGenomeRegions)) {
                         that.panelBrowser.render();
@@ -49,6 +51,12 @@ define([
                             obj.datatables[tableid] = tableSett;
                         }
                     });
+
+                    obj.extraComps = {};
+                    $.each(that.serialisableComponents, function(id, comp) {
+                        obj.extraComps[id] = comp.storeSettings();
+                    });
+
                     return obj;
                 };
 
@@ -79,6 +87,14 @@ define([
                             }
                         });
                     }
+
+                    if (settObj.extraComps) {
+                        $.each(that.serialisableComponents, function(id, comp) {
+                            if (settObj.extraComps[id])
+                                comp.recallSettings(settObj.extraComps[id]);
+                        });
+                    }
+
 
                     that.recallingSettings = false;
 
@@ -811,6 +827,7 @@ define([
                         var the_channel = GenotypeChannel.Channel(table_info, controls_group, that.panelBrowser);
                         the_channel.setMaxViewportSizeX(table_info.settings.GenomeMaxViewportSizeX);
                         that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
+                        that.serialisableComponents['genotypes_'+tableid] = the_channel;
                     });
 
 

@@ -48,7 +48,7 @@ define([
 
                 var showIndividualLines = row_height>10;
 
-                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.strokeStyle = "rgba(0,0,0,0.2)";
                 ctx.lineWidth = 1;
                 if (showIndividualLines) {
                     ctx.beginPath();
