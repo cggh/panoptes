@@ -107,24 +107,24 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                ctx.save();
                ctx.font = "" + row_height + "px sans-serif";
                ctx.lineWidth = 1;
-               var text_width = ctx.measureText('100/100').width;
-               for (var j = 0, ref = model.row_index.length; j < ref; j++) {
-                 var r = model.row_index[j], y = (r * row_height);
+               text_width = ctx.measureText('100/100').width;
+               for (j = 0, ref = model.row_index.length; j < ref; j++) {
+                 r = model.row_index[j], y = (r * row_height);
                  //Don't draw off screen genotypes
                  if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
                    continue;
                  var refs = ref_rows[r], nons = non_rows[r];
-                 for (var i = 0, end = pos.length; i < end; ++i) {
-                   var depth = refs[i] + nons[i];
-                   var height = ((depth - depth_offset) / depth_scale) * 0.8 + 0.2;
-                   height = Math.min(Math.max(height, 0), 1);
+                 for (i = 0, end = pos.length; i < end; ++i) {
                    var ref_ = refs[i], non = nons[i];
+                   var depth = ref_ + non;
+                   height = ((depth - depth_offset) / depth_scale) * 0.8 + 0.2;
+                   height = Math.min(Math.max(height, 0), 1);
                    if (ref_ + non == 0) {
                      ctx.fillStyle = 'rgb(40,40,40)';
                    } else {
-                     ctx.fillStyle = 'hsl(' + (216 + ((non / (ref_ + non)) * 144)) + ',100%,35%)';
+                     ctx.fillStyle = 'hsl(' + (240 + ((non / (ref_ + non)) * 120)) + ',100%,35%)';
                    }
-                   var spos = x_scale(pos[i]) - (snp_width * 0.5);
+                   spos = x_scale(pos[i]) - (snp_width * 0.5);
                    if (snp_width > text_width + 38 && row_height >= 6)
                      ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width - text_width), height * row_height); else
                      ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
@@ -141,8 +141,8 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                      continue;
                    refs = ref_rows[r], nons = non_rows[r];
                    for (i = 0, end = pos.length; i < end; ++i) {
-                     var text = ref_ + ',' + non;
                      ref_ = refs[i], non = nons[i];
+                     var text = ref_ + ',' + non;
                      x = x_scale(pos[i]) + (snp_width / 2) - text_width+1;
                      ctx.fillText(text, x, y);
                    }
