@@ -41,9 +41,11 @@ define([
                 ctx.font = "" + (fontSize) + "px sans-serif";
                 ctx.fillStyle = 'rgb(0,0,0)';
 
-                if (row_height>3) {
-                    ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                    ctx.lineWidth = 1;
+                var showIndividualLines = row_height>10;
+
+                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.lineWidth = 1;
+                if (showIndividualLines) {
                     ctx.beginPath();
                     for (var i=0; i<=row_keys.length; i++) {
                         var ypos = (i) * (row_height);
@@ -55,13 +57,45 @@ define([
                     ctx.stroke();
                 }
 
+
+                var drawGroupLabel = function(labelName, startIndex, endIndex) {
+                    if (endIndex<startIndex)
+                        return;
+                    var yposTop = startIndex * row_height;
+                    var yposBottom = (endIndex+1) * row_height;
+                    if (yposBottom>yposTop+3) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, yposBottom+0.5);
+                        ctx.lineTo(width, yposBottom+0.5);
+                        ctx.stroke();
+                        if (yposBottom>yposTop+5) {
+                            var fontSize = Math.min(12, yposBottom-yposTop-1);
+                            ctx.font = "" + (fontSize) + "px sans-serif";
+                            ctx.fillText(labelName, 2, (yposBottom+yposTop)/2 -1 + fontSize/2);
+                        }
+                    }
+                };
+
+                var groupLabel = null;
+                var groupStartIndex  = 0;
                 _.forEach(row_keys, function(key, i) {
                     var ypos = (i+1) * (row_height);
                     if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
                         var label = labelMapper(key);
-                        ctx.fillText(label, 2, ypos - 1 - (row_height-fontSize)/2);
+                        if (showIndividualLines) {
+                            ctx.fillText(label, 2, ypos - 1 - (row_height-fontSize)/2);
+                        }
+                        else {
+                            if (label!=groupLabel) {
+                                drawGroupLabel(groupLabel, groupStartIndex, i-1)
+                                groupLabel =label;
+                                groupStartIndex = i;
+                            }
+                        }
                     }
                 });
+                if (groupLabel!=null)
+                    drawGroupLabel(groupLabel, groupStartIndex, row_keys.length-1)
             };
 
             that.event = function (type, ev, offset) {
