@@ -41,16 +41,19 @@ define([
                 ctx.font = "" + (fontSize) + "px sans-serif";
                 ctx.fillStyle = 'rgb(0,0,0)';
 
-                ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                ctx.beginPath();
-                for (var i=0; i<=row_keys.length; i++) {
-                    var ypos = (i) * (row_height);
-                    if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
-                        ctx.moveTo(0, ypos+0.5);
-                        ctx.lineTo(width, ypos+0.5);
+                if (row_height>3) {
+                    ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    for (var i=0; i<=row_keys.length; i++) {
+                        var ypos = (i) * (row_height);
+                        if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
+                            ctx.moveTo(0, ypos+0.5);
+                            ctx.lineTo(width, ypos+0.5);
+                        }
                     }
+                    ctx.stroke();
                 }
-                ctx.stroke();
 
                 _.forEach(row_keys, function(key, i) {
                     var ypos = (i+1) * (row_height);

@@ -27,6 +27,23 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                if (firsts_rows == undefined || seconds_rows == undefined || alpha_rows == undefined || height_rows == undefined)
                  return model.row_index.length * row_height;
 
+               if (row_height>3) {
+                 ctx.save();
+                 ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                 ctx.lineWidth = 1;
+                 ctx.beginPath();
+                 for (var i=0; i<=model.row_index.length; i++) {
+                     var ypos = (i) * (row_height);
+                     if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
+                         ctx.moveTo(clip.l, ypos+0.5);
+                         ctx.lineTo(clip.r, ypos+0.5);
+                     }
+                 }
+                 ctx.stroke();
+                 ctx.restore();
+               }
+
+
                ctx.save();
                ctx.font = "" + row_height + "px sans-serif";
                ctx.lineWidth = 1;
