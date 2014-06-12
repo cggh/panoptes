@@ -35,7 +35,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     });
                 }
                 if (that.data_type == 'fractional') {
-                    that.properties = [that.settings.RefFraction];
+                    that.properties = [that.settings.Ref, that.settings.NonRef];
                     _.each(that.settings.ExtraProperties, function(prop) {
                         that.properties.push(prop);
                     });
@@ -74,6 +74,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.row_index = [];
                 that.genomic_start = 0;
                 that.genomic_end = 0;
+                that.intervals_being_fetched = [];
             };
 
             that.position_columns = function (ordinal) {
@@ -151,6 +152,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     that.data[prop] = data.twoD[prop] || [];
                 });
                 that.col_positions = that.position_columns(that.col_ordinal);
+                that.intervals_being_fetched = data.intervals_being_fetched;
 
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)

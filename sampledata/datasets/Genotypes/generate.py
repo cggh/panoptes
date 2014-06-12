@@ -71,9 +71,16 @@ var_ids = ['VAR_' + str(i).zfill(6) for i in range(NUM_VARIANTS)]
 
 with open('datatables/samples/data', 'w') as tabfile:
     writer = csv.writer(tabfile, delimiter='\t')
-    writer.writerow(('ID', ))
+    writer.writerow(('ID', 'Name', 'Category1', 'Category2', 'Value1'))
+    ctr = 0
     for id in sample_ids:
-        writer.writerow((id, ))
+        ctr += 1
+        writer.writerow((id, 
+                         'Sample' + str(ctr),
+                         'Group '+str(1+ctr/10),
+                         random.choice(['Cat A', 'Cat B', 'Cat C']),
+                         random.random()
+    ))
 
 gaps = list(np.random.poisson(10,(NUM_VARIANTS)))
 pos = 10
@@ -160,3 +167,13 @@ with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
     total_depth[:, :] = shuffled_total_depth
     gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
     gq[:, :] = shuffled_gq
+
+with h5py.File('2D_datatables/genotypes_frac/data.hdf5', 'w') as f:
+    col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
+    col_index[:] = shuffled_var_ids
+    row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
+    row_index[:] = shuffled_sample_ids
+    ref = f.create_dataset("ref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
+    ref[:, :] = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")
+    ref = f.create_dataset("nonref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
+    ref[:, :] = np.array(np.random.randint(0,50,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")

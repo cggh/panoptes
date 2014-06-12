@@ -1,21 +1,21 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
+define(['_', 'd3',
         "Views/Genotypes/Components/Container",
         "Views/Genotypes/Components/TabContainer",
         "Views/Genotypes/Components/ColumnHeader",
         "Views/Genotypes/Components/GenotypesTable",
         "Views/Genotypes/Components/Link",
-        "Views/Genotypes/Components/Gradient"
+        "Views/Genotypes/Components/Gradient",
+        "Views/Genotypes/Components/SamplesHeader"
     ],
-    function (_, d3, ColourAllocator, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient) {
+    function (_, d3, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient, SamplesHeader) {
         return function View(initial_params) {
             var that = {};
             that.init = function(inital_params) {
                 that.col_header_height = 30;
                 that.link_height = 40;
-                that.colours = ColourAllocator();
                 that.row_header_width = 150;
                 that.col_scale =  d3.scale.linear();
 
@@ -40,6 +40,8 @@ define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
                         ])
                     }
                 ]);
+
+                that.samplesHeader = SamplesHeader();
             };
 
             that.update_params = function(view_params){
@@ -52,20 +54,16 @@ define(['_', 'd3', 'Views/Genotypes/ColourAllocator',
                 that.col_scale.domain([model.col_start, model.col_end]).range([0,clip.r - clip.l]);
                 that.root_container.draw(ctx, clip, model, that);
 
+                ctx_left.save();
+                ctx_left.translate(0,that.col_header_height+that.link_height);
+                that.samplesHeader.draw(ctx_left, clip, model, that);
+                ctx_left.restore();
+
                 ctx = ctx_left;
-                var row_labels = model.row_ordinal;
                 ctx.save();
                 ctx.fillStyle = 'rgb(40,40,40)';
-                ctx.font = "" + (that.row_height) + "px sans-serif";
-                ctx.translate(0,that.col_header_height+that.link_height);
-                _.forEach(row_labels, function(label, i) {
-                    ctx.fillText(label, 0, (i+1) * (that.row_height));
-                });
-                ctx.restore();
-                ctx.save();
-              ctx.fillStyle = 'rgb(40,40,40)';
                 ctx.font = '11px sans serif';
-                ctx.fillText(model.table.tableCapNamePlural, 5 ,15);
+                ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." :model.table.tableCapNamePlural, 5 ,15);
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgb(0,55,135)';
                 ctx.fillRect(5,25,10,10);

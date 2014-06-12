@@ -22,6 +22,9 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 that.parent_browser = parent;
                 that.table_info = table_info;
 
+                that.rowTableInfo = that.table_info.row_table;
+
+
                 var model_params = DQXModel({
                   width_mode:'auto',
                   auto_width: true,
@@ -47,9 +50,14 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 view_controls.addControl(Controls.VerticalSeparator(3));
 
                 var view_params = DQXModel({
+                  samples_property:that.rowTableInfo.primkey,
                   row_height:11,
-                  alpha_channel:(that.model.settings.ExtraProperties[0] ? that.model.settings.ExtraProperties[0] : null),
-                  height_channel:(that.model.settings.ExtraProperties[1] ? that.model.settings.ExtraProperties[1] : null)
+                  alpha_channel:(that.model.settings.ExtraProperties &&
+                    that.model.settings.ExtraProperties[0] ?
+                    that.model.settings.ExtraProperties[0] : '__null'),
+                  height_channel:(that.model.settings.ExtraProperties &&
+                    that.model.settings.ExtraProperties[1] ?
+                    that.model.settings.ExtraProperties[1] : '__null')
                 });
 
                 view_params.on({}, function() {
@@ -62,6 +70,18 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                     //Call the full draw as we need to refresh data and column placement
                     that.draw(that.draw_info);
                 });
+
+
+                var states = [];
+                $.each(that.rowTableInfo.propertyGroups, function(idx1, propertyGroup) {
+                    $.each(propertyGroup.properties, function(idx2, propInfo) {
+                        if (propInfo.settings.showInTable || propInfo.isPrimKey)
+                            states.push({id: propInfo.propid, name: propInfo.name})
+                    });
+                });
+                var sampleProperty_channel = Controls.Combo(null, { label:'Samples label:', states:states})
+                    .bindToModel(view_params, 'samples_property');
+                view_controls.addControl(sampleProperty_channel);
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
@@ -125,7 +145,16 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
 
             that.draw = function (draw_info) {
                 if (!draw_info) return;
-                if (draw_info.needZoomIn) return;
+                if (draw_info.needZoomIn) {
+                  //comment out for now as one loses scroll pos
+//                  var height = 100;
+//                  if (that._height != height) {
+//                    that.modifyHeight(height);
+//                    that._myPlotter.resizeHeight(true);
+//                    //The last call will result in the framework calling draw, so we should end here.
+//                  }
+                  return;
+                }
                 //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
                 that.draw_info = draw_info;
                 //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.

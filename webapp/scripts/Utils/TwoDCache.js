@@ -231,6 +231,7 @@ define(["Utils/RequestCounter"],
                     that.intervals.splice(bisect(that.intervals, interval.start), 0, interval);
                     that._add_to_provider_queue(interval);
                 }
+                result.intervals_being_fetched = that._intervals_being_fetched;
                 return result;
             };
 

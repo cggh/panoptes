@@ -12,5 +12,21 @@ Properties:
   Name: Sample ID
   Description: Sample identifier
   DataType: Text
-  ShowInTable: true
+
+- Id: Name
+  Name: Name
+  DataType: Text
+
+- Id: Category1
+  Name: Category 1
+  DataType: Text
+
+- Id: Category2
+  Name: Category 2
+  DataType: Text
+
+- Id: Value1
+  Name: Value 1
+  DataType: Value
+  DecimDigits: 4
 
