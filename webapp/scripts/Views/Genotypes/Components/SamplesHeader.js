@@ -8,10 +8,27 @@ define([],
 
             that.draw = function (ctx, clip, model, view) {
 
-                ctx.fillStyle = 'rgb(40,40,40)';
+                var samplesTableInfo = model.table.row_table;
+
+                var dispPropId = view.samples_property;
+
+                if (samplesTableInfo.primkey == dispPropId) {
+                    var row_labels = model.row_ordinal;
+
+                }
+                else {
+                    if (!samplesTableInfo.fieldCache.requestAll(dispPropId, function() {
+                        model.update_callback();
+                    })) {
+                        //todo: draw waiting message
+                        return;
+                    }
+                    //todo: get fields into row_labels
+                }
+
+                ctx.fillStyle = 'rgb(0,0,0)';
                 ctx.font = "" + (view.row_height) + "px sans-serif";
 
-                var row_labels = model.row_ordinal;
                 _.forEach(row_labels, function(label, i) {
                     ctx.fillText(label, 0, (i+1) * (view.row_height));
                 });
