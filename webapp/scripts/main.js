@@ -18,7 +18,10 @@ require.config({
         DQX: "DQX",
         _:"DQX/Externals/lodash",
         tween: "Externals/Tween",
-        datastream: "DQX/Externals/DataStream"
+        datastream: "DQX/Externals/DataStream",
+        blob: "DQX/Externals/Blob",
+        filesaver: "DQX/Externals/FileSaver"
+
     },
     shim: {
         d3: {
@@ -32,7 +35,14 @@ require.config({
         },
         datastream: {
           exports: 'DataStream'
+        },
+        blob: {
+          exports: 'Blob'
+        },
+        filesaver: {
+          exports: 'saveAs'
         }
+
     },
     waitSeconds: 15,
     urlArgs: "version="+versionString

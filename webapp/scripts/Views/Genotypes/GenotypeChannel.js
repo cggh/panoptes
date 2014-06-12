@@ -1,10 +1,10 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
+define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
     "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],
-    function (require, _, d3, DQXModel, SQL, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+    function (require, _, d3, Blob, FileSaver, DQXModel, SQL, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
                View) {
 
         var GenotypeChannel = {};
@@ -44,6 +44,9 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 );
 
                 //Create controls
+                that.download_button = Controls.Button(null, {content:'Download Current View'})
+                .setOnChanged(that.download_view);
+                controls_group.addControl(that.download_button);
 
                 var view_controls = Controls.CompoundVert([]);
                 view_controls.addControl(that.createVisibilityControl());
@@ -153,6 +156,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
             that.draw = function (draw_info) {
                 if (!draw_info) return;
                 if (draw_info.needZoomIn) {
+                  that.download_button.enable(false);
                   //comment out for now as one loses scroll pos
 //                  var height = 100;
 //                  if (that._height != height) {
@@ -198,7 +202,26 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                                that.model);
                 that.drawMark(draw_info);
 
+                that.download_button.enable(that.model.intervals_being_fetched.length == 0);
+
                 that.drawing = false;
+            };
+
+            that.download_view = function() {
+              var data = '';
+              data += '#Dataset: ' + MetaData.database + '\n';
+              data += '#Workspace: ' + MetaData.workspaceid + '\n';
+              data += '#Table:' + that.table_info.tableCapNamePlural + '\n';
+              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.model.query.col_query.toDisplayString() + '\n';
+              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.model.query.row_query.toDisplayString() + '\n';
+              data += '#Choromosome:' + that.model.chrom + '\n';
+              data += '#Start:' + Math.floor(that.model.col_start) + '\n';
+              data += '#End:' + Math.ceil(that.model.col_end) + '\n';
+
+              //TABLE!
+
+              var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+              FileSaver(blob, MetaData.database + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
             };
 
             that.handleMouseClicked = function (px, py, area) {
