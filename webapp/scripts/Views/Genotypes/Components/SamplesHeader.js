@@ -12,6 +12,8 @@ define([
 
             that.draw = function (ctx, clip, model, view) {
 
+                var width = ctx.canvas.clientWidth;
+
                 var samplesTableInfo = model.table.row_table;
 
                 var dispPropId = view.samples_property;
@@ -35,14 +37,26 @@ define([
                 }
 
                 var row_height = view.row_height;
+                var fontSize = Math.min(12, row_height-1);
+                ctx.font = "" + (fontSize) + "px sans-serif";
                 ctx.fillStyle = 'rgb(0,0,0)';
-                ctx.font = "" + (row_height) + "px sans-serif";
+
+                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.beginPath();
+                for (var i=0; i<=row_keys.length; i++) {
+                    var ypos = (i) * (row_height);
+                    if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
+                        ctx.moveTo(0, ypos+0.5);
+                        ctx.lineTo(width, ypos+0.5);
+                    }
+                }
+                ctx.stroke();
 
                 _.forEach(row_keys, function(key, i) {
                     var ypos = (i+1) * (row_height);
                     if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
                         var label = labelMapper(key);
-                        ctx.fillText(label, 0, ypos);
+                        ctx.fillText(label, 2, ypos - 1 - (row_height-fontSize)/2);
                     }
                 });
             };
