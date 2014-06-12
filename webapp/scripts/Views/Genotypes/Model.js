@@ -184,7 +184,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     col_query = [];
                 else
                     col_query = [col_query];
-                col_query.push(SQL.WhereClause.CompareFixed('chrom', '=', chrom));
+                col_query.push(SQL.WhereClause.CompareFixed(that.table.col_table.ChromosomeField, '=', chrom));
                 col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '>=', start));
                 col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '<', end));
                 col_query = SQL.WhereClause.AND(col_query);
