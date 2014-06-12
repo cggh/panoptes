@@ -248,6 +248,11 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
                 }
             };
 
+            that.getToolTipInfo = function (px, py) {
+                return that.view.getToolTipInfo(px, py, that.model);
+            }
+
+
             that.init(table_info, controls_group, parent);
             return that;
         };

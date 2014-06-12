@@ -172,6 +172,46 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              return model.row_index.length * row_height;
            };
 
+             that.getToolTipInfo = function (px, py, model, view) {
+
+                 var row_height = Math.ceil(view.row_height);
+                 var rowNr = Math.floor(py / row_height);
+                 var x_scale = view.col_scale;
+                 var snp_width = x_scale(model.col_width) - x_scale(0);
+
+                 var pos = model.col_positions;
+
+                 var colNr = -1;
+                 var colPosRight = 0;
+                 for (var i = 0, end = pos.length; i < end; ++i) {
+                     var spos = x_scale(pos[i]) - (snp_width * 0.5);
+                     if ((px>=spos) && (px<spos+snp_width)) {
+                        colNr = i;
+                        colPosRight = spos+snp_width;
+                     }
+                 }
+
+                 if ((colNr<0) || (rowNr<0) || (rowNr>=model.row_index.length) )
+                    return null;
+
+                 var content = 'Sample ID: ' + model.row_primary_key[rowNr];
+                 content += '<br>Variant ID: ' + model.col_primary_key[colNr];
+
+                 if (model.data_type == 'fractional') {
+                     var ref_rows = model.data[model.settings.Ref];
+                     var non_rows = model.data[model.settings.NonRef];
+                 }
+
+                 return {
+                     ID: rowNr+'_'+colNr,
+                     content: content,
+                     px:colPosRight,
+                     py:(rowNr+1)*row_height
+                 };
+
+
+             }
+
            that.event = function (type, pos, offset, model, view) {
              pos = {x: pos.x - offset.x, y: pos.y - offset.y};
              var clip = that.last_clip;
