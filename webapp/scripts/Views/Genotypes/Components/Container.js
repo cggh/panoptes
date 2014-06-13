@@ -43,7 +43,7 @@ define([],
         }
 
 
-      that.event = function (type, ev, offset, model, view) {
+      that.event = function (type, ev, offset, model, view, params) {
         var done = false;
         //Go in reverse to get top elements first
         for (var i = contents.length - 1; i >= 0; --i) {
@@ -52,7 +52,8 @@ define([],
             ev,
             {x: that.contents[i].l + offset.x, y: that.contents[i].t + offset.y},
             model,
-            view);
+            view,
+            params);
           if (done)
             return done;
         }

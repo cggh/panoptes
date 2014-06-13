@@ -224,11 +224,11 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               FileSaver(blob, MetaData.database + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
             };
 
-            that.handleMouseClicked = function (px, py, area) {
+            that.handleMouseClicked = function (px, py, area, params) {
                 if (area == 'left') {
-                    var result = that.view.leftEvent('click', {x:px, y:py}, that.model);
+                    var result = that.view.leftEvent('click', {x:px, y:py}, that.model, params);
                 } else if (area == 'center') {
-                  var result = that.view.event('click', {x:px, y:py}, that.model);
+                  var result = that.view.event('click', {x:px, y:py}, that.model, params);
                   if (result.type == 'click_col')
                     Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.col_table.id, itemid:result.col_key } );
                 }

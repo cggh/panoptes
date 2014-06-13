@@ -13,13 +13,19 @@ define(["tween", "DQX/Utils"],
                 var scale = view.col_scale;
                 var pos = model.col_positions;
                 var ord = model.col_ordinal;
+                var col_primary_key = model.col_primary_key;
+                var fncIsColSelected = model.table.col_table.isItemSelected;
 
-                ctx.strokeStyle = 'rgb(130,130,130)';//TODODQX.getRGB(snp.rgb.r, snp.rgb.g, snp.rgb.b, alpha);
                 ctx.lineWidth = 1;//snp && snp.selected ? 2 : 1;
                 var mid = that.height * 0.5;
                 for (var i = 0, end = pos.length; i < end; ++i) {
+                    var key = col_primary_key[i];
                     var p = scale(pos[i]);
                     var o = scale(ord[i]);
+                    ctx.strokeStyle = 'rgba(80,80,80, 0.75)';//TODODQX.getRGB(snp.rgb.r, snp.rgb.g, snp.rgb.b, alpha);
+                    if (fncIsColSelected(key)) {
+                        ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
+                    }
                     ctx.beginPath();
                     ctx.moveTo(o,0);
                     ctx.bezierCurveTo(o, mid, p , mid, p, that.height);

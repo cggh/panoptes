@@ -32,7 +32,7 @@ define(['_', 'd3',
                             },
                             {name: 'moving_header', content:
                                 Container([
-                                    {name:'gradient', content:Gradient('rgba(255,255,255,0.8)', 'rgba(255,255,255,0)', 1, that.link_height+that.col_header_height)},
+                                    {name:'gradient', content:Gradient('rgba(255,255,255,1.0)', 'rgba(255,255,255,0.5)', 0.15, that.link_height+that.col_header_height)},
                                     {name:'column_header', t: that.link_height, content:ColumnHeader(that.col_header_height, that.clickSNP)},
                                     {name:'link', content:Link(that.link_height)}
                                 ])
@@ -113,8 +113,8 @@ define(['_', 'd3',
             }
 
 
-            that.event = function (type, pos, model) {
-                return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
+            that.event = function (type, pos, model, params) {
+                return that.root_container.event(type, pos, {x: 0, y: 0}, model, that, params);
           };
 
             that.leftEvent = function (type, pos, model) {
