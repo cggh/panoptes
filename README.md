@@ -9,9 +9,13 @@ generic and can be used with any kind of data. However, there are
 currently also some specialised features for genomic and geospatial
 data.
 
-Panoptes is a new project and in an early phase of development. For
-more information about the project please send an email to the public
+For more information about the project please send an email to the public
 mailing list <panoptes-dev@googlegroups.com>.
+
+**IMPORTANT NOTE: 
+Panoptes is a new project in an early phase of development. It should currently be considered as a prototype, unfit for production deployments.**
+ 
+
 
 Links:
 
