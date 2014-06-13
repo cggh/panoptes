@@ -108,6 +108,10 @@ define([
                     drawGroupLabel(groupLabel, groupStartIndex, row_keys.length-1)
             };
 
+            that.getToolTipInfo = function (px, py, model, view) {
+                debugger;
+            };
+
             that.event = function (type, ev, offset) {
             };
 

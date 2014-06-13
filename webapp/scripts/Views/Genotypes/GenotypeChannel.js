@@ -273,7 +273,20 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
             that.getToolTipInfo = function (px, py) {
                 return that.view.getToolTipInfo(px, py, that.model);
-            }
+            };
+
+
+            var cttr = 0;
+            that.getLeftToolTipInfo = function(px, py) {
+                cttr += 1;
+                return {
+                    ID: cttr,
+                    content: 'test',
+                    px: px,
+                    py: py,
+                    showPointer: true
+                };
+            };
 
 
             that.init(table_info, controls_group, parent);

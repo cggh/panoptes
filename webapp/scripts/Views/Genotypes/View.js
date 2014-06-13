@@ -100,7 +100,8 @@ define(['_', 'd3',
 
 
             that.getToolTipInfo = function (px, py, model) {
-                return that.root_container.getToolTipInfo(px, py, model, that);
+                var info = that.root_container.getToolTipInfo(px, py, model, that);
+                return info;
             }
 
 

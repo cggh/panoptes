@@ -226,7 +226,8 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                      ID: rowNr+'_'+colNr,
                      content: content,
                      px:colPosRight,
-                     py:(rowNr+1)*row_height
+                     py:(rowNr+1)*row_height,
+                     showPointer: true
                  };
 
 
