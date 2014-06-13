@@ -114,8 +114,14 @@ define(['_', 'd3',
 
 
             that.event = function (type, pos, model) {
-            return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
+                return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
           };
+
+            that.leftEvent = function (type, pos, model) {
+                var leftPanelVertOffset = that.col_header_height+that.link_height;
+                return that.samplesHeader.event(type, pos, {x: 0, y: leftPanelVertOffset}, model, that);
+            };
+
 
           that.init(initial_params);
           return that
