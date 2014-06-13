@@ -10,6 +10,7 @@ data. Many of the features, such as querying and browsing tables, are
 generic and can be used with any kind of data. There are also some
 specialised features for genomic and geospatial data.
 
+.. caution::
 Panoptes is still in an early stage of development. It should currently be considered as a prototype, unfit for production deployments.
 
 We welcome early adopters,
