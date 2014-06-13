@@ -1,8 +1,8 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["tween", "DQX/Utils"],
-  function (tween, DQX) {
+define(["tween", "DQX/Utils", "DQX/Msg"],
+  function (tween, DQX, Msg) {
     return function ColumnHeader(height, clickSNPCallback) {
       var that = {};
       that.height = height;
@@ -106,8 +106,15 @@ define(["tween", "DQX/Utils"],
           if (pos.x < clip.l || pos.x > clip.r || pos.y < 0 || pos.y > that.height)
             return false;
           var colIndex = that.GetColIndexByPosition(pos.x, model, view);
-          if (colIndex>=0)
-              return {type: 'click_col', col_key: model.col_primary_key[colIndex]};
+          if (colIndex>=0) {
+              var key = model.col_primary_key[colIndex];
+              if (params.controlPressed) {
+                  model.table.col_table.selectItem(key, !model.table.col_table.isItemSelected(key));
+                  Msg.broadcast({type:'SelectionUpdated'}, model.table.col_table.id);
+              }
+              else
+                return {type: 'click_col', col_key: model.col_primary_key[colIndex]};
+          }
 
         }
         return false;

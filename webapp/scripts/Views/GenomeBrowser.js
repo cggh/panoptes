@@ -166,7 +166,8 @@ define([
 
                     that.panelBrowser.setOnRangeSelected(function() {
                         var range = that.panelBrowser.getMark();
-                        that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(), range.min, range. max);
+                        if (range)
+                            that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(), range.min, range. max);
                     });
 
 
