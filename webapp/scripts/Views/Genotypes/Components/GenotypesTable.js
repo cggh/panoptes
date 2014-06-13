@@ -201,16 +201,18 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  if ((colNr<0) || (rowNr<0) || (rowNr>=model.row_index.length) )
                     return null;
 
-                 var content = 'Sample ID: ' + model.row_primary_key[rowNr];
-                 content += '<br>Variant ID: ' + model.col_primary_key[colNr];
+                 var content = model.row_primary_key[rowNr] + ' / ' + model.col_primary_key[colNr];
 
                  if (model.data_type == 'diploid') {
                     var firsts_rows = model.data[model.settings.FirstAllele];
                     var seconds_rows = model.data[model.settings.SecondAllele];
                     if (firsts_rows && seconds_rows)
                         content += '<br>Call: ' + firsts_rows[rowNr][colNr] + '/' + seconds_rows[rowNr][colNr];
-                     if (model.data.gq)
-                         content += '<br>GQ: ' + model.data.gq[rowNr][colNr];
+                     $.each(model.table.properties, function(idx, propInfo) {
+                         if ( (propInfo.id!=model.settings.FirstAllele) && (propInfo.id!=model.settings.SecondAllele) )
+                            if (model.data[propInfo.id])
+                                content += '<br>{name}: {value}'.DQXformat({name: propInfo.name, value: model.data.gq[rowNr][colNr]});
+                     });
                  }
 
                  if (model.data_type == 'fractional') {
