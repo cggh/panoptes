@@ -109,7 +109,34 @@ define([
             };
 
             that.getToolTipInfo = function (px, py, model, view) {
-                debugger;
+                var row_keys = model.row_primary_key;
+                var row_height = view.row_height;
+                var rowNr = -1;
+                var rowYPos = 0;
+                _.forEach(row_keys, function(key, i) {
+                    var ypos = i * (row_height);
+                    if ((py>=ypos) && (py<=ypos+row_height)) {
+                        rowNr = i;
+                        rowYPos = (i+1)*row_height;
+                    }
+                });
+                if (rowNr<0)
+                    return;
+                var key = row_keys[rowNr];
+                var content = key;
+                var samplesTableInfo = model.table.row_table;
+                var dispPropId = view.samples_property;
+                var dispPropInfo = MetaData.findProperty(samplesTableInfo.id, dispPropId);
+                if (samplesTableInfo.primkey != dispPropId) {
+                    content += '<br>' + dispPropInfo.toDisplayString(samplesTableInfo.fieldCache.getField(key, dispPropId));
+                }
+                return {
+                    ID: 'sample_'+key,
+                    content: content,
+                    px: px,
+                    py: rowYPos,
+                    showPointer: true
+                };
             };
 
             that.event = function (type, ev, offset) {

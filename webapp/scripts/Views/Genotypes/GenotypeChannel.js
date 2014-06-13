@@ -276,16 +276,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
             };
 
 
-            var cttr = 0;
             that.getLeftToolTipInfo = function(px, py) {
-                cttr += 1;
-                return {
-                    ID: cttr,
-                    content: 'test',
-                    px: px,
-                    py: py,
-                    showPointer: true
-                };
+                return that.view.getLeftToolTipInfo(px, py, that.model);
             };
 
 

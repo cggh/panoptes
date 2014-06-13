@@ -104,8 +104,16 @@ define(['_', 'd3',
                 return info;
             }
 
+            that.getLeftToolTipInfo = function (px, py, model) {
+                var leftPanelVertOffset = that.col_header_height+that.link_height;
+                var info = that.samplesHeader.getToolTipInfo(px, py - leftPanelVertOffset, model, that);
+                if (info)
+                    info.py += leftPanelVertOffset;
+                return info;
+            }
 
-          that.event = function (type, pos, model) {
+
+            that.event = function (type, pos, model) {
             return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
           };
 
