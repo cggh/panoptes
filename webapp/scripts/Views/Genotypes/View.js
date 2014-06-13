@@ -98,9 +98,30 @@ define(['_', 'd3',
                 ctx.restore();
           };
 
-          that.event = function (type, pos, model) {
-            return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
+
+            that.getToolTipInfo = function (px, py, model) {
+                var info = that.root_container.getToolTipInfo(px, py, model, that);
+                return info;
+            }
+
+            that.getLeftToolTipInfo = function (px, py, model) {
+                var leftPanelVertOffset = that.col_header_height+that.link_height;
+                var info = that.samplesHeader.getToolTipInfo(px, py - leftPanelVertOffset, model, that);
+                if (info)
+                    info.py += leftPanelVertOffset;
+                return info;
+            }
+
+
+            that.event = function (type, pos, model) {
+                return that.root_container.event(type, pos, {x: 0, y: 0}, model, that);
           };
+
+            that.leftEvent = function (type, pos, model) {
+                var leftPanelVertOffset = that.col_header_height+that.link_height;
+                return that.samplesHeader.event(type, pos, {x: 0, y: leftPanelVertOffset}, model, that);
+            };
+
 
           that.init(initial_params);
           return that

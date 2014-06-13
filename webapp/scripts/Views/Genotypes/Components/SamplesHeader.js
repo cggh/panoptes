@@ -2,9 +2,11 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define([
+    "DQX/Msg",
     "MetaData"
 ],
     function (
+        Msg,
         MetaData
         ) {
         return function SamplesHeader() {
@@ -62,7 +64,7 @@ define([
                     ctx.stroke();
                 }
 
-
+                var bottomLineDrawn =false;
                 var drawGroupLabel = function(labelName, startIndex, endIndex) {
                     if (endIndex<startIndex)
                         return;
@@ -70,9 +72,14 @@ define([
                     var yposBottom = (endIndex+1) * row_height;
                     if (yposBottom>yposTop+3) {
                         ctx.beginPath();
+                        if (!bottomLineDrawn) {
+                            ctx.moveTo(0, yposTop+0.5);
+                            ctx.lineTo(width, yposTop+0.5);
+                        }
                         ctx.moveTo(0, yposBottom+0.5);
                         ctx.lineTo(width, yposBottom+0.5);
                         ctx.stroke();
+                        bottomLineDrawn = true;
                         if (yposBottom>yposTop+5) {
                             var fontSize = Math.min(12, yposBottom-yposTop-1);
                             ctx.font = "" + (fontSize) + "px sans-serif";
@@ -84,6 +91,8 @@ define([
                             ctx.fillText(labelName, 2, textYPos);
                         }
                     }
+                    else
+                        bottomLineDrawn = false;
                 };
 
                 var groupLabel = null;
@@ -108,8 +117,55 @@ define([
                     drawGroupLabel(groupLabel, groupStartIndex, row_keys.length-1)
             };
 
-            that.event = function (type, ev, offset) {
+            that.getToolTipInfo = function (px, py, model, view) {
+                var row_keys = model.row_primary_key;
+                var row_height = view.row_height;
+                var rowNr = -1;
+                var rowYPos = 0;
+                _.forEach(row_keys, function(key, i) {
+                    var ypos = i * (row_height);
+                    if ((py>=ypos) && (py<=ypos+row_height)) {
+                        rowNr = i;
+                        rowYPos = (i+1)*row_height;
+                    }
+                });
+                if (rowNr<0)
+                    return;
+                var key = row_keys[rowNr];
+                var content = key;
+                var samplesTableInfo = model.table.row_table;
+                var dispPropId = view.samples_property;
+                var dispPropInfo = MetaData.findProperty(samplesTableInfo.id, dispPropId);
+                if (samplesTableInfo.primkey != dispPropId) {
+                    content += '<br>' + dispPropInfo.toDisplayString(samplesTableInfo.fieldCache.getField(key, dispPropId));
+                }
+                return {
+                    ID: 'sample_'+key,
+                    key: key,
+                    content: content,
+                    px: px,
+                    py: rowYPos,
+                    showPointer: true
+                };
             };
+
+            that.event = function (type, pos, offset, model, view) {
+                var samplesTableInfo = model.table.row_table;
+                if (type=='click') {
+                    var info = that.getToolTipInfo(pos.x - offset.x, pos.y - offset.y, model, view);
+                    if (info)
+                        Msg.send({ type: 'ItemPopup' }, { tableid:samplesTableInfo.id, itemid:info.key } );
+                }
+
+                py -= that.view.col_header_height+that.view.link_height+4;
+                py /= that.view.row_height;
+                py = Math.floor(py);
+                if (py >= 0 && py < that.model.row_ordinal.length) {
+                    var key = that.model.row_ordinal[py];
+                    Msg.send({ type: 'ItemPopup' }, { tableid:samplesTableInfo.id, itemid:key } );
+                }
+
+            }
 
             return that;
         };

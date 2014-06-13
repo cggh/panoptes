@@ -256,13 +256,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
             that.handleMouseClicked = function (px, py, area) {
                 if (area == 'left') {
-                    py -= that.view.col_header_height+that.view.link_height+4;
-                    py /= that.view.row_height;
-                    py = Math.floor(py);
-                    if (py >= 0 && py < that.model.row_ordinal.length) {
-                        var key = that.model.row_ordinal[py];
-                        Msg.send({ type: 'ItemPopup' }, { tableid:that.table_info.row_table.id, itemid:key } );
-                    }
+                    var result = that.view.leftEvent('click', {x:px, y:py}, that.model);
                 } else if (area == 'center') {
                   var result = that.view.event('click', {x:px, y:py}, that.model);
                   if (result.type == 'click_col')
@@ -300,6 +294,16 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that._draw();
                 }
             };
+
+            that.getToolTipInfo = function (px, py) {
+                return that.view.getToolTipInfo(px, py, that.model);
+            };
+
+
+            that.getLeftToolTipInfo = function(px, py) {
+                return that.view.getLeftToolTipInfo(px, py, that.model);
+            };
+
 
             that.init(table_info, controls_group, parent);
             return that;

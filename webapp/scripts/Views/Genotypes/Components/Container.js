@@ -24,8 +24,24 @@ define([],
           }, model, view);
           ctx.restore();
         })
-
       };
+
+
+        that.getToolTipInfo = function (px, py, model, view) {
+            var tooltip = null;
+            that.contents.forEach(function (element) {
+                if (element.content.getToolTipInfo) {
+                    var rs = element.content.getToolTipInfo(px - element.l, py - element.t, model, view);
+                    if (rs) {
+                        tooltip = rs;
+                        tooltip.px += element.l;
+                        tooltip.py += element.t;
+                    }
+                }
+            })
+            return tooltip;
+        }
+
 
       that.event = function (type, ev, offset, model, view) {
         var done = false;
