@@ -2,9 +2,10 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
-    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "MetaData", "Views/Genotypes/Model",
+    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "Utils/Serialise", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],
-    function (require, _, d3, Blob, FileSaver, DQXModel, SQL, Framework, ArrayBufferClient, Controls, Msg, DQX, ChannelCanvas, QueryTool, MetaData, Model,
+    function (require, _, d3, Blob, FileSaver, DQXModel, SQL, Framework, ArrayBufferClient,
+              Controls, Msg, DQX, ChannelCanvas, QueryTool, Serialise, MetaData, Model,
                View) {
 
         var GenotypeChannel = {};
@@ -217,11 +218,40 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               data += '#Choromosome:' + that.model.chrom + '\n';
               data += '#Start:' + Math.floor(that.model.col_start) + '\n';
               data += '#End:' + Math.ceil(that.model.col_end) + '\n';
+              Serialise.createStoredURL(function(url) {
+                data += '#URL: '+url+'\n';
+                data += 'Position\t';
+                for(var i=0; i<that.model.row_primary_key.length; i++)
+                  data += that.model.row_primary_key[i] +'\t'
+                data += "\n";
+                if (that.model.data_type == 'diploid') {
+                  for(i=0; i<that.model.col_ordinal.length; i++) {
+                    data += that.model.col_ordinal[i] + '\t';
+                    for(var j=0; j<that.model.row_ordinal.length; j++) {
+                      data += that.model.data[that.model.settings.FirstAllele][j][i];
+                      data += ',';
+                      data += that.model.data[that.model.settings.SecondAllele][j][i];
+                      data += '\t';
+                    }
+                    data += '\n';
+                  }
+                } else if (that.model.data_type == 'fractional') {
+                  for(i=0; i<that.model.col_ordinal.length; i++) {
+                    data += that.model.col_ordinal[i] + '\t';
+                    for(var j=0; j<that.model.row_ordinal.length; j++) {
+                      data += that.model.data[that.model.settings.Ref][j][i];
+                      data += ',';
+                      data += that.model.data[that.model.settings.NonRef][j][i];
+                      data += '\t';
+                    }
+                    data += '\n';
+                  }
+                }
 
-              //TABLE!
 
-              var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
-              FileSaver(blob, MetaData.database + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
+                var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+                FileSaver(blob, MetaData.database + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
+              });
             };
 
             that.handleMouseClicked = function (px, py, area) {

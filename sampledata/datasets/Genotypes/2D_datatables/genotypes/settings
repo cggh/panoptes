@@ -45,8 +45,4 @@ ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionO
     - gq
     - total_depth
 
-#    Type: fractional                    #Either 'diploid' or 'fractional'
-#    RefFraction:  ref_fraction
-#    Depth:        total_depth
-
 GenomeMaxViewportSizeX: 5000
