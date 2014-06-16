@@ -26,7 +26,8 @@ define([
                 that.serialisableComponents = {};
 
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
-                    if ((MetaData.mapTableCatalog[tableid].hasGenomePositions) || (MetaData.mapTableCatalog[tableid].hasGenomeRegions)) {
+                    var tableInfo = MetaData.mapTableCatalog[tableid];
+                    if ((tableInfo.hasGenomePositions) || (tableInfo.hasGenomeRegions)) {
                         that.panelBrowser.render();
                     }
                 } );

@@ -142,6 +142,13 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 //Fix order to by position for col and primary key for row
                 that.view = View(view_params.get());
+
+                Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
+                    if (tableid == that.model.table.row_table.id) {
+                        that._draw();
+                    }
+                });
+
             };
 
             that.new_col_query = function () {

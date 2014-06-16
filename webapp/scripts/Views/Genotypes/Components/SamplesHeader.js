@@ -12,16 +12,13 @@ define([
         return function SamplesHeader() {
             var that = {};
 
-//            that.sortByField = function() {
-//                debugger;
-//            };
-
             that.draw = function (ctx, clip, model, view) {
 
                 var width = ctx.canvas.clientWidth;
                 var height = ctx.canvas.clientHeight;
 
                 var samplesTableInfo = model.table.row_table;
+                var fncIsRowSelected = samplesTableInfo.isItemSelected;
 
                 var dispPropId = view.samples_property;
                 var dispPropInfo = MetaData.findProperty(samplesTableInfo.id, dispPropId);
@@ -48,11 +45,11 @@ define([
                 ctx.font = "" + (fontSize) + "px sans-serif";
                 ctx.fillStyle = 'rgb(0,0,0)';
 
-                var showIndividualLines = row_height>10;
+                that.showIndividualLines = row_height>10;
 
                 ctx.strokeStyle = "rgba(0,0,0,0.2)";
                 ctx.lineWidth = 1;
-                if (showIndividualLines) {
+                if (that.showIndividualLines) {
                     ctx.beginPath();
                     for (var i=0; i<=row_keys.length; i++) {
                         var ypos = (i) * (row_height);
@@ -101,8 +98,17 @@ define([
                     var ypos = (i+1) * (row_height);
                     if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
                         var label = labelMapper(key);
-                        if (showIndividualLines) {
-                            ctx.fillText(label, 2, ypos - 1 - (row_height-fontSize)/2);
+                        if (that.showIndividualLines) {
+                            if (fncIsRowSelected(key))
+                                ctx.fillStyle = 'rgb(255,80,80)';
+                            else
+                                ctx.fillStyle = 'rgb(255,255,255)';
+                            ctx.beginPath();
+                            ctx.rect(1.5,ypos-row_height+2.5, 10,row_height-4);
+                            ctx.fill();
+                            ctx.stroke();
+                            ctx.fillStyle = 'rgb(0,0,0)';
+                            ctx.fillText(label, 13, ypos - 1 - (row_height-fontSize)/2);
                         }
                         else {
                             if (label!=groupLabel) {
@@ -153,16 +159,15 @@ define([
                 var samplesTableInfo = model.table.row_table;
                 if (type=='click') {
                     var info = that.getToolTipInfo(pos.x - offset.x, pos.y - offset.y, model, view);
-                    if (info)
-                        Msg.send({ type: 'ItemPopup' }, { tableid:samplesTableInfo.id, itemid:info.key } );
-                }
-
-                py -= that.view.col_header_height+that.view.link_height+4;
-                py /= that.view.row_height;
-                py = Math.floor(py);
-                if (py >= 0 && py < that.model.row_ordinal.length) {
-                    var key = that.model.row_ordinal[py];
-                    Msg.send({ type: 'ItemPopup' }, { tableid:samplesTableInfo.id, itemid:key } );
+                    if (info) {
+                        if (that.showIndividualLines && (pos.x<12) ) {
+                            model.table.row_table.selectItem(info.key, !model.table.row_table.isItemSelected(info.key));
+                            Msg.broadcast({type:'SelectionUpdated'}, model.table.row_table.id);
+                        }
+                        else {
+                            Msg.send({ type: 'ItemPopup' }, { tableid:samplesTableInfo.id, itemid:info.key } );
+                        }
+                    }
                 }
 
             }
