@@ -43,9 +43,11 @@ def response(returndata):
         minval = rs[0]
         maxval = rs[1]
         count  = rs[2]
-        if (minval is None) or (maxval is None) or (maxval == minval) or (count == 0):
-            returndata['hasdata']=False
+        if (minval is None) or (maxval is None) or (count == 0):
+            returndata['hasdata'] = False
             return returndata
+        if maxval == minval:
+            maxval = minval + 1.0e-9
         jumpPrototypes = [1, 2, 5]
         optimalbincount = int(math.sqrt(count))
         optimalbincount = max(optimalbincount, 2)
