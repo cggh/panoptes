@@ -108,7 +108,7 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
           var colIndex = that.GetColIndexByPosition(pos.x, model, view);
           if (colIndex>=0) {
               var key = model.col_primary_key[colIndex];
-              if (params.controlPressed) {
+              if (params.controlPressed || params.altPressed) {
                   model.table.col_table.selectItem(key, !model.table.col_table.isItemSelected(key));
                   Msg.broadcast({type:'SelectionUpdated'}, model.table.col_table.id);
               }
