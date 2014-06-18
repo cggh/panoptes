@@ -94,6 +94,32 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
                 that.myTable = that.panelTable.getTable();
 
+                $.each(that.myTable.myColumns, function(idx, col) {
+                    if (col.propid) {
+                        col.setHeaderClickHandler(function(id) {
+                            var buttons = [];
+                            if (col.sortOption) {
+                                buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow4down.png'), width:120, height:40 })
+                                    .setOnChanged(function() {
+                                        that.panelTable.getTable().sortByColumn(col.propid,false);
+                                    }) );
+                                buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow4up.png'), width:120, height:40 })
+                                    .setOnChanged(function() {
+                                        that.panelTable.getTable().sortByColumn(col.propid,true);
+                                    }) );
+                            }
+                            Msg.send({type: 'PropInfoPopup'}, {
+                                tableid: that.tableInfo.id,
+                                propid: col.propid,
+                                query: that.theQuery.get(),
+                                buttons: buttons
+                            });
+                        })
+                    }
+                });
+
+
+
                 var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });

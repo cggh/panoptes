@@ -53,7 +53,7 @@ require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer",
-    "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup",
+    "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "InfoPopups/PropInfoPopup",
     "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
 ],
@@ -61,7 +61,7 @@ require([
         _, $, Application, Framework, Msg, DQX, SQL, Popup, PopupFrame, DataFetchers,
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer,
-        GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup,
+        GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PropInfoPopup,
         PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
         Serialise, ButtonChoiceBox, PlotStarter
         ) {
@@ -163,6 +163,7 @@ require([
                         DataItemTablePopup.init();
                         DataItemPlotPopup.init();
                         FindGene.init();
+                        PropInfoPopup.init();
 
 
 

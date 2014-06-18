@@ -287,7 +287,7 @@ define([
                 });
 
                 if (that.propidValue) {
-                    ctx.font="bold 11px Arial";
+                    ctx.font="bold 12px Arial";
                     ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValue).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
                 }
                 ctx.restore();
@@ -324,7 +324,7 @@ define([
                     }
                 }
                 if (true) {
-                    ctx.font="bold 11px Arial";
+                    ctx.font="bold 12px Arial";
                     ctx.save();
                     ctx.translate(17,drawInfo.sizeY/2);
                     ctx.rotate(-Math.PI/2);

@@ -210,6 +210,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if ( (propInfo.settings.showInTable) && (tableInfo.isPropertyColumnVisible(propInfo.propid)))
                     {
                         var col = MiscUtils.createItemTableViewerColumn(theTable, tableInfo.id, propInfo.propid);
+                        col.propid = propInfo.propid;
                     }
             });
             panelTable.onResize();

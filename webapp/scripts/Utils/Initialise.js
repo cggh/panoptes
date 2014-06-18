@@ -512,12 +512,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     );
                 }
 
-                prop.createInfoPopup = function() {
-                    Popup.create('',
-                        '<p><b>'+prop.name+'</b><p>'+
-                            '<div style="max-width: 450px">' + prop.settings.Description +'</div><p>'
-                    );
-                }
 
             });
 

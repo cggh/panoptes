@@ -1,11 +1,11 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/PopupFrame", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools", "Utils/ButtonChoiceBox"
 ],
-    function (require, Application, Framework, Controls, Msg, DocEl, Popup, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
+    function (require, Application, Framework, Controls, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
               EditQuery, QueryTool, MiscUtils, SelectionTools, ButtonChoiceBox
         ) {
@@ -81,6 +81,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     if (info.subSamplingOptions)
                         that.theQuery.setSubSamplingOptions(info.subSamplingOptions);
                     that.theQuery.modify(info.query);
+                    PopupFrame.minimiseAll();
                 });
 
                 that.storeSettings = function() {
@@ -290,42 +291,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     }
                 };
 
-                that.createColumnPopup = function(propid) {
-                    var colInfo = MetaData.findProperty(that.tableid, propid);
-                    var content = '<p>';
-                    if (colInfo.settings.Description)
-                        content += colInfo.settings.Description;
-                    else
-                        content += 'No description available';
-                    content += '<p>';
-                    var buttons=[];
-                    var thecol = that.panelTable.getTable().findColumn(propid);
-                    if (thecol.sortOption) {
-                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow4down.png'), width:120, height:40 })
-                            .setOnChanged(function() {
-                                that.panelTable.getTable().sortByColumn(propid,false);
-                                if (!Popup.isPinned(popupID))
-                                    DQX.ClosePopup(popupID);
-                            }) );
-                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow4up.png'), width:120, height:40 })
-                            .setOnChanged(function() {
-                                that.panelTable.getTable().sortByColumn(propid,true);
-                                if (!Popup.isPinned(popupID))
-                                    DQX.ClosePopup(popupID);
-                            }) );
-                    }
-/*                    if (thecol.linkFunction) {
-                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: thecol.linkHint, width:170, height:50 })
-                            .setOnChanged(function() {
-                                thecol.linkFunction(id);
-                                if (!Popup.isPinned(popupID))
-                                    DQX.ClosePopup(popupID);
-                            }) );
-                    }*/
-
-                    $.each(buttons,function(idx,bt) { content+=bt.renderHtml(); });
-                    var popupID = Popup.create(colInfo.name, content);
-                }
 
 
                 // Initialise the table viewer columns
@@ -389,7 +354,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                             var col = MiscUtils.createItemTableViewerColumn(that.myTable, that.tableid, propInfo.propid);
 
                             col.setHeaderClickHandler(function(id) {
-                                that.createColumnPopup(id);
+                                that.createPropertyPopup(id);
                             })
 
                             var canHide = true;
@@ -413,13 +378,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                                     col.setVisible(false);
                                 propertyGroupSectionMap[propInfo.group.Id].theSection.checkboxes.push(chk);
                                 that.columnVisibilityChecks.push(chk);
-                                var chk_compound = chk;
-                                if (propInfo.settings.Description) {
-                                    var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/question.png', vertShift:-2}).setOnChanged(function() {
-                                        propInfo.createInfoPopup();
-                                    });
-                                    chk_compound = Controls.CompoundHor([chk, Controls.HorizontalSeparator(8), ctrl_hint]);
-                                }
+                                var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/info.png', vertShift:-2}).setOnChanged(function() {
+                                    that.createPropertyPopup(propInfo.propid);
+                                });
+                                var chk_compound = Controls.CompoundHor([chk, Controls.HorizontalSeparator(8), ctrl_hint]);
                                 propertyGroupSectionMap[propInfo.group.Id].theList.addControl(chk_compound);
                             }
                         }
@@ -433,6 +395,31 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     that.myTable.reLoadTable();
                     this.panelSimpleQuery.render();
                 }
+
+
+                that.createPropertyPopup = function(propid) {
+                    var propInfo = MetaData.findProperty(that.tableInfo.id, propid);
+                    var thecol = that.panelTable.getTable().findColumn(propid);
+
+                    var buttons=[];
+                    if (thecol.sortOption) {
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow4down.png'), width:120, height:40 })
+                            .setOnChanged(function() {
+                                that.panelTable.getTable().sortByColumn(propid,false);
+                            }) );
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow4up.png'), width:120, height:40 })
+                            .setOnChanged(function() {
+                                that.panelTable.getTable().sortByColumn(propid,true);
+                            }) );
+                    }
+
+                    Msg.send({type: 'PropInfoPopup'}, {
+                        tableid: that.tableInfo.id,
+                        propid: propid,
+                        query: that.theQuery.get(),
+                        buttons: buttons
+                    });
+                };
 
 
                 that.theQuery.notifyQueryUpdated = that.updateQuery2;

@@ -598,15 +598,13 @@ define([
                     else {
                         var ctrl_onoff = theChannel.createComponentVisibilityControl(propInfo.propid, label, false, !channelDefaultVisible);
                     }
-                    if (propInfo.settings.Description) {
-                        var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/question.png', vertShift:-2}).setOnChanged(function() {
-                            propInfo.createInfoPopup();
+                    var ctrl_hint = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/info.png', vertShift:-2}).setOnChanged(function() {
+                        Msg.send({type: 'PropInfoPopup'}, {
+                            tableid: tableInfo.id,
+                            propid: propInfo.propid
                         });
-                        theChannel.controls.addControl(Controls.CompoundHor([ctrl_onoff, Controls.HorizontalSeparator(8), ctrl_hint]));
-                    }
-                    else {
-                        theChannel.controls.addControl(ctrl_onoff);
-                    }
+                    });
+                    theChannel.controls.addControl(Controls.CompoundHor([ctrl_onoff, Controls.HorizontalSeparator(8), ctrl_hint]));
                 }
 
 
