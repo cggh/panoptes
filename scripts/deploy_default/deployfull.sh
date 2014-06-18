@@ -4,7 +4,7 @@ red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m'
 
-release='Pn1.1.1'
+release='Pn1.2'
 #release='master'
 
 
