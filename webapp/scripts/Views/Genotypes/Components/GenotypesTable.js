@@ -211,7 +211,7 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                      $.each(model.table.properties, function(idx, propInfo) {
                          if ( (propInfo.id!=model.settings.FirstAllele) && (propInfo.id!=model.settings.SecondAllele) )
                             if (model.data[propInfo.id])
-                                content += '<br>{name}: {value}'.DQXformat({name: propInfo.name, value: model.data.gq[rowNr][colNr]});
+                                content += '<br>{name}: {value}'.DQXformat({name: propInfo.name, value: model.data[propInfo.id][rowNr][colNr]});
                      });
                  }
 
