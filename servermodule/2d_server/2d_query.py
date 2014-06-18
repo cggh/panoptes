@@ -92,7 +92,7 @@ def get_table_ids(db, datatable):
     cur.close()
     return result
 
-def GetWorkspaceTableName(tableid, workspaceid):
+def get_workspace_table_name(tableid, workspaceid):
     return "{0}CMB_{1}".format(tableid, workspaceid)
 
 
@@ -116,8 +116,8 @@ def handler(start_response, request_data):
     db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), dataset)
     col_tableid, row_tableid = get_table_ids(db, datatable)
 
-    col_tablename = GetWorkspaceTableName(col_tableid, workspace)
-    row_tablename = GetWorkspaceTableName(row_tableid, workspace)
+    col_tablename = get_workspace_table_name(col_tableid, workspace)
+    row_tablename = get_workspace_table_name(row_tableid, workspace)
 
     col_properties.append(datatable + '_column_index')
     row_properties.append(datatable + '_row_index')
