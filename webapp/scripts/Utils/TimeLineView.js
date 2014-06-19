@@ -89,16 +89,22 @@ define([
                 this.drawStandardGradientLeft(drawInfo, 0.84);
                 this.drawStandardGradientRight(drawInfo, 0.84);
 
-                var colorStrings0 = [];
-                $.each(that.myTimeLine.colorMap, function(idx, color) {
-                    colorStrings0.push(color.lighten(0.3).toStringCanvas());
-                });
 
                 var pointSet = that.myTimeLine.myPointSet;
                 if (pointSet.length == 0)
                     return;
 
-                var hasCategoricalData = that.myTimeLine.mySettings.catData;
+                var plotSettings = that.myTimeLine.mySettings;
+                var hasCategoricalData = plotSettings.catData;
+
+                var colorStrings0 = [];
+                if (hasCategoricalData) {
+                    $.each(that.myTimeLine.colorMap, function(idx, color) {
+                        colorStrings0.push(color.lighten(0.3).toStringCanvas());
+                    });
+                }
+                else
+                    colorStrings0.push(DQX.Color(0.7,0.7,0.7).toStringCanvas());
 
                 var blockSize = Math.max(1,Math.round(7/drawInfo.zoomFactX));
                 var JD1IntMin = Math.floor(that.myTimeLine.minJD);

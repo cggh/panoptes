@@ -101,7 +101,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:3, digits: 2}).setClassID('pointSize')
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
@@ -371,6 +371,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var selectionInfo = that.tableInfo.currentSelection;
 
                 that.mappedColors = DQX.standardColors;
+                that.mappedColors = [DQX.Color(1.0,0,0)];
 
                 if (that.catPropId) {
                     var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
