@@ -274,6 +274,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
             that.createVisibilityControl = function() {
                 var chk=Controls.Check(null,{ label:"Display", value:(true) }).setClassID(that._myID).setOnChanged(function() {
                     that.modifyVisibility(chk.getValue());
+                    if (chk.getValue())
+                        that.scrollInView();
                 });
                 return chk;
             };

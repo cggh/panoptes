@@ -63,6 +63,7 @@ define([
 
                 that.recallSettings = function(settObj) {
                     that.recallingSettings = true;
+                    that.panelBrowser.recallingSettings = true;
                     if ( (settObj.chromoid) && (that.panelBrowser) ) {
                         that.panelBrowser.setChromosome(settObj.chromoid, true, false);
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
@@ -98,6 +99,7 @@ define([
 
 
                     that.recallingSettings = false;
+                    that.panelBrowser.recallingSettings = false;
 
                     //Initialise all the table based summary values
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
@@ -466,6 +468,8 @@ define([
                             if (densChannel) {
                                 that.panelBrowser.channelModifyVisibility(densChannel.getID(), ctrl_onoff.getValue());
                                 densChannel.chk_percent.modifyEnabled(ctrl_onoff.getValue());
+                                if (ctrl_onoff.getValue())
+                                    densChannel.scrollInView();
                             }
                         });
                         controlsGroup.addControl(ctrl_onoff);
@@ -885,7 +889,11 @@ define([
                             comp_avg.myPlotHints.interruptLineAtAbsent = true;
                             comp_avg.myPlotHints.drawPoints = false;//only draw lines, no individual points
                         }
+                        return that.panelBrowser.findChannelRequired(channelid);
                     };
+
+
+
 
                     // For a specific datatable, (re)builds all the tracks that correspond to that datatable records
                     that.rebuildTableBasedSummaryValues = function(tableid) {
@@ -914,15 +922,20 @@ define([
 
                         //Add new tracks
                         var selectedList = tableInfo.genomeTrackSelectionManager.getSelectedList();
+                        var firstNewChannel = null;
                         $.each(selectedList, function(idx, recordid) {
                             $.each(tableInfo.tableBasedSummaryValues, function(idx2, summaryValue) {
                                 if (summaryValue.isVisible) {
                                     if (!presentMap[summaryValue.trackid+'_'+recordid]) {
-                                        that.tableBasedSummaryValue_Add(tableid, summaryValue.trackid, recordid);
+                                        var channel = that.tableBasedSummaryValue_Add(tableid, summaryValue.trackid, recordid);
+                                        if (!firstNewChannel)
+                                            firstNewChannel = channel;
                                     }
                                 }
                             });
                         });
+                        if (firstNewChannel)
+                            firstNewChannel.scrollInView();
 
                         //!!! todo: automatically sort the tablesummary tracks according to a meaningful criterion
 
@@ -950,6 +963,7 @@ define([
                         });
                         that.panelBrowser.render();
                     }
+
 
                     that.genomeRangePopup = function(chromosome, rangeMin, rangeMax) {
                         var content = '';
