@@ -2,14 +2,8 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-import DQXDbTools
-import uuid
-import os
 import config
-from DQXTableUtils import VTTable
-import time
 import asyncresponder
-import sys
 
 import importer.ImportWorkspaces
 

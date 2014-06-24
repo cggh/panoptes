@@ -50,7 +50,7 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
     global tableOrder, property_order
     with calculation_object.LogHeader('Importing 2D datatable {0}'.format(tableid)):
         print('Source: ' + folder)
-        DQXUtils.CheckValidIdentifier(tableid)
+        DQXUtils.CheckValidTableIdentifier(tableid)
 
         table_settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         table_settings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])

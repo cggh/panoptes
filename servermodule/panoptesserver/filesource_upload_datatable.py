@@ -5,6 +5,7 @@
 import os
 import config
 import DQXDbTools
+import DQXUtils
 import authorization
 import shutil
 import Utils
@@ -13,7 +14,6 @@ import Utils
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     fileid = DQXDbTools.ToSafeIdentifier(returndata['fileid'])
@@ -23,10 +23,8 @@ def response(returndata):
     for char in ['.', ' ', ',', '/', '"', "'"]:
         tableid = tableid.replace(char, '_')
 
-    if tableid in Utils.reservedTableNames:
+    if tableid in DQXUtils.reservedTableNames:
         tableid += '_'
-
-
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 

@@ -5,14 +5,12 @@
 import os
 import config
 import DQXDbTools
-import authorization
 import DQXbase64
 
 
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])

@@ -9,10 +9,11 @@ import config
 from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
-import uuid
-import sys
 import shutil
 import customresponders.panoptesserver.Utils as Utils
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
+from DQXDbTools import DBDBESC
 
 
 def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
@@ -27,7 +28,7 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             summaryids.append(dir)
     for summaryid in summaryids:
         with calculationObject.LogHeader('Importing reference genome summary data '+summaryid):
-            DQXUtils.CheckValidIdentifier(summaryid)
+            DQXUtils.CheckValidColumnIdentifier(summaryid)
             destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, summaryid)
             if not os.path.exists(destFolder):
                 os.makedirs(destFolder)

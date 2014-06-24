@@ -6,6 +6,8 @@ import DQXDbTools
 import uuid
 import os
 import config
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -29,8 +31,9 @@ def response(returndata):
 
 
     credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
-    sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(tablename, uid, name, tableid, workspaceid)
-    cur.execute(sql, [content] )
+    sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(
+        DBTBESC(tablename), uid, name, tableid, workspaceid)
+    cur.execute(sql, [content])
 
     db.commit()
     db.close()

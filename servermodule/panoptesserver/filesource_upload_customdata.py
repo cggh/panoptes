@@ -5,7 +5,6 @@
 import os
 import config
 import DQXDbTools
-import authorization
 import shutil
 
 
@@ -23,7 +22,6 @@ def response(returndata):
 
     for char in ['.', ' ', ',', '/']:
         sourceid = sourceid.replace(char, '_')
-
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 

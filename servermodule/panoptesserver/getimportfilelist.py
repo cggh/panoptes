@@ -3,7 +3,6 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-import time
 import config
 import DQXDbTools
 import authorization

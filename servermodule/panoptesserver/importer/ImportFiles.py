@@ -11,11 +11,8 @@ except:
     sys.exit()
 import DQXUtils
 import config
-from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
-import uuid
-import shutil
 import customresponders.panoptesserver.Utils as Utils
 
 import ImportDataTable
@@ -24,14 +21,16 @@ import ImportRefGenome
 import ImportWorkspaces
 import time
 import math
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
+from DQXDbTools import DBDBESC
 
 
 
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
-    Utils.CheckSafeIdentifier(datasetId)
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
-        DQXUtils.CheckValidIdentifier(datasetId)
+        DQXUtils.CheckValidDatabaseIdentifier(datasetId)
         datasetFolder = os.path.join(baseFolder, datasetId)
         indexDb = config.DB
 
@@ -53,10 +52,10 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             calculationObject.SetInfo('Dropping database')
             print('Dropping database')
             try:
-                ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DROP DATABASE IF EXISTS {0}'.format(datasetId))
+                ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DROP DATABASE IF EXISTS {0}'.format(DBDBESC(datasetId)))
             except:
                 pass
-            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'CREATE DATABASE {0}'.format(datasetId))
+            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'CREATE DATABASE {0}'.format(DBDBESC(datasetId)))
 
             # Creating new database
             scriptPath = os.path.dirname(os.path.realpath(__file__))
@@ -115,16 +114,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             globalSettings['Name'],
             str(math.ceil(importtime))
         ))
-
-
-
-# def ImportFileSet(baseFolder):
-#     datasets = []
-#     for dir in os.listdir(baseFolder):
-#         if os.path.isdir(os.path.join(baseFolder, dir)):
-#             datasets.append(dir)
-#     for dataset in datasets:
-#         ImportDataSet(calculationObject, baseFolder, dataset)
 
 
 if __name__ == "__main__":

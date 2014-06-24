@@ -4,6 +4,8 @@
 
 import DQXDbTools
 import B64
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -18,8 +20,8 @@ def response(returndata):
     if 'propid2' in returndata:
         propid2 = DQXDbTools.ToSafeIdentifier(returndata['propid2'])
 
-    whc=DQXDbTools.WhereClause()
-    whc.ParameterPlaceHolder='%s'#NOTE!: MySQL PyODDBC seems to require this nonstardard coding
+    whc = DQXDbTools.WhereClause()
+    whc.ParameterPlaceHolder = '%s' #NOTE!: MySQL PyODDBC seems to require this nonstardard coding
     whc.Decode(encodedquery)
     whc.CreateSelectStatement()
 
@@ -31,13 +33,12 @@ def response(returndata):
     if propid2 is None:
         categories1 = []
         categorycounts = []
-        sourcetable = 'select {1} from {0}'.format(tableid, propid1)
+        sourcetable = 'select {1} from {0}'.format(DBTBESC(tableid), DBCOLESC(propid1))
         if len(whc.querystring_params) > 0:
             sourcetable += " WHERE {0}".format(whc.querystring_params)
-        sourcetable +=  ' limit {0}'.format(maxrecordcount)
-        sql = 'select {1}, count({1}) as _cnt from ({0}) as tmp_table'.format(sourcetable, propid1)
-        sql += ' group by {1} order by _cnt desc limit 10000;'.format(tableid, propid1)
-        #print('=== '+sql)
+        sourcetable += ' limit {0}'.format(maxrecordcount)
+        sql = 'select {1}, count({1}) as _cnt from ({0}) as tmp_table'.format(sourcetable, DBCOLESC(propid1))
+        sql += ' group by {1} order by _cnt desc limit 10000;'.format(DBTBESC(tableid), DBCOLESC(propid1))
         cur.execute(sql, whc.queryparams)
         totalcount = 0
         for row in cur.fetchall():
@@ -56,13 +57,12 @@ def response(returndata):
         categories1 = []
         categories2 = []
         categorycounts = []
-        sourcetable = 'select {1}, {2} from {0}'.format(tableid, propid1, propid2, maxrecordcount)
+        sourcetable = 'select {1}, {2} from {0}'.format(DBTBESC(tableid), DBCOLESC(propid1), DBCOLESC(propid2), maxrecordcount)
         if len(whc.querystring_params) > 0:
             sourcetable += " WHERE {0}".format(whc.querystring_params)
         sourcetable +=  ' limit {0}'.format(maxrecordcount)
-        sql = 'select {1}, {2}, count({1}) as _cnt from ({0}) as tmp_table'.format(sourcetable, propid1, propid2)
-        sql += ' group by {1}, {2} limit 10000;'.format(tableid, propid1, propid2)
-#        print(sql+' '+str(whc.queryparams))
+        sql = 'select {1}, {2}, count({1}) as _cnt from ({0}) as tmp_table'.format(sourcetable, DBCOLESC(propid1), DBCOLESC(propid2))
+        sql += ' group by {1}, {2} limit 10000;'.format(DBTBESC(tableid), DBCOLESC(propid1), DBCOLESC(propid2))
         cur.execute(sql, whc.queryparams)
         totalcount = 0
         for row in cur.fetchall():

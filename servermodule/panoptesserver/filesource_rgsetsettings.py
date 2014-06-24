@@ -12,12 +12,9 @@ import DQXbase64
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     authorization.VerifyIsDataSetManager(credInfo, databaseName)
-
     encodedstr = returndata['content']
-
     content = DQXbase64.b64decode_var2(encodedstr)
 
     baseFolder = config.SOURCEDATADIR + '/datasets'

@@ -6,10 +6,6 @@ import os
 import config
 import DQXDbTools
 import authorization
-import DQXbase64
-import shutil
-import importer.ImpUtils as ImpUtils
-import asyncresponder
 
 
 def response(returndata):
@@ -23,7 +19,6 @@ def response(returndata):
     for char in ['.', ' ', ',', '/', '"', "'"]:
         workspaceid = workspaceid.replace(char, '_')
     returndata['workspaceid'] = workspaceid
-
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 

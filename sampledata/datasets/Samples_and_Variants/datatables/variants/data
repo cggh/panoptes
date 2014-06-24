@@ -1,4 +1,4 @@
-chromosome	position	SnpName	HighQuality	Value1	Value2	Value3	Extra1	NRAF_WAF	NRAF_EAF	NRAF_SAF
+chromosome	position	SnpName	HighQuality	Value1	Value2	Value three	Extra 1	NRAF_WAF	NRAF_EAF	NRAF_SAF
 Pf3D7_01_v3	1	SNP_00001	Yes		0.55	0.77	A	0	0	0
 Pf3D7_01_v3	10	SNP_00002	Yes	0.23		0.47	B	0.12	0.23	0.13
 Pf3D7_01_v3	20	SNP_00003	No	0.88	0.55		C	0.56	0.21	0.76

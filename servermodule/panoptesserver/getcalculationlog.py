@@ -4,9 +4,6 @@
 
 import os
 import config
-from DQXTableUtils import VTTable
-import DQXbase64
-import unicodedata
 
 
 def response(returndata):

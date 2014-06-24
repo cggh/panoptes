@@ -12,13 +12,10 @@ import shutil
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     fileid = DQXDbTools.ToSafeIdentifier(returndata['fileid'])
 
     authorization.VerifyIsDataSetManager(credInfo, databaseName)
-
-
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 

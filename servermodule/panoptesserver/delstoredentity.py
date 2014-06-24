@@ -6,6 +6,8 @@ import DQXDbTools
 import uuid
 import os
 import config
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -21,7 +23,7 @@ def response(returndata):
     cur = db.cursor()
 
 
-    sql = "DELETE FROM {0} WHERE id='{1}'".format(tablename, id)
+    sql = "DELETE FROM {0} WHERE id='{1}'".format(DBTBESC(tablename), id)
     cur.execute(sql)
 
     db.commit()

@@ -1,4 +1,4 @@
-ID	SiteID	Value1	InUse	Value2	SampleTypeID	Comment
+key	Site ID	Value1	InUse	Value2	SampleTypeID	Comment
 S0001	St01	0.75	Y	2.3	St1	This is a very long comment, taking up a rather large space in the record. The import routine will automatically reserve the right space for this.
 S0002	St01		Y	9.8	St1	A shorter comment on sample 2
 S0003	St02	0.23	N	9.2	St1	Uncertain origin

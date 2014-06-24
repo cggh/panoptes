@@ -5,6 +5,8 @@
 import DQXDbTools
 import B64
 import math
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -25,16 +27,16 @@ def response(returndata):
     cur = db.cursor()
     coder = B64.ValueListCoder()
 
-    querystring = " ({0} is not null) and ({1} is not null)".format(propidx, propidy)
+    querystring = " ({0} is not null) and ({1} is not null)".format(DBCOLESC(propidx), DBCOLESC(propidy))
     if len(whc.querystring_params) > 0:
         querystring += " AND ({0})".format(whc.querystring_params)
 
     if ('binsizex' not in returndata) or ('binsizey' not in returndata):
         # Fetch ranges for both properties, because we will need this
         sql = 'select min({propidx}) as _mnx, max({propidx}) as _mxx, min({propidy}) as _mny, max({propidy}) as _mxy, count(*) as _cnt from (select {propidx}, {propidy} FROM {tableid} WHERE {querystring} limit {maxrecordcount}) as tmp_table'.format(
-            propidx=propidx,
-            propidy=propidy,
-            tableid=tableid,
+            propidx=DBCOLESC(propidx),
+            propidy=DBCOLESC(propidy),
+            tableid=DBTBESC(tableid),
             querystring=querystring,
             maxrecordcount=maxrecordcount
         )
@@ -92,17 +94,17 @@ def response(returndata):
     bucketsy = []
     counts = []
     tablesource = 'select {propidx}, {propidy} from {tableid} where {querystring} limit {maxrecordcount}'.format(
-        propidx=propidx,
-        propidy=propidy,
-        tableid=tableid,
+        propidx=DBCOLESC(propidx),
+        propidy=DBCOLESC(propidy),
+        tableid=DBTBESC(tableid),
         querystring=querystring,
         maxrecordcount=maxrecordcount
     )
     sql = 'select floor({propidx}/{binsizex}) as bucketx, floor({propidy}/{binsizey}) as buckety, count(*) as _cnt from ({tablesource}) as tmp_table'.format(
         tablesource=tablesource,
-        propidx=propidx,
+        propidx=DBCOLESC(propidx),
         binsizex=binsizex,
-        propidy=propidy,
+        propidy=DBCOLESC(propidy),
         binsizey=binsizey)
     sql += ' group by bucketx, buckety'
     sql += ' limit {0}'.format(maxbincount)

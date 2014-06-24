@@ -15,6 +15,9 @@ import sys
 import shutil
 import customresponders.panoptesserver.Utils as Utils
 import simplejson
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
+from DQXDbTools import DBDBESC
 
 def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourceid, folder, importSettings):
 
@@ -65,7 +68,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
             settings=settings.ToJSON()
         ))
 
-
         properties = ImpUtils.LoadPropertyInfo(calculationObject, settings, os.path.join(folder, 'data'))
 
         # remove primary key, just in case
@@ -84,7 +86,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
 
         propidList = []
         for property in properties:
-            DQXUtils.CheckValidIdentifier(property['propid'])
+            DQXUtils.CheckValidColumnIdentifier(property['propid'])
             propidList.append(property['propid'])
 
         db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
@@ -103,11 +105,11 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                     sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
                     print(sql)
                     cur.execute(sql)
-                sql = "ALTER TABLE {0} ".format(sourcetable)
+                sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
                 for prop in toRemoveExistingProperties:
                     if prop != toRemoveExistingProperties[0]:
                         sql += ", "
-                    sql += "DROP COLUMN {0}".format(prop)
+                    sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
                 calculationObject.LogSQLCommand(sql)
                 cur.execute(sql)
 
@@ -146,9 +148,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                             'ReadData': prop['Settings']['ReadData']
                         } for prop in properties]
             columns.append({'name':primkey, 'DataType':'Text', 'Index': False, 'ReadData': True})
-            # print('----------------------------------------------------------------')
-            # print(str(columns))
-            # print('----------------------------------------------------------------')
             LoadTable.LoadTable(
                 calculationObject,
                 os.path.join(folder, 'data'),
@@ -160,17 +159,16 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                 False
             )
 
-
             print('Creating new columns')
             calculationObject.Log('WARNING: better mechanism to determine column types needed here')#TODO: implement
             frst = True
-            sql = "ALTER TABLE {0} ".format(sourcetable)
+            sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
             for property in properties:
                 propid = property['propid']
                 if not frst:
                     sql += " ,"
                 sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
-                sql += "ADD COLUMN {0} {1}".format(propid, sqldatatype)
+                sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
                 frst = False
                 calculationObject.LogSQLCommand(sql)
             cur.execute(sql)
@@ -179,12 +177,12 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
             print('Joining information')
             frst = True
             credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, sourcetable))
-            sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(sourcetable, tmptable, primkey)
+            sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(DBTBESC(sourcetable), tmptable, DBCOLESC(primkey))
             for property in properties:
                 propid = property['propid']
                 if not frst:
-                    sql += " ,"
-                sql += "{0}.{2}={1}.{2}".format(sourcetable,tmptable,propid)
+                    sql += ", "
+                sql += "{0}.{2}={1}.{2}".format(DBTBESC(sourcetable), tmptable, DBCOLESC(propid))
                 frst = False
                 calculationObject.LogSQLCommand(sql)
             cur.execute(sql)
@@ -222,10 +220,10 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                         calculationObject.Log('Extracting data to '+dataFileName)
                         script = ImpUtils.SQLScript(calculationObject)
                         script.AddCommand("SELECT {2} as chrom, {3} as pos, {0} FROM {1} ORDER BY {2},{3}".format(
-                            propid,
-                            Utils.GetTableWorkspaceView(workspaceid, tableid),
-                            chromField,
-                            posField
+                            DBCOLESC(propid),
+                            DBTBESC(Utils.GetTableWorkspaceView(workspaceid, tableid)),
+                            DBCOLESC(chromField),
+                            DBCOLESC(posField)
                         ))
                         script.Execute(datasetId, dataFileName)
                         calculationObject.LogFileTop(dataFileName, 10)
@@ -247,8 +245,8 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
 
 
 def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSettings):
-    Utils.CheckSafeIdentifier(workspaceid)
     with calculationObject.LogHeader('Importing workspace {0}.{1}'.format(datasetId, workspaceid)):
+        DQXUtils.CheckValidTableIdentifier(workspaceid)
         print('Source directory: '+folder)
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
         settings.RequireTokens(['Name'])
@@ -279,8 +277,15 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
                 tableid = table['id']
                 print('Re-creating custom data table for '+tableid)
                 execSQL("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
-                execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey'], tableid) )
-                execSQL("create unique index {1} on {0}({1})".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid), table['primkey']) )
+                execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(
+                    DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
+                    DBCOLESC(table['primkey']),
+                    DBTBESC(tableid)
+                ))
+                execSQL("create unique index {1} on {0}({1})".format(
+                    DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
+                    DBCOLESC(table['primkey']))
+                )
                 execSQL("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
 
         print('Removing existing workspace properties')

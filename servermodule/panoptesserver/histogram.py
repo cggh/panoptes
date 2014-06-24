@@ -5,7 +5,8 @@
 import DQXDbTools
 import B64
 import math
-
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
@@ -24,7 +25,7 @@ def response(returndata):
     cur = db.cursor()
     coder = B64.ValueListCoder()
 
-    querystring = " ({0} is not null)".format(propid)
+    querystring = " ({0} is not null)".format(DBCOLESC(propid))
     if len(whc.querystring_params) > 0:
         querystring += " AND ({0})".format(whc.querystring_params)
 
@@ -33,8 +34,8 @@ def response(returndata):
     else:
         #Automatically determine bin size
         sql = 'select min({propid}) as _mn, max({propid}) as _mx, count(*) as _cnt from (select {propid} from {tableid} WHERE {querystring} limit {maxrecordcount}) as tmplim'.format(
-            propid=propid,
-            tableid=tableid,
+            propid=DBCOLESC(propid),
+            tableid=DBTBESC(tableid),
             querystring=querystring,
             maxrecordcount=maxrecordcount
         )
@@ -75,8 +76,8 @@ def response(returndata):
     buckets = []
     counts = []
     totalcount = 0
-    sql = 'select floor({0}/{1}) as bucket, count(*) as _cnt'.format(propid, binsize)
-    sql += ' FROM (SELECT {1} FROM {0} '.format(tableid, propid)
+    sql = 'select floor({0}/{1}) as bucket, count(*) as _cnt'.format(DBCOLESC(propid), binsize)
+    sql += ' FROM (SELECT {1} FROM {0} '.format(DBTBESC(tableid), DBCOLESC(propid))
     sql += " WHERE {0}".format(querystring)
     sql += ' limit {0})  as tmplim'.format(maxrecordcount)
     sql += ' group by bucket'

@@ -311,10 +311,10 @@ require([
                     window.open('main.html');
                 }
                 });
-//                actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
-//                    window.open('admin.html');
-//                }
-//                });
+                actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
+                    window.open('admin.html');
+                }
+                });
 
                 ButtonChoiceBox.create('Panoptes','', [actions]);
             }

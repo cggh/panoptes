@@ -5,6 +5,8 @@
 import DQXDbTools
 import B64
 import math
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -25,7 +27,7 @@ def response(returndata):
     cur = db.cursor()
     coder = B64.ValueListCoder()
 
-    querystring = " ({0} is not null)".format(propidvalue)
+    querystring = " ({0} is not null)".format(DBCOLESC(propidvalue))
     if len(whc.querystring_params) > 0:
         querystring += " AND ({0})".format(whc.querystring_params)
 
@@ -34,8 +36,8 @@ def response(returndata):
     else:
         #Automatically determine bin size
         sql = 'select min({propidvalue}) as _mn, max({propidvalue}) as _mx, count(*) as _cnt from (select {propidvalue} from {tableid} WHERE {querystring} limit {maxrecordcount}) as tmplim'.format(
-            propidvalue=propidvalue,
-            tableid=tableid,
+            propidvalue=DBCOLESC(propidvalue),
+            tableid=DBTBESC(tableid),
             querystring=querystring,
             maxrecordcount=maxrecordcount
         )
@@ -43,7 +45,7 @@ def response(returndata):
         rs = cur.fetchone()
         minval = rs[0]
         maxval = rs[1]
-        count  = rs[2]
+        count = rs[2]
         if (minval is None) or (maxval is None) or (maxval == minval) or (count == 0):
             returndata['hasdata']=False
             return returndata
@@ -75,8 +77,8 @@ def response(returndata):
     buckets = []
     counts = []
     totalcount = 0
-    sql = 'select {2} as _propidcat, floor({0}/{1}) as bucket, count(*) as _cnt'.format(propidvalue, binsize, propidcat)
-    sql += ' FROM (SELECT {1},{2} FROM {0} '.format(tableid, propidvalue,propidcat)
+    sql = 'select {2} as _propidcat, floor({0}/{1}) as bucket, count(*) as _cnt'.format(DBCOLESC(propidvalue), binsize, DBCOLESC(propidcat))
+    sql += ' FROM (SELECT {1},{2} FROM {0} '.format(DBTBESC(tableid), DBCOLESC(propidvalue), DBCOLESC(propidcat))
     sql += " WHERE {0}".format(querystring)
     sql += ' limit {0})  as tmplim'.format(maxrecordcount)
     sql += ' group by bucket,_propidcat'

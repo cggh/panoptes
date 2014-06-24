@@ -3,8 +3,6 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-import os
-import sys
 import numpy
 import re
 import config
@@ -236,7 +234,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                     property['Settings'] = settings
                     propidMap[propid] = property
                     properties.append(property)
-                DQXUtils.CheckValidIdentifier(propid)
+                DQXUtils.CheckValidColumnIdentifier(propid)
                 settings.AddDict(propSource)
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
@@ -247,6 +245,15 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             tb.LoadFile(datafile, 9999)
         except Exception as e:
             raise Exception('Error while reading data file: '+str(e))
+        for propid in tb.GetColList():
+            propidcorr = propid.replace(' ', '_')
+            if propidcorr != propid:
+                tb.RenameCol(propid, propidcorr)
+            try:
+                DQXUtils.CheckValidColumnIdentifier(propidcorr)
+            except Exception as e:
+                raise Exception('Invalid data table column header:\n '+str(e))
+
         with calculationObject.LogDataDump():
             tb.PrintRows(0, 9)
         for propid in tb.GetColList():
@@ -274,7 +281,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                 if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
                     property['DataType'] = 'Boolean'
 
-                DQXUtils.CheckValidIdentifier(propid)
+                DQXUtils.CheckValidColumnIdentifier(propid)
                 settings = SettingsLoader.SettingsLoader()
                 settings.LoadDict({})
                 settings.AddTokenIfMissing('Name', propid)
@@ -314,7 +321,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
         for property in properties:
             calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
     for property in properties:
-        Utils.CheckSafeIdentifier(property['propid'])
+        DQXUtils.CheckValidColumnIdentifier(property['propid'])
     return properties
 
 
@@ -336,7 +343,7 @@ def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, wri
         with open(destFileName, 'w') as destFile:
             if writeHeader:
                 destFile.write('\t'.join(colList) + '\n')
-            header = sourceFile.readline().rstrip('\r\n').split('\t')
+            header = [colname.replace(' ', '_') for colname in sourceFile.readline().rstrip('\r\n').split('\t')]
             calculationObject.Log('Original header: {0}'.format(','.join(header)))
             colindices = []
             for col in colList:

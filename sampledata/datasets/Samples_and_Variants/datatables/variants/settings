@@ -69,7 +69,7 @@ Properties:
   #BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
   BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
-- Id: Value1, Value2, Value3    # Common settings for groups of properties can be defined simultaneously
+- Id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
   GroupId: Info
   Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
   ShowInTable: true
@@ -96,7 +96,7 @@ Properties:
   ChannelColor: "rgb(200,80,0)"
   ConnectLines: True
 
-- Id: Value3
+- Id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
   Name: Value 3
   DataType: Value
   Description: The third numerical value
@@ -106,7 +106,7 @@ Properties:
      BlockSizeMax: 50000            # Maximum summary block size (in bp)
      ChannelColor: "rgb(0,100,0)"   # Colour of the channel
 
-- Id: Extra1
+- Id: Extra_1
   Name: Extra 1
   GroupId: Info
   Description: An example categorical property
@@ -162,8 +162,8 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   - HighQuality
   - Value1
   - Value2
-  - Value3
-  - Extra1
+  - Value_three
+  - Extra_1
 
 - Type: PropertyGroup
   GroupId: AlleleFreq

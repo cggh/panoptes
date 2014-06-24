@@ -12,7 +12,6 @@ import DQXbase64
 def response(returndata):
 
     credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
@@ -25,7 +24,6 @@ def response(returndata):
         encodedstr = fp.read()
     os.remove(filename)
     content = DQXbase64.b64decode_var2(encodedstr)
-
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
     settingsFile = None
@@ -44,7 +42,6 @@ def response(returndata):
     if settingsFile is None:
         returndata['Error'] = 'Invalid file source type'
         return returndata
-
 
     try:
         with open(settingsFile, 'w') as fp:

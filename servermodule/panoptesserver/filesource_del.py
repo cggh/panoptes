@@ -6,10 +6,11 @@ import os
 import config
 import DQXDbTools
 import authorization
-import DQXbase64
 import shutil
 import importer.ImpUtils as ImpUtils
 import asyncresponder
+from DQXDbTools import DBDBESC
+from DQXDbTools import DBTBESC
 
 
 def response(returndata):
@@ -24,20 +25,20 @@ def response(returndata):
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 
-    calculationObject = asyncresponder.CalculationThread('', None, {'isRunningLocal':'True'}, '')
+    calculationObject = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
     dataFolder = None
     if sourcetype == 'dataset':
         dataFolder = os.path.join(baseFolder, databaseName)
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
-        ImpUtils.ExecuteSQL(calculationObject, config.DB, 'DROP DATABASE IF EXISTS {0}'.format(databaseName))
+        ImpUtils.ExecuteSQL(calculationObject, config.DB, 'DROP DATABASE IF EXISTS {0}'.format(DBDBESC(databaseName)))
         ImpUtils.ExecuteSQL(calculationObject, config.DB, 'DELETE FROM datasetindex WHERE id="{0}"'.format(databaseName))
 
 
     if sourcetype == 'datatable':
         dataFolder = os.path.join(baseFolder, databaseName, 'datatables', tableid)
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DROP TABLE IF EXISTS {0}'.format(tableid))
+        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DROP TABLE IF EXISTS {0}'.format(DBTBESC(tableid)))
         ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM tablecatalog WHERE id="{0}"'.format(tableid))
         ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM propertycatalog WHERE tableid="{0}"'.format(tableid))
         ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM summaryvalues WHERE tableid="{0}"'.format(tableid))

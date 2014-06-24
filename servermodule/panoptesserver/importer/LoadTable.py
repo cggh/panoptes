@@ -2,15 +2,14 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-import sys
 import os
-import DQXDbTools
-import DQXUtils
-import config
 from DQXTableUtils import VTTable
 import ImpUtils
 import datetime
 import dateutil.parser
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
+from DQXDbTools import DBDBESC
 
 
 # Columns: list of dict
@@ -18,9 +17,6 @@ import dateutil.parser
 #       DataType: Value, Boolean, Text
 
 def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, loadSettings, importSettings, allowSubSampling):
-
-    def DecoId(id):
-        return '`' + id + '`'
 
     def EncodeCell(icontent, col):
         content = icontent
@@ -104,7 +100,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         with open(destFileName, 'w') as ofp:
             if ofp is None:
                 raise Exception('Unable to write to temporary file ' + destFileName)
-            fileColNames = ifp.readline().rstrip('\n\r').split('\t')
+            fileColNames = [colname.replace(' ', '_') for colname in ifp.readline().rstrip('\n\r').split('\t')]
             calculationObject.Log('File columns: ' + str(fileColNames))
             fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
             if not(autoPrimKey) and (primkey not in fileColIndex):
@@ -135,7 +131,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                             col['MaxLen'] = max(col['MaxLen'], len(content))
 
                     if not(blockStarted):
-                        ofp.write('INSERT INTO {0} ({1}) VALUES '.format(DecoId(tableid), ', '.join([DecoId(col) for col in colNameList])))
+                        ofp.write('INSERT INTO {0} ({1}) VALUES '.format(DBTBESC(tableid), ', '.join([DBCOLESC(col) for col in colNameList])))
                         blockStarted = True
                         blockNr = 0
 
@@ -159,15 +155,15 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
 
     calculationObject.Log('Creating schema')
     scr = ImpUtils.SQLScript(calculationObject)
-    scr.AddCommand('drop table if exists {0};'.format(DecoId(tableid)))
-    sql = 'CREATE TABLE {0} (\n'.format(DecoId(tableid))
+    scr.AddCommand('drop table if exists {0};'.format(DBTBESC(tableid)))
+    sql = 'CREATE TABLE {0} (\n'.format(DBTBESC(tableid))
     colTokens = []
     if autoPrimKey:
-        colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(primkey))
+        colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(DBCOLESC(primkey)))
     if allowSubSampling:
         colTokens.append("_randomval_ double")
     for col in columns:
-        st = DecoId(col['name'])
+        st = DBCOLESC(col['name'])
         typestr = ''
         if col['DataType'] == 'Text':
             typestr = 'varchar({0})'.format(max(1, col['MaxLen']))
@@ -182,10 +178,18 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     scr.AddCommand(sql)
     calculationObject.Log('Creation statement: '+sql)
     if not(autoPrimKey):
-        scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, primkey))
+        scr.AddCommand('create unique index {2} ON {0}({1})'.format(
+            DBTBESC(tableid),
+            DBCOLESC(primkey),
+            DBCOLESC(tableid+'_'+primkey)
+        ))
     for col in columns:
         if ('Index' in col) and (col['Index']) and (col['name'] != primkey):
-            scr.AddCommand('create index {0}_{1} ON {0}({1})'.format(tableid, col['name']))
+            scr.AddCommand('create index {2} ON {0}({1})'.format(
+                DBTBESC(tableid),
+                DBCOLESC(col['name']),
+                DBCOLESC(tableid+'_'+col['name'])
+            ))
     scr.Execute(databaseid)
 
     calculationObject.Log('Importing data')
@@ -194,28 +198,28 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     if allowSubSampling:
         with calculationObject.LogHeader('Create subsampling table'):
             calculationObject.Log('Creating random data column')
-            sql = "UPDATE {0} SET _randomval_=RAND()".format(tableid)
+            sql = "UPDATE {0} SET _randomval_=RAND()".format(DBTBESC(tableid))
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-            sql = "CREATE INDEX {0}_randomindex ON {0}(_randomval_)".format(tableid)
+            sql = "CREATE INDEX {1} ON {0}(_randomval_)".format(DBTBESC(tableid), DBCOLESC(tableid+'_randomindex'))
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-            sql = "DROP TABLE IF EXISTS {0}_SORTRAND".format(tableid)
+            sortRandTable = tableid+'_SORTRAND'
+            sql = "DROP TABLE IF EXISTS {0}".format(DBTBESC(sortRandTable))
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-            sql = "CREATE TABLE {0}_SORTRAND LIKE {0}".format(tableid)
+            sql = "CREATE TABLE {1} LIKE {0}".format(DBTBESC(tableid), DBTBESC(sortRandTable))
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
             if autoPrimKey:
                 calculationObject.Log('Restructuring AutoKey')
-                sql = "alter table {0}_SORTRAND drop column AutoKey".format(tableid)
+                sql = "alter table {0} drop column AutoKey".format(DBTBESC(sortRandTable))
                 ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-                sql = "alter table {0}_SORTRAND add column AutoKey int FIRST".format(tableid)
+                sql = "alter table {0} add column AutoKey int FIRST".format(DBTBESC(sortRandTable))
                 ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-                sql = "create index idx_autokey on {0}_SORTRAND(AutoKey)".format(tableid)
+                sql = "create index idx_autokey on {0}(AutoKey)".format(DBTBESC(sortRandTable))
                 ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-            sql = "alter table {0}_SORTRAND add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(tableid)
+            sql = "alter table {0} add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(DBTBESC(sortRandTable))
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-            sql = "insert into {0}_SORTRAND select *,0 from {0} order by _randomval_".format(tableid)
+            sql = "insert into {1} select *,0 from {0} order by _randomval_".format(DBTBESC(tableid), DBTBESC(sortRandTable))
             sql += ' LIMIT 5000000' # NOTE: there is little point in importing more than that!
             ImpUtils.ExecuteSQL(calculationObject, databaseid, sql)
-
 
     os.remove(destFileName)
 
@@ -226,7 +230,6 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
     colDict = {col['name']: col for col in columns}
     colNameList = [col['name'] for col in columns]
     print('Column info: '+str(columns))
-
 
     tb = VTTable.VTTable()
     tb.allColumnsText = True
@@ -260,7 +263,7 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
     with calculationObject.LogDataDump():
         tb.PrintRows(0, 9)
 
-    createcmd = 'CREATE TABLE {0} ('.format(tableid)
+    createcmd = 'CREATE TABLE {0} ('.format(DBTBESC(tableid))
     frst = True
     for col in columns:
         if not frst:
@@ -275,15 +278,19 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
             datatypestr = 'varchar({0})'.format(maxlength)
         if len(datatypestr) == 0:
             datatypestr = ImpUtils.GetSQLDataType(col['DataType'])
-        createcmd += colname + ' ' + datatypestr
+        createcmd += DBCOLESC(colname) + ' ' + datatypestr
         frst = False
     createcmd += ')'
 
     calculationObject.Log('Creating datatable')
     scr = ImpUtils.SQLScript(calculationObject)
-    scr.AddCommand('drop table if exists {0}'.format(tableid))
+    scr.AddCommand('drop table if exists {0}'.format(DBTBESC(tableid)))
     scr.AddCommand(createcmd)
-    scr.AddCommand('create unique index {0}_{1} ON {0}({1})'.format(tableid, loadSettings['PrimKey']))
+    scr.AddCommand('create unique index {2} ON {0}({1})'.format(
+        DBTBESC(tableid),
+        DBCOLESC(loadSettings['PrimKey']),
+        DBTBESC(tableid+'_primkey')
+    ))
     scr.Execute(databaseid)
 
     calculationObject.Log('Loading datatable values')

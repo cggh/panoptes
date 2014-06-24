@@ -6,12 +6,9 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
-from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
 import LoadTable
-import uuid
-import sys
 import shutil
 import customresponders.panoptesserver.Utils as Utils
 
@@ -19,11 +16,10 @@ import customresponders.panoptesserver.Utils as Utils
 tableOrder = 0
 
 def ImportDataTable(calculationObject, datasetId, tableid, folder, importSettings):
-    Utils.CheckSafeIdentifier(tableid)
     global tableOrder
     with calculationObject.LogHeader('Importing datatable {0}'.format(tableid)):
         print('Source: ' + folder)
-        DQXUtils.CheckValidIdentifier(tableid)
+        DQXUtils.CheckValidTableIdentifier(tableid)
 
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablecatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))

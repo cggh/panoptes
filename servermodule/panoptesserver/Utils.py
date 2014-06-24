@@ -5,14 +5,6 @@
 import uuid
 import re
 
-reservedTableNames = ['2D_propertycatalog', '2D_tablecatalog', 'annotation', 'chromosomes', 'externallinks', 'propertycatalog', 'relations', 'settings', 'storedqueries', 'summaryvalues', 'tablebasedsummaryvalues', 'tablecatalog', 'workspaces']
-
-def CheckSafeIdentifier(id):
-    if not re.match("[_A-Za-z][_a-zA-Z0-9]*$", id):
-        raise Exception('Invalid identifier (invalid syntax): ' + id)
-    if id in reservedTableNames:
-        raise Exception('Invalid identifier (reserved name): ' + id)
-
 def GetTempID():
     return 'TMP'+str(uuid.uuid1()).replace('-', '_')
 

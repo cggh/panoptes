@@ -8,6 +8,8 @@ import asyncresponder
 import os
 import config
 import Utils
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 def ResponseExecute(returndata, calculationObject):
@@ -49,7 +51,7 @@ def ResponseExecute(returndata, calculationObject):
         db = DQXDbTools.OpenDatabase(credInfo, databaseName)
         cur = db.cursor()
         credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tableName, propid))
-        sqlstring = 'UPDATE {0} SET {1}=0 WHERE {1}=1'.format(tableName, propid)
+        sqlstring = 'UPDATE {0} SET {1}=0 WHERE {1}=1'.format(DBTBESC(tableName), DBCOLESC(propid))
         cur.execute(sqlstring)
         db.commit()
 
@@ -57,7 +59,7 @@ def ResponseExecute(returndata, calculationObject):
             keys = datastring.split('\t')
             def submitkeys(keylist):
                 if len(keylist) > 0:
-                    sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(tableName, propid, keyid, ', '.join(['"'+str(key)+'"' for key in keylist]))
+                    sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(DBTBESC(tableName), DBCOLESC(propid), DBCOLESC(keyid), ', '.join(['"'+str(key)+'"' for key in keylist]))
                     print(sqlstring)
                     cur.execute(sqlstring)
                     db.commit()
@@ -69,7 +71,7 @@ def ResponseExecute(returndata, calculationObject):
                     submitkeys(keysublist)
                     keysublist = []
                     calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
-                keyNr +=1
+                keyNr += 1
             submitkeys(keysublist)
 
         db.close()

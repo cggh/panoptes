@@ -5,11 +5,11 @@ Description: A table containing a number of samples "Line 2"
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
-PrimKey: ID
+PrimKey: key
 
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
-QuickFindFields: ID,SiteID,SampleTypeID
+QuickFindFields: key,Site_ID,SampleTypeID
 
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
@@ -17,19 +17,20 @@ QuickFindFields: ID,SiteID,SampleTypeID
 # Both mechanisms can be combined: further settings can still be specified for individual properties
 Properties:
 
-- Id: ID                           # Identifier of the property, corresponding to the column header in the [data] file
-  Name: Sample ID                  # Display name of the property
+- Id: key                          # Identifier of the property, corresponding to the column header in the [data] file
+  Name: Sample key                 # Display name of the property
   Description: Sample identifier   # Description of the property
   DataType: Text                   # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
   ShowInTable: true                # If true, this property will appear by default in data table grids in the application
   Search: StartPattern             # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
-- Id: SiteID
+- Id: Site_ID
   Name: Site ID
   Description: Identifier of the site the sample was collected from
   DataType: Text
   ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  Search: StartPattern
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: samplingsites          # Datatable id of the parent table
     ForwardName: is sampled from    # Display name of the relation from child to parent
