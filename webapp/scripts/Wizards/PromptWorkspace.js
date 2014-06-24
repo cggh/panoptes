@@ -67,30 +67,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
         }
 
-//        PromptWorkspace.createNew = function(name) {
-//            data={};
-//            data.database = MetaData.database;
-//            data.name = name;
-//            ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'workspace_create', data, function(resp) {
-//                PromptWorkspace.reload(resp.id);
-//            });
-//        }
-//
-//        PromptWorkspace.deleteWorkspace = function(id) {
-//            data={};
-//            data.database = MetaData.database;
-//            data.id = id;
-//            DQX.setProcessing();
-//            DQX.customRequest(MetaData.serverUrl,PnServerModule,'workspace_del',data,function(resp) {
-//                DQX.stopProcessing();
-//                if ('Error' in resp) {
-//                    alert(resp.Error);
-//                    return;
-//                }
-//                PromptWorkspace.reload();
-//            });
-//        }
-
         PromptWorkspace.reload = function(selid) {
             var getter = DataFetchers.ServerDataGetter();//Instantiate the fetcher object
             getter.addTable('workspaces',['id','name'],'name');
