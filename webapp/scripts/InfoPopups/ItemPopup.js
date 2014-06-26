@@ -283,9 +283,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     relTab.panelButtons = Framework.Form(relTab.frameButtons);
                     var button_OpenInTable = Controls.Button(null, { content: 'Show in table view', width:120, height:35}).setOnChanged(function() {
-                        Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
-                            { propid:relTab.relationInfo.childpropid, value:data.fields[that.tableInfo.primkey] }
-                        );
+                        var qry = SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]);
+                        Msg.send({type: 'DataItemTablePopup'}, {
+                            tableid: relTab.childTableInfo.id,
+                            query: qry,
+                            title: ''//that.tableInfo.tableCapNamePlural + ' at ' + pieChartInfo.longit + ', ' + pieChartInfo.lattit
+                        });
+//                        Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
+//                            { propid:relTab.relationInfo.childpropid, value:data.fields[that.tableInfo.primkey] }
+//                        );
                     })
                     buttons.push(button_OpenInTable);
 

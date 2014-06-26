@@ -343,7 +343,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (prop.isDate) {
                     tableInfo.hasDate = true;
                     prop.toDisplayString = function(vl) {
-                        if (vl==null)
+                        if ((vl==null) || (vl=='None'))
                             return '';
                         var dt = DQX.JD2DateTime(parseFloat(vl));
                         if (isNaN(dt.getTime()))
