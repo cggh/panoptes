@@ -497,7 +497,8 @@ define([
                             controlsSubList.push(chk_densPercent);
                             densChannel.chk_percent = chk_densPercent;
                         }
-                        controlsGroup.addControl(Controls.CompoundVert(controlsSubList).setTreatAsBlock(true).setLeftIndent(25));
+                        if (controlsGroup)
+                            controlsGroup.addControl(Controls.CompoundVert(controlsSubList).setTreatAsBlock(true).setLeftIndent(25));
                     }
 
                 }

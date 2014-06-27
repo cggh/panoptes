@@ -45,14 +45,14 @@ define([
                 if (theState) {
                   url += '&state=' + theState;
                 }
-                callback(url);
+                callback(url, theState);
               });
           });
         };
 
 
         Serialise.createLink = function() {
-            Serialise.createStoredURL(function(url) {
+            Serialise.createStoredURL(function(url, theState) {
               var str = '';
               var edt = Controls.Textarea('', { size: 80, linecount: 4, value: url}).setHasDefaultFocus();
               str += 'Permanent url to this view:<p>';
