@@ -6,18 +6,13 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
-from DQXTableUtils import VTTable
 import SettingsLoader
 import ImpUtils
 import LoadTable
-import uuid
-import sys
-import shutil
 import customresponders.panoptesserver.Utils as Utils
 import simplejson
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
-from DQXDbTools import DBDBESC
 
 def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourceid, folder, importSettings):
 
@@ -29,18 +24,15 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
         if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
             raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
 
-        db = DQXDbTools.OpenDatabase(credInfo, datasetId)
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'workspaces'))
-
-        cur = db.cursor()
-        cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
-        row = cur.fetchone()
-        if row is None:
-            raise Exception('Unable to find table record for table {0} in dataset {1}'.format(tableid, datasetId))
-        primkey = row[0]
-        tableSettingsStr = row[1]
-        db.close()
+        with DQXDbTools.DBCursor(credInfo, datasetId) as cur:
+            cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
+            row = cur.fetchone()
+            if row is None:
+                raise Exception('Unable to find table record for table {0} in dataset {1}'.format(tableid, datasetId))
+            primkey = row[0]
+            tableSettingsStr = row[1]
 
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog WHERE tableid="{tableid}" and sourceid="{sourceid}"'.format(
             tableid=tableid,
@@ -77,126 +69,121 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
         print('Source table: '+sourcetable)
 
         #Get list of existing properties
-        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
-        cur = db.cursor()
-        cur.execute('SELECT propid FROM propertycatalog WHERE (workspaceid="{0}") and (source="custom") and (tableid="{1}")'.format(workspaceid, tableid))
-        existingProperties = [row[0] for row in cur.fetchall()]
-        print('Existing properties: '+str(existingProperties))
-        db.close()
+        with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
+            cur.execute('SELECT propid FROM propertycatalog WHERE (workspaceid="{0}") and (source="custom") and (tableid="{1}")'.format(workspaceid, tableid))
+            existingProperties = [row[0] for row in cur.fetchall()]
+            print('Existing properties: '+str(existingProperties))
 
         propidList = []
         for property in properties:
             DQXUtils.CheckValidColumnIdentifier(property['propid'])
             propidList.append(property['propid'])
 
-        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
-        cur = db.cursor()
-
-        if not importSettings['ConfigOnly']:
-            # Dropping columns that will be replaced
-            toRemoveExistingProperties = []
-            for existProperty in existingProperties:
-                if existProperty in propidList:
-                    toRemoveExistingProperties.append(existProperty)
-            print('Removing outdated information:')
-            if len(toRemoveExistingProperties) > 0:
-                for prop in toRemoveExistingProperties:
-                    print('Removing outdated information: {0} {1} {2}'.format(workspaceid, prop, tableid))
-                    sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
-                    print(sql)
+        with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
+            if not importSettings['ConfigOnly']:
+                # Dropping columns that will be replaced
+                toRemoveExistingProperties = []
+                for existProperty in existingProperties:
+                    if existProperty in propidList:
+                        toRemoveExistingProperties.append(existProperty)
+                print('Removing outdated information:')
+                if len(toRemoveExistingProperties) > 0:
+                    for prop in toRemoveExistingProperties:
+                        print('Removing outdated information: {0} {1} {2}'.format(workspaceid, prop, tableid))
+                        sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(workspaceid, prop, tableid)
+                        print(sql)
+                        cur.execute(sql)
+                    sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
+                    for prop in toRemoveExistingProperties:
+                        if prop != toRemoveExistingProperties[0]:
+                            sql += ", "
+                        sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
+                    calculationObject.LogSQLCommand(sql)
                     cur.execute(sql)
+
+
+            ranknr = 0
+            for property in properties:
+                propid = property['propid']
+                settings = property['Settings']
+                extraSettings = settings.Clone()
+                extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
+                print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
+                sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(workspaceid, propid, tableid)
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
+                    workspaceid,
+                    settings['DataType'],
+                    propid,
+                    tableid,
+                    settings['Name'],
+                    0,
+                    extraSettings.ToJSON()
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                ranknr += 1
+
+            propDict = {}
+            for property in properties:
+                propDict[property['propid']] = property
+
+            if not importSettings['ConfigOnly']:
+                tmptable = Utils.GetTempID()
+                columns = [ {
+                                'name': prop['propid'],
+                                'DataType': prop['DataType'],
+                                'Index': prop['Settings']['Index'],
+                                'ReadData': prop['Settings']['ReadData']
+                            } for prop in properties]
+                columns.append({'name':primkey, 'DataType':'Text', 'Index': False, 'ReadData': True})
+                LoadTable.LoadTable(
+                    calculationObject,
+                    os.path.join(folder, 'data'),
+                    datasetId,
+                    tmptable,
+                    columns,
+                    {'PrimKey': primkey},
+                    importSettings,
+                    False
+                )
+
+                print('Creating new columns')
+                calculationObject.Log('WARNING: better mechanism to determine column types needed here')#TODO: implement
+                frst = True
                 sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
-                for prop in toRemoveExistingProperties:
-                    if prop != toRemoveExistingProperties[0]:
-                        sql += ", "
-                    sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
-                calculationObject.LogSQLCommand(sql)
+                for property in properties:
+                    propid = property['propid']
+                    if not frst:
+                        sql += " ,"
+                    sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
+                    sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
+                    frst = False
+                    calculationObject.LogSQLCommand(sql)
                 cur.execute(sql)
 
 
-        ranknr = 0
-        for property in properties:
-            propid = property['propid']
-            settings = property['Settings']
-            extraSettings = settings.Clone()
-            extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
-            print('Create property catalog entry for {0} {1} {2}'.format(workspaceid, tableid, propid))
-            sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(workspaceid, propid, tableid)
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
-                workspaceid,
-                settings['DataType'],
-                propid,
-                tableid,
-                settings['Name'],
-                0,
-                extraSettings.ToJSON()
-            )
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            ranknr += 1
-
-        propDict = {}
-        for property in properties:
-            propDict[property['propid']] = property
-
-        if not importSettings['ConfigOnly']:
-            tmptable = Utils.GetTempID()
-            columns = [ {
-                            'name': prop['propid'],
-                            'DataType': prop['DataType'],
-                            'Index': prop['Settings']['Index'],
-                            'ReadData': prop['Settings']['ReadData']
-                        } for prop in properties]
-            columns.append({'name':primkey, 'DataType':'Text', 'Index': False, 'ReadData': True})
-            LoadTable.LoadTable(
-                calculationObject,
-                os.path.join(folder, 'data'),
-                datasetId,
-                tmptable,
-                columns,
-                {'PrimKey': primkey},
-                importSettings,
-                False
-            )
-
-            print('Creating new columns')
-            calculationObject.Log('WARNING: better mechanism to determine column types needed here')#TODO: implement
-            frst = True
-            sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
-            for property in properties:
-                propid = property['propid']
-                if not frst:
-                    sql += " ,"
-                sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
-                sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
-                frst = False
-                calculationObject.LogSQLCommand(sql)
-            cur.execute(sql)
+                print('Joining information')
+                frst = True
+                credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, sourcetable))
+                sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(DBTBESC(sourcetable), tmptable, DBCOLESC(primkey))
+                for property in properties:
+                    propid = property['propid']
+                    if not frst:
+                        sql += ", "
+                    sql += "{0}.{2}={1}.{2}".format(DBTBESC(sourcetable), tmptable, DBCOLESC(propid))
+                    frst = False
+                    calculationObject.LogSQLCommand(sql)
+                cur.execute(sql)
 
 
-            print('Joining information')
-            frst = True
-            credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, sourcetable))
-            sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(DBTBESC(sourcetable), tmptable, DBCOLESC(primkey))
-            for property in properties:
-                propid = property['propid']
-                if not frst:
-                    sql += ", "
-                sql += "{0}.{2}={1}.{2}".format(DBTBESC(sourcetable), tmptable, DBCOLESC(propid))
-                frst = False
-                calculationObject.LogSQLCommand(sql)
-            cur.execute(sql)
+                print('Cleaning up')
+                cur.execute("DROP TABLE {0}".format(tmptable))
 
+            if not importSettings['ConfigOnly']:
+                print('Updating view')
+                Utils.UpdateTableInfoView(workspaceid, tableid, allowSubSampling, cur)
 
-            print('Cleaning up')
-            cur.execute("DROP TABLE {0}".format(tmptable))
-
-        if not importSettings['ConfigOnly']:
-            print('Updating view')
-            Utils.UpdateTableInfoView(workspaceid, tableid, allowSubSampling, cur)
-
-        db.commit()
-        db.close()
+            cur.commit()
 
         print('Creating summary values')
         for property in properties:
@@ -256,58 +243,56 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         if not ImpUtils.IsDatasetPresentInServer(calculationObject.credentialInfo, datasetId):
             raise Exception('Dataset {0} is not found. Please import the dataset first'.format(datasetId))
 
-        db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
-        cur = db.cursor()
+        with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
 
-        def execSQL(cmd):
-            calculationObject.LogSQLCommand(cmd)
-            cur.execute(cmd)
+            def execSQL(cmd):
+                calculationObject.LogSQLCommand(cmd)
+                cur.execute(cmd)
 
-        cur.execute('SELECT id, primkey, settings FROM tablecatalog')
-        tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
-        tableMap = {table['id']:table for table in tables}
+            cur.execute('SELECT id, primkey, settings FROM tablecatalog')
+            tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
+            tableMap = {table['id']:table for table in tables}
 
-        for table in tables:
-            tableSettings = SettingsLoader.SettingsLoader()
-            tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
-            table['settings'] = tableSettings
+            for table in tables:
+                tableSettings = SettingsLoader.SettingsLoader()
+                tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
+                table['settings'] = tableSettings
 
-        if not importSettings['ConfigOnly']:
+            if not importSettings['ConfigOnly']:
+                for table in tables:
+                    tableid = table['id']
+                    print('Re-creating custom data table for '+tableid)
+                    execSQL("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                    execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(
+                        DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
+                        DBCOLESC(table['primkey']),
+                        DBTBESC(tableid)
+                    ))
+                    execSQL("create unique index {1} on {0}({1})".format(
+                        DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
+                        DBCOLESC(table['primkey']))
+                    )
+                    execSQL("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+
+            print('Removing existing workspace properties')
+            execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
+
+            calculationObject.Log('Creating StoredSelection columns')
             for table in tables:
                 tableid = table['id']
-                print('Re-creating custom data table for '+tableid)
-                execSQL("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
-                execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(
-                    DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
-                    DBCOLESC(table['primkey']),
-                    DBTBESC(tableid)
-                ))
-                execSQL("create unique index {1} on {0}({1})".format(
-                    DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
-                    DBCOLESC(table['primkey']))
-                )
-                execSQL("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
+                cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tableid, sett)
+                execSQL(cmd)
 
-        print('Removing existing workspace properties')
-        execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
+            print('Re-creating workspaces record')
+            execSQL("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
+            execSQL('INSERT INTO workspaces VALUES ("{0}","{1}")'.format(workspaceid, workspaceName) )
+            if not importSettings['ConfigOnly']:
+                print('Updating views')
+                for table in tables:
+                    Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
 
-        calculationObject.Log('Creating StoredSelection columns')
-        for table in tables:
-            tableid = table['id']
-            sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
-            cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tableid, sett)
-            execSQL(cmd)
-
-        print('Re-creating workspaces record')
-        execSQL("DELETE FROM workspaces WHERE id='{0}'".format(workspaceid) )
-        execSQL('INSERT INTO workspaces VALUES ("{0}","{1}")'.format(workspaceid, workspaceName) )
-        if not importSettings['ConfigOnly']:
-            print('Updating views')
-            for table in tables:
-                Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
-
-        db.commit()
-        db.close()
+            cur.commit()
 
         print('Scanning for custom data')
         if os.path.exists(os.path.join(folder, 'customdata')):
@@ -350,45 +335,44 @@ def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tab
         return
 
     print('Checking for materialising of {0},{1},{2}'.format(datasetId, workspaceid, tableid))
-    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
-    cur = db.cursor()
-    cur.execute('SELECT settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
-    tableSettingsStr = cur.fetchone()[0]
-    tableSettings = SettingsLoader.SettingsLoader()
-    tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
-    #print('Table settings= '+tableSettings)
-    if (tableSettings.HasToken('CacheWorkspaceData')) and (tableSettings['CacheWorkspaceData']):
-        print('Executing materialising')
-        cur.execute('show indexes from {0}'.format(tableid))
-        indexedColumns1 = [indexRow[4] for indexRow in cur.fetchall()]
-        cur.execute('show indexes from {0}INFO_{1}'.format(tableid, workspaceid))
-        indexedColumns2 = [indexRow[4] for indexRow in cur.fetchall()]
-        indexedColumns = set(indexedColumns1+indexedColumns2)
-        print('Indexed columns: ' + str(indexedColumns))
-        tmptable = '_tmptable_'
-        wstable = '{0}CMB_{1}'.format(tableid, workspaceid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
-        sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-        for indexedColumn in indexedColumns:
-            sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
-
-        if (tableSettings.HasToken('AllowSubSampling')) and (tableSettings['AllowSubSampling']):
-            print('Processing subsampling table')
-            indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
+        cur.execute('SELECT settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
+        tableSettingsStr = cur.fetchone()[0]
+        tableSettings = SettingsLoader.SettingsLoader()
+        tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
+        #print('Table settings= '+tableSettings)
+        if (tableSettings.HasToken('CacheWorkspaceData')) and (tableSettings['CacheWorkspaceData']):
+            print('Executing materialising')
+            cur.execute('show indexes from {0}'.format(tableid))
+            indexedColumns1 = [indexRow[4] for indexRow in cur.fetchall()]
+            cur.execute('show indexes from {0}INFO_{1}'.format(tableid, workspaceid))
+            indexedColumns2 = [indexRow[4] for indexRow in cur.fetchall()]
+            indexedColumns = set(indexedColumns1+indexedColumns2)
+            print('Indexed columns: ' + str(indexedColumns))
             tmptable = '_tmptable_'
-            wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceid)
+            wstable = '{0}CMB_{1}'.format(tableid, workspaceid)
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
             sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            for indexedColumn in indexedColumnsSubSampling:
+            for indexedColumn in indexedColumns:
                 sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
+
+            if (tableSettings.HasToken('AllowSubSampling')) and (tableSettings['AllowSubSampling']):
+                print('Processing subsampling table')
+                indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
+                tmptable = '_tmptable_'
+                wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceid)
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
+                sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                for indexedColumn in indexedColumnsSubSampling:
+                    sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
+                    ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
 
 
 

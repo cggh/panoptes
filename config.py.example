@@ -17,6 +17,9 @@ DBPASS = '1234'
 # Name to use for the central panoptes MySQL DB
 DB='datasetindex'
 
+#Timeout for db queries
+TIMEOUT = 30
+
 ###########################################################################################################
 # Server side file locations
 #########################################################################################################

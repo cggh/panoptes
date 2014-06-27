@@ -21,22 +21,16 @@ def response(returndata):
         description = returndata['description']
 
     #Obtain the settings from storeddata
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    authorization.VerifyIsDataSetManager(credInfo, databaseName)
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        authorization.VerifyIsDataSetManager(cur.credentials, databaseName)
+        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
+        sql = 'UPDATE introviews SET name="{name}", section="{section}", description="{description}" WHERE id="{id}"'.format(
+            name=name,
+            section=section,
+            description=description,
+            id=id
+        )
+        cur.execute(sql)
+        cur.commit()
 
-    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
-    cur = db.cursor()
-
-
-    sql = 'UPDATE introviews SET name="{name}", section="{section}", description="{description}" WHERE id="{id}"'.format(
-        name=name,
-        section=section,
-        description=description,
-        id=id
-    )
-    cur.execute(sql)
-    db.commit()
-    db.close()
-
-    return returndata
+        return returndata

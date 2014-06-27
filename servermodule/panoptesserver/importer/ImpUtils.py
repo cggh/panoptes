@@ -122,35 +122,24 @@ class SQLScript:
 
 def ExecuteSQL(calculationObject, database, command):
     calculationObject.LogSQLCommand(database+';'+command)
-    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
-    db.autocommit(True)
-    cur = db.cursor()
-    cur.execute(command)
-    cur.close()
-    db.close()
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database, autocommit=True) as cur:
+        cur.execute(command)
 
 def ExecuteSQLQuery(calculationObject, database, query):
     calculationObject.LogSQLCommand(database+';'+query)
-    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
-    cur = db.cursor()
-    cur.execute(query)
-    result = cur.fetchall()
-    cur.close()
-    db.close()
-    return result
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database) as cur:
+        cur.execute(query)
+        return cur.fetchall()
 
 def ExecuteSQLGenerator(calculationObject, database, commands):
-    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, database)
-    db.autocommit(True)
-    cur = db.cursor()
-    for i, command in enumerate(commands):
-        if i < 5:
-            calculationObject.LogSQLCommand(database+';'+command.func_closure[-1].cell_contents)
-        if i == 5:
-            calculationObject.LogSQLCommand(database+'; Commands truncated...')
-        command(cur)
-    cur.close()
-    db.close()
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database) as cur:
+        for i, command in enumerate(commands):
+            if i < 5:
+                calculationObject.LogSQLCommand(database+';'+command.func_closure[-1].cell_contents)
+            if i == 5:
+                calculationObject.LogSQLCommand(database+'; Commands truncated...')
+            command(cur)
+            cur.commit()
 
 
 def RunConvertor(calculationObject, name, runpath, arguments):
@@ -479,8 +468,7 @@ def mkdir(name):
 
 
 def IsDatasetPresentInServer(credInfo, datasetId):
-    db = DQXDbTools.OpenDatabase(credInfo)
-    cur = db.cursor()
-    cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
-    return cur.fetchone()[0] > 0
+    with DQXDbTools.DBCursor(credInfo, datasetId) as cur:
+        cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
+        return cur.fetchone()[0] > 0
 

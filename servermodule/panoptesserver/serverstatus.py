@@ -26,16 +26,8 @@ def response(returndata):
     try:
 
         # Checks for server database
-        credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-        try:
-            db = DQXDbTools.OpenDatabase(credInfo)
-        except Exception as e:
-            raise Exception('Unable to access server database.\n' + str(e))
-        try:
-            cur = db.cursor()
+        with DQXDbTools.DBCursor(returndata) as cur:
             cur.execute('SELECT id,name FROM datasetindex')
-        except Exception as e:
-            raise Exception('Unable to access server database index.\n' + str(e))
 
         # Checks for DQXServer BASEDIR
         CheckFolderExistence(config.BASEDIR, '[BASEDIR]', False)
@@ -49,8 +41,8 @@ def response(returndata):
         # Try getting auth rules
         authorization.PnAuthRuleSet()
 
-        print('PANOPTES CLIENT APP START: ' + credInfo.GetAuthenticationInfo())
-        returndata['userid'] = credInfo.GetUserId()
+        print('PANOPTES CLIENT APP START: ' + cur.credentials.GetAuthenticationInfo())
+        returndata['userid'] = cur.credentials.GetUserId()
 
 
     except Exception as e:
