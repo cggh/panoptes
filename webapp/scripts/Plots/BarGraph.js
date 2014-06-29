@@ -35,9 +35,9 @@ define([
             that.fetchCount = 0;
             that.showRelative = false;
 
-            that.barW = 16;
-            that.scaleW = 100;
-            that.textH = 130;
+            that.barW = 14;
+            that.scaleW = 20;
+            that.textH = 170;
 
 
             that.createPanelPlot = function() {
@@ -276,7 +276,7 @@ define([
                 if (that.catpropid2)
                     var propInfo2 = MetaData.findProperty(that.tableInfo.id,that.catpropid2);
 
-                that.plotH = drawInfo.sizeY - that.textH - 60;
+                that.plotH = drawInfo.sizeY - that.textH - 40;
 
                 that.hoverItems = [];
 
@@ -285,7 +285,7 @@ define([
                     totcount += cat.count;
                 });
 
-                ctx.font="12px Arial";
+                ctx.font="11px Arial";
                 $.each(that.categories, function(idx, cat) {
                     var sumcount = that.maxcount;
                     if (that.showRelative && (that.catpropid2) )
@@ -313,7 +313,13 @@ define([
                     ctx.save();
                     ctx.translate((px1+px2)/2,py1+5);
                     ctx.rotate(-Math.PI/2);
-                    ctx.fillText(propInfo1.toDisplayString(cat.name),0,0);
+                    var content = cat.name;
+                    var truncateCount = 2;
+                    while ((ctx.measureText(content).width>that.textH-25) && (truncateCount<content.length)) {
+                        truncateCount += 1;
+                        content = DQX.truncateString(content, content.length-truncateCount);
+                    }
+                    ctx.fillText(propInfo1.toDisplayString(content),0,0);
                     ctx.restore();
                     //Draw count
                     ctx.fillStyle="rgb(150,150,150)";
@@ -337,6 +343,15 @@ define([
                         px1:px1, px2:px2, py1:py1+5, py2:py2-5,
                         selectors: selectors
                      });
+                    that.hoverItems.push({
+                        ID: 'i'+DQX.getNextUniqueID(),
+                        px: (px1+px2)/2,
+                        py: py1+that.textH/2,
+                        //showPointer:true,
+                        content: label,
+                        px1:px1, px2:px2, py1:py1+that.textH, py2:py1+1,
+                        selectors: selectors
+                    });
 
                     if (that.catpropid2) {
 //                        var colorMapper = propInfo2.category2Color;
