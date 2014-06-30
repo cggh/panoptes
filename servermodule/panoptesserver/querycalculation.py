@@ -3,6 +3,8 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import asyncresponder
+import os
+import config
 
 def response(returndata):
     info = asyncresponder.GetCalculationInfo(returndata['calculationid'])
@@ -13,4 +15,18 @@ def response(returndata):
         returndata['status'] = info['status']
         returndata['progress'] = info['progress']
         returndata['failed'] = info['failed']
+
+    if 'showlog' in returndata:
+        filename = os.path.join(config.BASEDIR, 'temp', 'log_' + returndata['calculationid'])
+        if os.path.exists(filename):
+            content = ''
+            with open(filename, 'r') as content_file:
+                for line in content_file:
+                    try:
+                        content += line.encode('ascii', 'ignore')
+                    except UnicodeDecodeError as e:
+                        content += '*** Failed to encode: ' + str(e) + '\n'
+
+            returndata['log'] = content
+
     return returndata

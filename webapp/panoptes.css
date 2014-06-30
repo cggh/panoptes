@@ -93,6 +93,12 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#daf0f2', endColorstr='#c0e0e2',GradientType=0 ); /* IE6-9 */
 }
 
+.DQXFloatBoxContent2
+{
+    background:rgb(230,250,252);
+    border: 1px solid rgb(170,170,170);
+}
+
 
 
 .DQXLargeListItemSelected
