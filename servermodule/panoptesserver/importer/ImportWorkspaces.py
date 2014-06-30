@@ -341,10 +341,14 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
             print('Directory not present')
 
         for table in tables:
-            CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, table['id'])
+            CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, table['id'], importSettings)
 
 
-def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tableid):
+def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tableid, importSettings):
+
+    if importSettings['ConfigOnly']:
+        return
+
     print('Checking for materialising of {0},{1},{2}'.format(datasetId, workspaceid, tableid))
     db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
     cur = db.cursor()
