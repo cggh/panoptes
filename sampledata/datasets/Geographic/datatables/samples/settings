@@ -7,7 +7,7 @@ QuickFindFields: ID,CatId,RegionId
 MaxCountQueryRecords: 250000
 MaxCountQueryAggregated: 500000
 AllowSubSampling: Yes
-CacheWorkspaceData: Yes
+CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
 
 Properties:
 

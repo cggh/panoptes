@@ -340,6 +340,53 @@ def ImportWorkspace(calculationObject, datasetId, workspaceid, folder, importSet
         else:
             print('Directory not present')
 
+        for table in tables:
+            CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, table['id'])
+
+
+def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tableid):
+    print('Checking for materialising of {0},{1},{2}'.format(datasetId, workspaceid, tableid))
+    db = DQXDbTools.OpenDatabase(calculationObject.credentialInfo, datasetId)
+    cur = db.cursor()
+    cur.execute('SELECT settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
+    tableSettingsStr = cur.fetchone()[0]
+    tableSettings = SettingsLoader.SettingsLoader()
+    tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
+    #print('Table settings= '+tableSettings)
+    if (tableSettings.HasToken('CacheWorkspaceData')) and (tableSettings['CacheWorkspaceData']):
+        print('Executing materialising')
+        cur.execute('show indexes from {0}'.format(tableid))
+        indexedColumns1 = [indexRow[4] for indexRow in cur.fetchall()]
+        cur.execute('show indexes from {0}INFO_{1}'.format(tableid, workspaceid))
+        indexedColumns2 = [indexRow[4] for indexRow in cur.fetchall()]
+        indexedColumns = set(indexedColumns1+indexedColumns2)
+        print('Indexed columns: ' + str(indexedColumns))
+        tmptable = '_tmptable_'
+        wstable = '{0}CMB_{1}'.format(tableid, workspaceid)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
+        sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+        for indexedColumn in indexedColumns:
+            sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
+
+        if (tableSettings.HasToken('AllowSubSampling')) and (tableSettings['AllowSubSampling']):
+            print('Processing subsampling table')
+            indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
+            tmptable = '_tmptable_'
+            wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceid)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
+            sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+            for indexedColumn in indexedColumnsSubSampling:
+                sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
+
+
 
 def ImportWorkspaces(calculationObject, datasetFolder, datasetId, settings):
 
