@@ -28,7 +28,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
 
                 that.panelList = FrameList(that.frameList);
 
-                var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Add...', bitmap: DQX.BMP('morelines.png'), width:100, height:28 }).setOnChanged(that.onAdd);
+                var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Create from selection...', bitmap: DQX.BMP('morelines.png'), width:100, height:28 }).setOnChanged(that.onAdd);
                 var bt_del = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Delete selected...', bitmap: DQX.BMP('lesslines.png'), width:100, height:28 }).setOnChanged(that.onDel);
 
                 that.panelButtons = Framework.Form(that.frameButtons);
@@ -103,9 +103,48 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                             var id = resp['id'];
                             that.tableInfo.storedSubsets.push({id: id, name: name});
                             that.loadList(id);
+                            that.storeSelection(id, 'replace')
                         });
                 }
             }
+
+
+            that.storeSelection =function (subsetid, method) {
+                var maxSelCount = 50000;
+                var datastring = '';
+                var keylist = tableInfo.getSelectedList();
+                if (keylist.length > maxSelCount)
+                    alert('Selection list will be limited to ' + maxSelCount);
+                $.each(keylist, function(idx, key) {
+                    if(idx <= maxSelCount) {
+                        if (idx > 0)
+                            datastring+='\t';
+                        datastring += key;
+                    }
+                });
+                DQX.setProcessing();
+                DQX.serverDataStoreLong(MetaData.serverUrl,datastring,function(id) {
+                    DQX.stopProcessing();
+                    ServerIO.customAsyncRequest(MetaData.serverUrl,PnServerModule,'subset_store',
+                        {
+                            database: MetaData.database,
+                            workspaceid:MetaData.workspaceid,
+                            tableid: that.tableInfo.id,
+                            subsetid: subsetid,
+                            dataid: id,
+                            method: method
+                        },
+                        function(resp) {
+                        }
+                    );
+
+                    //debugger;
+//                DQX.serverDataFetch(MetaData.serverUrl,id,function(content) {
+//                    alert('content length: '+content.length);
+//                });
+                });
+            }
+
 
             that.create();
 

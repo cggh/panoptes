@@ -15,20 +15,16 @@ def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
-    name = DQXDbTools.ToSafeIdentifier(returndata['name'])
+    subsetid = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
-    # uid = 'EN'+str(uuid.uuid1()).replace('-', '_')
-    # returndata['id'] = uid
+    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
+    cur = db.cursor()
 
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
+    cur.execute('DELETE FROM storedsubsets WHERE subsetid={0}'.format(subsetid))
+    cur.execute('DELETE FROM {0} WHERE subsetid={1}'.format(DBTBESC(tableid+'_subsets'), subsetid))
 
-    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
-        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
-        sql = "INSERT INTO storedsubsets VALUES (0, '{0}', '{1}', '{2}', 0)".format(
-        name, tableid, workspaceid)
-        cur.execute(sql)
-        cur.commit()
+    db.close()
 
-        cur.execute('SELECT MAX(subsetid) FROM storedsubsets')
-        returndata['id'] = cur.fetchone()[0]
-
-        return returndata
+    return returndata
