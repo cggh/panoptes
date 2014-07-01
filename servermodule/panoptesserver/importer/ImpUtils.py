@@ -122,7 +122,8 @@ class SQLScript:
 
 def ExecuteSQL(calculationObject, database, command):
     calculationObject.LogSQLCommand(database+';'+command)
-    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database, autocommit=True) as cur:
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database) as cur:
+        cur.db.autocommit(True)
         cur.execute(command)
 
 def ExecuteSQLQuery(calculationObject, database, query):
