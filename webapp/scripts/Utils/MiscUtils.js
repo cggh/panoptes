@@ -126,6 +126,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             col.CellToText = propInfo.toDisplayString;
             col.CellToTextInv = propInfo.fromDisplayString;
+            if (propInfo.group)
+                col.GroupName = propInfo.group.Name;
 
             if (propInfo.isFloat) {
                 if (propInfo.settings.minval || propInfo.settings.maxval) {
