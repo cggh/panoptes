@@ -13,7 +13,7 @@ import Utils
 
 def response(returndata):
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    credInfo = DQXDbTools.CredentialInformation(returndata)
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     fileid = DQXDbTools.ToSafeIdentifier(returndata['fileid'])

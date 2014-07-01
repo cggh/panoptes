@@ -11,7 +11,7 @@ import DQXbase64
 
 def response(returndata):
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    credInfo = DQXDbTools.CredentialInformation(returndata)
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     authorization.VerifyIsDataSetManager(credInfo, databaseName)
     encodedstr = returndata['content']

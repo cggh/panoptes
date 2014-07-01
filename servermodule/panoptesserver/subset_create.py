@@ -23,20 +23,14 @@ def response(returndata):
     # returndata['id'] = uid
 
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    cur = db.cursor()
-
-
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
-    sql = "INSERT INTO storedsubsets VALUES (0, '{0}', '{1}', '{2}', 0)".format(
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
+        sql = "INSERT INTO storedsubsets VALUES (0, '{0}', '{1}', '{2}', 0)".format(
         name, tableid, workspaceid)
-    cur.execute(sql)
-    db.commit()
+        cur.execute(sql)
+        cur.commit()
 
-    cur.execute('SELECT MAX(subsetid) FROM storedsubsets')
-    returndata['id'] = cur.fetchone()[0]
+        cur.execute('SELECT MAX(subsetid) FROM storedsubsets')
+        returndata['id'] = cur.fetchone()[0]
 
-    db.close()
-
-    return returndata
+        return returndata

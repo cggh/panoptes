@@ -10,7 +10,7 @@ import DQXbase64
 
 def response(returndata):
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    credInfo = DQXDbTools.CredentialInformation(returndata)
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])

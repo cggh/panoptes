@@ -11,7 +11,7 @@ import shutil
 
 def response(returndata):
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
+    credInfo = DQXDbTools.CredentialInformation(returndata)
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
     fileid = DQXDbTools.ToSafeIdentifier(returndata['fileid'])
 
