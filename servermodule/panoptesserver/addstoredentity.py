@@ -25,17 +25,10 @@ def response(returndata):
     returndata['id'] = uid
 
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    cur = db.cursor()
-
-
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
-    sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
+        sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(
         DBTBESC(tablename), uid, name, tableid, workspaceid)
-    cur.execute(sql, [content])
-
-    db.commit()
-    db.close()
-
-    return returndata
+        cur.execute(sql, [content])
+        cur.commit()
+        return returndata

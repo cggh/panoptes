@@ -35,8 +35,7 @@ def desc_to_dtype(desc):
     return dtype[col_type]
 
 
-def index_table_query(db, table, fields, query, order):
-    cur = db.cursor()
+def index_table_query(cur, table, fields, query, order):
     where = DQXDbTools.WhereClause()
     where.ParameterPlaceHolder = '%s'#NOTE!: MySQL PyODDBC seems to require this nonstardard coding
     where.Decode(query)
@@ -51,7 +50,6 @@ def index_table_query(db, table, fields, query, order):
     for i, (field, desc) in enumerate(zip(fields, cur.description)):
         dtype = desc_to_dtype(desc)
         result[field] = np.array([row[i] for row in rows], dtype=dtype)
-    cur.close()
     return result
 
 
@@ -84,12 +82,10 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
     return result
 
 
-def get_table_ids(db, datatable):
-    cur = db.cursor()
+def get_table_ids(cur, datatable):
     sql = 'SELECT col_table, row_table FROM 2D_tablecatalog WHERE id=%s'
     cur.execute(sql, (datatable,))
     result = cur.fetchall()[0]
-    cur.close()
     return result
 
 def get_workspace_table_name(tableid, workspaceid):
@@ -113,31 +109,31 @@ def handler(start_response, request_data):
     row_order = request_data['row_order']
     first_dimension = request_data['first_dimension']
 
-    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(request_data), dataset)
-    col_tableid, row_tableid = get_table_ids(db, datatable)
+    with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
+        col_tableid, row_tableid = get_table_ids(cur, datatable)
 
-    col_tablename = get_workspace_table_name(col_tableid, workspace)
-    row_tablename = get_workspace_table_name(row_tableid, workspace)
+        col_tablename = get_workspace_table_name(col_tableid, workspace)
+        row_tablename = get_workspace_table_name(row_tableid, workspace)
 
-    col_properties.append(datatable + '_column_index')
-    row_properties.append(datatable + '_row_index')
+        col_properties.append(datatable + '_column_index')
+        row_properties.append(datatable + '_row_index')
 
-    col_result = index_table_query(db,
-                                   col_tablename,
-                                   col_properties,
-                                   col_qry,
-                                   col_order)
+        col_result = index_table_query(cur,
+                                       col_tablename,
+                                       col_properties,
+                                       col_qry,
+                                       col_order)
 
-    row_result = index_table_query(db,
-                                   row_tablename,
-                                   row_properties,
-                                   row_qry,
-                                   row_order)
-    col_idx = col_result[datatable + '_column_index']
-    row_idx = row_result[datatable + '_row_index']
-    del col_result[datatable + '_column_index']
-    del row_result[datatable + '_row_index']
-    db.close()
+        row_result = index_table_query(cur,
+                                       row_tablename,
+                                       row_properties,
+                                       row_qry,
+                                       row_order)
+        col_idx = col_result[datatable + '_column_index']
+        row_idx = row_result[datatable + '_row_index']
+        del col_result[datatable + '_column_index']
+        del row_result[datatable + '_row_index']
+
     hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset+'_' + datatable + '.hdf5'), 'r')
 
     two_d_properties = dict((prop, None) for prop in two_d_properties)

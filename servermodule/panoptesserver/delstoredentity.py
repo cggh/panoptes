@@ -3,10 +3,6 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import DQXDbTools
-import uuid
-import os
-import config
-from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 
 
@@ -19,14 +15,9 @@ def response(returndata):
     id = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
 
-    db = DQXDbTools.OpenDatabase(DQXDbTools.ParseCredentialInfo(returndata), databaseName)
-    cur = db.cursor()
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        sql = "DELETE FROM {0} WHERE id='{1}'".format(DBTBESC(tablename), id)
+        cur.execute(sql)
+        cur.commit()
 
-
-    sql = "DELETE FROM {0} WHERE id='{1}'".format(DBTBESC(tablename), id)
-    cur.execute(sql)
-
-    db.commit()
-    db.close()
-
-    return returndata
+        return returndata

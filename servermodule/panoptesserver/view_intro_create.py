@@ -24,33 +24,29 @@ def response(returndata):
     viewstate = DQXDbTools.ToSafeIdentifier(returndata['viewstate'])
 
     #Obtain the settings from storeddata
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    authorization.VerifyIsDataSetManager(credInfo, databaseName)
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        authorization.VerifyIsDataSetManager(cur.credentials, databaseName)
+        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
 
-    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
-    cur = db.cursor()
-
-    sqlstring = 'SELECT max(ordr) FROM introviews WHERE workspaceid="{0}"'.format(workspaceid)
-    cur.execute(sqlstring)
-    rank = 0
-    dbrank = cur.fetchone()[0]
-    if dbrank is not None:
-        rank = dbrank+1
+        sqlstring = 'SELECT max(ordr) FROM introviews WHERE workspaceid="{0}"'.format(workspaceid)
+        cur.execute(sqlstring)
+        rank = 0
+        dbrank = cur.fetchone()[0]
+        if dbrank is not None:
+            rank = dbrank+1
 
 
-    sql = 'INSERT INTO introviews VALUES (0, "{workspace}", "{name}", "{section}", "{description}", {rank}, "{url}", "{id}", "{state}")'.format(
-        workspace=workspaceid,
-        name=name,
-        section=section,
-        description=description,
-        rank=rank,
-        url=url,
-        id=storeid,
-        state=viewstate
-    )
-    cur.execute(sql)
-    db.commit()
-    db.close()
+        sql = 'INSERT INTO introviews VALUES (0, "{workspace}", "{name}", "{section}", "{description}", {rank}, "{url}", "{id}", "{state}")'.format(
+            workspace=workspaceid,
+            name=name,
+            section=section,
+            description=description,
+            rank=rank,
+            url=url,
+            id=storeid,
+            state=viewstate
+        )
+        cur.execute(sql)
+        cur.commit()
 
-    return returndata
+        return returndata

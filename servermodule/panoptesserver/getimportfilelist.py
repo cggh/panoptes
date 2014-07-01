@@ -22,59 +22,56 @@ def response(returndata):
             pass
         return maxtime
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-
     # Obtain info about last import actions for all datasets
-    db = DQXDbTools.OpenDatabase(credInfo)
-    cur = db.cursor()
-    datasetImportTimes = {}
-    try:
-        cur.execute('SELECT id,importtime FROM datasetindex')
-        for row in cur.fetchall():
-            if credInfo.CanDo(DQXDbTools.DbOperationRead(row[0])):
-                if (row[1] is not None) and (len(row[1]) > 0):
-                    datasetImportTimes[row[0]] = float(row[1])
-                else:
-                    datasetImportTimes[row[0]] = 0
-    except Exception as e:
-        returndata['Error'] = 'Unable to obtain import time data\n(' + str(e) +')'
+    with DQXDbTools.DBCursor(returndata) as cur:
+        datasetImportTimes = {}
+        try:
+            cur.execute('SELECT id,importtime FROM datasetindex')
+            for row in cur.fetchall():
+                if cur.credentials.CanDo(DQXDbTools.DbOperationRead(row[0])):
+                    if (row[1] is not None) and (len(row[1]) > 0):
+                        datasetImportTimes[row[0]] = float(row[1])
+                    else:
+                        datasetImportTimes[row[0]] = 0
+        except Exception as e:
+            returndata['Error'] = 'Unable to obtain import time data\n(' + str(e) +')'
+            return returndata
+
+        try:
+            baseFolder = config.SOURCEDATADIR + '/datasets'
+            datasets = {}
+            for datasetid in os.listdir(baseFolder):
+                if os.path.isdir(os.path.join(baseFolder, datasetid)):
+                    if authorization.CanDo(cur.credentials, DQXDbTools.DbOperationWrite(datasetid, 'workspaces')).IsGranted():
+                        datasets[datasetid] = { 'workspaces': {} }
+                        if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces')):
+                            for wsid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces')):
+                                if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid)):
+                                    workspace = { 'sources': {} }
+                                    datasets[datasetid]['workspaces'][wsid] = workspace
+                                    if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
+                                        for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
+                                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
+                                                for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
+                                                    if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
+                                                        workspace['sources'][sourceid] = { 'tableid': tableid }
+                        # Fetch info about datatables
+                        datatables = {}
+                        if os.path.exists(os.path.join(baseFolder, datasetid, 'datatables')):
+                            for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'datatables')):
+                                if os.path.isdir(os.path.join(baseFolder, datasetid, 'datatables', tableid)):
+                                    datatables[tableid] = {}
+                        datasets[datasetid]['datatables'] = datatables
+                        importStatus = 'absent'
+                        lastModifiedTime = GetLastModifiedFileInTree(os.path.join(baseFolder, datasetid))
+                        if datasetid in datasetImportTimes:
+                            importStatus = 'outdated'
+                            if datasetImportTimes[datasetid] > lastModifiedTime:
+                                importStatus = 'ok'
+                        datasets[datasetid]['importstatus'] = importStatus
+            returndata['datasets'] = datasets
+        except Exception as e:
+            returndata['Error'] = str(e)
+
+
         return returndata
-
-    try:
-        baseFolder = config.SOURCEDATADIR + '/datasets'
-        datasets = {}
-        for datasetid in os.listdir(baseFolder):
-            if os.path.isdir(os.path.join(baseFolder, datasetid)):
-                if authorization.CanDo(credInfo, DQXDbTools.DbOperationWrite(datasetid, 'workspaces')).IsGranted():
-                    datasets[datasetid] = { 'workspaces': {} }
-                    if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces')):
-                        for wsid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces')):
-                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid)):
-                                workspace = { 'sources': {} }
-                                datasets[datasetid]['workspaces'][wsid] = workspace
-                                if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
-                                    for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
-                                        if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                            for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                                if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
-                                                    workspace['sources'][sourceid] = { 'tableid': tableid }
-                    # Fetch info about datatables
-                    datatables = {}
-                    if os.path.exists(os.path.join(baseFolder, datasetid, 'datatables')):
-                        for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'datatables')):
-                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'datatables', tableid)):
-                                datatables[tableid] = {}
-                    datasets[datasetid]['datatables'] = datatables
-                    importStatus = 'absent'
-                    lastModifiedTime = GetLastModifiedFileInTree(os.path.join(baseFolder, datasetid))
-                    if datasetid in datasetImportTimes:
-                        importStatus = 'outdated'
-                        if datasetImportTimes[datasetid] > lastModifiedTime:
-                            importStatus = 'ok'
-                    datasets[datasetid]['importstatus'] = importStatus
-        returndata['datasets'] = datasets
-    except Exception as e:
-        returndata['Error'] = str(e)
-
-
-    return returndata

@@ -7,16 +7,13 @@ import DQXDbTools
 
 def response(returndata):
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    db = DQXDbTools.OpenDatabase(credInfo)
-    cur = db.cursor()
+    with DQXDbTools.DBCursor(returndata) as cur:
+        list = []
+        cur.execute('SELECT id,name FROM datasetindex')
+        for row in cur.fetchall():
+            if cur.credentials.CanDo(DQXDbTools.DbOperationRead(row[0])):
+                list.append({'id': row[0], 'name': row[1]})
 
-    list = []
-    cur.execute('SELECT id,name FROM datasetindex')
-    for row in cur.fetchall():
-        if credInfo.CanDo(DQXDbTools.DbOperationRead(row[0])):
-            list.append({'id': row[0], 'name': row[1]})
+        returndata['datasets'] = list
 
-    returndata['datasets'] = list
-
-    return returndata
+        return returndata
