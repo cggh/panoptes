@@ -17,14 +17,12 @@ def response(returndata):
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     subsetid = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
-    credInfo = DQXDbTools.ParseCredentialInfo(returndata)
-    db = DQXDbTools.OpenDatabase(credInfo, databaseName)
-    cur = db.cursor()
-
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
-    cur.execute('DELETE FROM storedsubsets WHERE subsetid={0}'.format(subsetid))
-    cur.execute('DELETE FROM {0} WHERE subsetid={1}'.format(DBTBESC(tableid+'_subsets'), subsetid))
-
-    db.close()
+    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+        cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
+        sql = 'DELETE FROM storedsubsets WHERE subsetid={0}'.format(subsetid)
+        cur.execute(sql)
+        sql = 'DELETE FROM {0} WHERE subsetid={1}'.format(DBTBESC(tableid+'_subsets'), subsetid)
+        cur.execute(sql)
+        cur.commit()
 
     return returndata
