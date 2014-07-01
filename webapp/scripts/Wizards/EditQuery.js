@@ -24,8 +24,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 //that.panelBody = Framework.Form(that.frameBody).setPadding(10);
                 that.panelButtons = Framework.Form(that.frameButtons);
 
+                var subsetList = that.tableInfo.storedSubsets;
                 that.builder = MetaData.getTableInfo(that.tableInfo.id).tableViewer.panelTable.createPanelAdvancedQuery(that.frameBody, function() {
-                }, true);
+                }, true, {
+                    subsetTableName: that.tableInfo.id+'_subsets',
+                    primKey: that.tableInfo.primkey,
+                    subsetList: subsetList
+                });
                 that.builder.setQuery(that.query);
 
                 var bt_cancel = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Cancel', bitmap: DQX.BMP('cancel.png'), width:80, height:25 }).setOnChanged(function() {

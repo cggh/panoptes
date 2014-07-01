@@ -269,6 +269,9 @@ require([
                             );
 
                             getter.addTable('externallinks',['linktype','linkname','linkurl'],'linkname');
+
+                            getter.addTable('storedsubsets',['subsetid','name', 'tableid'], 'name', SQL.WhereClause.CompareFixed('workspaceid', '=', MetaData.workspaceid));
+
                             getter.execute(MetaData.serverUrl,MetaData.database,
                                 function() { // Upon completion of data fetching
                                     MetaData.externalLinks = getter.getTableRecords('externallinks');
@@ -281,6 +284,7 @@ require([
                                     Initialise.parse2DProperties();
                                     Initialise.parseTableBasedSummaryValues();
                                     Initialise.parseRelations(getter.getTableRecords('relations'));
+                                    Initialise.parseStoredSubsets(getter.getTableRecords('storedsubsets'));
                                     if (proceedFunction)
                                         Initialise.waitForCompletion(proceedFunction);
                                 }

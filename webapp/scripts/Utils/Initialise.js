@@ -565,8 +565,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 parentTableInfo.relationsParentOf.push(relationInfo);
                 MetaData.findProperty(childTableInfo.id, relationInfo.childpropid).relationParentTableId = parentTableInfo.id;
             });
-        }
+        };
 
+        Initialise.parseStoredSubsets = function(data) {
+            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                tableInfo.storedSubsets = [];
+            });
+            $.each(data, function(idx, subsetInfo) {
+                var tableInfo = MetaData.mapTableCatalog[subsetInfo.tableid];
+                if (tableInfo) {
+                    tableInfo.storedSubsets.push({
+                        id: subsetInfo.subsetid,
+                        name: subsetInfo.name
+                    });
+                }
+            });
+        };
 
 
         Initialise.parseTableBasedSummaryValues = function() {

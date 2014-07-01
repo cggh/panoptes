@@ -35,6 +35,8 @@ def CanDo(credInfo, operation):
             return DQXDbTools.DbAuthorization(True)
     if operation.OnTable('storedqueries'):
         return DQXDbTools.DbAuthorization(True)
+    if operation.OnTable('storedsubsets'):
+        return DQXDbTools.DbAuthorization(True)
 
     authRules = PnAuthRuleSet()
 

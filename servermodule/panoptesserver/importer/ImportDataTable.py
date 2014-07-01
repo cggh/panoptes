@@ -11,6 +11,8 @@ import ImpUtils
 import LoadTable
 import shutil
 import customresponders.panoptesserver.Utils as Utils
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
 
 
 tableOrder = 0
@@ -159,6 +161,19 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                     tableSettings['Position']
                 ))
                 scr.Execute(datasetId)
+
+            print('Creating subsets table')
+            subsetTableName = tableid + '_subsets'
+            primKey = tableSettings['PrimKey']
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(DBTBESC(subsetTableName)))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
+                subsettable=DBTBESC(subsetTableName),
+                primkey=DBCOLESC(primKey),
+                table=DBTBESC(tableid)
+            ))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE INDEX primkey ON {0}({1})'.format(DBTBESC(subsetTableName), DBCOLESC(primKey)))
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE INDEX subsetid ON {0}(subsetid)'.format(DBTBESC(subsetTableName)))
 
 
 

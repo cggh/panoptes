@@ -55,6 +55,14 @@ CREATE TABLE `storedqueries` (
   `content` text
 );
 
+CREATE TABLE `storedsubsets` (
+  `subsetid` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50),
+  `tableid` varchar(50),
+  `workspaceid` varchar(50),
+  `membercount` int,
+  PRIMARY KEY (`subsetid`)
+);
 
 
 CREATE TABLE `summaryvalues` (

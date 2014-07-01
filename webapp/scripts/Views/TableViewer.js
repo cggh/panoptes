@@ -3,11 +3,11 @@
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/PopupFrame", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Wizards/EditQuery", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools", "Utils/ButtonChoiceBox"
+    "Wizards/EditQuery", "Wizards/ManageStoredSubsets", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools", "Utils/ButtonChoiceBox"
 ],
     function (require, Application, Framework, Controls, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable, QueryBuilder, DataFetchers,
               MetaData,
-              EditQuery, QueryTool, MiscUtils, SelectionTools, ButtonChoiceBox
+              EditQuery, ManageStoredSubsets, QueryTool, MiscUtils, SelectionTools, ButtonChoiceBox
         ) {
 
 
@@ -189,6 +189,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
+                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Subsets...', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
+                    buttonManageStoredSubsets.setOnChanged(function() {
+                        ManageStoredSubsets.manage(that.tableid);
+                    });
+
                     var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         var subSamplingOptions = null;
@@ -200,7 +205,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         });
                     });
 
-                    var ctrlQuery = that.theQuery.createQueryControl({}, [buttonCreatePlot]);
+                    var ctrlQuery = that.theQuery.createQueryControl({}, [buttonManageStoredSubsets, buttonCreatePlot]);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
 
