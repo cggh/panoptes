@@ -183,7 +183,7 @@ class CalculationThread (threading.Thread):
     def SetInfo(self, status, progress=None):
         logentry = status
         if progress is not None:
-            logentry += ' '+str(progress)
+            logentry += ' '+str(round(progress*100.0,1)) + '%'
         print(logentry)
         theCalculationThreadList.SetInfo(self.id, status, progress)
 

@@ -100,12 +100,17 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
+.DQXLargeListItem
+{
+    padding:7px;
+    padding-bottom:10px;
+}
 
 .DQXLargeListItemSelected
 {
     color:Black;
-    padding:4px;
-    padding-bottom:8px;
+    padding:7px;
+    padding-bottom:10px;
     background: rgb(140,195,200);
     /*background: rgb(223,175,30);*/
     /*background: rgb(196,208,252); *//* Old browsers */
