@@ -76,7 +76,6 @@ def ResponseExecute(returndata, calculationObject):
                         submitkeys(keysublist)
                         keysublist = []
                         calculationObject.SetInfo('Storing', keyNr*1.0/len(keys))
-                        calculationObject.Log('Stored {0} items'.format(keyNr))
                     keyNr += 1
             submitkeys(keysublist)
 
