@@ -2,8 +2,14 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery", "MetaData"],
-    function (require, base64, Application, Framework, FrameList, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery, MetaData) {
+define([
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "Wizards/EditQuery", "MetaData", "DQX/ServerIO"
+],
+    function (
+        require, base64, Application, Framework, FrameList, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+              EditQuery, MetaData, ServerIO
+        ) {
 
         var ManageStoredSubsets = {};
 
@@ -122,6 +128,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                         datastring += key;
                     }
                 });
+
+                var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
+
                 DQX.setProcessing();
                 DQX.serverDataStoreLong(MetaData.serverUrl,datastring,function(id) {
                     DQX.stopProcessing();
@@ -130,9 +139,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
                             database: MetaData.database,
                             workspaceid:MetaData.workspaceid,
                             tableid: that.tableInfo.id,
+                            keyid: that.tableInfo.primkey,
                             subsetid: subsetid,
                             dataid: id,
-                            method: method
+                            method: method,
+                            isnumericalkey: isnumericalkey?1:0
                         },
                         function(resp) {
                         }
