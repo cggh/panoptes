@@ -17,8 +17,9 @@ echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
 mkdir -p webapp/scripts/Local
 cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
-rm -rf build
 mkdir -p build
+rm -rf build/DQX
+rm -rf build/DQXServer
 cd build
 
 echo -e "${green}  Fetching dependancies${NC}"
@@ -45,9 +46,9 @@ git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 
 echo -e "${green}    Python dependancies${NC}"
 cd .. 
-virtualenv DQXServer
+virtualenv virtualenv
+source virtualenv/bin/activate
 cd DQXServer
-source bin/activate
 echo -e "${green}      DQXServer requirements...${NC}"
 pip install -q -r REQUIREMENTS
 #Extra ones for custom responder
