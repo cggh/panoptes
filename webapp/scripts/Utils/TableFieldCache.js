@@ -33,6 +33,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.requestAll = function(fieldid, notifyReady) {
+                var isNumericalPrimKey = !!(MetaData.findProperty(tableInfo.id, tableInfo.primkey).isFloat);
                 if (!that._fieldStatus[fieldid]) {//not yet fetched - initiate now
                     that._fieldStatus[fieldid] = {
                         fetched: false,
@@ -44,7 +45,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.tableInfo.getQueryTableName(false)
                     );
                     //fetcher.setMaxResultCount(that.maxrecordcount);
-                    fetcher.addColumn(that.tableInfo.primkey, 'ST');
+                    fetcher.addColumn(that.tableInfo.primkey, isNumericalPrimKey?'IN':'ST');
                     fetcher.addColumn(fieldid, 'ST');
                     fetcher.getData(SQL.WhereClause.Trivial(), that.tableInfo.primkey,
                         function (data) { //success

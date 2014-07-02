@@ -236,7 +236,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (theQueryObject.isSubSampling())
                 orderField = 'RandPrimKey';
 
-            fetcher.addColumn(tableInfo.primkey, 'ST');
+            var isNumericalPrimKey = !!(MetaData.findProperty(tableInfo.id, tableInfo.primkey).isFloat);
+
+            fetcher.addColumn(tableInfo.primkey, isNumericalPrimKey?'IN':'ST');
             DQX.setProcessing();
             fetcher.getData(theQueryObject.getForFetching(), orderField,
                 function (data) { //success

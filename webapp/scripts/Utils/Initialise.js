@@ -77,7 +77,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.currentQuery = SQL.WhereClause.Trivial();
             table.currentSelection = {};
 
-
             table.tableNameSingle = table.name;
             table.tableNamePlural = table.name;
             if (table.settings.NameSingle)
