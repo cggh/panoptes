@@ -124,7 +124,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
                     var choices = [];
 
 
