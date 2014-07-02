@@ -220,8 +220,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               data += '#Dataset: ' + MetaData.database + '\n';
               data += '#Workspace: ' + MetaData.workspaceid + '\n';
               data += '#Table:' + that.table_info.tableCapNamePlural + '\n';
-              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.model.query.col_query.toDisplayString() + '\n';
-              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.model.query.row_query.toDisplayString() + '\n';
+              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.query.col_query) + '\n';
+              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.query.row_query) + '\n';
               data += '#Choromosome:' + that.model.chrom + '\n';
               data += '#Start:' + Math.floor(that.model.col_start) + '\n';
               data += '#End:' + Math.ceil(that.model.col_end) + '\n';

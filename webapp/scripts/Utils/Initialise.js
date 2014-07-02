@@ -179,6 +179,40 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             }
 
+            //Returns a query clause that restricts to a given subset
+            table.createSubsetWhereclause = function(subsetid) {
+                var wc = SQL.WhereClause.InSubset();
+                wc.SubsetTable = table.id + '_subsets';
+                wc.PrimKey = table.primkey;
+                wc.Subset = subsetid;
+                return wc;
+            }
+
+            table.createQueryDisplayString = function(qry) {
+                if ((!qry) || (qry.isTrivial))
+                    return 'All';
+                var nameMap = {};
+                $.each(MetaData.customProperties,function(idx, propInfo) {
+                    if (propInfo.tableid == table.id)
+                        nameMap[propInfo.propid] = {
+                            name: propInfo.name,
+                            toDisplayString: propInfo.toDisplayString
+                        };
+                });
+                var subsetMap = {};
+                $.each(table.storedSubsets, function(idx, subset) {
+                    subsetMap[subset.id] = {
+                        name: subset.name
+                    };
+                });
+                var queryData = {
+                    fieldInfoMap: nameMap,
+                    subsetMap: subsetMap
+                };
+                return qry.toQueryDisplayString(queryData, 0);
+                // qry.toQueryDisplayString(nameMap,0)
+            }
+
             table.propertyGroups = [];
             table.propertyGroupMap = {};
             if (table.settings.PropertyGroups) {

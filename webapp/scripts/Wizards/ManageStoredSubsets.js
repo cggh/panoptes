@@ -33,6 +33,7 @@ define([
             that.createPanels = function() {
 
                 that.panelList = FrameList(that.frameList);
+                that.panelList.setOnOpen(that.handleOpenSubset);
 
                 var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Create from selection...', bitmap: DQX.BMP('morelines.png'), width:100, height:28 }).setOnChanged(that.onAdd);
                 var bt_del = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Delete selected...', bitmap: DQX.BMP('lesslines.png'), width:100, height:28 }).setOnChanged(that.onDel);
@@ -114,6 +115,19 @@ define([
                 }
             }
 
+            that.handleOpenSubset = function() {
+                var id = that.panelList.getActiveItem();
+                if (id) {
+                    var query = that.tableInfo.createSubsetWhereclause(id);
+                    Msg.send({type: 'DataItemTablePopup'}, {
+                        tableid: that.tableInfo.id,
+                        query: query,
+                        subSamplingOptions: null,
+                        title: tableInfo.tableCapNamePlural + ' subset'
+                    });
+                    that.close();
+                }
+            }
 
             that.storeSelection =function (subsetid, method) {
                 var maxSelCount = 50000;

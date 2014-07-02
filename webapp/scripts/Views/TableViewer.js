@@ -255,19 +255,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 //Returns a user-friendly text description of a query
                 that.getQueryDescription = function(qry) {
                     var str = '<div style="background-color: rgb(255,240,230);width:100%">';
-                    if (!qry.isTrivial) {
-                        nameMap = {};
-                        $.each(MetaData.customProperties,function(idx,propInfo) {
-                            if (propInfo.tableid == that.tableid)
-                                nameMap[propInfo.propid] = {
-                                    name: propInfo.name,
-                                    toDisplayString: propInfo.toDisplayString
-                                };
-                        });
-                        str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">'+qry.toDisplayString(nameMap,0)+'</span>';
-                    } else {
-                      str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">All</span>'
-                    }
+                    str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
                     str += '</div>';
                     return str;
                 };
