@@ -66,7 +66,7 @@ define([
                 var items = [];
                 $.each(that.tableInfo.storedSubsets, function(idx, subset) {
                     var content = '<div style="display:inline;margin-top:2px">'+subset.name+'</div>';
-                    if (subset.membercount!=null) {
+                    if (subset.membercount!==null) {
                         countstring = subset.membercount;
                         if (subset.membercount>MetaData.subset_membercount_maxcount)
                             countstring = '>'+ MetaData.subset_membercount_maxcount;

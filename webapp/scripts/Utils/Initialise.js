@@ -609,7 +609,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (tableInfo) {
                     tableInfo.storedSubsets.push({
                         id: subsetInfo.subsetid,
-                        name: subsetInfo.name
+                        name: subsetInfo.name,
+                        membercount: null
                     });
                 }
             });
@@ -625,6 +626,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         $.each(tableInfo.storedSubsets, function(idx, subset) {
                             if (subsetinfo[subset.id])
                                 subset.membercount = subsetinfo[subset.id];
+                            else
+                                subset.membercount = 0;
                         })
                     });
             });
