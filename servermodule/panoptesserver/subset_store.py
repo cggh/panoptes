@@ -104,6 +104,17 @@ def ResponseExecute(returndata, calculationObject):
                         keyNr += 1
                 submitkeys(keysublist)
 
+        maxcount = 50000
+        cur.execute('SELECT count(*) FROM (SELECT * FROM {membertable} WHERE subsetid={subsetid} LIMIT {maxcount}) AS _tmptable_'.format(
+            membertable=DBTBESC(subsetTable),
+            subsetid=subsetid,
+            maxcount=maxcount+1
+        ))
+        count = int(cur.fetchone()[0])
+
+        return {
+            'membercount': count
+        }
 
 
 

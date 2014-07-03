@@ -57,7 +57,7 @@ CREATE TABLE `storedqueries` (
 
 CREATE TABLE `storedsubsets` (
   `subsetid` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50),
+  `name` varchar(150),
   `tableid` varchar(50),
   `workspaceid` varchar(50),
   `membercount` int,
