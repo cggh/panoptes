@@ -312,7 +312,7 @@ require([
                 }
                 });
                 actions.push( { content:'Load new instance', bitmap:'Bitmaps/actionbuttons/reload.png', handler:function() {
-                    window.open('main.html');
+                    window.open('index.html');
                 }
                 });
                 actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
