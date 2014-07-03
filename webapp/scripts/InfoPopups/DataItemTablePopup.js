@@ -73,7 +73,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.frameBody = frameTop.addMemberFrame(Framework.FrameFinal('', 0.7));
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 65).setFrameClassClient('DQXGrayClient');
+                    .setFixedSize(Framework.dimY, 53).setFrameClassClient('DQXGrayClient');
             };
 
             that.createPanels = function() {
@@ -120,11 +120,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
+                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
                     var choices = [];
 
 
@@ -174,7 +174,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, {
                         query: that.theQuery.get(),
                         tableid: that.tableInfo.id,
@@ -184,7 +184,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons = Framework.Form(that.frameButtons);
                 that.panelButtons.addControl(Controls.CompoundHor([
-                    Controls.HorizontalSeparator(7),
                     button_Selection,
                     button_ShowInTableViewer,
                     button_Showplots

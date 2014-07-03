@@ -119,6 +119,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.childRelationTabs.push(relTab);
                 });
 
+                that.frameSubsets = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
+                    .setDisplayTitle('Subsets');
             };
 
             that.createPanels = function() {
@@ -240,6 +242,56 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $.each(that.itemViewObjects, function(idx, dtViewObject) {
                     dtViewObject.createPanels();
                 });
+
+                that.createSubsetsControls();
+            }
+
+            that.createSubsetsControls = function() {
+                that.panelSubsets = Framework.Form(that.frameSubsets);
+
+                var subsetCheckList = [];
+                var subsetCheckMap = {};
+                $.each(that.tableInfo.storedSubsets, function(idx, subset) {
+                    var chk = Controls.Check(null, {label:subset.name});
+                    subsetCheckList.push(chk);
+                    subsetCheckMap[subset.id] = chk;
+                    chk.modifyEnabled(false);
+                    chk.setOnChanged(function() {
+//                        DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_modifyitemselection',
+//                            {
+//                                database: MetaData.database,
+//                                tableid: that.tableInfo.id,
+//                                workspaceid: MetaData.workspaceid,
+//                                itemid: that.itemid,
+//                                isnumericalkey: isnumericalkey?1:0,
+//                                primkey: that.tableInfo.primkey
+//                            }
+//                            , function(resp) {
+//                            });
+                    });
+                });
+                that.panelSubsets.addControl(Controls.CompoundVert(subsetCheckList));
+
+                var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
+                DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_getitemselection',
+                    {
+                        database: MetaData.database,
+                        tableid: that.tableInfo.id,
+                        workspaceid: MetaData.workspaceid,
+                        itemid: that.itemid,
+                        isnumericalkey: isnumericalkey?1:0,
+                        primkey: that.tableInfo.primkey
+                    }
+                    , function(resp) {
+                        $.each(subsetCheckList, function(idx, chk) {
+                            chk.modifyEnabled(true);
+                        })
+                        $.each(resp.subsetmemberlist, function(idx, activesubset) {
+                            if (subsetCheckMap[activesubset])
+                                subsetCheckMap[activesubset].modifyValue(true, true);
+                        });
+                    });
+
             }
 
             that.createPanelsRelations = function() {
