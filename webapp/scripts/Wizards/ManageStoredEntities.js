@@ -17,6 +17,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
+
                 that.frameList = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))

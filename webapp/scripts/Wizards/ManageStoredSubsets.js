@@ -24,7 +24,10 @@ define([
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
-                that.frameList = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
+                var frameGroupTop = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setSeparatorSize(2);
+                that.frameInfo = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.01)).setFrameClassClient('InfoBox')
+                .setMargins(8).setAutoSize().setAllowScrollBars(false, false);
+                that.frameList = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.99))
                     .setAllowScrollBars(false,false);
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setFixedSize(Framework.dimY, 47).setFrameClassClient('DQXGrayClient')
@@ -32,6 +35,10 @@ define([
             };
 
             that.createPanels = function() {
+
+                var panelInfo = Framework.Form(this.frameInfo);
+                panelInfo.addHtml("A subset is a named collection of {names} that is saved on the server, and can be shared with other users.".DQXformat({names: that.tableInfo.tableNamePlural}));
+                panelInfo.render();
 
                 that.panelList = FrameList(that.frameList);
                 that.panelList.setOnOpen(that.handleOpenSubset);
@@ -65,7 +72,11 @@ define([
             that.loadList = function(selId) {
                 var items = [];
                 $.each(that.tableInfo.storedSubsets, function(idx, subset) {
-                    items.push({id:subset.id, content:subset.name});
+                    items.push({
+                        id:subset.id,
+                        content:subset.name,
+                        icon:'Bitmaps/list.png'
+                    });
                 });
                 that.panelList.setItems(items, selId);
                 that.panelList.render();

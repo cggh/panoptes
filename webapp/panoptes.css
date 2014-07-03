@@ -111,16 +111,18 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     color:Black;
     padding:7px;
     padding-bottom:10px;
-    background: rgb(140,195,200);
-    /*background: rgb(223,175,30);*/
-    /*background: rgb(196,208,252); *//* Old browsers */
-    /*background: -moz-linear-gradient(top, rgba(200,215,255,1) 0%, rgba(164,181,234,1) 100%); *//* FF3.6+ */
-    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(200,215,255,1)), color-stop(100%,rgba(164,181,234,1))); *//* Chrome,Safari4+ */
-    /*background: -webkit-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* Chrome10+,Safari5.1+ */
-    /*background: -o-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* Opera 11.10+ */
-    /*background: -ms-linear-gradient(top, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* IE10+ */
-    /*background: linear-gradient(to bottom, rgba(200,215,255,1) 0%,rgba(164,181,234,1) 100%); *//* W3C */
-    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4d0fc', endColorstr='#a4b5ea',GradientType=0 ); *//* IE6-9 */
+
+
+    background: #9fdae0; /* Old browsers */
+    background: -moz-linear-gradient(top,  #9fdae0 0%, #90c7cc 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#9fdae0), color-stop(100%,#90c7cc)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #9fdae0 0%,#90c7cc 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #9fdae0 0%,#90c7cc 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #9fdae0 0%,#90c7cc 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #9fdae0 0%,#90c7cc 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9fdae0', endColorstr='#90c7cc',GradientType=0 ); /* IE6-9 */
+
+
 
     /*font-size:8pt;*/
     cursor:pointer;
@@ -510,4 +512,10 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 {
     background-color: rgb(140,220,230);
     height:14px;
+}
+
+.InfoBox
+{
+    color: rgb(100,100,100);
+    background-color: rgb(230,230,230);
 }
