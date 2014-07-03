@@ -189,12 +189,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Subsets...', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/list2.png' });
+                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Subsets...', buttonClass: 'PnButtonGrid', width:100, height:35, bitmap:'Bitmaps/list2.png' });
                     buttonManageStoredSubsets.setOnChanged(function() {
                         ManageStoredSubsets.manage(that.tableid);
                     });
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'PnButtonGrid', width:100, height:35, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         var subSamplingOptions = null;
                         if (that.theQuery.isSubSampling())
@@ -205,7 +205,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         });
                     });
 
-                    var ctrlQuery = that.theQuery.createQueryControl({}, [buttonManageStoredSubsets, buttonCreatePlot]);
+                    var ctrlQuery = that.theQuery.createQueryControl({}, [Controls.CompoundHor([buttonCreatePlot, buttonManageStoredSubsets])]);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
 

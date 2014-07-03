@@ -51,19 +51,12 @@ define([
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
-//                var bt_close = Controls.Button(null, { buttonClass: 'PnButtonGrid', content: 'Close', /*width:80,*/ height:buttonH }).setOnChanged(function() {
-//                    that.close();
-//                });
-
                 that.panelButtons.addControl(Controls.CompoundHor([
                     bt_open,
                     bt_add,
                     bt_edit,
                     bt_del
                 ]));
-//                that.panelButtons.addControl(Controls.AlignRight(Controls.CompoundHor([
-//                    bt_close,
-//                ])));
 
                 that.loadList();
 
@@ -72,9 +65,16 @@ define([
             that.loadList = function(selId) {
                 var items = [];
                 $.each(that.tableInfo.storedSubsets, function(idx, subset) {
+                    var content = '<div style="display:inline;margin-top:2px">'+subset.name+'</div>';
+                    if (subset.membercount!==null) {
+                        countstring = subset.membercount;
+                        if (subset.membercount>MetaData.subset_membercount_maxcount)
+                            countstring = '>'+ MetaData.subset_membercount_maxcount;
+                        content += '<div style="margin-left:40px;margin-top:3px;color:rgb(120,120,120)">{count} {names}</div>'.DQXformat({count: countstring, names: that.tableInfo.tableNamePlural});
+                    }
                     items.push({
                         id:subset.id,
-                        content:subset.name,
+                        content:content,
                         icon:'Bitmaps/list.png'
                     });
                 });
@@ -263,6 +263,19 @@ define([
                             isnumericalkey: isnumericalkey?1:0
                         },
                         function(resp) {
+                            DQX.customRequest(MetaData.serverUrl,PnServerModule,'subset_fetchmembercount',
+                                {
+                                    database: MetaData.database,
+                                    workspaceid: MetaData.workspaceid,
+                                    tableid: that.tableInfo.id,
+                                    subsetid: subsetid
+                                }, function(resp) {
+                                    $.each(that.tableInfo.storedSubsets, function(idx, subset) {
+                                        if (subset.id == subsetid)
+                                            subset.membercount = resp.membercount;
+                                    });
+                                    that.loadList();
+                                });
                         }
                     );
                 });

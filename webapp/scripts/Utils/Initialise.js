@@ -609,9 +609,27 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (tableInfo) {
                     tableInfo.storedSubsets.push({
                         id: subsetInfo.subsetid,
-                        name: subsetInfo.name
+                        name: subsetInfo.name,
+                        membercount: null
                     });
                 }
+            });
+            //Fetch member count of each subset
+            DQX.customRequest(MetaData.serverUrl,PnServerModule,'subset_fetchallmembercounts',
+                {
+                    database: MetaData.database,
+                    workspaceid: MetaData.workspaceid
+                }, function(resp) {
+                    MetaData.subset_membercount_maxcount = resp['maxcount'];
+                    $.each(resp.info, function(tableid, subsetinfo) {
+                        var tableInfo = MetaData.mapTableCatalog[tableid];
+                        $.each(tableInfo.storedSubsets, function(idx, subset) {
+                            if (subsetinfo[subset.id])
+                                subset.membercount = subsetinfo[subset.id];
+                            else
+                                subset.membercount = 0;
+                        })
+                    });
             });
         };
 
