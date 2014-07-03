@@ -63,7 +63,7 @@ cp scripts/deploy_default/config.py config.py
 
 ./scripts/build.sh
 
-cp scripts/deploy_default/_SetServerUrl.js build/DQXServer/static/scripts/Local/_SetServerUrl.js
+cp scripts/deploy_default/_SetServerUrl.js build/DQXServer/scripts/Local/_SetServerUrl.js
 
 cp /etc/apache2/sites-enabled/000-default /panoptes/bck_000-default
 cp scripts/deploy_default/apache_settings /etc/apache2/sites-enabled/000-default
@@ -72,4 +72,4 @@ ln -s /panoptes/source/build/DQXServer /var/www
 
 /etc/init.d/apache2 restart
 
-echo -e "${green}Serving from [ServerName]/DQXServer/app/static/main.html or [ServerName]/panoptes/main.html${NC}"
+echo -e "${green}Serving from [ServerName]/DQXServer/app/index.html or [ServerName]/panoptes/index.html${NC}"

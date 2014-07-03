@@ -8,7 +8,7 @@
 //    console.log(message);
 //});
 
-casper.start('http://localhost:8000/static/main.html');
+casper.start('http://localhost:8000/index.html');
 casper.viewport(1280, 1024);
 
 casper.waitForSelector('#WizBoxButtonFinish');

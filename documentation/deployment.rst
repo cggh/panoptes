@@ -80,7 +80,7 @@ The simplest way to run Panoptes is using::
 
 	./scripts/run.sh
 
-by default, this serves Panoptes on http://localhost:8000/static/main.html using gunicorn.
+by default, this serves Panoptes on http://localhost:8000/index.html using gunicorn.
 To run on your external network interface use (with the port you desire)::
 
 	./scripts/run.sh 0.0.0.0:8000
@@ -119,7 +119,7 @@ Create a new directory, pointing to DQXServer::
 
 In this configuration, the app is served from::
 
-  [ServerName]/DQXServer/app/static/main.html
+  [ServerName]/DQXServer/app/index.html
 
 Automatic deployment on a new Ubuntu EC2 image
 ----------------------------------------------
@@ -140,7 +140,7 @@ The following steps will create a fully working Panoptes instance on a Amazon EC
   sudo chmod +x deployfull.sh
   sudo ./deployfull.sh
 
-The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/DQXServer/app/static/main.html` or `[ServerName]/panoptes/main.html`.
+The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/DQXServer/app/index.html` or `[ServerName]/panoptes/index.html`.
 
 Authorization
 -------------
