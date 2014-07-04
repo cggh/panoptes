@@ -8,7 +8,7 @@ from DQXDbTools import DBTBESC
 
 
 
-
+# Returns the number of items in an individual subset
 
 def response(returndata):
 

@@ -8,7 +8,7 @@ from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 
 
-
+# Returns all subsets a data item is member of
 
 def response(returndata):
 

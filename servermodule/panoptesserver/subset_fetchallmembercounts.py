@@ -8,7 +8,7 @@ from DQXDbTools import DBTBESC
 
 
 
-
+# Returns the number of data items in all subsets for a given workspace
 
 def response(returndata):
 

@@ -120,7 +120,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 that.frameSubsets = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setDisplayTitle('Subsets');
+                    .setDisplayTitle('Subsets').setMargins(10);
             };
 
             that.createPanels = function() {
@@ -257,20 +257,31 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     subsetCheckMap[subset.id] = chk;
                     chk.modifyEnabled(false);
                     chk.setOnChanged(function() {
-//                        DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_modifyitemselection',
-//                            {
-//                                database: MetaData.database,
-//                                tableid: that.tableInfo.id,
-//                                workspaceid: MetaData.workspaceid,
-//                                itemid: that.itemid,
-//                                isnumericalkey: isnumericalkey?1:0,
-//                                primkey: that.tableInfo.primkey
-//                            }
-//                            , function(resp) {
-//                            });
+                        DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_setitemselection',
+                            {
+                                database: MetaData.database,
+                                tableid: that.tableInfo.id,
+                                workspaceid: MetaData.workspaceid,
+                                itemid: that.itemid,
+                                isnumericalkey: isnumericalkey?1:0,
+                                primkey: that.tableInfo.primkey,
+                                subsetid: subset.id,
+                                ismember: chk.getValue()?1:0
+                            }
+                            , function(resp) {
+                                subset.membercount += resp.diff;
+                            });
                     });
                 });
-                that.panelSubsets.addControl(Controls.CompoundVert(subsetCheckList));
+                if (subsetCheckList.length == 0) {
+                    that.panelSubsets.addControl(Controls.Static('There are currently no {name} subsets defined'.DQXformat({name: that.tableInfo.tableNameSingle})));
+                }
+                else {
+                    that.panelSubsets.addControl(Controls.CompoundVert([
+                        Controls.Static('This {name} is member of the following subsets:<p>'.DQXformat({name: that.tableInfo.tableNameSingle})),
+                        Controls.CompoundVert(subsetCheckList)
+                    ]));
+                }
 
                 var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
                 DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_getitemselection',
