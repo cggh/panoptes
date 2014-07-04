@@ -192,7 +192,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 col_query = SQL.WhereClause.AND(col_query);
                 var myurl = DQX.Url(MetaData.serverUrl);
                 myurl.addUrlQueryItem("datatype", "custom");
-                myurl.addUrlQueryItem("respmodule", "2d_server");
+                myurl.addUrlQueryItem("respmodule", "panoptesserver");
                 myurl.addUrlQueryItem("respid", "2d_query");
                 myurl.addUrlQueryItem('dataset', MetaData.database);
                 myurl.addUrlQueryItem('datatable', that.table.id);
