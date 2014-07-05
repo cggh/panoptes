@@ -1,6 +1,5 @@
 
 ** MIT Licence **
-
 Blob.js (https://github.com/eligrey/Blob.js)
 FileSaver.js (https://github.com/eligrey/FileSaver.js)
 handlebars.js (http://handlebarsjs.com)
@@ -10,10 +9,10 @@ markdown.js (https://github.com/evilstreak/markdown-js)
 modernizr.js (http://modernizr.com)
 spectrum.js (https://github.com/bgrins/spectrum)
 
+
 ** BSD License **
 D3.js (http://d3js.org)
 
 
 ** Unknown / undeclared license **
-
 DataStream.js
