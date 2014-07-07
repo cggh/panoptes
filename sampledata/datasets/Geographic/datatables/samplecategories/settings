@@ -2,6 +2,7 @@ NameSingle: sample category
 NamePlural: sample categories
 PrimKey: ID
 QuickFindFields: ID,Name
+Description: Each sample category is a fictitious grouping of a random number of samples.
 
 
 Properties:

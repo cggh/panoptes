@@ -212,6 +212,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 // qry.toQueryDisplayString(nameMap,0)
             }
 
+            table.createIcon = function(settings) {
+                var dv = DocEl.Div();
+                dv.setCssClass("DatasetIcon");
+                dv.addElem(table.settings.LetterCode);
+                if (settings && settings.floatLeft) {
+                    dv.addStyle("float", "left");
+                    dv.addStyle('margin-right', '10px');
+                    dv.addStyle('margin-bottom', '5px');
+                }
+                return dv.toString();
+            };
+
             table.propertyGroups = [];
             table.propertyGroupMap = {};
             if (table.settings.PropertyGroups) {
@@ -245,6 +257,37 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
             table.settings = settings;
         };
+
+
+        Initialise.createLetterCodes = function() {
+            var usedCodes = []
+            $.each(MetaData.tableCatalog, function(idx, table) {
+                if (table.settings.LetterCode)
+                    usedCodes.push(table.settings.LetterCode);
+            });
+            $.each(MetaData.tableCatalog, function(idx, table) {
+                if (!table.settings.LetterCode) {
+                    table.settings.LetterCode = 'Xx';
+                    if (table.tableCapNamePlural && (table.tableCapNamePlural.length>1)) {
+                        table.settings.LetterCode = '';
+                        var secondCandidates = [];
+                        var tokens = table.tableCapNamePlural.split(' ');
+                        if (tokens.length>1)
+                            secondCandidates.push(tokens[1][0]);
+                        for (var i=1; i<table.tableCapNamePlural.length; i++)
+                            secondCandidates.push(table.tableCapNamePlural[i]);
+                        $.each(secondCandidates, function(idx, letter) {
+                            if (!table.settings.LetterCode) {
+                                var candid = table.tableCapNamePlural[0] + letter;
+                                if (usedCodes.indexOf(candid, 0)<0)
+                                    table.settings.LetterCode = candid;
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
 
         Initialise.parseSummaryValues = function() {
             $.each(MetaData.summaryValues, function(idx, summaryValue) {

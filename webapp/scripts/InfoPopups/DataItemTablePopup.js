@@ -63,29 +63,30 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.createFrames = function() {
 
-                that.frameRoot.makeGroupVert();
+                that.frameRoot.makeGroupHor();
 
-                var frameTop = that.frameRoot.addMemberFrame(Framework.FrameGroupHor('', 0.7));
+                that.frameControls = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                    .setAllowScrollBars(false,true).setFixedSize(Framework.dimX,210);
 
-                that.frameControls = frameTop.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
-
-
-                that.frameBody = frameTop.addMemberFrame(Framework.FrameFinal('', 0.7));
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 53).setFrameClassClient('DQXGrayClient');
+                that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7));
             };
 
             that.createPanels = function() {
 
-                var ctrl_Query = that.theQuery.createQueryControl({});
+                that.introText = Controls.Html(null,'', '_dummyclass_');
+
+                var ctrl_Query = that.theQuery.createQueryControl({noDefine: true, controlsWidth: 165});
 
                 var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query
+                    that.introText,
+                    Controls.AlignCenter(Controls.CompoundVert([
+                        Controls.VerticalSeparator(10),
+                        ctrl_Query
+                    ]))
                 ]);
                 //that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelControls = Framework.Form(that.frameControls).setPadding(0);
-                that.panelControls.addControl(controlsGroup);
+                that.panelControls.addControl(Controls.Wrapper(controlsGroup, 'ControlsSectionBody'));
 
 
                 that.panelTable = MiscUtils.createDataItemTable(that.frameBody, that.tableInfo, that.theQuery.getForFetching(), {
@@ -120,11 +121,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
+                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
                     var choices = [];
 
 
@@ -174,7 +175,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:100, height:40, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, {
                         query: that.theQuery.get(),
                         tableid: that.tableInfo.id,
@@ -182,13 +183,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 });
 
-                that.panelButtons = Framework.Form(that.frameButtons);
-                that.panelButtons.addControl(Controls.CompoundHor([
+                controlsGroup.addControl(Controls.VerticalSeparator(15));
+
+                controlsGroup.addControl(Controls.AlignCenter(Controls.CompoundVert([
                     button_Selection,
                     button_ShowInTableViewer,
                     button_Showplots
-                ]));
+                ]).setMargin(0)));
 
+                that.theQuery.notifyQueryUpdated = that.onQueryModified;
+                that.setIntroText();
             };
 
             that.onClose = function() {
@@ -198,7 +202,24 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
 
+            that.setIntroText = function() {
+                var content = '';
+                content += that.tableInfo.createIcon({floatLeft: true});
+                content += '<b>{Names}</b><br>'.DQXformat({Names: that.tableInfo.tableCapNamePlural});
+                content += that.theQuery.createQueryDisplayStringHtml();
+//                content += '</i>';
+//                    content += '</div>';
+                that.introText.modifyValue(content);
+            };
+
+
+            that.onQueryModified = function() {
+                that.setIntroText();
+            }
+
+
             that.create();
+
         }
 
 

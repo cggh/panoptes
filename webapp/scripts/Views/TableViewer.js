@@ -37,7 +37,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 Msg.listen('',{ type: 'SelectionUpdated'}, function(scope,tableid) {
                     if (that.tableid==tableid) {
                         if (that.selectedItemCountText)
-                            that.selectedItemCountText.modifyValue(that.tableInfo.getSelectedCount() + ' selected');
+                            that.selectedItemCountText.modifyValue(that.tableInfo.getSelectedCount()+' ' + that.tableInfo.tableNamePlural + ' selected');
                         if (that.myTable)
                             that.myTable.render();
                     }
@@ -119,7 +119,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 that.createFrames = function(rootFrame) {
                     rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setMinSize(Framework.dimX,250);
+                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setFixedSize(Framework.dimX,250);
                     this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,false);
                 }
@@ -189,12 +189,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Subsets...', buttonClass: 'PnButtonGrid', width:100, height:35, bitmap:'Bitmaps/list2.png' });
+                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Manage subsets', buttonClass: 'PnButtonGrid', width:80, height:35, bitmap:'Bitmaps/list2.png' });
                     buttonManageStoredSubsets.setOnChanged(function() {
                         ManageStoredSubsets.manage(that.tableid);
                     });
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot...', buttonClass: 'PnButtonGrid', width:100, height:35, bitmap:'Bitmaps/chart.png' });
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:35, bitmap:'Bitmaps/chart.png' });
                     buttonCreatePlot.setOnChanged(function() {
                         var subSamplingOptions = null;
                         if (that.theQuery.isSubSampling())
@@ -205,7 +205,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         });
                     });
 
-                    var ctrlQuery = that.theQuery.createQueryControl({}, [Controls.CompoundHor([buttonCreatePlot, buttonManageStoredSubsets])]);
+                    var ctrlQuery = that.theQuery.createQueryControl({}, []);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
 
@@ -213,50 +213,81 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     // Selection controls
 
-                    that.selectedItemCountText = Controls.Html(null, '0 selected');
+                    that.selectedItemCountText = Controls.Html(null, '0 {names} selected'.DQXformat({names: that.tableInfo.tableNamePlural}));
 
-                    var selectionClear = Controls.Button(null, { content: 'Clear', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionClear = Controls.Button(null, { content: 'Clear', buttonClass: 'PnButtonGrid', width:80/*, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionClear.setOnChanged(function() {
                         tableInfo.clearSelection();
                         Msg.broadcast({type:'SelectionUpdated'}, that.tableid);
                     });
-                    var selectionAll = Controls.Button(null, { content: 'Select...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+                    var selectionAll = Controls.Button(null, { content: 'Select', buttonClass: 'PnButtonGrid', width:80/*, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
                     selectionAll.setOnChanged(function() {
                         ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                     });
-                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'DQXToolButton2'/*, width:120, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
-                    selectionStore.setOnChanged(function() {
-                        SelectionTools.cmdStore(that.tableInfo);
-                    });
+//                    var selectionStore = Controls.Button(null, { content: 'Store...', buttonClass: 'PnButtonGrid', width:120/*, height:40, bitmap: 'Bitmaps/circle_red_small.png'*/ });
+//                    selectionStore.setOnChanged(function() {
+//                        SelectionTools.cmdStore(that.tableInfo);
+//                    });
 
-                    var groupSelection = Controls.Section(Controls.CompoundVert([
-                        that.selectedItemCountText,
-                        Controls.CompoundHor([selectionClear, selectionAll, selectionStore])
-                    ]), {
-                        title: 'Current selection',
-                        bodyStyleClass: 'ControlsSectionBody'
-                    });
+//                    var groupSelection = Controls.Section(Controls.CompoundVert([
+//                        that.selectedItemCountText,
+//                        Controls.CompoundHor([selectionClear, selectionAll, selectionStore])
+//                    ]).setMargin(0), {
+//                        title: 'Current selection',
+//                        bodyStyleClass: 'ControlsSectionBody'
+//                    });
 
 
 
 
                     that.visibilityControlsGroup = Controls.CompoundVert([]).setMargin(0);
 
+                    that.introText = Controls.Html(null,'');
+
+                    var topGroup = Controls.Wrapper(Controls.CompoundVert([
+                        that.introText,
+                        Controls.AlignCenter(Controls.CompoundVert([
+                            ctrlQuery,
+                            Controls.VerticalSeparator(10),
+                            Controls.CompoundHor([buttonCreatePlot, buttonManageStoredSubsets])
+
+                        ]).setMargin(0)),
+                        Controls.VerticalSeparator(7),
+                        that.selectedItemCountText,
+                        Controls.AlignCenter(Controls.CompoundHor([selectionClear, selectionAll]))
+
+
+                    ]), 'ControlsSectionBody');
+
                     that.controlsGroup = Controls.CompoundVert([
-                        ctrlQuery,
-                        groupSelection,
+                        topGroup,
                         that.visibilityControlsGroup
 
                     ]).setMargin(0);
 
                     this.panelSimpleQuery.addControl(that.controlsGroup);
+                    that.setIntroText();
                 }
+
+
+                that.setIntroText = function() {
+                    var content = '';
+                    content += that.tableInfo.createIcon({floatLeft: true});
+                    if (that.tableInfo.settings.Description) {
+                        content += '<span style="color:rgb(100,100,100)">'+that.tableInfo.settings.Description + '</span>';
+                        content += '<p>';
+                    }
+                    content += '<i><b>Query: </b>';
+                    content += that.theQuery.createQueryDisplayStringHtml();
+                    content += '</i>';
+//                    content += '</div>';
+                    that.introText.modifyValue(content);
+                };
 
                 //Returns a user-friendly text description of a query
                 that.getQueryDescription = function(qry) {
-                    var str = '<div style="background-color: rgb(255,240,230);width:100%">';
+                    var str = '<div  style="background-color: rgb(255,240,230);width:100%">';
                     str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
-                    str += '</div>';
                     return str;
                 };
 
@@ -274,6 +305,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
                 that.updateQuery2 = function() {
+                    that.setIntroText();
                     if (that.myTable) {
                         that.myTable.setQuery(that.theQuery.getForFetching());
                         that.myTable.setTable(that.tableInfo.getQueryTableName(that.theQuery.isSubSampling()));

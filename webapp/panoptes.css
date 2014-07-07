@@ -2,8 +2,12 @@
 a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHeader, .DQXQueryTableSortHeader
 {
     color:rgb(0,107,117) !important;
-    text-decoration: underline;
     /*border-bottom: 1px solid rgb(130,200,210);*/
+}
+
+a:link, a:visited
+{
+    text-decoration: underline;
 }
 
 .PanoptesLogoBox
@@ -55,17 +59,27 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .DQXPopupFrameHeader
 {
-    background-color: rgb(36, 105, 112);
+    background-color: rgb(56, 135, 142);
     padding:7px;
     padding-left:12px;
     cursor:move;
     font-size:10pt;
     font-weight:bold;
     color:rgb(255,255,255);
-    background-image:url(Bitmaps/misc/barback1a.png);
+    /*background-image:url(Bitmaps/misc/barback1a.png);*/
+    background-image:none;
     /*width:50px;*/
     /*background-image:none*/
 }
+
+.DQXPopupFrame
+{
+    border-width:4px;
+    border-style:solid;
+    border-color:rgb(80,80,80);
+    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+}
+
 
 
 
@@ -141,27 +155,16 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid
 {
-/*
-    background: #ffffff;
-    background: -moz-linear-gradient(top, #ffffff 0%, #c7e4e5 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#c7e4e5));
-    background: -webkit-linear-gradient(top, #ffffff 0%,#c7e4e5 100%);
-    background: -o-linear-gradient(top, #ffffff 0%,#c7e4e5 100%);
-    background: -ms-linear-gradient(top, #ffffff 0%,#c7e4e5 100%);
-    background: linear-gradient(to bottom, #ffffff 0%,#c7e4e5 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#c7e4e5',GradientType=0 );
-*/
 
-    background: rgb(244,244,244); /* Old browsers */
-    background: -moz-linear-gradient(top, rgb(244,244,244) 0%, rgb(224,224,224) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(244,244,244)), color-stop(100%,rgb(224,224,224))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, rgb(244,244,244) 0%,rgb(224,224,224) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, rgb(244,244,244) 0%,rgb(224,224,224) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, rgb(244,244,244) 0%,rgb(224,224,224) 100%); /* IE10+ */
-    background: linear-gradient(to bottom, rgb(244,244,244) 0%,rgb(224,224,224) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#e0e0e0',GradientType=0 ); /* IE6-9 */
+    background: rgb(255,255,255); /* Old browsers */
+    background: -moz-linear-gradient(top, rgb(255,255,255) 0%, rgb(234,234,234) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(255,255,255)), color-stop(100%,rgb(234,234,234))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* W3C */
 
-    border: 1px solid rgb(170, 170, 170);
+    border: 1px solid rgb(200, 200, 200);
 
     box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
 
@@ -195,7 +198,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .DQXToolButton0 img, .DQXToolButton1 img, .DQXToolButton2 img, .DQXToolButton3 img, .PnButtonLarge img, .PnButtonSmall img, .PnButtonGrid img
 {
-    opacity:0.7;
+    opacity:0.6;
 }
 
 .DQXToolButton0:hover img, .DQXToolButton1:hover img, .DQXToolButton2:hover img, .DQXToolButton3:hover img, .PnButtonLarge:hover img, .PnButtonSmall:hover img, .PnButtonGrid:hover img
@@ -218,8 +221,11 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 }
 
-.PnButtonGrid
+.PnButtonGrid, .DQXToolButton1, .DQXToolButton3, .DQXToolButton2
 {
+    margin: 0px;
+    font-size:11px;
+    color: rgb(70,70,70);
     display:inline-block;
     padding-top:4px;
     padding-bottom:4px;
@@ -227,13 +233,27 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     padding-right:6px;
     cursor:pointer;
     box-shadow: none;
+    border: none;
+    border-radius: 0px;
+    outline:1px solid rgb(200,200,200);
 }
 
 
-.PnButtonGrid:hover
+.PnButtonGrid:hover, .DQXToolButton1:hover, .DQXToolButton3:hover, .DQXToolButton2:hover
 {
     color: rgb(0,94,102);
-    border: 1px solid rgb(0,122,132);
+    box-shadow:none;
+    border:none;
+
+    background: rgb(245,255,255); /* Old browsers */
+    background: -moz-linear-gradient(top, rgb(245,255,255) 0%, rgb(200,225,225) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(245,255,255)), color-stop(100%,rgb(200,225,225))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgb(245,255,255) 0%,rgb(200,225,225) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgb(245,255,255) 0%,rgb(200,225,225) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgb(245,255,255) 0%,rgb(200,225,225) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgb(245,255,255) 0%,rgb(200,225,225) 100%); /* W3C */
+    
+    /*outline: 1px solid rgb(0,122,132);*/
 }
 
 .PnGridCheckWrapper
@@ -292,14 +312,41 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 }
 
 
-.QueryTab10eValueBar
+.DQXQueryTable th
 {
-    height:15px;
-    background-color: rgb(140,230,255);
-    border-spacing: 20px;
-    border-collapse: collapse;
-    cursor: pointer;
+    background: rgb(240,240,240);
+    background: -moz-linear-gradient(left, rgb(240,240,240) 0%, rgb(200,200,200) 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(240,240,240)), color-stop(100%,rgb(200,200,200)));
+    background: -webkit-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
+    background: -o-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
+    background: -ms-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
+    background: linear-gradient(to right, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(170,170,170);
+
+    color:rgb(0,0,0);
+    text-align: left;
+    height:28px;
+    font-size:8pt;
+    font-weight:normal;
+    /*    width: 180px !important; */
+    white-space:nowrap;
+    padding: 4px;
+
+
 }
+
+
+/*.QueryTableValueBar*/
+/*{*/
+    /*height:15px;*/
+    /*background-color: rgb(140,230,255);*/
+    /*border-spacing: 20px;*/
+    /*border-collapse: collapse;*/
+    /*cursor: pointer;*/
+/*}*/
 
 .PlotTypeTable
 {
@@ -357,7 +404,7 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 .ControlsSectionBody {
     margin-left:9px;
     margin-top:20px;
-    margin-right:4px;
+    margin-right:9px;
     margin-bottom:20px;
 }
 
@@ -470,14 +517,14 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
     background: linear-gradient(to right, rgb(182,230,235) 0%,rgb(123,181,186) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ceeaed', endColorstr='#8cc3c8',GradientType=1 ); /* IE6-9 */    border: 2px solid black;
     padding:5px;
-    padding-top:1px;
+    padding-top:0px;
     padding-bottom:3px;
     border: 1px solid rgb(140,195,200);
 
-    border-radius: 4px;
+    border-radius: 3px;
     margin-top:4px;
     margin-left:6px;
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.45);
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .DQXThumbNailMinimised
@@ -510,12 +557,38 @@ a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHead
 
 .QueryTableValueBar
 {
-    background-color: rgb(140,220,230);
+    background-color: rgb(225,225,225);
     height:14px;
+}
+
+.SupportingText,.InfoBox
+{
+    font-size:11px;
+    color: rgb(70,70,70);
 }
 
 .InfoBox
 {
-    color: rgb(100,100,100);
+    /*color: rgb(100,100,100);*/
     background-color: rgb(230,230,230);
+}
+
+.DatasetIcon
+{
+    width: 45px;
+    height: 45px;
+    font-family:Arial;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    /*vertical-align: middle;*/
+    line-height: 45px;
+    /*background-color: rgb(220,220,220);*/
+    border-radius:9px;
+
+    border:2px solid rgb(99,201,205);
+    color: rgb(61,104,108);
+    background-color: rgba(206,234,237,0.5);
+
+
 }

@@ -152,6 +152,7 @@ require([
                             Initialise.augmentTableInfo(table);
                             MetaData.mapTableCatalog[table.id] = table;
                         });
+                        Initialise.createLetterCodes();
                         MetaData.map2DTableCatalog = {};
                         $.each(MetaData.twoDTableCatalog, function(idx, table) {
                             Initialise.augment2DTableInfo(table);
@@ -182,11 +183,11 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Find...','Bitmaps/Find.png', 80, function(){
+                        Application.addNavigationButton('Find','Bitmaps/Find.png', 70, function(){
                             var actions = [];
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
-                                actions.push( { content:'Find gene...', bitmap:'Bitmaps/GenomeBrowser.png', handler:function() {
+                                actions.push( { content:'Find gene', bitmap:'Bitmaps/GenomeBrowser.png', handler:function() {
                                     FindGene.execute()
                                 }
                                 });
@@ -212,7 +213,7 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link...',DQX.BMP("Icons/Small/Link.png"), 80, function(){
+                        Application.addNavigationButton('Get link',DQX.BMP("Icons/Small/Link.png"), 70, function(){
                             Serialise.createLink();
                         });
 

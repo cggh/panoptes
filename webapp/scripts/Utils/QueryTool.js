@@ -113,8 +113,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
 
-
             that.createQueryControl = function(controlSettings, extraControlsList) {
+
+                var defaultHidden = false;
+                if (controlSettings && controlSettings.defaultHidden)
+                    defaultHidden = true;
+
+                var hasDefine = true;
+                if (controlSettings && controlSettings.noDefine)
+                    hasDefine = false;
+
+                that.controlsWidth = 185;
+                if (controlSettings && controlSettings.controlsWidth)
+                    that.controlsWidth = controlSettings.controlsWidth;
+
 
                 var theControl = Controls.BaseCustom(true).setMargin(0);
 
@@ -129,7 +141,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         subSampleFrac = settings.subSamplingOptions.frac;
                     }
 
-                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling', width: 165, height: 18, minval:0, maxval:1, value:subSampleFrac, digits: 10, drawIndicators: false})
+                    that.ctrlSubSampler = Controls.ValueSlider(null, {label: 'Subsampling:', width: that.controlsWidth, height: 18, minval:0, maxval:1, value:subSampleFrac, digits: 10, drawIndicators: false})
                         .setNotifyOnFinished()
                         .setOnChanged(function() {
                             that.reSampleSliceIndex = 0;
@@ -157,54 +169,61 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         var st = '';
                         if (frac<0) {
                             st = 'All';
-                            st = '<span style="color:rgb(0,128,0);font-size:13pt;"><b>' + st + '</b></span>';
+                            //st = '<span style="color:rgb(0,128,0);font-size:13pt;"><b>' + st + '</b></span>';
                         }
                         else {
                             st = (frac).toFixed(0);
                             if (frac>10000)
                                 var st = (frac/1000.0).toFixed(0)+'K';
-                            st = '<span style="color:red;background-color:yellow;font-size:13pt;"><b>' + st + '</b></span>';
+                            //st = '<span style="color:red;background-color:yellow;font-size:13pt;"><b>' + st + '</b></span>';
                         }
                         return st;
                     };
 
-                    that.ctrlReSample = Controls.ImageButton(null, { bitmap:"Bitmaps/actionbuttons/reload.png", hint:"Resample", vertShift:18})
-                    that.ctrlReSample.setOnChanged(function() {
-                        that.reSampleSliceIndex += 1;
-                        that.notifyQueryUpdated();
-                    });
+//                    that.ctrlReSample = Controls.ImageButton(null, { bitmap:"Bitmaps/actionbuttons/reload.png", hint:"Resample", vertShift:18})
+//                    that.ctrlReSample.setOnChanged(function() {
+//                        that.reSampleSliceIndex += 1;
+//                        that.notifyQueryUpdated();
+//                    });
 
-                    group.addControl(Controls.CompoundHor([that.ctrlSubSampler, Controls.HorizontalSeparator(4), that.ctrlReSample]));
+                    group.addControl(Controls.CompoundHor([
+                        that.ctrlSubSampler,
+//                        Controls.HorizontalSeparator(4),
+//                        that.ctrlReSample
+                    ]));
                 }
 
 
-                var buttonDefineQuery = Controls.Button(null, { content: 'Define query...', buttonClass: 'PnButtonLarge', width:110, height:35, bitmap: DQX.BMP('filter1.png') });
-                buttonDefineQuery.setOnChanged(function() {
-                    EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
-                        that.modify(query);
+                if (hasDefine) {
+                    var buttonDefineQuery = Controls.Button(null, { content: 'Define query', buttonClass: 'PnButtonGrid', width:125, height:35, bitmap: DQX.BMP('filter1.png') });
+                    buttonDefineQuery.setOnChanged(function() {
+                        EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
+                            that.modify(query);
+                        });
                     });
-                });
 
-                var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
-                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:160 }).setOnChanged(that.handlePickQuery);
+    //                var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
+    //                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:160 }).setOnChanged(that.handlePickQuery);
 
-                that.buttonPrevQuery = Controls.Button(null, { content: ' ', hint:'Back to previous query', buttonClass: 'PnButtonLarge', bitmap: DQX.BMP('link2.png'), width:25, height:35}).setOnChanged(function() {
-                    if (that.prevQueries.length>0) {
-                        that.query = SQL.WhereClause.decode(that.prevQueries.pop());
-                        that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
-                        that.notifyQueryUpdated();
-                        that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
-                    }
-                });
-                that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
-
-
-                that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
+                    that.buttonPrevQuery = Controls.Button(null, { content: ' ', hint:'Back to previous query', buttonClass: 'PnButtonGrid', bitmap: DQX.BMP('link2.png'), width:35, height:35}).setOnChanged(function() {
+                        if (that.prevQueries.length>0) {
+                            that.query = SQL.WhereClause.decode(that.prevQueries.pop());
+                            that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
+                            that.notifyQueryUpdated();
+                            that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
+                        }
+                    });
+                    that.buttonPrevQuery.modifyEnabled(that.prevQueries.length>0);
+                }
 
 
-                group.addControl(Controls.CompoundHor([buttonDefineQuery, Controls.HorizontalSeparator(10), that.buttonPrevQuery]));
-                group.addControl(that.ctrlPick);
-                group.addControl(that.ctrlQueryString);
+//                that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
+
+
+                if (hasDefine)
+                    group.addControl(Controls.CompoundHor([buttonDefineQuery, that.buttonPrevQuery]));
+//                group.addControl(that.ctrlPick);
+//                group.addControl(that.ctrlQueryString);
 
 
                 if (extraControlsList) {
@@ -221,43 +240,40 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.updateStoredQueries();
                 });
 
-                var defaultHidden = false;
-                if (controlSettings && controlSettings.defaultHidden)
-                    defaultHidden = true;
-
-                theControl.addControl(Controls.Section(group, {
-                    title: that.tableInfo.tableCapNamePlural + ' query',
-                    bodyStyleClass: 'ControlsSectionBody',
-                    defaultCollapsed: defaultHidden
-                }));
+//                theControl.addControl(Controls.Section(group, {
+//                    title: that.tableInfo.tableCapNamePlural + ' query',
+//                    bodyStyleClass: 'ControlsSectionBody',
+//                    defaultCollapsed: defaultHidden
+//                }));
+                theControl.addControl(group);
 
                 return theControl;
             }
 
             that.updateStoredQueries = function() {
-                var getter = DataFetchers.ServerDataGetter();
-                getter.addTable(
-                    'storedqueries',['id','name'],'name',
-                    SQL.WhereClause.AND([
-                        SQL.WhereClause.CompareFixed('workspaceid', '=', MetaData.workspaceid),
-                        SQL.WhereClause.CompareFixed('tableid', '=', that.tableInfo.id)
-                    ])
-                );
-                getter.execute(MetaData.serverUrl, MetaData.database, function() {
-                    var data = getter.getTableRecords('storedqueries');
-                    var states = [];
-                    states.push({id:'', name:'[ Queries ]'})
-                    states.push({id:'_all_', name:'- All '+that.tableInfo.name+' -'})
-                    states.push({id:'_storedselection_', name:'- Stored selection -'})
-                    if (that.includeCurrentQuery)
-                        states.push({id:'_current_', name:'- '+that.tableInfo.name+' active in table -'})
-                    $.each(data, function(idx, record) {
-                        states.push({id:record.id, name:record.name});
-                    });
-                    states.push({id:'_manage_', name:'---- EDIT STORED QUERIES ----'})
-                    that.ctrlPick.setItems(states,'');
-                    //debugger;
-                });
+//                var getter = DataFetchers.ServerDataGetter();
+//                getter.addTable(
+//                    'storedqueries',['id','name'],'name',
+//                    SQL.WhereClause.AND([
+//                        SQL.WhereClause.CompareFixed('workspaceid', '=', MetaData.workspaceid),
+//                        SQL.WhereClause.CompareFixed('tableid', '=', that.tableInfo.id)
+//                    ])
+//                );
+//                getter.execute(MetaData.serverUrl, MetaData.database, function() {
+//                    var data = getter.getTableRecords('storedqueries');
+//                    var states = [];
+//                    states.push({id:'', name:'[ Queries ]'})
+//                    states.push({id:'_all_', name:'- All '+that.tableInfo.name+' -'})
+//                    states.push({id:'_storedselection_', name:'- Stored selection -'})
+//                    if (that.includeCurrentQuery)
+//                        states.push({id:'_current_', name:'- '+that.tableInfo.name+' active in table -'})
+//                    $.each(data, function(idx, record) {
+//                        states.push({id:record.id, name:record.name});
+//                    });
+//                    states.push({id:'_manage_', name:'---- EDIT STORED QUERIES ----'})
+//                    that.ctrlPick.setItems(states,'');
+//                    //debugger;
+//                });
             };
 
             that.handlePickQuery = function() {
@@ -299,6 +315,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 }
             }
+
+            that.createQueryDisplayStringHtml = function() {
+                var content = '';
+                content = that.tableInfo.createQueryDisplayString(that.get());
+                if (that.isSubSampling()) {
+                    var frac = that.subSamplerMapper(that.ctrlSubSampler.getValue());
+                    content += '<br><span style="color:rgb(150,100,100)">(from a <span style="color:rgb(192,0,0);"><b>{count}</b></span> {names} random subsampling set)</span>'.DQXformat({
+                        count: frac,
+                        names: that.tableInfo.tableNamePlural
+                    });
+
+                }
+                return content;
+            };
 
             return that;
         }
