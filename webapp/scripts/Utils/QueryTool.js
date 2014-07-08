@@ -195,7 +195,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 if (hasDefine) {
-                    var buttonDefineQuery = Controls.Button(null, { content: 'Define query', buttonClass: 'PnButtonGrid', width:125, height:35, bitmap: DQX.BMP('filter1.png') });
+                    var buttonDefineQuery = Controls.Button(null, { content: 'Define query', buttonClass: 'PnButtonGrid', width:125, height:30, bitmap: DQX.BMP('filter1.png'), bitmapHeight:22 });
                     buttonDefineQuery.setOnChanged(function() {
                         EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
                             that.modify(query);
@@ -205,7 +205,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
     //                var states = [ {id:'', name:'- Stored queries -'}, {id:'_all_', name:'All '+that.tableInfo.name}, {id:'_manage_', name:'- Manage... -'} ];
     //                that.ctrlPick = Controls.Combo(null, { label:'', states:states, width:160 }).setOnChanged(that.handlePickQuery);
 
-                    that.buttonPrevQuery = Controls.Button(null, { content: ' ', hint:'Back to previous query', buttonClass: 'PnButtonGrid', bitmap: DQX.BMP('link2.png'), width:35, height:35}).setOnChanged(function() {
+                    that.buttonPrevQuery = Controls.Button(null, { content: ' ', hint:'Back to previous query', buttonClass: 'PnButtonGrid', bitmap: DQX.BMP('link2.png'), width:35, height:30}).setOnChanged(function() {
                         if (that.prevQueries.length>0) {
                             that.query = SQL.WhereClause.decode(that.prevQueries.pop());
                             that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));

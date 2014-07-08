@@ -189,12 +189,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Manage subsets', buttonClass: 'PnButtonGrid', width:80, height:35, bitmap:'Bitmaps/list2.png' });
+                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Manage subsets', buttonClass: 'PnButtonGrid', width:80, height:30, bitmap:'Bitmaps/list2.png', bitmapHeight:18 });
                     buttonManageStoredSubsets.setOnChanged(function() {
                         ManageStoredSubsets.manage(that.tableid);
                     });
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:35, bitmap:'Bitmaps/chart.png' });
+                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:30, bitmap:'Bitmaps/chart2.png', bitmapHeight:20 });
                     buttonCreatePlot.setOnChanged(function() {
                         var subSamplingOptions = null;
                         if (that.theQuery.isSubSampling())

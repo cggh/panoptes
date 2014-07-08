@@ -121,11 +121,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
+                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:130, height:30, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 
-                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/datagridadd.png'}).setOnChanged(function() {
+                var button_ShowInTableViewer = Controls.Button(null, {content: 'Show in view', buttonClass: 'PnButtonGrid', width:130, height:30, bitmap:'Bitmaps/datagridadd.png', bitmapHeight:19}).setOnChanged(function() {
                     var choices = [];
 
 
@@ -175,7 +175,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:130, height:35, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:130, height:30, bitmap:'Bitmaps/chart2.png', bitmapHeight:20}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, {
                         query: that.theQuery.get(),
                         tableid: that.tableInfo.id,
