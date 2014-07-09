@@ -75,7 +75,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true).setMinSize(Framework.dimX,240);
+                    .setAllowScrollBars(false,true).setFixedSize(Framework.dimX,240);
 
                 var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7))
                     .setMargins(0).setSeparatorSize(0);
@@ -150,7 +150,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
                     var actions = [];
 
                     actions.push( { content:'Rectangular latt-long area', handler:function() {
@@ -168,7 +168,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount, cmdPointSelection]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -185,7 +184,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsList = [
-                    ctrl_Query,
+                    that.createIntroControls(),
+                    cmdPointSelection,
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlColorProperty,
@@ -578,7 +578,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
 
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

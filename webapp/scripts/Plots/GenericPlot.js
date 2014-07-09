@@ -136,8 +136,43 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.reloadAll();
             }
 
+            that.createIntroControls = function() {
+                that.introText = Controls.Html(null,'', '_dummyclass_');
+                that.ctrl_PointCount = Controls.Html(null, '');
+                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
+                that.setIntroText();
+                return Controls.Wrapper(Controls.CompoundVert([
+                    that.introText,
+                    Controls.AlignCenter(Controls.CompoundVert([
+                        Controls.VerticalSeparator(10),
+                        ctrl_Query
+                    ]))
+                ]), 'ControlsSectionBody')
+            };
+
+            that.onQueryModified = function() {
+                that.setIntroText();
+                if (that.updateQuery)
+                    that.updateQuery();
+            };
+
+
+            that.setIntroText = function() {
+                var content = '';
+                content += that.tableInfo.createIcon({floatLeft: true});
+                content += '<b>{Names}</b><br>'.DQXformat({Names: that.tableInfo.tableCapNamePlural});
+                content += that.theQuery.createQueryDisplayStringHtml();
+                that.introText.modifyValue(content);
+            };
+
+            that.theQuery.notifyQueryUpdated = that.onQueryModified;
+
             return that;
         }
+
+
+
+
 
         GenericPlot.store = function() {
             var obj = [];
@@ -156,6 +191,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 thePlot.recall(plotSettObj);
             });
         }
+
 
         return GenericPlot;
     });

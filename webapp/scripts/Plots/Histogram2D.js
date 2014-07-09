@@ -84,7 +84,6 @@ define([
 
             that.createPanelButtons = function() {
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -113,7 +112,7 @@ define([
                 that.ctrl_binsizeValueX = Controls.Edit(null,{size:10, label:'X:'}).setClassID('binsizex').modifyEnabled(false);
                 that.ctrl_binsizeValueY = Controls.Edit(null,{size:10, label:'Y:'}).setClassID('binsizey').modifyEnabled(false);
 
-                that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update'}).setOnChanged(function() {
+                that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update', buttonClass: 'PnButtonGrid'}).setOnChanged(function() {
                     that.fetchData();
                 });
                 that.ctrl_binsizeUpdate.modifyEnabled(false);
@@ -144,7 +143,7 @@ define([
                         that.reDraw();
                     });
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
                     var actions = [];
                     actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
                         that.panelPlot.startHalfPlaneSelection(function(center, dir) {
@@ -165,7 +164,8 @@ define([
                 });
 
                 var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
+                    that.createIntroControls(),
+                    cmdPointSelection,
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlValueXProperty,
@@ -509,7 +509,6 @@ define([
             }
 
 
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

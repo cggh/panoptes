@@ -48,9 +48,6 @@ define([
             };
 
             that.createPanelButtons = function() {
-                that.ctrl_PointCount = Controls.Html(null, '');
-
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -76,7 +73,7 @@ define([
                 });
                 that.ctrl_binsizeValue.modifyEnabled(false);
 
-                that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update'}).setOnChanged(function() {
+                that.ctrl_binsizeUpdate = Controls.Button(null,{content:'Update', buttonClass: 'PnButtonGrid'}).setOnChanged(function() {
                     that.fetchData();
                 });
                 that.ctrl_binsizeUpdate.modifyEnabled(false);
@@ -94,7 +91,7 @@ define([
                     }, 10));
 
                 var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
+                    that.createIntroControls(),
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlValueProperty
                     ]).setMargin(10), {
@@ -411,7 +408,6 @@ define([
             }
 
 
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

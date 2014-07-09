@@ -51,7 +51,6 @@ define([
             that.createPanelButtons = function() {
 
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
 
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -86,7 +85,7 @@ define([
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
+                    that.createIntroControls(),
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlCatProperty1,
@@ -432,7 +431,6 @@ define([
 
 
 
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

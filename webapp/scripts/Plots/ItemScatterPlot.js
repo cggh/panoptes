@@ -67,7 +67,7 @@ define([
 
             that.createPanelButtons = function() {
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonSmall'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
 
                     var actions = [];
 
@@ -202,8 +202,6 @@ define([
                 });
 
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount, cmdPointSelection]);
-
 
                 var pickControls = Controls.CompoundVert([]).setMargin(10);
                 $.each(that.plotAspects,function(aspectIdx, plotAspect) {
@@ -245,7 +243,8 @@ define([
                 that.colorLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
-                    ctrl_Query,
+                    that.createIntroControls(),
+                    cmdPointSelection,
 
                     Controls.Section(pickControls, {
                         title: 'Plot data',
@@ -839,7 +838,6 @@ define([
 
 
 
-            that.theQuery.notifyQueryUpdated = that.updateQuery;
             that.create();
             return that;
         }

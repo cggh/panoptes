@@ -130,7 +130,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 var theControl = Controls.BaseCustom(true).setMargin(0);
 
-                var group = Controls.CompoundVert().setMargin(12);
+                var group = Controls.CompoundVert().setMargin(6);
 
                 if (that.hasSubSampler) {
                     that.reSampleSliceIndex = 0;

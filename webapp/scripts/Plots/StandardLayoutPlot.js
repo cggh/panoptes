@@ -34,7 +34,7 @@ define([
             that.createFrames = function() {
                 that.frameRoot.makeGroupHor();
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setAllowScrollBars(false,true);
+                    .setAllowScrollBars(false,true).setFixedSize(Framework.dimX,240);
 
                 var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7))
                     .setMargins(0).setSeparatorSize(0);
@@ -63,8 +63,8 @@ define([
                 this.panelWarning.addControl(this.warningContent);
                 this.panelWarning.render();
 
-
             };
+
 
 
             that.setWarning = function(warning) {
@@ -74,6 +74,7 @@ define([
                     that.warningContent.modifyValue('');
                 that.panelWarning.render();
             };
+
 
             return that;
         }
