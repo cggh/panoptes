@@ -17,37 +17,35 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/FrameL
 
             that.createFrames = function() {
                 that.frameRoot.makeGroupVert();
+                var frameGroupTop = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7)).setSeparatorSize(2);
+                that.frameInfo = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.01)).setFrameClassClient('InfoBox')
+                    .setMargins(8).setAutoSize().setAllowScrollBars(false, false);
 
-                that.frameList = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7))
+
+                that.frameList = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.7))
                     .setAllowScrollBars(true,true);
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 70).setFrameClassClient('DQXGrayClient');
+                    .setFixedSize(Framework.dimY, 47).setFrameClassClient('DQXGrayClient');
             };
 
             that.createPanels = function() {
+                var panelInfo = Framework.Form(this.frameInfo);
+                panelInfo.addHtml("Stored queries are permanently maintained on the server, and can be recalled during later sessions or shared with other users.");
+                panelInfo.render();
 
                 that.panelList = FrameList(that.frameList);
 
                 that.reload();
 
-                var bt_add = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Add current...', bitmap: DQX.BMP('morelines.png'), width:100, height:28 }).setOnChanged(that.onAdd);
-                var bt_del = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Delete selected...', bitmap: DQX.BMP('lesslines.png'), width:100, height:28 }).setOnChanged(that.onDel);
+                var bt_add = Controls.Button(null, { buttonClass: 'PnButtonGrid', content: 'Add current', bitmap: 'Bitmaps/actionbuttons/new.png', width:100, height:35 }).setOnChanged(that.onAdd);
+                var bt_del = Controls.Button(null, { buttonClass: 'PnButtonGrid', content: 'Delete selected', bitmap: 'Bitmaps/actionbuttons/delete.png', width:100, height:35 }).setOnChanged(that.onDel);
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
-                var bt_close = Controls.Button(null, { buttonClass: 'DQXWizardButton', content: 'Close', /*width:80,*/ height:25 }).setOnChanged(function() {
-                    that.close();
-                });
-
                 that.panelButtons.addControl(Controls.CompoundHor([
-                    Controls.HorizontalSeparator(7),
                     bt_add,
                     bt_del
                 ]));
-                that.panelButtons.addControl(Controls.AlignRight(Controls.CompoundHor([
-                    bt_close,
-                    Controls.HorizontalSeparator(7)
-                ])));
 
             };
 
