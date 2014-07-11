@@ -664,7 +664,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             var channelControlsGroup = Controls.CompoundVert([]).setMargin(0);
@@ -731,7 +731,7 @@ define([
                                 tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
                                 that.panelBrowser.render();
                             };
-                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({defaultHidden: true});
+                            var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                             controlsGroup.addControl(ctrlQuery);
 
                             states = [{id:'', name:'-None-'}];

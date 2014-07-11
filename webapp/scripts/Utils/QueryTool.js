@@ -123,6 +123,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (controlSettings && controlSettings.noDefine)
                     hasDefine = false;
 
+                var hasSection = false;
+                if (controlSettings && controlSettings.hasSection)
+                    hasSection = true;
+
+                var hasQueryString = false;
+                if (controlSettings && controlSettings.hasQueryString)
+                    hasQueryString = true;
+
+
                 that.controlsWidth = 185;
                 if (controlSettings && controlSettings.controlsWidth)
                     that.controlsWidth = controlSettings.controlsWidth;
@@ -217,13 +226,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
 
-//                that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
-
+                if (hasQueryString) {
+                    that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
+                    group.addControl(that.ctrlQueryString);
+                }
 
                 if (hasDefine)
                     group.addControl(Controls.CompoundHor([buttonDefineQuery, that.buttonPrevQuery]));
 //                group.addControl(that.ctrlPick);
-//                group.addControl(that.ctrlQueryString);
 
 
                 if (extraControlsList) {
@@ -240,12 +250,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.updateStoredQueries();
                 });
 
-//                theControl.addControl(Controls.Section(group, {
-//                    title: that.tableInfo.tableCapNamePlural + ' query',
-//                    bodyStyleClass: 'ControlsSectionBody',
-//                    defaultCollapsed: defaultHidden
-//                }));
-                theControl.addControl(group);
+                if (hasSection) {
+                    theControl.addControl(Controls.Section(group, {
+                        title: that.tableInfo.tableCapNamePlural + ' query',
+                        bodyStyleClass: 'ControlsSectionBody',
+                        defaultCollapsed: defaultHidden
+                    }));
+                }
+                else
+                    theControl.addControl(group);
 
                 return theControl;
             }

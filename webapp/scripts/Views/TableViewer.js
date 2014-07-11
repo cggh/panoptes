@@ -286,8 +286,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                 //Returns a user-friendly text description of a query
                 that.getQueryDescription = function(qry) {
-                    var str = '<div  style="background-color: rgb(255,240,230);width:100%">';
-                    str += '<span style="color: rgb(128,0,0)"><b>Query:</b></span> <span style="color: rgb(128,0,0);font-size:80%">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
+                    str = '<span style=""><b>Query:</b></span> <span style="">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
                     return str;
                 };
 

@@ -127,11 +127,11 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = that.new_col_query;
-                var col_query_tool = that.col_query.createQueryControl({defaultHidden: true});
+                var col_query_tool = that.col_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(col_query_tool);
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
                 that.row_query.notifyQueryUpdated = that.new_row_query;
-                var row_query_tool = that.row_query.createQueryControl({defaultHidden: true});
+                var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
 
                 controls_group.addControl(Controls.Section(view_controls, {
