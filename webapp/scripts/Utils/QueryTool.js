@@ -419,7 +419,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 //that.frameInfo = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.01)).setFrameClassClient('InfoBox')
                 //    .setMargins(8).setAutoSize().setAllowScrollBars(false, false);
                 that.frameTree = frameGroupTop.addMemberFrame(Framework.FrameFinal('', 0.99))
-                    .setAllowScrollBars(false,false);
+                    .setAllowScrollBars(false,true);
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setFixedSize(Framework.dimY, 47).setFrameClassClient('DQXGrayClient')
                     .setAllowScrollBars(false,false);
@@ -469,30 +469,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTree.clear();
                 var prevQueryList = [];
                 if (that.queryTool.prevQueries.length>0) {
-                    prevQueryList.push({
-                        name: 'Back to previous query',
-                        action:function() {
-                            that.queryTool.modify(SQL.WhereClause.decode(that.queryTool.prevQueries.pop()));
-                            that.queryTool.prevQueries.pop();
-                    }})
+                    var query = SQL.WhereClause.decode(that.queryTool.prevQueries[that.queryTool.prevQueries.length-1]);
+                    if (!query.isTrivial) {
+                        prevQueryList.push({
+                            id: '_previous_',
+                            name: 'Previous query <span style="color:rgb(150,150,150)">(' + that.tableInfo.createQueryDisplayString(query) + ')</span>'
+                        })
+                    }
                 };
                 if (!that.queryTool.query.isTrivial) {
                     prevQueryList.push({
-                        name: 'All',
-                        action:function() {
-                            that.queryTool.modify(SQL.WhereClause.Trivial());
-                    }})
+                        id: '_all_',
+                        name: 'All '+that.tableInfo.tableNamePlural
+                    })
                 };
                 if (prevQueryList.length>0) {
-                    var grpPrevQueries = FrameTree.Control(Controls.CompoundHor([Controls.Static('<div style="font-size: 120%;font-weight: bold">Previous queries</div>')]));
-                    that.panelTree.root.addItem(grpPrevQueries);
                     $.each(prevQueryList, function(idx, query) {
-                        var buttonOpen = Controls.ImageButton(null, { bitmap:'Bitmaps/actionbuttons/open.png', hint:'Open', vertShift:-3}).setOnChanged(function() {
-                            that.close();
-                            query.action();
-                        });
-                        var item = FrameTree.Control(Controls.CompoundHor([buttonOpen, Controls.Static('&nbsp;&nbsp;'+query.name)]));
-                        grpPrevQueries.addItem(item);
+                        var str = '<img style="position:relative;top:2px" src="Bitmaps/actionbuttons/open.png"/>&nbsp;' + query.name;
+                        var item = FrameTree.Branch(query.id, str);
+                        that.panelTree.root.addItem(item);
                     });
                 }
 
@@ -509,18 +504,36 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelTree.root.addItem(grpStoredQueries);
 
                 $.each(that.storedQueries, function(idx, query) {
-                    var buttonOpen = Controls.ImageButton(null, { bitmap:'Bitmaps/actionbuttons/open.png', hint:'Open', vertShift:-3}).setOnChanged(function() {
-                        DataFetchers.fetchSingleRecord(MetaData.serverUrl, MetaData.database, 'storedqueries', 'id', query.id, function(rsp) {
-                            that.queryTool.modify(SQL.WhereClause.decode(rsp.content));
-                        });
-                        that.close();
-                    });
-                    var item = FrameTree.Control(Controls.CompoundHor([buttonOpen, Controls.Static('&nbsp;&nbsp;'+query.name)]));
+                    var str = '<img style="position:relative;top:2px" src="Bitmaps/actionbuttons/open.png"/>&nbsp;' + query.name;
+                    var item = FrameTree.Branch('storedquery_l_'+query.id, str);
                     grpStoredQueries.addItem(item);
                 });
                 if (that.storedQueries.length == 0) {
                     var item = FrameTree.Branch(null, '<span class="SupportingText"><i>There are currently no stored queries present for {names}. You can store the current query by clicking on the edit button.</i></span>'.DQXformat({names: that.tableInfo.tableNamePlural}));
+                    item.setCanSelect(false);
                     grpStoredQueries.addItem(item);
+                }
+
+                that.panelTree.notifyClickTreeItem = function(id) {
+                    if (id == '_all_') {
+                        that.queryTool.modify(SQL.WhereClause.Trivial());
+                        that.close();
+                        return;
+                    }
+                    if (id == '_previous_') {
+                        that.queryTool.modify(SQL.WhereClause.decode(that.queryTool.prevQueries.pop()));
+                        that.queryTool.prevQueries.pop();
+                        that.close();
+                        return;
+                    }
+                    if (id.split('_l_')[0] == 'storedquery') {
+                        queryid = id.split('_l_')[1];
+                        DataFetchers.fetchSingleRecord(MetaData.serverUrl, MetaData.database, 'storedqueries', 'id', queryid, function(rsp) {
+                            that.queryTool.modify(SQL.WhereClause.decode(rsp.content));
+                        });
+                        that.close();
+                        return;
+                    }
                 }
 
                 that.panelTree.render();
