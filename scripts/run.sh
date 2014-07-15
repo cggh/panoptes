@@ -22,4 +22,4 @@ else
 	BIND=${1}
 fi  
 echo -e "${green}Serving PANOPTES on http://${BIND}/index.html${NC}"
-../virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_static:application
+../virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application
