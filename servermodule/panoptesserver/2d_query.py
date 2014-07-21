@@ -45,17 +45,17 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     query = "WHERE " + where.querystring_params if len(where.querystring_params) > 0 else ''
     fields_string = ','.join('`'+DQXDbTools.ToSafeIdentifier(f)+'`' for f in fields)
     table = DQXDbTools.ToSafeIdentifier(table)
-    sqlquery = "SELECT {fields_string} FROM {table} {query} ORDER BY %s".format(**locals())
+    order = DQXDbTools.ToSafeIdentifier(order)
+    sqlquery = "SELECT {fields_string} FROM {table} {query} ORDER BY {order}".format(**locals())
     params = where.queryparams
-    params.append(order)
     #Set the limit to one past the req
     limit = limit or fail_limit
     if limit:
         sqlquery += ' LIMIT %s'
-        params.append(str(int(limit)))
+        params.append(int(limit))
     if offset:
         sqlquery += ' OFFSET %s'
-        params.append(str(int(offset)))
+        params.append(int(offset))
     
     print sqlquery, params
     cur.execute(sqlquery, params)
