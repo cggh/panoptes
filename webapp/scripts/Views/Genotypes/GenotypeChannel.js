@@ -33,7 +33,9 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   row_order: table_info.row_table.primkey,
                   width_mode:'auto',
                   auto_width: true,
-                  user_column_width:3
+                  user_column_width:3,
+                  page_length: 10,
+                  page: 0
                 });
 
                 that.model = Model(table_info,

@@ -167,7 +167,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 //TODO Set row index by sort
                 if (that.row_ordinal.length > 0)
                     that.row_index = _.times(that.row_ordinal.length, function (i) {return i;});
-                elsedoors lizard
+                else
                     that.row_index = [];
                 that.update_callback();
             }
