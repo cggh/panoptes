@@ -6,6 +6,8 @@ define([],
     function Interval(start, end) {
       this.start = start;
       this.end = end;
+      this.pages = {};
+      this.fetching = [];
       if (end < start) {
         DQX.reportError('Negative interval created')
       }
@@ -21,6 +23,14 @@ define([],
 
     Interval.prototype.equals = function (interval) {
       return this.start === interval.start && interval.end === this.end;
+    };
+
+    Interval.prototype.has_fetched = function (page) {
+      return _(this.pages).keys().contains(page.toString());
+    };
+
+    Interval.prototype.is_fetching = function (page) {
+      return _(this.fetching).contains(page);
     };
 
     return Interval;

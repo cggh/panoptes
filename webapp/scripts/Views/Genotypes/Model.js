@@ -65,13 +65,14 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 _.each(that.chromosomes, function (chrom) {
                     that.cache_for_chrom[chrom] = TwoDCache(
                         that.col_order,
-                        function(start, end, callback) {
-                            that.data_provider(chrom, start, end, callback);
+                        function(start, end, r_start, r_end, callback) {
+                            that.data_provider(chrom, start, end, r_start, r_end, callback);
                         },
                         function () {
                             //Grab the new data from the cache
                             that.refresh_data();
-                        }
+                        },
+                        10
                     )
                 });
                 that.col_ordinal = [];
@@ -153,7 +154,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.refresh_data = function() {
                 var overdraw = (that.col_end - that.col_start)*0.00;
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw);
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, 0);
                 that.col_ordinal = data.col[that.col_order] || [];
                 that.row_ordinal = data.row[that.row_order] || [];
                 that.row_primary_key = data.row[that.table.row_table.primkey] || [];
@@ -179,7 +180,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.refresh_data();
             };
 
-            that.data_provider = function(chrom, col_ordinal_start, col_ordinal_end, callback) {
+            that.data_provider = function(chrom, col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, callback) {
                 //Modify the horizontal query to just the requested window
                 var col_query = that.col_query;
                 if (col_query.isTrivial)
@@ -201,6 +202,8 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.row_query));
                 myurl.addUrlQueryItem("col_order", that.col_order);
                 myurl.addUrlQueryItem("row_order", that.row_order);
+                myurl.addUrlQueryItem("row_offset", row_index_start);
+                myurl.addUrlQueryItem("row_limit", row_index_end-row_index_start);
                 myurl.addUrlQueryItem("first_dimension", that.table.first_dimension);
                 if (that.table.col_table.primkey == that.col_order)
                   myurl.addUrlQueryItem("col_properties", that.col_order);
@@ -213,10 +216,10 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
-                        callback(col_ordinal_start, col_ordinal_end, data);
+                        callback(col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, data);
                     },
                     function(error) {
-                        callback(col_ordinal_start, col_ordinal_end, null);
+                        callback(col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, null);
                     }
                 );
             };

@@ -3,9 +3,9 @@
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["Utils/RequestCounter", "Utils/Interval"],
   function (RequestCounter, Interval) {
-    return function TwoDCache(col_ordinal, provider, update_callback) {
+    return function TwoDCache(col_ordinal, provider, update_callback, row_page_length) {
       var that = {};
-      that.init = function (col_ordinal, provider, update_callback) {
+      that.init = function (col_ordinal, provider, update_callback, row_page_length) {
         that.col_ordinal = col_ordinal;
         that.provider = provider;
         that.update_callback = update_callback;
@@ -15,8 +15,8 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         that._intervals_being_fetched = [];
         that.provider_queue = [];
         that.current_provider_requests = 0;
-        that.row_data_fetched = false;
-        that.row_data = {};
+        that.row_data_pages = {};
+        that.row_page_length = row_page_length;
       };
 
       that.merge = function (arrays) {
@@ -101,45 +101,34 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         });
       };
 
-      that.get_by_ordinal = function (col_ord_start, col_ord_end, retrieve_missing) {
-        var bisect, i, last_match, matching_intervals, missing_intervals, ref;
-        var result = {'row': that.row_data, 'col': {}, 'twoD': {}};
-        if (retrieve_missing == null) retrieve_missing = true;
-        var col_ord_req = new Interval(col_ord_start, col_ord_end);
-
-        if (col_ord_req.start < 0) col_ord_req = new Interval(0, col_ord_req.end);
-        if (col_ord_req.end < 0) col_ord_req = new Interval(col_ord_req.start, 0);
-        if (col_ord_req.length() === 0) return result;
-
-        matching_intervals = that.intervals.filter(function (interval) {
-          return interval.overlaps(col_ord_req);
+      that._collate_data_for = function(req_interval, page) {
+        var result = {'row': that.row_data_pages[page] || {}, 'col': {}, 'twoD': {}};
+        var matching_intervals_with_data = that.intervals.filter(function (interval) {
+          return interval.overlaps(req_interval) && interval.has_fetched(page);
         });
 
-        var matching_intervals_with_data = matching_intervals.filter(function (interval) {
-          return interval.fetched;
-        });
         var interval, col_ordinal_array, start_index, end_index;
         if (matching_intervals_with_data.length == 1) {
           interval = matching_intervals_with_data[0];
           col_ordinal_array = interval.col[that.col_ordinal];
-          start_index = that.find_start(col_ordinal_array, col_ord_req.start);
-          end_index = that.find_end(col_ordinal_array, col_ord_req.end);
+          start_index = that.find_start(col_ordinal_array, req_interval.start);
+          end_index = that.find_end(col_ordinal_array, req_interval.end);
           _.forEach(interval.col, function (array, prop) {
             result.col[prop] = that.slice(array, start_index, end_index);
           });
-          _.forEach(interval.twoD, function (array, prop) {
+          _.forEach(interval.pages[page].twoD, function (array, prop) {
             result.twoD[prop] = that.twoD_col_slice(array, start_index, end_index);
           });
         } else if (matching_intervals_with_data.length > 1) {
           //Take the matching from the first interval
           interval = matching_intervals_with_data[0];
           col_ordinal_array = interval.col[that.col_ordinal];
-          start_index = that.find_start(col_ordinal_array, col_ord_req.start);
+          start_index = that.find_start(col_ordinal_array, req_interval.start);
           end_index = col_ordinal_array.length;
           _.forEach(interval.col, function (array, prop) {
             result.col[prop] = [that.slice(array, start_index, end_index)];
           });
-          _.forEach(interval.twoD, function (array, prop) {
+          _.forEach(interval.pages[page].twoD, function (array, prop) {
             result.twoD[prop] = [that.twoD_col_slice(array, start_index, end_index)];
           });
           //Then add in the intervals that are fully covered
@@ -148,7 +137,7 @@ define(["Utils/RequestCounter", "Utils/Interval"],
             _.forEach(interval.col, function (array, prop) {
               result.col[prop].push(array);
             });
-            _.forEach(interval.twoD, function (array, prop) {
+            _.forEach(interval.pages[page].twoD, function (array, prop) {
               result.twoD[prop].push(array);
             });
           }
@@ -156,39 +145,46 @@ define(["Utils/RequestCounter", "Utils/Interval"],
           interval = matching_intervals_with_data[matching_intervals_with_data.length - 1];
           col_ordinal_array = interval.col[that.col_ordinal];
           start_index = 0;
-          end_index = that.find_start(col_ordinal_array, col_ord_req.end);
+          end_index = that.find_start(col_ordinal_array, req_interval.end);
           _.forEach(interval.col, function (array, prop) {
             result.col[prop].push(that.slice(array, start_index, end_index));
           });
-          _.forEach(interval.twoD, function (array, prop) {
+          _.forEach(interval.pages[page].twoD, function (array, prop) {
             result.twoD[prop].push(that.twoD_col_slice(array, start_index, end_index));
           });
           //Merge the result
           _.forEach(interval.col, function (array, prop) {
             result.col[prop] = that.merge(result.col[prop]);
           });
-          _.forEach(interval.twoD, function (array, prop) {
+          _.forEach(interval.pages[page].twoD, function (array, prop) {
             result.twoD[prop] = that.merge2D(result.twoD[prop]);
           });
         }
-        if (!retrieve_missing) return result;
-        missing_intervals = [];
+        return result
+      };
+
+      that._create_missing_intervals = function(req_interval) {
+        var matching_intervals = that.intervals.filter(function (interval) {
+          return interval.overlaps(req_interval);
+        });
+
+        var missing_intervals = [];
         if (matching_intervals.length === 0) {
           missing_intervals.push(new Interval(
-            Math.floor(col_ord_start / 1000) * 1000,
-            Math.ceil(col_ord_end / 1000) * 1000
+              Math.floor(req_interval.start / 1000) * 1000,
+              Math.ceil(req_interval.end / 1000) * 1000
           ));
         }
         if (matching_intervals.length > 0) {
-          if (col_ord_start < matching_intervals[0].start) {
+          if (req_interval.start < matching_intervals[0].start) {
             missing_intervals.push(new Interval(
-              Math.floor(col_ord_start / 1000) * 1000,
+                Math.floor(req_interval.start / 1000) * 1000,
               matching_intervals[0].start
             ));
           }
         }
         if (matching_intervals.length > 1) {
-          for (i = 1, ref = matching_intervals.length - 1; i <= ref; i++) {
+          for (var i = 1, ref = matching_intervals.length - 1; i <= ref; i++) {
             if (matching_intervals[i - 1].end !== matching_intervals[i].start) {
               missing_intervals.push(new Interval(
                 matching_intervals[i - 1].end,
@@ -198,22 +194,19 @@ define(["Utils/RequestCounter", "Utils/Interval"],
           }
         }
         if (matching_intervals.length > 0) {
-          last_match = matching_intervals[matching_intervals.length - 1];
-          if (col_ord_req.end > last_match.end) {
+          var last_match = matching_intervals[matching_intervals.length - 1];
+          if (req_interval.end > last_match.end) {
             missing_intervals.push(new Interval(
               last_match.end,
-              Math.ceil(col_ord_end / 1000) * 1000
+                Math.ceil(req_interval.end / 1000) * 1000
             ));
           }
         }
-        bisect = d3.bisector(function (interval) {
-          return interval.start;
-        }).left;
         //Request small regions at a time to give a sense of progress...
         var resized_missing_intervals = [];
         var threshold = 2000000;
         for (i = 0, ref = missing_intervals.length; i < ref; i++) {
-          interval = missing_intervals[i];
+          var interval = missing_intervals[i];
           if (interval.length() < threshold)
             resized_missing_intervals.push(interval);
           else {
@@ -226,20 +219,48 @@ define(["Utils/RequestCounter", "Utils/Interval"],
           }
         }
         missing_intervals = resized_missing_intervals;
-
+        var bisect = d3.bisector(function (interval) {
+          return interval.start;
+        }).left;
         for (i = 0, ref = missing_intervals.length; i < ref; i++) {
           interval = missing_intervals[i];
-          interval.fetched = false;
-          that._intervals_being_fetched.push(interval);
           that.intervals.splice(bisect(that.intervals, interval.start), 0, interval);
-          that._add_to_provider_queue(interval);
         }
+        return missing_intervals;
+      };
+
+      that.get_by_ordinal = function (col_ord_start, col_ord_end, page, retrieve_missing) {
+        var bisect, i, last_match, matching_intervals, missing_intervals, ref;
+        if (retrieve_missing == null) retrieve_missing = true;
+        var col_ord_req = new Interval(col_ord_start, col_ord_end);
+
+        if (col_ord_req.start < 0) col_ord_req = new Interval(0, col_ord_req.end);
+        if (col_ord_req.end < 0) col_ord_req = new Interval(col_ord_req.start, 0);
+        if (col_ord_req.length() === 0) return {'row': {}, 'col': {}, 'twoD': {}};
+
+        //Grab the data we have already in the cache
+        var result = that._collate_data_for(col_ord_req, page);
+        if (!retrieve_missing) return result;
+
+        //Create intervals where we have none
+        that._create_missing_intervals(col_ord_req);
+
+        //Filter to the intervals that don't have this page and are not fetching it
+        //and request it for them
+        var to_fetch = that.intervals.filter(function (interval) {
+          return interval.overlaps(col_ord_req) && !interval.has_fetched(page) && !interval.is_fetching(page);
+        });
+        _.forEach(to_fetch, function(interval) {
+          interval.fetching.push(page);
+          that._intervals_being_fetched.push(interval);
+          that._add_to_provider_queue(page, interval);
+        });
         result.intervals_being_fetched = that._intervals_being_fetched;
         return result;
       };
 
-      that._add_to_provider_queue = function (interval) {
-        that.provider_queue.push(interval);
+      that._add_to_provider_queue = function (page, interval) {
+        that.provider_queue.push({page:page, interval:interval});
         if (that.provider_queue.length == 1) {
           that._process_provider_queue()
         }
@@ -247,8 +268,10 @@ define(["Utils/RequestCounter", "Utils/Interval"],
 
       that._process_provider_queue = function () {
         if (that.request_counter.free() && that.provider_queue.length > 0) {
-          var interval = that.provider_queue.pop();
-          that.provider(interval.start, interval.end, that._insert_received_data);
+          var pi = that.provider_queue.pop();
+          that.provider(pi.interval.start, pi.interval.end,
+                        pi.page*that.row_page_length, (pi.page+1)*that.row_page_length,
+                        that._insert_received_data);
           that.request_counter.increment();
         }
         if (that.provider_queue.length > 0) {
@@ -256,26 +279,35 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         }
       };
 
-      that._insert_received_data = function (start, end, data) {
+      that._insert_received_data = function (col_ord_start, col_ord_end, row_index_start, row_index_end, data) {
         that.request_counter.decrement();
         var match;
-        var interval = new Interval(start,end);
+        var interval = new Interval(col_ord_start, col_ord_end);
         match = that.intervals.filter(function (i) {
           return i.equals(interval);
         });
+        var page = row_index_start / that.row_page_length;
+        if (page !== Math.round(page)) {
+          console.log("Data for invalid page");
+          return;
+        }
         if (match.length !== 1) {
-          console.log("Got data for non-existant interval or multiples", start, end);
+          console.log("Got data for non-existant interval or multiples", col_ord_start, col_ord_end);
           return;
         }
         match = match[0];
+        if (!match.is_fetching(page)) {
+          console.log("Got data for page not being fetched", col_ord_start, col_ord_end);
+          return;
+        }
         //Remove from the being fetched list
         that._intervals_being_fetched = that._intervals_being_fetched.filter(function (i) {
           return !i.equals(match);
         });
+        match.fetching = _.without(match.fetching, page);
         if (data) {
-          match.fetched = true;
           match.col = {};
-          match.twoD = {};
+          match.pages[page] = {twoD: {}};
           var props = _.keys(data);
           for (var i = 0, ref = props.length; i < ref; i++) {
             var full_prop = props[i];
@@ -283,27 +315,22 @@ define(["Utils/RequestCounter", "Utils/Interval"],
             var prop = full_prop.substring(full_prop.indexOf('_') + 1);
             if (type == 'col')
               match.col[prop] = data[full_prop].array;
-            if (type == 'row')
-              that.row_data[prop] = data[full_prop].array;
+            if (type == 'row') {
+              that.row_data_pages[page] = {};
+              that.row_data_pages[page][prop] = data[full_prop].array;
+            }
             if (type == '2D') {
               var packed = data[full_prop];
-              match.twoD[prop] = _.times(packed.shape[0], function (i) {
+              match.pages[page].twoD[prop] = _.times(packed.shape[0], function (i) {
                 return that.slice(packed.array, i * packed.shape[1], (i + 1) * packed.shape[1]);
               });
             }
-
           }
-          //TODO MERGE TO NEIGHBOURS
-        } else {
-          that.intervals = that.intervals.filter(function (i) {
-            //No data so just remove so we get a request
-            return !i.equals(match);
-          });
         }
         that.update_callback();
       };
 
-      that.init(col_ordinal, provider, update_callback);
+      that.init(col_ordinal, provider, update_callback, row_page_length);
       return that
     };
   }
