@@ -50,7 +50,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.update_params = function(new_params){
               var invalidating_change = false;
-              _.each(['col_query', 'row_query', 'col_order', 'row_order'], function (param){
+              _.each(['col_query', 'row_query', 'col_order', 'row_order', 'page_length'], function (param){
                 if (that[param] !== new_params[param])
                   invalidating_change = true;
               });
@@ -72,7 +72,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                             //Grab the new data from the cache
                             that.refresh_data();
                         },
-                        10
+                        that.page_length
                     )
                 });
                 that.col_ordinal = [];
@@ -154,7 +154,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.refresh_data = function() {
                 var overdraw = (that.col_end - that.col_start)*0.00;
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, 0);
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page);
                 that.col_ordinal = data.col[that.col_order] || [];
                 that.row_ordinal = data.row[that.row_order] || [];
                 that.row_primary_key = data.row[that.table.row_table.primkey] || [];

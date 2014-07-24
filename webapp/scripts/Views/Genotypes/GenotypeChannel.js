@@ -128,6 +128,11 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
 
+                var page = Controls.ValueSlider(null, {label: 'Page', width:220, minval:0, maxval:10, scaleDistance: 20, value:model_params.get('page')})
+                  .bindToModel(model_params, 'page').setClassID(that.table_info.id + 'Page');
+                view_controls.addControl(page);
+
+
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = function() {
                   model_params.set('col_query', that.col_query.get());
