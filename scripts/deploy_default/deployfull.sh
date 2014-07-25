@@ -4,8 +4,8 @@ red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m'
 
-release='Pn1.2'
-#release='master'
+#release='Pn1.2'
+release='master'
 
 
 # target: ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9)
@@ -63,12 +63,10 @@ cp scripts/deploy_default/config.py config.py
 
 ./scripts/build.sh
 
-cp scripts/deploy_default/_SetServerUrl.js build/DQXServer/scripts/Local/_SetServerUrl.js
-
 cp /etc/apache2/sites-enabled/000-default /panoptes/bck_000-default
 cp scripts/deploy_default/apache_settings /etc/apache2/sites-enabled/000-default
 
-ln -s /panoptes/source/build/DQXServer /var/www
+ln -s /panoptes/source/build/DQXServer/wsgi_server.py /var/www/.
 
 /etc/init.d/apache2 restart
 
