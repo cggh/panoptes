@@ -34,7 +34,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   width_mode:'auto',
                   auto_width: true,
                   user_column_width:3,
-                  page_length: 10,
+                  page_length: 200,
                   page: 0
                 });
 
@@ -85,7 +85,6 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
                 var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
-                //var buttonSortSamplesByField = Controls.Button(null, {content:'Sort'});
                 var buttonSortSamplesByField = Controls.ImageButton(null,
                     {
                         bitmap:DQX.BMP("arrow4down.png"),
@@ -128,10 +127,25 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
 
-                var page = Controls.ValueSlider(null, {label: 'Page', width:220, minval:0, maxval:10, scaleDistance: 20, value:model_params.get('page')})
-                  .bindToModel(model_params, 'page').setClassID(that.table_info.id + 'Page');
-                view_controls.addControl(page);
-
+                var page_up = Controls.ImageButton(null,
+                {
+                  bitmap:DQX.BMP("arrow4up.png"),
+                  vertShift:-2,
+                  hint:"Page up"
+                })
+                .setOnChanged(function() {
+                  model_params.set('page', Math.max(model_params.get('page')-1, 0));
+                });
+                var page_down = Controls.ImageButton(null,
+                {
+                  bitmap:DQX.BMP("arrow4down.png"),
+                  vertShift:-2,
+                  hint:"Page Down"
+                })
+                .setOnChanged(function() {
+                  model_params.set('page', model_params.get('page')+1);
+                });
+                view_controls.addControl(Controls.CompoundHor([page_up, Controls.HorizontalSeparator(5), page_down]));
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = function() {
@@ -223,8 +237,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               data += '#Dataset: ' + MetaData.database + '\n';
               data += '#Workspace: ' + MetaData.workspaceid + '\n';
               data += '#Table:' + that.table_info.tableCapNamePlural + '\n';
-              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.query.col_query) + '\n';
-              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.query.row_query) + '\n';
+              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.col_query) + '\n';
+              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.row_query) + '\n';
               data += '#Choromosome:' + that.model.chrom + '\n';
               data += '#Start:' + Math.floor(that.model.col_start) + '\n';
               data += '#End:' + Math.ceil(that.model.col_end) + '\n';
