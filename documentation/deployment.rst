@@ -104,7 +104,7 @@ and the Apache2 WSGI configuration has to be instructed to use that virtualenv.
 This can be done by inserting the following statement at the virtual host level
 (note that the tokens need to be replaced by their proper values)::
 
-   WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/DQXServer/lib/python[Version]/site-packages
+   WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/virtualenv/lib/python[Version]/site-packages
 
 Create a new directory, pointing to DQXServer::
 
