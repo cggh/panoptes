@@ -27,18 +27,18 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
 
                 var model_params = DQXModel({
+                  col_query: SQL.WhereClause.Trivial(),
+                  row_query: SQL.WhereClause.Trivial(),
+                  col_order: table_info.col_table.PositionField,
+                  row_order: table_info.row_table.primkey,
                   width_mode:'auto',
                   auto_width: true,
-                  user_column_width:3
+                  user_column_width:3,
+                  page_length: 200,
+                  page: 0
                 });
 
                 that.model = Model(table_info,
-                                   {
-                                       col_query: SQL.WhereClause.Trivial(),
-                                       row_query: SQL.WhereClause.Trivial(),
-                                       col_order: table_info.col_table.PositionField,
-                                       row_order: table_info.row_table.primkey
-                                   },
                                    _.map(MetaData.chromosomes, DQX.attr('id')),
                                    that._draw,
                                    model_params.get()
@@ -85,13 +85,15 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
                 var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
-                //var buttonSortSamplesByField = Controls.Button(null, {content:'Sort'});
-                var buttonSortSamplesByField = Controls.ImageButton(null, {bitmap:DQX.BMP("arrow4down.png"), vertShift:-2, hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural})}).setOnChanged(function() {
-                    var sortPropId = sampleProperty_channel.getValue();
-                    that.model.query.row_order = sortPropId;
-                    that.model.reset_cache();
-                    that._draw();
-                });
+                var buttonSortSamplesByField = Controls.ImageButton(null,
+                    {
+                        bitmap:DQX.BMP("arrow4down.png"),
+                        vertShift:-2,
+                        hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural})
+                    })
+                    .setOnChanged(function() {
+                      model_params.set('row_order', view_params.get('samples_property'));
+                    });
                 view_controls.addControl(Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(5), buttonSortSamplesByField]));
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
@@ -125,12 +127,36 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
 
+                var page_up = Controls.ImageButton(null,
+                {
+                  bitmap:DQX.BMP("arrow4up.png"),
+                  vertShift:-2,
+                  hint:"Page up"
+                })
+                .setOnChanged(function() {
+                  model_params.set('page', Math.max(model_params.get('page')-1, 0));
+                });
+                var page_down = Controls.ImageButton(null,
+                {
+                  bitmap:DQX.BMP("arrow4down.png"),
+                  vertShift:-2,
+                  hint:"Page Down"
+                })
+                .setOnChanged(function() {
+                  model_params.set('page', model_params.get('page')+1);
+                });
+                view_controls.addControl(Controls.CompoundHor([page_up, Controls.HorizontalSeparator(5), page_down]));
+
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
-                that.col_query.notifyQueryUpdated = that.new_col_query;
+                that.col_query.notifyQueryUpdated = function() {
+                  model_params.set('col_query', that.col_query.get());
+                };
                 var col_query_tool = that.col_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(col_query_tool);
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
-                that.row_query.notifyQueryUpdated = that.new_row_query;
+                that.row_query.notifyQueryUpdated = function() {
+                  model_params.set('row_query', that.row_query.get());
+                };
                 var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
 
@@ -148,17 +174,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         that._draw();
                     }
                 });
-
-            };
-
-            that.new_col_query = function () {
-                that.model.new_col_query(that.col_query.get());
-                that._draw();
-            };
-
-            that.new_row_query = function () {
-                that.model.new_row_query(that.row_query.get());
-                that._draw();
+                that.model_params = model_params;
+                that.view_params = view_params;
             };
 
             that.draw = function (draw_info) {
@@ -220,8 +237,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               data += '#Dataset: ' + MetaData.database + '\n';
               data += '#Workspace: ' + MetaData.workspaceid + '\n';
               data += '#Table:' + that.table_info.tableCapNamePlural + '\n';
-              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.query.col_query) + '\n';
-              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.query.row_query) + '\n';
+              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.col_query) + '\n';
+              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.row_query) + '\n';
               data += '#Choromosome:' + that.model.chrom + '\n';
               data += '#Start:' + Math.floor(that.model.col_start) + '\n';
               data += '#End:' + Math.ceil(that.model.col_end) + '\n';
@@ -288,19 +305,13 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
             that.storeSettings = function() {
                 return {
-                    rowOrderField: that.model.query.row_order
+                    rowOrderField: that.model_params.get('row_order')
                 };
             };
 
             that.recallSettings = function(settObj) {
-                var needRefresh = false;
                 if (settObj.rowOrderField) {
-                    that.model.query.row_order = settObj.rowOrderField;
-                    needRefresh = true;
-                }
-                if (needRefresh) {
-                    that.model.reset_cache();
-                    that._draw();
+                    that.model_params.set('row_order',settObj.rowOrderField);
                 }
             };
 

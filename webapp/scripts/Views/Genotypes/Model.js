@@ -4,24 +4,27 @@
 define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
     function (_, TwoDCache, MetaData, ArrayBufferClient, SQL) {
         return function Model(table_info,
-                              query,
                               chromosomes,
                               update_callback,
                               initial_params) {
             var that = {};
             that.init = function(table_info,
-                                 query,
                                  chromosomes,
                                  update_callback,
                                  initial_params) {
                 that.table = table_info;
-                that.query = query;
+
                 that.chromosomes = chromosomes;
                 that.update_callback = update_callback;
 
                 that.first_col_ordinal = 0;
                 that.last_col_ordinal = 0;
-                //Vars set by params
+
+                that.col_query = SQL.WhereClause.Trivial();
+                that.row_query = SQL.WhereClause.Trivial();
+                that.col_order = '1';
+                that.row_order = '1';
+                //Vars set by params - can override those above
                 _.extend(that, initial_params);
                 that.data = {};
                 that.settings = table_info.settings.ShowInGenomeBrowser;
@@ -45,8 +48,15 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             };
 
-            that.update_params = function(view_params){
-              _.extend(that, view_params);
+            that.update_params = function(new_params){
+              var invalidating_change = false;
+              _.each(['col_query', 'row_query', 'col_order', 'row_order', 'page_length'], function (param){
+                if (that[param] !== new_params[param])
+                  invalidating_change = true;
+              });
+              _.extend(that, new_params);
+              if (invalidating_change)
+                that.reset_cache();
             };
 
             that.reset_cache = function() {
@@ -54,14 +64,15 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.cache_for_chrom = {};
                 _.each(that.chromosomes, function (chrom) {
                     that.cache_for_chrom[chrom] = TwoDCache(
-                        that.query.col_order,
-                        function(start, end, callback) {
-                            that.data_provider(chrom, start, end, callback);
+                        that.col_order,
+                        function(start, end, r_start, r_end, callback) {
+                            that.data_provider(chrom, start, end, r_start, r_end, callback);
                         },
                         function () {
                             //Grab the new data from the cache
                             that.refresh_data();
-                        }
+                        },
+                        that.page_length
                     )
                 });
                 that.col_ordinal = [];
@@ -143,9 +154,9 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.refresh_data = function() {
                 var overdraw = (that.col_end - that.col_start)*0.00;
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw);
-                that.col_ordinal = data.col[that.query.col_order] || [];
-                that.row_ordinal = data.row[that.query.row_order] || [];
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page);
+                that.col_ordinal = data.col[that.col_order] || [];
+                that.row_ordinal = data.row[that.row_order] || [];
                 that.row_primary_key = data.row[that.table.row_table.primkey] || [];
                 that.col_primary_key = data.col[that.table.col_table.primkey] || [];
                 _.each(that.properties, function(prop) {
@@ -169,26 +180,16 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.refresh_data();
             };
 
-            that.new_col_query = function(q) {
-                that.query.col_query = q;
-                that.reset_cache();
-            };
-
-            that.new_row_query = function(q) {
-                that.query.row_query = q;
-                that.reset_cache();
-            };
-
-            that.data_provider = function(chrom, start, end, callback) {
+            that.data_provider = function(chrom, col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, callback) {
                 //Modify the horizontal query to just the requested window
-                var col_query = that.query.col_query;
+                var col_query = that.col_query;
                 if (col_query.isTrivial)
                     col_query = [];
                 else
                     col_query = [col_query];
                 col_query.push(SQL.WhereClause.CompareFixed(that.table.col_table.ChromosomeField, '=', chrom));
-                col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '>=', start));
-                col_query.push(SQL.WhereClause.CompareFixed(that.query.col_order, '<', end));
+                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '>=', col_ordinal_start));
+                col_query.push(SQL.WhereClause.CompareFixed(that.col_order, '<', col_ordinal_end));
                 col_query = SQL.WhereClause.AND(col_query);
                 var myurl = DQX.Url(MetaData.serverUrl);
                 myurl.addUrlQueryItem("datatype", "custom");
@@ -198,31 +199,32 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem('datatable', that.table.id);
                 myurl.addUrlQueryItem('workspace', MetaData.workspaceid);
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
-                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.query.row_query));
-                myurl.addUrlQueryItem("col_order", that.query.col_order);
-                myurl.addUrlQueryItem("row_order", that.query.row_order);
+                myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.row_query));
+                myurl.addUrlQueryItem("col_order", that.col_order);
+                myurl.addUrlQueryItem("row_order", that.row_order);
+                myurl.addUrlQueryItem("row_offset", row_index_start);
+                myurl.addUrlQueryItem("row_limit", row_index_end-row_index_start);
                 myurl.addUrlQueryItem("first_dimension", that.table.first_dimension);
-                if (that.table.col_table.primkey == that.query.col_order)
-                  myurl.addUrlQueryItem("col_properties", that.query.col_order);
+                if (that.table.col_table.primkey == that.col_order)
+                  myurl.addUrlQueryItem("col_properties", that.col_order);
                 else
-                  myurl.addUrlQueryItem("col_properties", that.query.col_order+'~'+that.table.col_table.primkey);
-                if (that.table.row_table.primkey == that.query.row_order)
-                  myurl.addUrlQueryItem("row_properties", that.query.row_order);
+                  myurl.addUrlQueryItem("col_properties", that.col_order+'~'+that.table.col_table.primkey);
+                if (that.table.row_table.primkey == that.row_order)
+                  myurl.addUrlQueryItem("row_properties", that.row_order);
                 else
-                  myurl.addUrlQueryItem("row_properties", that.query.row_order+'~'+that.table.row_table.primkey);
+                  myurl.addUrlQueryItem("row_properties", that.row_order+'~'+that.table.row_table.primkey);
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
-                        callback(start, end, data);
+                        callback(col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, data);
                     },
                     function(error) {
-                        callback(start, end, null);
+                        callback(col_ordinal_start, col_ordinal_end, row_index_start, row_index_end, null);
                     }
                 );
             };
 
             that.init(table_info,
-                      query,
                       chromosomes,
                       update_callback,
                       initial_params);
