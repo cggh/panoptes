@@ -62,6 +62,13 @@ def response(returndata):
                                 if os.path.isdir(os.path.join(baseFolder, datasetid, 'datatables', tableid)):
                                     datatables[tableid] = {}
                         datasets[datasetid]['datatables'] = datatables
+                        # Fetch info about 2Ddatatables
+                        twoDdatatables = {}
+                        if os.path.exists(os.path.join(baseFolder, datasetid, '2D_datatables')):
+                            for tableid in os.listdir(os.path.join(baseFolder, datasetid, '2D_datatables')):
+                                if os.path.isdir(os.path.join(baseFolder, datasetid, '2D_datatables', tableid)):
+                                    twoDdatatables[tableid] = {}
+                        datasets[datasetid]['2D_datatables'] = twoDdatatables
                         importStatus = 'absent'
                         lastModifiedTime = GetLastModifiedFileInTree(os.path.join(baseFolder, datasetid))
                         if datasetid in datasetImportTimes:
