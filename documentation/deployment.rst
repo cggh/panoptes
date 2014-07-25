@@ -97,29 +97,28 @@ Deployment on Apache2
   
 Install the Apache2 wsgi dependency `libapache2-mod-wsgi`.
 
-Create a symbolic link in `/var/www/DQXServer` to `[PanoptesInstallationPath]/build/DQXServer`.
+Create a symbolic link in `/var/www/` to `[PanoptesInstallationPath]/build/DQXServer/wsgi_server.py`::
+
+    ln -s [PanoptesInstallationPath]/build/DQXServer/wsgi_server.py /var/www/.
 
 The build script uses a virtualenv for the installation of Python dependencies,
 and the Apache2 WSGI configuration has to be instructed to use that virtualenv.
-This can be done by inserting the following statement at the virtual host level
-(note that the tokens need to be replaced by their proper values)::
+An example VirtualHost config would be (note that the tokens need to be replaced by their proper values)::
 
-   WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/virtualenv/lib/python[Version]/site-packages
-
-Create a new directory, pointing to DQXServer::
-
-    <Directory "/var/www/DQXServer">
+    <VirtualHost *:80>
+        DocumentRoot /var/www
+        <Directory />
+            Options FollowSymLinks
+            AllowOverride None
+        </Directory>
+        WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/virtualenv/lib/python2.7/site-packages:[PanoptesInstallationPath]/build/DQXServer
         WSGIProcessGroup Panoptes
-        Options Indexes FollowSymLinks MultiViews ExecCGI
-        MultiviewsMatch Handlers
-        AddHandler wsgi-script .wsgi .py
-        AddHandler cgi-script .cgi .pl
-        AllowOverride All
-    </Directory>
+        WSGIScriptAlias / /var/www/wsgi_server.py
+    </VirtualHost>
 
 In this configuration, the app is served from::
 
-  [ServerName]/DQXServer/app/index.html
+  [ServerName]:80/
 
 Automatic deployment on a new Ubuntu EC2 image
 ----------------------------------------------
