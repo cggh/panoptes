@@ -388,13 +388,13 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
 
                             $.each(datasetInfo['2D_datatables'], function(datatableid, datatableInfo) {
-                                var branchid = '2Ddatatable_'+datasetid+'_'+datatableid;
-                                var actionList = [];//createActionView(branchid), createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
+                                var branchid = '2D_datatable_'+datasetid+'_'+datatableid;
+                                var actionList = [createActionEdit(branchid), createActionLoad(branchid), createActionDelete(branchid)];
                                 var branch = createBranch(branchid, datatableid, 'AdminTreeNormal', actionList );
                                 branch.canCollapse = false;
                                 twoDdatatablesBranch.addItem(branch);
                                 that.sourceFileInfoList[branchid] = {
-                                    tpe: '2Ddatatable',
+                                    tpe: '2D_datatable',
                                     datasetid: datasetid,
                                     tableid: datatableid
                                 };

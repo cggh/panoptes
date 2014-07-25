@@ -33,6 +33,9 @@ def response(returndata):
     if sourcetype == 'datatable':
         settingsFile = os.path.join(baseFolder, databaseName, 'datatables', tableid, 'settings')
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
+    if sourcetype == '2D_datatable':
+        settingsFile = os.path.join(baseFolder, databaseName, '2D_datatables', tableid, 'settings')
+        authorization.VerifyIsDataSetManager(credInfo, databaseName)
     if sourcetype == 'workspace':
         settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'settings')
         credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))

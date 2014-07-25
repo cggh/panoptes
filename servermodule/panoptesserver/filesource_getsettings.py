@@ -29,6 +29,8 @@ def response(returndata):
         settingsFile = os.path.join(baseFolder, databaseName, 'settings')
     if sourcetype == 'datatable':
         settingsFile = os.path.join(baseFolder, databaseName, 'datatables', tableid, 'settings')
+    if sourcetype == '2D_datatable':
+        settingsFile = os.path.join(baseFolder, databaseName, '2D_datatables', tableid, 'settings')
     if sourcetype == 'customdata':
         settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
     if sourcetype == 'workspace':
