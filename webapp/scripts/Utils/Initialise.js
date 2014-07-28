@@ -216,7 +216,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var dv = DocEl.Div();
                 dv.setCssClass("DatasetIcon");
                 if (table.settings.Icon)
-                    dv.addElem('<span class="fa {icon}" style="padding-top: 7px;font-size: 30px"></span>'.DQXformat({icon:table.settings.Icon}));
+                    dv.addElem('<span class="fa {icon}" style="line-height: inherit;font-size: 30px;text-shadow:1px 1px 2px rgba(0,0,0,0.3);"></span>'.DQXformat({icon:table.settings.Icon}));
                 else {
                     dv.addElem(table.settings.LetterCode);
                 }
