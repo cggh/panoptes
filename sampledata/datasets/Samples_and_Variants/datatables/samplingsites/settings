@@ -2,6 +2,8 @@ NameSingle: sampling site    # Display name referring to a table item (single, n
 NamePlural: sampling sites    # Display name referring to a table item (plural, no capital)
 Description: Information about the sites where samples were collected     # A description of this dataset
 
+Icon: fa-map-marker
+
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: SiteID

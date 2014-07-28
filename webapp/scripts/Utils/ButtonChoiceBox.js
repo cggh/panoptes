@@ -148,9 +148,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             choices.push(choicesRow);
 
-            var queryDescription = tableInfo.tableViewer.getQueryDescription(theQueryObject.get());
+            var txt = tableInfo.tableViewer.getQueryDescription(theQueryObject.get());
+            txt += '<p>Select the {names} in this query:<br>'.DQXformat({names:tableInfo.tableNamePlural});
 
-            ButtonChoiceBox.create('Select '+tableInfo.tableNamePlural, queryDescription, choices);
+            ButtonChoiceBox.create('Select '+tableInfo.tableNamePlural, txt, choices);
         }
 
 

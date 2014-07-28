@@ -592,3 +592,8 @@ a:link, a:visited
 
 
 }
+
+
+[data-icon]:before {
+    font-family: icons; /* BYO icon font, mapped smartly */
+    content: attr(data-icon);

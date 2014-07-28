@@ -215,7 +215,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             table.createIcon = function(settings) {
                 var dv = DocEl.Div();
                 dv.setCssClass("DatasetIcon");
-                dv.addElem(table.settings.LetterCode);
+                if (table.settings.Icon)
+                    dv.addElem('<span class="fa {icon}" style="padding-top: 7px;font-size: 30px"></span>'.DQXformat({icon:table.settings.Icon}));
+                else {
+                    dv.addElem(table.settings.LetterCode);
+                }
                 if (settings && settings.floatLeft) {
                     dv.addStyle("float", "left");
                     dv.addStyle('margin-right', '10px');

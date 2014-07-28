@@ -485,7 +485,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 };
                 if (prevQueryList.length>0) {
                     $.each(prevQueryList, function(idx, query) {
-                        var str = '<img style="position:relative;top:2px" src="Bitmaps/actionbuttons/open.png"/>&nbsp;' + query.name;
+                        var str = '<div style="padding-bottom:5px;padding-top:5px"><img style="position:relative;top:2px" src="Bitmaps/actionbuttons/open.png"/>&nbsp;' + query.name+'</div>';
                         var item = FrameTree.Branch(query.id, str);
                         that.panelTree.root.addItem(item);
                     });
@@ -501,6 +501,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 var grpStoredQueries = FrameTree.Control(Controls.CompoundHor([Controls.Static('<div style="font-size: 120%;font-weight: bold">Stored queries&nbsp;&nbsp;</div>'), buttonManageStoredQueries]));
+                grpStoredQueries.canCollapse = false;
                 that.panelTree.root.addItem(grpStoredQueries);
 
                 $.each(that.storedQueries, function(idx, query) {

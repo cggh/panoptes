@@ -2,6 +2,8 @@ NameSingle: population
 NamePlural: populations
 #Description:
 
+Icon: fa-group # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
+
 PrimKey: ID
 
 Properties:
