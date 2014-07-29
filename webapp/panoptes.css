@@ -587,13 +587,10 @@ a:link, a:visited
     border-radius:9px;
 
     border:2px solid rgb(99,201,205);
-    color: rgb(61,104,108);
+/*    color: rgb(61,104,108);*/
+    color: rgb(91,144,148);
     background-color: rgba(206,234,237,0.5);
 
 
 }
 
-
-[data-icon]:before {
-    font-family: icons; /* BYO icon font, mapped smartly */
-    content: attr(data-icon);

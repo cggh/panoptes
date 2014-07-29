@@ -33,9 +33,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         ItemPopup.show_sub1 = function(itemInfo, data) {
 
 
+            var tableInfo = MetaData.getTableInfo(itemInfo.tableid);
             var that = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
                 {
-                    title:MetaData.getTableInfo(itemInfo.tableid).tableCapNameSingle + ' "'+itemInfo.itemid+'"',
+                    title:tableInfo.tableCapNameSingle + ' "'+itemInfo.itemid+'"',
+                    icon:tableInfo.settings.Icon,
                     blocking:false,
                     sizeX:700, sizeY:500
                 }

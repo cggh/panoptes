@@ -22,8 +22,8 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     rootFrame.makeGroupHor();
                     rootFrame.setSeparatorSize(7);
 
-                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.57));
-                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.43))/*.setFixedSize(Framework.dimX, 400)*/;
+                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.6));
+                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.4))/*.setFixedSize(Framework.dimX, 400)*/;
                     this.frameButtons.setMargins(0);
                     this.frameButtons2.setMargins(0);
                     //this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
@@ -47,7 +47,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         var browserButton = Application.getView('genomebrowser').createActivationButton({
                             content: "Genome browser",
                             buttonClass: "DQXToolButton2",
-                            bitmap: 'Bitmaps/GenomeBrowser.png'
+                            bitmap: 'Bitmaps/GenomeBrowserSmall.png'
                         });
 //                        var findGeneButton = Application.getView('genomebrowser').createActivationButton({
 //                            content: "Fine gene...",
@@ -60,7 +60,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                                 buttonClass: 'DQXToolButton1',
                                 content: "Find gene...",
                                 bitmap: 'Bitmaps/Find.png',
-                                width:120, height:50
+                                width:100, height:35
                             });
                         findGeneButton.setOnChanged(function() {
                             FindGene.execute()
@@ -72,7 +72,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
 
                         var grp = Controls.CompoundVert([
                             Controls.Static(descr),
-                            Controls.CompoundHor([browserButton, Controls.HorizontalSeparator(8), findGeneButton])
+                            Controls.CompoundHor([browserButton, findGeneButton])
 //                            browserButton
                         ]);
                         tableButtons.push(Controls.Section(grp, {
@@ -90,25 +90,38 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             bitmap: 'Bitmaps/datagrid2.png'
                         });
 
-                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:120, height:50, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
                             Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
                         });
 
-                        var descr = tableInfo.settings.Description||'<i>No description</i>';
-                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
-                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
-                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
-                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
-                            });
-                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
-                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
-                            });
-                            descr += '</div>';
-                        }
+                        var descr = '';
+//                        descr += tableInfo.createIcon({floatLeft: true});
+                        descr += tableInfo.settings.Description||'<i>No description</i>';
+//                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
+//                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
+//                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
+//                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
+//                            });
+//                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
+//                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
+//                            });
+//                            descr += '</div>';
+//                        }
                         var info = Controls.Static(descr);
                         var grp = Controls.CompoundVert([
+                            Controls.CompoundHor([
+                                Controls.Static(tableInfo.createIcon({floatLeft: false})),
+                                Controls.HorizontalSeparator(18),
+                                Controls.CompoundVert([
+                                    Controls.VerticalSeparator(4),
+                                    Controls.CompoundHor([
+                                        tableViewerButton,
+                                        button_Showplots
+                                    ])
+                                ]).setTreatAsBlock().setMargin(0)
+                            ]),
                             info,
-                            Controls.CompoundHor([tableViewerButton, Controls.HorizontalSeparator(8), button_Showplots])
+                            Controls.Static('')
                         ]);;
                         tableButtons.push(Controls.Section(grp, {
                             title: tableInfo.tableCapNamePlural,
