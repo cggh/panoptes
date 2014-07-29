@@ -206,6 +206,13 @@ a:link, a:visited
     opacity:1;
 }
 
+.DQXToolButton0 .buttonicon, .DQXToolButton1 .buttonicon, .DQXToolButton2 .buttonicon, .DQXToolButton3 .buttonicon, .PnButtonLarge .buttonicon, .PnButtonSmall .buttonicon, .PnButtonGrid .buttonicon {
+    color:rgb(130,130,130);
+}
+
+.DQXToolButton0:hover .buttonicon, .DQXToolButton1:hover .buttonicon, .DQXToolButton2:hover .buttonicon, .DQXToolButton3:hover .buttonicon, .PnButtonLarge:hover .buttonicon, .PnButtonSmall:hover .buttonicon, .PnButtonGrid:hover .buttonicon {
+    color:rgb(0,0,0);
+}
 
 .PnButtonSmall
 {

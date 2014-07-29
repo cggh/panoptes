@@ -166,7 +166,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += headerCtrl.renderHtml() + '<br>';
             content += '<div style="background-color:white; border:1px solid rgb(100,190,200); min-width: 450px; max-height:450px; overflow-y:auto">';
             content += controls.renderHtml() + '</div><p>';
-            var buttonCreatePlot = Controls.Button(null, { content: '<b>Create plot</b>', buttonClass: 'PnButtonLarge', width:120, height:40, bitmap:'Bitmaps/chart.png' });
+            var buttonCreatePlot = Controls.Button(null, { content: '<b>Create plot</b>', buttonClass: 'PnButtonLarge', width:120, height:40, icon:'fa-bar-chart-o' });
             buttonCreatePlot.setOnChanged(function() {
                 var aspects = {};
                 $.each(selectors, function(idx, selector) {

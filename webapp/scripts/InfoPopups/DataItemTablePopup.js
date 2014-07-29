@@ -175,7 +175,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 });
 
-                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:130, height:30, bitmap:'Bitmaps/chart2.png', bitmapHeight:20}).setOnChanged(function() {
+                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'PnButtonGrid', width:130, height:30, icon:'fa-bar-chart-o'}).setOnChanged(function() {
                     Msg.send({type: 'CreateDataItemPlot'}, {
                         query: that.theQuery.get(),
                         tableid: that.tableInfo.id,

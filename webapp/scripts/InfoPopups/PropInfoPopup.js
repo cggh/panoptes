@@ -30,7 +30,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += '<br>';
             }
 
-            var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot', width:120, height:40, bitmap:'Bitmaps/chart.png' }).setOnChanged(function() {
+            var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot', width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
                 Msg.send({type: 'CreateDefaultPropertyPlot'}, {
                     tableid: propInfo.tableid,
                     propid: propInfo.propid,

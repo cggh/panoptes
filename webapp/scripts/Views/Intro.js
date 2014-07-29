@@ -87,10 +87,10 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
                         var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
                             content: "Show table",
-                            bitmap: 'Bitmaps/datagrid2.png'
+                            icon: 'fa-table'
                         });
 
-                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, bitmap:'Bitmaps/chart.png'}).setOnChanged(function() {
+                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
                             Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
                         });
 
