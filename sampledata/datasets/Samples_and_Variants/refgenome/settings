@@ -1,6 +1,13 @@
 AnnotMaxViewPortSize: 750000  # Maximum viewport (in bp) the genome browser can have in order to show the annotation track
 RefSequenceSumm: Yes          # Include a summary track displaying the reference sequence
 
+Annotation:                             # Directives for parsing the annotation file (annotation.gff)
+  Format: GFF                           # Format: GFF = Version 3 GFF file ; GTF = Version 2 GTF file
+  GeneFeature: [gene, pseudogene]       # Feature id(s) used to identify genes
+  ExonFeature: exon                     # Feature id(s) used to identify exons
+  GeneNameAttribute: Name               # Attribute id used to identify gene names
+  GeneNameSetAttribute: [Name,Alias]    # Attribute id(s) used to identify gene name sets
+  GeneDescriptionAttribute: description # Attribute id(s) used to identify gene descriptions
 
 ExternalGeneLinks:
 - Url: https://www.google.co.uk/search?q={Id}

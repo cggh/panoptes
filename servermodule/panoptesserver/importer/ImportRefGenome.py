@@ -14,7 +14,13 @@ import customresponders.panoptesserver.Utils as Utils
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
+import sys
 
+def flattenarglist(arg):
+    if isinstance(arg, list):
+        return ','.join(arg)
+    else:
+        return arg
 
 def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
     if not os.path.exists(os.path.join(folder, 'summaryvalues')):
@@ -111,19 +117,56 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
             ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
             os.remove(sqlfile)
 
-        if importSettings['ScopeStr'] == 'all':
-            # Import annotation
+        # Import annotation
+        if not(importSettings['ConfigOnly']):
             with calculationObject.LogHeader('Converting annotation'):
+                str_maxrowcount = 'all'
+                if importSettings['ScopeStr'] == '1k':
+                    str_maxrowcount = '1000'
+                if importSettings['ScopeStr'] == '10k':
+                    str_maxrowcount = '10000'
+
+                formatid = 'GFF'
+                geneidlist = 'gene,pseudogene'
+                exonid = 'exon'
+                attrib_genename = 'Name'
+                attrib_genenames = 'Name,Alias,previous_systematic_id'
+                attrib_descr = 'descr'
+                if settings.HasToken('Annotation'):
+                    annotationsettings = settings.GetSubSettings('Annotation')
+                    print('Annotation settings: '+str(annotationsettings.Get()))
+                    if annotationsettings.HasToken('Format'):
+                        formatid = annotationsettings['Format']
+                        if formatid not in ['GFF', 'GTF']:
+                            raise Exception('Invalid annotation format (should be GTF or GFF')
+                    if annotationsettings.HasToken('GeneFeature'):
+                        geneidlist = flattenarglist(annotationsettings['GeneFeature'])
+                    if annotationsettings.HasToken('ExonFeature'):
+                        exonid = annotationsettings['ExonFeature']
+                    if annotationsettings.HasToken('GeneNameAttribute'):
+                        attrib_genename = flattenarglist(annotationsettings['GeneNameAttribute'])
+                    if annotationsettings.HasToken('GeneNameSetAttribute'):
+                        attrib_genenames = flattenarglist(annotationsettings['GeneNameSetAttribute'])
+                    if annotationsettings.HasToken('GeneDescriptionAttribute'):
+                        attrib_descr = flattenarglist(annotationsettings['GeneDescriptionAttribute'])
+
                 tempgfffile = ImpUtils.GetTempFileName()
                 temppath = os.path.dirname(tempgfffile)
                 shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
-                ImpUtils.RunConvertor(calculationObject, 'ParseGFF', temppath, [os.path.basename(tempgfffile)])
+                ImpUtils.RunConvertor(calculationObject, 'ParseAnnotation', temppath, [
+                    str_maxrowcount,
+                    formatid,
+                    geneidlist,
+                    exonid,
+                    attrib_genename,
+                    attrib_genenames,
+                    attrib_descr,
+                    os.path.basename(tempgfffile)
+                ])
                 print('Importing annotation')
                 ImpUtils.ExecuteSQLScript(calculationObject, os.path.join(temppath, 'annotation_dump.sql'), datasetId)
                 os.remove(tempgfffile)
                 os.remove(os.path.join(temppath, 'annotation.txt'))
                 os.remove(os.path.join(temppath, 'annotation_dump.sql'))
                 os.remove(os.path.join(temppath, 'annotation_create.sql'))
-        else:
-            calculationObject.Log('WARNING: Skipping converting annotation')
 
