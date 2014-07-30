@@ -55,7 +55,7 @@ def ResponseExecute(returndata, calculationObject):
                 keys = datastring.split('\t')
                 def delkeys(keylist):
                     if len(keylist) > 0:
-                        keystr = ', '.join(['"'+deleteString.format(key)+'"' for key in keylist])
+                        keystr = ', '.join([deleteString.format(key) for key in keylist])
                         sqlstring = "DELETE FROM {0} WHERE (subsetid={1}) AND ({2} IN ({3}))".format(DBTBESC(subsetTable), subsetid, DBCOLESC(keyid), keystr)
                         cur.execute(sqlstring)
                         cur.commit()
