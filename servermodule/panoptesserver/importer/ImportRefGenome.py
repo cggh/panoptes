@@ -26,6 +26,18 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
     if not os.path.exists(os.path.join(folder, 'summaryvalues')):
         return
 
+    maxLineCount = -1
+    if importSettings['ScopeStr'] == '1k':
+        maxLineCount = 1000
+    if importSettings['ScopeStr'] == '10k':
+        maxLineCount = 10000
+    if importSettings['ScopeStr'] == '100k':
+        maxLineCount = 100000
+    if importSettings['ScopeStr'] == '1M':
+        maxLineCount = 1000000
+    if importSettings['ScopeStr'] == '10M':
+        maxLineCount = 10000000
+
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
 
     summaryids = []
@@ -50,9 +62,9 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             settings.DefineKnownTokens(['channelColor'])
             settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
             print('SETTINGS: '+settings.ToJSON())
-            if importSettings['ScopeStr'] == 'all':
+            if not(importSettings['ConfigOnly']):
                 print('Executing filter bank')
-                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings)
+                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings, maxLineCount)
             else:
                 calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
             extraSettings = settings.Clone()

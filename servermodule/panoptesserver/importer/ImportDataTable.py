@@ -23,6 +23,18 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         print('Source: ' + folder)
         DQXUtils.CheckValidTableIdentifier(tableid)
 
+        maxLineCount = -1
+        if importSettings['ScopeStr'] == '1k':
+            maxLineCount = 1000
+        if importSettings['ScopeStr'] == '10k':
+            maxLineCount = 10000
+        if importSettings['ScopeStr'] == '100k':
+            maxLineCount = 100000
+        if importSettings['ScopeStr'] == '1M':
+            maxLineCount = 1000000
+        if importSettings['ScopeStr'] == '10M':
+            maxLineCount = 10000000
+
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablecatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'relations'))
@@ -267,18 +279,23 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         summSettings['BlockSizeMin']
                     )
                     ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-                    if importSettings['ScopeStr'] == 'all':
+                    if not importSettings['ConfigOnly']:
+                        maxitemtrackcount = -1
+                        if importSettings['ScopeStr'] != 'all':
+                            maxitemtrackcount = 5
+                            print('Limited to {0} items'.format(maxitemtrackcount))
                         itemtracknr = 0
                         for fileid in os.listdir(os.path.join(folder, summaryid)):
                             if not(os.path.isdir(os.path.join(folder, summaryid, fileid))):
                                 itemtracknr += 1
-                                calculationObject.Log('Processing {0}: {1}'.format(itemtracknr, fileid))
-                                destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, 'TableTracks', tableid, summaryid, fileid)
-                                calculationObject.Log('Destination: '+destFolder)
-                                if not os.path.exists(destFolder):
-                                    os.makedirs(destFolder)
-                                shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
-                                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid+'_'+fileid, summSettings)
+                                if (maxitemtrackcount < 0) or (itemtracknr < maxitemtrackcount):
+                                    calculationObject.Log('Processing {0}: {1}'.format(itemtracknr, fileid))
+                                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, 'TableTracks', tableid, summaryid, fileid)
+                                    calculationObject.Log('Destination: '+destFolder)
+                                    if not os.path.exists(destFolder):
+                                        os.makedirs(destFolder)
+                                    shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
+                                    ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid+'_'+fileid, summSettings, maxLineCount)
 
 
 

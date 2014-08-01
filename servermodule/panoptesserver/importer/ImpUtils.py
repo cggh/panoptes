@@ -149,7 +149,7 @@ def RunConvertor(calculationObject, name, runpath, arguments):
     calculationObject.RunPythonScript(scriptFile, runpath, arguments)
 
 
-def ExecuteFilterbankSummary_Value(calculationObject, destFolder, id, settings):
+def ExecuteFilterbankSummary_Value(calculationObject, destFolder, id, settings, maxcount=-1):
     RunConvertor(calculationObject, '_CreateSimpleFilterBankData', destFolder,
                  [
                      id,
@@ -157,7 +157,8 @@ def ExecuteFilterbankSummary_Value(calculationObject, destFolder, id, settings):
                      settings['MaxVal'],
                      settings['BlockSizeMin'],
                      2,
-                     settings['BlockSizeMax']
+                     settings['BlockSizeMax'],
+                     maxcount
                 ]
     )
 
