@@ -151,8 +151,6 @@ a:link, a:visited
 }
 
 
-
-
 .DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid
 {
 
@@ -212,6 +210,17 @@ a:link, a:visited
 
 .DQXToolButton0:hover .buttonicon, .DQXToolButton1:hover .buttonicon, .DQXToolButton2:hover .buttonicon, .DQXToolButton3:hover .buttonicon, .PnButtonLarge:hover .buttonicon, .PnButtonSmall:hover .buttonicon, .PnButtonGrid:hover .buttonicon {
     color:rgb(0,0,0);
+}
+
+.DQXButtonBar
+{
+    color:rgb(150,150,150);
+}
+
+.DQXButtonBarButton:hover
+{
+    background-color:inherit;
+    color: black;
 }
 
 .PnButtonSmall
