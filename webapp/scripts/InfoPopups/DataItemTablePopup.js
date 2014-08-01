@@ -215,6 +215,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.onQueryModified = function() {
                 that.setIntroText();
+                that.myTable.setQuery(that.theQuery.getForFetching());
+                that.myTable.setTable(that.tableInfo.getQueryTableName(that.theQuery.isSubSampling()));
+                that.myTable.reLoadTable();
             }
 
 

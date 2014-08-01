@@ -91,7 +91,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             that.recall = function(settObj, notify) {
                 that.query = SQL.WhereClause.decode(settObj.query);
-                that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
+                if (that.ctrlQueryString)
+                    that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
                 if (that.hasSubSampler) {
                     that.ctrlSubSampler.modifyValue(settObj.frac);
                     if (settObj.sliceidx != null)
