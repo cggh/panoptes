@@ -148,7 +148,6 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                 )
 
                 print('Creating new columns')
-                calculationObject.Log('WARNING: better mechanism to determine column types needed here')#TODO: implement
                 frst = True
                 sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
                 for property in properties:

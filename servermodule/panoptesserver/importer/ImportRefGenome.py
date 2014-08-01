@@ -81,7 +81,12 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
         ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
         # Import reference genome
-        if importSettings['ScopeStr'] == 'all':
+        if not(importSettings['ConfigOnly']):
+            str_maxbasecount = 'all'
+            if importSettings['ScopeStr'] != 'all':
+                str_maxbasecount = '10000'
+            if importSettings['ScopeStr'] == '100k':
+                str_maxbasecount = '1000000'
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
@@ -90,11 +95,9 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
                         os.makedirs(destfolder)
                     tempfastafile = destfolder + '/refsequence.fa'
                     shutil.copyfile(refsequencefile, tempfastafile)
-                    ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, ['refsequence.fa'])
+                    ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, [str_maxbasecount, 'refsequence.fa'])
             else:
                 calculationObject.Log('WARNING: missing reference sequence file')
-        else:
-            calculationObject.Log('WARNING: Skipping converting reference genome')
 
 
         # Import chromosomes

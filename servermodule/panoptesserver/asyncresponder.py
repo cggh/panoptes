@@ -218,7 +218,9 @@ class CalculationThread (threading.Thread):
             if self.logfilename is not None:
                 cmd += ' >> ' + self.logfilename + ' 2>&1'
             print('COMMAND:'+cmd)
-            os.system(cmd)
+            retval = os.system(cmd)
+            if retval != 0:
+                raise Exception('An error occurred while running subprocess (return value: {0}) '.format(retval)+cmd)
 
 class CalcLogHeader:
     def __init__(self, calcObject, title):
