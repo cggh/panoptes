@@ -48,7 +48,7 @@ select {
         border: none;
     }
     div.DQXSelectWrapper:after {
-        background: white;
+        background: transparent;
         content: "\f0d7";
         font-family: FontAwesome;
         font-style: normal;
