@@ -45,17 +45,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
 
             that.hasTimeLine = false;
-//            $.each(MetaData.customProperties, function(idx, propInfo) {
-//                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
-//                    that.hasTimeLine = true;
-//            });
+            $.each(MetaData.customProperties, function(idx, propInfo) {
+                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
+                    that.hasTimeLine = true;
+            });
 
-            if (that.hasProvidedAspects()) {
-                if (!that.providedAspect2Property('dateprop'))
-                    that.hasTimeLine = false;
-                else
-                that.hasTimeLine = true;
-            }
+//            if (that.hasProvidedAspects()) {
+//                if (!that.providedAspect2Property('dateprop'))
+//                    that.hasTimeLine = false;
+//                else
+//                that.hasTimeLine = true;
+//            }
 
 
 
@@ -150,7 +150,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
 
                     actions.push( { content:'Rectangular latt-long area', handler:function() {
@@ -185,7 +185,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var controlsList = [
                     that.createIntroControls(),
-                    cmdPointSelection,
+                    Controls.AlignCenter(Controls.CompoundHor([
+                        cmdPointSelection,
+                        Controls.HorizontalSeparator(95)
+                    ])),
+                    Controls.VerticalSeparator(20),
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlColorProperty,
@@ -242,8 +246,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 );
 
                 that.startZoomFit = true;
-                if (that.hasProvidedAspects())
-                    that.reloadAll();
+//                if (that.hasProvidedAspects())
+                that.reloadAll();
             };
 
             that.setWarning = function(warning) {

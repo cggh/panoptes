@@ -26,14 +26,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
             that.createControls = function() {
-                var propList = [];
+                var propList = [{id:'', name:'-None-'}];
                 $.each(MetaData.customProperties, function(idx, propInfo) {
                     if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
                         propList.push({id:propInfo.propid, name:propInfo.name});
                 });
                 that.ctrlDateProperty = Controls.Combo(null,{ label:'Date:', states: propList, value:propList[0].id, value:that.thePlot.providedAspect2Property('dateprop') }).setClassID('dateprop');
                 that.ctrlDateProperty.setOnChanged(function() {
-                    that.fetchData();
+                    that.thePlot.fetchData();
                 });
 
                 that.ctrl_restrictToTimeViewPort = Controls.Check(null,{ label: 'Restrict to viewport'}).setClassID('restricttotimeviewport');
@@ -68,7 +68,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.addFetchProperties = function(fetcher) {
                 that.datePropId = that.ctrlDateProperty.getValue();
-                fetcher.addColumn(that.datePropId, 'F4');
+                if (that.datePropId)
+                    fetcher.addColumn(that.datePropId, 'F4');
             }
 
             that.processFetchedPoints = function(pointData, points) {

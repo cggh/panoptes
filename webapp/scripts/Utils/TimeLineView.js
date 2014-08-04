@@ -20,11 +20,13 @@ define([
             that.myTimeLine = itimeLine;
 
             that.draw = function (drawInfo) {
-                if ((!that.myTimeLine.minJD) && (!that.myTimeLine.maxJD))
-                    return;
                 this.drawStandardGradientCenter(drawInfo, 0.84);
                 this.drawStandardGradientLeft(drawInfo, 0.84);
                 this.drawStandardGradientRight(drawInfo, 0.84);
+                if (!that.myTimeLine.hasDataPoints)
+                    return;
+                if ((!that.myTimeLine.minJD) && (!that.myTimeLine.maxJD))
+                    return;
 
                 drawInfo.centerContext.fillStyle = DQX.Color(0.3, 0.3, 0.3).toString();
                 drawInfo.centerContext.font = '11px sans-serif';
@@ -88,6 +90,8 @@ define([
                 this.drawStandardGradientCenter(drawInfo, 1);
                 this.drawStandardGradientLeft(drawInfo, 0.84);
                 this.drawStandardGradientRight(drawInfo, 0.84);
+                if (!that.myTimeLine.hasDataPoints)
+                    return;
 
 
                 var pointSet = that.myTimeLine.myPointSet;
@@ -286,14 +290,21 @@ define([
 
                 var minJD = 1.0E99;
                 var maxJD = -1.0E99;
+                that.hasDataPoints = false;
                 $.each(that.myPointSet, function(idx, pt) {
                     if (pt.dateJD!=null) {
                         minJD = Math.min(minJD, pt.dateJD-0.5);
                         maxJD = Math.max(maxJD, pt.dateJD+0.5);
+                        that.hasDataPoints = true;
                     }
                 })
-                if ( (!that.minJD) || (!that.maxJD) || (Math.abs(that.minJD-minJD)>0.001) || (Math.abs(that.maxJD-maxJD)>0.001) )
-                    that.setRangeJD(minJD, maxJD);
+                if (that.hasDataPoints) {
+                    if ( (!that.minJD) || (!that.maxJD) || (Math.abs(that.minJD-minJD)>0.001) || (Math.abs(that.maxJD-maxJD)>0.001) )
+                        that.setRangeJD(minJD, maxJD);
+                }
+                else {
+                    that.setRangeJD(2456873.5, 2456873.5+100);
+                }
             };
 
             that.clearPoints = function() {
@@ -307,7 +318,8 @@ define([
 
 
             that.draw = function() {
-                that.render();
+                if (that.hasDataPoints)
+                    that.render();
             }
 
             that.updateSelection = function() {
