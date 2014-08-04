@@ -194,7 +194,7 @@ define([
                     that.buttonsGroup = Controls.CompoundVert([]).setMargin(0);
                     $.each(MetaData.tableCatalog,function(idx,tableInfo) {
                         if (tableInfo.tableBasedSummaryValues.length>0) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.tableNamePlural+"...",  width:140 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Select active "+tableInfo.tableNamePlural+"...",  width:110, height: 30, icon: 'fa-crosshairs' }).setOnChanged(function() {
                                 EditTableBasedSummaryValues.prompt(tableInfo.id);
                             });
                             states = [];
