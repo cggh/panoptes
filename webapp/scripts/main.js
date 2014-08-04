@@ -183,7 +183,7 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Find','Bitmaps/Find.png', 70, function(){
+                        Application.addNavigationButton('Find','fa-search', 70, function(){
                             var actions = [];
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
@@ -213,7 +213,7 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link',DQX.BMP("Icons/Small/Link.png"), 70, function(){
+                        Application.addNavigationButton('Get link','fa-link', 70, function(){
                             Serialise.createLink();
                         });
 
