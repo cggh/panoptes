@@ -45,17 +45,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
 
             that.hasTimeLine = false;
-//            $.each(MetaData.customProperties, function(idx, propInfo) {
-//                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
-//                    that.hasTimeLine = true;
-//            });
+            $.each(MetaData.customProperties, function(idx, propInfo) {
+                if ( (propInfo.tableid == that.tableInfo.id) && (propInfo.isDate) )
+                    that.hasTimeLine = true;
+            });
 
-            if (that.hasProvidedAspects()) {
-                if (!that.providedAspect2Property('dateprop'))
-                    that.hasTimeLine = false;
-                else
-                that.hasTimeLine = true;
-            }
+//            if (that.hasProvidedAspects()) {
+//                if (!that.providedAspect2Property('dateprop'))
+//                    that.hasTimeLine = false;
+//                else
+//                that.hasTimeLine = true;
+//            }
 
 
 
@@ -246,8 +246,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 );
 
                 that.startZoomFit = true;
-                if (that.hasProvidedAspects())
-                    that.reloadAll();
+//                if (that.hasProvidedAspects())
+                that.reloadAll();
             };
 
             that.setWarning = function(warning) {
