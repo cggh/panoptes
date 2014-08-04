@@ -1,4 +1,71 @@
 
+/*http://webdesign.tutsplus.com/tutorials/quick-tip-easy-css3-checkboxes-and-radio-buttons--webdesign-8953*/
+input[type="checkbox"] {
+    display: none;
+}
+input[type="checkbox"] + label {
+cursor:pointer;
+}
+
+input[type="checkbox"] + label:before {
+    display:inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /*width:19px;*/
+    /*height:19px;*/
+    margin:-1px 6px 0 0;
+    /*vertical-align:middle;*/
+    content: "\f096";
+    cursor:pointer;
+}
+
+input[type="checkbox"]:checked + label:before {
+    margin:-1px 4px 0 0;
+    content: "\f046";
+}
+
+/* The CSS */
+select {
+    margin: 0;
+    display: inline-block;
+    -webkit-appearance:none;
+    appearance:none;
+    cursor:pointer;
+    background: #ffffff;
+    border-radius: 4px;
+    border-color: rgb(200,200,200);
+}
+
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select {padding-right:18px}
+    div.DQXSelectWrapper {
+        position:relative;
+        border: none;
+    }
+    div.DQXSelectWrapper:after {
+        background: white;
+        content: "\f0d7";
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        font-size:17px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: gray;
+        right:6px; top:1px;
+        position:absolute;
+        pointer-events:none;
+    }
+}
+
+
+
 a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHeader, .DQXQueryTableSortHeader
 {
     color:rgb(0,107,117) !important;
