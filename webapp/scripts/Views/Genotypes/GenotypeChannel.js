@@ -45,7 +45,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 );
 
                 //Create controls
-                that.download_button = Controls.Button(null, {content:'Download Current View'})
+                that.download_button = Controls.Button(null, {content:'Download View', buttonClass: 'PnButtonGrid', width:120, height:30, icon:'fa-download'})
                 .setOnChanged(that.download_view);
                 controls_group.addControl(that.download_button);
 
