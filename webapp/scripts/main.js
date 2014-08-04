@@ -67,6 +67,12 @@ require([
         ) {
         $(function () {
 
+            $(document).ajaxStart(function () {
+                $('.PanoptesLogoBox').addClass('fa-spin');
+            });
+            $(document).ajaxStop(function () {
+                $('.PanoptesLogoBox').removeClass('fa-spin');
+            });
 
             function Start_Part0() {
                 PopupFrame.setHasThumbNails();
