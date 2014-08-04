@@ -183,7 +183,7 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Find','Bitmaps/Find.png', 70, function(){
+                        Application.addNavigationButton('Find','fa-search', 70, function(){
                             var actions = [];
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
@@ -213,13 +213,13 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link',DQX.BMP("Icons/Small/Link.png"), 70, function(){
+                        Application.addNavigationButton('Get link','fa-link', 70, function(){
                             Serialise.createLink();
                         });
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div><div class="DQXThumbNailBox"></div></div></div>'.DQXformat({
+                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox fa-spin" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div><div class="DQXThumbNailBox"></div></div></div>'.DQXformat({
                             datasetname: MetaData.generalSettings.NameBanner || MetaData.generalSettings.Name
                         });
                         Application.setHeaderHeight(48);
