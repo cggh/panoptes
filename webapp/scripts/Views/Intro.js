@@ -59,7 +59,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             {
                                 buttonClass: 'DQXToolButton1',
                                 content: "Find gene...",
-                                bitmap: 'Bitmaps/Find.png',
+                                icon: 'fa-search',
                                 width:100, height:35
                             });
                         findGeneButton.setOnChanged(function() {
