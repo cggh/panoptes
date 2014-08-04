@@ -150,7 +150,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 that.panelButtons = Framework.Form(that.frameButtons).setPadding(0);
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
 
                     actions.push( { content:'Rectangular latt-long area', handler:function() {
@@ -185,7 +185,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
                 var controlsList = [
                     that.createIntroControls(),
-                    cmdPointSelection,
+                    Controls.AlignCenter(Controls.CompoundHor([
+                        cmdPointSelection,
+                        Controls.HorizontalSeparator(95)
+                    ])),
+                    Controls.VerticalSeparator(20),
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlColorProperty,

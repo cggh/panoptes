@@ -143,7 +143,7 @@ define([
                         that.reDraw();
                     });
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
                     actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
                         that.panelPlot.startHalfPlaneSelection(function(center, dir) {
@@ -165,7 +165,11 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     that.createIntroControls(),
-                    cmdPointSelection,
+                    Controls.AlignCenter(Controls.CompoundHor([
+                        cmdPointSelection,
+                        Controls.HorizontalSeparator(95)
+                    ])),
+                    Controls.VerticalSeparator(20),
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlValueXProperty,

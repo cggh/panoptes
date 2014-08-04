@@ -67,7 +67,7 @@ define([
 
             that.createPanelButtons = function() {
 
-                var cmdPointSelection = Controls.Button(null, { content: 'Select points...', buttonClass: 'PnButtonGrid'}).setOnChanged(function () {
+                var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
 
                     var actions = [];
 
@@ -244,7 +244,11 @@ define([
 
                 var controlsGroup = Controls.CompoundVert([
                     that.createIntroControls(),
-                    cmdPointSelection,
+                    Controls.AlignCenter(Controls.CompoundHor([
+                        cmdPointSelection,
+                        Controls.HorizontalSeparator(95)
+                    ])),
+                    Controls.VerticalSeparator(20),
 
                     Controls.Section(pickControls, {
                         title: 'Plot data',
