@@ -21,6 +21,7 @@ input[type="checkbox"] + label:before {
     /*vertical-align:middle;*/
     content: "\f096";
     cursor:pointer;
+    color:rgb(128,128,128);
 }
 
 input[type="checkbox"]:checked + label:before {
@@ -36,8 +37,10 @@ select {
     appearance:none;
     cursor:pointer;
     background: #ffffff;
-    border-radius: 4px;
+    border-radius: 2px;
     border-color: rgb(200,200,200);
+    padding:2px;
+    padding-left:4px;
 }
 
 /* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
