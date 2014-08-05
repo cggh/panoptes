@@ -1,19 +1,23 @@
 // This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License.
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require"],
-    function (require) {
+define(["require", "DQX/Utils"],
+    function (require, DQX) {
 
         var treeCreator = function() {
             var that = {};
 
             that.load = function(settings, data) {
-//                try {
+                that.root = null;
+                try {
                     that.loadNewick(data);
-//                }
-//                catch(err) {
-//                    DQX.reportError(err);
-//                }
+                }
+                catch(err) {
+                    DQX.reportError(err);
+                }
+                if (!that.root)
+                    return;
+                that.layout();
             }
 
             that.loadNewick = function(data) {
@@ -26,8 +30,6 @@ define(["require"],
                         currentLevel --;
                     levels.push(currentLevel);
                 }
-
-
 
                 var stripBracketsFromRange = function(range) {
                     //Strip any leading & trailing spaces, and remove surrounding () if present
@@ -46,7 +48,6 @@ define(["require"],
                     var str = '';for (var i=range.start; i<=range.end; i++) str+=data.charAt(i);
                     return str;
                 };
-
 
                 var parse = function(range, level) {
 
@@ -99,14 +100,13 @@ define(["require"],
                         $.each(subranges, function(idx, subrange) {
                             var subBranch = parse(subrange, level);
                             subBranch.parent = branch;
-                            branch.children.push(branch);
+                            branch.children.push(subBranch);
                         });
                     }
                     else {//parse endpoint
                         stripBracketsFromRange(range);
                         branch.itemid = getRange(range);
                     }
-
 
                     return branch;
                 };
@@ -115,10 +115,25 @@ define(["require"],
                 while ((endPos<data.length) && ((data.charAt(endPos)!=')') || (levels[endPos]>0)) )
                     endPos++;
                 var globalRange = {start: 0, end: endPos};
-                console.log(getRange(globalRange));
-                //stripBracketsFromRange(globalRange);
                 that.root = parse(globalRange, 0);
             }
+
+
+            that.layout = function() {
+                var countItems = function(branch) {
+                    var cnt = 0;
+                    $.each(branch.children, function(idx, child) {
+                        cnt += countItems(child);
+                    });
+                    if (branch.itemid)
+                        cnt += 1;
+                    branch.itemCount = cnt;
+                    return cnt;
+                }
+                countItems(that.root);
+                debugger;
+            }
+
 
             return that;
         }
