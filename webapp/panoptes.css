@@ -55,8 +55,10 @@ input[type="checkbox"]:checked + label:before {
     div.DQXSelectWrapper {
         position:relative;
         /*border: none;*/
-        padding: 1px;
+        padding: 2px;
+        padding-left: 3px;
         border-radius: 3px;
+        background-color: white;
         border: 1px solid rgb(200,200,200);
     }
     div.DQXSelectWrapper:after {
