@@ -140,6 +140,7 @@ require([
                 getter.addTable('customdatacatalog',['tableid','sourceid', 'settings'],'tableid');
                 getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'first_dimension', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
+                getter.addTable('graphs',['graphid','tableid', 'tpe', 'dispname'],'graphid');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching
                         MetaData.tableCatalog = getter.getTableRecords('tablecatalog');
@@ -164,6 +165,19 @@ require([
                             Initialise.augment2DTableInfo(table);
                             MetaData.map2DTableCatalog[table.id] = table;
                         });
+                        //parse graph info
+                        $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                            tableInfo.trees = [];
+                        });
+                        $.each(getter.getTableRecords('graphs'), function(idx, graphInfo) {
+                            if (graphInfo.tpe=='tree') {
+                                MetaData.mapTableCatalog[graphInfo.tableid].trees.push({
+                                    id: graphInfo.graphid,
+                                    name: graphInfo.dispname
+                                });
+                            }
+                        });
+
 
                         GenePopup.init();
                         ItemPopup.init();

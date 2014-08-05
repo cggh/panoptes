@@ -92,6 +92,18 @@ CREATE TABLE `tablebasedsummaryvalues` (
 );
 
 
+ CREATE TABLE `graphs` (
+  `graphid` varchar(50),
+  `tableid` varchar(20),
+  `tpe` varchar(20),
+  `dispname` varchar(50),
+  `settings` text,
+  `crosslnk` varchar(50),
+  `ordr`  int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`ordr`)
+);
+
+
 CREATE TABLE `tablecatalog` (
   `id` varchar(20),
   `name` varchar(50),

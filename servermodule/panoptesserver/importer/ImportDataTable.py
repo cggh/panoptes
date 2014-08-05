@@ -298,6 +298,26 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                                     ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid+'_'+fileid, summSettings, maxLineCount)
 
 
-
-
+        with calculationObject.LogHeader('Importing graphs'):
+            sql = "DELETE FROM graphs WHERE tableid='{0}'".format(tableid)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+            graphsfolder = os.path.join(folder, 'graphs')
+            if os.path.exists(graphsfolder):
+                for graphid in os.listdir(graphsfolder):
+                    if os.path.isdir(os.path.join(graphsfolder, graphid)):
+                        print('Importing graph ' + graphid)
+                        graphfolder = os.path.join(graphsfolder, graphid)
+                        graphSettings = SettingsLoader.SettingsLoader(os.path.join(graphfolder, 'settings'))
+                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', 0)".format(
+                            graphid,
+                            tableid,
+                            'tree',
+                            graphSettings['Name'],
+                            graphSettings.ToJSON()
+                        )
+                        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                        destFolder = os.path.join(config.BASEDIR, 'Graphs', datasetId, tableid)
+                        if not os.path.exists(destFolder):
+                            os.makedirs(destFolder)
+                        shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
 

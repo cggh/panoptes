@@ -3,11 +3,11 @@
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require",
     "Plots/GenericPlot",
-    "Plots/Histogram", "Plots/BarGraph", "Plots/Histogram2D", "Plots/ItemScatterPlot", "Plots/MultiCategoryHistogram", "Plots/GeoTemporal/GeoTemporal"
+    "Plots/Histogram", "Plots/BarGraph", "Plots/Histogram2D", "Plots/ItemScatterPlot", "Plots/MultiCategoryHistogram", "Plots/GeoTemporal/GeoTemporal", "Plots/Tree/TreePlot"
 ],
     function (require,
               GenericPlot,
-              Histogram, BarGraph, Histogram2D, ItemScatterPlot, MultiCategoryHistogram, GeoTemporal
+              Histogram, BarGraph, Histogram2D, ItemScatterPlot, MultiCategoryHistogram, GeoTemporal, TreePlot
         ) {
 
 
@@ -19,6 +19,7 @@ define(["require",
         GenericPlot.registerPlotType(ItemScatterPlot);
         GenericPlot.registerPlotType(MultiCategoryHistogram);
         GenericPlot.registerPlotType(GeoTemporal);
+        GenericPlot.registerPlotType(TreePlot);
 
         return PlotStarter;
     });

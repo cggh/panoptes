@@ -224,7 +224,7 @@ a:link, a:visited
 }
 
 
-.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid
+.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid, .DQXWizardButton
 {
 
     background: rgb(255,255,255); /* Old browsers */
@@ -258,7 +258,9 @@ a:link, a:visited
 }
 
 
-
+.DQXWizardButton {
+    border-radius: 2px;
+}
 
 .DQXToolButton0:hover, .DQXToolButton1:hover, .DQXToolButton2:hover, .DQXToolButton3:hover, .PnButtonLarge:hover, .PnButtonSmall:hover
 {

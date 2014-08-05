@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += '<table class="PlotTypeTable" style="max-width: 500px;padding:5px" cellspacing="0" cellpadding="0">';
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
-                content += '<tr id="{id}">'.DQXformat({id:id});
+                content += '<tr id="createplot_{id}">'.DQXformat({id:id});
                 content += '<td class="DQXLarge"><div style="padding:13px">' + plottype.name + '</div></td>';
                 content += '<td><div style="padding:13px">' + plottype.description.DQXformat({item: tableInfo.tableNameSingle, items: tableInfo.tableNamePlural}) + "</div></td>";
                 content += "</tr>";
@@ -66,7 +66,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             $.each(GenericPlot.getCompatiblePlotTypes(tableInfo), function(idx, plottype) {
                 var id = 'PlotTypeChoice_'+plottype.typeID;
-                $('#'+id).click(function() {
+                $('#createplot_'+id).click(function() {
                     DataItemPlotPopup.promptAspects = chk_promptAspects.getValue();
                     Popup.closeIfNeeded(popupID);
                     if (DataItemPlotPopup.promptAspects)
