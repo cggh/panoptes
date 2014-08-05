@@ -308,7 +308,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         print('Importing graph ' + graphid)
                         graphfolder = os.path.join(graphsfolder, graphid)
                         graphSettings = SettingsLoader.SettingsLoader(os.path.join(graphfolder, 'settings'))
-                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', 0)".format(
+                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '', 0)".format(
                             graphid,
                             tableid,
                             'tree',
