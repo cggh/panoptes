@@ -12,6 +12,7 @@ input[type="checkbox"] + label:before {
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
+    font-size: 120%;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -29,26 +30,34 @@ input[type="checkbox"]:checked + label:before {
     content: "\f046";
 }
 
-/* The CSS */
-select {
-    margin: 0;
-    display: inline-block;
-    -webkit-appearance:none;
-    appearance:none;
-    cursor:pointer;
-    background: #ffffff;
-    border-radius: 2px;
-    border-color: rgb(200,200,200);
-    padding:2px;
-    padding-left:4px;
+.DQXSelectWrapper
+{
+    border: none;
+    padding-left:2px;
+    padding-right:2px;
+    border-left:1px solid rgb(190,190,190);
+    border-right:1px solid rgb(190,190,190);
 }
 
 /* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-    select {padding-right:18px}
+    select {
+        margin: 0;
+        display: inline-block;
+        -webkit-appearance:none;
+        appearance:none;
+        cursor:pointer;
+        background: #ffffff;
+        border: none;
+        padding-right:18px;
+        box-shadow: none;
+    }
     div.DQXSelectWrapper {
         position:relative;
-        border: none;
+        /*border: none;*/
+        padding: 1px;
+        border-radius: 3px;
+        border: 1px solid rgb(200,200,200);
     }
     div.DQXSelectWrapper:after {
         background: transparent;
@@ -66,6 +75,9 @@ select {
         pointer-events:none;
     }
 }
+
+
+
 
 
 
@@ -91,15 +103,6 @@ a:link, a:visited
     opacity:1.0;
 }
 
-.DQXSelectWrapper
-{
-/*    border:1px solid rgb(190,190,190);*/
-    border: none;
-    padding-left:2px;
-    padding-right:2px;
-    border-left:1px solid rgb(190,190,190);
-    border-right:1px solid rgb(190,190,190);
-}
 
 .DQXTitleBar
 {
