@@ -105,6 +105,7 @@ define([
                 that.addPlotSettingsControl('controls',controlsGroup);
                 that.panelButtons.addControl(controlsGroup);
 
+                that.loadTree();
                 if (that.hasProvidedAspects())
                     that.reloadAll();
             };
