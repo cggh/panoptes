@@ -2,12 +2,12 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers",
+    "require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvasXYPlot", "DQX/DataFetcher/DataFetchers",
     "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils",
     "Plots/Tree/Tree"
 ],
     function (
-        require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers,
+        require, base64, Application, DataDecoders, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvasXYPlot, DataFetchers,
         EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils,
         Tree
         ) {
@@ -39,11 +39,11 @@ define([
 
 
             that.createPanelPlot = function() {
-                that.panelPlot = FrameCanvas(that.framePlot);
-                that.panelPlot.draw = that.draw;
+                that.panelPlot = FrameCanvasXYPlot(that.framePlot);
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
+                that.panelPlot.drawCenter = that.drawCenter;
             }
 
             that.createPanelButtons = function() {
@@ -147,6 +147,9 @@ define([
                     }
                     that.currentTree = Tree();
                     that.currentTree.load(resp.settings, resp.data);
+                    that.currentTree.layout();
+                    that.panelPlot.setXRange(0,1);
+                    that.panelPlot.setYRange(0,1);
                     that.reDraw();
                 });
 
@@ -158,23 +161,14 @@ define([
             }
 
             that.reDraw = function() {
-                that.panelPlot.invalidate();
+                that.panelPlot.render();
             }
 
+            that.drawCenter = function(drawInfo) {
 
-
-            that.draw = function(drawInfo) {
-                that.drawImpl(drawInfo);
-            }
-
-            that.drawImpl = function(drawInfo) {
-
-                that.plotPresent = false;
-                var ctx = drawInfo.ctx;
-
-
-                that.plotPresent = true;
             };
+
+
 
             that.getToolTipInfo = function(px0 ,py0) {
                 if (!that.plotPresent) return;

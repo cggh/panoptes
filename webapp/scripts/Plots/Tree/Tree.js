@@ -15,10 +15,9 @@ define(["require", "DQX/Utils"],
                 catch(err) {
                     DQX.reportError(err);
                 }
-                if (!that.root)
-                    return;
-                that.layout();
             }
+
+
 
             that.loadNewick = function(data) {
                 var levels = [];
@@ -65,7 +64,7 @@ define(["require", "DQX/Utils"],
 //                        console.log(str);
                     }
 
-                    var getSubRanges = function(sepChar) {//returns a set of subranges separated by a character, at the current level
+                    var getSubRanges = function(sepChar) {//returns a set of subranges separated by a character, occurring at the current level
                         var splitpoints = [range.start-1];
                         for (var i=range.start; i<=range.end; i++)
                             if ((levels[i]==level) && (data.charAt(i)==sepChar))
@@ -92,11 +91,10 @@ define(["require", "DQX/Utils"],
                     }
 
                     stripBracketsFromRange(range);
-                    level += 1;
+                    level += 1;//we are entering the sublevel now
 
-                    //figure out if this token is an enumeration of comma separated subtokens
                     var subranges = getSubRanges(',');
-                    if (subranges.length>1) {//parse subtokens
+                    if (subranges.length>1) {//parse subbranches
                         $.each(subranges, function(idx, subrange) {
                             var subBranch = parse(subrange, level);
                             subBranch.parent = branch;
@@ -119,7 +117,12 @@ define(["require", "DQX/Utils"],
             }
 
 
+
+
             that.layout = function() {
+                if (!that.root)
+                    return;
+
                 var countItems = function(branch) {
                     var cnt = 0;
                     $.each(branch.children, function(idx, child) {
@@ -131,9 +134,36 @@ define(["require", "DQX/Utils"],
                     return cnt;
                 }
                 countItems(that.root);
-                debugger;
-            }
 
+                var angularSpread = function(branch, ang1, ang2, parentPosX, parentPosY, parentAngle) {
+                    branch.relativeAngle = (ang1+ang2)/2;
+                    branch.absoluteAngle = parentAngle + branch.relativeAngle;
+                    branch.posX = parentPosX + branch.distance * Math.cos(branch.absoluteAngle);
+                    branch.posY = parentPosY + branch.distance * Math.sin(branch.absoluteAngle);
+                    cnt = 0;
+                    $.each(branch.children, function(idx, child) {
+                        var subang1 = ang1 + cnt*1.0/branch.itemCount * (ang2-ang1);
+                        cnt += child.itemCount;
+                        var subang2 = ang1 + cnt*1.0/branch.itemCount * (ang2-ang1);
+                        angularSpread(child, subang1, subang2, branch.posX, branch.posY, branch.absoluteAngle );
+                    });
+                }
+                angularSpread(that.root, 0, 2*Math.PI, 0, 0, 0);
+
+                that.calcBoundingBox();
+            };
+
+            that.calcBoundingBox = function() {
+                that.boundingBox = { minX: 1.0e99, maxX: -1.0e99, minY:  1.0e99, maxY: -1.0e99 };
+                var addBB = function(branch) {
+                    that.boundingBox.minX = Math.min(that.boundingBox.minX, branch.posX);
+                    that.boundingBox.maxX = Math.max(that.boundingBox.maxX, branch.posX);
+                    that.boundingBox.minY = Math.min(that.boundingBox.minY, branch.posY);
+                    that.boundingBox.maxY = Math.max(that.boundingBox.maxY, branch.posY);
+                    $.each(branch.children, function(idx, child) { addBB(child); });
+                };
+                addBB(that.root);
+            };
 
             return that;
         }
