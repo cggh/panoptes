@@ -36,7 +36,6 @@ define(["require", "DQX/Utils"],
                         range.start++;
                     while ((range.start<range.end) && (data.charAt(range.end)==' '))
                         range.end--;
-//                    console.log('stripping'+data.charAt(range.start)+data.charAt(range.end));
                     if ((data.charAt(range.start)=='(') && (data.charAt(range.end)==')')) {
                         range.start++;
                         range.end--;
@@ -138,9 +137,9 @@ define(["require", "DQX/Utils"],
                 var angularSpread = function(branch, ang1, ang2, parentPosX, parentPosY, parentAngle) {
                     branch.relativeAngle = (ang1+ang2)/2;
                     branch.absoluteAngle = parentAngle + branch.relativeAngle;
-                    //console.log(ang1 +' '+ ang2 + ' ' + branch.absoluteAngle + ' ' + parentAngle + ' ' + branch.relativeAngle + ' ' + branch.itemid);
                     branch.posX = parentPosX + branch.distance * Math.cos(branch.absoluteAngle);
                     branch.posY = parentPosY + branch.distance * Math.sin(branch.absoluteAngle);
+                    branch.pointingLeft = Math.cos(branch.absoluteAngle)<0;
                     var cnt = 0;
                     var angW = ang2 - ang1;
                     $.each(branch.children, function(idx, child) {

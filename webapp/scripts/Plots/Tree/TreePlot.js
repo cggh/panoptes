@@ -106,13 +106,18 @@ define([
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlTree,
                         that.ctrlValueLabel,
-                        that.ctrlValueColor,
-                        that.colorLegend
+                        that.ctrlValueColor
                     ]).setMargin(10), {
                         title: 'Plot data',
                         bodyStyleClass: 'ControlsSectionBody'
                     }),
 
+                    Controls.Section(Controls.CompoundVert([
+                        that.colorLegend
+                    ]).setMargin(10), {
+                        title: 'Color legend',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
 
                 ]).setMargin(0);
                 that.addPlotSettingsControl('controls',controlsGroup);
@@ -152,20 +157,11 @@ define([
 
                 if (!that.pointData[that.tableInfo.primkey])
                     fetcher.addColumn(that.tableInfo.primkey, 'ST');
-                that.catPropId = null;
-                that.numPropId = null;
+                that.colorPropId = null;
                 if (that.ctrlValueColor.getValue()) {
-                    var propInfo = MetaData.findProperty(that.tableInfo.id, that.ctrlValueColor.getValue());
-                    if ( (propInfo.datatype=='Text') || (propInfo.datatype=='Boolean') ) {
-                        that.catPropId = that.ctrlValueColor.getValue();
-                        if (!that.pointData[that.catPropId])
-                            fetcher.addColumn(that.catPropId, 'ST');
-                    }
-                    if (propInfo.isFloat) {
-                        that.numPropId = that.ctrlValueColor.getValue();
-                        if (!that.pointData[that.numPropId])
-                            fetcher.addColumn(that.numPropId, 'ST');
-                    }
+                    that.colorPropId = that.ctrlValueColor.getValue();
+                    if (!that.pointData[that.colorPropId])
+                        fetcher.addColumn(that.colorPropId, 'ST');
                 }
 
                 that.labelPropId = null;
@@ -244,16 +240,18 @@ define([
 
             }
 
+            that.allDataPresent = function() {
+                return that.currentTree && that.currentTree.root && that.itemDataLoaded;
+            }
+
             that.reDraw = function() {
                 that.panelPlot.render();
             }
 
             that.drawCenter = function(drawInfo) {
                 var ctx = drawInfo.ctx;
-                if (!that.currentTree) return;
-                if (!that.currentTree.root) return;
-                if (!that.itemDataLoaded) return;
-
+                if (!that.allDataPresent())
+                    return;
 
                 var treeSizeX = that.currentTree.boundingBox.maxX-that.currentTree.boundingBox.minX;
                 var treeSizeY = that.currentTree.boundingBox.maxY-that.currentTree.boundingBox.minY;
@@ -286,9 +284,9 @@ define([
                 ctx.strokeStyle = 'rgba(0,0,0,0.2)';
 
                 var catData = null;
-                if (that.catPropId) {
-                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
-                    var catProps = that.pointData[that.catPropId];
+                if (that.colorPropId) {
+                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.colorPropId);
+                    var catProps = that.pointData[that.colorPropId];
                     for (var i=0; i<catProps.length; i++)
                         catProps[i] = catPropInfo.toDisplayString(catProps[i]);
                     var maprs = catPropInfo.mapColors(catProps);
@@ -307,9 +305,11 @@ define([
                 var drawBranch = function(branch) {
                     var px1 = Math.round(branch.posX * scaleX + offsetX);
                     var py1 = Math.round(branch.posY * scaleY + offsetY);
+                    branch.screenX = px1;
+                    branch.screenY = py1;
                     if (branch.parent) {
-                        var px0 = Math.round(branch.parent.posX * scaleX + offsetX);
-                        var py0 = Math.round(branch.parent.posY * scaleY + offsetY);
+                        var px0 = branch.parent.screenX;
+                        var py0 = branch.parent.screenY;
                         ctx.beginPath();
                         ctx.moveTo(px0, py0);
                         ctx.lineTo(px1, py1);
@@ -333,8 +333,17 @@ define([
                             ctx.beginPath();
                             ctx.arc(px1, py1, 2, 0, 2 * Math.PI, false);
                             ctx.fill();
-                            if (that.labelPropId)
-                                ctx.fillText(that.pointData[that.labelPropId][idx], px1, py1);
+                            if (that.labelPropId) {
+                                var xoffset = 3;
+                                if (branch.pointingLeft) {
+                                    ctx.textAlign="right";
+                                    xoffset = -3
+                                }
+                                else {
+                                    ctx.textAlign="left";
+                                }
+                                ctx.fillText(that.pointData[that.labelPropId][idx], px1+xoffset, py1+4);
+                            }
                         }
                     }
                     else {
@@ -344,9 +353,7 @@ define([
                         ctx.fill();
                     }
 
-                    $.each(branch.children, function(idx, child) {
-                        drawBranch(child);
-                    });
+                    $.each(branch.children, function(idx, child) { drawBranch(child); });
                 }
 
                 drawBranch(that.currentTree.root);
@@ -355,8 +362,39 @@ define([
 
 
             that.getToolTipInfo = function(px0 ,py0) {
-                if (!that.plotPresent) return;
-                return null;
+                if (!that.allDataPresent())
+                    return;
+                var mindst = 9;
+                var bestBranch = null;
+                var findPoint = function(branch) {
+                    if (branch.itemid) {
+                        var dst = Math.abs(px0-branch.screenX) + Math.abs(py0-branch.screenY);
+                        if (dst<=mindst) {
+                            mindst = dst;
+                            bestBranch = branch;
+                        }
+                    }
+                    $.each(branch.children, function(idx, child) { findPoint(child); });
+                }
+                findPoint(that.currentTree.root);
+                if (bestBranch) {
+                    var idx = that.pointIndex[bestBranch.itemid];
+                    var content = bestBranch.itemid;
+                    if (that.labelPropId && (that.labelPropId!=that.tableInfo.primkey))
+                        content += '<br>' + that.pointData[that.labelPropId][idx];
+                    if (that.colorPropId && (that.colorPropId!=that.tableInfo.primkey))
+                        content += '<br>' + that.pointData[that.colorPropId][idx];
+                    return {
+                        itemid: bestBranch.itemid,
+                        ID: bestBranch.itemid,
+                        px: bestBranch.screenX,
+                        py: bestBranch.screenY,
+                        showPointer:true,
+                        content: content
+                    };
+                }
+                else
+                    return null;
             };
 
 
