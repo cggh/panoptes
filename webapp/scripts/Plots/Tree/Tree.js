@@ -138,13 +138,15 @@ define(["require", "DQX/Utils"],
                 var angularSpread = function(branch, ang1, ang2, parentPosX, parentPosY, parentAngle) {
                     branch.relativeAngle = (ang1+ang2)/2;
                     branch.absoluteAngle = parentAngle + branch.relativeAngle;
+                    //console.log(ang1 +' '+ ang2 + ' ' + branch.absoluteAngle + ' ' + parentAngle + ' ' + branch.relativeAngle + ' ' + branch.itemid);
                     branch.posX = parentPosX + branch.distance * Math.cos(branch.absoluteAngle);
                     branch.posY = parentPosY + branch.distance * Math.sin(branch.absoluteAngle);
-                    cnt = 0;
+                    var cnt = 0;
+                    var angW = ang2 - ang1;
                     $.each(branch.children, function(idx, child) {
-                        var subang1 = ang1 + cnt*1.0/branch.itemCount * (ang2-ang1);
+                        var subang1 = -angW/2 + cnt*1.0/branch.itemCount * angW;
                         cnt += child.itemCount;
-                        var subang2 = ang1 + cnt*1.0/branch.itemCount * (ang2-ang1);
+                        var subang2 = -angW/2 + cnt*1.0/branch.itemCount * angW;
                         angularSpread(child, subang1, subang2, branch.posX, branch.posY, branch.absoluteAngle );
                     });
                 }

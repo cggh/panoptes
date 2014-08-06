@@ -22,6 +22,7 @@ define([
         }
 
         TreePlot.plotAspects = [
+            { id:'label', name:'Label', dataType:'', requiredLevel: 0 },
             { id:'color', name:'Item color', dataType:'', requiredLevel: 0 }
         ];
 
@@ -30,6 +31,7 @@ define([
             var that = StandardLayoutPlot.Create(tableid, TreePlot.typeID, {title: TreePlot.name}, startQuery, querySettings);
             that.treesMap = {};
             that.fetchCount = 0;
+            that.pointData = {};//first index: property id, second index: point nr
 
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
             Msg.listen(eventid,{ type: 'SelectionUpdated'}, function(scope,tableid) {
@@ -40,6 +42,8 @@ define([
 
             that.createPanelPlot = function() {
                 that.panelPlot = FrameCanvasXYPlot(that.framePlot);
+                that.panelPlot.scaleMarginX = 0;
+                that.panelPlot.scaleMarginY = 0;
                 that.panelPlot.getToolTipInfo = that.getToolTipInfo;
                 that.panelPlot.onMouseClick = that.onMouseClick;
                 that.panelPlot.onSelected = that.onSelected;
@@ -47,7 +51,7 @@ define([
             }
 
             that.createPanelButtons = function() {
-                that.ctrl_PointCount = Controls.Html(null, '');
+                //that.ctrl_PointCount = Controls.Html(null, '');
 
                 that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:that.tableInfo.trees[0].id }).setClassID('tree');
                 that.ctrlTree.setOnChanged(that.loadTree);
@@ -58,11 +62,16 @@ define([
                     if ( (prop.tableid==that.tableInfo.id) )
                         propList.push({ id:prop.propid, name:prop.name });
                 });
+                that.ctrlValueLabel = Controls.Combo(null,{ label:'Label:<br>', states: propList, value:that.providedAspect2Property('label') }).setClassID('label');
+                that.ctrlValueLabel.setOnChanged(function() {
+                    that.fetchData();
+                });
                 that.ctrlValueColor = Controls.Combo(null,{ label:'Color:<br>', states: propList, value:that.providedAspect2Property('color') }).setClassID('color');
                 that.ctrlValueColor.setOnChanged(function() {
                     that.fetchData();
                 });
 
+                that.colorLegend = Controls.Html(null,'');
 
                 var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
@@ -84,6 +93,8 @@ define([
                     ButtonChoiceBox.create('Select points','', [actions]);
                 });
 
+                //that.ctrl_PointCount = Controls.Html(null, '');
+
                 var controlsGroup = Controls.CompoundVert([
                     that.createIntroControls(),
                     Controls.AlignCenter(Controls.CompoundHor([
@@ -94,7 +105,9 @@ define([
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlTree,
+                        that.ctrlValueLabel,
                         that.ctrlValueColor,
+                        that.colorLegend
                     ]).setMargin(10), {
                         title: 'Plot data',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -106,8 +119,7 @@ define([
                 that.panelButtons.addControl(controlsGroup);
 
                 that.loadTree();
-                if (that.hasProvidedAspects())
-                    that.reloadAll();
+                that.reloadAll();
             };
 
 
@@ -120,10 +132,87 @@ define([
             }
 
             that.reloadAll = function() {
+                that.pointData = {}; // remove all stored data
                 that.fetchData();
             }
 
             that.fetchData = function() {
+                var fetcher = DataFetchers.RecordsetFetcher(
+                    MetaData.serverUrl,
+                    MetaData.database,
+                    that.tableInfo.getQueryTableName(that.theQuery.isSubSampling())
+                );
+                fetcher.setMaxResultCount(that.tableInfo.settings.MaxCountQueryRecords);
+                //that.ctrl_PointCount.modifyValue('--- data points');
+
+                that.itemDataLoaded = false;
+                that.colorLegend.modifyValue('');
+
+                var sortField = that.tableInfo.primkey;
+
+                if (!that.pointData[that.tableInfo.primkey])
+                    fetcher.addColumn(that.tableInfo.primkey, 'ST');
+                that.catPropId = null;
+                that.numPropId = null;
+                if (that.ctrlValueColor.getValue()) {
+                    var propInfo = MetaData.findProperty(that.tableInfo.id, that.ctrlValueColor.getValue());
+                    if ( (propInfo.datatype=='Text') || (propInfo.datatype=='Boolean') ) {
+                        that.catPropId = that.ctrlValueColor.getValue();
+                        if (!that.pointData[that.catPropId])
+                            fetcher.addColumn(that.catPropId, 'ST');
+                    }
+                    if (propInfo.isFloat) {
+                        that.numPropId = that.ctrlValueColor.getValue();
+                        if (!that.pointData[that.numPropId])
+                            fetcher.addColumn(that.numPropId, 'ST');
+                    }
+                }
+
+                that.labelPropId = null;
+                if (that.ctrlValueLabel.getValue()) {
+                    that.labelPropId = that.ctrlValueLabel.getValue();
+                    if (!that.pointData[that.labelPropId])
+                        fetcher.addColumn(that.labelPropId, 'ST');
+                }
+
+                if (fetcher.getColumnIDs().length <= 0) {
+                    that.itemDataLoaded = true;
+                    that.reDraw();
+                    return;
+                }
+
+                var requestID = DQX.getNextUniqueID();
+                that.requestID = requestID;
+                var selectionInfo = that.tableInfo.currentSelection;
+                DQX.setProcessing();
+                var qry = that.theQuery.getForFetching();
+
+                fetcher.getData(qry, sortField,
+                    function (data) { //success
+                        DQX.stopProcessing();
+                        if (that.requestID == requestID) {
+                            //debugger;
+                                var resultpointcount = 0;
+                                if (!that.pointData[that.tableInfo.primkey]) {//build item index
+                                    that.pointIndex = {};
+                                    $.each(data[that.tableInfo.primkey], function(idx, itemid) {
+                                        that.pointIndex[itemid] = idx;
+                                    });
+                                }
+                                $.each(data, function(id, values) {
+                                    that.pointData[id] = values;
+                                    resultpointcount = values.length;
+                                });
+                            that.itemDataLoaded = true;
+                            that.reDraw();
+                        }
+                    },
+                    function (data) { //error
+                        DQX.stopProcessing();
+                        that.fetchCount -= 1;
+                    }
+
+                );
             }
 
             that.loadTree = function() {
@@ -155,17 +244,112 @@ define([
 
             }
 
-
-            that.reloadAll = function() {
-                that.fetchData();
-            }
-
             that.reDraw = function() {
                 that.panelPlot.render();
             }
 
             that.drawCenter = function(drawInfo) {
+                var ctx = drawInfo.ctx;
+                if (!that.currentTree) return;
+                if (!that.currentTree.root) return;
+                if (!that.itemDataLoaded) return;
 
+
+                var treeSizeX = that.currentTree.boundingBox.maxX-that.currentTree.boundingBox.minX;
+                var treeSizeY = that.currentTree.boundingBox.maxY-that.currentTree.boundingBox.minY;
+                var treeSizeMax = Math.max(treeSizeX, treeSizeY);
+
+                var zoom_scaleX = Math.abs(that.panelPlot.getXScale()/drawInfo.sizeX);
+                var zoom_offsetX = that.panelPlot.getXOffset();
+                var zoom_scaleY = Math.abs(that.panelPlot.getYScale()/drawInfo.sizeY);
+                var zoom_offsetY = that.panelPlot.getYOffset();//-drawInfo.sizeY;
+
+                var marginfac = 0.2;
+                var fcx = drawInfo.sizeX / treeSizeX;
+                var fcy = drawInfo.sizeY / treeSizeY;
+                var fc = Math.min(fcx, fcy);
+                scaleX = fc/(1+2*marginfac);
+                scaleY = fc/(1+2*marginfac);
+
+                offsetX = -1 * that.currentTree.boundingBox.minX *scaleX + treeSizeX*scaleX*marginfac;
+                offsetY = -1 * that.currentTree.boundingBox.minY *scaleY + treeSizeY*scaleY*marginfac;
+
+                offsetX = offsetX*zoom_scaleX + zoom_offsetX;
+                offsetY = offsetY*zoom_scaleY + zoom_offsetY - drawInfo.sizeY*zoom_scaleY;
+
+                scaleX *= zoom_scaleX;
+                scaleY *= zoom_scaleY;
+
+
+                ctx.font="11px Arial";
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+
+                var catData = null;
+                if (that.catPropId) {
+                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.catPropId);
+                    var catProps = that.pointData[that.catPropId];
+                    for (var i=0; i<catProps.length; i++)
+                        catProps[i] = catPropInfo.toDisplayString(catProps[i]);
+                    var maprs = catPropInfo.mapColors(catProps);
+                    catData = maprs.indices;
+                    that.mappedColors = [];
+                    $.each(maprs.colors, function(idx, color) {
+                        that.mappedColors.push(color.changeOpacity(0.5));
+                    });
+                    var legendStr = '';
+                    $.each(maprs.legend,function(idx, legendItem) {
+                        legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
+                    });
+                    that.colorLegend.modifyValue(legendStr);
+                }
+
+                var drawBranch = function(branch) {
+                    var px1 = Math.round(branch.posX * scaleX + offsetX);
+                    var py1 = Math.round(branch.posY * scaleY + offsetY);
+                    if (branch.parent) {
+                        var px0 = Math.round(branch.parent.posX * scaleX + offsetX);
+                        var py0 = Math.round(branch.parent.posY * scaleY + offsetY);
+                        ctx.beginPath();
+                        ctx.moveTo(px0, py0);
+                        ctx.lineTo(px1, py1);
+                        ctx.stroke();
+                    }
+
+
+                    if (!branch.parent) {
+                        ctx.beginPath();
+                        ctx.arc(px1, py1, 4, 0, 2 * Math.PI, false);
+                        ctx.fill();
+                    }
+
+                    if (branch.itemid) {
+                        var idx = that.pointIndex[branch.itemid];
+                        if (idx!=null) {
+                            if (catData)
+                                ctx.fillStyle = that.mappedColors[catData[idx]].toStringCanvas();
+                            else
+                                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                            ctx.beginPath();
+                            ctx.arc(px1, py1, 2, 0, 2 * Math.PI, false);
+                            ctx.fill();
+                            if (that.labelPropId)
+                                ctx.fillText(that.pointData[that.labelPropId][idx], px1, py1);
+                        }
+                    }
+                    else {
+                        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                        ctx.beginPath();
+                        ctx.arc(px1, py1, 2, 0, 2 * Math.PI, false);
+                        ctx.fill();
+                    }
+
+                    $.each(branch.children, function(idx, child) {
+                        drawBranch(child);
+                    });
+                }
+
+                drawBranch(that.currentTree.root);
             };
 
 
@@ -188,6 +372,10 @@ define([
                 alert('Not implemented');
             }
 
+
+            that.updateQuery = function() {
+                that.reloadAll();
+            }
 
             that.create();
             return that;
