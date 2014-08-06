@@ -93,7 +93,23 @@ define([
                     ButtonChoiceBox.create('Select points','', [actions]);
                 });
 
-                //that.ctrl_PointCount = Controls.Html(null, '');
+                that.ctrl_SizeFactor = Controls.ValueSlider(null, {label: 'Point size factor', width: 180, minval:0, maxval:2, value:1, digits: 2})
+                    .setNotifyOnFinished().setClassID('sizefactor')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_Opacity = Controls.ValueSlider(null, {label: 'Point opacity', width: 180, minval:0, maxval:1, value:1, digits: 2})
+                    .setNotifyOnFinished().setClassID('opacity')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_BranchOpacity = Controls.ValueSlider(null, {label: 'Branch opacity', width: 180, minval:0, maxval:1, value:0.25, digits: 2})
+                    .setNotifyOnFinished().setClassID('branchopacity')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
 
                 var controlsGroup = Controls.CompoundVert([
                     that.createIntroControls(),
@@ -109,6 +125,15 @@ define([
                         that.ctrlValueColor
                     ]).setMargin(10), {
                         title: 'Plot data',
+                        bodyStyleClass: 'ControlsSectionBody'
+                    }),
+
+                    Controls.Section(Controls.CompoundVert([
+                        that.ctrl_SizeFactor,
+                        that.ctrl_Opacity,
+                        that.ctrl_BranchOpacity
+                    ]).setMargin(10), {
+                        title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
                     }),
 
@@ -253,6 +278,10 @@ define([
                 if (!that.allDataPresent())
                     return;
 
+                var sizeFactor =that.ctrl_SizeFactor.getValue();
+                var opacity = that.ctrl_Opacity.getValue();
+                var opacityBranch = that.ctrl_BranchOpacity.getValue();
+
                 var selectionMap = that.tableInfo.currentSelection;
 
                 var treeSizeX = that.currentTree.boundingBox.maxX-that.currentTree.boundingBox.minX;
@@ -283,7 +312,7 @@ define([
 
                 ctx.font="11px Arial";
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.strokeStyle = DQX.Color(0,0,0,opacityBranch).toStringCanvas();
 
                 var catData = null;
                 if (that.colorPropId) {
@@ -295,7 +324,7 @@ define([
                     catData = maprs.indices;
                     that.mappedColors = [];
                     $.each(maprs.colors, function(idx, color) {
-                        that.mappedColors.push(color.changeOpacity(0.5));
+                        that.mappedColors.push(color.changeOpacity(opacity));
                     });
                     var legendStr = '';
                     $.each(maprs.legend,function(idx, legendItem) {
@@ -337,7 +366,7 @@ define([
                             else
                                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                             ctx.beginPath();
-                            ctx.arc(px1, py1, 2, 0, 2 * Math.PI, false);
+                            ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
                             ctx.fill();
                             if (that.labelPropId) {
                                 var xoffset = 3;
@@ -355,7 +384,7 @@ define([
                     else {
                         ctx.fillStyle = 'rgba(0,0,0,0.25)';
                         ctx.beginPath();
-                        ctx.arc(px1, py1, 2, 0, 2 * Math.PI, false);
+                        ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
                         ctx.fill();
                     }
 
@@ -366,8 +395,6 @@ define([
                 var selpsY = [];
                 drawBranch(that.currentTree.root);
 
-                var opacity = 0.7;
-                var sizeFactor = 2;
                 ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
                 ctx.strokeStyle=DQX.Color(1,0,0,0.75*opacity).toStringCanvas();
                 for (var i=0; i<selpsX.length; i++) {
