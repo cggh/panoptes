@@ -253,6 +253,8 @@ define([
                 if (!that.allDataPresent())
                     return;
 
+                var selectionMap = that.tableInfo.currentSelection;
+
                 var treeSizeX = that.currentTree.boundingBox.maxX-that.currentTree.boundingBox.minX;
                 var treeSizeY = that.currentTree.boundingBox.maxY-that.currentTree.boundingBox.minY;
                 var treeSizeMax = Math.max(treeSizeX, treeSizeY);
@@ -326,6 +328,10 @@ define([
                     if (branch.itemid) {
                         var idx = that.pointIndex[branch.itemid];
                         if (idx!=null) {
+                            if (selectionMap[branch.itemid]) {
+                                selpsX.push(branch.screenX);
+                                selpsY.push(branch.screenY);
+                            }
                             if (catData)
                                 ctx.fillStyle = that.mappedColors[catData[idx]].toStringCanvas();
                             else
@@ -356,7 +362,22 @@ define([
                     $.each(branch.children, function(idx, child) { drawBranch(child); });
                 }
 
+                var selpsX = [];
+                var selpsY = [];
                 drawBranch(that.currentTree.root);
+
+                var opacity = 0.7;
+                var sizeFactor = 2;
+                ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
+                ctx.strokeStyle=DQX.Color(1,0,0,0.75*opacity).toStringCanvas();
+                for (var i=0; i<selpsX.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
             };
 
 
@@ -401,13 +422,28 @@ define([
             that.onMouseClick = function(ev, info) {
                 var tooltip = that.getToolTipInfo(info.x, info.y);
                 if (tooltip) {
-                    alert('Not implemented');
+                    Msg.send({ type: 'ItemPopup' }, { tableid: that.tableInfo.id, itemid: tooltip.itemid } );
                 }
             }
 
 
             that.onSelected = function(minX, minY, maxX, maxY, shiftPressed, controlPressed, altPressed) {
-                alert('Not implemented');
+                if (!that.allDataPresent())
+                    return;
+                var selectionCreationFunction = function() {
+                    var sellist = [];
+                    var selectPoints = function(branch) {
+                        if (branch.itemid) {
+                            if ( (branch.screenX>=minX) && (branch.screenX<=maxX) && (branch.screenY>=minY) && (branch.screenY<=maxY) )
+                                sellist.push(branch.itemid);
+                        }
+                        $.each(branch.children, function(idx, child) { selectPoints(child); });
+                    }
+                    selectPoints(that.currentTree.root);
+                    return sellist;
+                };
+
+                ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Tree selection', '', null, selectionCreationFunction);
             }
 
 
