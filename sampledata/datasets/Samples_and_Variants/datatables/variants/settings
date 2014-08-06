@@ -2,6 +2,8 @@ NameSingle: variant     # Display name referring to a table item (single, no cap
 NamePlural: variants    # Display name referring to a table item (plural, no capital)
 Description: A table containing a number of genomic variants     # A description of this dataset
 
+CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
+
 Icon: fa-caret-up
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record

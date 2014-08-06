@@ -347,15 +347,28 @@ def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tab
             cur.execute('show indexes from {0}INFO_{1}'.format(tableid, workspaceid))
             indexedColumns2 = [indexRow[4] for indexRow in cur.fetchall()]
             indexedColumns = set(indexedColumns1+indexedColumns2)
+
+
             print('Indexed columns: ' + str(indexedColumns))
             tmptable = '_tmptable_'
             wstable = '{0}CMB_{1}'.format(tableid, workspaceid)
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
             sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
             ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
             for indexedColumn in indexedColumns:
                 sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
+            if tableSettings['IsPositionOnGenome']:
+                calculationObject.Log('Indexing chromosome,position on materialised view')
+                sql = 'create index mt1_chrompos ON {0}({1},{2})'.format(
+                    DBTBESC(tmptable),
+                    DBCOLESC(tableSettings['Chromosome']),
+                    DBCOLESC(tableSettings['Position'])
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
 
@@ -367,9 +380,11 @@ def CheckMaterialiseWorkspaceView(calculationObject, datasetId, workspaceid, tab
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(tmptable))
                 sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
                 for indexedColumn in indexedColumnsSubSampling:
                     sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
                     ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
                 ImpUtils.ExecuteSQL(calculationObject, datasetId, 'RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
 

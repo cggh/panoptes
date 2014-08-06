@@ -167,10 +167,10 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             if tableSettings['IsPositionOnGenome']:
                 calculationObject.Log('Indexing chromosome')
                 scr = ImpUtils.SQLScript(calculationObject)
-                scr.AddCommand('create index {0}_chrompos ON {0}({1},{2})'.format(
-                    tableid,
-                    tableSettings['Chromosome'],
-                    tableSettings['Position']
+                scr.AddCommand('create index chrompos ON {0}({1},{2})'.format(
+                    DBTBESC(tableid),
+                    DBCOLESC(tableSettings['Chromosome']),
+                    DBCOLESC(tableSettings['Position'])
                 ))
                 scr.Execute(datasetId)
 
