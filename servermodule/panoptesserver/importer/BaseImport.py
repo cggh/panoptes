@@ -51,7 +51,7 @@ class BaseImport(object):
             
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = SettingsLoader.SettingsLoader(settingsFile, False)
+            self._globalSettings = SettingsLoader.SettingsLoader(settingsFile)
         else:
             self._globalSettings = None
             
@@ -73,10 +73,7 @@ class BaseImport(object):
                 self._datasetFolder, self._datatablesFolder,self._datasetId, self._workspaceId, self._tablesToken, self._dataDir))
     
     def _getImportSetting(self, name):
-        ret = None
-        if name in self._importSettings:
-            ret = self._importSettings[name]
-        return ret
+        return self._importSettings[name]
     
     #Return the list of tables to process either as specified in the settings file or by looking at the directories
     def _getTables(self):
@@ -124,8 +121,8 @@ class BaseImport(object):
         folder = os.path.join(self._datatablesFolder, datatable)
             
         settings = os.path.join(folder, 'settings')
-#        self._log("BaseImport._getDataFiles",settings)
-#        self._log("BaseImport._getDataFiles",str(self))
+        self._log(settings)
+        self._log(str(self))
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
 #            raise Exception("Missing settings {}".format(settings))
@@ -141,7 +138,7 @@ class BaseImport(object):
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
         else:
-            tableSettings = SettingsLoader.SettingsLoader(settings, False)
+            tableSettings = SettingsLoader.SettingsLoader(settings)
 
         properties = None
         if includeProperties:
@@ -149,15 +146,13 @@ class BaseImport(object):
         
         return tableSettings, properties
     
-    def _fetchSettings(self, datatable, includeProperties = True):
+    def _fetchSettings(self, datatable):
                 
         settings, data = self._getDataFiles(datatable)
         
-        tableSettings = SettingsLoader.SettingsLoader(settings, False)
+        tableSettings = SettingsLoader.SettingsLoader(settings)
 
-        properties = None
-        if includeProperties:
-            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
+        properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
         
         return tableSettings, properties
 
@@ -166,7 +161,7 @@ class BaseImport(object):
         subDir = 'datatables'
         for directory in os.listdir(os.path.join(self._datasetFolder, subDir)):
             if os.path.isdir(os.path.join(self._datasetFolder, subDir, directory)):
-                if directory not in datatables:
+                if dir not in datatables:
                     datatables.append(directory)
         
         print 'Data tables: ' + str(datatables)

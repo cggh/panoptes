@@ -162,25 +162,11 @@ class ImportCustomData(BaseImport):
                     importer._sourceId = self._sourceId
             
                     tableSettings = {'PrimKey': primkey}
-                    importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), properties = properties, loadSettings = tableSettings, addPrimaryKey = True)
-                    
-                    importer.cleanUp()
-                    
-
-                    print('Checking column existence')
-                    existingcols = []
-                    cur.execute('SHOW COLUMNS FROM {0}'.format(DBTBESC(tableid)))
-                    for row in cur.fetchall():
-                        existingcols.append(row[0])
-                    cur.execute('SHOW COLUMNS FROM {0}'.format(DBTBESC(sourcetable)))
-                    for row in cur.fetchall():
-                        existingcols.append(row[0])
-                    print('Existing columns: '+str(existingcols))
-                    for prop in properties:
-                        propid = prop['propid']
-                        if propid in existingcols:
-                            raise Exception('Property "{0}" from custom data source "{1}" is already present'.format(propid, sourceid))
-
+                    loader = importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), properties = properties, loadSettings = tableSettings, addPrimaryKey = True)
+                    loader.join()
+                    if loader.status is not None:
+                        self._log(loader.status)
+                        raise Exception("Database loading failed")
 
                     print('Creating new columns')
                     self._log('WARNING: better mechanism to determine column types needed here')#TODO: implement
@@ -207,7 +193,7 @@ class ImportCustomData(BaseImport):
                             sql += ", "
                         sql += "{0}.{2}={1}.{2}".format(DBTBESC(sourcetable), tmptable, DBCOLESC(propid))
                         frst = False
-                    self._calculationObject.LogSQLCommand(sql)
+                        self._calculationObject.LogSQLCommand(sql)
                     cur.execute(sql)
     
     
@@ -220,7 +206,7 @@ class ImportCustomData(BaseImport):
     
                 cur.commit()
     
-            print('Creating custom summary values')
+            print('Creating summary values')
             for property in properties:
                 propid = property['propid']
                 settings = property['Settings']
@@ -248,7 +234,7 @@ class ImportCustomData(BaseImport):
                                 DBCOLESC(posField)
                             ))
                             script.Execute(self._datasetId, dataFileName)
-                            self._calculationObject.LogFileTop(dataFileName, 5)
+                            self._calculationObject.LogFileTop(dataFileName, 10)
     
                         ImpUtils.CreateSummaryValues_Value(
                             self._calculationObject,

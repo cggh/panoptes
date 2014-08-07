@@ -13,18 +13,6 @@ logger = logging.getLogger(__name__)
 
 class ProcessDatabase(BaseImport):
         
-    def cleanUp(self):
-        if not self._importSettings['ConfigOnly']:
-            #Wait for the database loader thread to return
-            self._dbloader.join()
-    
-    
-            self._dbloader.printLog()
-    
-            if self._dbloader.status is not None:
-                self._log(str(self._dbloader.status))
-                raise Exception("Database loading failed")
-
     def importData(self, tableid, inputFile = None, createSubsets = False, addPrimaryKey = False, loadSettings = None, properties = None):
         
         
@@ -49,12 +37,13 @@ class ProcessDatabase(BaseImport):
             
         
         
-        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, columns, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
+        loader = LoadTable(self._calculationObject, data, self._datasetId, tableid, columns, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
         
         if not self._importSettings['ConfigOnly']:
             self._log(("Preparing to load {} to {}.{}").format(data, self._datasetId, tableid))
-            self._dbloader.start()
+            loader.start()
             
                 
+        return loader
            
     

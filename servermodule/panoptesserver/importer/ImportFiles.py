@@ -14,7 +14,6 @@ import DQXUtils
 import config
 import SettingsLoader
 import ImpUtils
-import customresponders.panoptesserver.schemaversion as schemaversion
 import customresponders.panoptesserver.Utils as Utils
 
 from ImportDataTable import ImportDataTable

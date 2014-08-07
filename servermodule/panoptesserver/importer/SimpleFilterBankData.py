@@ -2,7 +2,6 @@ import os
 import simplejson
 import DQXEncoder
 import sys
-import mmap
 
 class Level:
     def __init__(self):
@@ -18,7 +17,8 @@ class Level:
         return ("sum %d, count %d, min %d, max %d" % (int(self.sum), int(self.count), int(self.min), int(self.max)))
 
 class Summariser:
-    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal):
+    def __init__(self, propid, chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal):
+        print('##### Start processing chromosome '+chromosome)
         self._minval = 0
         
         self._chromosome = chromosome
@@ -47,8 +47,6 @@ class Summariser:
             blocksize *= self._blockSizeIncrFactor
 #        print(str(self.levels))
 
-    def __str__ (self):
-        return("chrom %s minval %f maxval %f blkSizeStart %d blkSizeIncr %d blkSizeMax %d" % (self._chromosome, self._minval, self._maxval, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax))
 
     def Add(self, pos, val):
         if val != None:
@@ -148,78 +146,7 @@ class Summariser:
         fp.close()
 
 
-class SimpleFilterBank:
-    def __init__(self, basedir, sourcefile, minval, maxval, blockSizeStart, blockSizeIncrFactor, blockSizeMax):
-        self._propid=sourcefile.split('.')[0]
-        self._processfile = basedir+'/'+sourcefile
-        self._basedir = basedir
-        self._sourcefile = sourcefile
-        self._minval = minval
-        self._maxval = maxval
-        self._blockSizeStart = blockSizeStart
-        self._blockSizeIncrFactor = blockSizeIncrFactor
-        self._blockSizeMax = blockSizeMax
-        
-    def __str__ (self):
-        return("SimpleFilterBank %s %f %f %d %d %d" % (self._sourcefile, self._minval, self._maxval, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax))
-    
 
-    def _getNewSummarizer(self, chromosome):
-        return Summariser(self._propid, chromosome, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, self._basedir, self._maxval)
-    
-    def parse(self):
-        filesize = os.path.getsize(self._processfile)
-        
-        #Left in but not significantly faster
-        mmapFile = False
-        
-        with open(self._processfile, 'r+b') as f:
-        
-            currentChromosome=''
-            summariser = None
-            processedChromosomes = {}
-            
-            if mmapFile:
-                sf = mmap.mmap(f.fileno(),0)
-            else:
-                sf = f
-            
-            linecount = 0
-            while True:
-                line=sf.readline().rstrip('\n')
-                if not(line):
-                    break
-                else:
-                    linecount += 1
-                    if linecount % 500000 ==0:
-                        print(str(linecount))
-                comps = line.split('\t')
-                chromosome = comps[0]
-                pos = int(comps[1])
-                val = None
-                try:
-                    val = float(comps[2])
-                except:
-                    pass
-                if chromosome != currentChromosome:
-                    if summariser != None:
-                        summariser.Finalise()
-                    print('##### Start processing chromosome '+chromosome)
-                    summariser = self._getNewSummarizer(chromosome)
-                    if chromosome in processedChromosomes:
-                        raise Exception('File should be ordered by chromosome')
-                    processedChromosomes[chromosome] = True
-                    currentChromosome = chromosome
-                summariser.Add(pos,val)
-            
-            if mmapFile: 
-                sf.close()
-            
-            if summariser != None:
-                summariser.Finalise()
-        
-        print(str(linecount))
-        
 if __name__ == "__main__":
     
     basedir = '.'
@@ -237,13 +164,50 @@ if __name__ == "__main__":
         sys.exit()
     
     sourcefile = sys.argv[1]
+    propid=sourcefile.split('.')[0]
     minval = float(sys.argv[2])
     maxval = float(sys.argv[3])
     blockSizeStart = int(sys.argv[4])
     blockSizeIncrFactor = int(sys.argv[5])
     blockSizeMax = int(sys.argv[6])
 
-    sfb = SimpleFilterBank(basedir, sourcefile, minval, maxval, blockSizeStart, blockSizeIncrFactor, blockSizeMax)
-
-    print(str(sfb))
-    sfb.parse()
+    sf = open(basedir+'/'+sourcefile,'r')
+    
+    currentChromosome=''
+    summariser = None
+    processedChromosomes = {}
+    
+    
+    
+    linecount = 0
+    while True:
+        line=sf.readline().rstrip('\n')
+        if not(line):
+            break
+        else:
+            linecount += 1
+            if linecount % 500000 ==0:
+                print(str(linecount))
+        comps = line.split('\t')
+        chromosome = comps[0]
+        pos = int(comps[1])
+        val = None
+        try:
+            val = float(comps[2])
+        except:
+            pass
+        if chromosome != currentChromosome:
+            if summariser != None:
+                summariser.Finalise()
+            summariser = Summariser(propid, chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax, basedir, maxval)
+            if chromosome in processedChromosomes:
+                raise Exception('File should be ordered by chromosome')
+            processedChromosomes[chromosome] = True
+            currentChromosome = chromosome
+        summariser.Add(pos,val)
+    
+    
+    if summariser != None:
+        summariser.Finalise()
+    
+    print(str(linecount))
