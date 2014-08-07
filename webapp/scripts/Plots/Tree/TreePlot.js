@@ -89,6 +89,11 @@ define([
                         that.reDraw();
                     });
 
+                that.ctrl_RotateLabels = Controls.Check(null,{label:'Rotate labels', value:true}).setClassID('rotatelabels')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
                 that.ctrl_ShowInternalNodes = Controls.Check(null,{label:'Show internal nodes', value:true}).setClassID('showinternalnodes')
                     .setOnChanged(function() {
                     that.reDraw();
@@ -178,6 +183,7 @@ define([
                         that.ctrl_BranchOpacity,
                         that.ctrl_ColorDrawing,
                         that.ctrl_SelDrawing,
+                        that.ctrl_RotateLabels,
                         that.ctrl_ShowInternalNodes
                     ]).setMargin(10), {
                         title: 'Layout',
@@ -339,6 +345,7 @@ define([
                 var selConsensusStrictBranch = (that.ctrl_SelDrawing.getValue() == 'consensus1');
                 var selConsensusRelaxedBranch = (that.ctrl_SelDrawing.getValue() == 'consensus2');
                 var showInternalNodes = that.ctrl_ShowInternalNodes.getValue();
+                var rotateLabels = that.ctrl_RotateLabels.getValue();
 
                 var selectionMap = that.tableInfo.currentSelection;
 
@@ -497,15 +504,26 @@ define([
                             ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
                             ctx.fill();
                             if (that.labelPropId) {
-                                var xoffset = 3;
+                                var xoffset = 3*sizeFactor+1;
                                 if (branch.pointingLeft) {
                                     ctx.textAlign="right";
-                                    xoffset = -3
+                                    xoffset = -xoffset;
                                 }
                                 else {
                                     ctx.textAlign="left";
                                 }
-                                ctx.fillText(that.pointData[that.labelPropId][idx], px1+xoffset, py1+4);
+                                if (rotateLabels) {
+                                    ctx.save();
+                                    ctx.translate(px1,py1);
+                                    var ang = branch.absoluteAngle;
+                                    if (branch.pointingLeft)
+                                        ang -= Math.PI;
+                                    ctx.rotate(ang);
+                                    ctx.fillText(that.pointData[that.labelPropId][idx], xoffset,4);
+                                    ctx.restore();
+                                }
+                                else
+                                    ctx.fillText(that.pointData[that.labelPropId][idx], px1+xoffset, py1+4);
                             }
                         }
                     }
