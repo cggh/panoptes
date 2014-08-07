@@ -23,7 +23,8 @@ define([
 
         TreePlot.plotAspects = [
             { id:'label', name:'Label', dataType:'', requiredLevel: 0 },
-            { id:'color', name:'Item color', dataType:'', requiredLevel: 0 }
+            { id:'color', name:'Node color', dataType:'', requiredLevel: 0 },
+            { id:'colorbranch', name:'Branch color', dataType:'', requiredLevel: 0 }
         ];
 
 
@@ -66,9 +67,27 @@ define([
                 that.ctrlValueLabel.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueColor = Controls.Combo(null,{ label:'Color:<br>', states: propList, value:that.providedAspect2Property('color') }).setClassID('color');
-                that.ctrlValueColor.setOnChanged(function() {
+                that.ctrlValueColorNode = Controls.Combo(null,{ label:'Node colour:<br>', states: propList, value:that.providedAspect2Property('color') }).setClassID('color');
+                that.ctrlValueColorNode.setOnChanged(function() {
                     that.fetchData();
+                });
+                that.ctrlValueColorBranch = Controls.Combo(null,{ label:'Branch colour:<br>', states: propList, value:that.providedAspect2Property('colorbranch') }).setClassID('colorbranch');
+                that.ctrlValueColorBranch.setOnChanged(function() {
+                    that.fetchData();
+                });
+
+                that.ctrl_ColorDrawing = Controls.Combo(null,{ label:'Draw branch colour on:<br>', states: [{id: 'consensus', 'name':'Consensus branches'}, {id: 'leaf', 'name':'Leaf branches'}], value:'consensus' }).setClassID('drawcolor')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+                that.ctrl_SelDrawing = Controls.Combo(null,{ label:'Draw selection on:<br>', states: [{id: 'node', 'name':'Nodes only'}, {id: 'leaf', 'name':'Leaf branches'}, {id: 'consensus1', 'name':'Branches (all selected)'}, {id: 'consensus2', 'name':'Branches (some selected)'}], value:'node' }).setClassID('drawsel')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
+                that.ctrl_ShowInternalNodes = Controls.Check(null,{label:'Show internal nodes', value:true}).setClassID('showinternalnodes')
+                    .setOnChanged(function() {
+                    that.reDraw();
                 });
 
                 that.colorLegend = Controls.Html(null,'');
@@ -122,7 +141,8 @@ define([
                     Controls.Section(Controls.CompoundVert([
                         that.ctrlTree,
                         that.ctrlValueLabel,
-                        that.ctrlValueColor
+                        that.ctrlValueColorNode,
+                        that.ctrlValueColorBranch
                     ]).setMargin(10), {
                         title: 'Plot data',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -131,7 +151,10 @@ define([
                     Controls.Section(Controls.CompoundVert([
                         that.ctrl_SizeFactor,
                         that.ctrl_Opacity,
-                        that.ctrl_BranchOpacity
+                        that.ctrl_BranchOpacity,
+                        that.ctrl_ColorDrawing,
+                        that.ctrl_SelDrawing,
+                        that.ctrl_ShowInternalNodes
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -182,11 +205,17 @@ define([
 
                 if (!that.pointData[that.tableInfo.primkey])
                     fetcher.addColumn(that.tableInfo.primkey, 'ST');
-                that.colorPropId = null;
-                if (that.ctrlValueColor.getValue()) {
-                    that.colorPropId = that.ctrlValueColor.getValue();
-                    if (!that.pointData[that.colorPropId])
-                        fetcher.addColumn(that.colorPropId, 'ST');
+                that.colorNodePropId = null;
+                if (that.ctrlValueColorNode.getValue()) {
+                    that.colorNodePropId = that.ctrlValueColorNode.getValue();
+                    if (!that.pointData[that.colorNodePropId])
+                        fetcher.addColumn(that.colorNodePropId, 'ST');
+                }
+                that.colorBranchPropId = null;
+                if (that.ctrlValueColorBranch.getValue()) {
+                    that.colorBranchPropId = that.ctrlValueColorBranch.getValue();
+                    if (!that.pointData[that.colorBranchPropId])
+                        fetcher.addColumn(that.colorBranchPropId, 'ST');
                 }
 
                 that.labelPropId = null;
@@ -281,6 +310,11 @@ define([
                 var sizeFactor =that.ctrl_SizeFactor.getValue();
                 var opacity = that.ctrl_Opacity.getValue();
                 var opacityBranch = that.ctrl_BranchOpacity.getValue();
+                var colorOnConsensusBranch = (that.ctrl_ColorDrawing.getValue() == 'consensus');
+                var selOnLeafBranch = (that.ctrl_SelDrawing.getValue() != 'node');
+                var selConsensusStrictBranch = (that.ctrl_SelDrawing.getValue() == 'consensus1');
+                var selConsensusRelaxedBranch = (that.ctrl_SelDrawing.getValue() == 'consensus2');
+                var showInternalNodes = that.ctrl_ShowInternalNodes.getValue();
 
                 var selectionMap = that.tableInfo.currentSelection;
 
@@ -310,61 +344,131 @@ define([
                 scaleY *= zoom_scaleY;
 
 
+                var blackNodeColorString = DQX.Color(0,0,0,opacity).toStringCanvas();
+                var blackBranchColorString = DQX.Color(0,0,0,opacityBranch).toStringCanvas();
+                var internalNodeColorString = DQX.Color(0,0,0,0.5*opacity).toStringCanvas();
+                var selBranchColorString = DQX.Color(1,0,0,opacityBranch).toStringCanvas();
+
                 ctx.font="11px Arial";
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.strokeStyle = DQX.Color(0,0,0,opacityBranch).toStringCanvas();
+                ctx.strokeStyle = blackBranchColorString;
 
-                var catData = null;
-                if (that.colorPropId) {
-                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.colorPropId);
-                    var catProps = that.pointData[that.colorPropId];
+                var legendStr = '';
+                var colorDataNodes = null;
+                if (that.colorNodePropId) {
+                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.colorNodePropId);
+                    var catProps = that.pointData[that.colorNodePropId];
                     for (var i=0; i<catProps.length; i++)
                         catProps[i] = catPropInfo.toDisplayString(catProps[i]);
                     var maprs = catPropInfo.mapColors(catProps);
-                    catData = maprs.indices;
-                    that.mappedColors = [];
+                    colorDataNodes = maprs.indices;
+                    that.mappedNodeColorStrings = [];
                     $.each(maprs.colors, function(idx, color) {
-                        that.mappedColors.push(color.changeOpacity(opacity));
+                        that.mappedNodeColorStrings.push(color.changeOpacity(opacity).toStringCanvas());
                     });
-                    var legendStr = '';
+                    if (that.colorBranchPropId && (that.colorBranchPropId != that.colorNodePropId))
+                        legendStr += '<b>Node colors:</b><br>';
                     $.each(maprs.legend,function(idx, legendItem) {
                         legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
                     });
-                    that.colorLegend.modifyValue(legendStr);
                 }
+                var colorDataBranches = null;
+                if (that.colorBranchPropId) {
+                    var catPropInfo = MetaData.findProperty(that.tableInfo.id, that.colorBranchPropId);
+                    var catProps = that.pointData[that.colorBranchPropId];
+                    for (var i=0; i<catProps.length; i++)
+                        catProps[i] = catPropInfo.toDisplayString(catProps[i]);
+                    var maprs = catPropInfo.mapColors(catProps);
+                    colorDataBranches = maprs.indices;
+                    that.mappedBranchColorStrings = [];
+                    $.each(maprs.colors, function(idx, color) {
+                        that.mappedBranchColorStrings.push(color.changeOpacity(opacityBranch).toStringCanvas());
+                    });
+                    if (that.colorBranchPropId != that.colorNodePropId) {
+                        legendStr += '<br><b>Branch colours:</b><br>';
+                        $.each(maprs.legend,function(idx, legendItem) {
+                            legendStr+='<span style="background-color:{cl}">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{name}<br>'.DQXformat({cl:legendItem.color.toString(), name:legendItem.state});
+                        });
+                    }
+                }
+                that.colorLegend.modifyValue(legendStr);
 
                 var drawBranch = function(branch) {
+                    branch.colorIndexNode = -1;
+                    branch.colorIndexBranch = -1;
+                    branch.selected = false;
+                    if (branch.itemid) {
+                        var idx = that.pointIndex[branch.itemid];
+                        if (idx!=null) {
+                            if (colorDataNodes)
+                                branch.colorIndexNode = colorDataNodes[idx];
+                            if (colorDataBranches)
+                                branch.colorIndexBranch = colorDataBranches[idx];
+                            if (selectionMap[branch.itemid])
+                                branch.selected = true;
+                        }
+                    }
                     var px1 = Math.round(branch.posX * scaleX + offsetX);
                     var py1 = Math.round(branch.posY * scaleY + offsetY);
                     branch.screenX = px1;
                     branch.screenY = py1;
+
+                    // Draw children first
+                    var newColorIndexBranch = -1;
+                    var hasSubSel = false;
+                    var hasSubNonSel = false;
+                    $.each(branch.children, function(idx, child) {
+                        drawBranch(child);
+                        if (colorOnConsensusBranch)
+                            if (newColorIndexBranch==-1)
+                                newColorIndexBranch = child.colorIndexBranch;
+                            else
+                                if (newColorIndexBranch != child.colorIndexBranch)
+                                    newColorIndexBranch = -2;
+                        if (child.selected)
+                            hasSubSel = true;
+                        else
+                            hasSubNonSel = true;
+                    });
+                    if (!branch.itemid) {
+                        branch.colorIndexBranch = newColorIndexBranch;
+                        if (selConsensusStrictBranch)
+                            branch.selected = !hasSubNonSel;
+                        if (selConsensusRelaxedBranch)
+                            branch.selected = hasSubSel;
+                    }
+
                     if (branch.parent) {
                         var px0 = branch.parent.screenX;
                         var py0 = branch.parent.screenY;
+                        if (that.colorBranchPropId) {
+                            if (branch.colorIndexBranch>=0)
+                                ctx.strokeStyle = that.mappedBranchColorStrings[branch.colorIndexBranch];
+                            else
+                                ctx.strokeStyle = blackBranchColorString;
+                        }
+                        if (selOnLeafBranch) {
+                            if (branch.selected)
+                                ctx.strokeStyle = selBranchColorString;
+                            else
+                                ctx.strokeStyle = blackBranchColorString;
+                        }
                         ctx.beginPath();
                         ctx.moveTo(px0, py0);
                         ctx.lineTo(px1, py1);
                         ctx.stroke();
                     }
 
-
-                    if (!branch.parent) {
-                        ctx.beginPath();
-                        ctx.arc(px1, py1, 4, 0, 2 * Math.PI, false);
-                        ctx.fill();
-                    }
-
                     if (branch.itemid) {
-                        var idx = that.pointIndex[branch.itemid];
                         if (idx!=null) {
-                            if (selectionMap[branch.itemid]) {
+                            if (branch.selected) {
                                 selpsX.push(branch.screenX);
                                 selpsY.push(branch.screenY);
                             }
-                            if (catData)
-                                ctx.fillStyle = that.mappedColors[catData[idx]].toStringCanvas();
+                            if (branch.colorIndexNode>=0)
+                                ctx.fillStyle = that.mappedNodeColorStrings[branch.colorIndexNode];
                             else
-                                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                                ctx.fillStyle = blackNodeColorString;
                             ctx.beginPath();
                             ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
                             ctx.fill();
@@ -382,13 +486,14 @@ define([
                         }
                     }
                     else {
-                        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-                        ctx.beginPath();
-                        ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
-                        ctx.fill();
+                        if (showInternalNodes) {
+                            ctx.fillStyle = internalNodeColorString;
+                            ctx.beginPath();
+                            ctx.arc(px1, py1, 2*sizeFactor, 0, 2 * Math.PI, false);
+                            ctx.fill();
+                        }
                     }
 
-                    $.each(branch.children, function(idx, child) { drawBranch(child); });
                 }
 
                 var selpsX = [];
@@ -396,10 +501,10 @@ define([
                 drawBranch(that.currentTree.root);
 
                 ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
-                ctx.strokeStyle=DQX.Color(1,0,0,0.75*opacity).toStringCanvas();
+                ctx.strokeStyle=DQX.Color(1,0,0,opacity).toStringCanvas();
                 for (var i=0; i<selpsX.length; i++) {
                     ctx.beginPath();
-                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
+                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+3, 0, 2 * Math.PI, false);
                     ctx.closePath();
                     ctx.fill();
                     ctx.stroke();
@@ -430,8 +535,8 @@ define([
                     var content = bestBranch.itemid;
                     if (that.labelPropId && (that.labelPropId!=that.tableInfo.primkey))
                         content += '<br>' + that.pointData[that.labelPropId][idx];
-                    if (that.colorPropId && (that.colorPropId!=that.tableInfo.primkey))
-                        content += '<br>' + that.pointData[that.colorPropId][idx];
+                    if (that.colorNodePropId && (that.colorNodePropId!=that.tableInfo.primkey))
+                        content += '<br>' + that.pointData[that.colorNodePropId][idx];
                     return {
                         itemid: bestBranch.itemid,
                         ID: bestBranch.itemid,
