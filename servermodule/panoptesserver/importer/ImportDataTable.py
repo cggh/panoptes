@@ -6,42 +6,22 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
+import shutil
 import SettingsLoader
 import ImpUtils
-import LoadTable
-import shutil
-import customresponders.panoptesserver.Utils as Utils
-from DQXDbTools import DBCOLESC
-from DQXDbTools import DBTBESC
+from ProcessDatabase import ProcessDatabase
+from ProcessFilterBank import ProcessFilterBank
+
+from BaseImport import BaseImport
 
 
-tableOrder = 0
-
-def ImportDataTable(calculationObject, datasetId, tableid, folder, importSettings):
-    global tableOrder
-    with calculationObject.LogHeader('Importing datatable {0}'.format(tableid)):
-        print('Source: ' + folder)
-        DQXUtils.CheckValidTableIdentifier(tableid)
-
-        maxLineCount = -1
-        if importSettings['ScopeStr'] == '1k':
-            maxLineCount = 1000
-        if importSettings['ScopeStr'] == '10k':
-            maxLineCount = 10000
-        if importSettings['ScopeStr'] == '100k':
-            maxLineCount = 100000
-        if importSettings['ScopeStr'] == '1M':
-            maxLineCount = 1000000
-        if importSettings['ScopeStr'] == '10M':
-            maxLineCount = 10000000
-
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablecatalog'))
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'propertycatalog'))
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'relations'))
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablebasedsummaryvalues'))
-
-
-        tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
+class ImportDataTable(BaseImport):
+    tableOrder = 0
+      
+    #Retrieve and validate settings
+    def getSettings(self, tableid):
+        tableSettings, properties = self._fetchSettings(tableid)    
+        
         tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
         tableSettings.AddTokenIfMissing('IsRegionOnGenome', False)
@@ -50,89 +30,19 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('MaxCountQueryAggregated', 1000000)
         tableSettings.AddTokenIfMissing('AllowSubSampling', False)
 
-        if tableSettings.HasToken('Description'):
-            tableSettings.SetToken('Description', tableSettings['Description'].replace('\n', ' ').replace('\r', ' '))
-
-        extraSettings = tableSettings.Clone()
-        extraSettings.DropTokens(['PrimKey', 'Properties'])
-
         if tableSettings['MaxTableSize'] is not None:
-            print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
+            self._log('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
 
-
-        # Drop existing tablecatalog record
-        sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-
-        # Add to tablecatalog
-        extraSettings.ConvertStringsToSafeSQL()
-        sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', {5})".format(
-            tableid,
-            tableSettings['NamePlural'],
-            tableSettings['PrimKey'],
-            tableSettings['IsPositionOnGenome'],
-            extraSettings.ToJSON(),
-            tableOrder
-        )
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-        tableOrder += 1
-
-        properties = ImpUtils.LoadPropertyInfo(calculationObject, tableSettings, os.path.join(folder, 'data'))
-
-        sql = "DELETE FROM propertycatalog WHERE tableid='{0}'".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-        sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-
-        ranknr = 0
-        for property in properties:
-            propid = property['propid']
-            settings = property['Settings']
-            extraSettings = settings.Clone()
-            extraSettings.DropTokens(['Name', 'DataType', 'Order'])
-            sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
-                settings['DataType'],
-                propid,
-                tableid,
-                settings['Name'],
-                0,
-                extraSettings.ToJSON()
-            )
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            if settings.HasToken('Relation'):
-                relationSettings = settings.GetSubSettings('Relation')
-                calculationObject.Log('Creating relation: '+relationSettings.ToJSON())
-                relationSettings.RequireTokens(['TableId'])
-                relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
-                relationSettings.AddTokenIfMissing('ReverseName', 'has')
-                sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
-                    tableid,
-                    propid,
-                    relationSettings['TableId'],
-                    '',
-                    relationSettings['ForwardName'],
-                    relationSettings['ReverseName']
-                )
-                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            ranknr += 1
-
-
-
-        propidList = []
         propDict = {}
-        for property in properties:
-            propDict[property['propid']] = property
-            propidList.append(property['propid'])
+        for prop in properties:
+            propDict[prop['propid']] = prop
+            
 
         if tableSettings['IsPositionOnGenome']:
-            if not tableSettings.HasToken('Chromosome'):
-                raise Exception('Missing settings tag Chromosome in genome position datatable.')
-            if not tableSettings.HasToken('Position'):
-                raise Exception('Missing settings tag Position in genome position datatable.')
             if tableSettings['Chromosome'] not in propDict:
-                 raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
+                raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
             if tableSettings['Position'] not in propDict:
-                 raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Position']))
+                raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Position']))
 
         if tableSettings['IsRegionOnGenome']:
             if not tableSettings.HasToken('Chromosome'):
@@ -142,172 +52,167 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
             if not tableSettings.HasToken('RegionStop'):
                 raise Exception('Missing setting "RegionStop" in genome region datatable {0}'.format(tableid))
             if tableSettings['Chromosome'] not in propDict:
-                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
+                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
             if tableSettings['RegionStart'] not in propDict:
-                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStart']))
+                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStart']))
             if tableSettings['RegionStop'] not in propDict:
-                 raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStop']))
-            propDict[tableSettings['Chromosome']]['Settings'].SetToken('Index', True)
-            propDict[tableSettings['RegionStart']]['Settings'].SetToken('Index', True)
-            propDict[tableSettings['RegionStop']]['Settings'].SetToken('Index', True)
-
-
-        if not importSettings['ConfigOnly']:
-            columns = [ {
-                            'name': prop['propid'],
-                            'DataType': prop['DataType'],
-                            'Index': prop['Settings']['Index'],
-                            'ReadData': prop['Settings']['ReadData']
-                        }
-                        for prop in properties if (prop['propid'] != 'AutoKey')]
-            LoadTable.LoadTable(
-                calculationObject,
-                os.path.join(folder, 'data'),
-                datasetId,
-                tableid,
-                columns,
-                tableSettings,
-                importSettings,
-                tableSettings['AllowSubSampling']
-            )
-            if tableSettings['IsPositionOnGenome']:
-                calculationObject.Log('Indexing chromosome')
-                scr = ImpUtils.SQLScript(calculationObject)
-                scr.AddCommand('create index chrompos ON {0}({1},{2})'.format(
-                    DBTBESC(tableid),
-                    DBCOLESC(tableSettings['Chromosome']),
-                    DBCOLESC(tableSettings['Position'])
-                ))
-                scr.Execute(datasetId)
-
-            print('Creating subsets table')
-            subsetTableName = tableid + '_subsets'
-            primKey = tableSettings['PrimKey']
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DROP TABLE IF EXISTS {0}'.format(DBTBESC(subsetTableName)))
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
-                subsettable=DBTBESC(subsetTableName),
-                primkey=DBCOLESC(primKey),
-                table=DBTBESC(tableid)
-            ))
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE INDEX primkey ON {0}({1})'.format(DBTBESC(subsetTableName), DBCOLESC(primKey)))
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'CREATE INDEX subsetid ON {0}(subsetid)'.format(DBTBESC(subsetTableName)))
-
-
-
-        print('Creating summary values')
-        sql = "DELETE FROM summaryvalues WHERE tableid='{0}'".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-        for property in properties:
-            propid = property['propid']
-            settings = property['Settings']
-
-            if (settings.HasToken('SummaryValues')) and ImpUtils.IsValueDataTypeIdenfifier(property['DataType']):
-                with calculationObject.LogHeader('Creating numerical summary values for {0}.{1}'.format(tableid,propid)):
-                    summSettings = settings.GetSubSettings('SummaryValues')
-                    if settings.HasToken('minval'):
-                        summSettings.AddTokenIfMissing('MinVal', settings['minval'])
-                    if settings.HasToken('maxval'):
-                        summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
-                    sourceFileName = os.path.join(folder, 'data')
-                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
-                    if not os.path.exists(destFolder):
-                        os.makedirs(destFolder)
-                    dataFileName = os.path.join(destFolder, propid)
-                    if not importSettings['ConfigOnly']:
-                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False, importSettings)
-                    ImpUtils.CreateSummaryValues_Value(
-                        calculationObject,
-                        summSettings,
-                        datasetId,
-                        tableid,
-                        'fixed',
-                        '',
-                        propid,
-                        settings['Name'],
-                        dataFileName,
-                        importSettings
-                    )
-
-            if (settings.HasToken('SummaryValues')) and (property['DataType'] == 'Text'):
-                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
-                    summSettings = settings.GetSubSettings('SummaryValues')
-                    sourceFileName = os.path.join(folder, 'data')
-                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
-                    if not os.path.exists(destFolder):
-                        os.makedirs(destFolder)
-                    dataFileName = os.path.join(destFolder, propid)
-                    if not importSettings['ConfigOnly']:
-                        ImpUtils.ExtractColumns(calculationObject, sourceFileName, dataFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], False, importSettings)
-                    categories = []
-                    if settings.HasToken('categoryColors'):
-                        stt = settings.GetSubSettings('categoryColors')
-                        categories = [x for x in stt.Get()]
-                        summSettings.AddTokenIfMissing('Categories', categories)
-                    ImpUtils.CreateSummaryValues_Categorical(
-                        calculationObject,
-                        summSettings,
-                        datasetId,
-                        tableid,
-                        'fixed',
-                        '',
-                        propid,
-                        settings['Name'],
-                        dataFileName,
-                        importSettings
-                    )
-
-        sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStop']))
 
         if tableSettings.HasToken('TableBasedSummaryValues'):
-            calculationObject.Log('Processing table-based summary values')
             if not type(tableSettings['TableBasedSummaryValues']) is list:
                 raise Exception('TableBasedSummaryValues token should be a list')
             for stt in tableSettings['TableBasedSummaryValues']:
                 summSettings = SettingsLoader.SettingsLoader()
                 summSettings.LoadDict(stt)
                 summSettings.RequireTokens(['Id', 'Name', 'MaxVal', 'BlockSizeMax'])
+             
+        for prop in properties:
+                settings = prop['Settings']
+                if settings.HasToken('Relation'):
+                    relationSettings = settings.GetSubSettings('Relation')
+                    relationSettings.RequireTokens(['TableId'])
+                    relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
+                    relationSettings.AddTokenIfMissing('ReverseName', 'has')
+
+        if tableSettings.HasToken('Description'):
+            tableSettings.SetToken('Description', tableSettings['Description'].replace('\n', ' ').replace('\r', ' '))
+                   
+        return tableSettings, properties
+                
+
+    def createSummaryFilterBank(self, tableid, summSettings, summaryid):
+        global config
+        if self._getImportSetting('ScopeStr') == 'all':
+            itemtracknr = 0
+            parentdir = os.path.join(self._datatablesFolder, tableid, summaryid)
+            for fileid in os.listdir(parentdir):
+                fileName = os.path.join(parentdir, fileid)
+                if not (os.path.isdir(fileName)):
+                    itemtracknr += 1
+                    self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
+                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, 'TableTracks', tableid, summaryid, fileid)
+                    self._log('Destination: ' + destFolder)
+                    if not os.path.exists(destFolder):
+                        os.makedirs(destFolder)
+                    shutil.copyfile(fileName, os.path.join(destFolder, summaryid + '_' + fileid))
+                    ImpUtils.ExecuteFilterbankSummary_Value(self._calculationObject, destFolder, summaryid + '_' + fileid, summSettings)
+
+
+    def createTableBasedSummaryValues(self, tableid, tableSettings):
+        sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
+        self._execSql(sql)
+        if tableSettings.HasToken('TableBasedSummaryValues'):
+            self._log('Processing table-based summary values')
+            if not type(tableSettings['TableBasedSummaryValues']) is list:
+                raise Exception('TableBasedSummaryValues token should be a list')
+            for stt in tableSettings['TableBasedSummaryValues']:
+                summSettings = SettingsLoader.SettingsLoader()
+                summSettings.LoadDict(stt)
                 summSettings.AddTokenIfMissing('MinVal', 0)
                 summSettings.AddTokenIfMissing('BlockSizeMin', 1)
                 summSettings.DefineKnownTokens(['channelColor'])
                 summaryid = summSettings['Id']
-                with calculationObject.LogHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+                with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
                     extraSummSettings = summSettings.Clone()
                     extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)".format(
+                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)".format(tableid, 
+                        summaryid, 
+                        summSettings['Name'], 
+                        extraSummSettings.ToJSON(), 
+                        summSettings['MinVal'], 
+                        summSettings['MaxVal'], 
+                        summSettings['BlockSizeMin'])
+                    self._execSql(sql)
+                    self.createSummaryFilterBank(tableid, summSettings, summaryid)
+
+    def ImportDataTable(self, tableid):
+        
+        with self._logHeader('Importing datatable {0}'.format(tableid)):
+
+            DQXUtils.CheckValidTableIdentifier(tableid)
+    
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablecatalog'))
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'propertycatalog'))
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'relations'))
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablebasedsummaryvalues'))
+    
+            tableSettings, properties = self.getSettings(tableid)
+            extraSettings = tableSettings.Clone()
+            extraSettings.DropTokens(['PrimKey', 'Properties'])
+    
+            # Drop existing tablecatalog record
+            sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)
+            self._execSql(sql)
+    
+            # Add to tablecatalog
+            extraSettings.ConvertStringsToSafeSQL()
+            sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', {5})".format(
+                tableid,
+                tableSettings['NamePlural'],
+                tableSettings['PrimKey'],
+                tableSettings['IsPositionOnGenome'],
+                extraSettings.ToJSON(),
+                self.tableOrder
+            )
+            self._execSql(sql)
+            self.tableOrder += 1
+    
+
+    
+            sql = "DELETE FROM propertycatalog WHERE tableid='{0}'".format(tableid)
+            self._execSql(sql)
+            sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
+            self._execSql(sql)
+    
+            ranknr = 0
+            for prop in properties:
+                propid = prop['propid']
+                settings = prop['Settings']
+                extraSettings = settings.Clone()
+                extraSettings.DropTokens(['Name', 'DataType', 'Order'])
+                sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
+                    settings['DataType'],
+                    propid,
+                    tableid,
+                    settings['Name'],
+                    0,
+                    extraSettings.ToJSON()
+                )
+                self._execSql(sql)
+                if settings.HasToken('Relation'):
+                    relationSettings = settings.GetSubSettings('Relation')
+                    self._log('Creating relation: '+relationSettings.ToJSON())
+                    sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                         tableid,
-                        summaryid,
-                        summSettings['Name'],
-                        extraSummSettings.ToJSON(),
-                        summSettings['MinVal'],
-                        summSettings['MaxVal'],
-                        summSettings['BlockSizeMin']
+                        propid,
+                        relationSettings['TableId'],
+                        '',
+                        relationSettings['ForwardName'],
+                        relationSettings['ReverseName']
                     )
-                    ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-                    if not importSettings['ConfigOnly']:
-                        maxitemtrackcount = -1
-                        if importSettings['ScopeStr'] != 'all':
-                            maxitemtrackcount = 5
-                            print('Limited to {0} items'.format(maxitemtrackcount))
-                        itemtracknr = 0
-                        for fileid in os.listdir(os.path.join(folder, summaryid)):
-                            if not(os.path.isdir(os.path.join(folder, summaryid, fileid))):
-                                itemtracknr += 1
-                                if (maxitemtrackcount < 0) or (itemtracknr < maxitemtrackcount):
-                                    calculationObject.Log('Processing {0}: {1}'.format(itemtracknr, fileid))
-                                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, 'TableTracks', tableid, summaryid, fileid)
-                                    calculationObject.Log('Destination: '+destFolder)
-                                    if not os.path.exists(destFolder):
-                                        os.makedirs(destFolder)
-                                    shutil.copyfile(os.path.join(folder, summaryid, fileid), os.path.join(destFolder, summaryid+'_'+fileid))
-                                    ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid+'_'+fileid, summSettings, maxLineCount)
+                    self._execSql(sql)
+                ranknr += 1    
+ 
+            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+                       
+            importer.importData(tableid, createSubsets = True)
+            
+            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+            filterBanker.createSummaryValues(tableid)
+           
+            if not self._importSettings['ConfigOnly']:
+                importer.cleanUp()
+    
+            self.createTableBasedSummaryValues(tableid, tableSettings)
+                
+            self.importGraphs(tableid)
 
-
-        with calculationObject.LogHeader('Importing graphs'):
+    def importGraphs(self, tableid):
+        folder = self._datatablesFolder
+        with self._logHeader('Importing graphs'):
             sql = "DELETE FROM graphs WHERE tableid='{0}'".format(tableid)
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-            graphsfolder = os.path.join(folder, 'graphs')
+            self._execSql(sql)
+            graphsfolder = os.path.join(folder, tableid, 'graphs')
             if os.path.exists(graphsfolder):
                 for graphid in os.listdir(graphsfolder):
                     if os.path.isdir(os.path.join(graphsfolder, graphid)):
@@ -325,9 +230,23 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                             graphSettings.ToJSON(),
                             crosslink
                         )
-                        ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
-                        destFolder = os.path.join(config.BASEDIR, 'Graphs', datasetId, tableid)
+                        self._execSql(sql)
+                        destFolder = os.path.join(config.BASEDIR, 'Graphs', self._datasetId, tableid)
                         if not os.path.exists(destFolder):
                             os.makedirs(destFolder)
                         shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
 
+    
+    def importAllDataTables(self):
+        
+        datatables = self._getTables()
+        
+        datatables = self._getDatasetFolders(datatables)
+
+        for datatable in datatables:
+            
+            self.ImportDataTable(datatable)
+        
+        return datatable
+    
+    
