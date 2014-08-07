@@ -24,7 +24,7 @@ define([
         TreePlot.plotAspects = [
             { id:'label', name:'Label', dataType:'', requiredLevel: 0 },
             { id:'color', name:'Node color', dataType:'', requiredLevel: 0 },
-            { id:'colorbranch', name:'Branch color', dataType:'', requiredLevel: 0 }
+            { id:'colorbranch', name:'Branch color', dataType:'Text', requiredLevel: 0 }
         ];
 
 
@@ -58,10 +58,14 @@ define([
                 that.ctrlTree.setOnChanged(that.loadTree);
 
                 var propList = [ {id:'', name:'-- None --'}];
+                var propListText = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) )
+                    if ( (prop.tableid==that.tableInfo.id) ) {
                         propList.push({ id:prop.propid, name:prop.name });
+                        if (prop.isText)
+                            propListText.push({ id:prop.propid, name:prop.name });
+                    }
                 });
                 that.ctrlValueLabel = Controls.Combo(null,{ label:'Label:<br>', states: propList, value:that.providedAspect2Property('label') }).setClassID('label');
                 that.ctrlValueLabel.setOnChanged(function() {
@@ -71,7 +75,7 @@ define([
                 that.ctrlValueColorNode.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueColorBranch = Controls.Combo(null,{ label:'Branch colour:<br>', states: propList, value:that.providedAspect2Property('colorbranch') }).setClassID('colorbranch');
+                that.ctrlValueColorBranch = Controls.Combo(null,{ label:'Branch colour:<br>', states: propListText, value:that.providedAspect2Property('colorbranch') }).setClassID('colorbranch');
                 that.ctrlValueColorBranch.setOnChanged(function() {
                     that.fetchData();
                 });
