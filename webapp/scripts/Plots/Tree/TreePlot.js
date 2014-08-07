@@ -94,21 +94,41 @@ define([
 
                 var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
-                    actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
-                        that.panelPlot.startHalfPlaneSelection(function(center, dir) {
-                            center.x = (center.x-that.offsetX)/that.scaleX;
-                            center.y = (center.y-that.offsetY)/that.scaleY;
-                            dir.x = dir.x/that.scaleX;
-                            dir.y = dir.y/that.scaleY;
-                            var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.propidValueX, that.propidValueY, center, dir);
 
-                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', {
-                                query: queryInfo.query,
-                                subSamplingOptions: that.theQuery.getSubSamplingOptions()
-                            }, null);
+                    actions.push( { content:'Lasso selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startLassoSelection(function(selectedPoints) {
+                            function isPointInPoly(poly, pt) {
+                                for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+                                    ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
+                                        && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
+                                    && (c = !c);
+                                return c;
+                            }
+                            var polygonPoints = [];
+                            $.each(selectedPoints, function(idx, pt) {
+                                polygonPoints.push({
+                                    x: (pt.x-that.offsetX)/that.scaleX,
+                                    y: (pt.y-that.offsetY)/that.scaleY
+                                });
+                            });
+                            if (!that.allDataPresent()) return;
+                            var selectionCreationFunction = function() {
+                                var sellist = [];
+                                var selectPoints = function(branch) {
+                                    if (branch.itemid) {
+                                        if (isPointInPoly(selectedPoints, {x: branch.screenX, y:branch.screenY}))
+                                            sellist.push(branch.itemid);
+                                    }
+                                    $.each(branch.children, function(idx, child) { selectPoints(child); });
+                                }
+                                selectPoints(that.currentTree.root);
+                                return sellist;
+                            };
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Tree lasso selection', '', null, selectionCreationFunction);
                         });
                     }
                     });
+
                     ButtonChoiceBox.create('Select points','', [actions]);
                 });
 
