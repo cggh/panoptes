@@ -223,14 +223,29 @@ require([
                                     }
                                 });
                                 if (canPerformSearch) {
-                                    actions.push( { content:'Find '+tableInfo.tableNameSingle+'...', bitmap:'Bitmaps/datagrid2.png', handler:function() {
+                                    var content = '';
+                                    content += 'Find '+tableInfo.tableNameSingle;
+                                    actions.push( {
+                                        content:content,
+                                        bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                                        icon: tableInfo.settings.Icon,
+                                        handler:function() {
                                         FindDataItem.execute(tableInfo.id);
                                     }
                                     });
                                 }
                             });
-
-                            ButtonChoiceBox.create('Find item','', [actions]);
+                            var actionRows = [];
+                            var rowCnt = 99;
+                            $.each(actions, function(idx, action) {
+                                if (rowCnt>=3) {
+                                    actionRows.push([]);
+                                    rowCnt = 0;
+                                }
+                                actionRows[actionRows.length-1].push(action);
+                                rowCnt++;
+                            });
+                            ButtonChoiceBox.create('Find item','', actionRows);
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header

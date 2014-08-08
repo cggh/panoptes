@@ -17,7 +17,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var content = '';
 
             $.each(tableInfo.tableBasedSummaryValues, function(idx, summaryValue) {
-                var bt = Controls.Button(null, { content: 'Show <b>' + summaryValue.trackname + '</b>', buttonClass: 'DQXToolButton2', width:200, height:30}).setOnChanged(function() {
+                var bt = Controls.Button(null, { content: 'Show <b>' + summaryValue.trackname + '</b>', buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/GenomeBrowserSmall.png', width:200, height:30}).setOnChanged(function() {
                     if (!tableInfo.genomeTrackSelectionManager.isItemSelected(itemid))
                         tableInfo.genomeTrackSelectionManager.selectItem(itemid, true);
                     if (!tableInfo.mapTableBasedSummaryValues[summaryValue.trackid].isVisible) {
@@ -31,7 +31,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
 
-            var bt = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2', width:200, height:30}).setOnChanged(function() {
+            var bt = Controls.Button(null, { content: 'Hide all', buttonClass: 'DQXToolButton2', icon: 'fa-ban', width:200, height:30}).setOnChanged(function() {
                 if (tableInfo.genomeTrackSelectionManager.isItemSelected(itemid))
                     tableInfo.genomeTrackSelectionManager.selectItem(itemid, false);
                 Popup.closeIfNeeded(popupid);

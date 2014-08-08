@@ -65,7 +65,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var frameTabGroup = that.frameRoot.addMemberFrame(Framework.FrameGroupTab('', 0.7));
 
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 83).setFrameClassClient('DQXGrayClient').setAllowScrollBars(false, false).setMargins(0);
+                    .setFixedSize(Framework.dimY, 80).setFrameClassClient('DQXGrayClient').setAllowScrollBars(false, false).setMargins(0);
 
 
 
@@ -151,7 +151,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     // Create buttons to show genomic regions spanning this position
                     $.each(MetaData.tableCatalog, function(idx, oTableInfo) {
                         if (oTableInfo.hasGenomeRegions) {
-                            var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/datagrid2Small.png'}).setOnChanged(function() {
+                            var bt = Controls.Button(null, {
+                                content: 'Show '+oTableInfo.tableNamePlural,
+                                buttonClass: 'PnButtonGrid',
+                                width:that.buttonWidth,
+                                height:that.buttonHeight,
+                                bitmap: (!oTableInfo.settings.Icon)?'Bitmaps/datagrid2Small.png':null,
+                                icon: oTableInfo.settings.Icon
+                            }).setOnChanged(function() {
                                 var qry = SQL.WhereClause.AND([
                                     SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', genome_chromosome),
                                     SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', genome_position),
@@ -181,7 +188,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     $.each(MetaData.tableCatalog,  function(idx, tableInfo) {
                         if (tableInfo.hasGenomePositions) {
-                            var bt = Controls.Button(null, { content: 'Show '+tableInfo.tableNamePlural+' in range', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/datagrid2Small.png'}).setOnChanged(function() {
+                            var bt = Controls.Button(null, {
+                                content: 'Show '+tableInfo.tableNamePlural+' in range',
+                                buttonClass: 'PnButtonGrid',
+                                width:that.buttonWidth,
+                                height:that.buttonHeight,
+                                bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2Small.png':null,
+                                icon: tableInfo.settings.Icon
+                            }).setOnChanged(function() {
                                 Msg.send({type: 'ShowItemsInGenomeRange', tableid:tableInfo.id}, {
                                     preservecurrentquery:false,
                                     chrom: data.fields[that.tableInfo.settings.Chromosome],
@@ -211,7 +225,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.settings.ExternalLinks) {
                     $.each(that.tableInfo.settings.ExternalLinks, function(idx, linkInfo) {
-                        var bt = Controls.Button(null, { content: linkInfo.Name, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:"Bitmaps/circle_cyan_small.png"}).setOnChanged(function() {
+                        var bt = Controls.Button(null, { content: linkInfo.Name, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, icon:"fa-link"}).setOnChanged(function() {
                             var url = linkInfo.Url.DQXformat(data.fields);
                             window.open(url,'_blank');
                         })

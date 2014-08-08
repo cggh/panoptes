@@ -326,9 +326,10 @@ a:link, a:visited
     padding-right:6px;
     cursor:pointer;
     box-shadow: none;
-    border: none;
     border-radius: 0px;
-    outline:1px solid rgb(200,200,200);
+    margin-left: -1px;
+    margin-top: -1px;
+    border:1px solid rgb(200,200,200);
 }
 
 
@@ -336,7 +337,7 @@ a:link, a:visited
 {
     color: rgb(0,94,102);
     box-shadow:none;
-    border:none;
+    /*border:none;*/
 
     background: rgb(245,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgb(245,255,255) 0%, rgb(200,225,225) 100%); /* FF3.6+ */

@@ -11,9 +11,11 @@ Properties:
   Name: ID
   ShowInTable: true
   DataType: Text
+  Search: StartPattern
 
 - Id: Name
   Name: Name
   DataType: Text
   ShowInTable: true
   IsCategorical: true
+  Search: StartPattern
