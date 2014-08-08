@@ -308,12 +308,16 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
                         print('Importing graph ' + graphid)
                         graphfolder = os.path.join(graphsfolder, graphid)
                         graphSettings = SettingsLoader.SettingsLoader(os.path.join(graphfolder, 'settings'))
-                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '', 0)".format(
+                        crosslink = ''
+                        if graphSettings.HasToken('CrossLink'):
+                            crosslink = graphSettings['CrossLink']
+                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
                             graphid,
                             tableid,
                             'tree',
                             graphSettings['Name'],
-                            graphSettings.ToJSON()
+                            graphSettings.ToJSON(),
+                            crosslink
                         )
                         ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
                         destFolder = os.path.join(config.BASEDIR, 'Graphs', datasetId, tableid)

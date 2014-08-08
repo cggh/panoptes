@@ -194,6 +194,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 }
 
+                var reverseCrossLinkInfoList = MiscUtils.getReverseCrossLinkList(that.tableInfo.id, that.itemid);
+                $.each(reverseCrossLinkInfoList, function(idx, linkInfo) {
+                    var bt = Controls.Button(null, { content: 'Show associated '+linkInfo.dispName, buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:linkInfo.bitmap, bitmapHeight:20}).setOnChanged(function() {
+                        MiscUtils.openReverseCrossLink(linkInfo);
+                        });
+                    buttons.push(bt);
+                });
+
                 if (that.tableInfo.tableBasedSummaryValues.length>0) {
                     var bt = Controls.Button(null, { content: 'Show genome tracks...', buttonClass: 'PnButtonGrid', width:that.buttonWidth, height:that.buttonHeight, bitmap:'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function() {
                         ItemGenomeTracksPopup.show(that.tableInfo, that.itemid);

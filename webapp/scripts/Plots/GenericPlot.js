@@ -136,10 +136,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 that.reloadAll();
             }
 
-            that.createIntroControls = function() {
+            that.createIntroControls = function(inpExtraControls) {
                 that.introText = Controls.Html(null,'', '_dummyclass_');
                 that.ctrl_PointCount = Controls.Html(null, '');
-                var ctrl_Query = that.theQuery.createQueryControl({}, [that.ctrl_PointCount]);
+                var extraControls = [that.ctrl_PointCount];
+                if (inpExtraControls)
+                    $.each(inpExtraControls, function(idx, ctrl) {
+                        extraControls.push(ctrl);
+                    });
+                var ctrl_Query = that.theQuery.createQueryControl({}, extraControls);
                 that.setIntroText();
                 return Controls.Wrapper(Controls.CompoundVert([
                     that.introText,

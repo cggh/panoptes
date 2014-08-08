@@ -8,6 +8,7 @@ define(["require", "DQX/Utils"],
             var that = {};
 
             that.load = function(settings, data) {
+                that.settings  = settings;
                 that.root = null;
                 try {
                     that.loadNewick(data);

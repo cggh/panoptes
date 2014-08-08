@@ -14,6 +14,13 @@ define([
 
         var TreePlot = {};
 
+        Msg.listen('',{type:'OpenTree'}, function(scope, info) {
+            var querySettings = {
+                treeid: info.treeid
+            };
+            TreePlot.Create(info.tableid, SQL.WhereClause.Trivial(), querySettings);
+        });
+
         TreePlot.typeID = 'TreePlot';
         TreePlot.name = 'Tree';
         TreePlot.description= 'Displays a pre-calculated, unrooted tree of {items}.';
@@ -54,7 +61,10 @@ define([
             that.createPanelButtons = function() {
                 //that.ctrl_PointCount = Controls.Html(null, '');
 
-                that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:that.tableInfo.trees[0].id }).setClassID('tree');
+                var startTreeId = that.tableInfo.trees[0].id;
+                if (querySettings.treeid)
+                    startTreeId = querySettings.treeid;
+                that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:startTreeId }).setClassID('tree');
                 that.ctrlTree.setOnChanged(that.loadTree);
 
                 var propList = [ {id:'', name:'-- None --'}];
@@ -100,6 +110,14 @@ define([
                 });
 
                 that.colorLegend = Controls.Html(null,'');
+
+                that.ctrl_Description = Controls.Html(null,'');
+                that.ctrl_crossLink = Controls.Hyperlink(null, {content: 'xxx'}).setOnChanged(function() {
+                    MiscUtils.openCrossLink(that.crossLinkInfo);
+                });
+                that.ctrl_ShowHideCrossLink = Controls.ShowHide(that.ctrl_crossLink);
+                that.ctrl_ShowHideCrossLink.setVisible(false);
+
 
                 var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
@@ -160,11 +178,12 @@ define([
                     });
 
                 var controlsGroup = Controls.CompoundVert([
-                    that.createIntroControls(),
+                    that.createIntroControls([that.ctrl_Description, that.ctrl_ShowHideCrossLink]) ,
                     Controls.AlignCenter(Controls.CompoundHor([
                         cmdPointSelection,
                         Controls.HorizontalSeparator(95)
                     ])),
+                    Controls.VerticalSeparator(10),
                     Controls.VerticalSeparator(20),
 
                     Controls.Section(Controls.CompoundVert([
@@ -299,6 +318,7 @@ define([
                 that.currentTreeId = that.ctrlTree.getValue();
                 that.currentTree = that.treesMap[that.currentTreeId];
                 if (that.currentTree) {
+                    that.updateTreeInfo();
                     that.reDraw();
                     return;
                 }
@@ -315,13 +335,31 @@ define([
                         return;
                     }
                     that.currentTree = Tree();
-                    that.currentTree.load(resp.settings, resp.data);
+                    that.currentTree.name = resp.name;
+                    that.currentTree.load(JSON.parse(resp.settings), resp.data);
                     that.currentTree.layout();
                     that.panelPlot.setXRange(0,1);
                     that.panelPlot.setYRange(0,1);
+                    that.updateTreeInfo();
                     that.reDraw();
                 });
 
+            }
+
+
+            that.updateTreeInfo = function() {
+                var descr = '';
+                if (that.currentTree.name)
+                    descr += '<b>' + that.currentTree.name + '.</b> ';
+                if (that.currentTree.settings.Description)
+                    descr += that.currentTree.settings.Description;
+                that.ctrl_Description.modifyValue(descr);
+                that.crossLinkInfo = null;
+                if (that.currentTree.settings.CrossLink) {
+                    that.crossLinkInfo = MiscUtils.parseCrossLink(that.currentTree.settings.CrossLink);
+                    that.ctrl_crossLink.modifyValue('<span class="fa fa-external-link-square" style="font-size: 120%"></span> Open associated <b>' + that.crossLinkInfo.dispName + '</b>');
+                    that.ctrl_ShowHideCrossLink.setVisible(true);
+                }
             }
 
             that.allDataPresent = function() {
@@ -559,7 +597,7 @@ define([
             that.getToolTipInfo = function(px0 ,py0) {
                 if (!that.allDataPresent())
                     return;
-                var mindst = 9;
+                var mindst = 12;
                 var bestBranch = null;
                 var findPoint = function(branch) {
                     if (branch.itemid) {

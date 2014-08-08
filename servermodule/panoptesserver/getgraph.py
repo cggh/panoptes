@@ -16,7 +16,7 @@ def response(returndata):
     graphid = DQXDbTools.ToSafeIdentifier(returndata['graphid'])
 
     with DQXDbTools.DBCursor(returndata, databaseName, read_timeout=config.TIMEOUT) as cur:
-        sql = 'select settings from graphs WHERE (tableid="{tableid}") and (graphid="{graphid}")'.format(
+        sql = 'select dispname,settings from graphs WHERE (tableid="{tableid}") and (graphid="{graphid}")'.format(
             tableid=tableid,
             graphid=graphid
         )
@@ -25,7 +25,8 @@ def response(returndata):
         if rs is None:
             returndata['Error'] = 'Unable to find graph data record'
             return
-        returndata['settings'] = rs[0]
+        returndata['name'] = rs[0]
+        returndata['settings'] = rs[1]
 
     filename = os.path.join(config.BASEDIR, 'Graphs', databaseName, tableid, graphid)
     if not(os.path.exists(filename)):
