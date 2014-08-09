@@ -36,9 +36,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += "<table>";
                 var fieldContent = '';
                 $.each(viewSettings.Fields, function(idx, propid) {
+                    var lnk = null;
                     if (propid.indexOf('@')<0) {//property from this table
                         var propInfo = MetaData.findProperty(tableInfo.id, propid);
                         fieldContent = itemData.fields[propid];
+                        if (propInfo.relationParentTableId) {
+                            var lnk = Controls.Hyperlink(null,{ content: '<span class="fa fa-external-link-square" style="font-size: 120%"></span> <b>Open</b>'});
+                            lnk.setOnChanged(function() {
+                                Msg.send({type: 'ItemPopup'}, {
+                                    tableid: propInfo.relationParentTableId,
+                                    itemid: itemData.fields[propid]
+                                });
+                            });
+                        }
                     }
                     else {//property from a parent table
                         var parenttableid = propid.split('@')[1];
@@ -53,7 +63,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         hint: (propInfo.settings.Description)||'',
                         name: propInfo.name
                     });
-                    content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
+                    content += '<td style="padding-left:5px;word-wrap:break-word;">';
+                    content += propInfo.toDisplayString(fieldContent);
+                    if (lnk) {
+                        content += '&nbsp;&nbsp;&nbsp;';
+                        content += lnk.renderHtml();
+                    }
+                    content += "</td>";
                     content += "</tr>";
                 });
                 content += "</table>";

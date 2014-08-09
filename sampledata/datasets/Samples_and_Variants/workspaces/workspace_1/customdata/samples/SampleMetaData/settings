@@ -17,6 +17,7 @@ DataItemViews:
   Name: Custom
   Introduction: A custom field view
   Fields:
+  - Site_ID
   - Year
   - Comment
   - Country@samplingsites
