@@ -62,7 +62,7 @@ define([
                 //that.ctrl_PointCount = Controls.Html(null, '');
 
                 var startTreeId = that.tableInfo.trees[0].id;
-                if (querySettings.treeid)
+                if (querySettings && querySettings.treeid)
                     startTreeId = querySettings.treeid;
                 that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:startTreeId }).setClassID('tree');
                 that.ctrlTree.setOnChanged(that.loadTree);
