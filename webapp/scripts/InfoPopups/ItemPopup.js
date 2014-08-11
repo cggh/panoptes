@@ -121,8 +121,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.childRelationTabs.push(relTab);
                 });
 
-                that.frameSubsets = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
-                    .setDisplayTitle('Subsets').setMargins(10);
+                if (!that.tableInfo.settings.DisableSubsets) {
+                    that.frameSubsets = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
+                        .setDisplayTitle('Subsets').setMargins(10);
+                }
             };
 
             that.createPanels = function() {
@@ -271,62 +273,63 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             that.createSubsetsControls = function() {
-                that.panelSubsets = Framework.Form(that.frameSubsets);
+                if (!that.tableInfo.settings.DisableSubsets) {
+                    that.panelSubsets = Framework.Form(that.frameSubsets);
 
-                var subsetCheckList = [];
-                var subsetCheckMap = {};
-                $.each(that.tableInfo.storedSubsets, function(idx, subset) {
-                    var chk = Controls.Check(null, {label:subset.name});
-                    subsetCheckList.push(chk);
-                    subsetCheckMap[subset.id] = chk;
-                    chk.modifyEnabled(false);
-                    chk.setOnChanged(function() {
-                        DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_setitemselection',
-                            {
-                                database: MetaData.database,
-                                tableid: that.tableInfo.id,
-                                workspaceid: MetaData.workspaceid,
-                                itemid: that.itemid,
-                                isnumericalkey: isnumericalkey?1:0,
-                                primkey: that.tableInfo.primkey,
-                                subsetid: subset.id,
-                                ismember: chk.getValue()?1:0
-                            }
-                            , function(resp) {
-                                subset.membercount += resp.diff;
-                            });
-                    });
-                });
-                if (subsetCheckList.length == 0) {
-                    that.panelSubsets.addControl(Controls.Static('There are currently no {name} subsets defined'.DQXformat({name: that.tableInfo.tableNameSingle})));
-                }
-                else {
-                    that.panelSubsets.addControl(Controls.CompoundVert([
-                        Controls.Static('This {name} is member of the following subsets:<p>'.DQXformat({name: that.tableInfo.tableNameSingle})),
-                        Controls.CompoundVert(subsetCheckList)
-                    ]));
-                }
-
-                var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
-                DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_getitemselection',
-                    {
-                        database: MetaData.database,
-                        tableid: that.tableInfo.id,
-                        workspaceid: MetaData.workspaceid,
-                        itemid: that.itemid,
-                        isnumericalkey: isnumericalkey?1:0,
-                        primkey: that.tableInfo.primkey
-                    }
-                    , function(resp) {
-                        $.each(subsetCheckList, function(idx, chk) {
-                            chk.modifyEnabled(true);
-                        })
-                        $.each(resp.subsetmemberlist, function(idx, activesubset) {
-                            if (subsetCheckMap[activesubset])
-                                subsetCheckMap[activesubset].modifyValue(true, true);
+                    var subsetCheckList = [];
+                    var subsetCheckMap = {};
+                    $.each(that.tableInfo.storedSubsets, function(idx, subset) {
+                        var chk = Controls.Check(null, {label:subset.name});
+                        subsetCheckList.push(chk);
+                        subsetCheckMap[subset.id] = chk;
+                        chk.modifyEnabled(false);
+                        chk.setOnChanged(function() {
+                            DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_setitemselection',
+                                {
+                                    database: MetaData.database,
+                                    tableid: that.tableInfo.id,
+                                    workspaceid: MetaData.workspaceid,
+                                    itemid: that.itemid,
+                                    isnumericalkey: isnumericalkey?1:0,
+                                    primkey: that.tableInfo.primkey,
+                                    subsetid: subset.id,
+                                    ismember: chk.getValue()?1:0
+                                }
+                                , function(resp) {
+                                    subset.membercount += resp.diff;
+                                });
                         });
                     });
+                    if (subsetCheckList.length == 0) {
+                        that.panelSubsets.addControl(Controls.Static('There are currently no {name} subsets defined'.DQXformat({name: that.tableInfo.tableNameSingle})));
+                    }
+                    else {
+                        that.panelSubsets.addControl(Controls.CompoundVert([
+                            Controls.Static('This {name} is member of the following subsets:<p>'.DQXformat({name: that.tableInfo.tableNameSingle})),
+                            Controls.CompoundVert(subsetCheckList)
+                        ]));
+                    }
 
+                    var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_getitemselection',
+                        {
+                            database: MetaData.database,
+                            tableid: that.tableInfo.id,
+                            workspaceid: MetaData.workspaceid,
+                            itemid: that.itemid,
+                            isnumericalkey: isnumericalkey?1:0,
+                            primkey: that.tableInfo.primkey
+                        }
+                        , function(resp) {
+                            $.each(subsetCheckList, function(idx, chk) {
+                                chk.modifyEnabled(true);
+                            })
+                            $.each(resp.subsetmemberlist, function(idx, activesubset) {
+                                if (subsetCheckMap[activesubset])
+                                    subsetCheckMap[activesubset].modifyValue(true, true);
+                            });
+                        });
+                }
             }
 
             that.createPanelsRelations = function() {
