@@ -7,6 +7,7 @@ import config
 import asyncresponder
 
 import importer.ImportWorkspaces
+import importer.ImportError
 
 
 def ResponseExecute(data, calculationObject):
@@ -19,15 +20,18 @@ def ResponseExecute(data, calculationObject):
     if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
     importSettings['ScopeStr'] = data['ScopeStr']
-    importer.ImportWorkspaces.ImportCustomData(
-        calculationObject,
-        datasetid,
-        workspaceid,
-        tableid,
-        sourceid,
-        os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'workspaces', workspaceid, 'customdata', tableid, sourceid),
-        importSettings
-    )
+    try:
+        importer.ImportWorkspaces.ImportCustomData(
+            calculationObject,
+            datasetid,
+            workspaceid,
+            tableid,
+            sourceid,
+            os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'workspaces', workspaceid, 'customdata', tableid, sourceid),
+            importSettings
+        )
+    except importer.ImportError.ImportException as e:
+        calculationObject.fail(str(e))
 
 def response(returndata):
     retval = asyncresponder.RespondAsync(

@@ -5,6 +5,7 @@
 import simplejson
 import copy
 import yaml
+import ImportError
 
 
 def BoolIsTrueish(val):
@@ -27,7 +28,7 @@ class SettingsLoader:
                     self.settings = yaml.load(configfile.read())
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
-                    raise Exception('Error while parsing yaml file {0}'.format(fileName))
+                    raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
                 print('Settings: '+str(self.settings))
         else:
             self.fileName = ''

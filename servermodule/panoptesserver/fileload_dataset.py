@@ -6,7 +6,7 @@ import config
 import asyncresponder
 
 import importer.ImportFiles
-
+import importer.ImportError
 
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
@@ -15,12 +15,15 @@ def ResponseExecute(data, calculationObject):
     if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
     importSettings['ScopeStr'] = data['ScopeStr']
-    importer.ImportFiles.ImportDataSet(
-        calculationObject,
-        config.SOURCEDATADIR + '/datasets',
-        datasetid,
-        importSettings
-    )
+    try:
+        importer.ImportFiles.ImportDataSet(
+            calculationObject,
+            config.SOURCEDATADIR + '/datasets',
+            datasetid,
+            importSettings
+        )
+    except importer.ImportError.ImportException as e:
+        calculationObject.fail(str(e))
 
 def response(returndata):
     retval = asyncresponder.RespondAsync(

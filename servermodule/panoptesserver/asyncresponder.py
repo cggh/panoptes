@@ -16,6 +16,7 @@ import sys
 
 class CalculationThreadList:
     def __init__(self):
+        self.failed = False
         self.threads = {}
         self.lock = threading.Lock()
 
@@ -38,9 +39,10 @@ class CalculationThreadList:
         with self.lock:
             del self.threads[id]
         with DQXDbTools.DBCursor() as cur:
-            sqlstring = 'UPDATE calculations SET completed=1, status="Finished", progress=0 WHERE id="{0}"'.format(id)
-            cur.execute(sqlstring)
-            cur.commit()
+            if not(self.failed):
+                sqlstring = 'UPDATE calculations SET completed=1, status="Finished", progress=0 WHERE id="{0}"'.format(id)
+                cur.execute(sqlstring)
+                cur.commit()
 
     def SetInfo(self, id, status, progress):
 
@@ -75,6 +77,7 @@ class CalculationThreadList:
 
     def SetFailed(self, id):
         with self.lock:
+            self.failed = True
             if id in self.threads:
                 self.threads[id]['failed'] = True
         with DQXDbTools.DBCursor() as cur:
@@ -141,6 +144,12 @@ class CalculationThread (threading.Thread):
         sys.stdout = self.orig_stdout
         sys.stderr = self.orig_stderr
         self.logfilename = None
+
+    def fail(self, errormessage):
+        theCalculationThreadList.SetFailed(self.id)
+        theCalculationThreadList.SetInfo(self.id, 'Error: '+errormessage, None)
+        print('ERROR:'+errormessage)
+        self.CloseLog()
 
     def run(self):
         theCalculationThreadList.AddThread(self.id, self.calculationname, self.credentialInfo.userid)
