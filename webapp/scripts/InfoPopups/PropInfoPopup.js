@@ -13,6 +13,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         PropInfoPopup.show = function(settings) {
+            var tableInfo = MetaData.mapTableCatalog[settings.tableid];
             var propInfo = MetaData.findProperty(settings.tableid, settings.propid);
             var content = '<p>';
             if (propInfo.settings.Description)
@@ -30,15 +31,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += '<br>';
             }
 
-            var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot', width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
-                Msg.send({type: 'CreateDefaultPropertyPlot'}, {
-                    tableid: propInfo.tableid,
-                    propid: propInfo.propid,
-                    query: settings.query
+            if (!tableInfo.settings.DisablePlots) {
+                var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot', width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
+                    Msg.send({type: 'CreateDefaultPropertyPlot'}, {
+                        tableid: propInfo.tableid,
+                        propid: propInfo.propid,
+                        query: settings.query
+                    });
+                    Popup.closeIfNeeded(popupid);
                 });
-                Popup.closeIfNeeded(popupid);
-            });
-            content += button_plot.renderHtml();
+                content += button_plot.renderHtml();
+            }
 
 
             var popupid = Popup.create(propInfo.name,content);

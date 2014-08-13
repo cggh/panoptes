@@ -199,16 +199,21 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         var buttonManageStoredSubsets = Controls.HorizontalSeparator(80);
                     }
 
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-bar-chart-o', bitmapHeight:20 });
-                    buttonCreatePlot.setOnChanged(function() {
-                        var subSamplingOptions = null;
-                        if (that.theQuery.isSubSampling())
-                            subSamplingOptions = that.theQuery.getSubSamplingOptions();
-                        Msg.send({type: 'CreateDataItemPlot'}, {
-                            tableid: that.tableid,
-                            subSamplingOptions: subSamplingOptions
+                    if (!that.tableInfo.settings.DisablePlots) {
+                        var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-bar-chart-o', bitmapHeight:20 });
+                        buttonCreatePlot.setOnChanged(function() {
+                            var subSamplingOptions = null;
+                            if (that.theQuery.isSubSampling())
+                                subSamplingOptions = that.theQuery.getSubSamplingOptions();
+                            Msg.send({type: 'CreateDataItemPlot'}, {
+                                tableid: that.tableid,
+                                subSamplingOptions: subSamplingOptions
+                            });
                         });
-                    });
+                    }
+                    else {
+                        var buttonCreatePlot = Controls.HorizontalSeparator(80);
+                    }
 
                     var ctrlQuery = that.theQuery.createQueryControl({}, []);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
