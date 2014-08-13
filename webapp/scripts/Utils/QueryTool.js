@@ -204,7 +204,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 if (hasDefine) {
-                    var buttonDefineQuery = Controls.Button(null, { content: 'Define query', buttonClass: 'PnButtonGrid', width:130, height:30, icon:'fa-filter' });
+                    var buttonDefineQuery = Controls.Button(null, { content: 'Define query', buttonClass: 'PnButtonGrid', width:125, height:30, icon:'fa-filter' });
                     buttonDefineQuery.setOnChanged(function() {
                         EditQuery.CreateDialogBox(that.tableInfo.id, that.query, function(query) {
                             that.modify(query);
@@ -212,7 +212,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
 
 
-                    that.buttonOpen = Controls.Button(null, { content: ' ', hint:'Open existing query', buttonClass: 'PnButtonGrid', icon:'fa-external-link', width:30, height:30}).setOnChanged(function() {
+                    that.buttonOpen = Controls.Button(null, { content: ' ', hint:'Open existing query', buttonClass: 'PnButtonGrid', icon:'fa-external-link', width:35, height:30}).setOnChanged(function() {
                         QueryTool.createOpenQueryPopup(that);
                     });
 
