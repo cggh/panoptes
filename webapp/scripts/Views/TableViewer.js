@@ -189,21 +189,31 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     this.panelSimpleQuery = Framework.Form(this.frameControls);
                     this.panelSimpleQuery.setPadding(0);
 
-                    var buttonManageStoredSubsets = Controls.Button(null, { content: 'Manage subsets', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-list-ul', bitmapHeight:18 });
-                    buttonManageStoredSubsets.setOnChanged(function() {
-                        ManageStoredSubsets.manage(that.tableid);
-                    });
-
-                    var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-bar-chart-o', bitmapHeight:20 });
-                    buttonCreatePlot.setOnChanged(function() {
-                        var subSamplingOptions = null;
-                        if (that.theQuery.isSubSampling())
-                            subSamplingOptions = that.theQuery.getSubSamplingOptions();
-                        Msg.send({type: 'CreateDataItemPlot'}, {
-                            tableid: that.tableid,
-                            subSamplingOptions: subSamplingOptions
+                    if (!that.tableInfo.settings.DisableSubsets) {
+                        var buttonManageStoredSubsets = Controls.Button(null, { content: 'Manage subsets', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-list-ul', bitmapHeight:18 });
+                        buttonManageStoredSubsets.setOnChanged(function() {
+                            ManageStoredSubsets.manage(that.tableid);
                         });
-                    });
+                    }
+                    else {
+                        var buttonManageStoredSubsets = Controls.HorizontalSeparator(80);
+                    }
+
+                    if (!that.tableInfo.settings.DisablePlots) {
+                        var buttonCreatePlot = Controls.Button(null, { content: 'Create plot', buttonClass: 'PnButtonGrid', width:80, height:30, icon:'fa-bar-chart-o', bitmapHeight:20 });
+                        buttonCreatePlot.setOnChanged(function() {
+                            var subSamplingOptions = null;
+                            if (that.theQuery.isSubSampling())
+                                subSamplingOptions = that.theQuery.getSubSamplingOptions();
+                            Msg.send({type: 'CreateDataItemPlot'}, {
+                                tableid: that.tableid,
+                                subSamplingOptions: subSamplingOptions
+                            });
+                        });
+                    }
+                    else {
+                        var buttonCreatePlot = Controls.HorizontalSeparator(80);
+                    }
 
                     var ctrlQuery = that.theQuery.createQueryControl({}, []);
                     var tableInfo = MetaData.getTableInfo(that.tableid);

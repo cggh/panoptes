@@ -140,7 +140,7 @@ require([
                 getter.addTable('customdatacatalog',['tableid','sourceid', 'settings'],'tableid');
                 getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'first_dimension', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');
-                getter.addTable('graphs',['graphid','tableid', 'tpe', 'dispname'],'graphid');
+                getter.addTable('graphs',['graphid','tableid', 'tpe', 'dispname', 'crosslnk'],'graphid');
                 getter.execute(MetaData.serverUrl,MetaData.database,
                     function() { // Upon completion of data fetching
                         MetaData.tableCatalog = getter.getTableRecords('tablecatalog');
@@ -173,7 +173,8 @@ require([
                             if (graphInfo.tpe=='tree') {
                                 MetaData.mapTableCatalog[graphInfo.tableid].trees.push({
                                     id: graphInfo.graphid,
-                                    name: graphInfo.dispname
+                                    name: graphInfo.dispname,
+                                    crossLink: graphInfo.crosslnk
                                 });
                             }
                         });
@@ -222,14 +223,29 @@ require([
                                     }
                                 });
                                 if (canPerformSearch) {
-                                    actions.push( { content:'Find '+tableInfo.tableNameSingle+'...', bitmap:'Bitmaps/datagrid2.png', handler:function() {
+                                    var content = '';
+                                    content += 'Find '+tableInfo.tableNameSingle;
+                                    actions.push( {
+                                        content:content,
+                                        bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                                        icon: tableInfo.settings.Icon,
+                                        handler:function() {
                                         FindDataItem.execute(tableInfo.id);
                                     }
                                     });
                                 }
                             });
-
-                            ButtonChoiceBox.create('Find item','', [actions]);
+                            var actionRows = [];
+                            var rowCnt = 99;
+                            $.each(actions, function(idx, action) {
+                                if (rowCnt>=3) {
+                                    actionRows.push([]);
+                                    rowCnt = 0;
+                                }
+                                actionRows[actionRows.length-1].push(action);
+                                rowCnt++;
+                            });
+                            ButtonChoiceBox.create('Find item','', actionRows);
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header

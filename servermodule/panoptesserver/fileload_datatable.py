@@ -8,6 +8,7 @@ import os
 
 import importer.ImportDataTable
 import importer.ImportWorkspaces
+import importer.ImportError
 
 
 def ResponseExecute(data, calculationObject):
@@ -22,13 +23,16 @@ def ResponseExecute(data, calculationObject):
     datasetFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid)
 
     datatableFolder = os.path.join(datasetFolder, 'datatables', tableid)
-    importer.ImportDataTable.ImportDataTable(
-        calculationObject,
-        datasetid,
-        tableid,
-        datatableFolder,
-        importSettings
-    )
+    try:
+        importer.ImportDataTable.ImportDataTable(
+            calculationObject,
+            datasetid,
+            tableid,
+            datatableFolder,
+            importSettings
+        )
+    except importer.ImportError.ImportException as e:
+        calculationObject.fail(str(e))
 
     importer.ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetid, importSettings)
 

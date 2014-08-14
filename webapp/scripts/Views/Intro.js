@@ -90,9 +90,14 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             icon: 'fa-table'
                         });
 
-                        var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
-                            Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
-                        });
+                        if (!tableInfo.settings.DisablePlots) {
+                            var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
+                                Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
+                            });
+                        }
+                        else {
+                            var button_Showplots = Controls.HorizontalSeparator(100);
+                        }
 
                         var descr = '';
 //                        descr += tableInfo.createIcon({floatLeft: true});

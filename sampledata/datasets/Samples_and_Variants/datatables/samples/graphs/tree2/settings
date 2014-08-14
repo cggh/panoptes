@@ -1,2 +1,4 @@
 Name: Second sample tree
 Format: newick
+Description: This is the second example tree
+CrossLink: regions::R02

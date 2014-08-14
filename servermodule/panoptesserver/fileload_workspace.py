@@ -6,6 +6,7 @@ import config
 import asyncresponder
 
 import importer.ImportWorkspaces
+import importer.ImportError
 
 
 def ResponseExecute(data, calculationObject):
@@ -17,13 +18,16 @@ def ResponseExecute(data, calculationObject):
         importSettings['ConfigOnly'] = True
     importSettings['ScopeStr'] = data['ScopeStr']
 
-    importer.ImportWorkspaces.ImportWorkspace(
-        calculationObject,
-        datasetid,
-        workspaceid,
-        config.SOURCEDATADIR + '/datasets/' + datasetid + '/workspaces/' + workspaceid,
-        importSettings
-    )
+    try:
+        importer.ImportWorkspaces.ImportWorkspace(
+            calculationObject,
+            datasetid,
+            workspaceid,
+            config.SOURCEDATADIR + '/datasets/' + datasetid + '/workspaces/' + workspaceid,
+            importSettings
+        )
+    except importer.ImportError.ImportException as e:
+        calculationObject.fail(str(e))
 
 def response(returndata):
     retval = asyncresponder.RespondAsync(

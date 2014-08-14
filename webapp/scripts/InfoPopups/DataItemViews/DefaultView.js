@@ -48,7 +48,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         content += '<div style="color:rgb(128,0,0);background-color: rgb(240,230,220);padding:3px;padding-left:8px"><i>';
                         content += parentInfo.relation.forwardname+' '+parentTableInfo.tableNameSingle;
                         content += '</i>&nbsp;&nbsp;';
-                        var lnk = Controls.Hyperlink(null,{ content: 'Open'});
+                        var lnk = Controls.Hyperlink(null,{ content: '<span class="fa fa-external-link-square" style="font-size: 120%"></span> Open'});
                         lnk.setOnChanged(function() {
                             Msg.send({type: 'ItemPopup'}, {tableid: parentInfo.tableid, itemid: parentInfo.fields[parentTableInfo.primkey]});
                         });

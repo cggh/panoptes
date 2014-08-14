@@ -14,6 +14,7 @@ PrimKey: key
 QuickFindFields: key,Site_ID,SampleTypeID
 
 
+
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties

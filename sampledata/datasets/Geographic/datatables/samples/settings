@@ -15,6 +15,7 @@ Properties:
   Name: Sample ID
   ShowInTable: true
   DataType: Text
+  Search: StartPattern
 
 - Id: CatId
   Name: Category ID

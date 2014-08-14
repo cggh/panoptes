@@ -14,6 +14,13 @@ define([
 
         var TreePlot = {};
 
+        Msg.listen('',{type:'OpenTree'}, function(scope, info) {
+            var querySettings = {
+                treeid: info.treeid
+            };
+            TreePlot.Create(info.tableid, SQL.WhereClause.Trivial(), querySettings);
+        });
+
         TreePlot.typeID = 'TreePlot';
         TreePlot.name = 'Tree';
         TreePlot.description= 'Displays a pre-calculated, unrooted tree of {items}.';
@@ -24,7 +31,7 @@ define([
         TreePlot.plotAspects = [
             { id:'label', name:'Label', dataType:'', requiredLevel: 0 },
             { id:'color', name:'Node color', dataType:'', requiredLevel: 0 },
-            { id:'colorbranch', name:'Branch color', dataType:'', requiredLevel: 0 }
+            { id:'colorbranch', name:'Branch color', dataType:'Text', requiredLevel: 0 }
         ];
 
 
@@ -54,14 +61,21 @@ define([
             that.createPanelButtons = function() {
                 //that.ctrl_PointCount = Controls.Html(null, '');
 
-                that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:that.tableInfo.trees[0].id }).setClassID('tree');
+                var startTreeId = that.tableInfo.trees[0].id;
+                if (querySettings && querySettings.treeid)
+                    startTreeId = querySettings.treeid;
+                that.ctrlTree = Controls.Combo(null,{ label:'Tree:<br>', states: that.tableInfo.trees, value:startTreeId }).setClassID('tree');
                 that.ctrlTree.setOnChanged(that.loadTree);
 
                 var propList = [ {id:'', name:'-- None --'}];
+                var propListText = [ {id:'', name:'-- None --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
-                    if ( (prop.tableid==that.tableInfo.id) )
+                    if ( (prop.tableid==that.tableInfo.id) ) {
                         propList.push({ id:prop.propid, name:prop.name });
+                        if (prop.isText)
+                            propListText.push({ id:prop.propid, name:prop.name });
+                    }
                 });
                 that.ctrlValueLabel = Controls.Combo(null,{ label:'Label:<br>', states: propList, value:that.providedAspect2Property('label') }).setClassID('label');
                 that.ctrlValueLabel.setOnChanged(function() {
@@ -71,7 +85,7 @@ define([
                 that.ctrlValueColorNode.setOnChanged(function() {
                     that.fetchData();
                 });
-                that.ctrlValueColorBranch = Controls.Combo(null,{ label:'Branch colour:<br>', states: propList, value:that.providedAspect2Property('colorbranch') }).setClassID('colorbranch');
+                that.ctrlValueColorBranch = Controls.Combo(null,{ label:'Branch colour:<br>', states: propListText, value:that.providedAspect2Property('colorbranch') }).setClassID('colorbranch');
                 that.ctrlValueColorBranch.setOnChanged(function() {
                     that.fetchData();
                 });
@@ -85,6 +99,11 @@ define([
                         that.reDraw();
                     });
 
+                that.ctrl_RotateLabels = Controls.Check(null,{label:'Rotate labels', value:true}).setClassID('rotatelabels')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
                 that.ctrl_ShowInternalNodes = Controls.Check(null,{label:'Show internal nodes', value:true}).setClassID('showinternalnodes')
                     .setOnChanged(function() {
                     that.reDraw();
@@ -92,23 +111,51 @@ define([
 
                 that.colorLegend = Controls.Html(null,'');
 
+                that.ctrl_Description = Controls.Html(null,'');
+                that.ctrl_crossLink = Controls.Hyperlink(null, {content: 'xxx'}).setOnChanged(function() {
+                    MiscUtils.openCrossLink(that.crossLinkInfo);
+                });
+                that.ctrl_ShowHideCrossLink = Controls.ShowHide(that.ctrl_crossLink);
+                that.ctrl_ShowHideCrossLink.setVisible(false);
+
+
                 var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
                     var actions = [];
-                    actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
-                        that.panelPlot.startHalfPlaneSelection(function(center, dir) {
-                            center.x = (center.x-that.offsetX)/that.scaleX;
-                            center.y = (center.y-that.offsetY)/that.scaleY;
-                            dir.x = dir.x/that.scaleX;
-                            dir.y = dir.y/that.scaleY;
-                            var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.propidValueX, that.propidValueY, center, dir);
 
-                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Half plane', '', {
-                                query: queryInfo.query,
-                                subSamplingOptions: that.theQuery.getSubSamplingOptions()
-                            }, null);
+                    actions.push( { content:'Lasso selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        that.panelPlot.startLassoSelection(function(selectedPoints) {
+                            function isPointInPoly(poly, pt) {
+                                for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+                                    ((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y))
+                                        && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
+                                    && (c = !c);
+                                return c;
+                            }
+                            var polygonPoints = [];
+                            $.each(selectedPoints, function(idx, pt) {
+                                polygonPoints.push({
+                                    x: (pt.x-that.offsetX)/that.scaleX,
+                                    y: (pt.y-that.offsetY)/that.scaleY
+                                });
+                            });
+                            if (!that.allDataPresent()) return;
+                            var selectionCreationFunction = function() {
+                                var sellist = [];
+                                var selectPoints = function(branch) {
+                                    if (branch.itemid) {
+                                        if (isPointInPoly(selectedPoints, {x: branch.screenX, y:branch.screenY}))
+                                            sellist.push(branch.itemid);
+                                    }
+                                    $.each(branch.children, function(idx, child) { selectPoints(child); });
+                                }
+                                selectPoints(that.currentTree.root);
+                                return sellist;
+                            };
+                            ButtonChoiceBox.createPlotItemSelectionOptions(that, that.tableInfo, 'Tree lasso selection', '', null, selectionCreationFunction);
                         });
                     }
                     });
+
                     ButtonChoiceBox.create('Select points','', [actions]);
                 });
 
@@ -131,11 +178,12 @@ define([
                     });
 
                 var controlsGroup = Controls.CompoundVert([
-                    that.createIntroControls(),
+                    that.createIntroControls([that.ctrl_Description, that.ctrl_ShowHideCrossLink]) ,
                     Controls.AlignCenter(Controls.CompoundHor([
                         cmdPointSelection,
                         Controls.HorizontalSeparator(95)
                     ])),
+                    Controls.VerticalSeparator(10),
                     Controls.VerticalSeparator(20),
 
                     Controls.Section(Controls.CompoundVert([
@@ -154,6 +202,7 @@ define([
                         that.ctrl_BranchOpacity,
                         that.ctrl_ColorDrawing,
                         that.ctrl_SelDrawing,
+                        that.ctrl_RotateLabels,
                         that.ctrl_ShowInternalNodes
                     ]).setMargin(10), {
                         title: 'Layout',
@@ -269,6 +318,7 @@ define([
                 that.currentTreeId = that.ctrlTree.getValue();
                 that.currentTree = that.treesMap[that.currentTreeId];
                 if (that.currentTree) {
+                    that.updateTreeInfo();
                     that.reDraw();
                     return;
                 }
@@ -285,13 +335,31 @@ define([
                         return;
                     }
                     that.currentTree = Tree();
-                    that.currentTree.load(resp.settings, resp.data);
+                    that.currentTree.name = resp.name;
+                    that.currentTree.load(JSON.parse(resp.settings), resp.data);
                     that.currentTree.layout();
                     that.panelPlot.setXRange(0,1);
                     that.panelPlot.setYRange(0,1);
+                    that.updateTreeInfo();
                     that.reDraw();
                 });
 
+            }
+
+
+            that.updateTreeInfo = function() {
+                var descr = '';
+                if (that.currentTree.name)
+                    descr += '<b>' + that.currentTree.name + '.</b> ';
+                if (that.currentTree.settings.Description)
+                    descr += that.currentTree.settings.Description;
+                that.ctrl_Description.modifyValue(descr);
+                that.crossLinkInfo = null;
+                if (that.currentTree.settings.CrossLink) {
+                    that.crossLinkInfo = MiscUtils.parseCrossLink(that.currentTree.settings.CrossLink);
+                    that.ctrl_crossLink.modifyValue('<span class="fa fa-external-link-square" style="font-size: 120%"></span> Open associated <b>' + that.crossLinkInfo.dispName + '</b>');
+                    that.ctrl_ShowHideCrossLink.setVisible(true);
+                }
             }
 
             that.allDataPresent = function() {
@@ -315,6 +383,7 @@ define([
                 var selConsensusStrictBranch = (that.ctrl_SelDrawing.getValue() == 'consensus1');
                 var selConsensusRelaxedBranch = (that.ctrl_SelDrawing.getValue() == 'consensus2');
                 var showInternalNodes = that.ctrl_ShowInternalNodes.getValue();
+                var rotateLabels = that.ctrl_RotateLabels.getValue();
 
                 var selectionMap = that.tableInfo.currentSelection;
 
@@ -473,15 +542,26 @@ define([
                             ctx.arc(px1, py1, 3*sizeFactor, 0, 2 * Math.PI, false);
                             ctx.fill();
                             if (that.labelPropId) {
-                                var xoffset = 3;
+                                var xoffset = 3*sizeFactor+1;
                                 if (branch.pointingLeft) {
                                     ctx.textAlign="right";
-                                    xoffset = -3
+                                    xoffset = -xoffset;
                                 }
                                 else {
                                     ctx.textAlign="left";
                                 }
-                                ctx.fillText(that.pointData[that.labelPropId][idx], px1+xoffset, py1+4);
+                                if (rotateLabels) {
+                                    ctx.save();
+                                    ctx.translate(px1,py1);
+                                    var ang = branch.absoluteAngle;
+                                    if (branch.pointingLeft)
+                                        ang -= Math.PI;
+                                    ctx.rotate(ang);
+                                    ctx.fillText(that.pointData[that.labelPropId][idx], xoffset,4);
+                                    ctx.restore();
+                                }
+                                else
+                                    ctx.fillText(that.pointData[that.labelPropId][idx], px1+xoffset, py1+4);
                             }
                         }
                     }
@@ -517,7 +597,7 @@ define([
             that.getToolTipInfo = function(px0 ,py0) {
                 if (!that.allDataPresent())
                     return;
-                var mindst = 9;
+                var mindst = 12;
                 var bestBranch = null;
                 var findPoint = function(branch) {
                     if (branch.itemid) {

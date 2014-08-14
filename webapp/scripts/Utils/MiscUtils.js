@@ -2,7 +2,7 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/QueryTable", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvas", "DQX/DataFetcher/DataFetchers", "Wizards/EditQuery",
-    "MetaData",
+    "MetaData"
 ],
     function (require, Base64, Application, Framework, Controls, Msg, SQL, QueryTable, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvas, DataFetchers, EditQuery,
               MetaData
@@ -522,6 +522,55 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
         };
 
+
+        // A crosslink is of the format {datatableid}::{itemid}
+        MiscUtils.parseCrossLink =function(crossLinkUrl) {
+            var linkInfo = {};
+            var tokens = crossLinkUrl.split('::');
+            if (tokens.length!=2)
+                DQX.reportError('Invalid crosslink: '+crossLinkUrl);
+            linkInfo.tableid = tokens[0];
+            linkInfo.itemid = tokens[1];
+            var tableInfo = MetaData.mapTableCatalog[linkInfo.tableid];
+            if (!tableInfo)
+                DQX.reportError('Invalid crosslink: '+crossLinkUrl);
+            linkInfo.dispName = tableInfo.tableNameSingle;
+            return linkInfo;
+        };
+
+        MiscUtils.openCrossLink = function(crossLinkInfo) {
+            if (!crossLinkInfo) return;
+            if ((!crossLinkInfo.tableid)||(!crossLinkInfo.itemid)||(!MetaData.mapTableCatalog[crossLinkInfo.tableid]))
+                DQX.reportError('Invalid crosslink');
+            Msg.send({ type: 'ItemPopup' }, { tableid: crossLinkInfo.tableid, itemid: crossLinkInfo.itemid } );
+        }
+
+        MiscUtils.getReverseCrossLinkList = function(tableid, itemid) {
+            var lst = [];
+            var crossLinkUrl = tableid+'::'+itemid;
+            $.each(MetaData.tableCatalog, function(idx, tbInfo) {
+                $.each(tbInfo.trees, function(idx, treeInfo) {
+                    if (crossLinkUrl==treeInfo.crossLink) {
+                        lst.push({
+                            tpe: 'tree',
+                            dispName: 'tree',
+                            bitmap: 'Bitmaps/unroottree.png',
+                            tableid: tbInfo.id,
+                            treeid: treeInfo.id
+                        });
+                    }
+                });
+            });
+            return lst;
+        }
+
+        MiscUtils.openReverseCrossLink = function(info) {
+            if (info.tpe=='tree') {
+                Msg.send({ type: 'OpenTree' }, info );
+                return;
+            }
+            DQX.reportError('Invalid reverse crosslink');
+        };
 
 
         return MiscUtils;
