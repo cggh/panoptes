@@ -354,6 +354,60 @@ a:link, a:visited
     padding:7px;
 }
 
+label.PnGenotypesPageEdit{
+    border-radius: 4px;
+    border:1px solid rgb(128,128,128);
+    background-color: rgba(255,255,255,0.75);
+    vertical-align: middle;
+    padding: 2px;
+    margin: 0px;
+}
+input.PnGenotypesPageEdit{
+    border-radius: 4px;
+    border:1px solid rgb(128,128,128);
+    background-color: rgba(255,255,255,0.75);
+    vertical-align: middle;
+    margin: 0px;
+}
+
+.PnGenotypesPageArrow{
+    border-radius: 4px;
+    border:1px solid rgb(128,128,128);
+    display:inline-block;
+    margin-left:5px;
+    margin-right:5px;
+    padding:8px;
+    height:17px;
+    box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.30);
+    cursor:pointer;
+    font-weight:bold;
+    vertical-align: middle;
+    background: #f7f7f7; /* Old browsers */
+    background: -moz-linear-gradient(top, #f7f7f7 0%, #dddddd 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(100%,#dddddd)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #f7f7f7 0%,#dddddd 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #f7f7f7 0%,#dddddd 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f7f7f7 0%,#dddddd 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #f7f7f7 0%,#dddddd 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
+}
+
+.PnGenotypesPageArrow:hover
+{
+    /*background-color:rgb(255,255,240);*/
+    border:1px solid rgb(0,0,0);
+    box-shadow: 1.5px 1.5px 6px rgba(0,0,0,0.50);
+    background: #f3f9ac; /* Old browsers */
+    background: -moz-linear-gradient(top, #f3f9ac 0%, #ffe36b 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f3f9ac), color-stop(100%,#ffe36b)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #f3f9ac 0%,#ffe36b 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #f3f9ac 0%,#ffe36b 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f3f9ac 0%,#ffe36b 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #f3f9ac 0%,#ffe36b 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f9ac', endColorstr='#ffe36b',GradientType=0 ); /* IE6-9 */
+}
+
+
 .GenomeBrowserControlBackground
 {
     color:Black;

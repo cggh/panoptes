@@ -85,11 +85,12 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
                 var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
-                var buttonSortSamplesByField = Controls.ImageButton(null,
+                var buttonSortSamplesByField = Controls.Button(null,
                     {
-                        bitmap:DQX.BMP("arrow4down.png"),
-                        vertShift:-2,
-                        hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural})
+                        icon:'fa-sort-amount-asc',
+                        height: 14,
+                        hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural}),
+                        buttonClass:'PnButtonGrid'
                     })
                     .setOnChanged(function() {
                       model_params.set('row_order', view_params.get('samples_property'));
@@ -126,26 +127,6 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
-
-                var page_up = Controls.ImageButton(null,
-                {
-                  bitmap:DQX.BMP("arrow4up.png"),
-                  vertShift:-2,
-                  hint:"Page up"
-                })
-                .setOnChanged(function() {
-                  model_params.set('page', Math.max(model_params.get('page')-1, 0));
-                });
-                var page_down = Controls.ImageButton(null,
-                {
-                  bitmap:DQX.BMP("arrow4down.png"),
-                  vertShift:-2,
-                  hint:"Page Down"
-                })
-                .setOnChanged(function() {
-                  model_params.set('page', model_params.get('page')+1);
-                });
-                view_controls.addControl(Controls.CompoundHor([page_up, Controls.HorizontalSeparator(5), page_down]));
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = function() {
@@ -201,6 +182,50 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 //Changing the col range will cause a redraw by calling _draw below
                 that.model.change_col_range(chrom, min_genomic_pos, max_genomic_pos);
+
+                if (!that.page_controls) {
+                    that.page_controls = $('<div class="PnGenotypePageControl" style="position:absolute"> </div>');
+                    var page_up = Controls.Button(null,
+                        {
+                            icon:'fa-chevron-up',
+                            vertShift:-2,
+                            width:12,
+                            height:12,
+                            hint:"Page Up",
+                            buttonClass:"PnGenotypesPageArrow"
+                        })
+                        .setOnChanged(function() {
+                            that.model_params.set('page', Math.max(that.model_params.get('page')-1, 0));
+                        });
+                    var edit = Controls.Edit(null, {
+                        label:'Page:',
+                        class: 'PnGenotypesPageEdit',
+                        size:2
+                    });
+                    edit.bindToModel(that.model_params, 'page', parseInt);
+                    var page_down = Controls.Button(null,
+                        {
+                            icon:'fa-chevron-down',
+                            width:12,
+                            height:12,
+                            hint:"Page Down",
+                            buttonClass: "PnGenotypesPageArrow"
+                        })
+                        .setOnChanged(function() {
+                            that.model_params.set('page', that.model_params.get('page')+1);
+                        });
+                    var compound = Controls.CompoundHor([page_up, edit, page_down]);
+                    that.page_controls.append(compound.renderHtml());
+                    that.getCanvasElementJQ('center').after(that.page_controls);
+                    Controls.ExecPostCreateHtml();
+                }
+                if (that.page_controls) {
+                    that.page_controls.css({
+                        top: Math.max(0,draw_info.top_visible + 10),
+                        left: (draw_info.sizeCenterX/2) + draw_info.sizeLeftX - 100
+                    })
+                }
+
             };
 
             that._draw = function () {
@@ -266,6 +291,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                       data += that.model.data[that.model.settings.Ref][j][i];
                       data += ',';
                       data += that.model.data[that.model.settings.NonRef][j][i];
+
                       data += '\t';
                     }
                     data += '\n';
