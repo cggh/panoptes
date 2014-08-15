@@ -38,6 +38,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             var that = PopupFrame.PopupFrame(tableid+'_'+plotTypeID, settings);
             GenericPlot.activePlotList.push(that);
 
+            if (MetaData.isManager)
+                that.addTool('fa-link', function() { that.handleCreateLink(); });
+
             that.plotTypeID = plotTypeID;
             that.tableInfo = MetaData.getTableInfo(tableid);
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
@@ -169,6 +172,53 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 content += '<b>{Names}</b><br>'.DQXformat({Names: that.tableInfo.tableCapNamePlural});
                 content += that.theQuery.createQueryDisplayStringHtml();
                 that.introText.modifyValue(content);
+            };
+
+            that.handleCreateLink = function() {
+                var str='';
+
+                str += '<b>Name:</b><br>';
+                var edt_name = Controls.Textarea('', { size:60, linecount:1, value: ''}).setHasDefaultFocus();
+                str += edt_name.renderHtml();
+
+                str += '<p><b>Section:</b><br>';
+                var edt_section = Controls.Textarea('', { size:60, linecount:1, value: 'Predefined views'});
+                str += edt_section.renderHtml();
+
+                str += '<p><b>Description:</b><br>';
+                var edt_descr = Controls.Textarea('', { size:60, linecount:4, value: ''});
+                str += edt_descr.renderHtml();
+
+                var btOpen = Controls.Button(null, {  content: 'Save to intro page' }).setOnChanged(function() {
+                    if (!edt_name.getValue()) {
+                        alert('No name provided');
+                        return;
+                    }
+                    if (!edt_section.getValue()) {
+                        alert('No section provided');
+                        return;
+                    }
+//                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_intro_create',
+//                        {
+//                            database: MetaData.database,
+//                            workspaceid:MetaData.workspaceid,
+//                            name: edt_name.getValue(),
+//                            section: edt_section.getValue(),
+//                            description: edt_descr.getValue(),
+//                            url: Base64.encode(url),
+//                            storeid: storeid,
+//                            viewstate: viewstate
+//                        },
+//                        function(resp) {
+//                            Msg.send({ type: 'LoadIntroViews' }, {} );
+//                        });
+                    Popup.closeIfNeeded(popupid);
+                });
+                str += '<p>';
+                str += btOpen.renderHtml();
+                str += '<p>';
+
+                var popupid = Popup.create('Add plot to start page',str);
             };
 
             that.theQuery.notifyQueryUpdated = that.onQueryModified;
