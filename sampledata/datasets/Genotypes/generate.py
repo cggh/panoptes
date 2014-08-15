@@ -3,7 +3,7 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 NUM_SAMPLES = 100
-NUM_VARIANTS = 1000
+NUM_VARIANTS = 2000
 
 import errno
 import csv
