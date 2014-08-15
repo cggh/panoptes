@@ -193,15 +193,21 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     if len(nulls) > 0:
                         print("WARNING: Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
                 else:
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;".format(
+                        table_settings['ColumnDataTable'],
+                        table_settings['ColumnIndexField'],
+                        tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
                     #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
                     if max_line_count:
-                        sql = """ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
-                               SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {3};
-                               """
+                        sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {3};"
                     else:
-                        sql = """ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
-                               SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;
-                               """
+                        sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;"
                     sql = sql.format(
                         table_settings['ColumnDataTable'],
                         table_settings['ColumnIndexField'],
@@ -250,10 +256,18 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     if len(nulls) > 0:
                         print("WARNING:Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
                 else:
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;".format(
+                        table_settings['RowDataTable'],
+                        table_settings['RowIndexField'],
+                        tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
                     #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "RowIndexField" so we index by that column in order
-                    sql = """ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
-                             SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;
-                             """.format(
+                    sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;".format(
                         table_settings['RowDataTable'],
                         table_settings['RowIndexField'],
                         tableid)
