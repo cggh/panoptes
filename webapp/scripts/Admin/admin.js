@@ -122,6 +122,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             //Upload a single datatable
                             data.datasetid = sourceFileInfo.datasetid;
                             data.tableid = sourceFileInfo.tableid;
+                            data.type = sourceFileInfo.tpe;
                             ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_datatable', data, function(resp) {
                             });
                             return;
