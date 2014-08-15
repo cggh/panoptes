@@ -369,6 +369,7 @@ input.PnGenotypesPageEdit{
     background-color: rgba(255,255,255,0.75);
     vertical-align: middle;
     margin: 0px;
+    text-align: center;
 }
 
 .PnGenotypesPageArrow{
