@@ -56,8 +56,8 @@ define([
 
 
 
-        Histogram2D.Create = function(tableid, startQuery, querySettings) {
-            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery, querySettings);
+        Histogram2D.Create = function(tableid, startQuery, querySettings, plotSettings) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram2D.typeID, {title: Histogram2D.name}, startQuery, querySettings, plotSettings);
             that.fetchCount = 0;
             that.showRelative = false;
 

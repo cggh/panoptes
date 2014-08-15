@@ -35,8 +35,8 @@ define([
         ];
 
 
-        TreePlot.Create = function(tableid, startQuery, querySettings) {
-            var that = StandardLayoutPlot.Create(tableid, TreePlot.typeID, {title: TreePlot.name}, startQuery, querySettings);
+        TreePlot.Create = function(tableid, startQuery, querySettings, plotSettings) {
+            var that = StandardLayoutPlot.Create(tableid, TreePlot.typeID, {title: TreePlot.name}, startQuery, querySettings, plotSettings);
             that.treesMap = {};
             that.fetchCount = 0;
             that.pointData = {};//first index: property id, second index: point nr

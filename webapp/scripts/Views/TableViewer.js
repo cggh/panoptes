@@ -118,10 +118,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
                 that.createFrames = function(rootFrame) {
-                    rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('',0.2)).setFixedSize(Framework.dimX,250);
-                    this.frameTable = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.8))//Create frame that will contain the table viewer
+                    this.frameControls = Framework.FrameFinal('',0.2);
+                    this.frameTable = Framework.FrameFinal('', 0.8)//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,false);
+                    rootFrame.MakeControlsFrame(this.frameControls, this.frameTable, 250);
                 }
 
 

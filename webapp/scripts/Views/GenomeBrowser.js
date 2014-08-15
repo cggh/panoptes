@@ -112,9 +112,9 @@ define([
 
 
                 that.createFrames = function(rootFrame) {
-                    rootFrame.makeGroupHor();
-                    this.frameControls = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.25)).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
-                    this.frameBrowser = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.75));//Create frame that will contain the genome browser panel
+                    this.frameControls = Framework.FrameFinal('', 0.25).setFrameClassClient('GenomeBrowserControlBackground');//Create frame that will contain the controls panel
+                    this.frameBrowser = Framework.FrameFinal('', 0.75);//Create frame that will contain the genome browser panel
+                    rootFrame.MakeControlsFrame(this.frameControls, this.frameBrowser, 280);
 
                     Msg.listen("", { type: 'JumpgenomeRegion' }, that.onJumpGenomeRegion);
                     Msg.listen("", { type: 'JumpgenomePosition' }, that.onJumpGenomePosition);

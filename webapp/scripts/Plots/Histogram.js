@@ -25,8 +25,8 @@ define([
 
 
 
-        Histogram.Create = function(tableid, startQuery, querySettings) {
-            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery, querySettings);
+        Histogram.Create = function(tableid, startQuery, querySettings, plotSettings) {
+            var that = StandardLayoutPlot.Create(tableid, Histogram.typeID, {title:Histogram.name }, startQuery, querySettings, plotSettings);
             that.fetchCount = 0;
             that.showRelative = false;
 

@@ -117,6 +117,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 });
                 if (that.storeCustomSettings)
                     obj.settingsCustom = that.storeCustomSettings();
+                obj.controlsCollapsed = that.frameRoot.isControlsCollapsed();
                 return obj;
             }
 
@@ -192,7 +193,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 var plotGenerator = GenericPlot._registeredPlotTypes[plotSettObj.plotTypeID];
                 if (!plotGenerator)
                     DQX.reportError('Unknown plot type: '+plotSettObj.plotTypeID);
-                var thePlot = plotGenerator.Create(plotSettObj.tableid);
+                var thePlot = plotGenerator.Create(plotSettObj.tableid, null, null, plotSettObj);
                 thePlot.recall(plotSettObj);
             });
         }

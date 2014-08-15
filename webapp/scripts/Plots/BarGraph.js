@@ -25,13 +25,13 @@ define([
         ];
 
 
-        BarGraph.Create = function(tableid, startQuery, querySettings) {
+        BarGraph.Create = function(tableid, startQuery, querySettings, plotSettings) {
             var that = StandardLayoutPlot.Create(tableid, BarGraph.typeID,
                 {
                     title: BarGraph.name,
                     scrollHorizontal: true
                 },
-                startQuery, querySettings);
+                startQuery, querySettings, plotSettings);
             that.fetchCount = 0;
             that.showRelative = false;
 

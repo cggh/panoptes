@@ -38,8 +38,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
 
-        GeoTemporal.Create = function(tableid, startQuery, querySettings) {
-            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery, querySettings);
+        GeoTemporal.Create = function(tableid, startQuery, querySettings, plotSettings) {
+            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery, querySettings, plotSettings, plotSettings);
 
             that.pointData = {};//first index: property id, second index: point nr
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
@@ -73,12 +73,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             }
 
             that.createFrames = function() {
-                that.frameRoot.makeGroupHor();
-                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
+                var controlsCollapsed = false;
+                if (plotSettings && plotSettings.controlsCollapsed)
+                    controlsCollapsed = true;
+                that.frameButtons = Framework.FrameFinal('', 0.3)
                     .setAllowScrollBars(false,true).setFixedSize(Framework.dimX,240);
-
-                var frameRight = that.frameRoot.addMemberFrame(Framework.FrameGroupVert('', 0.7))
+                var frameRight = Framework.FrameGroupVert('', 0.7)
                     .setMargins(0).setSeparatorSize(0);
+
+                that.frameRoot.MakeControlsFrame(that.frameButtons, frameRight, 240, controlsCollapsed);
 
                 that.frameWarning = frameRight.addMemberFrame(Framework.FrameFinal('', 0.01))
                     .setMargins(0).setAutoSize().setAllowScrollBars(false, false);
