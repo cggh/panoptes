@@ -1,4 +1,4 @@
-# This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
+# This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'panoptes'
-copyright = u'2014, Paul Vauterin, Ben Jeffery, Alistair Miles'
+copyright = u'2014, CGGH'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

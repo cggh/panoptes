@@ -14,7 +14,7 @@ RowIndexArray: row_index             #1D Array in HDF5 that gives the value of R
                                      #if this is missing then it is assumed that the HDF5 rows are in the same
                                      #order as the "RowDataTable" sorted by "RowIndexField"
 
-FirstArrayDimension: row             #Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
+FirstArrayDimension: row             #Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better
 
 Properties:
     -  Id: first_allele                            #Name of dataset in HDF5

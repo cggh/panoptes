@@ -1,4 +1,4 @@
-// This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
+// This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
@@ -122,6 +122,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             //Upload a single datatable
                             data.datasetid = sourceFileInfo.datasetid;
                             data.tableid = sourceFileInfo.tableid;
+                            data.type = sourceFileInfo.tpe;
                             ServerIO.customAsyncRequest(MetaData.serverUrl, PnServerModule, 'fileload_datatable', data, function(resp) {
                             });
                             return;

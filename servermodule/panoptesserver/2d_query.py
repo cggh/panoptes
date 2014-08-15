@@ -1,4 +1,4 @@
-# This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
+# This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
@@ -35,14 +35,19 @@ def desc_to_dtype(desc):
     return dtype[col_type]
 
 
-def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit):
+def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field):
     if limit and fail_limit:
         raise Exception("Only one type of limit can be specified")
     where = DQXDbTools.WhereClause()
     where.ParameterPlaceHolder = '%s'#NOTE!: MySQL PyODDBC seems to require this nonstardard coding
     where.Decode(query)
     where.CreateSelectStatement()
-    query = "WHERE " + where.querystring_params if len(where.querystring_params) > 0 else ''
+    if index_field not in fields:
+        fields.append(index_field)
+    if len(where.querystring_params) > 0:
+        query = "WHERE " + where.querystring_params + ' AND ' + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
+    else:
+        query = "WHERE " + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
     fields_string = ','.join('`'+DQXDbTools.ToSafeIdentifier(f)+'`' for f in fields)
     table = DQXDbTools.ToSafeIdentifier(table)
     order = DQXDbTools.ToSafeIdentifier(order)
@@ -169,8 +174,10 @@ def handler(start_response, request_data):
         col_tablename = get_workspace_table_name(col_tableid, workspace)
         row_tablename = get_workspace_table_name(row_tableid, workspace)
 
-        col_properties.append(datatable + '_column_index')
-        row_properties.append(datatable + '_row_index')
+        col_index_field = datatable + '_column_index'
+        row_index_field = datatable + '_row_index'
+        col_properties.append(col_index_field)
+        row_properties.append(row_index_field)
 
         col_result = index_table_query(cur,
                                        col_tablename,
@@ -179,7 +186,8 @@ def handler(start_response, request_data):
                                        col_order,
                                        col_limit,
                                        col_offset,
-                                       col_fail_limit)
+                                       col_fail_limit,
+                                       col_index_field)
 
         row_result = index_table_query(cur,
                                        row_tablename,
@@ -188,15 +196,16 @@ def handler(start_response, request_data):
                                        row_order,
                                        row_limit,
                                        row_offset,
-                                       row_fail_limit)
+                                       row_fail_limit,
+                                       row_index_field)
 
-    col_idx = col_result[datatable + '_column_index']
-    row_idx = row_result[datatable + '_row_index']
+    col_idx = col_result[col_index_field]
+    row_idx = row_result[row_index_field]
     if len(col_idx) == col_fail_limit:
         result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
     else:
-        del col_result[datatable + '_column_index']
-        del row_result[datatable + '_row_index']
+        del col_result[col_index_field]
+        del row_result[row_index_field]
 
         two_d_result = extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_properties)
 

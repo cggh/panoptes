@@ -1,4 +1,4 @@
-# This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
+# This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
@@ -454,7 +454,7 @@ class Numpy_to_SQL(object):
         column_type = self.dtype_to_column_type(str(array.dtype))
         sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)
-        for start in range(0, len(array), 500):
+        for start in xrange(0, len(array), 500):
             end = min(start + 500, len(array))
             sql = "INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name)
             data = [(ele,) for ele in array[start: end]]

@@ -1,6 +1,7 @@
-# This file is part of Panoptes - (C) Copyright 2014, Paul Vauterin, Ben Jeffery, Alistair Miles <info@cggh.org>
+# This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+from _mysql import OperationalError
 
 import os
 import DQXDbTools
@@ -18,7 +19,7 @@ import customresponders.panoptesserver.Utils as Utils
 tableOrder = 0
 property_order = 0
 
-def hdf5_copy(src, dest, func = None):
+def hdf5_copy(src, dest, func=None, limit=None):
         #Process in chunk sized (at least on the primary dimension) pieces
         try:
             step_size = src.chunks[0]
@@ -28,19 +29,19 @@ def hdf5_copy(src, dest, func = None):
             step_size = 10000
         shape = src.shape
         if func:
-            for start in xrange(0, len(src), step_size):
-                 end = min(start + step_size, len(src))
+            for start in xrange(0, limit[0] or len(src), step_size):
+                 end = min(start + step_size, limit[0] or len(src))
                  if len(shape) == 2:
-                     dest[start:end, :] = func(src[start:end, :])
+                     dest[start:end, :limit[1]] = func(src[start:end, :limit[1]])
                  elif len(shape) == 1:
                      dest[start:end] = func(src[start:end])
                  else:
                      print "shape", shape, "not of dimension 1 or 2"
         else:
-            for start in xrange(0, len(src), step_size):
-                 end = min(start + step_size, len(src))
+            for start in xrange(0, limit[0] or len(src), step_size):
+                 end = min(start + step_size, limit[0] or len(src))
                  if len(shape) == 2:
-                     dest[start:end, :] = src[start:end, :]
+                     dest[start:end, :limit[1]] = src[start:end, :limit[1]]
                  elif len(shape) == 1:
                      dest[start:end] = src[start:end]
                  else:
@@ -52,6 +53,21 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         print('Source: ' + folder)
         DQXUtils.CheckValidTableIdentifier(tableid)
 
+        max_line_count = None
+        if import_settings['ScopeStr'] == '1k':
+            max_line_count = 1000
+        if import_settings['ScopeStr'] == '10k':
+            max_line_count = 10000
+        if import_settings['ScopeStr'] == '100k':
+            max_line_count = 100000
+        if import_settings['ScopeStr'] == '1M':
+            max_line_count = 1000000
+        if import_settings['ScopeStr'] == '10M':
+            max_line_count = 10000000
+
+        calculation_object.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(dataset_id, '2D_tablecatalog'))
+        calculation_object.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(dataset_id, '2D_propertycatalog'))
+        
         table_settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         table_settings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])
         table_settings.AddTokenIfMissing('ShowInGenomeBrowser', False)
@@ -138,7 +154,7 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
             if table_settings['ColumnDataTable']:
                 if table_settings.HasToken('ColumnIndexArray'):
                     #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
-                    #Firstly create a temporay table with the index array
+                    #Firstly create a temporary table with the index array
                     try:
                         column_index = remote_hdf5[table_settings['ColumnIndexArray']]
                     except KeyError:
@@ -146,13 +162,23 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     for property in table_settings['Properties']:
                         if len(column_index) != remote_hdf5[property['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'column' else 1]:
                             raise Exception("Property {0} has a different column length to the column index".format(property))
-                    sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index)
+                    sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index[0:max_line_count])
                     ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
+
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;".format(
+                        table_settings['ColumnDataTable'],
+                        table_settings['ColumnIndexField'],
+                        tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
 
                     #We have a datatable - add an index to it then copy that index across to the data table
                     sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
                              SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
-                             ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
                              UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
                              DROP TABLE `TempColIndex`""".format(
                         table_settings['ColumnDataTable'],
@@ -165,15 +191,28 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                         tableid)
                     nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
                     if len(nulls) > 0:
-                        raise Exception("Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
+                        print("WARNING: Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
                 else:
-                    #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
-                    sql = """ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;
-                             SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;
-                             """.format(
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;".format(
                         table_settings['ColumnDataTable'],
                         table_settings['ColumnIndexField'],
                         tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
+                    #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
+                    if max_line_count:
+                        sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {3};"
+                    else:
+                        sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;"
+                    sql = sql.format(
+                        table_settings['ColumnDataTable'],
+                        table_settings['ColumnIndexField'],
+                        tableid,
+                        max_line_count)
                     ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
 
             if table_settings['RowDataTable']:
@@ -190,10 +229,19 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                     sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
                     ImpUtils.ExecuteSQLGenerator(calculation_object, dataset_id, sql)
 
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;".format(
+                        table_settings['RowDataTable'],
+                        table_settings['RowIndexField'],
+                        tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
                     #We have a datatable - add an index to it then copy that index across to the data table
                     sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
                              SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
-                             ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
                              UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
                              DROP TABLE `TempRowIndex`""".format(
                         table_settings['RowDataTable'],
@@ -206,12 +254,20 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                         tableid)
                     nulls = ImpUtils.ExecuteSQLQuery(calculation_object, dataset_id, sql)
                     if len(nulls) > 0:
-                        raise Exception("Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
+                        print("WARNING:Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
                 else:
+                    #Add an index to the table - catch the exception if it exists.
+                    sql = "ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;".format(
+                        table_settings['RowDataTable'],
+                        table_settings['RowIndexField'],
+                        tableid)
+                    try:
+                        ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
+                    except OperationalError as e:
+                        if e[0] != 1060:
+                            raise e
                     #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "RowIndexField" so we index by that column in order
-                    sql = """ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;
-                             SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;
-                             """.format(
+                    sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;".format(
                         table_settings['RowDataTable'],
                         table_settings['RowIndexField'],
                         tableid)
@@ -236,7 +292,7 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                 else:
                     chunks = (min(10, prop_in.shape[0]), min(1000, prop_in.shape[1]))
                 prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=chunks, maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
-                hdf5_copy(prop_in, prop_out)
+                hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
                 print "done"
             print "all copies complete"
             local_hdf5.close()
