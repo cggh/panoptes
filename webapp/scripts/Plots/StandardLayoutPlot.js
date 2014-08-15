@@ -18,7 +18,7 @@ define([
         StandardLayoutPlot.Create = function(tableid, plotTypeID, settings, startQuery, querySettings, plotSettings) {
 
             var tableInfo = MetaData.getTableInfo(tableid);
-            settings.title += ' (' + tableInfo.tableCapNamePlural + ')';
+            settings.title = tableInfo.tableCapNamePlural + ' (' + settings.title + ')';
 
 
             var that = GenericPlot.Create(tableid, plotTypeID, settings, startQuery, querySettings, plotSettings);

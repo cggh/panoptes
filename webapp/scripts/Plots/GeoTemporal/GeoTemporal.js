@@ -15,7 +15,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         var GeoTemporal = {};
 
         GeoTemporal.typeID = 'GeoTemporal';
-        GeoTemporal.name = 'Geographic map';
+        GeoTemporal.name = 'Map';
         GeoTemporal.description= 'Takes a <b>geographic lattitude & longitude property pair</b>, and maps the {items} on a world map. Optionally, a date property can be used to add a time line.';
         GeoTemporal.isCompatible = function(tableInfo) {
             return tableInfo.hasGeoCoord;
@@ -39,7 +39,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
 
         GeoTemporal.Create = function(tableid, startQuery, querySettings, plotSettings) {
-            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {title:GeoTemporal.name }, startQuery, querySettings, plotSettings, plotSettings);
+            var tableInfo = MetaData.getTableInfo(tableid);
+            var that = GenericPlot.Create(tableid, GeoTemporal.typeID, {
+                title:tableInfo.tableCapNamePlural + ' (' + GeoTemporal.name + ')'
+            }, startQuery, querySettings, plotSettings, plotSettings);
 
             that.pointData = {};//first index: property id, second index: point nr
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;
