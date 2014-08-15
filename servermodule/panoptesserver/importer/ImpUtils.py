@@ -454,7 +454,7 @@ class Numpy_to_SQL(object):
         column_type = self.dtype_to_column_type(str(array.dtype))
         sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)
-        for start in range(0, len(array), 500):
+        for start in xrange(0, len(array), 500):
             end = min(start + 500, len(array))
             sql = "INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name)
             data = [(ele,) for ele in array[start: end]]
