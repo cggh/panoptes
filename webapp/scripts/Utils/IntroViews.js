@@ -19,7 +19,7 @@ define([
 
         IntroViews.loadIntroViews = function() {
             var getter = DataFetchers.ServerDataGetter();
-            getter.addTable('introviews',['id','name','section', 'description', 'url'], 'ordr',
+            getter.addTable('introviews',['id','name','section', 'description', 'url', 'storedviewid'], 'ordr',
                 SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid)
             );
             getter.execute(MetaData.serverUrl,MetaData.database,
@@ -62,7 +62,10 @@ define([
                     group.postCreateHtml();
                     $.each(introviews, function(idx, introview) {
                         $('#' + introview.divid).click(function() {
-                            window.location.replace(Base64.decode(introview.url));
+                            if (introview.url!='plot')
+                                window.location.replace(Base64.decode(introview.url));
+                            else
+                                Msg.send({type:'LoadStoredPlot'}, introview.storedviewid);
                         });
                         if (MetaData.isManager) {
                             $('#' + introview.divid).find('.IntroViewItemDelete').click(function(ev) {

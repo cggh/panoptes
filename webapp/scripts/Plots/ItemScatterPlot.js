@@ -30,7 +30,7 @@ define([
 
 
         ItemScatterPlot.Create = function(tableid, startQuery, querySettings, plotSettings) {
-            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery, querySettings);
+            var that = StandardLayoutPlot.Create(tableid, ItemScatterPlot.typeID, {title: ItemScatterPlot.name }, startQuery, querySettings, plotSettings);
             that.fetchCount = 0;
             that.propDataMap = {};
             that.maxrecordcount = that.tableInfo.settings.MaxCountQueryRecords || 200000;

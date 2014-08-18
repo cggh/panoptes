@@ -11,6 +11,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
         // - Active query
         // - Store & recall
 
+
+
         var GenericPlot = {};
 
         GenericPlot._registeredPlotTypes = {};
@@ -175,6 +177,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
             };
 
             that.handleCreateLink = function() {
+                var content = base64.encode(JSON.stringify(that.store()));
+
+                DQX.serverDataStore(MetaData.serverUrl, content, function (id) {
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
+                        { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                        function (resp) {
+                            that.handleCreateLink_part2(id);
+                        });
+                });
+            }
+
+            that.handleCreateLink_part2 = function(storeid) {
                 var str='';
 
                 str += '<b>Name:</b><br>';
@@ -198,20 +212,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         alert('No section provided');
                         return;
                     }
-//                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_intro_create',
-//                        {
-//                            database: MetaData.database,
-//                            workspaceid:MetaData.workspaceid,
-//                            name: edt_name.getValue(),
-//                            section: edt_section.getValue(),
-//                            description: edt_descr.getValue(),
-//                            url: Base64.encode(url),
-//                            storeid: storeid,
-//                            viewstate: viewstate
-//                        },
-//                        function(resp) {
-//                            Msg.send({ type: 'LoadIntroViews' }, {} );
-//                        });
+                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_intro_create',
+                        {
+                            database: MetaData.database,
+                            workspaceid:MetaData.workspaceid,
+                            name: edt_name.getValue(),
+                            section: edt_section.getValue(),
+                            description: edt_descr.getValue(),
+                            url: 'plot',
+                            storeid: storeid,
+                            viewstate: '_'
+                        },
+                        function(resp) {
+                            Msg.send({ type: 'LoadIntroViews' }, {} );
+                        });
                     Popup.closeIfNeeded(popupid);
                 });
                 str += '<p>';
@@ -225,6 +239,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             return that;
         }
+
+
+        GenericPlot.loadStoredPlot = function(tpe, storeid) {
+            DQX.serverDataFetch(MetaData.serverUrl, storeid, function(content) {
+                var obj = JSON.parse(base64.decode(content));
+
+                GenericPlot.recall([obj]);
+            });
+        };
 
 
 
@@ -247,6 +270,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 thePlot.recall(plotSettObj);
             });
         }
+
+        Msg.listen('', { type: 'LoadStoredPlot'}, GenericPlot.loadStoredPlot);
 
 
         return GenericPlot;
