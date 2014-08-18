@@ -559,8 +559,9 @@ define([
                 ctx.fillRect(0, 0, drawInfo.sizeX,  drawInfo.sizeY);
                 if (that.fetchCount > 0) {
                     ctx.font="20px Arial";
+                    ctx.textAlign = 'left';
                     ctx.fillStyle="rgb(140,140,140)";
-                    ctx.fillText("Fetching data ... "+that.fetchCount,10,50);
+                    ctx.fillText("Fetching data ... "+that.fetchCount,110,50);
                     return;
                 }
 
