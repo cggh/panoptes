@@ -17,7 +17,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         ButtonChoiceBox.create = function(title, header, buttonsMatrix) {
-            var content = header + '<br>';
+            var content = header + '<p>';
 
             $.each(buttonsMatrix, function(idx, buttonsRow) {
                 if (idx>0)
@@ -106,10 +106,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             if (newQueryInfo) {
                 var choicesRow = [];
-                choicesRow.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
-                    thePlot.theQuery.modify(newQueryInfo.query);
-                }
-                } );
                 choicesRow.push( { content:'Show items in query', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: tableInfo.id,
@@ -117,6 +113,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         subSamplingOptions: newQueryInfo.subSamplingOptions,
                         title: title + ' (' + tableInfo.tableCapNamePlural+ ')'
                     });
+                }
+                } );
+                choicesRow.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
+                    thePlot.theQuery.modify(newQueryInfo.query);
                 }
                 } );
                 choices.push(choicesRow);

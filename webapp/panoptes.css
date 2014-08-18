@@ -509,8 +509,8 @@ input.PnGenotypesPageEdit{
 .PlotTypeTable tr:hover
 {
     background-color: white;
-    outline: 1px solid rgb(0,188,205);
-    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+    /*outline: 1px solid rgb(0,188,205);*/
+    /*box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);*/
 }
 
 

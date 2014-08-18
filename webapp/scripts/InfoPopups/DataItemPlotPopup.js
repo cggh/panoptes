@@ -16,6 +16,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         DataItemPlotPopup.promptAspects = true;
 
+        DataItemPlotPopup.legacyPropertySelection = false;
+
         DataItemPlotPopup.init = function() {
             Msg.listen('', {type:'CreateDataItemPlot'}, function(scope, info) {
                 DataItemPlotPopup.create(info);
@@ -69,8 +71,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $('#createplot_'+id).click(function() {
                     DataItemPlotPopup.promptAspects = chk_promptAspects.getValue();
                     Popup.closeIfNeeded(popupID);
-                    if (DataItemPlotPopup.promptAspects)
-                        DataItemPlotPopup.createAspectSelector(plottype, info);
+                    if (DataItemPlotPopup.promptAspects) {
+                        if (DataItemPlotPopup.legacyPropertySelection)
+                            DataItemPlotPopup.createAspectSelector(plottype, info);
+                        else
+                            DataItemPlotPopup.createPropertySelector(plottype, info);
+                    }
                     else
                         plottype.Create(tableInfo.id, info.query, {
                             subSamplingOptions: info.subSamplingOptions
@@ -80,25 +86,97 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         }
 
+        DataItemPlotPopup.isCompatibleProperty = function(dataType, propInfo) {
+            if (!dataType)
+                return true;
+            if (dataType==propInfo.datatype)
+                return true;
+            if (dataType=='Value')
+                return propInfo.isFloat;
+            if (dataType=='Category') {
+                if (propInfo.isText) return true;
+                if (propInfo.isBoolean) return true;
+            }
+            return false;
+        }
+
+
+        DataItemPlotPopup.createPropertySelector = function(plottype, info) {
+            var tableInfo = MetaData.mapTableCatalog[info.tableid];
+
+            var selectors = [];
+            $.each(plottype.plotAspects, function(idx, aspectInfo) {
+                var propList = [{id:'', name:''}];
+                $.each(tableInfo.propertyGroups, function(idx0, groupInfo) {
+                    $.each(groupInfo.properties, function(idx1, propInfo) {
+                        if (DataItemPlotPopup.isCompatibleProperty(aspectInfo.dataType, propInfo)) {
+                            propList.push({id: propInfo.propid, name: propInfo.name, group:propInfo.group.Name});
+                        }
+                    });
+                } );
+                var cmb = Controls.Combo(null, {label: '', states: propList, width:130});
+                selectors.push({ aspectInfo:aspectInfo, ctrl:cmb, required: (aspectInfo.requiredLevel == 2)});
+            });
+
+
+
+
+            var content = '';
+            var controls = Controls.CompoundVert([]).setMargin(0);
+            content += controls.renderHtml() + '<p>';
+
+
+            groupList = Controls.CompoundGrid().setSeparation(4,2);
+            var rowNr = 0;
+            $.each(selectors, function(idx, item) {
+                groupList.setItem(rowNr, 0, Controls.Static(item.aspectInfo.name+':'));
+                groupList.setItem(rowNr, 1, item.ctrl);
+                groupList.setItem(rowNr, 0, Controls.Static(item.aspectInfo.name+':'));
+                groupList.setItem(rowNr, 2, Controls.Static(item.required?'<i><span style="color:rgb(128,128,128)">(required)</span></i>':''));
+                rowNr++;
+            });
+            controls.addControl(groupList);
+
+            content += controls.renderHtml();
+
+            var buttonCreatePlot = Controls.Button(null, { content: '<b>Create plot</b>', buttonClass: 'PnButtonLarge', width:120, height:40, icon:'fa-bar-chart-o' });
+            buttonCreatePlot.setOnChanged(function() {
+                var aspects = {};
+                $.each(selectors, function(idx, selector) {
+                    if (selector.ctrl.getValue())
+                        aspects[selector.aspectInfo.id] = selector.ctrl.getValue();
+                });
+
+                //Check for missing required aspects
+                var missingAspects = [];
+                $.each(plottype.plotAspects, function(idx, aspectInfo) {
+                    if ((aspectInfo.requiredLevel == 2) && (!aspects[aspectInfo.id]) ) {
+                        missingAspects.push(aspectInfo.name);
+                    }
+                });
+                if (missingAspects.length>0) {
+                    alert('Please associate the following plot aspect(s) to data properties: \n\n'+missingAspects.join(', '));
+                    return;
+                }
+
+                Popup.closeIfNeeded(popupID);
+                plottype.Create(tableInfo.id, info.query, {
+                    subSamplingOptions: info.subSamplingOptions,
+                    aspects: aspects
+                });
+            });
+            content += '<p>' + buttonCreatePlot.renderHtml() + '<p>';
+            var popupID = Popup.create(plottype.name+' aspects', content);
+            controls.postCreateHtml();
+        };
+
+
+
+
+
+        //NOTE: createAspectSelector is a legacy option to associate plot aspects & dataitem properties. This has been replaced by createPropertySelector
 
         DataItemPlotPopup.createAspectSelector = function(plottype, info) {
-
-
-            var isCompatibleProperty = function(dataType, propInfo) {
-                if (!dataType)
-                    return true;
-                if (dataType==propInfo.datatype)
-                    return true;
-                if (dataType=='Value')
-                    return propInfo.isFloat;
-                if (dataType=='Category') {
-                    if (propInfo.isText) return true;
-                    if (propInfo.isBoolean) return true;
-                }
-                return false;
-            }
-
-
             var content = '';
 
             var controls = Controls.CompoundVert([]).setMargin(0);
@@ -128,7 +206,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (propInfo.settings.showInTable) {
                         states = [{id:'', name:''}];
                         $.each(plottype.plotAspects, function(idx, aspectInfo) {
-                            if (isCompatibleProperty(aspectInfo.dataType, propInfo))
+                            if (DataItemPlotPopup.isCompatibleProperty(aspectInfo.dataType, propInfo))
                                 states.push({id: aspectInfo.id, name: aspectInfo.name+' :' });
                         });
                         if (states.length>1) {
