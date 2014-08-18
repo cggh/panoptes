@@ -63,12 +63,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
             dowait();
         }
-
         Initialise.parseTableSettings = function(table) {
             var settings = { GenomeMaxViewportSizeX:50000 };
             if (table.settings) {
+                //FIXME We need a proper escaping of the json
                 table.settings = table.settings.replace(/`/g, '\\"');
-//                console.log('\n\n\n'+table.settings);
+                table.settings = table.settings.replace(/\n/g, "\\n");
                 settings = $.extend(settings,JSON.parse(table.settings));
             }
             table.settings = settings;

@@ -85,10 +85,17 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     }
 
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                        var tableViewerButton = Application.getView('table_'+tableInfo.id).createActivationButton({
-                            content: "Show table",
-                            icon: 'fa-table'
-                        });
+                        if (tableInfo.settings.TemplatedView) {
+                            var tableViewerButton = Application.getView('template_' + tableInfo.id).createActivationButton({
+                                content: "Show list",
+                                icon: 'fa-list'
+                            });
+                        } else {
+                            var tableViewerButton = Application.getView('table_' + tableInfo.id).createActivationButton({
+                                content: "Show table",
+                                icon: 'fa-table'
+                            });
+                        }
 
                         if (!tableInfo.settings.DisablePlots) {
                             var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
