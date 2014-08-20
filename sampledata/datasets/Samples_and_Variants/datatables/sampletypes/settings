@@ -35,3 +35,5 @@ Properties:
   Name: Description
   DataType: Text
   Search: Pattern
+  MaxColumnWidth: 120
+

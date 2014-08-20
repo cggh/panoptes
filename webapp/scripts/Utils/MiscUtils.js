@@ -142,6 +142,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             }
 
+            if (propInfo.settings.MaxColumnWidth)
+                col.maxColumnWidth = propInfo.settings.MaxColumnWidth;
 
             if (propInfo.isBoolean)
                 col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }

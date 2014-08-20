@@ -68,7 +68,8 @@ Properties:
   Name: Comment
   Description: An example of a comment string
   DataType: Text
-  ShowInTable: false
+  ShowInTable: true
+  MaxColumnWidth: 120               # Specifies the maximum pixel width used for the column representing this property in a table
   Search: Pattern
   
 # The following block declares that this datatable contains a genome values for each item in the table
