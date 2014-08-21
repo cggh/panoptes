@@ -68,7 +68,7 @@ PropertyGroups
   Property groups can be used to combine sets of related properties into sections in the app.
 
 
-.._Properties:
+.. _Properties:
 Properties
   *List (required)*
   The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
