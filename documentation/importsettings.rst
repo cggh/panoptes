@@ -7,7 +7,6 @@ General dataset settings
 
 Name
   *String (required).* The visible name of the dataset, as it appears in the intro page.
-  Bla
 
 NameBanner
   *String.* Visible name of the dataset, as it appears in the top banner of the app.
@@ -31,38 +30,42 @@ NamePlural
   *String (required).* Display name referring to several table items (plural, no no starting capital).
 
 Description 
-  *String (required).* A description of this dataset. This text will appear on the intro page, and on the table view page of this datatable.
+  *String (required).* A description of this dataset.
+  This text will appear on the intro page, and on the table view page of this datatable.
 
-**CacheWorkspaceData**: Yes/No. 
-If Set, a materialised table will be created for this data in each workspace.
-This is faster for large datasets than the standard option, based on a JOIN statement.
+CacheWorkspaceData
+  *Boolean.* If Set, a materialised table will be created for this data in each workspace.
+  This is faster for large datasets than the standard option, based on a JOIN statement.
 
-**Icon**: Specifies an icon that will be associated with the datatable. The name can be chosen from http://fortawesome.github.io/Font-Awesome/icons/.
+Icon:
+  *String.* Specifies an icon that will be associated with the datatable.
+  The name can be chosen from http://fortawesome.github.io/Font-Awesome/icons/.
 
-**PrimKey** (*required*):
-The primary key column ID for this table. This should correspond to a column in data, containing a unique value for each record.
-Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key.
+PrimKey:
+  *Property ID (required)*. The primary key column ID for this table.
+  This should correspond to a column in data, containing a unique value for each record.
+  Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key.
 
-**SortDefault** (*required*):
-Specify a property ID as the default sort field.
-
-
-# The following tags set limits on the data volumes that can be queried
-**MaxCountQueryRecords**: Number.
-Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots).
-
-**MaxCountQueryAggregated**: Number.
-Defines the maximum number of records that will be queried on the server for aggregated reports (e.g. for creating histograms).
-
-**QuickFindFields**: Comma-separated list of property ID's.
-The specified list of properties will be used by some tools that allow the user to quickly find a (set of) item(s).
+SortDefault
+  *Property ID (required)*. Specifies the property ID used as the default sort field.
 
 
+MaxCountQueryRecords
+  *Value.* Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots).
 
-**PropertyGroups** List:
-Each item in the list specifies a group of properties. 
-It should contain two tags: "Id" representing a unique identifier for the group, and "Name" representing a display name.
-Property groups can be used to combine sets of related properties into sections in the app.
+MaxCountQueryAggregated
+  *Value.* Defines the maximum number of records that will be queried on the server for aggregated reports (e.g. for creating histograms).
+
+QuickFindFields
+  *Comma-separated list of property ID's.*
+  The specified list of properties will be used by some tools that allow the user to quickly find a (set of) item(s).
+
+
+PropertyGroups
+  *List. *
+  Each item in the list specifies a group of properties. 
+  It should contain two tags: "Id" representing a unique identifier for the group, and "Name" representing a display name.
+  Property groups can be used to combine sets of related properties into sections in the app.
 
 
 Properties
