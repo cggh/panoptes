@@ -68,7 +68,7 @@ PropertyGroups
   Property groups can be used to combine sets of related properties into sections in the app.
 
 
-.. _Properties:
+.._Properties:
 Properties
   *List (required)*
   The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
@@ -110,6 +110,20 @@ GroupId
 
 Description
   *Text.* Description of the property. This will appear in hover tool tips and in the popup box if a user clicks on a property info button.
+  
+MaxColumnWidth
+  *Value.* Specifies the maximum pixel width used for the column representing this property in a table.
+  Longer text will be abbreviated with ellipsis.
+  
+MinVal
+  *Value.* For Value types, specifies the minimum value that can be reached. 
+
+MaxVal
+  *Value.* For Value types, specifies the maximum value that can be reached.
+
+DecimDigits
+  *Value.* For Value types, specifies the number of decmimal digits that should be used to display the value
+
 
 ShowInTable
   *Boolean*. If set, this property will appear by default in data table grids in the application.
