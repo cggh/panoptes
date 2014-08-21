@@ -198,13 +198,14 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         .setOnChanged(function() {
                             that.model_params.set('page', Math.max(that.model_params.get('page')-1, 0));
                         });
+                    page_up.modifyEnabled(that.model_params.get('page') !== 0);
                     var edit = Controls.Edit(null, {
                         label:'Page:',
                         class: 'PnGenotypesPageEdit',
                         size:2
                     });
                     edit.bindToModel(that.model_params, 'page', parseInt);
-                    var page_down = Controls.Button(null,
+                    that.page_down = Controls.Button(null,
                         {
                             icon:'fa-chevron-down',
                             width:12,
@@ -215,11 +216,15 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         .setOnChanged(function() {
                             that.model_params.set('page', that.model_params.get('page')+1);
                         });
-                    var compound = Controls.CompoundHor([page_up, edit, page_down]);
+                    var compound = Controls.CompoundHor([page_up, edit, that.page_down]);
                     that.page_controls.append(compound.renderHtml());
                     that.getCanvasElementJQ('center').after(that.page_controls);
                     Controls.ExecPostCreateHtml();
-                }
+                    that.model_params.on({change:'page'}, function() {
+                        page_up.modifyEnabled(that.model_params.get('page') !== 0);
+                    });
+
+                    }
                 if (that.page_controls) {
                     that.page_controls.css({
                         top: Math.max(0,draw_info.top_visible + 10),
@@ -245,6 +250,9 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     //The last call will result in the framework calling draw, so we should end here.
                     return;
                 }
+
+                if (that.page_down)
+                    that.page_down.modifyEnabled(!(that.model.row_ordinal.length && that.model.row_ordinal.length != that.model_params.get('page_length')));
 
                 that.drawStandardGradientLeft(draw_info, 1);
                 that.drawStandardGradientRight(draw_info, 1);
