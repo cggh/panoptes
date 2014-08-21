@@ -45,6 +45,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
+            if (MetaData.isManager)
+                that.addTool('fa-link', function() { that.handleCreateLink(); });
+
             if (itemInfo.frameSettings) {
                 // Popupframe settings were stored; recall & set as new history, so that settings will be picked up during creation
                 PopupFrame.setFrameSettingsHistory(that.typeID, itemInfo.frameSettings);
@@ -433,6 +436,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return obj;
             };
 
+            that.handleCreateLink = function() {
+                var content = base64.encode(JSON.stringify(that.store()));
+                DQX.serverDataStore(MetaData.serverUrl, content, function (id) {
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
+                        { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                        function (resp) {
+                            require("Utils/IntroViews").createIntroView('dataitem', id, '-', 'Add {name} to start page'.DQXformat({name:that.tableInfo.tableNameSingle}));
+                        });
+                });
+            }
 
             ItemPopup.activeList.push(that);
             that.create();
@@ -454,6 +467,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
         }
 
+        ItemPopup.loadStoredItem = function(tpe, storeid) {
+            DQX.serverDataFetch(MetaData.serverUrl, storeid, function(content) {
+                var obj = JSON.parse(base64.decode(content));
+                ItemPopup.recall([obj]);
+            });
+        };
+
+
+        Msg.listen('', { type: 'LoadStoredDataItem'}, ItemPopup.loadStoredItem);
 
         return ItemPopup;
     });

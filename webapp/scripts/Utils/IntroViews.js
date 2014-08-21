@@ -67,6 +67,10 @@ define([
                                 Msg.send({type:'LoadStoredPlot'}, introview.storedviewid);
                                 handled = true;
                             }
+                            if (introview.url=='dataitem') {
+                                Msg.send({type:'LoadStoredDataItem'}, introview.storedviewid);
+                                handled = true;
+                            }
                             if (introview.url=='itemtable') {
                                 Msg.send({type:'LoadStoredItemTable'}, introview.storedviewid);
                                 handled = true;
