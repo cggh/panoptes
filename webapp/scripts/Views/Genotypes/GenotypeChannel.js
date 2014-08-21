@@ -122,6 +122,18 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
                 show_hide_width.setVisible(false);
 
+                var page_length = Controls.Edit(null, {
+                    label:'Page Size:',
+                    size:5
+                });
+                page_length.bindToModel(model_params, 'page_length', function(input) {
+                    var num = parseInt(input);
+                    if (num != num) //Check for NaN
+                        return 0;
+                    else
+                        return num;
+                });
+                view_controls.addControl(page_length);
 
                 view_controls.addControl(Controls.VerticalSeparator(3));
                 var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
@@ -204,7 +216,13 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         class: 'PnGenotypesPageEdit',
                         size:2
                     });
-                    edit.bindToModel(that.model_params, 'page', parseInt);
+                    edit.bindToModel(that.model_params, 'page', function(input) {
+                        var num = parseInt(input);
+                        if (num != num) //Check for NaN
+                            return 0;
+                        else
+                            return num;
+                    });
                     that.page_down = Controls.Button(null,
                         {
                             icon:'fa-chevron-down',
