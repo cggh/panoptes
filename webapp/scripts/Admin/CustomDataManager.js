@@ -206,7 +206,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var content = CustomDataManager.getSourceFileDescription({datasetid: sourceInfo.datasetid, workspaceid: sourceInfo.workspaceid, tableid:sourceInfo.tableid, sourceid: sourceInfo.sourceid});
             var edt = Controls.Textarea('', { size:65, linecount:20, value: settingsStr, fixedfont: true, noWrap: true});
             content += edt.renderHtml();
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update settings</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-refresh', content: '<b>Update settings</b>', width:140, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();
 
                 DQX.serverDataStoreLong(MetaData.serverUrl,Base64.encode(settingsStr),function(id) {
@@ -229,8 +229,21 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
             });
+
+            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Settings tokens overview', width:140, height:35 }).setOnChanged(function() {
+                var urlMapper = {
+                    datatable: 'importsettings.html#datatable-settings',
+                    '2D_datatable': 'importsettings.html#d-datatable-settings',
+                    dataset: 'importsettings.html#general-dataset-settings',
+                    workspace: 'importsettings.html#workspace-settings',
+                    customdata: 'importsettings.html#custom-data-settings'
+                }
+                var url = MetaData.urlDocumentation + urlMapper[sourceInfo.tpe];
+                window.open(url,'_blank');
+            });
+
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
-            content += '<p>' + bt.renderHtml() + '<p>' ;
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' + bt_help.renderHtml() + '<p>' ;
             var popupid = Popup.create('Edit data settings', content);
         }
 

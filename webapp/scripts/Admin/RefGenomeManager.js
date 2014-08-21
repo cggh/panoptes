@@ -207,8 +207,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 //                    RefGenomeManager.importData(datasetid);
                 });
             });
+
+            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Settings tokens overview', width:140, height:35 }).setOnChanged(function() {
+                var url = MetaData.urlDocumentation + 'importsettings.html#reference-genome-settings';
+                window.open(url,'_blank');
+            });
+
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
-            content += '<p>' + bt.renderHtml() + '<p>' ;
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' + bt_help.renderHtml() + '<p>' ;
             var popupid = Popup.create('Edit reference genome settings', content);
         }
 
