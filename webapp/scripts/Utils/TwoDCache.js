@@ -308,6 +308,7 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         if (data) {
           match.col = {};
           match.pages[page] = {twoD: {}};
+          that.row_data_pages[page] = {};
           var props = _.keys(data);
           for (var i = 0, ref = props.length; i < ref; i++) {
             var full_prop = props[i];
@@ -316,7 +317,6 @@ define(["Utils/RequestCounter", "Utils/Interval"],
             if (type == 'col')
               match.col[prop] = data[full_prop].array;
             if (type == 'row') {
-              that.row_data_pages[page] = {};
               that.row_data_pages[page][prop] = data[full_prop].array;
             }
             if (type == '2D') {
