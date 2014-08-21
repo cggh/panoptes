@@ -89,6 +89,28 @@ Position
 GenomeMaxViewportSizeX
   *Value.* Specifies the maximum genome browser viewport size (in bp) for which data in this table will be displayed as a tracks.
 
+TableBasedSummaryValues
+  *Block. *
+  Declares that this datatable contains a numerical genome values for each item in the table
+  Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser
+  There should be a subfolder with the identifier of this track in the datatable source data folder.
+  For each data item, this folder should contain a data file with the name equal to the primary key
+  This block can contain the following tokens:
+    Id
+      *Text. (required)* Identifier of this per-dataitem genomic value.
+    Name
+      *Text (required).* Display name.
+    MinVal
+      *Value (required).* Minimum this value can reach.
+    MaxVal
+      *Value (required).* Maximum this value can reach.
+    BlockSizeMi
+      *Value (required).* Minimum block size used by the multiresolution summariser (in bp).
+    BlockSizeMax
+      *Value (required).) Maximum block size used by the multiresolution summariser (in bp).
+    ChannelColor
+      *Text. *: Colour used to display these tracks genome browser track. Formatted as ``"rgb(r,g,b)"``
+
 
 Property settings
 -----------------
