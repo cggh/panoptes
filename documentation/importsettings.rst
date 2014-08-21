@@ -7,6 +7,11 @@ General dataset settings
 
 Name : String : Required
   The visible name of the dataset, as it appears in the intro page.
+  
+  Sub1:
+     Description
+  Sub2:
+     Description
 
 NameBanner : String
   Visible name of the dataset, as it appears in the top banner of the app.
