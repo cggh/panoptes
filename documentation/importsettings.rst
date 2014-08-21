@@ -299,10 +299,10 @@ PieChartSize
   *Value (required).* Size of the largest pie chart
 MapCenter
   *Block (required).* Specifies the start map center, and should contain the following tokens:
-    Longitude
-      *Value (required).* Geographic longitude.
-    Lattitude
-      *Value (required).* Geographic latitude.
+   Longitude
+     *Value (required).* Geographic longitude.
+   Lattitude
+     *Value (required).* Geographic latitude.
 MapZoom
   *Value (required).* Start zoom factor of the map (integer, minimum value of 0).
 DataType
@@ -317,7 +317,7 @@ LocationSizeProperty
 LocationNameProperty
   *Text (required).* Property of the locations datatable containing the name of the pie chart.
 ComponentColumns
-  List. Enumerates all the pies of the pie charts, and binds them to properties of this datatable (one for each component x location).
+  *List (required).* Enumerates all the pies of the pie charts, and binds them to properties of this datatable (one for each component x location).
   Each list item should have the following tokens:
     Pattern:
       *Text (required).* Column name providing the data. NOTE: {locid} will be replaced by the location primary key value.
