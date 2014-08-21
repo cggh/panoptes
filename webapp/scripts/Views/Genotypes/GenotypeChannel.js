@@ -237,6 +237,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 var height = 5 + that.view.link_height + that.view.col_header_height;
                 if (that.model.row_ordinal.length)
                     height += that.view.row_height * that.model.row_ordinal.length;
+                else
+                    height += that.view.row_height * that.model_params.get('page_length');
                 if (that._height != height) {
                     that.modifyHeight(height);
                     that._myPlotter.resizeHeight(true);
