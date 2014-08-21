@@ -114,7 +114,7 @@ TableBasedSummaryValues
 
 
 Property settings
------------------
+~~~~~~~~~~~~~~~~~
 An overview of the possible tags than can be defined for an individual property in
 the **Properties** tag of the datatable settings (see Properties_).
 
