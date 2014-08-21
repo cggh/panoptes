@@ -286,8 +286,8 @@ MapZoom:
 PieChartMap
 ...........
 Defines a view that shows a set of pie charts on a geographic map.
-This is achieved by combining information from two datatable:
- - A locations datatable. Each item in this datatable is a location and will display a pie chart
+This is achieved by combining information from two datatables:
+ - A locations datatable. Each item in this datatable defines a location and will display a pie chart.
  - The current datatable (where the view is defined).
  
 A set of properties of the current table is used to define pies on all pie charts.
@@ -338,7 +338,7 @@ ComponentColumns
       *Text (required).* Color of the pie. Format: ``rgb(r,g,b)``.
 
 ResidualFractionName
-  *Text*. Name of the residual fraction (if any)
+  *Text*. Name of the residual fraction (if any).
   
 
 
