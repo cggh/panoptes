@@ -156,7 +156,7 @@ define([
         }
 
 
-        IntroViews.createIntroView = function(url, storeid, viewstate) {
+        IntroViews.createIntroView = function(encodedUrl, storeid, viewstate, title) {
             var str='';
 
             str += '<b>Name:</b><br>';
@@ -187,7 +187,7 @@ define([
                         name: edt_name.getValue(),
                         section: edt_section.getValue(),
                         description: edt_descr.getValue(),
-                        url: Base64.encode(url),
+                        url: encodedUrl,
                         storeid: storeid,
                         viewstate: viewstate
                     },
@@ -200,7 +200,7 @@ define([
             str += btOpen.renderHtml();
             str += '<p>';
 
-            var popupid = Popup.create('Add view to start page',str);
+            var popupid = Popup.create(title, str);
         };
 
 

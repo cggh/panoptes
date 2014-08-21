@@ -66,7 +66,7 @@ define([
 
               if (MetaData.isManager) {
                 var btCreateIntroView = Controls.Button(null, {  content: 'Add to start page' }).setOnChanged(function () {
-                  require("Utils/IntroViews").createIntroView(url, id, theState);
+                  require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
                 });
                 str += btCreateIntroView.renderHtml();
               }
