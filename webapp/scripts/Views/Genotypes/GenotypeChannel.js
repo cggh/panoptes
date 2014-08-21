@@ -32,8 +32,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   col_order: table_info.col_table.PositionField,
                   row_order: table_info.row_table.primkey,
                   width_mode:'auto',
-                  auto_width: true,
-                  user_column_width:3,
+                  user_column_width: 1,
                   page_length: 200,
                   page: 0
                 });
@@ -74,7 +73,6 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     //Call the full draw as we need to refresh data and column placement
                     that.draw(that.draw_info);
                 });
-
 
                 var states = [];
                 $.each(that.rowTableInfo.propertyGroups, function(idx1, propertyGroup) {
