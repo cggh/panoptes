@@ -19,13 +19,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         }
 
         DataItemTablePopup.show = function(itemInfo) {
+            var theTitle = MetaData.mapTableCatalog[itemInfo.tableid].tableCapNamePlural + ' table';
+            if (itemInfo.title)
+                theTitle = itemInfo.title;
             var that = PopupFrame.PopupFrame('DataItemTablePopup'+itemInfo.tableid,
                 {
-                    title: itemInfo.title,
+                    title: theTitle,
                     blocking:false,
                     sizeX:700, sizeY:500
                 }
             );
+            if (MetaData.isManager)
+                that.addTool('fa-link', function() { that.handleCreateLink(); });
 
             that.tableInfo =MetaData.mapTableCatalog[itemInfo.tableid];
 
@@ -46,7 +51,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 hasSubSampler:that.tableInfo.settings.AllowSubSampling,
                 subSamplingOptions: itemInfo.subSamplingOptions
             });
-            that.theQuery.setStartQuery(itemInfo.query);
+            if (itemInfo.serialisedquery)
+                that.theQuery.recall(itemInfo.serialisedquery);
+            if (itemInfo.query)
+                that.theQuery.setStartQuery(itemInfo.query);
             that.theQuery.notifyQueryUpdated = that.updateQuery;
 
             that.eventids = [];//Add event listener id's to this list to have them removed when the popup closes
@@ -221,10 +229,68 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
 
+            that.store = function() {
+                var obj = {};
+                obj.tableid = that.tableInfo.id;
+                obj.query = that.theQuery.store();
+//                obj.settings = {};
+//                $.each(that.plotSettingsControls, function(id, ctrl) {
+//                    obj.settings[id] = Controls.storeSettings(ctrl);
+//                });
+//                if (that.storeCustomSettings)
+//                    obj.settingsCustom = that.storeCustomSettings();
+//                obj.controlsCollapsed = that.frameRoot.isControlsCollapsed();
+                return obj;
+            }
+
+            that.recall = function(settObj) {
+                if (settObj.query)
+                    that.theQuery.recall(settObj.query);
+                if (settObj.settings) {
+//                    that.staging = true;
+//                    $.each(that.plotSettingsControls, function(id, ctrl) {
+//                        if (settObj.settings[id])
+//                            Controls.recallSettings(ctrl, settObj.settings[id], false );
+//                    });
+//                    that.staging = false;
+                }
+//                if (settObj.settingsCustom && that.recallCustomSettings)
+//                    that.recallCustomSettings(settObj.settingsCustom);
+//                that.reloadAll();
+            }
+
+
+
+
+
+            that.handleCreateLink = function() {
+                var content = base64.encode(JSON.stringify(that.store()));
+                DQX.serverDataStore(MetaData.serverUrl, content, function (id) {
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
+                        { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                        function (resp) {
+                            require("Utils/IntroViews").createIntroView('itemtable', id, '-', 'Add table to start page');
+                        });
+                });
+            }
+
+
             that.create();
 
         }
 
+        DataItemTablePopup.loadStoredTable = function(tpe, storeid) {
+            DQX.serverDataFetch(MetaData.serverUrl, storeid, function(content) {
+                var obj = JSON.parse(base64.decode(content));
+                DataItemTablePopup.show({
+                    tableid: obj.tableid,
+                    serialisedquery: obj.query
+                });
+//                GenericPlot.recall([obj]);
+            });
+        };
+
+        Msg.listen('', { type: 'LoadStoredItemTable'}, DataItemTablePopup.loadStoredTable);
 
 
         return DataItemTablePopup;

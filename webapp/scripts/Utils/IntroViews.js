@@ -62,10 +62,17 @@ define([
                     group.postCreateHtml();
                     $.each(introviews, function(idx, introview) {
                         $('#' + introview.divid).click(function() {
-                            if (introview.url!='plot')
-                                window.location.replace(Base64.decode(introview.url));
-                            else
+                            var handled = false;
+                            if (introview.url=='plot') {
                                 Msg.send({type:'LoadStoredPlot'}, introview.storedviewid);
+                                handled = true;
+                            }
+                            if (introview.url=='itemtable') {
+                                Msg.send({type:'LoadStoredItemTable'}, introview.storedviewid);
+                                handled = true;
+                            }
+                            if (!handled)
+                                window.location.replace(Base64.decode(introview.url));
                         });
                         if (MetaData.isManager) {
                             $('#' + introview.divid).find('.IntroViewItemDelete').click(function(ev) {
