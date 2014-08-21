@@ -93,7 +93,7 @@ GenomeMaxViewportSizeX
 Property settings
 -----------------
 An overview of the possible tags than can be defined for an individual property in
-the **Properties** tag of the datatable settings (see _Properties).
+the **Properties** tag of the datatable settings (see Properties_).
 
 Id
   *Text (required).* Identifier of the property, corresponding to the column header in the [data] file
