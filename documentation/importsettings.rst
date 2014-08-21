@@ -5,6 +5,12 @@ Data import settings
 General dataset settings
 ------------------------
 
+Name : String : Required
+  The visible name of the dataset, as it appears in the intro page.
+
+NameBanner : String
+  Visible name of the dataset, as it appears in the top banner of the app.
+
 **Name** (*required*): The visible name of the dataset, as it appears in the intro page.
 
 **NameBanner**: Visible name of the dataset, as it appears in the top banner of the app.
