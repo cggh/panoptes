@@ -67,6 +67,8 @@ PropertyGroups
   It should contain two tags: "Id" representing a unique identifier for the group, and "Name" representing a display name.
   Property groups can be used to combine sets of related properties into sections in the app.
 
+AutoScanProperties
+  *Boolean.* If set, Panoptes will try to automatically obtain property definitions from the TAB-delimited source data file.
 
 .. _Properties:
 Properties
@@ -75,19 +77,18 @@ Properties
   See `Property settings`_ for an overview of the tokens that can be used for each individual item in this list.
 
 
-*The following set of tags is used to define the items in a datatable as positions on the genome.*
-
 IsPositionOnGenome
-  *Boolean*. Tells Panoptes that this should be interpreted as genomic positions
+  *Boolean*. Tells Panoptes that this should be interpreted as genomic positions.
 
 Chromosome
-  *Property ID.* Speficies the table column ID that contains the chromosome
+  *Property ID.* Speficies the table column ID that contains the chromosome (if *IsPositionOnGenome* is set).
 
 Position
-  *Property ID.* Specifies the table column ID that contains the position on the chromosome
+  *Property ID.* Specifies the table column ID that contains the position on the chromosome (if *IsPositionOnGenome* is set).
 
 GenomeMaxViewportSizeX
-  *Value.* Specifies the maximum genome browser viewport size (in bp) for which data in this table will be displayed as a tracks.
+  *Value.* Specifies the maximum genome browser viewport size (in bp)
+  for which data in this table will be displayed as a tracks  (if *IsPositionOnGenome* is set).
 
 TableBasedSummaryValues
   *Block. *
@@ -104,12 +105,12 @@ TableBasedSummaryValues
       *Value (required).* Minimum this value can reach.
     MaxVal
       *Value (required).* Maximum this value can reach.
-    BlockSizeMi
+    BlockSizeMin
       *Value (required).* Minimum block size used by the multiresolution summariser (in bp).
     BlockSizeMax
-      *Value (required).) Maximum block size used by the multiresolution summariser (in bp).
+      *Value (required).* Maximum block size used by the multiresolution summariser (in bp).
     ChannelColor
-      *Text. *: Colour used to display these tracks genome browser track. Formatted as ``"rgb(r,g,b)"``
+      *Text.*: Colour used to display these tracks genome browser track. Formatted as ``"rgb(r,g,b)"``
 
 
 Property settings
@@ -125,7 +126,7 @@ Name
 
 DataType:
   *Text (required)*. Data type of the values in the property.
-  This can be ``Text``, ``Value``, ``Boolean``,  ``GeoLongitude``, ``GeoLattitude``, ``Date``.
+  This can be ``Text``, ``Value``, ``HighPrecisionValue``, ``Boolean``,  ``GeoLongitude``, ``GeoLattitude``, ``Date``.
 
 GroupId
   *Text.* Id of the Property group this property belongs to.
@@ -137,6 +138,9 @@ MaxColumnWidth
   *Value.* Specifies the maximum pixel width used for the column representing this property in a table.
   Longer text will be abbreviated with ellipsis.
   
+BarWidth
+  *Value*. Draws a bar in the background of the table, indicating the value. This requires *MinVal* & *MaxVal* to be defined.
+  
 MinVal
   *Value.* For Value types, specifies the minimum value that can be reached. 
 
@@ -146,15 +150,49 @@ MaxVal
 DecimDigits
   *Value.* For Value types, specifies the number of decmimal digits that should be used to display the value
 
-
 ShowInTable
   *Boolean*. If set, this property will appear by default in data table grids in the application.
+  
+ShowInBrowser
+  *Boolean.* If set, this property will automatically appear as a track in the genome browser
+  (only applies if *IsPositionOnGenome* is specified in database settings).
+  
+BrowserDefaultVisible
+  *Boolean.* Indicates that the channel will activated by default in the genome browser (only applies if *ShowInBrowser* is set).
+
+BrowserShowOnTop
+  *Boolean.* Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser.
+  In this case, it will always be visible (only applies if *ShowInBrowser* is set).
+  
+ChannelName
+  *Text.* Name of the genome browser channel this property will be displayed in. 
+  Properties sharing the same channel name will be displayed in overlay
+  (only applies if *ShowInBrowser* is set).
+
+ChannelColor
+  *Text.* Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
+   (only applies if *ShowInBrowser* is set).
+
+ConnectLines
+  *Boolean.* Indicate that the points will be connected with lines in the genome browser
+   (only applies if *ShowInBrowser* is set).
+   
+SummaryValues
+  *Block.* Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property
+  in the genome browser at any zoom level (only applies if *ShowInBrowser* is set). Possible tokens in this block:
+    BlockSizeMin
+      *Value (required).* Minimum summary block size (in bp)
+    BlockSizeMax
+      *Value (required).* Maximum summary block size (in bp)
+    ChannelColor
+      *Text.* Colour of the channel. Formatted as ``"rgb(r,g,b)"``.
+   
+  
   
 Index
   *Boolean.* If set, instructs Panoptes to create a database index for this property.
   For large datasets, this massively speeds up queries based on this property.
 
-    
 Search
   *Text.* Indicates that this field can be used for text search in the find data item wizard.
   Possible values: ``StartPattern``, ``Pattern``, ``Match``.
