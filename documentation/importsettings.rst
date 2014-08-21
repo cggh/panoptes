@@ -68,10 +68,11 @@ PropertyGroups
   Property groups can be used to combine sets of related properties into sections in the app.
 
 
+.. _Properties:
 Properties
   *List (required)*
   The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
-  Each item in this list can contain the following tokens:
+  See `Property settings`_ for an overview of the tokens that can be used for each individual item in this list.
 
 
 *The following set of tags is used to define the items in a datatable as positions on the genome.*
@@ -91,7 +92,8 @@ GenomeMaxViewportSizeX
 
 Property settings
 -----------------
-An overview of the possible tags than can be defined for an individual property in the **Properties** tag of the datatable settings.
+An overview of the possible tags than can be defined for an individual property in
+the **Properties** tag of the datatable settings (see _Properties).
 
 Id
   *Text (required).* Identifier of the property, corresponding to the column header in the [data] file
