@@ -137,6 +137,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
                 that.row_query.notifyQueryUpdated = function() {
                   model_params.set('row_query', that.row_query.get());
+                  model_params.set('page', 0);
                 };
                 var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
