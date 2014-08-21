@@ -6,7 +6,8 @@ General dataset settings
 ------------------------
 
 Name
-  *String (Required).* The visible name of the dataset, as it appears in the intro page.
+  *String (required).* The visible name of the dataset, as it appears in the intro page.
+  Bla
 
 NameBanner
   *String.* Visible name of the dataset, as it appears in the top banner of the app.
@@ -15,22 +16,22 @@ Description
   *String.* A description of the dataset that will appear on the start page.
 
 DataTables
-*List.* A list of the data table identifiers in the dataset.
-These names should correspond to directory names in the datatables source directory. 
-This can be included in the settings to provide an explicit ordering of the data tables.
-If this tag is not provided, a default ordering wil be used.
+  *List.* A list of the data table identifiers in the dataset.
+  These names should correspond to directory names in the datatables source directory. 
+  This can be included in the settings to provide an explicit ordering of the data tables.
+  If this tag is not provided, a default ordering wil be used.
 
 Datatable settings
 ------------------
 
-**NameSingle**  (*required*): 
-Display name referring to a single table item (single, use no starting capital).
+NameSingle
+  *String (required).* Display name referring to a single table item (single, use no starting capital).
 
-**NamePlural**  (*required*): 
-Display name referring to several table items (plural, no no starting capital).
+NamePlural
+  *String (required).* Display name referring to several table items (plural, no no starting capital).
 
-**Description**  (*required*): 
-A description of this dataset. This text will appear on the intro page, and on the table view page of this datatable.
+Description 
+  *String (required).* A description of this dataset. This text will appear on the intro page, and on the table view page of this datatable.
 
 **CacheWorkspaceData**: Yes/No. 
 If Set, a materialised table will be created for this data in each workspace.
