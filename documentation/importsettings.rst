@@ -61,6 +61,9 @@ QuickFindFields
   The specified list of properties will be used by some tools that allow the user to quickly find a (set of) item(s).
 
 
+Properties definition
+~~~~~~~~~~~~~~~~~~~~~
+
 PropertyGroups
   *List.*
   Each item in the list specifies a group of properties. 
@@ -77,35 +80,38 @@ Properties
     *String (required).* Identifier of the property, corresponding to the column header in the [data] file
 
   Name
-    *String (required).* Display name of the property
+    *String (required).* Display name of the property.
 
-**GroupId:**
-XXXX
+  DataType:
+    *String (required)*. Data type of the values in the property.
+    This can be ``Text``, ``Value``, ``Boolean``,  ``GeoLongitude``, ``GeoLattitude``, ``Date``.
 
-**Description**:
-Description of the property
+  GroupId
+    *String.* Id of the Property group this property belongs to.
 
-**DataType**:
-Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+  Description
+    *String.* Description of the property. This will appear in hover tool tips and in the popup box if a user clicks on a property info button.
 
-**ShowInTable**: Yes/No
-If set, this property will appear by default in data table grids in the application
+
+  ShowInTable
+    *Boolean*. If set, this property will appear by default in data table grids in the application.
 
 
 Genome-specific tags
 ~~~~~~~~~~~~~~~~~~~~
 The following set of tags is used to define the items in a datatable as positions on the genome.
-**IsPositionOnGenome**: Yes/No
-Tells Panoptes that this should be interpreted as genomic positions
 
-**Chromosome**: 
-Speficies the table column ID that contains the chromosome
+IsPositionOnGenome
+  *Boolean*. Tells Panoptes that this should be interpreted as genomic positions
 
-**Position**:
-Specifies the table column ID that contains the position on the chromosome
+Chromosome
+  *Property ID.* Speficies the table column ID that contains the chromosome
 
-**GenomeMaxViewportSizeX**: Number.
-Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
+Position
+  *Property ID.* Specifies the table column ID that contains the position on the chromosome
+
+GenomeMaxViewportSizeX
+  *Value.* Specifies the maximum genome browser viewport size (in bp) for which data in this table will be displayed as a tracks.
 
 
 2D Datatable settings
