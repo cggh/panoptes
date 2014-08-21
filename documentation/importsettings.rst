@@ -287,18 +287,18 @@ PieChartMap
 ...........
 Defines a view that shows a set of pie charts on a geographic map.
 This is achieved by combining information from two datatable:
-* A locations datatable. Each item in this datatable is a location and will display a pie chart
-* Current datatable (where the view is defined).
-  A set of properties of this table can be used to define pies on all pie charts.
-  There has to be a property for each pie and location combination,
-  and the value of that property contains the relative size of that specific pie.
+ - A locations datatable. Each item in this datatable is a location and will display a pie chart
+ - Current datatable (where the view is defined).
+A set of properties of this table can be used to define pies on all pie charts.
+There has to be a property for each pie and location combination,
+and the value of that property contains the relative size of that specific pie.
 
 Name
   *Text (required)*. Display name of this view.
 PieChartSize
   *Value (required).* Size of the largest pie chart
 MapCenter
-  *Block (required).* Specifies the start map center, and should contain the following tokens:
+  Block (required). Specifies the start map center, and should contain the following tokens:
    Longitude
      *Value (required).* Geographic longitude.
    Lattitude
