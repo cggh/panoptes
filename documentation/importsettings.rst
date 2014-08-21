@@ -113,10 +113,27 @@ Description
 
 ShowInTable
   *Boolean*. If set, this property will appear by default in data table grids in the application.
+  
+Index
+  *Boolean.* If set, instructs Panoptes to create a database index for this property.
+  For large datasets, this massively speeds up queries based on this property.
+
     
 Search
   *Text.* Indicates that this field can be used for text search in the find data item wizard.
   Possible values: ``StartPattern``, ``Pattern``, ``Match``.
+  
+Relation
+  *Block.* Defines a many-to-one foreign relation to a parent datatable.
+  The parent table should contain a property with the same name as the key property in the child table.
+  The block can contain the following tags:
+    TableId
+      *Datatable ID (required).* Datatable id of the relation parent table
+    ForwardName
+      *Text (required).* Display name of the relation from child to parent
+    ReverseName
+      *Text (required).* Display name of the relation from parent to child
+  
 
 
 2D Datatable settings
