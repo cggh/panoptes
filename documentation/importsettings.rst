@@ -134,6 +134,16 @@ GroupId
 Description
   *Text.* Description of the property. This will appear in hover tool tips and in the popup box if a user clicks on a property info button.
   
+IsCategorical
+  *Boolean.* Instructs Panoptes to treat the property as a categorical variable.
+  For example, a combo box with the possible states is automatically shown in queries for this property.
+  Categorical properties are automatically indexed.
+  
+CategoryColors
+  *Block.* Specifies display colours for the categorical states of this property.
+  Each token in the block links a possible value of the property to a color (for example: ``Accepted: rgb(0,192,0)``).
+  The special value ``_other_`` can be used to specify a color for all other property values that are not listed.
+  
 MaxColumnWidth
   *Value.* Specifies the maximum pixel width used for the column representing this property in a table.
   Longer text will be abbreviated with ellipsis.
@@ -170,11 +180,11 @@ ChannelName
   (only applies if *ShowInBrowser* is set).
 
 ChannelColor
-  *Text.* Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
+   *Text.* Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
    (only applies if *ShowInBrowser* is set).
 
 ConnectLines
-  *Boolean.* Indicate that the points will be connected with lines in the genome browser
+   *Boolean.* Indicate that the points will be connected with lines in the genome browser
    (only applies if *ShowInBrowser* is set).
    
 SummaryValues
