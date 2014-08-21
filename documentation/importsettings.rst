@@ -33,10 +33,6 @@ Description
   *Text (required).* A description of this dataset.
   This text will appear on the intro page, and on the table view page of this datatable.
 
-CacheWorkspaceData
-  *Boolean.* If Set, a materialised table will be created for this data in each workspace.
-  This is faster for large datasets than the standard option, based on a JOIN statement.
-
 Icon:
   *Text.* Specifies an icon that will be associated with the datatable.
   The name can be chosen from http://fortawesome.github.io/Font-Awesome/icons/.
@@ -49,6 +45,9 @@ PrimKey:
 SortDefault
   *Property ID (required)*. Specifies the property ID used as the default sort field.
 
+CacheWorkspaceData
+  *Boolean.* If Set, a materialised table will be created for this data in each workspace.
+  This is faster for large datasets than the standard option, based on a JOIN statement.
 
 MaxCountQueryRecords
   *Value.* Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots).
@@ -60,6 +59,11 @@ QuickFindFields
   *Comma-separated list of property ID's.*
   The specified list of properties will be used by some tools that allow the user to quickly find a (set of) item(s).
 
+DisableSubsets
+  *Boolean.* If this is set, there will be no subsets options for this dataset.
+
+DisablePlots
+  *Boolean.* If this is set, there will be no options to create plots for this dataset.
 
 PropertyGroups
   *List.*
@@ -94,19 +98,28 @@ ExternalLinks
     Name:
       *Text (required).* Display name for this external link.
 
-
 IsPositionOnGenome
-  *Boolean*. Tells Panoptes that this should be interpreted as genomic positions.
+  *Boolean.* Tells Panoptes that this datatabke should be interpreted as genomic positions.
+
+IsRegionOnGenome
+  *Boolean.* Instructs Panoptes that this datatable should be interpreted as genomic regions.
 
 Chromosome
-  *Property ID.* Speficies the table column ID that contains the chromosome (if *IsPositionOnGenome* is set).
+  *Property ID.* Speficies the table column ID that contains the chromosome 
+  (if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
 
 Position
   *Property ID.* Specifies the table column ID that contains the position on the chromosome (if *IsPositionOnGenome* is set).
 
+RegionStart
+  *Property ID.* Specifies the table column ID that contains the start position of the region (if *IsRegionOnGenome*  is set).
+
+RegionStop
+  *Property ID.* Specifies the table column ID that contains the end position of the region (if *IsRegionOnGenome*  is set).
+
 GenomeMaxViewportSizeX
   *Value.* Specifies the maximum genome browser viewport size (in bp)
-  for which data in this table will be displayed as a tracks  (if *IsPositionOnGenome* is set).
+  for which data in this table will be displayed as a tracks  (if *IsPositionOnGenome* or *IsRegionOnGenome*  is set).
 
 TableBasedSummaryValues
   *Block. *
@@ -139,19 +152,19 @@ the **Properties** tag of the datatable settings (see Properties_).
 Id
   *Text (required).* Identifier of the property, corresponding to the column header in the [data] file
 
-Name
-  *Text (required).* Display name of the property.
-
 DataType:
   *Text (required)*. Data type of the values in the property.
   This can be ``Text``, ``Value``, ``HighPrecisionValue``, ``Boolean``,  ``GeoLongitude``, ``GeoLattitude``, ``Date``.
 
-GroupId
-  *Text.* Id of the Property group this property belongs to.
+Name
+  *Text (required).* Display name of the property.
 
 Description
   *Text.* Description of the property. This will appear in hover tool tips and in the popup box if a user clicks on a property info button.
-  
+
+GroupId
+  *Text.* Id of the Property group this property belongs to.
+
 IsCategorical
   *Boolean.* Instructs Panoptes to treat the property as a categorical variable.
   For example, a combo box with the possible states is automatically shown in queries for this property.
@@ -177,6 +190,31 @@ MaxVal
 
 DecimDigits
   *Value.* For Value types, specifies the number of decmimal digits that should be used to display the value
+
+Index
+  *Boolean.* If set, instructs Panoptes to create a database index for this property.
+  For large datasets, this massively speeds up queries based on this property.
+
+Search
+  *Text.* Indicates that this field can be used for text search in the find data item wizard.
+  Possible values: ``StartPattern``, ``Pattern``, ``Match``.
+  
+Relation
+  *Block.* Defines a many-to-one foreign relation to a parent datatable.
+  The parent table should contain a property with the same name as the key property in the child table.
+  The block can contain the following tags:
+    TableId
+      *Datatable ID (required).* Datatable id of the relation parent table
+    ForwardName
+      *Text (required).* Display name of the relation from child to parent
+    ReverseName
+      *Text (required).* Display name of the relation from parent to child
+      
+ReadData
+  *Boolean.* If set to false, this property will not be imported from the TAB-delimited source file. (*NOTE: under construction*).
+
+CanUpdate: true
+  *Boolean.* If set to true, this property can be modified by the user. (*NOTE: under construction*).
 
 ShowInTable
   *Boolean*. If set, this property will appear by default in data table grids in the application.
@@ -215,32 +253,6 @@ SummaryValues
     ChannelColor
       *Text.* Colour of the channel. Formatted as ``"rgb(r,g,b)"``.
    
-  
-  
-Index
-  *Boolean.* If set, instructs Panoptes to create a database index for this property.
-  For large datasets, this massively speeds up queries based on this property.
-
-Search
-  *Text.* Indicates that this field can be used for text search in the find data item wizard.
-  Possible values: ``StartPattern``, ``Pattern``, ``Match``.
-  
-Relation
-  *Block.* Defines a many-to-one foreign relation to a parent datatable.
-  The parent table should contain a property with the same name as the key property in the child table.
-  The block can contain the following tags:
-    TableId
-      *Datatable ID (required).* Datatable id of the relation parent table
-    ForwardName
-      *Text (required).* Display name of the relation from child to parent
-    ReverseName
-      *Text (required).* Display name of the relation from parent to child
-      
-ReadData
-  *Boolean.* If set to false, this property will not be imported from the TAB-delimited source file. (*NOTE: under construction*).
-
-CanUpdate: true
-  *Boolean.* If set to true, this property can be modified by the user. (*NOTE: under construction*).
       
       
       
