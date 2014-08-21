@@ -76,6 +76,16 @@ Properties
   The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
   See `Property settings`_ for an overview of the tokens that can be used for each individual item in this list.
 
+ExternalLinks
+  *List.* Each item in the list specifies a link for a data item to an external url.
+  These links will show up as buttons in the data item popup window.
+  An item in this list should contain the following tokens:
+    Url
+      *Text (required).*: Url for this link. This may include property ID's between curly braces.
+      Example: ``http://maps.google.com/maps?q={Lattitude},{Longitude}``.
+    Name:
+      *Text (required).* Display name for this external link.
+
 
 IsPositionOnGenome
   *Boolean*. Tells Panoptes that this should be interpreted as genomic positions.
