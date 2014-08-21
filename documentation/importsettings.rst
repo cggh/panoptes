@@ -62,22 +62,22 @@ QuickFindFields
 
 
 PropertyGroups
-  *List. *
+  *List.*
   Each item in the list specifies a group of properties. 
   It should contain two tags: "Id" representing a unique identifier for the group, and "Name" representing a display name.
   Property groups can be used to combine sets of related properties into sections in the app.
 
 
 Properties
-~~~~~~~~~~
-The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
-Each item in this list can contain the following tokens:
+  *List (required)*
+  The datatable yaml should contain a token "Properties", which contains a list of descriptions for all table columns used in the app. 
+  Each item in this list can contain the following tokens:
 
-**Id**:
-Identifier of the property, corresponding to the column header in the [data] file
+  Id
+    *String (required).* Identifier of the property, corresponding to the column header in the [data] file
 
-**Name**:
-Display name of the property
+  Name
+    *String (required).* Display name of the property
 
 **GroupId:**
 XXXX
