@@ -1,5 +1,7 @@
 .. _YAML: http://www.yaml.org/about.html
 
+.. _def-settings-customdata:
+
 Custom data settings
 --------------------
 This YAML_ file contains settings for :ref:`def-source-customdata`, and may contain the following tokens:

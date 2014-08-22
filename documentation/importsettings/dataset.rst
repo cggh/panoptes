@@ -1,6 +1,8 @@
 .. _YAML: http://www.yaml.org/about.html
 
 
+.. _def-settings-dataset:
+
 General dataset settings
 ------------------------
 This YAML_ file contains settings for a :ref:`def-source-dataset`, and may contain the following tokens:

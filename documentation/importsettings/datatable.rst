@@ -1,5 +1,7 @@
 .. _YAML: http://www.yaml.org/about.html
 
+.. _def-settings-datatable:
+
 Datatable settings
 ------------------
 

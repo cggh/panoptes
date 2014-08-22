@@ -99,7 +99,8 @@ Dataset
 ~~~~~~~~
 The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
 
-In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset. In the *dataset* folder, a yaml ``settings`` file should be present, specifying the displayed name of the dataset, and an optional description.
+In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset.
+In the *dataset* folder, a yaml ``settings`` file should be present, specifying the displayed name of the dataset, and an optional description (see :ref:`def-settings-dataset`).
 
 
 .. _def-source-referencegenome:
@@ -111,7 +112,7 @@ A *dataset* source data folder may optionally contain a subfolder ``refgenome``,
 - ``chromosomes`` (required). A list of all chromosomes identifiers, and their lengths (in MB).
 - ``annotation.gff`` (required). The annotation of the reference genome, in GFF format.
 - ``refsequence.fa`` (optional). The reference genome sequence, as FASTA file.
-- ``settings`` (required, yaml formatted). Various settings concerning the reference genome.
+- ``settings`` (required, yaml formatted). Various settings concerning the reference genome (see :ref:`def-settings-refgenome`).
 
 Summary values
 ~~~~~~~~~~~~~~
@@ -134,7 +135,8 @@ In the *dataset* folder, a subfolder ``datatables`` should be present. This is t
 
 In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers for all *properties*.
 
-In addition, a yaml ``settings`` file should be present in the *datatable* folder. This file can contain a number of settings, both at the level of the *data table*, as at the level of individual *properties*.
+In addition, a yaml ``settings`` file should be present in the *datatable* folder.
+This file can contain a number of settings, both at the level of the *data table*, as at the level of individual *properties* (see :ref:`def-settings-datatable`).
 
 
 .. _def-source-workspace:
@@ -143,7 +145,7 @@ Workspace
 ~~~~~~~~~~
 In the *dataset* folder, a subfolder ``workspaces`` should be present. This is the root for a set of subfolders, each one describing a *workspace* for this *dataset*. The folder name serves as identifier for the *workspace*.
 
-In a *workspace* folder, a yaml structured ``settings`` file should be present, specifying the displayed name of the workspace.
+In a *workspace* folder, a yaml structured ``settings`` file should be present, specifying the displayed name of the workspace (see :ref:`def-settings-workspace`).
 
 In addition, a subfolder ``customdata`` should be present. This location is used to specify *Custom data*, which has the following basic properties:
 
@@ -159,4 +161,4 @@ Custom data
 The ``customdata`` folder in a workspace should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
 
 - ``data``. TAB-delimited file containing the custom property values.
-- ``settings``. (yaml formatted). Specifies how the custom data should be interpreted.
+- ``settings``. (yaml formatted). Specifies how the custom data should be interpreted (see :ref:`def-settings-customdata`).

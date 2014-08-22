@@ -232,11 +232,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Documentation', width:140, height:35 }).setOnChanged(function() {
                 var urlMapper = {
-                    dataset: 'importsettings/dataset',
-                    datatable: 'importsettings/datatable',
-                    '2D_datatable': 'importsettings/twoddatatable',
-                    workspace: 'importsettings/workspace',
-                    customdata: 'importsettings/customdata'
+                    dataset: 'importsettings/dataset.html',
+                    datatable: 'importsettings/datatable.html',
+                    '2D_datatable': 'importsettings/twoddatatable.html',
+                    workspace: 'importsettings/workspace.html',
+                    customdata: 'importsettings/customdata.html'
                 }
                 var url = MetaData.urlDocumentation + urlMapper[sourceInfo.tpe];
                 window.open(url,'_blank');
