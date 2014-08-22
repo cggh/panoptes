@@ -93,6 +93,8 @@ The formatting of the source data relies a few concepts:
 .. Note:: 
   This documentation does not describe all the directives that can be specified in the yaml settings files. The sample dataset **Samples_and_Variants** contains settings files that are fully commented, and can serve as a starting point to explore the possibe options. Additional comments are provided in other datasets as well, wherever concepts are introduced that are not present in this dataset.
 
+.. _def-source-datasets:
+
 Datasets
 ~~~~~~~~
 The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
