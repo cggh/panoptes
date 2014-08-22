@@ -1,10 +1,11 @@
+.. _YAML: http://www.yaml.org/about.html
 
 Data import settings
 ====================
 
 General dataset settings
 ------------------------
-See :ref:`def-source-datasets`.
+See also :ref:`def-source-datasets`. This YAML_ file can contain the following tokens:
 
 Name
   *Text (required).* The visible name of the dataset, as it appears in the intro page.
@@ -23,6 +24,7 @@ DataTables
 
 Datatable settings
 ------------------
+See also :ref:`def-source-datatable`. This YAML_ file can contain the following tokens:
 
 NameSingle
   *Text (required).* Display name referring to a single table item (single, use no starting capital).
@@ -368,14 +370,17 @@ ResidualFractionName
 ---------------------
 @@TODO.
 
+
 Workspace settings
 ------------------
+See also :ref:`def-source-workspace`. This YAML_ file can contain the following tokens:
 
 Name
   *Text (required).* Display name of the workspace.
 
 Reference genome settings
 -------------------------
+See also :ref:`def-source-referencegenome`. This YAML_ file can contain the following tokens:
 
 GenomeBrowserDescr
   *Text.* Descriptive text that will be displayed in the genome browser section of the main page.
@@ -399,7 +404,7 @@ Annotation
     Example: ``[gene, pseudogene]``.
 
   ExonFeature
-    *Text or List.* Feature id(s) used to identify axons.
+    *Text or List.* Feature id(s) used to identify exons.
 
   GeneNameAttribute:
     *Text.* Attribute id used to identify gene names
@@ -426,6 +431,7 @@ ExternalGeneLinks:
 
 Custom data settings
 --------------------
+See also :ref:`def-source-customdata`. This YAML_ file can contain the following tokens:
 
 AutoScanProperties
   *Boolean.* If set, Panoptes will try to automatically obtain property definitions from the TAB-delimited source data file.

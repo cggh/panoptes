@@ -101,6 +101,9 @@ The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, servin
 
 In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset. In the *dataset* folder, a yaml ``settings`` file should be present, specifying the displayed name of the dataset, and an optional description.
 
+
+.. _def-source-referencegenome:
+
 Reference genome
 ~~~~~~~~~~~~~~~~
 A *dataset* source data folder may optionally contain a subfolder ``refgenome``, describing the reference genome used. It can contain the following files:
@@ -122,6 +125,9 @@ The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Ea
 
 - ``settings`` (yaml formatted). Contains the displayed name of the summary value, and further guidelines on how to process the information.
 
+
+.. _def-source-datatable:
+
 Data tables
 ~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``datatables`` should be present. This is the root for a set of folders, each one describing an individual *data table*, with the name of the folder serves as an identifier.
@@ -129,6 +135,9 @@ In the *dataset* folder, a subfolder ``datatables`` should be present. This is t
 In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers for all *properties*.
 
 In addition, a yaml ``settings`` file should be present in the *datatable* folder. This file can contain a number of settings, both at the level of the *data table*, as at the level of individual *properties*.
+
+
+.. _def-source-workspace:
 
 Workspaces
 ~~~~~~~~~~
@@ -141,6 +150,8 @@ In addition, a subfolder ``customdata`` should be present. This location is used
 - It only exists in the context of a specific *workspace*.
 - It adds extra properties to a *data table* that already exists in the *dataset*. 
 - The primary key of the *data table* (as defined in the settings) is used to link the custom properties to the original table.
+
+.. _def-source-customdata:
 
 The ``customdata`` folder should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
 
