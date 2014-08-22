@@ -33,7 +33,7 @@ Contents
    introduction
    deployment
    datasets
-   importsettings
+   importsettings/_intro
    roadmap
 
 License

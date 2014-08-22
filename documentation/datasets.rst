@@ -93,9 +93,9 @@ The formatting of the source data relies a few concepts:
 .. Note:: 
   This documentation does not describe all the directives that can be specified in the yaml settings files. The sample dataset **Samples_and_Variants** contains settings files that are fully commented, and can serve as a starting point to explore the possibe options. Additional comments are provided in other datasets as well, wherever concepts are introduced that are not present in this dataset.
 
-.. _def-source-datasets:
+.. _def-source-dataset:
 
-Datasets
+Dataset
 ~~~~~~~~
 The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
 
@@ -128,7 +128,7 @@ The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Ea
 
 .. _def-source-datatable:
 
-Data tables
+Data table
 ~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``datatables`` should be present. This is the root for a set of folders, each one describing an individual *data table*, with the name of the folder serves as an identifier.
 
@@ -139,7 +139,7 @@ In addition, a yaml ``settings`` file should be present in the *datatable* folde
 
 .. _def-source-workspace:
 
-Workspaces
+Workspace
 ~~~~~~~~~~
 In the *dataset* folder, a subfolder ``workspaces`` should be present. This is the root for a set of subfolders, each one describing a *workspace* for this *dataset*. The folder name serves as identifier for the *workspace*.
 
@@ -153,7 +153,10 @@ In addition, a subfolder ``customdata`` should be present. This location is used
 
 .. _def-source-customdata:
 
-The ``customdata`` folder should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
+Custom data
+~~~~~~~~~~~
+
+The ``customdata`` folder in a workspace should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
 
 - ``data``. TAB-delimited file containing the custom property values.
 - ``settings``. (yaml formatted). Specifies how the custom data should be interpreted.

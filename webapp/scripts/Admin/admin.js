@@ -137,7 +137,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.loadData = function(sourceFileInfo) {
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Import</b>', width:155, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-cog', content: '<b>Import</b>', width:155, height:28 }).setOnChanged(function() {
                             var scopeStr = ctrlLoadScope.getValue();
                             if (!scopeStr) {
                                 alert('Please select a data load option.');
@@ -149,7 +149,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                         content += bt.renderHtml() + '<p>';
 
                         var ctrlLoadScope = Controls.RadioGroup(null,{label:'Load data:', value: '', states: [
-                            {id:'all', name:'All'},
+                            {id:'all', name:'Full import'},
                             {id:'none', name:'Update configuration only'},
                             {id:'1k', name:'Top 1K preview'},
                             {id:'10k', name:'Top 10K preview'},

@@ -208,7 +208,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Settings tokens overview', width:140, height:35 }).setOnChanged(function() {
+            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Documentation', width:140, height:35 }).setOnChanged(function() {
                 var url = MetaData.urlDocumentation + 'importsettings.html#reference-genome-settings';
                 window.open(url,'_blank');
             });

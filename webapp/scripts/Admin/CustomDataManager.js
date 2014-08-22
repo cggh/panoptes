@@ -230,13 +230,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             });
 
-            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Settings tokens overview', width:140, height:35 }).setOnChanged(function() {
+            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Documentation', width:140, height:35 }).setOnChanged(function() {
                 var urlMapper = {
-                    datatable: 'importsettings.html#datatable-settings',
-                    '2D_datatable': 'importsettings.html#d-datatable-settings',
-                    dataset: 'importsettings.html#general-dataset-settings',
-                    workspace: 'importsettings.html#workspace-settings',
-                    customdata: 'importsettings.html#custom-data-settings'
+                    dataset: 'importsettings/dataset',
+                    datatable: 'importsettings/datatable',
+                    '2D_datatable': 'importsettings/twoddatatable',
+                    workspace: 'importsettings/workspace',
+                    customdata: 'importsettings/customdata'
                 }
                 var url = MetaData.urlDocumentation + urlMapper[sourceInfo.tpe];
                 window.open(url,'_blank');
@@ -250,7 +250,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         CustomDataManager.delData = function(sourceInfo) {
             var content = CustomDataManager.getSourceFileDescription(sourceInfo);
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b><span style="color:red">Delete</span></b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-trash-o', content: '<b><span style="color:red">Delete</span></b>', width:140, height:35 }).setOnChanged(function() {
                 DQX.setProcessing();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_del',{
                     sourcetype: sourceInfo.tpe,
