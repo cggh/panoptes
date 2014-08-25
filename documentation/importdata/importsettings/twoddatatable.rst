@@ -3,5 +3,5 @@
 .. _def-settings-twoddatatable:
 
 2D Datatable settings
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 @@TODO.

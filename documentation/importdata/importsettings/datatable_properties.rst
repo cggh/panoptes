@@ -2,7 +2,7 @@
 .. _def-settings-datatable-properties:
 
 Datatable property settings
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 An overview of the possible keys than can be defined for an individual property in
 the *Properties* block of the data table settings.
 

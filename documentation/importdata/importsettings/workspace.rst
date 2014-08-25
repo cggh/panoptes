@@ -4,7 +4,7 @@
 .. _def-settings-workspace:
 
 Workspace settings
-------------------
+~~~~~~~~~~~~~~~~~~
 This YAML_ file contains settings for a :ref:`def-source-workspace`, and may contain the following keys:
 
 Name

@@ -3,7 +3,7 @@
 .. _def-settings-refgenome:
 
 Reference genome settings
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 This YAML_ file contains settings for the :ref:`def-source-referencegenome`, and may contain the following keys:
 
 GenomeBrowserDescr

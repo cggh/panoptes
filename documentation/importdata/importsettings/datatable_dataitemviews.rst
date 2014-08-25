@@ -2,25 +2,25 @@
 .. _def-settings-datatable-dataitemviews:
 
 DataItemViews settings
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 The key *Type* for member of the data table settings key *DataItemViews* can have the following values:
 
 Overview
-........
+::::::::
 Specifies the default data item view of Panoptes, including all fields. Other keys in this block:
 
 Name
   *Text (required)*. Display name of this view.
 
 PropertyGroup
-.............
+:::::::::::::
 Displays all properties that are member of a specific property group.
 
 GroupId
   *Text (required).* Identifier of the property group to display.
 
 FieldList
-.........
+:::::::::
 Displays a selection of properties for the data item.
 
 Name
@@ -33,7 +33,7 @@ Fields
   *List (required).* Each item in this list specifies a property ID.
 
 ItemMap
-.......
+:::::::
 Displays the data item as a pin on a geographical map.
 Requires the presence of properties with data type ``GeoLongitude`` and ``GeoLattitude``.
 
@@ -43,7 +43,7 @@ MapZoom:
   *Value (required)*. Start zoom factor of the map (integer, minimum value of 0).
 
 PieChartMap
-...........
+:::::::::::
 Defines a view that shows a set of pie charts on a geographic map
 (see `example <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/settings>`_).
 This is achieved by combining information from two data tables:

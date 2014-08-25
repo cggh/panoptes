@@ -3,7 +3,7 @@
 .. _def-settings-datatable:
 
 Data table settings
-------------------
+~~~~~~~~~~~~~~~~~~~
 
 This YAML_ file contains settings for a :ref:`def-source-datatable`, and may contain the following keys:
 

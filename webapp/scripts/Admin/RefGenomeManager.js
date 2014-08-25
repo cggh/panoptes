@@ -25,7 +25,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 RefGenomeManager.uploadRefGenome(datasetid);
             });
             content += bt.renderHtml() + '<br>';
-            var popupid = Popup.create('Import file source data', content);
+            var popupid = Popup.create('Upload data', content);
         };
 
         RefGenomeManager.uploadAnnotation = function(datasetid) {

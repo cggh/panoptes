@@ -35,8 +35,8 @@ require.config({
 });
 
 
-require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Admin/CustomDataManager", "Admin/RefGenomeManager" ],
-    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData, CustomDataManager, RefGenomeManager) {
+require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQX/FrameTree", "DQX/Controls", "DQX/Msg", "DQX/Utils", "DQX/Popup", "DQX/ServerIO", "DQX/SQL", "DQX/DataFetcher/DataFetchers", "MetaData", "Admin/CustomDataManager", "Admin/RefGenomeManager", "Utils/MiscUtils" ],
+    function (_, $, Application, Framework, FrameList, FrameTree, Controls, Msg, DQX, Popup, ServerIO, SQL, DataFetchers, MetaData, CustomDataManager, RefGenomeManager, MiscUtils) {
         $(function () {
 
 
@@ -137,7 +137,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     that.loadData = function(sourceFileInfo) {
                         var content = '<p>' + CustomDataManager.getSourceFileDescription(sourceFileInfo);
                         content += '<p><i>Import the data in this file source<br>to the web server</i></p>';
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-cog', content: '<b>Import</b>', width:155, height:28 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-cog', content: '<b>Import</b>', width:120, height:35 }).setOnChanged(function() {
                             var scopeStr = ctrlLoadScope.getValue();
                             if (!scopeStr) {
                                 alert('Please select a data load option.');
@@ -146,7 +146,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             Popup.closeIfNeeded(popupid);
                             that.execLoadData(sourceFileInfo, scopeStr);
                         });
-                        content += bt.renderHtml() + '<p>';
+                        content += bt.renderHtml() + '&nbsp;';
+
+                        content += MiscUtils.createDocButton('importdata/importdialog').renderHtml();
+
+                        content += '<p>';
 
                         var ctrlLoadScope = Controls.RadioGroup(null,{label:'Load data:', value: '', states: [
                             {id:'all', name:'Full import'},
@@ -158,6 +162,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             {id:'10M', name:'Top 10M preview'}
                         ]});
                         content += ctrlLoadScope.renderHtml();
+
 
                         var popupid = Popup.create('Import file source data', content);
                     }
