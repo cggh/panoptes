@@ -209,7 +209,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
 
-            var bt_help = MiscUtils.createDocButton('importsettings/refgenome');
+            var bt_help = MiscUtils.createDocButton('importdata/importsettings/refgenome');
 
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' + bt_help.renderHtml() + '<p>' ;

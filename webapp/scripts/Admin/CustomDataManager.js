@@ -231,13 +231,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
             var docUrlMapper = {
-                dataset: 'importsettings/dataset',
-                datatable: 'importsettings/datatable',
-                '2D_datatable': 'importsettings/twoddatatable',
-                workspace: 'importsettings/workspace',
-                customdata: 'importsettings/customdata'
+                dataset: '/dataset',
+                datatable: 'datatable',
+                '2D_datatable': 'twoddatatable',
+                workspace: 'workspace',
+                customdata: 'customdata'
             }
-            var bt_help = MiscUtils.createDocButton(docUrlMapper[sourceInfo.tpe]);
+            var bt_help = MiscUtils.createDocButton('importdata/importsettings/' + docUrlMapper[sourceInfo.tpe]);
 
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' + bt_help.renderHtml() + '<p>' ;
