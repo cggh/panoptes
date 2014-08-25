@@ -13,6 +13,7 @@ A dataset can consist of:
 - A *reference genome*, including annotation.
 - A set of *summary values*, defined on the reference genome.
 - *Genotype data*.
+- Various settings that define the structure of these components, and the interactions between them.
 
 Workspace
 .........

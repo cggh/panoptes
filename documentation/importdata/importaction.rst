@@ -2,10 +2,7 @@
 
 Importing datasets
 ------------------
-Panoptes imports datasets into the server database from source data, consisting in a set of simple, structured files.
-These source data files are located in ``SOURCEDATADIR/datasets`` (as specified in ``config.py``).
 Importing a dataset source does not happen automatically, and has to be initiated by the user.
-
 After installation, a number of sample dataset sources are copied into the source data folder, and are ready to be imported.
 
 - Start the Panoptes app in a browser.
