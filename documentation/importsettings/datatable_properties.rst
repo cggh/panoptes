@@ -3,21 +3,29 @@
 
 Datatable property settings
 ~~~~~~~~~~~~~~~~~
-An overview of the possible tags than can be defined for an individual property in
-the **Properties** tag of the datatable settings.
+An overview of the possible keys than can be defined for an individual property in
+the *Properties* block of the data table settings.
 
 Id
-  *Text (required).* Identifier of the property, corresponding to the column header in the [data] file
+  *Text (required).* Identifier of the property, equal to the corresponding column header in the TAB-delimited source file ``data``.
 
 DataType:
   *Text (required)*. Data type of the values in the property.
-  This can be ``Text``, ``Value``, ``HighPrecisionValue``, ``Boolean``,  ``GeoLongitude``, ``GeoLattitude``, ``Date``.
+  Possible values:
+   - ``Text``: text strings.
+   - ``Value``: numerical values (integer of decimal; the distincion is made by the key *DecimDigits*). Absent values are coded by an empty cell.
+   - ``HighPrecisionValue``: same as ``Value``, with higher precision.
+   - ``Boolean``: Yes/No binary states.
+   - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
+   - ``GeoLattitude``: latitude part of a geographical coordinates (in decimal degrees).
+   - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
 
 Name
   *Text (required).* Display name of the property.
 
 Description
-  *Text.* Description of the property. This will appear in hover tool tips and in the popup box if a user clicks on a property info button.
+  *Text.* Brief description of the property.
+  This will appear in hover tool tips and in the popup box if a user clicks a property info button.
 
 GroupId
   *Text.* Id of the Property group this property belongs to.
@@ -29,44 +37,48 @@ IsCategorical
 
 CategoryColors
   *Block.* Specifies display colours for the categorical states of this property.
-  Each token in the block links a possible value of the property to a color (for example: ``Accepted: rgb(0,192,0)``).
-  The special value ``_other_`` can be used to specify a color for all other property values that are not listed.
+  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).
+  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
 
 MaxColumnWidth
-  *Value.* Specifies the maximum pixel width used for the column representing this property in a table.
+  *Value.* Specifies the maximum width (in pixels) used for the column representing this property in a table view.
   Longer text will be abbreviated with ellipsis.
 
 BarWidth
-  *Value*. Draws a bar in the background of the table, indicating the value. This requires *MinVal* & *MaxVal* to be defined.
+  *Value*. Draws a bar in the background of the table, indicating the value.
+  Only applicable to *Value* data types, and requires *MinVal* & *MaxVal* to be defined.
 
 MinVal
-  *Value.* For Value types, specifies the minimum value that can be reached.
+  *Value.* For *Value* types, specifies the minimum value that can be reached.
 
 MaxVal
-  *Value.* For Value types, specifies the maximum value that can be reached.
+  *Value.* For *Value* types, specifies the maximum value that can be reached.
 
 DecimDigits
-  *Value.* For Value types, specifies the number of decmimal digits that should be used to display the value
+  *Value.* For *Value* types, specifies the number of decimal digits used to display the value.
 
 Index
-  *Boolean.* If set, instructs Panoptes to create a database index for this property.
-  For large datasets, this massively speeds up queries based on this property.
+  *Boolean.* If set, instructs Panoptes to create an index for this property in the relational database.
+  For large datasets, this massively speeds up queries and sort commands based on this property.
 
 Search
   *Text.* Indicates that this field can be used for text search in the find data item wizard.
-  Possible values: ``StartPattern``, ``Pattern``, ``Match``.
+  Possible values:
+    - ``Match``: only exact matched are searched for.
+    - ``StartPattern``: searches all text that starts with the string typed by the user.
+    - ``Pattern``: searches all text that contains the string typed by the user.
 
 Relation
-  *Block.* Defines a many-to-one foreign relation to a parent datatable.
-  The parent table should contain a property with the same name as the key property in the child table.
-  The block can contain the following tags:
+  *Block.* Defines a many-to-one foreign relation to a parent data table.
+  The parent table should contain a property with the same name as the primary key property in the child table.
+  The block can contain the following keys:
 
     TableId
-      *Datatable ID (required).* Datatable id of the relation parent table
+      *Datatable ID (required).* Data table ID of the relation parent table.
     ForwardName
-      *Text (required).* Display name of the relation from child to parent
+      *Text (required).* Display name of the relation from child to parent.
     ReverseName
-      *Text (required).* Display name of the relation from parent to child
+      *Text (required).* Display name of the relation from parent to child.
 
 ReadData
   *Boolean.* If set to false, this property will not be imported from the TAB-delimited source file. (*NOTE: under construction*).
@@ -82,15 +94,15 @@ ShowInBrowser
   (only applies if *IsPositionOnGenome* is specified in database settings).
 
 BrowserDefaultVisible
-  *Boolean.* Indicates that the channel will activated by default in the genome browser (only applies if *ShowInBrowser* is set).
+  *Boolean.* Indicates that the track will activated by default in the genome browser (only applies if *ShowInBrowser* is set).
 
 BrowserShowOnTop
-  *Boolean.* Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser.
+  *Boolean.* Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.
   In this case, it will always be visible (only applies if *ShowInBrowser* is set).
 
 ChannelName
-  *Text.* Name of the genome browser channel this property will be displayed in.
-  Properties sharing the same channel name will be displayed in overlay
+  *Text.* Name of the genome browser track this property will be displayed in.
+  Properties sharing the same track name will be displayed in overlay
   (only applies if *ShowInBrowser* is set).
 
 ChannelColor
@@ -103,7 +115,7 @@ ConnectLines
 
 SummaryValues
   *Block.* Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property
-  in the genome browser at any zoom level (only applies if *ShowInBrowser* is set). Possible tokens in this block:
+  in the genome browser at any zoom level (only applies if *ShowInBrowser* is set). Possible keys in this block:
 
     BlockSizeMin
       *Value (required).* Minimum summary block size (in bp)

@@ -3,11 +3,11 @@
 
 DataItemViews settings
 ~~~~~~~~~~~~~~~~~~~~~~
-The token *Type* for member of the datatable token *DataItemViews* can have the following values:
+The key *Type* for member of the data table settings key *DataItemViews* can have the following values:
 
 Overview
 ........
-Specifies the default data item view of Panoptes, including all fields. Possible tokens:
+Specifies the default data item view of Panoptes, including all fields. Other keys in this block:
 
 Name
   *Text (required)*. Display name of this view.
@@ -25,14 +25,16 @@ Displays a selection of properties for the data item.
 
 Name
   *Text (required).* Display name of this view.
+
 Introduction
   *Text.* A static text that will be displayed on top of this view.
+
 Fields
-  *List (required).* Each item in this list should be a property ID.
+  *List (required).* Each item in this list specifies a property ID.
 
 ItemMap
 .......
-Displays the item as a pin on a geographical map.
+Displays the data item as a pin on a geographical map.
 Requires the presence of properties with data type ``GeoLongitude`` and ``GeoLattitude``.
 
 Name
@@ -42,24 +44,26 @@ MapZoom:
 
 PieChartMap
 ...........
-Defines a view that shows a set of pie charts on a geographic map.
-This is achieved by combining information from two datatables:
+Defines a view that shows a set of pie charts on a geographic map
+(see `example <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/settings>`_).
+This is achieved by combining information from two data tables:
+ - A locations data table. Each item in this data table defines a location where a pie chart is displayed.
+ - The current data table (where the view is defined), which contains the sizes of the pies for each data item as column values.
 
- - A locations datatable. Each item in this datatable defines a location and will display a pie chart.
- - The current datatable (where the view is defined).
+A set of properties of the current table is used to define pie sizes on all pie charts.
+For each pie and location combination there should be a property in the data table,
+containing the relative size of that specific pie.
 
-A set of properties of the current table is used to define pies on all pie charts.
-There has to be a property for each pie and location combination,
-and the value of that property contains the relative size of that specific pie.
+Key used to define this view:
 
 Name
-  *Text (required)*. Display name of this view.
+  *Text (required)*. Display name of the view.
 
 PieChartSize
-  *Value (required).* Size of the largest pie chart
+  *Value (required).* Displayed size of the largest pie chart.
 
 MapCenter
-  *Block (required).* Specifies the start map center, and should contain the following tokens:
+  *Block (required).* Specifies the map center in the start view, and should contain the following keys:
 
    Longitude
      *Value (required).* Geographic longitude.
@@ -74,27 +78,30 @@ DataType
 
 PositionOffsetFraction
   *Value (required).* An offset between the pie chart location and the actual chart,
-  used to achieve a nice (nonoverlapping) view.
+  used to achieve a nice (ideally non-overlapping) view.
 
 LocationDataTable
-  *Text (required).* ID of the datatable containing the locations (should have properties width ``GeoLongitude`` and ``GeoLattitude`` data types).
+  *Text (required).* ID of the data table containing the locations
+  (this table should have properties width ``GeoLongitude`` and ``GeoLattitude`` data types).
 
 LocationSizeProperty
-  *Text (required).* Property ID of the locations datatable containing the size of the pie chart.
+  *Text (required).* Property ID of the locations data table containing the size of the pie chart.
 
 LocationNameProperty
-  *Text (required).* Property of the locations datatable containing the name of the pie chart.
+  *Text (required).* Property ID of the locations data table containing the name of the pie chart.
 
 ComponentColumns
-  *List (required).* Enumerates all the pies of the pie charts, and binds them to properties of this datatable (one for each component x location).
-  Each list item should have the following tokens:
+  *List (required).* Enumerates all the pies displayed on the pie charts, and binds them to properties of this data table
+  (one for each combination of component x location).
+  Each list item should have the following keys:
 
     Pattern:
-      *Text (required).* Column name providing the data. NOTE: {locid} will be replaced by the location primary key value.
+      *Text (required).* Property ID of the column providing the data.
+      NOTE: the token {locid} will be replaced by the primary key value of the records in the locations data table.
     Name:
-      *Text (required).* Name of the pie
+      *Text (required).* Display name of the pie.
     Color:
       *Text (required).* Color of the pie. Format: ``rgb(r,g,b)``.
 
 ResidualFractionName
-  *Text*. Name of the residual fraction (if any).
+  *Text*. Name of the pie representing residual fraction (only applicable if the fractions do not sum up to 1).

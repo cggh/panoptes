@@ -129,6 +129,7 @@ The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Ea
 
 .. _def-source-datatable:
 
+
 Data table
 ~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``datatables`` should be present. This is the root for a set of folders, each one describing an individual *data table*, with the name of the folder serves as an identifier.

@@ -5,19 +5,26 @@
 
 General dataset settings
 ------------------------
-This YAML_ file contains settings for a :ref:`def-source-dataset`, and may contain the following tokens:
+This YAML_ file contains settings for a :ref:`def-source-dataset`, and may contain the following keys:
 
 Name
-  *Text (required).* The visible name of the dataset, as it appears in the intro page.
+  *Text (required).* The visible name of the dataset, as it appears on the intro page.
 
 NameBanner
-  *Text.* Visible name of the dataset, as it appears in the top banner of the app.
+  *Text.* Visible name of the dataset, as it appears on the top banner of the app.
+  Note: this text may contain html markup.
 
 Description
-  *Text.* A description of the dataset that will appear on the start page.
+  *Text.* A description of the dataset that appears on the start page.
+  Note: this text may contain html markup.
+  A longer description can be split over several lines by writing a ``>`` sign on the key line,
+  and indent subsequent lines::
+     Description: >
+        This web application provides an interactive view
+        on the data ...
 
 DataTables
   *List.* A list of the data table identifiers in the dataset.
-  These names should correspond to directory names in the datatables source directory.
-  This can be included in the settings to provide an explicit ordering of the data tables.
-  If this tag is not provided, a default ordering wil be used.
+  These names should correspond to directory names in the *datatables* source directory (see :ref:`def-source-datatable`).
+  This can be included in the settings in order to provide an explicit ordering of the data tables in the app.
+  If this key is not provided, a default ordering wil be used.
