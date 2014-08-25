@@ -3,7 +3,7 @@
 .. _def-settings-datatable:
 
 Data table settings
-~~~~~~~~~~~~~~~~~~~
+------------------
 
 This YAML_ file contains settings for a :ref:`def-source-datatable`, and may contain the following keys:
 
@@ -123,12 +123,17 @@ GenomeMaxViewportSizeX
   for which individual data points from this table will be displayed in the tracks.
   (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome*  is set).
 
+BrowserDefaultVisible
+  *Boolean.* For genomic regions: specifies the default visibility status of this data table in the genome browser
+  (only to be used if *IsRegionOnGenome*  is set).
+  Note that, for genomic position, default visibility is specified on a per-property basis.
+
 
 TableBasedSummaryValues
   *Block.*
   Declares that numerical genome values for are available for each item in the table.
   Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser.
-  A typical use case is if the data table contains samples that were sequenced, and there is coverage data available for each sample.
+  A typical use case is if the data table contains samples that were sequenced, and there is coverage data availble
 
   There should be a subdirectory named after the identifier of this track in the data table source data folder.
   For each data item, this directory should contain a data file with the name equal to the primary key

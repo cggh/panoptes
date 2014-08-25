@@ -777,9 +777,6 @@ define([
 
                             dispSettingsControlsGroup = Controls.CompoundVert([]).setMargin(8);
 
-                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
-                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorChoice);
-                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorLegend);
 
                             controlsGroup.addControl(Controls.Section(dispSettingsControlsGroup, {
                                 title: 'Display settings',
@@ -812,6 +809,11 @@ define([
                             };
                             tableInfo.genomeBrowserInfo.regionChannel = regionChannel;
 
+                            var ctrl_onoff = regionChannel.createVisibilityControl(!tableInfo.settings.BrowserDefaultVisible, 'Display');
+                            dispSettingsControlsGroup.addControl(ctrl_onoff);
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserFieldChoice);
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorChoice);
+                            dispSettingsControlsGroup.addControl(tableInfo.genomeBrowserColorLegend);
 
                         }
 
