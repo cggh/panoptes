@@ -187,7 +187,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var content = '<p><i>Reference genome processing settings</i></p>';
             var edt = Controls.Textarea('', { size:65, linecount:20, value: settingsStr, fixedfont: true, noWrap: true });
             content += edt.renderHtml();
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Update reference genome settings</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-refresh', content: '<b>Update reference genome settings</b>', width:170, height:35 }).setOnChanged(function() {
                 settingsStr = edt.getValue();
 
                 var enc = Base64.encode(settingsStr);
@@ -208,10 +208,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Documentation', width:140, height:35 }).setOnChanged(function() {
-                var url = MetaData.urlDocumentation + 'importsettings.html#reference-genome-settings';
-                window.open(url,'_blank');
-            });
+
+            var bt_help = MiscUtils.createDocButton('importsettings/refgenome');
 
             content += '<p><div style="padding:3px;border:1px solid black;background-color:rgb(255,164,0)"><b>WARNING:<br>Changing these settings may cause the data source not to load correctly!</b></div></p>';
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' + bt_help.renderHtml() + '<p>' ;

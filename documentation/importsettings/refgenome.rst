@@ -20,7 +20,7 @@ Annotation
   Possible member keys:
 
   Format
-    *Text.* File format. Possible values:
+    *Text.* File format. Possible values
      - ``GFF`` = Version 3 GFF file
      - ``GTF`` = Version 2 GTF file
 
