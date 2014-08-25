@@ -18,7 +18,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 countInfo.modifyValue('Currently active: '+tableInfo.genomeTrackSelectionManager.getSelectedCount());
             }
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Pick '+tableInfo.name+'...' }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width:140, icon:'fa-crosshairs', content: 'Pick '+tableInfo.name+'...' }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 EditTableBasedSummaryValues.CreateDialogBox(tableid);
             });
@@ -28,7 +28,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var recordCount  = Application.getView('table_'+tableid).getRecordCount();
             if (recordCount!=null)
                 str += '<br>('+recordCount+' items)';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: str }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width:140, icon:'fa-filter', content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 DQX.executeProcessing(function() {
                     EditTableBasedSummaryValues.loadCurrentQuery(tableid);
@@ -36,11 +36,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += bt.renderHtml();
 
+            content += '<br>';
+
 
             var str = 'Use currently highlighted';
             var recordCount  = tableInfo.getSelectedList().length;
             str += '<br>('+recordCount+' items)';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: str }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width:140, bitmap:'Bitmaps/selection.png', content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 DQX.executeProcessing(function() {
                     EditTableBasedSummaryValues.loadCurrentSelection(tableid);
@@ -49,7 +51,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += bt.renderHtml();
 
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:30, content: 'Clear all' }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width: 140, icon:'fa-ban', content: 'Clear all' }).setOnChanged(function() {
                 DQX.executeProcessing(function() {
                     Popup.closeIfNeeded(popupid);
                     tableInfo.genomeTrackSelectionManager.clearAll();
