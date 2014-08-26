@@ -171,20 +171,13 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
             };
 
             that.draw = function (draw_info) {
+                //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
+                that.draw_info = draw_info;
                 if (!draw_info) return;
                 if (draw_info.needZoomIn) {
                   that.download_button.enable(false);
-                  //comment out for now as one loses scroll pos
-//                  var height = 100;
-//                  if (that._height != height) {
-//                    that.modifyHeight(height);
-//                    that._myPlotter.resizeHeight(true);
-//                    //The last call will result in the framework calling draw, so we should end here.
-//                  }
                   return;
                 }
-                //Save the draw info so that we can redraw when we need to without redrawing the entire panel.
-                that.draw_info = draw_info;
                 //This is the place where we are called by the framework when the horizontal range is changed so update the model data here.
                 var chrom = that.parent_browser.getCurrentChromoID();
                 if (!chrom) return;
@@ -253,7 +246,10 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
             that._draw = function () {
                 var draw_info = that.draw_info;
                 if (!draw_info) return;
-
+                if (draw_info.needZoomIn) {
+                    that.download_button.enable(false);
+                    return;
+                }
                 //Modify the height of the channel
                 var height = 5 + that.view.link_height + that.view.col_header_height;
                 if (that.model.row_ordinal.length)
