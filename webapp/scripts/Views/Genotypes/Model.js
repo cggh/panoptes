@@ -154,7 +154,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.refresh_data = function() {
                 var overdraw = (that.col_end - that.col_start)*0.00;
-                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page);
+                var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page-1);
                 that.col_ordinal = data.col[that.col_order] || [];
                 that.row_ordinal = data.row[that.row_order] || [];
                 that.row_primary_key = data.row[that.table.row_table.primkey] || [];

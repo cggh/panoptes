@@ -34,7 +34,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   width_mode:'auto',
                   user_column_width: 1,
                   page_length: 50,
-                  page: 0
+                  page: 1
                 });
 
                 that.model = Model(table_info,
@@ -147,7 +147,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
                 that.row_query.notifyQueryUpdated = function() {
                   model_params.set('row_query', that.row_query.get());
-                  model_params.set('page', 0);
+                  model_params.set('page', 1);
                 };
                 var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
@@ -206,9 +206,9 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                             buttonClass:"PnGenotypesPageArrow"
                         })
                         .setOnChanged(function() {
-                            that.model_params.set('page', Math.max(that.model_params.get('page')-1, 0));
+                            that.model_params.set('page', Math.max(that.model_params.get('page')-1, 1));
                         });
-                    page_up.modifyEnabled(that.model_params.get('page') !== 0);
+                    page_up.modifyEnabled(that.model_params.get('page') > 1);
                     var edit = Controls.Edit(null, {
                         label:'Page:',
                         class: 'PnGenotypesPageEdit',
@@ -217,7 +217,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     edit.bindToModel(that.model_params, 'page', function(input) {
                         var num = parseInt(input);
                         if (num != num) //Check for NaN
-                            return 0;
+                            return 1;
                         else
                             return num;
                     });
@@ -237,7 +237,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that.getCanvasElementJQ('center').after(that.page_controls);
                     Controls.ExecPostCreateHtml();
                     that.model_params.on({change:'page'}, function() {
-                        page_up.modifyEnabled(that.model_params.get('page') !== 0);
+                        page_up.modifyEnabled(that.model_params.get('page') > 1);
                     });
 
                     }
