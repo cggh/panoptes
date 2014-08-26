@@ -234,8 +234,6 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         if (retrieve_missing == null) retrieve_missing = true;
         var col_ord_req = new Interval(col_ord_start, col_ord_end);
 
-        if (col_ord_req.start < 0) col_ord_req = new Interval(0, col_ord_req.end);
-        if (col_ord_req.end < 0) col_ord_req = new Interval(col_ord_req.start, 0);
         if (col_ord_req.length() === 0) return {'row': {}, 'col': {}, 'twoD': {}};
 
         //Grab the data we have already in the cache
