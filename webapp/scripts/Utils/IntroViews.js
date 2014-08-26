@@ -32,7 +32,7 @@ define([
                             return sectionMapper[sectionName];
                         var sectionGroup = Controls.CompoundVert([]).setMargin(0);
                         if (sectionName) {
-                            var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName/*, headerStyleClass:'GenomeBrowserMainSectionHeader'*/ })
+                            var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName, /*headerStyleClass:'GenomeBrowserMainSectionHeader',*/ canCollapse:false })
                             group.addControl(sect);
                         }
                         else
