@@ -33,7 +33,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   row_order: table_info.row_table.primkey,
                   width_mode:'auto',
                   user_column_width: 1,
-                  page_length: 200,
+                  page_length: 50,
                   page: 0
                 });
 
