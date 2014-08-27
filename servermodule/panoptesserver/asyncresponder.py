@@ -16,13 +16,12 @@ import sys
 
 class CalculationThreadList:
     def __init__(self):
-        self.failed = False
         self.threads = {}
         self.lock = threading.Lock()
 
     def AddThread(self,id, calculationname, userid):
         with self.lock:
-            self.threads[id] = { 'status':'Calculating', 'progress':None, 'failed':False }
+            self.threads[id] = {'status': 'Calculating', 'progress': None, 'failed': False}
         with DQXDbTools.DBCursor() as cur:
             timestamp = str(datetime.datetime.now())[0:19]
             sqlstring = 'INSERT INTO calculations VALUES ("{0}", "{1}", "{2}", "{3}", "Calculating", 0, 0, 0, "")'.format(
@@ -36,10 +35,13 @@ class CalculationThreadList:
 
 
     def DelThread(self, id):
+        hasfailed = False
         with self.lock:
-            del self.threads[id]
+            if id in self.threads:
+                hasfailed = self.threads[id]['failed']
+                del self.threads[id]
         with DQXDbTools.DBCursor() as cur:
-            if not(self.failed):
+            if not(hasfailed):
                 sqlstring = 'UPDATE calculations SET completed=1, status="Finished", progress=0 WHERE id="{0}"'.format(id)
                 cur.execute(sqlstring)
                 cur.commit()
@@ -77,7 +79,6 @@ class CalculationThreadList:
 
     def SetFailed(self, id):
         with self.lock:
-            self.failed = True
             if id in self.threads:
                 self.threads[id]['failed'] = True
         with DQXDbTools.DBCursor() as cur:
