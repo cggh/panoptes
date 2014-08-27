@@ -25,6 +25,25 @@ def response(returndata):
 
     try:
 
+        # Check for mysql version nr
+        with DQXDbTools.DBCursor(returndata) as cur:
+            try:
+                cur.execute('SELECT VERSION()')
+                versionstring = cur.fetchone()[0]
+                versiontokens = versionstring.split('.')
+                if len(versiontokens) < 2:
+                    raise Exception('Invalid syntax')
+                version1 = int(versiontokens[0])
+                version2 = int(versiontokens[1])
+            except Exception as e:
+                raise Exception('Unable to obtain MySQL version information: '+str(e))
+            if (version1 < DQXDbTools.MySQLMinVersion[0]) or (version1 == DQXDbTools.MySQLMinVersion[0]) and (version2 < DQXDbTools.MySQLMinVersion[1]):
+                raise Exception('Invalid version of MySQL: {0} (should be at least {1}.{2})'.format(
+                    versionstring,
+                    DQXDbTools.MySQLMinVersion[0],
+                    DQXDbTools.MySQLMinVersion[1]
+                ))
+
         # Checks for server database
         with DQXDbTools.DBCursor(returndata) as cur:
             cur.execute('SELECT id,name FROM datasetindex')
@@ -50,3 +69,4 @@ def response(returndata):
         returndata['issue'] = str(e)
 
     return returndata
+

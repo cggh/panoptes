@@ -553,7 +553,29 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
 
             Application.bootScheduler = DQX.Scheduler();
 
+
             Application.bootScheduler.add([], function() {
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
+                    if ('issue' in resp) {
+                        var issueText = resp.issue;
+                        issueText = issueText.replace(/\n/g, "<br>");
+                        var content = '<div style="margin:30px"><p><h2>Server configuration problem</h2><p>' + issueText;
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-arrow-circle-right', content: 'Proceed anyway', width:120, height:35 }).setOnChanged(function() {
+                            Popup.closeIfNeeded(popupid);
+                            Application.bootScheduler.setCompleted('serverstatus');
+                        });
+                        content += '<p><span style="color:red"><b>The software will not work correctly!</b></span></p>'
+                        content += '<br>' + bt.renderHtml();
+                        content += '</div>';
+                        var popupid = Popup.create('Fatal error', content, null, {canClose: false});
+                        return;
+                    }
+                    Application.bootScheduler.setCompleted('serverstatus');
+                });
+            });
+
+
+            Application.bootScheduler.add(['serverstatus'], function() {
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'getimportfilelist',{},function(resp) {
                     if (resp.Error)
                         alert(resp.Error);

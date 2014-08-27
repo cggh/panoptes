@@ -50,7 +50,7 @@ require.config({
 
 
 require([
-    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
+    "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/Controls", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "InfoPopups/PropInfoPopup",
@@ -58,7 +58,7 @@ require([
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
 ],
     function (
-        _, $, Application, Framework, Msg, DQX, SQL, Popup, PopupFrame, DataFetchers,
+        _, $, Application, Framework, Msg, DQX, Controls, SQL, Popup, PopupFrame, DataFetchers,
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PropInfoPopup,
@@ -80,8 +80,15 @@ require([
                     if ('issue' in resp) {
                         var issueText = resp.issue;
                         issueText = issueText.replace(/\n/g, "<br>");
-                        var content = '<div style="margin:30px"><p><h2>Server configuration problem</h2><p>' + issueText + '</div>';
-                        Popup.create('Fatal error', content, null, {canClose: false});
+                        var content = '<div style="margin:30px"><p><h2>Server configuration problem</h2><p>' + issueText;
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-arrow-circle-right', content: 'Proceed anyway', width:120, height:35 }).setOnChanged(function() {
+                            Popup.closeIfNeeded(popupid);
+                            Start_Part1();
+                        });
+                        content += '<p><span style="color:red"><b>The software will not work correctly!</b></span></p>'
+                        content += '<br>' + bt.renderHtml();
+                        content += '</div>';
+                        var popupid = Popup.create('Fatal error', content, null, {canClose: false});
                         return;
                     }
                     MetaData.userId = resp.userid;
