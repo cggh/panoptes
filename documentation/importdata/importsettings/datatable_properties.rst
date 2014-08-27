@@ -13,12 +13,17 @@ DataType:
   *Text (required)*. Data type of the values in the property.
   Possible values:
    - ``Text``: text strings.
-   - ``Value``: numerical values (integer of decimal; the distincion is made by the key *DecimDigits*). Absent values are coded by an empty cell.
+   - ``Value``: numerical values (integer of decimal; the distincion is made by the key *DecimDigits*).
+     Absent values can be coded by an empty string, "NA", "None", "NULL", "null", "inf" or "-".
    - ``HighPrecisionValue``: same as ``Value``, with higher precision.
-   - ``Boolean``: Yes/No binary states.
+   - ``Boolean``: Yes/No binary states. Possible values: "true", "yes", "y", "1", "false", "no", "n", "0".
+     Absent values are coded by an empty string.
    - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
+     Absent values are coded by an empty string.
    - ``GeoLattitude``: latitude part of a geographical coordinates (in decimal degrees).
+     Absent values are coded by an empty string.
    - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
+     Absent values are coded by an empty string.
 
 Name
   *Text (required).* Display name of the property.
