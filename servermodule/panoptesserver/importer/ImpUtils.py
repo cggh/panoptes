@@ -24,6 +24,9 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
+def IsValidDataTypeIdenfifier(datatypeIdentifier):
+    return datatypeIdentifier in ['Text', 'Value', 'LowPrecisionValue', 'HighPrecisionValue', 'Boolean', 'GeoLongitude', 'GeoLattitude', 'Date']
+
 def IsValueDataTypeIdenfifier(datatypeIdentifier):
     return (datatypeIdentifier == 'Value') or \
            (datatypeIdentifier == 'GeoLongitude') or\
@@ -213,96 +216,113 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
             if 'Id' not in propSource:
                 raise Exception('Property is missing Id field')
             propids = propSource['Id']
+            if not(isinstance(propids, basestring)):
+                raise Exception('Property has invalid Id field: '+str(propids))
             for propid in propids.split(','):
                 propid = propid.strip()
-                if propid in propidMap:
-                    property = propidMap[propid]
-                    settings = property['Settings']
-                else:
-                    property = {'propid': propid}
-                    settings = SettingsLoader.SettingsLoader()
-                    settings.LoadDict({})
-                    property['Settings'] = settings
-                    propidMap[propid] = property
-                    properties.append(property)
-                DQXUtils.CheckValidColumnIdentifier(propid)
-                settings.AddDict(propSource)
+                try:
+                    if propid in propidMap:
+                        property = propidMap[propid]
+                        settings = property['Settings']
+                    else:
+                        property = {'propid': propid}
+                        settings = SettingsLoader.SettingsLoader()
+                        settings.LoadDict({})
+                        property['Settings'] = settings
+                        propidMap[propid] = property
+                        properties.append(property)
+                    DQXUtils.CheckValidColumnIdentifier(propid)
+                    settings.AddDict(propSource)
+                except Exception as e:
+                    raise Exception('Invalid property "{0}": {1}'.format(propid, str(e)))
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
-        calculationObject.Log('Auto determining columns')
-        tb = VTTable.VTTable()
-        tb.allColumnsText = True
         try:
-            tb.LoadFile(datafile, 9999)
-        except Exception as e:
-            raise Exception('Error while reading data file: '+str(e))
-        for propid in tb.GetColList():
-            propidcorr = propid.replace(' ', '_')
-            if propidcorr != propid:
-                tb.RenameCol(propid, propidcorr)
+            calculationObject.Log('Auto determining columns')
+            tb = VTTable.VTTable()
+            tb.allColumnsText = True
             try:
-                DQXUtils.CheckValidColumnIdentifier(propidcorr)
+                tb.LoadFile(datafile, 9999)
             except Exception as e:
-                raise Exception('Invalid data table column header:\n '+str(e))
+                raise Exception('Error while reading data file: '+str(e))
+            for propid in tb.GetColList():
+                propidcorr = propid.replace(' ', '_')
+                if propidcorr != propid:
+                    tb.RenameCol(propid, propidcorr)
+                try:
+                    DQXUtils.CheckValidColumnIdentifier(propidcorr)
+                except Exception as e:
+                    raise Exception('Invalid data table column header: '+str(e))
 
-        with calculationObject.LogDataDump():
-            tb.PrintRows(0, 9)
-        for propid in tb.GetColList():
-            if propid not in propidMap:
-                property = { 'propid': propid }
-                colnr = tb.GetColNr(propid)
-                cnt_tot = 0
-                cnt_isnumber = 0
-                cnt_isbool = 0
-                for rownr in tb.GetRowNrRange():
-                    val = tb.GetValue(rownr, colnr)
-                    if val is not None:
-                        cnt_tot += 1
-                        try:
-                            float(val)
-                            cnt_isnumber += 1
-                        except ValueError:
-                            pass
-                        if val in ['True', 'true', 'TRUE', 'False', 'false', 'FALSE', '1', '0']:
-                            cnt_isbool += 1
+            with calculationObject.LogDataDump():
+                tb.PrintRows(0, 9)
+            for propid in tb.GetColList():
+                if propid not in propidMap:
+                    property = { 'propid': propid }
+                    colnr = tb.GetColNr(propid)
+                    cnt_tot = 0
+                    cnt_isnumber = 0
+                    cnt_isbool = 0
+                    for rownr in tb.GetRowNrRange():
+                        val = tb.GetValue(rownr, colnr)
+                        if val is not None:
+                            cnt_tot += 1
+                            try:
+                                float(val)
+                                cnt_isnumber += 1
+                            except ValueError:
+                                pass
+                            if val in ['True', 'true', 'TRUE', 'False', 'false', 'FALSE', '1', '0']:
+                                cnt_isbool += 1
 
-                property['DataType'] = 'Text'
-                if (cnt_isnumber > 0.75*cnt_tot) and (cnt_isnumber > cnt_isbool):
-                    property['DataType'] = 'Value'
-                if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
-                    property['DataType'] = 'Boolean'
+                    property['DataType'] = 'Text'
+                    if (cnt_isnumber > 0.75*cnt_tot) and (cnt_isnumber > cnt_isbool):
+                        property['DataType'] = 'Value'
+                    if (cnt_isbool == cnt_tot) and (cnt_isbool >= cnt_isnumber):
+                        property['DataType'] = 'Boolean'
 
-                DQXUtils.CheckValidColumnIdentifier(propid)
-                settings = SettingsLoader.SettingsLoader()
-                settings.LoadDict({})
-                settings.AddTokenIfMissing('Name', propid)
-                settings.AddTokenIfMissing('DataType', property['DataType'])
-                property['Settings'] = settings
-                properties.append(property)
-                propidMap[propid] = property
+                    DQXUtils.CheckValidColumnIdentifier(propid)
+                    settings = SettingsLoader.SettingsLoader()
+                    settings.LoadDict({})
+                    settings.AddTokenIfMissing('Name', propid)
+                    settings.AddTokenIfMissing('DataType', property['DataType'])
+                    property['Settings'] = settings
+                    properties.append(property)
+                    propidMap[propid] = property
+        except Exception as autoscanerror:
+            raise Exception('Error while auto-scanning properties from {0}: {1}'.format(
+                datafile,
+                str(autoscanerror)
+            ))
 
     for property in properties:
-        settings = property['Settings']
-        settings.AddTokenIfMissing('Index', False)
-        settings.AddTokenIfMissing('Search', 'None')
-        settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors', 'channelName', 'channelColor', 'connectLines', 'SummaryValues'])
-        settings.RequireTokens(['DataType'])
-        settings.ConvertToken_Boolean('isCategorical')
-        if settings.HasToken('isCategorical') and settings['isCategorical']:
-            settings.SetToken('Index', True) # Categorical data types are always indexed
-        if settings.HasToken('Relation'):
-            settings.SetToken('Index', True) # Relation child properties are always indexed
-        if settings['Search'] not in ['None', 'StartPattern', 'Pattern', 'Match']:
-            raise Exception('Property "Search" token should be None,StartPattern,Pattern,Match')
-        if settings['Search'] in ['StartPattern', 'Pattern', 'Match']:
-            settings.SetToken('Index', True) # Use index to speed up search
-        settings.AddTokenIfMissing('Name', property['propid'])
-        settings.AddTokenIfMissing('ReadData', True)
-        settings.ConvertToken_Boolean('ReadData')
-        settings.AddTokenIfMissing('CanUpdate', False)
-        settings.ConvertToken_Boolean('CanUpdate')
-        settings.ConvertStringsToSafeSQL()
-        property['DataType'] = settings['DataType']
+        try:
+            settings = property['Settings']
+            settings.AddTokenIfMissing('Index', False)
+            settings.AddTokenIfMissing('Search', 'None')
+            settings.DefineKnownTokens(['isCategorical', 'minval', 'maxval', 'decimDigits', 'showInBrowser', 'showInTable', 'categoryColors', 'channelName', 'channelColor', 'connectLines', 'SummaryValues'])
+            settings.RequireTokens(['DataType'])
+            settings.ConvertToken_Boolean('isCategorical')
+            if settings.HasToken('isCategorical') and settings['isCategorical']:
+                settings.SetToken('Index', True) # Categorical data types are always indexed
+            if settings.HasToken('Relation'):
+                settings.SetToken('Index', True) # Relation child properties are always indexed
+            if settings['Search'] not in ['None', 'StartPattern', 'Pattern', 'Match']:
+                raise Exception('Property "Search" token should be None,StartPattern,Pattern,Match')
+            if settings['Search'] in ['StartPattern', 'Pattern', 'Match']:
+                settings.SetToken('Index', True) # Use index to speed up search
+            settings.AddTokenIfMissing('Name', property['propid'])
+            settings.AddTokenIfMissing('ReadData', True)
+            settings.ConvertToken_Boolean('ReadData')
+            settings.AddTokenIfMissing('CanUpdate', False)
+            settings.ConvertToken_Boolean('CanUpdate')
+            settings.ConvertStringsToSafeSQL()
+            property['DataType'] = settings['DataType']
+        except Exception as e:
+            errpropertyid = 'unknown'
+            if 'propid' in property:
+                errpropertyid = property['propid']
+            raise Exception('Error while parsing property "{0}": {1}'.format(errpropertyid, str(e)))
 
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')

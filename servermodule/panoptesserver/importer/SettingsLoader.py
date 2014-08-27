@@ -45,7 +45,10 @@ class SettingsLoader:
         self.DefineKnownTokens(tokensList)
         for token in tokensList:
             if token not in self.settings:
-                raise Exception('Missing token "{0}" in file "{1}"'.format(token, self.fileName))
+                errorstr = 'Missing token "{0}"'.format(token)
+                if (self.fileName is not None) and (len(self.fileName) > 0):
+                    errorstr += 'in file "{0}"'.format(self.fileName)
+                raise Exception(errorstr)
 
     def DefineKnownTokens(self, tokensList):
         self._CheckLoaded()

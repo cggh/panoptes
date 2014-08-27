@@ -74,6 +74,12 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
     print('Primary key: ' + primkey)
 
     for col in columns:
+        if not(ImpUtils.IsValidDataTypeIdenfifier(col['DataType'])):
+            raise Exception('Invalid datatype "{0}" for property "{1}" in "{2}"'.format(
+                col['DataType'],
+                col['name'],
+                sourceFileName
+            ))
         col['IsString'] = (col['DataType'] == 'Text')
         col['IsValue'] = ImpUtils.IsValueDataTypeIdenfifier(col['DataType'])
         col['IsDate'] = ImpUtils.IsDateDataTypeIdenfifier(col['DataType'])
@@ -106,15 +112,15 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                 calculationObject.Log('File columns: ' + str(fileColNames))
                 fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
                 if not(autoPrimKey) and (primkey not in fileColIndex):
-                    raise Exception('File is missing primary key '+primkey)
+                    raise Exception('File is missing primary key "{0}"'.format(primkey))
                 for col in columns:
                     # if 'ReadData' not in col:
                     #     print('==========' + str(col))
                     colname = col['name']
                     if (col['ReadData']) and (colname not in fileColIndex):
-                        raise Exception('File is missing column '+colname)
+                        raise Exception('File is missing column "'+colname+'"')
             except Exception as e:
-                raise Exception('Error while parsing header of file {0}: {1}'.format(
+                raise Exception('Error while parsing header of file "{0}": {1}'.format(
                     sourceFileName,
                     str(e)
                 ))
@@ -163,7 +169,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                             break
                 except Exception as e:
                     calculationObject.Log('Offending line: '+line);
-                    raise Exception('Error while parsing line {0} of file {1}: {2}'.format(
+                    raise Exception('Error while parsing line {0} of file "{1}": {2}'.format(
                         lineCount+1,
                         sourceFileName,
                         str(e)
