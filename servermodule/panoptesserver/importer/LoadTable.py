@@ -100,56 +100,74 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
         with open(destFileName, 'w') as ofp:
             if ofp is None:
                 raise Exception('Unable to write to temporary file ' + destFileName)
-            fileColNames = [colname.replace(' ', '_') for colname in ifp.readline().rstrip('\n\r').split('\t')]
-            calculationObject.Log('File columns: ' + str(fileColNames))
-            fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
-            if not(autoPrimKey) and (primkey not in fileColIndex):
-                raise Exception('File is missing primary key '+primkey)
-            for col in columns:
-                # if 'ReadData' not in col:
-                #     print('==========' + str(col))
-                colname = col['name']
-                if (col['ReadData']) and (colname not in fileColIndex):
-                    raise Exception('File is missing column '+colname)
+
+            try:
+                fileColNames = [colname.replace(' ', '_') for colname in ifp.readline().rstrip('\n\r').split('\t')]
+                calculationObject.Log('File columns: ' + str(fileColNames))
+                fileColIndex = {fileColNames[i]: i for i in range(len(fileColNames))}
+                if not(autoPrimKey) and (primkey not in fileColIndex):
+                    raise Exception('File is missing primary key '+primkey)
+                for col in columns:
+                    # if 'ReadData' not in col:
+                    #     print('==========' + str(col))
+                    colname = col['name']
+                    if (col['ReadData']) and (colname not in fileColIndex):
+                        raise Exception('File is missing column '+colname)
+            except Exception as e:
+                raise Exception('Error while parsing header of file {0}: {1}'.format(
+                    sourceFileName,
+                    str(e)
+                ))
 
             blockSize = 499
             blockStarted = False
 
             lineCount = 0
             for line in ifp:
-                line = line.rstrip('\r\n')
-                if len(line) > 0:
-                    sourceCells = line.split('\t')
-                    writeCells = []
-                    for col in columns:
-                        content = 'NULL'
-                        if col['name'] in fileColIndex:
-                            content = sourceCells[fileColIndex[col['name']]]
-                            content = EncodeCell(content, col)
-                        writeCells.append(content)
-                        if col['IsString']:
-                            col['MaxLen'] = max(col['MaxLen'], len(content))
+                try:
+                    line = line.rstrip('\r\n')
+                    if len(line) > 0:
+                        sourceCells = line.split('\t')
+                        writeCells = []
+                        for col in columns:
+                            content = 'NULL'
+                            if col['name'] in fileColIndex:
+                                colNr = fileColIndex[col['name']]
+                                if colNr >= len(sourceCells):
+                                    raise Exception('Not enough columns')
+                                content = sourceCells[colNr]
+                                content = EncodeCell(content, col)
+                            writeCells.append(content)
+                            if col['IsString']:
+                                col['MaxLen'] = max(col['MaxLen'], len(content))
 
-                    if not(blockStarted):
-                        ofp.write('INSERT INTO {0} ({1}) VALUES '.format(DBTBESC(tableid), ', '.join([DBCOLESC(col) for col in colNameList])))
-                        blockStarted = True
-                        blockNr = 0
+                        if not(blockStarted):
+                            ofp.write('INSERT INTO {0} ({1}) VALUES '.format(DBTBESC(tableid), ', '.join([DBCOLESC(col) for col in colNameList])))
+                            blockStarted = True
+                            blockNr = 0
 
-                    if blockNr > 0:
-                        ofp.write(',')
-                    ofp.write('(')
-                    ofp.write(','.join(writeCells))
-                    ofp.write(')')
-                    blockNr += 1
-                    if blockNr >= blockSize:
-                        ofp.write(';\n')
-                        blockStarted = False
-                    lineCount += 1
-                    if lineCount % 250000 == 0:
-                        calculationObject.Log('Line '+str(lineCount))
-                    if (maxLineCount>0) and (lineCount >= maxLineCount):
-                        calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
-                        break
+                        if blockNr > 0:
+                            ofp.write(',')
+                        ofp.write('(')
+                        ofp.write(','.join(writeCells))
+                        ofp.write(')')
+                        blockNr += 1
+                        if blockNr >= blockSize:
+                            ofp.write(';\n')
+                            blockStarted = False
+                        lineCount += 1
+                        if lineCount % 250000 == 0:
+                            calculationObject.Log('Line '+str(lineCount))
+                        if (maxLineCount>0) and (lineCount >= maxLineCount):
+                            calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
+                            break
+                except Exception as e:
+                    calculationObject.Log('Offending line: '+line);
+                    raise Exception('Error while parsing line {0} of file {1}: {2}'.format(
+                        lineCount+1,
+                        sourceFileName,
+                        str(e)
+                    ))
 
     calculationObject.Log('Column sizes: '+str({col['name']: col['MaxLen'] for col in columns}))
 
