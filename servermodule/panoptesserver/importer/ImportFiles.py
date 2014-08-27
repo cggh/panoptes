@@ -62,6 +62,14 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             calculationObject.SetInfo('Creating database')
             print('Creating new database')
             ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
+        else:
+            #Check existence of database
+            sql = "SELECT SCHEMA_NAME FROM information_schema.SCHEMATA  WHERE SCHEMA_NAME='{0}'".format(datasetId)
+            with DQXDbTools.DBCursor(calculationObject.credentialInfo) as cur:
+                cur.execute(sql)
+                rs = cur.fetchone()
+                if rs is None:
+                    raise Exception('Database does not yet exist. Please do a full import or top N preview import first.')
 
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
@@ -101,19 +109,19 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId, importSettings)
 
         # Global settings
-        print('Defining global settings')
-        ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
+        with calculationObject.LogHeader('Defining global settings'):
+            ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
 
         # Finalise: register dataset
-        print('Registering dataset')
-        importtime = 0
-        if not importSettings['ConfigOnly']:
-            importtime = time.time()
-        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}", "{2}")'.format(
-            datasetId,
-            globalSettings['Name'],
-            str(math.ceil(importtime))
-        ))
+        with calculationObject.LogHeader('Registering dataset'):
+            importtime = 0
+            if not importSettings['ConfigOnly']:
+                importtime = time.time()
+            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}", "{2}")'.format(
+                datasetId,
+                globalSettings['Name'],
+                str(math.ceil(importtime))
+            ))
 
 
 if __name__ == "__main__":
