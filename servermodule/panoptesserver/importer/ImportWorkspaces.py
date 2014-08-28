@@ -147,6 +147,21 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                     False
                 )
 
+                print('Checking column existence')
+                existingcols = []
+                cur.execute('SHOW COLUMNS FROM {0}'.format(DBTBESC(tableid)))
+                for row in cur.fetchall():
+                    existingcols.append(row[0])
+                cur.execute('SHOW COLUMNS FROM {0}'.format(DBTBESC(sourcetable)))
+                for row in cur.fetchall():
+                    existingcols.append(row[0])
+                print('Existing columns: '+str(existingcols))
+                for property in properties:
+                    propid = property['propid']
+                    if propid in existingcols:
+                        raise Exception('Property "{0}" from custom data source "{1}" is already present'.format(propid, sourceid))
+
+
                 print('Creating new columns')
                 frst = True
                 sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
@@ -157,7 +172,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                     sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
                     sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
                     frst = False
-                    calculationObject.LogSQLCommand(sql)
+                calculationObject.LogSQLCommand(sql)
                 cur.execute(sql)
 
 
