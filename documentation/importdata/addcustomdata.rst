@@ -18,14 +18,24 @@ and upload it to the Panoptes server as a source file for a new custom data sour
 - Select the data table identifier to which this custom data should be attached to
 - Click *"Create custom data file"* to create a new custom data source, based on this file.
 
-.. Note::
-   The name of the local source file will be used as an internal identifier for this custom data source.
-
-.. Caution::
-   Make sure that the identifier is a valid variable name (see :ref:`data-import-identifiers`).
 
 This action creates a new custom data directory for this workspace on the server, and uploads the file as data source
 (see also :ref:`def-source-data`).
+
+**Notes**
+
+- The name of the local source file will be used as an internal identifier for this custom data source.
+- The columns in the source file will be mapped to extra properties of the data table,
+  only visible in the context of the workspace this data source is loaded in.
+- The column header name will be used as the property unique ID.
+- The property ID's defined in this custom data source must be unique for this data table,
+  and all other custom data sources associated with this data table.
+- The custom data source **must** have a column with a name that corresponds to the primary key defined for this data table.
+  The custom will be merged to the data table by joining the values of this primary key.
+
+
+.. Caution::
+   Make sure that the source file name, and the column headers are valid variable names (see :ref:`data-import-identifiers`).
 
 
 Follow-up actions
