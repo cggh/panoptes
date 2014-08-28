@@ -6,6 +6,7 @@ import config
 import os
 import uuid
 import DQXDbTools
+import DQXUtils
 import authorization
 
 def response(returndata):
@@ -60,12 +61,12 @@ def response(returndata):
         # Try getting auth rules
         authorization.PnAuthRuleSet()
 
-        print('PANOPTES CLIENT APP START: ' + cur.credentials.GetAuthenticationInfo())
+        DQXUtils.LogServer('PANOPTES CLIENT APP START: ' + cur.credentials.GetAuthenticationInfo())
         returndata['userid'] = cur.credentials.GetUserId()
 
 
     except Exception as e:
-        print('SERVER CONFIGURATION ERROR: ' + str(e))
+        DQXUtils.LogServer('SERVER CONFIGURATION ERROR: ' + str(e))
         returndata['issue'] = str(e)
 
     return returndata

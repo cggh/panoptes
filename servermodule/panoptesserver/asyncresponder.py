@@ -133,6 +133,8 @@ class CalculationThread (threading.Thread):
         self.orig_stdout = sys.stdout
         self.orig_stderr = sys.stderr
         self.credentialInfo = DQXDbTools.CredentialInformation(data)
+        self.logging_lock = threading.Lock()
+
 
     def OpenLog(self):
         self.logfilename = os.path.join(config.BASEDIR, 'temp', 'log_'+self.id)
@@ -167,11 +169,15 @@ class CalculationThread (threading.Thread):
         self.CloseLog()
 
     def write(self, line):
-        if self.logfilename is None:
+        if line[0:3] == '@@@': # These are logs from normal operation, not from import
             self.orig_stdout.write(line)
-        else:
-            with open(self.logfilename, 'a') as logfile:
-                logfile.write(line)
+            return
+        with self.logging_lock:
+            if self.logfilename is None:
+                self.orig_stdout.write(line)
+            else:
+                with open(self.logfilename, 'a') as logfile:
+                    logfile.write(line)
 
 
     def Log(self, content):
@@ -214,7 +220,10 @@ class CalculationThread (threading.Thread):
             with open(filename) as fp:
                 ct = 0
                 for line in fp:
-                    self.Log(line.rstrip('\r\n'))
+                    line = line.rstrip('\r\n')
+                    if len(line) > 100:
+                        line = line[:100]+'...';
+                    self.Log(line)
                     ct += 1
                     if ct >= maxlinecount:
                         break

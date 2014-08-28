@@ -162,7 +162,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                             ofp.write(';\n')
                             blockStarted = False
                         lineCount += 1
-                        if lineCount % 250000 == 0:
+                        if lineCount % 1000000 == 0:
                             calculationObject.Log('Line '+str(lineCount))
                         if (maxLineCount>0) and (lineCount >= maxLineCount):
                             calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
@@ -263,7 +263,7 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
         raise Exception('Error while reading file: '+str(e))
     calculationObject.Log('---- ORIG TABLE ----')
     with calculationObject.LogDataDump():
-        tb.PrintRows(0, 9)
+        tb.PrintRows(0, 5)
 
     for col in columns:
         if not tb.IsColumnPresent(col['name']):
@@ -285,7 +285,7 @@ def LoadTable0(calculationObject, sourceFileName, databaseid, tableid, columns, 
             tb.ConvertColToValue(colname)
     calculationObject.Log('---- PROCESSED TABLE ----')
     with calculationObject.LogDataDump():
-        tb.PrintRows(0, 9)
+        tb.PrintRows(0, 5)
 
     createcmd = 'CREATE TABLE {0} ('.format(DBTBESC(tableid))
     frst = True

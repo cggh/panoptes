@@ -58,7 +58,6 @@ def ResponseExecute(returndata, calculationObject):
                 def submitkeys(keylist):
                     if len(keylist) > 0:
                         sqlstring = 'UPDATE {0} SET {1}=1 WHERE {2} IN ({3})'.format(DBTBESC(tableName), DBCOLESC(propid), DBCOLESC(keyid), ', '.join(['"'+str(key)+'"' for key in keylist]))
-                        print(sqlstring)
                         cur.execute(sqlstring)
                         cur.commit()
                 keysublist = []

@@ -68,11 +68,11 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
         with open(filename) as fp:
             linect = 0
             for line in fp:
-                if len(line)>200:
-                    line = line[:200] + '...'
+                if len(line)>100:
+                    line = line[:100] + '...'
                 calculationObject.LogSQLCommand(line)
                 linect += 1
-                if linect > 15:
+                if linect > 10:
                     calculationObject.LogSQLCommand('...')
                     break
         cmd = config.mysqlcommand
@@ -255,7 +255,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
                     raise Exception('Invalid data table column header: '+str(e))
 
             with calculationObject.LogDataDump():
-                tb.PrintRows(0, 9)
+                tb.PrintRows(0, 5)
             for propid in tb.GetColList():
                 if propid not in propidMap:
                     property = { 'propid': propid }

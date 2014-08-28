@@ -212,7 +212,7 @@ def ImportCustomData(calculationObject, datasetId, workspaceid, tableid, sourcei
                             DBCOLESC(posField)
                         ))
                         script.Execute(datasetId, dataFileName)
-                        calculationObject.LogFileTop(dataFileName, 10)
+                        calculationObject.LogFileTop(dataFileName, 5)
 
                     ImpUtils.CreateSummaryValues_Value(
                         calculationObject,
