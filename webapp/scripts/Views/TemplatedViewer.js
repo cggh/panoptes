@@ -32,12 +32,15 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                 that.storeSettings = function () {
                     var obj = {};
-                    //TODO Store a ref to the selected obj
+                    obj.selected_item = that.selectedItem;
                     return obj;
                 };
 
                 that.recallSettings = function (settObj) {
-
+                    if (that.list_loaded)
+                        that.panelList.setActiveItem(settObj.selected_item);
+                    else
+                        that.load_item = settObj.selected_item;
                 };
 
                 // Activates this view, and loads a query
@@ -82,7 +85,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                     //Right Panel
                     this.panelTemplate = Framework.TemplateFrame(this.frameTemplate, that.template);
-                    this.panelTemplate.render({Name:'BENNY'});
+                    this.panelTemplate.render();
 
                     //Initialise the data fetcher that will download the data for the table
                     this.tableFetcher = DataFetchers.Table(
@@ -116,12 +119,17 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 };
 
                 that.itemSelected = function (item) {
-                    that.render(item)
+                    that.selectedItem = item;
+                    that.render(item);
                 };
 
                 //This function is called by the datafetcher to inform the view that new data is ready. In reaction, we render the view
                 that.notifyDataReady = function () {
+                    that.list_loaded = true;
                     that.renderList();
+                    if (that.load_item)
+                        that.panelList.setActiveItem(that.load_item);
+
                 };
 
                 that.renderList = function() {
