@@ -50,9 +50,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
 
                 that.createFrames = function (rootFrame) {
-                    this.frameControls = Framework.FrameGroupVert('', 0.2).setMargins(0).setSeparatorSize(0);
-                    this.frameTemplate = Framework.FrameFinal('', 0.8).setAllowScrollBars(true, true);
-                    rootFrame.MakeControlsFrame(this.frameControls, this.frameTemplate, 250);
+                    this.frameControls = Framework.FrameGroupVert('', 0.2);
+                    this.frameTemplate = Framework.FrameFinal('', 0.8);
+                    rootFrame.makeGroupHor();
+                    rootFrame.addMemberFrame(that.frameControls);
+                    rootFrame.addMemberFrame(that.frameTemplate);
                     this.frameContext = this.frameControls.addMemberFrame(Framework.FrameFinal('', 0.01))
                         .setMargins(0).setMinSize(Framework.dimY, 80).setAllowScrollBars(false, false);
                     this.frameList = this.frameControls.addMemberFrame(Framework.FrameFinal('', 0.8));
