@@ -67,7 +67,6 @@ require([
         ) {
         $(function () {
 
-            console.log('sdfsd');
 
             $(document).ajaxStart(function () {
                 $('.PanoptesLogoBox').addClass('fa-spin');

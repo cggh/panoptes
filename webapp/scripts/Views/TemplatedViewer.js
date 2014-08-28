@@ -1,11 +1,14 @@
 // This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/FrameList", "DQX/Msg", "DQX/DocEl", "DQX/Popup", "DQX/PopupFrame", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
-        "MetaData",
-        "Wizards/EditQuery", "Wizards/ManageStoredSubsets", "Utils/QueryTool", "Utils/MiscUtils", "Utils/SelectionTools", "Utils/ButtonChoiceBox"
+define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/FrameList", "DQX/Msg", "DQX/DocEl", "DQX/Popup",
+        "DQX/PopupFrame", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
+        "MetaData", "Wizards/EditQuery", "Wizards/ManageStoredSubsets", "Utils/QueryTool", "Utils/MiscUtils", "Utils/GetFullDataItemInfo",
+        "Views/ItemView"
     ],
-    function (require, Application, Framework, Controls, FrameList, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable, QueryBuilder, DataFetchers, MetaData, EditQuery, ManageStoredSubsets, QueryTool, MiscUtils, SelectionTools, ButtonChoiceBox) {
+    function (require, Application, Framework, Controls, FrameList, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable,
+              QueryBuilder, DataFetchers, MetaData, EditQuery, ManageStoredSubsets, QueryTool, MiscUtils, GetFullDataItemInfo,
+        ItemView) {
         var TemplatedViewerModule = {
 
             init: function (tableid) {
@@ -21,15 +24,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 that.tableInfo.templatedViewer = that;
                 that.template = that.tableInfo.settings.TemplatedView.Template;
 
-//                Msg.listen('', { type: 'SelectionUpdated'}, function (scope, tableid) {
-//                    if (that.tableid == tableid) {
-//                        if (that.selectedItemCountText)
-//                            that.selectedItemCountText.modifyValue(that.tableInfo.getSelectedCount() + ' ' + that.tableInfo.tableNamePlural + ' selected');
-//                        if (that.myTable)
-//                            that.myTable.render();
-//                    }
-//                });
-
                 that.storeSettings = function () {
                     var obj = {};
                     obj.selected_item = that.selectedItem;
@@ -43,15 +37,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                         that.load_item = settObj.selected_item;
                 };
 
-                // Activates this view, and loads a query
-                that.activateWithQuery = function (qry) {
-                    that.activateState();
-                };
-
 
                 that.createFrames = function (rootFrame) {
                     this.frameControls = Framework.FrameGroupVert('', 0.2);
-                    this.frameTemplate = Framework.FrameFinal('', 0.8);
+                    this.frameTemplate = Framework.FrameDynamic('', 0.8);
                     rootFrame.makeGroupHor();
                     rootFrame.addMemberFrame(that.frameControls);
                     rootFrame.addMemberFrame(that.frameTemplate);
@@ -87,8 +76,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.panelList.render();
 
                     //Right Panel
-                    this.panelTemplate = Framework.TemplateFrame(this.frameTemplate, that.template);
-                    this.panelTemplate.render();
+                    //this.panelTemplate = Framework.TemplateFrame(this.frameTemplate, that.template);
+                    //this.panelTemplate.render();
 
                     //Initialise the data fetcher that will download the data for the table
                     this.tableFetcher = DataFetchers.Table(
@@ -149,15 +138,22 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 };
 
                 that.render = function(item) {
-                    that.tableFetcher.fetchFullRecordInfo(
-                        SQL.WhereClause.CompareFixed(that.tableInfo.primkey, '=', item),
-                        function (data) {
-                            that.panelTemplate.render(data);
-                        },
-                        function (msg) {
-                            //TODO - find standard error path
+                    DQX.setProcessing("Downloading...");
+                    GetFullDataItemInfo.Get(that.tableid, item, function(resp) {
+                        DQX.stopProcessing();
+                        if (!that.itemView) {
+                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
+                            that.itemView.createFrames(that.frameTemplate);
+                            that.itemView.render();
+                            that.itemView.createPanels();
+                            that.frameTemplate.applyOnPanels(function(panel) {
+                                if (panel._panelfirstRendered==false)
+                                    panel.render();
+                            })
+
                         }
-                    );
+                    })
+
                 };
 
                 return that;
