@@ -26,17 +26,15 @@ Follow-up actions
 ~~~~~~~~~~~~~~~~~
 
 Modify the reference genome settings:
-
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"
   2. Click non the button "Edit Settings" in the popup.
      (see :ref:`data-import-settings`)
 
 Edit the chromosome definitions:
-
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"
   2. Click non the button "Edit Chromosome definition" in the popup.
 
 Import the source data:
-  Importing a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.
+  Updating a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.
   Click on the |buttonrun| icon left of the dataset label to initiate this import.
   (see :ref:`importdialog`).

@@ -32,5 +32,6 @@ Add custom data to this workspace:
   (see :ref:`data-import-addcustomdata`).
 
 Re-import the source data:
+  Updating a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.
   Click on the |buttonrun| icon left of the dataset label
   (see :ref:`importdialog`).

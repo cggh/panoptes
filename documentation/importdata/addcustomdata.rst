@@ -39,6 +39,7 @@ Modify the settings:
   (see :ref:`data-import-settings`).
 
 Import the source data:
-  Click on the |buttonrun| icon left of the custom data label.
+  Updating a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.
+  If the dataset was already imported earlier, the custom data can be added by clicking on the |buttonrun| icon left of the custom data label.
   This will only import the custom data, augmenting the already deployed database.
   (see :ref:`importdialog`).
