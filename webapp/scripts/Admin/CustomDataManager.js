@@ -47,7 +47,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             content += ctrl_uploadFile.renderHtml() + '<p>';
 
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload data file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create data table</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 if (!fileid) {
@@ -76,9 +76,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            content += bt.renderHtml() + '<p>';
+            var bt_help = MiscUtils.createDocButton('importdata/importsettings/adddatatable');
 
-            var popupid = Popup.create('Upload Datatable', content);
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
+
+            var popupid = Popup.create('Upload data table', content);
         };
 
 
@@ -100,7 +102,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             ctrl_dataSetChoice = Controls.Combo(null,{label:'Upload to target datatable:', states: states});
             content += ctrl_dataSetChoice.renderHtml() + '<p>';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload custom data file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create custom data source</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 var tableid = ctrl_dataSetChoice.getValue();
@@ -136,7 +138,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            content += bt.renderHtml() + '<p>';
+            var bt_help = MiscUtils.createDocButton('importdata/addcustomdata');
+
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
 
             var popupid = Popup.create('Upload custom data', content);
         };
@@ -273,8 +277,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         };
 
         CustomDataManager.createDataSet = function() {
-            var datasetid = prompt('Enter dataset identifier', 'dataset');
-            if (datasetid) {
+            var content = 'Enter a unique identifier for this data set:<p>';
+
+            var ctrl_id = Controls.Edit(null, {size:20}).setHasDefaultFocus();
+            content += ctrl_id.renderHtml();
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create</b>', width:140, height:35 }).setOnChanged(function() {
+                var datasetid = ctrl_id.getValue();
+                if (!datasetid) {
+                    alert('Please provide an identifier for this dataset');
+                    return;
+                }
+                Popup.closeIfNeeded(popupid);
                 DQX.setProcessing();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_create_dataset',{
                     database: datasetid
@@ -287,18 +301,29 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     datasetid = resp.database;
                     Msg.send({type: 'RenderSourceDataInfo'}, {
-                        activeDataset: datasetid,
-//                        proceedFunction: function() {
-//                            Msg.send({type: 'ExecLoadDataFull'}, { datasetid: datasetid});
-//                        }
+                        activeDataset: datasetid
                     });
                 });
-            }
+            });
+            var bt_help = MiscUtils.createDocButton('importdata/adddataset');
+
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
+
+            var popupid = Popup.create('Add new dataset', content);
         };
 
         CustomDataManager.createWorkspace = function(sourceInfo) {
-            var workspaceid = prompt('Enter workspace identifier', 'workspace');
-            if (workspaceid) {
+            var content = 'Enter a unique identifier for this workspace:<p>';
+
+            var ctrl_id = Controls.Edit(null, {size:20}).setHasDefaultFocus();
+            content += ctrl_id.renderHtml();
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create</b>', width:140, height:35 }).setOnChanged(function() {
+                var workspaceid = ctrl_id.getValue();
+                if (!workspaceid) {
+                    alert('Please provide an identifier for this workspace');
+                    return;
+                }
                 DQX.setProcessing();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'filesource_create_workspace',{
                     database: sourceInfo.datasetid,
@@ -317,7 +342,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     });
                 });
-            }
+            });
+            var bt_help = MiscUtils.createDocButton('importdata/addworkspace');
+            content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
+            var popupid = Popup.create('Add new dataset', content);
         };
 
 

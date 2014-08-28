@@ -12,4 +12,9 @@ Importing a dataset from source data does not happen automatically, and has to b
    datastructure
    importaction
    sourcefilesstructure
+   adddataset
+   adddatatable
+   addworkspace
+   addcustomdata
    importsettings/_intro
+   identifiers

@@ -12,18 +12,19 @@ Id
 DataType:
   *Text (required)*. Data type of the values in the property.
   Possible values:
-   - ``Text``: text strings.
-   - ``Value``: numerical values (integer of decimal; the distincion is made by the key *DecimDigits*).
-     Absent values can be coded by an empty string, "NA", "None", "NULL", "null", "inf" or "-".
-   - ``HighPrecisionValue``: same as ``Value``, with higher precision.
-   - ``Boolean``: Yes/No binary states. Possible values: "true", "yes", "y", "1", "false", "no", "n", "0".
-     Absent values are coded by an empty string.
-   - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
-     Absent values are coded by an empty string.
-   - ``GeoLattitude``: latitude part of a geographical coordinates (in decimal degrees).
-     Absent values are coded by an empty string.
-   - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
-     Absent values are coded by an empty string.
+
+  - ``Text``: text strings.
+  - ``Value``: numerical values (integer of decimal; the distincion is made by the key *DecimDigits*).
+    Absent values can be coded by an empty string, "NA", "None", "NULL", "null", "inf" or "-".
+  - ``HighPrecisionValue``: same as ``Value``, with higher precision.
+  - ``Boolean``: Yes/No binary states. Possible values: "true", "yes", "y", "1", "false", "no", "n", "0".
+    Absent values are coded by an empty string.
+  - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
+    Absent values are coded by an empty string.
+  - ``GeoLattitude``: latitude part of a geographical coordinates (in decimal degrees).
+    Absent values are coded by an empty string.
+  - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
+    Absent values are coded by an empty string.
 
 Name
   *Text (required).* Display name of the property.
@@ -69,9 +70,10 @@ Index
 Search
   *Text.* Indicates that this field can be used for text search in the find data item wizard.
   Possible values:
-    - ``Match``: only exact matched are searched for.
-    - ``StartPattern``: searches all text that starts with the string typed by the user.
-    - ``Pattern``: searches all text that contains the string typed by the user.
+
+  - ``Match``: only exact matched are searched for.
+  - ``StartPattern``: searches all text that starts with the string typed by the user.
+  - ``Pattern``: searches all text that contains the string typed by the user.
 
 Relation
   *Block.* Defines a many-to-one foreign relation to a parent data table.

@@ -36,7 +36,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += ctrl_uploadFile.renderHtml() + '<p>';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-upload', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 if (!fileid) {
@@ -76,7 +76,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += ctrl_uploadFile.renderHtml() + '<p>';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-upload', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 if (!fileid) {

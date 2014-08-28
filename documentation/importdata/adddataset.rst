@@ -1,0 +1,34 @@
+.. |buttonnew| image:: /buttons/new.png
+.. |buttonedit| image:: /buttons/edit.png
+.. |buttonrun| image:: /buttons/run.png
+
+Creating a new dataset
+----------------------
+
+Using the admin web frontend, a new dataset can be created  by clicking the |buttonnew| icon, next to the top branch "*Datasets*".
+
+In the dialog box, specify a unique identifier for this new dataset.
+
+.. Note::
+   This identifier will be used internally, and is different from the display name which is specified in the settings.
+   The data will be imported into a database that has a name equal to this identifier.
+
+.. Caution::
+   Make sure that the identifier is a valid variable name (see :ref:`data-import-identifiers`).
+
+This action creates a new source data directory for this dataset on the server (see also :ref:`def-source-data`).
+
+Follow-up actions
+~~~~~~~~~~~~~~~~~
+
+Modify the settings:
+  Click on the |buttonedit| icon left of the dataset label
+  (see :ref:`data-import-settings`).
+
+Add a data table to this dataset:
+  Click on the |buttonnew| icon right of the *"Datatables"* label in the dataset section
+  (see :ref:`data-import-adddatatable`).
+
+Import the source data:
+  Click on the |buttonrun| icon left of the dataset label
+  (see :ref:`importdialog`).

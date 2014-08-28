@@ -47,8 +47,9 @@ PieChartMap
 Defines a view that shows a set of pie charts on a geographic map
 (see `example <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/settings>`_).
 This is achieved by combining information from two data tables:
- - A locations data table. Each item in this data table defines a location where a pie chart is displayed.
- - The current data table (where the view is defined), which contains the sizes of the pies for each data item as column values.
+
+- A locations data table. Each item in this data table defines a location where a pie chart is displayed.
+- The current data table (where the view is defined), which contains the sizes of the pies for each data item as column values.
 
 A set of properties of the current table is used to define pie sizes on all pie charts.
 For each pie and location combination there should be a property in the data table,
