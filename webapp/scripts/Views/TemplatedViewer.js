@@ -81,6 +81,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.panelList = FrameList(this.frameList);
                     this.panelList.setOnItemHighlighted(that.itemSelected);
                     this.panelList.setHasFilter();
+                    this.panelList.setTemplate('<span class="fa '+that.tableInfo.settings.Icon +' buttonicon" style="color:rgb(130,130,130);padding-right: 5px"></span><span>{title_field}</span>');
                     this.panelList.render();
 
                     //Right Panel
@@ -97,9 +98,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.tableFetcher.setReportIfError(true);
                     this.tableFetcher.setMaxRecordCount(that.tableInfo.settings.MaxCountQueryAggregated || 1000000);
                     this.tableFetcher.setTableName(that.tableid);
-                    this.tableFetcher.positionField = 'ID';
-                    this.tableFetcher.addFetchColumnActive('ID', MiscUtils.createEncoderId(tableid, 'ID'));
-                    this.tableFetcher.addFetchColumnActive('Name', MiscUtils.createEncoderId(tableid, 'Name'));
+                    this.tableFetcher.positionField = that.tableInfo.primkey;
+                    this.tableFetcher.addFetchColumnActive(that.tableInfo.primkey, MiscUtils.createEncoderId(tableid, that.tableInfo.primkey));
+                    this.tableFetcher.addFetchColumnActive(that.tableInfo.settings.TemplatedView.TitleField, MiscUtils.createEncoderId(tableid, that.tableInfo.settings.TemplatedView.TitleField));
                     this.tableFetcher.IsDataReady(-1,1000000);
                     that.panelsCreated = true;
                 };
@@ -136,8 +137,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     var items = [];
                     for (var i = 0; i < that.tableFetcher.totalRecordCount; i++) {
                         items.push({
-                            id: that.tableFetcher.getColumnPoint(i, 'ID'),
-                            content: that.tableFetcher.getColumnPoint(i, 'Name')
+                            id: that.tableFetcher.getColumnPoint(i, that.tableInfo.primkey),
+                            content: {title_field:that.tableFetcher.getColumnPoint(i, that.tableInfo.settings.TemplatedView.TitleField)}
                         });
                     }
                     that.panelList.setItems(items, items[0].id);
@@ -147,7 +148,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                 that.render = function(item) {
                     that.tableFetcher.fetchFullRecordInfo(
-                        SQL.WhereClause.CompareFixed('ID', '=', item),
+                        SQL.WhereClause.CompareFixed(that.tableInfo.primkey, '=', item),
                         function (data) {
                             that.panelTemplate.render(data);
                         },

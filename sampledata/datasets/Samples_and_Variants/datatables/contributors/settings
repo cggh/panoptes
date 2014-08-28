@@ -30,6 +30,7 @@ Properties:
   DataType: Text
 
 TemplatedView:
+    TitleField: Name
     Template: |
         <img style=\"float:right\" src={{{Image}}}>
         <h4>ID: {{ID}}</h4>
