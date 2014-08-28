@@ -7,7 +7,7 @@
 Add a new workspace to a dataset
 ---------------------------------
 
-Using the admin web frontend, a new data workspace can be created  by clicking the button |buttonnew|, next to the label "*Workspaces*",
+Using the admin web frontend, a new data workspace can be created by clicking the button |buttonnew|, next to the label "*Workspaces*",
 under the tree branch that represents the dataset.
 
 In the dialog box, specify a unique identifier for this new workspace.

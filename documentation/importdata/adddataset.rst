@@ -5,7 +5,7 @@
 Creating a new dataset
 ----------------------
 
-Using the admin web frontend, a new dataset can be created  by clicking the |buttonnew| icon, next to the top branch "*Datasets*".
+Using the admin web frontend, a new dataset can be created by clicking the |buttonnew| icon, next to the top branch "*Datasets*".
 
 In the dialog box, specify a unique identifier for this new dataset.
 
@@ -30,5 +30,6 @@ Add a data table to this dataset:
   (see :ref:`data-import-adddatatable`).
 
 Import the source data:
-  Click on the |buttonrun| icon left of the dataset label
+  Importing a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.
+  Click on the |buttonrun| icon left of the dataset label to initiate this import.
   (see :ref:`importdialog`).

@@ -1,4 +1,4 @@
-.. |buttonrun| image:: run.png
+.. |buttonrun| image:: /buttons/run.png
 
 Importing datasets
 ------------------

@@ -8,7 +8,7 @@
 Add a custom data source to a workspace
 ---------------------------------------
 
-Using the admin web frontend, a custom data can be  by clicking the button |buttonnew|, next to the label "*Custom data*",
+Using the admin web frontend, custom data can be added by clicking the button |buttonnew|, next to the label "*Custom data*",
 under the tree branch that represents the workspace.
 
 A dialog box appears that allows one to pick a TAB-delimited file from the local computer,

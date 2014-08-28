@@ -16,5 +16,7 @@ Importing a dataset from source data does not happen automatically, and has to b
    adddatatable
    addworkspace
    addcustomdata
+   addannotation
+   addrefgenome
    importsettings/_intro
    identifiers

@@ -15,12 +15,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         RefGenomeManager.uploadData = function(datasetid) {
             var content = '';
             content += '<p><i>Upload reference genome data</i></p>';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Annotation</b><br>(GFF file)', width:180, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/actionbuttons/import.png', content: '<b>Annotation</b><br>(GFF file)', width:180, height:35 }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 RefGenomeManager.uploadAnnotation(datasetid);
             });
             content += bt.renderHtml() + '<br>';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '<b>Reference genome</b><br>(FASTA file)', width:180, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/actionbuttons/import.png', content: '<b>Reference genome</b><br>(FASTA file)', width:180, height:35 }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 RefGenomeManager.uploadRefGenome(datasetid);
             });
@@ -36,7 +36,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += ctrl_uploadFile.renderHtml() + '<p>';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-upload', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create annotation</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 if (!fileid) {
@@ -63,7 +63,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            content += bt.renderHtml() + '<p>';
+            content += bt.renderHtml() + '&nbsp;&nbsp;' + MiscUtils.createDocButton('importdata/addannotation').renderHtml() + '<p>';
+
             var popupid = Popup.create('Upload reference genome annotation', content);
         };
 
@@ -76,7 +77,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             content += ctrl_uploadFile.renderHtml() + '<p>';
 
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-upload', content: '<b>Upload file</b>', width:140, height:35 }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-plus', content: '<b>Create reference genome</b>', width:140, height:35 }).setOnChanged(function() {
                 var fileid = ctrl_uploadFile.getValue();
                 var filename = ctrl_uploadFile.getFileName();
                 if (!fileid) {
@@ -103,7 +104,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            content += bt.renderHtml() + '<p>';
+            content += bt.renderHtml() + '&nbsp;&nbsp;' + MiscUtils.createDocButton('importdata/addrefgenome').renderHtml() + '<p>';
+
             var popupid = Popup.create('Upload reference genome sequence', content);
         };
 
