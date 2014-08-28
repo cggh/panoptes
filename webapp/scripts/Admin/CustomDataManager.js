@@ -76,7 +76,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
 
-            var bt_help = MiscUtils.createDocButton('importdata/importsettings/adddatatable');
+            var bt_help = MiscUtils.createDocButton('importdata/adddatatable');
 
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
 
