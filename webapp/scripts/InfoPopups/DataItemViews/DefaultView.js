@@ -12,11 +12,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var DefaultView = {};
 
-        DefaultView.create = function(viewSettings, tableInfo, itemData) {
+        DefaultView.create = function(viewSettings, itemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(itemData.tableid);
 
-            that.createFrames = function() {
-                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true);
+            that.createFrames = function(parent) {
+                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true)
+                .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameFields);
                 return that.frameFields;
             };
 

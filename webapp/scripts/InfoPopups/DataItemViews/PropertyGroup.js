@@ -12,11 +12,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var PropertyGroup = {};
 
-        PropertyGroup.create = function(viewSettings, tableInfo, itemData) {
+        PropertyGroup.create = function(viewSettings, itemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(itemData.tableid);
 
-            that.createFrames = function() {
-                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true);
+            that.createFrames = function(parent) {
+                var name = '-Absent-';
+                var groupInfo = tableInfo.propertyGroupMap[viewSettings.GroupId];
+                if (groupInfo)
+                    name = groupInfo.Name;
+                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true)
+                    .setDisplayTitle(name);
+                parent.addMemberFrame(that.frameFields);
                 return that.frameFields;
             };
 

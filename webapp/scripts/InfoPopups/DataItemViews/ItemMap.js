@@ -12,14 +12,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var ItemMap = {};
 
-        ItemMap.create = function(viewSettings, tableInfo, itemData) {
+        ItemMap.create = function(viewSettings, itemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(itemData.tableid);
 
             if (!tableInfo.hasGeoCoord)
                 DQX.reportError('Table does not have geographic coordinates: '+tableInfo.id);
 
-            that.createFrames = function() {
-                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise);
+            that.createFrames = function(parent) {
+                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise)
+                    .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameFields);
                 return that.frameMap;
             };
 

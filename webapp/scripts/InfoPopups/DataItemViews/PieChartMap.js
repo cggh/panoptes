@@ -12,11 +12,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var PieChartMap = {};
 
-        PieChartMap.create = function(viewSettings, tableInfo, itemData) {
+        PieChartMap.create = function(viewSettings, itemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(itemData.tableid);
 
-            that.createFrames = function() {
-                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise);
+
+            that.createFrames = function(parent) {
+                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise)
+                    .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameMap);
                 return that.frameMap;
             };
 

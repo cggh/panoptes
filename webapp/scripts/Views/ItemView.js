@@ -7,12 +7,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         "DQX/ChannelPlot/ChannelSequence", "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
         "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
         "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap",
-        "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup", "InfoPopups/ItemPopup"
+        "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup", "InfoPopups/ItemPopup",
+        "InfoPopups/DataItemViews/RelationTableView", "InfoPopups/DataItemViews/SubsetsView"
     ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, Wizard, Popup,
               PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap,
-              ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup) {
+              ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup, RelationTableView, SubsetsView) {
 
         var ItemView = function (frameRoot, itemInfo, data) {
             var that = {};
@@ -52,49 +53,41 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $.each(dataItemViews, function (idx, dtViewInfo) {
                     var dtViewObject = null;
                     if (dtViewInfo.Type == 'Overview') {
-                        dtViewObject = ItemView_DefaultView.create(dtViewInfo, that.tableInfo, data);
+                        dtViewObject = ItemView_DefaultView.create(dtViewInfo, data);
                     }
                     if (dtViewInfo.Type == 'PieChartMap') {
-                        dtViewObject = ItemView_PieChartMap.create(dtViewInfo, that.tableInfo, data);
+                        dtViewObject = ItemView_PieChartMap.create(dtViewInfo, data);
                     }
                     if (dtViewInfo.Type == 'ItemMap') {
-                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, that.tableInfo, data);
+                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, data);
                     }
                     if (dtViewInfo.Type == 'FieldList') {
-                        dtViewObject = ItemView_FieldList.create(dtViewInfo, that.tableInfo, data);
+                        dtViewObject = ItemView_FieldList.create(dtViewInfo, data);
                     }
                     if (dtViewInfo.Type == 'PropertyGroup') {
-                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, that.tableInfo, data);
-                        dtViewInfo.Name = '-Absent-';
-                        var groupInfo = that.tableInfo.propertyGroupMap[dtViewInfo.GroupId];
-                        if (groupInfo)
-                            dtViewInfo.Name = groupInfo.Name;
+                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, data);
                     }
                     if (!dtViewObject)
                         DQX.reportError("Invalid dataitem view type " + dtViewInfo.Type);
                     that.itemViewObjects.push(dtViewObject);
-                    frameTabGroup.addMemberFrame(dtViewObject.createFrames())
-                        .setDisplayTitle(dtViewInfo.Name);
                 });
 
-                that.childRelationTabs = [];
                 $.each(that.tableInfo.relationsParentOf, function (idx, relationInfo) {
-                    var relTab = {};
-                    relTab.relationInfo = relationInfo;
-                    relTab.childTableInfo = MetaData.mapTableCatalog[relationInfo.childtableid];
-                    var frameRelation = frameTabGroup.addMemberFrame(Framework.FrameGroupHor('', 0.7))
-                        .setDisplayTitle(relationInfo.reversename + ' ' + relTab.childTableInfo.tableNamePlural);
-                    relTab.frameButtons = frameRelation.addMemberFrame(Framework.FrameFinal('', 0.3))
-                        .setFixedSize(Framework.dimX, 150)/*.setFrameClassClient('DQXGrayClient')*/;
-                    relTab.frameTable = frameRelation.addMemberFrame(Framework.FrameFinal('', 0.7))
-                        .setAllowScrollBars(true, true);
-                    that.childRelationTabs.push(relTab);
+                    var relationView = RelationTableView.create(data, relationInfo);
+                    that.itemViewObjects.push(relationView);
                 });
 
                 if (!that.tableInfo.settings.DisableSubsets) {
-                    that.frameSubsets = frameTabGroup.addMemberFrame(Framework.FrameFinal('', 0.7))
-                        .setDisplayTitle('Subsets').setMargins(10);
+                    var subsetView = SubsetsView.create(data);
+                    that.itemViewObjects.push(subsetView);
                 }
+
+                $.each(that.itemViewObjects, function (idx, dtViewObject) {
+                    //Create frames and add to parent
+                    dtViewObject.createFrames(frameTabGroup);
+                });
+
+
             };
 
             that.createPanels = function () {
@@ -245,155 +238,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons.addControl(Controls.CompoundHor(cols));
 
-                that.createPanelsRelations();
-
                 $.each(that.itemViewObjects, function (idx, dtViewObject) {
                     dtViewObject.createPanels();
                 });
-
-                that.createSubsetsControls();
             }
-
-            that.createSubsetsControls = function () {
-                if (!that.tableInfo.settings.DisableSubsets) {
-                    that.panelSubsets = Framework.Form(that.frameSubsets);
-
-                    var subsetCheckList = [];
-                    var subsetCheckMap = {};
-                    $.each(that.tableInfo.storedSubsets, function (idx, subset) {
-                        var chk = Controls.Check(null, {label: subset.name});
-                        subsetCheckList.push(chk);
-                        subsetCheckMap[subset.id] = chk;
-                        chk.modifyEnabled(false);
-                        chk.setOnChanged(function () {
-                            DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_setitemselection',
-                                {
-                                    database: MetaData.database,
-                                    tableid: that.tableInfo.id,
-                                    workspaceid: MetaData.workspaceid,
-                                    itemid: that.itemid,
-                                    isnumericalkey: isnumericalkey ? 1 : 0,
-                                    primkey: that.tableInfo.primkey,
-                                    subsetid: subset.id,
-                                    ismember: chk.getValue() ? 1 : 0
-                                }
-                                , function (resp) {
-                                    subset.membercount += resp.diff;
-                                });
-                        });
-                    });
-                    if (subsetCheckList.length == 0) {
-                        that.panelSubsets.addControl(Controls.Static('There are currently no {name} subsets defined'.DQXformat({name: that.tableInfo.tableNameSingle})));
-                    }
-                    else {
-                        that.panelSubsets.addControl(Controls.CompoundVert([
-                            Controls.Static('This {name} is member of the following subsets:<p>'.DQXformat({name: that.tableInfo.tableNameSingle})),
-                            Controls.CompoundVert(subsetCheckList)
-                        ]));
-                    }
-
-                    var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
-                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'subset_getitemselection',
-                        {
-                            database: MetaData.database,
-                            tableid: that.tableInfo.id,
-                            workspaceid: MetaData.workspaceid,
-                            itemid: that.itemid,
-                            isnumericalkey: isnumericalkey ? 1 : 0,
-                            primkey: that.tableInfo.primkey
-                        }
-                        , function (resp) {
-                            $.each(subsetCheckList, function (idx, chk) {
-                                chk.modifyEnabled(true);
-                            })
-                            $.each(resp.subsetmemberlist, function (idx, activesubset) {
-                                if (subsetCheckMap[activesubset])
-                                    subsetCheckMap[activesubset].modifyValue(true, true);
-                            });
-                        });
-                }
-            }
-
-            that.createPanelsRelations = function () {
-                $.each(that.childRelationTabs, function (idx, relTab) {
-
-                    //Initialise the data fetcher that will download the data for the table
-                    var theDataFetcher = DataFetchers.Table(
-                        MetaData.serverUrl,
-                        MetaData.database,
-                        relTab.childTableInfo.getQueryTableName(false)
-                    );
-                    theDataFetcher.setReportIfError(true);
-
-                    relTab.panelTable = QueryTable.Panel(
-                        relTab.frameTable,
-                        theDataFetcher,
-                        { leftfraction: 50 }
-                    );
-                    var theTable = relTab.panelTable.getTable();
-                    theTable.fetchBuffer = 300;
-                    theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
-                    var theQuery = SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]);
-                    theTable.setQuery(theQuery);
-
-
-                    $.each(MetaData.customProperties, function (idx, propInfo) {
-                        if ((propInfo.tableid == relTab.childTableInfo.id) && (propInfo.propid != relTab.relationInfo.childpropid)) {
-                            var col = MiscUtils.createItemTableViewerColumn(theTable, relTab.childTableInfo.id, propInfo.propid);
-                        }
-                    });
-//                    $.each(relTab.childTableInfo.quickFindFields, function(idx, propid) {
-//                        if (propid!=relTab.relationInfo.childpropid) {
-//                            var propInfo = MetaData.findProperty(relTab.childTableInfo.id,propid);
-//                            var col = MiscUtils.createItemTableViewerColumn(theTable, relTab.childTableInfo.id, propid);
-//
-//                        }
-//                    });
-//                    that.updateQuery();
-                    relTab.panelTable.onResize();
-
-                    var buttons = [];
-
-
-                    relTab.panelButtons = Framework.Form(relTab.frameButtons);
-                    var button_OpenInTable = Controls.Button(null, { content: 'Show in table view', icon: 'fa-table', buttonClass: 'PnButtonGrid', width: 135, height: 35}).setOnChanged(function () {
-                        var qry = SQL.WhereClause.CompareFixed(relTab.relationInfo.childpropid, '=', data.fields[that.tableInfo.primkey]);
-                        Msg.send({type: 'DataItemTablePopup'}, {
-                            tableid: relTab.childTableInfo.id,
-                            query: qry,
-                            title: ''//that.tableInfo.tableCapNamePlural + ' at ' + pieChartInfo.longit + ', ' + pieChartInfo.lattit
-                        });
-//                        Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
-//                            { propid:relTab.relationInfo.childpropid, value:data.fields[that.tableInfo.primkey] }
-//                        );
-                        Msg.listen('', { type: 'LoadStoredDataItem'}, require("InfoPopups/ItemPopup").loadStoredItem);
-
-                    })
-                    buttons.push(button_OpenInTable);
-
-                    if (relTab.childTableInfo.hasGeoCoord) {
-                        var button_OpenInMap = Controls.Button(null, { content: 'Show on map'}).setOnChanged(function () {
-                                Msg.send({type: 'CreateGeoMapPoint' },
-                                    {
-                                        tableid: relTab.childTableInfo.id,
-                                        startQuery: theQuery
-                                    });
-                            }
-                        );
-                        buttons.push(button_OpenInMap);
-                    }
-
-                    relTab.panelButtons.addControl(Controls.CompoundHor(buttons));
-
-                });
-            };
 
             that.destroy = function () {
-                $.each(that.itemViewObjects, function(idx, dtViewObj) {
+                $.each(that.itemViewObjects, function (idx, dtViewObj) {
                     dtViewObj.onClose();
                 });
 
-                $.each(that.eventids,function(idx,eventid) {
+                $.each(that.eventids, function (idx, eventid) {
                     Msg.delListener(eventid);
                 });
             }
@@ -420,8 +275,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             return that;
         };
-
-
         return ItemView;
     });
 
