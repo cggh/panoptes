@@ -77,8 +77,8 @@ AutoScanProperties
 
 Properties
   *List (required)*
-  The datatable yaml should contain a key "Properties", containing a list of descriptions for all table columns used in the app.
-  See :ref:`def-settings-datatable-properties` for an overview of the keys that can be used for each individual item in this list.
+  Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.
+  See :ref:`def-settings-datatable-properties` for an overview of the keys that can be used for each property in this list.
 
 DataItemViews
   *List.* Definitions of custom views that will appear in the popup for an individual data table item.
