@@ -39,11 +39,27 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
 
                 that.createFrames = function (rootFrame) {
-                    this.frameControls = Framework.FrameGroupVert('', 0.2);
-                    this.frameTemplate = Framework.FrameDynamic('', 0.8);
                     rootFrame.makeGroupHor();
-                    rootFrame.addMemberFrame(that.frameControls);
-                    rootFrame.addMemberFrame(that.frameTemplate);
+                        that.frameControls = Framework.FrameGroupVert('', 0.2);
+                        rootFrame.addMemberFrame(that.frameControls);
+
+                        that.frameRight = Framework.FrameGroupVert('', 0.8)
+                        .setMargins(0)
+                        .setSeparatorSize(0);
+                        rootFrame.addMemberFrame(that.frameRight);
+
+                            that.frameTitle = Framework.FrameFinal('', 0.1)
+                            .setFixedSize(Framework.dimY, 50)
+                            .setAllowScrollBars(false,false)
+                            that.frameRight.addMemberFrame(that.frameTitle);
+
+                            that.frameTemplateHolder = Framework.FrameDynamic('', 0.8);
+                            that.frameRight.addMemberFrame(that.frameTemplateHolder);
+
+                                that.frameTemplateHolder.makeGroupHor();
+                                that.frameTemplate = Framework.FrameGeneric('', 0.8);
+                                that.frameTemplateHolder.addMemberFrame(that.frameTemplate);
+
                     this.frameContext = this.frameControls.addMemberFrame(Framework.FrameFinal('', 0.01))
                         .setMargins(0).setMinSize(Framework.dimY, 80).setAllowScrollBars(false, false);
                     this.frameList = this.frameControls.addMemberFrame(Framework.FrameFinal('', 0.8));
@@ -141,21 +157,17 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     DQX.setProcessing("Downloading...");
                     GetFullDataItemInfo.Get(that.tableid, item, function(resp) {
                         DQX.stopProcessing();
-                        if (!that.itemView) {
-                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
-                            that.itemView.createFrames(that.frameTemplate);
-                            that.itemView.render();
-                            that.itemView.createPanels();
-                            that.frameTemplate.applyOnPanels(function(panel) {
-                                if (panel._panelfirstRendered==false)
-                                    panel.render();
-                            })
-
-                        }
+                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ resp.fields[that.tableInfo.settings.TemplatedView.TitleField]+"</div>");
+                        that.frameTemplate = Framework.FrameDynamic('', 0.8);
+                        that.frameTemplateHolder.clearMemberFrames();
+                        that.frameTemplateHolder.addMemberFrame(that.frameTemplate);
+                        if (that.itemView)
+                            that.itemView.tearDown();
+                        that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
+                        that.frameTemplateHolder.render();
+                        that.itemView.render();
                     })
-
                 };
-
                 return that;
             }
         };

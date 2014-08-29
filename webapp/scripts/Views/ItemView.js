@@ -1,15 +1,22 @@
 // This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
-        "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl",
+        "DQX/Utils", "DQX/QueryTable", "DQX/Map", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame",
+        "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions",
+        "DQX/ChannelPlot/ChannelSequence", "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
         "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
-        "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap", "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup"
+        "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap",
+        "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup", "InfoPopups/ItemPopup"
     ],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary, MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap, ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup) {
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, Wizard, Popup,
+              PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
+              MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap,
+              ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup) {
 
-        var ItemView = function (frame, itemInfo, data) {
-            var that = frame;
+        var ItemView = function (frameRoot, itemInfo, data) {
+            var that = {};
+            that.frameRoot = frameRoot;
             that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
@@ -23,13 +30,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
 
 
-            that.createFrames = function (rootFrame) {
+            that.createFrames = function () {
 
-                rootFrame.makeGroupVert();
+                that.frameRoot.makeGroupVert();
 
-                var frameTabGroup = rootFrame.addMemberFrame(Framework.FrameGroupTab('', 0.7));
+                var frameTabGroup = that.frameRoot.addMemberFrame(Framework.FrameGroupTab('', 0.7));
 
-                that.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.3))
+                that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
                     .setFixedSize(Framework.dimY, 80).setFrameClassClient('DQXGrayClient').setAllowScrollBars(false, false).setMargins(0);
 
 
@@ -359,7 +366,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 //                        Msg.send({type: 'ShowItemsInSimpleQuery', tableid:relTab.childTableInfo.id},
 //                            { propid:relTab.relationInfo.childpropid, value:data.fields[that.tableInfo.primkey] }
 //                        );
-                        Msg.listen('', { type: 'LoadStoredDataItem'}, ItemPopup.loadStoredItem);
+                        Msg.listen('', { type: 'LoadStoredDataItem'}, require("InfoPopups/ItemPopup").loadStoredItem);
 
                     })
                     buttons.push(button_OpenInTable);
@@ -390,6 +397,26 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Msg.delListener(eventid);
                 });
             }
+
+            that.render = function () {
+                that.createFrames();
+                that.frameRoot.render();
+                that.createPanels();
+                that.frameRoot.applyOnPanels(function(panel) {
+                    if (panel._panelfirstRendered==false)
+                        panel.render();
+                });
+            };
+
+
+            that.tearDown = function () {
+                that.destroy();
+                that.frameRoot.applyOnPanels(function(panel) {
+                    if (panel.tearDown)
+                        panel.tearDown();
+                });
+            };
+
 
             return that;
         };

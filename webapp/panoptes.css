@@ -193,6 +193,11 @@ a:link, a:visited
     border: 1px solid rgb(170,170,170);
 }
 
+.DQXLargeList
+{
+    background-color: rgb(218, 218, 218);
+}
+
 
 .DQXLargeListItem
 {
@@ -784,5 +789,11 @@ input.PnGenotypesPageEdit{
     background-color: rgba(206,234,237,0.5);
 
 
+}
+
+.PnItemTitle
+{
+    padding: 10px;
+    font-size: 20px;
 }
 

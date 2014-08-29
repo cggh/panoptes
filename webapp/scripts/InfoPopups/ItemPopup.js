@@ -32,28 +32,32 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             var tableInfo = MetaData.getTableInfo(itemInfo.tableid);
-
-            var that = ItemView(PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
+            var popup = PopupFrame.PopupFrame('ItemPopup'+itemInfo.tableid,
                 {
                     title:tableInfo.tableCapNameSingle + ' "'+itemInfo.itemid+'"',
                     icon:tableInfo.settings.Icon,
                     blocking:false,
                     sizeX:700, sizeY:500
                 }
-            ), itemInfo, data);
+            );
+
+            var itemView = ItemView(popup.frameRoot, itemInfo, data);
+            popup.createFrames = itemView.createFrames;
+            popup.createPanels = itemView.createPanels;
+
 
             if (MetaData.isManager)
-                that.addTool('fa-link', function() { that.handleCreateLink(); });
+                popup.addTool('fa-link', function() { popup.handleCreateLink(); });
 
             if (itemInfo.frameSettings) {
                 // Popupframe settings were stored; recall & set as new history, so that settings will be picked up during creation
-                PopupFrame.setFrameSettingsHistory(that.typeID, itemInfo.frameSettings);
+                PopupFrame.setFrameSettingsHistory(popup.typeID, itemInfo.frameSettings);
             }
 
-            that.onClose = function() {
+            popup.onClose = function() {
                 var activeIndex = -1;
-                $.each(ItemPopup.activeList, function(idx,popup) {
-                    if (popup===that)
+                $.each(ItemPopup.activeList, function(idx,i_popup) {
+                    if (i_popup===popup)
                         activeIndex = idx;
                 });
                 if (activeIndex>=0) {
@@ -61,30 +65,30 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 else
                     DQX.reportError('Plot not found!');
-                that.destroy();
+                itemView.destroy();
             };
 
-            that.store = function() {
+            popup.store = function() {
                 var obj = {};
-                obj.itemid = that.itemid;
-                obj.tableid = that.tableInfo.id;
-                obj.frameSettings = that.frameRoot.settingsStreamOut();
+                obj.itemid = itemView.itemid;
+                obj.tableid = itemView.tableInfo.id;
+                obj.frameSettings = popup.frameRoot.settingsStreamOut();
                 return obj;
             };
 
-            that.handleCreateLink = function() {
-                var content = base64.encode(JSON.stringify(that.store()));
+            popup.handleCreateLink = function() {
+                var content = base64.encode(JSON.stringify(popup.store()));
                 DQX.serverDataStore(MetaData.serverUrl, content, function (id) {
                     DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
                         { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
                         function (resp) {
-                            require("Utils/IntroViews").createIntroView('dataitem', id, '-', 'Add {name} to start page'.DQXformat({name:that.tableInfo.tableNameSingle}));
+                            require("Utils/IntroViews").createIntroView('dataitem', id, '-', 'Add {name} to start page'.DQXformat({itemView:that.tableInfo.tableNameSingle}));
                         });
                 });
             }
 
-            ItemPopup.activeList.push(that);
-            that.create();
+            ItemPopup.activeList.push(popup);
+            popup.create();
         }
 
 
