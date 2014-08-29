@@ -18,7 +18,7 @@ class ProcessFilterBank(BaseImport):
         try:
             val = float(val_str)
         except:
-                pass
+            pass
 #   print 'chrom %s, pos %d, val %s' % (chromosome, pos, val)
         if chromosome != output["currentChromosome"]:
             if output["summariser"] != None:
@@ -34,12 +34,15 @@ class ProcessFilterBank(BaseImport):
         if chromosome != output["currentChromosome"]:
             if output["summariser"] != None:
                 output["summariser"].Finalise()
-            output["summariser"] = MultiCategoryDensityFilterBankData.Summariser(chromosome, output["encoder"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputdir"], output["Categories"])
+            output["summariser"] = MultiCategoryDensityFilterBankData.Summariser(chromosome, output["propId"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputDir"], output["Categories"])
             output["currentChromosome"] = chromosome
         output["summariser"].Add(pos,val)        
         
         
-    def _extractColumns(self, sourceFileName, outputs, outputc, writeHeader):
+    def _extractColumnsAndProcess(self, sourceFileName, outputs, outputc, writeHeader):
+        
+        #Not really needed but handy if you want to regenerate
+        writeColumnFiles = True
         
         if len(outputs) == 0 and len(outputc) == 0:
 #            self._log('Nothing to filter bank from {}'.format(sourceFileName))
@@ -47,17 +50,19 @@ class ProcessFilterBank(BaseImport):
         
         for output in outputs:
             self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
-            #Changing the bufsiz seems to have little or no impact
-            output["destFile"] = open(output["outputFile"], 'w')
-            if writeHeader:
-                output["destFile"].write('\t'.join(output["columns"]) + '\n')
+            if writeColumnFiles:
+                #Changing the bufsiz seems to have little or no impact
+                output["destFile"] = open(output["outputFile"], 'w')
+                if writeHeader:
+                    output["destFile"].write('\t'.join(output["columns"]) + '\n')
                 
         for output in outputc:
             self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
-            #Changing the bufsiz seems to have little or no impact
-            output["destFile"] = open(output["outputFile"], 'w')
-            if writeHeader:
-                output["destFile"].write('\t'.join(output["columns"]) + '\n')
+            if writeColumnFiles:
+                #Changing the bufsiz seems to have little or no impact
+                output["destFile"] = open(output["outputFile"], 'w')
+                if writeHeader:
+                    output["destFile"].write('\t'.join(output["columns"]) + '\n')
                     
         linecount = 0
         with self._logHeader('Creating summary values from {}'.format(sourceFileName)):
@@ -112,12 +117,14 @@ class ProcessFilterBank(BaseImport):
                             fields = [columns[colindex] for colindex in output["colindices"]]
                             outline = '\t'.join(fields)
                             self._createSummary(output, fields[0], fields[1], fields[2])
-                            output["destFile"].write(outline + '\n')
+                            if writeColumnFiles:
+                                output["destFile"].write(outline + '\n')
                         for output in outputc:
                             fields = [columns[colindex] for colindex in output["colindices"]]
                             outline = '\t'.join(fields)
                             self._createSummaryValues_Categorical(output, fields[0], fields[1], fields[2])
-                            output["destFile"].write(outline + '\n')
+                            if writeColumnFiles:
+                                output["destFile"].write(outline + '\n')
     
     
             self._log('Finished processing {}. {} lines'.format(sourceFileName,str(linecount)))
@@ -237,11 +244,10 @@ class ProcessFilterBank(BaseImport):
                           'blockSizeStart': int(summSettings["BlockSizeMin"]),
                           'blockSizeMax': int(summSettings["BlockSizeMax"]),
                           'Categories': summSettings['Categories']
-                            }                    
-                    MultiCategoryDensityFilterBankData.SetupSummary(cval)
+                            }
                     outputc.append(cval)
 
-        self._extractColumns(sourceFileName, outputs, outputc, False)
+        self._extractColumnsAndProcess(sourceFileName, outputs, outputc, False)
 
                
     def createAllSummaryValues(self):
