@@ -263,6 +263,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             };
 
+            that.update = function(newItemData) {
+                $.each(that.itemViewObjects, function (idx, dtViewObject) {
+                    if (dtViewObject.update)
+                        dtViewObject.update(newItemData);
+                });
+            }
 
             that.tearDown = function () {
                 that.destroy();

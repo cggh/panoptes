@@ -22,7 +22,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.createFrames = function(parent) {
                 that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise)
                     .setDisplayTitle(viewSettings.Name);
-                parent.addMemberFrame(that.frameFields);
+                parent.addMemberFrame(that.frameMap);
                 return that.frameMap;
             };
 

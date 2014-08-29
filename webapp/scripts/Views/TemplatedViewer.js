@@ -53,12 +53,9 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                             .setAllowScrollBars(false,false)
                             that.frameRight.addMemberFrame(that.frameTitle);
 
-                            that.frameTemplateHolder = Framework.FrameDynamic('', 0.8);
-                            that.frameRight.addMemberFrame(that.frameTemplateHolder);
+                            that.frameTemplate = Framework.FrameDynamic('', 0.8);
+                            that.frameRight.addMemberFrame(that.frameTemplate);
 
-                                that.frameTemplateHolder.makeGroupHor();
-                                that.frameTemplate = Framework.FrameGeneric('', 0.8);
-                                that.frameTemplateHolder.addMemberFrame(that.frameTemplate);
 
                     this.frameContext = this.frameControls.addMemberFrame(Framework.FrameFinal('', 0.01))
                         .setMargins(0).setMinSize(Framework.dimY, 80).setAllowScrollBars(false, false);
@@ -90,10 +87,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.panelList.setHasFilter();
                     this.panelList.setTemplate('<span class="fa '+that.tableInfo.settings.Icon +' buttonicon" style="color:rgb(130,130,130);padding-right: 5px"></span><span>{title_field}</span>');
                     this.panelList.render();
-
-                    //Right Panel
-                    //this.panelTemplate = Framework.TemplateFrame(this.frameTemplate, that.template);
-                    //this.panelTemplate.render();
 
                     //Initialise the data fetcher that will download the data for the table
                     this.tableFetcher = DataFetchers.Table(
@@ -158,14 +151,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     GetFullDataItemInfo.Get(that.tableid, item, function(resp) {
                         DQX.stopProcessing();
                         that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ resp.fields[that.tableInfo.settings.TemplatedView.TitleField]+"</div>");
-                        that.frameTemplate = Framework.FrameDynamic('', 0.8);
-                        that.frameTemplateHolder.clearMemberFrames();
-                        that.frameTemplateHolder.addMemberFrame(that.frameTemplate);
-                        if (that.itemView)
-                            that.itemView.tearDown();
-                        that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
-                        that.frameTemplateHolder.render();
-                        that.itemView.render();
+                        if (!that.itemView) {
+                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
+                            that.itemView.render()
+                        } else {
+                            that.itemView.update(resp);
+                        }
                     })
                 };
                 return that;
