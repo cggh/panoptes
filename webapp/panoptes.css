@@ -226,9 +226,8 @@ a:link, a:visited
 }
 
 
-.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid, .DQXWizardButton
+.DQXToolButton2, .PnButtonLarge, .PnButtonSmall, .DQXToolButton3, .PnButtonGrid, .DQXWizardButton, .PnButtonHelp
 {
-
     background: rgb(255,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgb(255,255,255) 0%, rgb(234,234,234) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(255,255,255)), color-stop(100%,rgb(234,234,234))); /* Chrome,Safari4+ */
@@ -236,11 +235,13 @@ a:link, a:visited
     background: -o-linear-gradient(top, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* Opera 11.10+ */
     background: -ms-linear-gradient(top, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* IE10+ */
     background: linear-gradient(to bottom, rgb(255,255,255) 0%,rgb(234,234,234) 100%); /* W3C */
-
     border: 1px solid rgb(200, 200, 200);
-
     box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+}
 
+ .PnButtonHelp
+{
+    border: 1px solid rgb(0, 200, 0) !important;
 }
 
 
@@ -271,21 +272,23 @@ a:link, a:visited
 }
 
 
-.DQXToolButton0 img, .DQXToolButton1 img, .DQXToolButton2 img, .DQXToolButton3 img, .PnButtonLarge img, .PnButtonSmall img, .PnButtonGrid img
+.DQXToolButton0 img, .DQXToolButton1 img, .DQXToolButton2 img, .DQXToolButton3 img, .PnButtonLarge img, .PnButtonSmall img, .PnButtonGrid img, .PnButtonHelp img
 {
     opacity:0.6;
 }
 
-.DQXToolButton0:hover img, .DQXToolButton1:hover img, .DQXToolButton2:hover img, .DQXToolButton3:hover img, .PnButtonLarge:hover img, .PnButtonSmall:hover img, .PnButtonGrid:hover img
+.DQXToolButton0:hover img, .DQXToolButton1:hover img, .DQXToolButton2:hover img, .DQXToolButton3:hover img, .PnButtonLarge:hover img, .PnButtonSmall:hover img, .PnButtonGrid:hover img, .PnButtonHelp:hover img
 {
     opacity:1;
 }
 
-.DQXToolButton0 .buttonicon, .DQXToolButton1 .buttonicon, .DQXToolButton2 .buttonicon, .DQXToolButton3 .buttonicon, .PnButtonLarge .buttonicon, .PnButtonSmall .buttonicon, .PnButtonGrid .buttonicon {
+.DQXToolButton0 .buttonicon, .DQXToolButton1 .buttonicon, .DQXToolButton2 .buttonicon, .DQXToolButton3 .buttonicon, .PnButtonLarge .buttonicon, .PnButtonSmall .buttonicon, .PnButtonGrid .buttonicon, .PnButtonHelp .buttonicon
+{
     color:rgb(130,130,130);
 }
 
-.DQXToolButton0:hover .buttonicon, .DQXToolButton1:hover .buttonicon, .DQXToolButton2:hover .buttonicon, .DQXToolButton3:hover .buttonicon, .PnButtonLarge:hover .buttonicon, .PnButtonSmall:hover .buttonicon, .PnButtonGrid:hover .buttonicon {
+.DQXToolButton0:hover .buttonicon, .DQXToolButton1:hover .buttonicon, .DQXToolButton2:hover .buttonicon, .DQXToolButton3:hover .buttonicon, .PnButtonLarge:hover .buttonicon, .PnButtonSmall:hover .buttonicon, .PnButtonGrid:hover .buttonicon, .PnButtonHelp .buttonicon
+{
     color:rgb(0,0,0);
 }
 
@@ -314,7 +317,7 @@ a:link, a:visited
 
 }
 
-.PnButtonGrid, .DQXToolButton1, .DQXToolButton3, .DQXToolButton2
+.PnButtonGrid, .DQXToolButton1, .DQXToolButton3, .DQXToolButton2, .PnButtonHelp
 {
     margin: 0px;
     font-size:11px;
@@ -333,7 +336,7 @@ a:link, a:visited
 }
 
 
-.PnButtonGrid:hover, .DQXToolButton1:hover, .DQXToolButton3:hover, .DQXToolButton2:hover
+.PnButtonGrid:hover, .DQXToolButton1:hover, .DQXToolButton3:hover, .DQXToolButton2:hover, .PnButtonHelp:hover
 {
     color: rgb(0,94,102);
     box-shadow:none;

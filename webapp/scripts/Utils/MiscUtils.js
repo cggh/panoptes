@@ -576,7 +576,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         MiscUtils.createDocButton = function(urlFraction) {
-            var bt_help = Controls.Button(null, { buttonClass: 'DQXToolButton2', bitmap:'Bitmaps/Icons/Small/documentation.png', bitmapHeight:25, content: 'Doc', width:80, height:35 }).setOnChanged(function() {
+            var bt_help = Controls.Button(null, {
+                buttonClass: 'PnButtonHelp',
+                //icon: 'fa-question-circle',
+                bitmap:'Bitmaps/Icons/Small/documentationgreen.png', bitmapHeight:25,
+                content: '<span style="color:rgb(0,120,0)"><b>Help</b></span>',
+                width:80, height:35
+            }).setOnChanged(function() {
                 var url = MetaData.urlDocumentation + urlFraction+ '.html';
                 window.open(url,'_blank');
             });

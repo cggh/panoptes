@@ -80,7 +80,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
 
-            var popupid = Popup.create('Upload data table', content);
+            var popupid = Popup.create('Add new data table', content);
         };
 
 
@@ -142,7 +142,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
 
-            var popupid = Popup.create('Upload custom data', content);
+            var popupid = Popup.create('Add new custom data', content);
         };
 
 
@@ -345,7 +345,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             });
             var bt_help = MiscUtils.createDocButton('importdata/addworkspace');
             content += '<p>' + bt.renderHtml() + '&nbsp;&nbsp;' +bt_help.renderHtml() + '<p>';
-            var popupid = Popup.create('Add new dataset', content);
+            var popupid = Popup.create('Add new workspace', content);
         };
 
 

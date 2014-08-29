@@ -1,7 +1,7 @@
-Panoptes data structure
------------------------
+Panoptes data concepts
+----------------------
 
-The datga served by Panoptes is structured according to a number of central concepts:
+The data served by Panoptes is structured according to a number of central concepts:
 
 .. toctree::
    :maxdepth: 1

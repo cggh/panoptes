@@ -1,8 +1,10 @@
-Adding data
-===========
+Loading data
+============
 
-Panoptes imports datasets into the server database from source data, consisting in a set of simple, structured files.
-Importing a dataset from source data does not happen automatically, and has to be initiated by the user.
+Panoptes imports datasets into the server database from source data, consisting in a set of simple, structured files present on the server.
+Importing a dataset from source data does not happen automatically, and has to be initiated by the user (see :doc:`importaction`).
+This import action creates all necessary components to serve the dataset in Panoptes (relational database, preprocessed files, etc...)
+
 
 See also:
 
@@ -10,6 +12,7 @@ See also:
    :maxdepth: 1
 
    dataconcepts/_intro
+   importaction
 
 New source data can be added following two approaches:
 
@@ -57,14 +60,3 @@ See also:
    importsettings/_intro
    identifiers
 
-Importing source data
----------------------
-Importing a dataset from source data does not happen automatically, and has to be initiated by the user.
-This import action creates all necessary components to serve the dataset in Panoptes (relational database, preprocessed files, etc...)
-
-See also:
-
-.. toctree::
-   :maxdepth: 1
-
-   importaction
