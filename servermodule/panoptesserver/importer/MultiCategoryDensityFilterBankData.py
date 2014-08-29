@@ -1,4 +1,5 @@
 import os
+import sys
 import simplejson
 import DQXEncoder
 
@@ -13,23 +14,27 @@ class Level:
         return ("sum %d, count %d, min %d, max %d" % (int(self.sum), int(self.count), int(self.min), int(self.max)))
 
 class Summariser:
-    def __init__(self, chromosome, encoder, blockSizeStart, blockSizeIncrFactor, blockSizeMax, outputFolder, categories):
+    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, outputFolder, categories):
         print('##### Start processing chromosome '+chromosome)
-        self.encoder = encoder
+        
         self.chromosome = chromosome
         self.outputFolder = outputFolder
         self.lastpos=-1
         self.blockSizeStart = blockSizeStart
         self.blockSizeIncrFactor = blockSizeIncrFactor
         self.blockSizeMax = blockSizeMax
+        self._field = propid
         
         print('Categories: ' + str(categories))
+        self._categories = categories
         self._numCategories = len(categories)
         self._categorymap = {categories[i]:i for i in range(len(categories))}
         self._otherCategoryNr = None
         for i in range(len(categories)):
             if categories[i] == '_other_':
                 self._otherCategoryNr = i
+                
+        self._setupSummary()
                 
         self.levels = []
         blocksize = self.blockSizeStart
@@ -61,7 +66,7 @@ class Summariser:
                         level.catcounts[self._otherCategoryNr] += 1
 
     def CloseCurrentBlock(self, level):
-        level.outputfile.write(self.encoder.perform(level.catcounts))
+        level.outputfile.write(self._encoder.perform(level.catcounts))
 
 
     def StartNextBlock(self, level):
@@ -75,52 +80,114 @@ class Summariser:
             level.outputfile.close()
 
 
-#Don't think this is quite right - at least some should be in the constructor
-def SetupSummary(output):
-    output["processedChromosomes"] = {}
-    output["currentChromosome"] = ''
-    output["summariser"] = None
 
-    basedir = output['outputDir']
-#create output directory if necessary
-    outputdir=os.path.join(basedir,'Summaries')
-    output["outputdir"] = outputdir
-    if not os.path.exists(outputdir):
-        os.makedirs(outputdir)
-
-#remove all summary files that correspond to this configuration
-    for filename in os.listdir(outputdir):
-        if filename.startswith('Summ_'):
-            os.remove(os.path.join(outputdir,filename))
-
-
-    encoderInfo = {"ID": "MultiCatCount", 'CatCount': len(output["Categories"]), 'EncoderLen': 4, 'Categories':output["Categories"] }
-    output["encoder"] = DQXEncoder.GetEncoder(encoderInfo)
-
-
-    propid=output["propId"]
-
-    cnf={}
-
-    cnf["BlockSizeStart"] = output["blockSizeStart"]
-    cnf["BlockSizeIncrFactor"] = output["blockSizeIncrFactor"]
-    cnf["BlockSizeMax"] = output["blockSizeMax"]
-    cnf["Properties"] = [
-        { "ID": propid, "Type": "Float"}
-    ]
-
-    cnf["Summarisers"] = [
-        {
-            "PropID": propid,
-            "IDExt": "cats",
-            "Method": "MultiCatCount",
-            "Encoder": encoderInfo
-        }
-    ]
-
-    fp = open(basedir+'/Summ.cnf','w')
-    simplejson.dump(cnf,fp,indent=True)
-    fp.write('\n')
-    fp.close()
+    def _setupSummary(self):
+        
+            basedir = self._baseDir
+        #create output directory if necessary
+            self._outputdir=os.path.join(basedir,'Summaries')
+            
+            if not os.path.exists(self._outputdir):
+                os.makedirs(self._outputdir)
+        
+        #remove all summary files that correspond to this configuration
+            for filename in os.listdir(self._outputdir):
+                if filename.startswith('Summ_' + self._chromosome):
+                    os.remove(os.path.join(self._outputdir,filename))
+        
+        
+            encoderInfo = {"ID": "MultiCatCount", 'CatCount': self._numCategories, 'EncoderLen': 4, 'Categories':self._categories }
+            self._encoder = DQXEncoder.GetEncoder(encoderInfo)
+        
+        
+            propid= self._field
+        
+            cnf={}
+        
+            cnf["BlockSizeStart"] = self._blockSizeStart
+            cnf["BlockSizeIncrFactor"] = self._blockSizeIncrFactor
+            cnf["BlockSizeMax"] = self._blockSizeMax
+            cnf["Properties"] = [
+                { "ID": propid, "Type": "Float"}
+            ]
+        
+            cnf["Summarisers"] = [
+                {
+                    "PropID": propid,
+                    "IDExt": "cats",
+                    "Method": "MultiCatCount",
+                    "Encoder": encoderInfo
+                }
+            ]
+        
+            fp = open(basedir+'/Summ.cnf','w')
+            simplejson.dump(cnf,fp,indent=True)
+            fp.write('\n')
+            fp.close()
 
 
+if __name__ == "__main__":
+    
+    basedir = '.'
+    
+    #============= FAKE STUFF FOR DEBUGGING; REMOVE FOR PRODUCTION ==============
+    # if False:
+    #     basedir = '/Users/pvaut/Documents/Genome/SummaryTracks/Samples_and_Variants/Extra1'
+    #     sys.argv = ['', 'Extra1', '20', '2', '50000', 'A;B']
+    #============= END OF FAKE STUFF ============================================
+    
+    
+    if len(sys.argv)<6:
+        print('Usage: COMMAND datafile blockSizeStart blockSizeIncrFactor blockSizeMax, Categories (; separated)')
+        print('   datafile: format: chromosome\\tposition\\tvalue (no header)')
+        sys.exit()
+    
+    sourcefile = sys.argv[1]
+    blockSizeStart = int(sys.argv[2])
+    blockSizeIncrFactor = int(sys.argv[3])
+    blockSizeMax = int(sys.argv[4])
+    
+    categories  = sys.argv[5].split(';')
+    print('Categories: ' + str(categories))
+    categorymap = {categories[i]:i for i in range(len(categories))}
+    otherCategoryNr = None
+    for i in range(len(categories)):
+        if categories[i] == '_other_':
+            otherCategoryNr = i
+       
+    propid=sourcefile.split('.')[0]
+      
+    sf = open(basedir+'/'+sourcefile,'r')
+    
+    currentChromosome = ''
+    summariser = None
+    processedChromosomes = {}
+        
+    linecount = 0
+    while True:
+        line=sf.readline().rstrip('\n')
+        if not(line):
+            break
+        else:
+            linecount += 1
+            if linecount % 500000 ==0:
+                print(str(linecount))
+        comps = line.split('\t')
+        chromosome = comps[0]
+        pos = int(float(comps[1]))
+        val = comps[2]
+        if chromosome != currentChromosome:
+            if summariser != None:
+                summariser.Finalise()
+            summariser = Summariser(chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax)
+            if chromosome in processedChromosomes:
+                raise Exception('File should be ordered by chromosome')
+            processedChromosomes[chromosome] = True
+            currentChromosome = chromosome
+        summariser.Add(pos,val)
+    
+    
+    if summariser != None:
+        summariser.Finalise()
+    
+    print(str(linecount))

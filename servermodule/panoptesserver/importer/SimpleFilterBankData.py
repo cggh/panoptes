@@ -17,7 +17,7 @@ class Level:
         return ("sum %d, count %d, min %d, max %d" % (int(self.sum), int(self.count), int(self.min), int(self.max)))
 
 class Summariser:
-    def __init__(self, propid, chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal):
+    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal):
         print('##### Start processing chromosome '+chromosome)
         self._minval = 0
         
