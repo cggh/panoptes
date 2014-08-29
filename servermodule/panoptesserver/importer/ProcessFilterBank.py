@@ -83,6 +83,7 @@ class ProcessFilterBank(BaseImport):
                 for output in outputc:
                     output["currentChromosome"] = ''
                     output["colindices"] = []
+                    output["summariser"] = None
                     for col in output["columns"]:
                         try:
                             output["colindices"].append(header.index(col))
