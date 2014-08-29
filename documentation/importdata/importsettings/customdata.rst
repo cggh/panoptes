@@ -4,9 +4,8 @@
 
 Custom data settings
 ~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for a custom data source. See also:
+This YAML_ file contains settings for a :ref:`custom data source<dataconcept_customdata>`. See also:
 
-- :ref:`def-source-customdata`
 - :ref:`data-import-settings`
 - :ref:`data-import-addcustomdata`
 

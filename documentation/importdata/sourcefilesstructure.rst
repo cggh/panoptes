@@ -15,8 +15,8 @@ The formatting of the source data relies a few concepts:
 
 .. _def-source-dataset:
 
-Dataset
-~~~~~~~~
+Dataset source files
+~~~~~~~~~~~~~~~~~~~~
 The ``config.SOURCEDATADIR`` folder should contain a folder ``datasets``, serving as a root for all *datasets* being served by the Panoptes instance.
 
 In this folder, a subfolder should be present for each *dataset*. The folder name is used as the unique identifier of this dataset.
@@ -25,8 +25,8 @@ In the *dataset* folder, a yaml ``settings`` file should be present, specifying 
 
 .. _def-source-referencegenome:
 
-Reference genome
-~~~~~~~~~~~~~~~~
+Reference genome source files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A *dataset* source data folder may optionally contain a subfolder ``refgenome``, describing the reference genome used. It can contain the following files:
 
 - ``chromosomes`` (required). A list of all chromosomes identifiers, and their lengths (in MB).
@@ -34,8 +34,8 @@ A *dataset* source data folder may optionally contain a subfolder ``refgenome``,
 - ``refsequence.fa`` (optional). The reference genome sequence, as FASTA file.
 - ``settings`` (required, yaml formatted). Various settings concerning the reference genome (see :ref:`def-settings-refgenome`).
 
-Summary values
-~~~~~~~~~~~~~~
+Summary values source files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Each subfolder in this folder represents a different (numerical) property defined over the genome that will be filter banked and can be displayed in the genome browser. The folder name serves as the identifier of the summary value. Each summary value folder should contain the following two files:
 
 - ``values``. A TAB-delimited file having three columns (and no header):
@@ -50,8 +50,8 @@ The ``refgenome`` folder may contain an optional subfolder ``summaryvalues``. Ea
 .. _def-source-datatable:
 
 
-Data table
-~~~~~~~~~~~
+Data table source files
+~~~~~~~~~~~~~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``datatables`` should be present. This is the root for a set of folders, each one describing an individual *data table*, with the name of the folder serves as an identifier.
 
 In a *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table. Each line consists in a set of TAB-delimited *properties*. The first line of the file serves as a header, specifying the identifiers for all *properties*.
@@ -62,8 +62,8 @@ This file can contain a number of settings, both at the level of the *data table
 
 .. _def-source-workspace:
 
-Workspace
-~~~~~~~~~~
+Workspace source files
+~~~~~~~~~~~~~~~~~~~~~~
 In the *dataset* folder, a subfolder ``workspaces`` should be present. This is the root for a set of subfolders, each one describing a *workspace* for this *dataset*. The folder name serves as identifier for the *workspace*.
 
 In a *workspace* folder, a yaml structured ``settings`` file should be present, specifying the displayed name of the workspace (see :ref:`def-settings-workspace`).
@@ -76,8 +76,8 @@ In addition, a subfolder ``customdata`` should be present. This location is used
 
 .. _def-source-customdata:
 
-Custom data
-~~~~~~~~~~~
+Custom data source files
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``customdata`` folder in a workspace should have a subfolder for each *data table* it defines date for, and the folder name should be the *data table* identifier. In this data table - specific folder, a number of subfolder can be defined, each one specifying an individual set of *custom data*. Such a subfolder should contain two files:
 

@@ -4,9 +4,8 @@
 
 Reference genome settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for the reference genome. See also:
+This YAML_ file contains settings for the :ref:`reference genome<dataconcept_refgenome>`. See also:
 
-- :ref:`def-source-referencegenome`
 - :ref:`data-import-settings`
 - :ref:`data-import-addannotation`
 - :ref:`data-import-addrefgenome`

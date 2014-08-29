@@ -9,7 +9,7 @@
 Add reference genome sequence
 -----------------------------
 
-Using the admin web frontend, reference genome sequence can be added to a dataset
+Using the admin web frontend, a :ref:`reference genome<dataconcept_refgenome>` sequence can be added to a dataset
 by
 
 1. Clicking the |buttonimport| icon to the left of the label "**Reference genome**",

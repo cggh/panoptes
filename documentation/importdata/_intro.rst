@@ -9,7 +9,7 @@ See also:
 .. toctree::
    :maxdepth: 1
 
-   datastructure
+   dataconcepts/_intro
 
 New source data can be added following two approaches:
 

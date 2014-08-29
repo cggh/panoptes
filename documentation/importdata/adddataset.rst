@@ -7,7 +7,7 @@
 Creating a new dataset
 ----------------------
 
-Using the admin web frontend, a new dataset can be created by clicking the |buttonnew| icon, next to the top branch "*Datasets*".
+Using the admin web frontend, a new :ref:`dataset<dataconcept_dataset>` can be created by clicking the |buttonnew| icon, next to the top branch "*Datasets*".
 
 In the dialog box, specify a unique identifier for this new dataset.
 

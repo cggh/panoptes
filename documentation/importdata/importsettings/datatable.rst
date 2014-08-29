@@ -5,9 +5,8 @@
 Data table settings
 ------------------
 
-This YAML_ file contains settings for a data table. See also:
+This YAML_ file contains settings for a :ref:`data table<dataconcept_datatable>`. See also:
 
-- :ref:`def-source-datatable`
 - :ref:`data-import-settings`
 - :ref:`data-import-adddatatable`
 

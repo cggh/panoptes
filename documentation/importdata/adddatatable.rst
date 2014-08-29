@@ -8,7 +8,7 @@
 Add a new data table to a dataset
 ---------------------------------
 
-Using the admin web frontend, a new data table can be created by clicking the button |buttonnew|, next to the label "*Datatables*",
+Using the admin web frontend, a new :ref:`data table<dataconcept_datatable>` can be created by clicking the button |buttonnew|, next to the label "*Datatables*",
 under the tree branch that represents the dataset.
 
 A dialog box appears that allows one to pick a TAB-delimited file from the local computer,

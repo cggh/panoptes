@@ -4,9 +4,8 @@
 
 Workspace settings
 ~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for a dataset workspace. See also:
+This YAML_ file contains settings for a :ref:`workspace<dataconcept_workspace>`. See also:
 
-- :ref:`def-source-workspace`
 - :ref:`data-import-settings`
 - :ref:`data-import-addworkspace`
 

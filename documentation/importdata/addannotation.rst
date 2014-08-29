@@ -9,7 +9,7 @@
 Add reference genome annotation
 -------------------------------
 
-Using the admin web frontend, reference genome annotation data can be added to a dataset
+Using the admin web frontend, :ref:`reference genome<dataconcept_refgenome>` annotation data can be added to a dataset
 by
 
 1. Clicking the |buttonimport| icon to the left of the label "**Reference genome**",

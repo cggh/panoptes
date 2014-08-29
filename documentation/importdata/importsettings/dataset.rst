@@ -5,9 +5,8 @@
 
 General dataset settings
 ~~~~~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for a dataset. See also:
+This YAML_ file contains settings for a :ref:`dataset<dataconcept_dataset>`. See also:
 
-- :ref:`def-source-dataset`
 - :ref:`data-import-settings`
 - :ref:`data-import-adddataset`
 
