@@ -2,6 +2,8 @@
 .. |buttonedit| image:: /buttons/edit.png
 .. |buttonrun| image:: /buttons/run.png
 
+.. _data-import-adddataset:
+
 Creating a new dataset
 ----------------------
 
@@ -23,7 +25,7 @@ Follow-up actions
 
 Modify the settings:
   Click on the |buttonedit| icon left of the dataset label
-  (see :ref:`data-import-settings`).
+  (see :ref:`data-import-settings` and  and :ref:`def-settings-dataset`).
 
 Add a data table to this dataset:
   Click on the |buttonnew| icon right of the *"Datatables"* label in the dataset section

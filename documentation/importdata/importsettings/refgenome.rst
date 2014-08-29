@@ -4,7 +4,15 @@
 
 Reference genome settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for the :ref:`def-source-referencegenome`, and may contain the following keys:
+This YAML_ file contains settings for the reference genome. See also:
+
+- :ref:`def-source-referencegenome`
+- :ref:`data-import-settings`
+- :ref:`data-import-addannotation`
+- :ref:`data-import-addrefgenome`
+
+Possible keys
+.............
 
 GenomeBrowserDescr
   *Text.* Descriptive text that will be displayed in the genome browser section of the main page.

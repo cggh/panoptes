@@ -29,7 +29,7 @@ Modify the settings:
 
 Add custom data to this workspace:
   Click on the |buttonnew| icon right of the *"Custom data"* label in the workspace section
-  (see :ref:`data-import-addcustomdata`).
+  (see :ref:`data-import-addcustomdata` and  and :ref:`def-settings-workspace`).
 
 Re-import the source data:
   Updating a dataset from source the data to the server database does not happen automatically, and has to be initiated by the user.

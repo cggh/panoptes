@@ -4,7 +4,7 @@
 .. |buttonviewdata| image:: /buttons/viewdata.png
 .. |buttonimport| image:: /buttons/import.png
 
-.. _data-import-addannotation:
+.. _data-import-addrefgenome:
 
 Add reference genome sequence
 -----------------------------
@@ -28,7 +28,7 @@ Follow-up actions
 Modify the reference genome settings:
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"
   2. Click non the button "Edit Settings" in the popup.
-     (see :ref:`data-import-settings`)
+     (see :ref:`data-import-settings` and  and :ref:`def-settings-refgenome`)
 
 Edit the chromosome definitions:
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"

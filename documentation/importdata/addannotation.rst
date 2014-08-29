@@ -28,7 +28,7 @@ Follow-up actions
 Modify the reference genome settings:
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"
   2. Click on the button "Edit Settings" in the popup.
-     (see :ref:`data-import-settings`)
+     (see :ref:`data-import-settings` and :ref:`def-settings-refgenome`)
 
 Edit the chromosome definitions:
   1. Click on the |buttonedit| icon left of the label "**Reference genome**"

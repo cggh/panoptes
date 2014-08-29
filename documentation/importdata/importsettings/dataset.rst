@@ -5,7 +5,15 @@
 
 General dataset settings
 ~~~~~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for a :ref:`def-source-dataset`, and may contain the following keys:
+This YAML_ file contains settings for a dataset. See also:
+
+- :ref:`def-source-dataset`
+- :ref:`data-import-settings`
+- :ref:`data-import-adddataset`
+
+
+Possible keys
+.............
 
 Name
   *Text (required).* The visible name of the dataset, as it appears on the intro page.

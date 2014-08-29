@@ -5,7 +5,15 @@
 Data table settings
 ------------------
 
-This YAML_ file contains settings for a :ref:`def-source-datatable`, and may contain the following keys:
+This YAML_ file contains settings for a data table. See also:
+
+- :ref:`def-source-datatable`
+- :ref:`data-import-settings`
+- :ref:`data-import-adddatatable`
+
+
+Possible keys
+.............
 
 NameSingle
   *Text (required).* Display name referring to a single table item (single, without starting capital).

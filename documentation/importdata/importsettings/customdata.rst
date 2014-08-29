@@ -4,7 +4,14 @@
 
 Custom data settings
 ~~~~~~~~~~~~~~~~~~~~
-This YAML_ file contains settings for :ref:`def-source-customdata`, and may contain the following keys:
+This YAML_ file contains settings for a custom data source. See also:
+
+- :ref:`def-source-customdata`
+- :ref:`data-import-settings`
+- :ref:`data-import-addcustomdata`
+
+Possible keys
+.............
 
 AutoScanProperties
   *Boolean.* If set, Panoptes will try to automatically obtain property definitions from the TAB-delimited source data file.
@@ -26,7 +33,7 @@ DataItemViews
   custom data source will be added to the standard data item popup.
   Each item in the list should contain the following key:
 
-  Type
-    *Text (required).* Identifier of the custom view type
-    (can be ``Overview``, ``PropertyGroup``, ``FieldList``, ``ItemMap``, ``PieChartMap``)
-    See :ref:`def-settings-datatable-dataitemviews` for more details about these custom views.
+Type
+  *Text (required).* Identifier of the custom view type
+  (can be ``Overview``, ``PropertyGroup``, ``FieldList``, ``ItemMap``, ``PieChartMap``)
+  See :ref:`def-settings-datatable-dataitemviews` for more details about these custom views.

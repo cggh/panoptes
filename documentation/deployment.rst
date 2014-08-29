@@ -141,6 +141,8 @@ The following steps will create a fully working Panoptes instance on a Amazon EC
 
 The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/DQXServer/app/index.html` or `[ServerName]/panoptes/index.html`.
 
+.. _authorization:
+
 Authorization
 -------------
 Panoptes contains a simple authorization mechanism that can be used to grant or deny certain privileges on datasets.
