@@ -8,6 +8,8 @@ This YAML_ file contains settings for a :ref:`workspace<dataconcept_workspace>`.
 
 - :ref:`data-import-settings`
 - :ref:`data-import-addworkspace`
+- `Example file
+  <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/workspaces/workspace_1/settings>`_
 
 
 Possible keys

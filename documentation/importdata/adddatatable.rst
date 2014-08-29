@@ -12,7 +12,8 @@ Using the admin web frontend, a new :ref:`data table<dataconcept_datatable>` can
 under the tree branch that represents the dataset.
 
 A dialog box appears that allows one to pick a TAB-delimited file from the local computer,
-and upload it to the Panoptes server as a source file for a new data table.
+and upload it to the Panoptes server as a source file for a new data table
+(`example file <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/data>`_).
 
 - Click *"Choose file"* to select the local file that contains the data for this data table.
 - Click *"Create data table"* to create a new data table source, based on this file.

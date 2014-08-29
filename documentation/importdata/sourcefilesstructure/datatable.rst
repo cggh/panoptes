@@ -7,7 +7,9 @@ This is the root for a set of folders, each one describing an individual :ref:`d
 
 In each *data table* folder, a file ``data`` should be present, containing a list of all the *data items* in the table.
 Each line consists in a set of TAB-delimited *properties*.
-The first line of the file serves as a header, specifying the identifiers for all *properties*.
+The first line of the file serves as a header, specifying the identifiers for all *properties*
+(`example file
+<https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/data>`_).
 
 In addition, a yaml ``settings`` file should be present in the *datatable* folder.
 This file can contain a number of settings, both at the level of the *data table*,

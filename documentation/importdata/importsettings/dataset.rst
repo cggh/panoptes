@@ -9,6 +9,8 @@ This YAML_ file contains settings for a :ref:`dataset<dataconcept_dataset>`. See
 
 - :ref:`data-import-settings`
 - :ref:`data-import-adddataset`
+- `Example file
+  <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/settings>`_
 
 
 Possible keys

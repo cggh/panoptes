@@ -8,6 +8,8 @@ This YAML_ file contains settings for a :ref:`custom data source<dataconcept_cus
 
 - :ref:`data-import-settings`
 - :ref:`data-import-addcustomdata`
+- `Example file
+  <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/workspaces/workspace_1/customdata/samples/SampleMetaData/settings>`_
 
 Possible keys
 .............

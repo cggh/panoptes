@@ -9,6 +9,8 @@ This YAML_ file contains settings for a :ref:`data table<dataconcept_datatable>`
 
 - :ref:`data-import-settings`
 - :ref:`data-import-adddatatable`
+- `Example file
+  <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/variants/settings>`_
 
 
 Possible keys

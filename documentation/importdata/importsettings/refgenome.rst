@@ -9,6 +9,8 @@ This YAML_ file contains settings for the :ref:`reference genome<dataconcept_ref
 - :ref:`data-import-settings`
 - :ref:`data-import-addannotation`
 - :ref:`data-import-addrefgenome`
+- `Example file
+  <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/refgenome/settings>`_
 
 Possible keys
 .............

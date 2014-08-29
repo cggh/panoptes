@@ -12,7 +12,9 @@ Using the admin web frontend, :ref:`custom data<dataconcept_customdata>` can be 
 under the tree branch that represents the workspace.
 
 A dialog box appears that allows one to pick a TAB-delimited file from the local computer,
-and upload it to the Panoptes server as a source file for a new custom data source.
+and upload it to the Panoptes server as a source file for a new custom data source
+(`example file <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/workspaces/workspace_1/customdata/variants/custom1/data>`_).
+
 
 - Click *"Choose file"* to select the local file that contains the data for this custom data source.
 - Select the data table identifier to which this custom data should be attached to
