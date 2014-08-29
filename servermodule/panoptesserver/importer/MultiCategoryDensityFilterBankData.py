@@ -14,15 +14,15 @@ class Level:
         return ("sum %d, count %d, min %d, max %d" % (int(self.sum), int(self.count), int(self.min), int(self.max)))
 
 class Summariser:
-    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, outputFolder, categories):
+    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, categories):
         print('##### Start processing chromosome '+chromosome)
         
-        self.chromosome = chromosome
-        self.outputFolder = outputFolder
-        self.lastpos=-1
-        self.blockSizeStart = blockSizeStart
-        self.blockSizeIncrFactor = blockSizeIncrFactor
-        self.blockSizeMax = blockSizeMax
+        self._chromosome = chromosome
+        self._baseDir = baseDir
+        self._lastpos=-1
+        self._blockSizeStart = blockSizeStart
+        self._blockSizeIncrFactor = blockSizeIncrFactor
+        self._blockSizeMax = blockSizeMax
         self._field = propid
         
         print('Categories: ' + str(categories))
@@ -36,16 +36,16 @@ class Summariser:
                 
         self._setupSummary()
                 
-        self.levels = []
-        blocksize = self.blockSizeStart
-        while blocksize <= self.blockSizeMax:
+        self._levels = []
+        blocksize = self._blockSizeStart
+        while blocksize <= self._blockSizeMax:
             level = Level(self._numCategories)
             level.blocksize = blocksize
             level.currentblockend = blocksize
             level.catcounts = [0] * len(categories)
-            level.outputfile = open(self.outputFolder+'/Summ_'+self.chromosome+'_'+str(blocksize), 'w')
-            self.levels.append(level)
-            blocksize *= self.blockSizeIncrFactor
+            level.outputfile = open(self._outputdir+'/Summ_'+self._chromosome+'_'+str(blocksize), 'w')
+            self._levels.append(level)
+            blocksize *= self._blockSizeIncrFactor
 #        print(str(self.levels))
 
 
@@ -53,9 +53,9 @@ class Summariser:
 
     def Add(self, pos, val):
         if val != None:
-            if pos <= self.lastpos:
+            if pos <= self._lastpos:
                 raise Exception('Positions should be strictly ordered')
-            for level in self.levels:
+            for level in self._levels:
                 while pos>=level.currentblockend:
                     self.CloseCurrentBlock(level)
                     self.StartNextBlock(level)
@@ -75,7 +75,7 @@ class Summariser:
 
 
     def Finalise(self):
-        for level in self.levels:
+        for level in self._levels:
             self.CloseCurrentBlock(level)
             level.outputfile.close()
 
