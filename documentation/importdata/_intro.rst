@@ -29,7 +29,7 @@ See also:
 .. toctree::
    :maxdepth: 1
 
-   sourcefilesstructure
+   sourcefilesstructure/_intro
 
 
 Using the Panoptes admin web frontend

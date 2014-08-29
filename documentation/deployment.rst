@@ -74,6 +74,8 @@ This directory contains the file-bases data sources that are used to import into
 .. note::
   Both paths have to be specified as absolute, starting from /. Do not use relative paths here.
 
+See section :doc:`importdata/_intro` for more information on how to populate the Panoptes instance with data.
+
 Simple Server
 -------------
 The simplest way to run Panoptes is using::
@@ -86,7 +88,6 @@ To run on your external network interface use (with the port you desire)::
 	./scripts/run.sh 0.0.0.0:8000
 
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
-See section :doc:`datasets` for more information on how to populate the Panoptes instance with data.
 
 Deployment on Apache2
 ---------------------

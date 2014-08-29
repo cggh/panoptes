@@ -18,7 +18,7 @@ In the dialog box, specify a unique identifier for this new dataset.
 .. Caution::
    Make sure that the identifier is a valid variable name (see :ref:`data-import-identifiers`).
 
-This action creates a new source data directory for this dataset on the server (see also :ref:`def-source-data`).
+This action creates a new source data directory for this dataset on the server (see also :ref:`def-source-dataset`).
 
 Follow-up actions
 ~~~~~~~~~~~~~~~~~

@@ -3,7 +3,7 @@
 .. _def-settings-datatable:
 
 Data table settings
-------------------
+-------------------
 
 This YAML_ file contains settings for a :ref:`data table<dataconcept_datatable>`. See also:
 

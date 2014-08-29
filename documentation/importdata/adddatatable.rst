@@ -30,7 +30,7 @@ and upload it to the Panoptes server as a source file for a new data table.
 
 
 This action creates a new data table directory for this dataset on the server, and uploads the file as data source
-(see also :ref:`def-source-data`).
+(see also :ref:`def-source-datatable`).
 
 Follow-up actions
 ~~~~~~~~~~~~~~~~~
