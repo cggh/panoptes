@@ -14,9 +14,9 @@ left of the label that identifies a source data resource.
 
 
 .. Note::
-  The sample dataset **Samples_and_Variants** contains settings files that are fully commented,
+  The sample dataset `Samples_and_Variants <https://github.com/cggh/panoptes/tree/master/sampledata/datasets/Samples_and_Variants>`_ contains settings files that are fully commented,
   and can serve as a starting point to explore the possible options.
-  Additional comments are provided in other datasets as well, wherever concepts are introduced
+  Additional comments are provided in other sample datasets as well, wherever concepts are introduced
   that are not present in this dataset.
 
 

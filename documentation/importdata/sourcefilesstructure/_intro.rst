@@ -2,7 +2,9 @@
 
 Source files structure
 ----------------------
-Internally, Panoptes uses a combination of a set of MySQL databases and a file structure to serve the data. Data are loaded into this system be launching an **import action** that reads the data from a **source file location** (specified by ``SOURCEDATADIR`` in ``config.py``).
+Internally, Panoptes uses a combination of a set of MySQL databases and a file structure to serve the data.
+Data are loaded into this system be launching an **import action** that reads the data from a **source file location**
+(specified by ``SOURCEDATADIR`` in ``config.py``, see also :ref:`server-data-structure`).
 
 The formatting of the source data relies a few concepts:
 
