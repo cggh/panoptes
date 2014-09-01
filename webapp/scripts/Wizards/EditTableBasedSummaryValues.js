@@ -42,7 +42,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var str = 'Use currently highlighted';
             var recordCount  = tableInfo.getSelectedList().length;
             str += '<br>('+recordCount+' items)';
-            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width:140, bitmap:'Bitmaps/selection.png', content: str }).setOnChanged(function() {
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', height:45, width:140, icon: 'fa-check-circle' , content: str }).setOnChanged(function() {
                 Popup.closeIfNeeded(popupid);
                 DQX.executeProcessing(function() {
                     EditTableBasedSummaryValues.loadCurrentSelection(tableid);

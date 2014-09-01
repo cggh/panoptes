@@ -129,7 +129,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
 
-                var button_Selection = Controls.Button(null, {content: 'Selection...', buttonClass: 'PnButtonGrid', width:130, height:30, bitmap:'Bitmaps/selection.png'}).setOnChanged(function() {
+                var button_Selection = Controls.Button(null, {
+                    content: 'Selection...',
+                    buttonClass: 'PnButtonGrid',
+                    width:130, height:30,
+                    icon: 'fa-check-circle'
+                }).setOnChanged(function() {
                     ButtonChoiceBox.createQuerySelectionOptions(that.tableInfo, that.theQuery);
                 });
 

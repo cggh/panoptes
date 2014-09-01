@@ -204,7 +204,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             theTable.setQuery(query);
 
             if (settings.hasSelection) {
-                theTable.createSelectionColumn("sel", "", tableInfo.id, tableInfo.primkey, tableInfo, DQX.Color(1,0,0), function() {
+                theTable.createSelectionColumn("sel", "", tableInfo.id, tableInfo.primkey, tableInfo, DQX.Color(0.8,0.2,0), function() {
                     Msg.broadcast({type:'SelectionUpdated'}, tableInfo.id);
                 });
             }
