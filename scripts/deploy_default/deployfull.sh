@@ -32,9 +32,9 @@ apt-get update
 apt-get -y install apache2
 apt-get -y install libapache2-mod-wsgi
 
-echo "mysql-server-5.5 mysql-server/root_password password 1234" | debconf-set-selections
-echo "mysql-server-5.5 mysql-server/root_password_again password 1234" | debconf-set-selections
-apt-get -y install mysql-server-5.5
+echo "mysql-server-5.6 mysql-server/root_password password 1234" | debconf-set-selections
+echo "mysql-server-5.6 mysql-server/root_password_again password 1234" | debconf-set-selections
+apt-get -y install mysql-server-5.6
 
 apt-get -y install unzip wget git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
 apt-get -y install libhdf5-serial-dev
