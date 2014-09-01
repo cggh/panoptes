@@ -36,12 +36,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         GenePopup.show_sub1 = function(data) {
-            var content='';//JSON.stringify(data);
+            var content='';
+            content += '<div style="padding:5px">';
+            content += '<div style="max-width:600px;line-height: 150%">';
             content += '<b>Id</b>: '+data.fid+'<br/>';
             content += '<b>Name</b>: '+data.fname+'<br/>';
             content += '<b>Alternatives</b>: '+data.fnames.split(',').join(', ')+'<br/>';
             content += '<b>Description</b>: '+data.descr+'<br/>';
             content += '<b>Position</b>: '+data.chromid+':'+data.fstart+'-'+data.fstop+'<br/>';
+            content += '</div>';
+
+            content +='<p>';
 
             var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Show in genome browser', width:140, height:50, bitmap:'Bitmaps/GenomeBrowser.png' }).setOnChanged(function() {
                 Msg.send({type: 'JumpgenomeRegion'}, { chromoID:data.chromid, start:parseInt(data.fstart), end:parseInt(data.fstop) });
@@ -110,6 +115,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
             });
 
+            content += '</div>';
             var popupid = Popup.create('Gene',content);
         }
 
