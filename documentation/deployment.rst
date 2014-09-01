@@ -17,9 +17,9 @@ Download the code from the GitHub repository::
     unzip master.zip
     cd panoptes-master
 
-Panoptes needs a running MySQL with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
+Panoptes needs a running MySQL version **5.6 or later** with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
 
-    sudo apt-get install mysql-server mysql-client
+    sudo apt-get install mysql-server-5.6 mysql-client
 
 .. caution::
   Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
