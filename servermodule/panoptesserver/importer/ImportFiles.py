@@ -14,6 +14,7 @@ import config
 import SettingsLoader
 import ImpUtils
 import customresponders.panoptesserver.Utils as Utils
+import customresponders.panoptesserver.schemaversion as schemaversion
 
 import ImportDataTable
 import Import2DDataTable
@@ -26,6 +27,17 @@ from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
 
 
+def GetCurrentSchemaVersion(calculationObject, datasetId):
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
+        cur.execute('SELECT `content` FROM `settings` WHERE `id`="DBSchemaVersion"')
+        rs = cur.fetchone()
+        if rs is None:
+            return (0, 0)
+        else:
+            majorversion = int(rs[0].split('.')[0])
+            minorversion = int(rs[0].split('.')[1])
+            return (majorversion, minorversion)
+
 
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
@@ -36,6 +48,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
+
 
         # Remove current reference in the index first: if import fails, nothing will show up
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
@@ -69,7 +82,11 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
                 cur.execute(sql)
                 rs = cur.fetchone()
                 if rs is None:
-                    raise Exception('Database does not yet exist. Please do a full import or top N preview import first.')
+                    raise Exception('Database does not yet exist. Please do a full import or top N preview import.')
+            # Verify is major schema version is OK - otherways we can't do config update only
+            currentVersion = GetCurrentSchemaVersion(calculationObject, datasetId)
+            if currentVersion[0] < schemaversion.major:
+                raise Exception("The database schema of this dataset is outdated. Actualise it by running a full data import or or top N preview import.")
 
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
@@ -114,6 +131,12 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
+
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
+                schemaversion.major,
+                schemaversion.minor
+            ))
+
             importtime = 0
             if not importSettings['ConfigOnly']:
                 importtime = time.time()

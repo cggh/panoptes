@@ -135,12 +135,40 @@ require([
 
 
             function Start_Part2() {
-                    DQX.customRequest(MetaData.serverUrl,PnServerModule,'datasetinfo', {
-                        database: MetaData.database
-                    }, function(resp) {
-                        if (resp.manager)
-                            MetaData.isManager = true;
-                    });
+                DQX.customRequest(MetaData.serverUrl,PnServerModule,'datasetinfo', {
+                    database: MetaData.database
+                }, function(resp) {
+                    if (resp.manager)
+                        MetaData.isManager = true;
+
+                    var showError = function(tpe) {
+                        var content = '<div style="padding:10px">';
+                        content += '<span class="fa fa-exclamation-triangle" style="font-size: 36px; color:rgb(150,0,0);float:left;padding:10px"></span>'
+                        content += 'The database schema of this dataset is outdated.<br>Please actualise it by running a <b>{tpe}</b>.<p>The application is aborted.'.DQXformat({
+                            tpe:tpe
+                        });
+                        var bt = Controls.Button(null, {content: 'Open admin section'});
+                        bt.setOnChanged(function() {
+                            window.open("admin.html","_self")
+                        });
+                        content += bt.renderHtml();
+                        content += '</div>';
+                        Popup.create('Fatal error', content, null, {canClose: false});
+                    }
+
+                    if (resp.needfullreload) {
+                        showError('full data reload import');
+                        return;
+                    }
+                    if (resp.needconfigreload) {
+                        showError('config update import');
+                        return;
+                    }
+                    Start_Part3();
+                });
+            }
+
+            function Start_Part3() {
 
                 var getter = DataFetchers.ServerDataGetter();
                 getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
