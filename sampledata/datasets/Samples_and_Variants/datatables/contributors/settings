@@ -6,6 +6,8 @@ Icon: fa-institution # Optionally specify an icon identifier taken from the list
 
 PrimKey: ID
 
+ItemTitle: <b>{{ID}}</b> {{Name}}
+
 Properties:
 - Id: ID
   Description: Contributor identifier
@@ -29,8 +31,7 @@ Properties:
   Description: Image
   DataType: Text
 
-TemplatedView:
-    TitleField: Name
+ListView:
     Template: |
         <img style=\"float:right\" src={{{Image}}}>
         <h4>ID: {{ID}}</h4>

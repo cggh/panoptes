@@ -9,12 +9,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
     function (require, Application, Framework, Controls, FrameList, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable,
               QueryBuilder, DataFetchers, MetaData, EditQuery, ManageStoredSubsets, QueryTool, MiscUtils, GetFullDataItemInfo,
         ItemView) {
-        var TemplatedViewerModule = {
+        var ListViewerModule = {
 
             init: function (tableid) {
                 // Instantiate the view object
                 var that = Application.View(
-                        'template_' + tableid,  // View ID
+                        'list_' + tableid,  // View ID
                     MetaData.getTableInfo(tableid).tableCapNamePlural
                 );
 
@@ -22,7 +22,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
                 that.tableInfo.templatedViewer = that;
-                that.template = that.tableInfo.settings.TemplatedView.Template;
+                //that.template = that.tableInfo.settings.TemplatedView.Template;
+                that.titleTemplate = Handlebars.compile(that.tableInfo.settings.ItemTitle || '{{'+that.tableInfo.primkey+'}}');
 
                 that.storeSettings = function () {
                     var obj = {};
@@ -85,7 +86,6 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.panelList = FrameList(this.frameList);
                     this.panelList.setOnItemHighlighted(that.itemSelected);
                     this.panelList.setHasFilter();
-                    this.panelList.setTemplate('<span class="fa '+that.tableInfo.settings.Icon +' buttonicon" style="color:rgb(130,130,130);padding-right: 5px"></span><span>{title_field}</span>');
                     this.panelList.render();
 
                     //Initialise the data fetcher that will download the data for the table
@@ -100,7 +100,10 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     this.tableFetcher.setTableName(that.tableid);
                     this.tableFetcher.positionField = that.tableInfo.primkey;
                     this.tableFetcher.addFetchColumnActive(that.tableInfo.primkey, MiscUtils.createEncoderId(tableid, that.tableInfo.primkey));
-                    this.tableFetcher.addFetchColumnActive(that.tableInfo.settings.TemplatedView.TitleField, MiscUtils.createEncoderId(tableid, that.tableInfo.settings.TemplatedView.TitleField));
+                    that.titleFields = Handlebars.fields_used(that.titleTemplate, _.map(that.tableInfo.properties,DQX.attr('propid')));
+                    _.forEach(that.titleFields, function(prop) {
+                        that.tableFetcher.addFetchColumnActive(prop, MiscUtils.createEncoderId(tableid, prop));
+                    });
                     this.tableFetcher.IsDataReady(-1,1000000);
                     that.panelsCreated = true;
                 };
@@ -135,10 +138,17 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                 that.renderList = function() {
                     var items = [];
+                    function make_title(index) {
+                        var fields = {};
+                        _.forEach(that.titleFields, function(field) {
+                            fields[field] = that.tableFetcher.getColumnPoint(index, field)
+                        });
+                        return that.titleTemplate(fields)
+                    }
                     for (var i = 0; i < that.tableFetcher.totalRecordCount; i++) {
                         items.push({
                             id: that.tableFetcher.getColumnPoint(i, that.tableInfo.primkey),
-                            content: {title_field:that.tableFetcher.getColumnPoint(i, that.tableInfo.settings.TemplatedView.TitleField)}
+                            content: make_title(i)
                         });
                     }
                     that.panelList.setItems(items, items[0].id);
@@ -150,7 +160,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     DQX.setProcessing("Downloading...");
                     GetFullDataItemInfo.Get(that.tableid, item, function(resp) {
                         DQX.stopProcessing();
-                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ resp.fields[that.tableInfo.settings.TemplatedView.TitleField]+"</div>");
+                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.titleTemplate(resp.fields) +"</div>");
                         if (!that.itemView) {
                             that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
                             that.itemView.render()
@@ -162,5 +172,5 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 return that;
             }
         };
-        return TemplatedViewerModule;
+        return ListViewerModule;
     });

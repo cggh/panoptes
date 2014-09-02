@@ -242,6 +242,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     table.propertyGroupMap[groupInfo.Id] = groupInfo;
                 });
             }
+
         }
 
         Initialise.augment2DTableInfo = function(table) {
@@ -596,8 +597,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     );
                 }
-
-
+                tableInfo.properties = tableInfo.properties || [];
+                tableInfo.properties.push(prop)
             });
 
             // Determine of datatables have geographic info
@@ -605,6 +606,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
                     tableInfo.hasGeoCoord = true;
             });
+
+
         }
 
         Initialise.parse2DProperties = function() {

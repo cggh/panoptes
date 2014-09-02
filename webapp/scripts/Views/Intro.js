@@ -85,8 +85,8 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     }
 
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                        if (tableInfo.settings.TemplatedView) {
-                            var tableViewerButton = Application.getView('template_' + tableInfo.id).createActivationButton({
+                        if (tableInfo.settings.ListView) {
+                            var tableViewerButton = Application.getView('list_' + tableInfo.id).createActivationButton({
                                 content: "Show list",
                                 icon: 'fa-list'
                             });
