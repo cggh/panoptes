@@ -68,7 +68,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 that.panelButtons = Framework.Form(that.frameButtons);
-                var button_OpenInTable = Controls.Button(null, { content: 'Show in table view', icon: 'fa-table', buttonClass: 'PnButtonGrid', width: 135, height: 35}).setOnChanged(function () {
+                that.button_OpenInTable = Controls.Button(null, { content: 'Show in table view', icon: 'fa-table', buttonClass: 'PnButtonGrid', width: 135, height: 35}).setOnChanged(function () {
                     var qry = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: that.childTableInfo.id,
@@ -81,7 +81,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Msg.listen('', { type: 'LoadStoredDataItem'}, require("InfoPopups/ItemPopup").loadStoredItem);
 
                 });
-                buttons.push(button_OpenInTable);
+                buttons.push(that.button_OpenInTable);
 
                 if (that.childTableInfo.hasGeoCoord) {
                     var button_OpenInMap = Controls.Button(null, { content: 'Show on map'}).setOnChanged(function () {
@@ -97,6 +97,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons.addControl(Controls.CompoundHor(buttons));
 
+            };
+
+            that.update = function(newItemData) {
+                that.itemData = newItemData;
+                var table = that.panelTable.getTable();
+                var theQuery = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
+                table.setQuery(theQuery);
+                table.reLoadTable();
             };
 
 
