@@ -12,9 +12,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var DefaultView = {};
 
-        DefaultView.create = function(itemData) {
+        DefaultView.create = function(initialItemData) {
             var that = {};
-            that.tableInfo = MetaData.getTableInfo(itemData.tableid);
+            that.tableInfo = MetaData.getTableInfo(initialItemData.tableid);
 
             that.createFrames = function(parent) {
                 that.frameSubsets = Framework.FrameFinal('', 0.7)
@@ -24,6 +24,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
+                that.setContent(initialItemData);
+            };
+
+            that.setContent = function(itemData) {
                 if (!that.tableInfo.settings.DisableSubsets) {
                     that.panelSubsets = Framework.Form(that.frameSubsets);
 
@@ -40,7 +44,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                     database: MetaData.database,
                                     tableid: that.tableInfo.id,
                                     workspaceid: MetaData.workspaceid,
-                                    itemid: that.itemid,
+                                    itemid: itemData.fields[that.tableInfo.primkey],
                                     isnumericalkey: isnumericalkey ? 1 : 0,
                                     primkey: that.tableInfo.primkey,
                                     subsetid: subset.id,
@@ -67,7 +71,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             database: MetaData.database,
                             tableid: that.tableInfo.id,
                             workspaceid: MetaData.workspaceid,
-                            itemid: that.itemid,
+                            itemid: itemData.fields[that.tableInfo.primkey],
                             isnumericalkey: isnumericalkey ? 1 : 0,
                             primkey: that.tableInfo.primkey
                         }
@@ -83,6 +87,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
             };
+
+            that.update = function(newItemData) {
+                that.setContent(newItemData);
+            }
 
 
             that.onClose = function() {
