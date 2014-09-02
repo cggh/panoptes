@@ -353,11 +353,6 @@ a:link, a:visited
     /*outline: 1px solid rgb(0,122,132);*/
 }
 
-.PnGridCheckWrapper
-{
-    padding:7px;
-}
-
 label.PnGenotypesPageEdit{
     border-radius: 4px;
     border:1px solid rgb(128,128,128);

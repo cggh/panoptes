@@ -57,7 +57,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var eventid = DQX.getNextUniqueID();that.eventids.push(eventid);
             Msg.listen(eventid, { type: 'SelectionUpdated'}, function(scope,tableid) {
                 if (that.tableInfo.id==tableid) {
-                    that._selchk.modifyValue(that.tableInfo.isItemSelected(that.itemid), true);
+                    that._updateSelectButton();
                 }
             } );
 
@@ -238,14 +238,27 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 }
 
-                that._selchk = Controls.Check(null, {
-                        label: 'Select',
-                        value: that.tableInfo.isItemSelected(that.itemid)
-                    }).setOnChanged(function() {
-                        that.tableInfo.selectItem(that.itemid, that._selchk.getValue());
-                        Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
+                that._updateSelectButton = function() {
+                    var isSelected = that.tableInfo.isItemSelected(that.itemid);
+                    if (isSelected)
+                        that._btchk.changeIcon('fa-check-circle', DQX.Color(0.8,0.2,0), 'Selected');
+                    else
+                        that._btchk.changeIcon('fa-circle-thin', 'inherit', 'Select');
+                };
+
+                var isSelected = that.tableInfo.isItemSelected(that.itemid);
+                that._btchk = Controls.Button(null, {
+                    buttonClass: 'PnButtonGrid',
+                    width:that.buttonWidth, height:that.buttonHeight,
+                    content: isSelected?'Selected':'Select',
+                    icon:isSelected?'fa-check-circle':"fa-circle-thin",
+                    iconColor:isSelected?DQX.Color(0.8,0.2,0):null
+                }).setOnChanged(function() {
+                    that.tableInfo.selectItem(that.itemid, !that.tableInfo.isItemSelected(that.itemid));
+                    that._updateSelectButton();
+                    Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
                 })
-                buttons.push(Controls.Wrapper(that._selchk,'PnGridCheckWrapper'));
+                buttons.push(that._btchk);
 
                 var currentCol = null;
                 var cols = [];
