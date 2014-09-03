@@ -18,6 +18,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     MetaData.getTableInfo(tableid).tableCapNamePlural
                 );
 
+                that.cache = {};
+
                 that.setEarlyInitialisation();
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
@@ -156,18 +158,30 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                     that.render(items[0].id);
                 };
 
+                that.try_cache = function(item, callback) {
+                    if (that.cache[item])
+                        callback(that.cache[item]);
+                    else {
+                        DQX.setProcessing("Downloading...");
+                        GetFullDataItemInfo.Get(that.tableid, item, function(data) {
+                            DQX.stopProcessing();
+                            that.cache[item] = data;
+                            callback(data);
+                        })
+                    }
+                };
+
                 that.render = function(item) {
-                    DQX.setProcessing("Downloading...");
-                    GetFullDataItemInfo.Get(that.tableid, item, function(resp) {
-                        DQX.stopProcessing();
-                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.titleTemplate(resp.fields) +"</div>");
+                    that.try_cache(item, function(data) {
+                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.titleTemplate(data.fields) +"</div>");
                         if (!that.itemView) {
-                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, resp);
+                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, data);
                             that.itemView.render()
                         } else {
-                            that.itemView.update(resp);
+                            that.itemView.update(data);
                         }
-                    })
+
+                    });
                 };
                 return that;
             }
