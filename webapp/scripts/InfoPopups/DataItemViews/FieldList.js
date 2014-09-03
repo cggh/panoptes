@@ -12,9 +12,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var FieldList = {};
 
-        FieldList.create = function(viewSettings, itemData) {
+        FieldList.create = function(viewSettings, initialItemData) {
             var that = {};
-            var tableInfo = MetaData.getTableInfo(itemData.tableid);
+            var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
 
             that.createFrames = function(parent) {
                 that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true)
@@ -26,14 +26,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
             that.createPanels = function() {
+                that.setContent(initialItemData)
+            };
 
+            that.setContent = function(itemData) {
                 var parentFieldsMap = {};
                 if (itemData.parents)
                     $.each(itemData.parents, function(idx, parentInfo) {
                         parentFieldsMap[parentInfo.tableid] = parentInfo.fields;
                     });
-
-                var content = '<div style="padding:8px">';
+                that.id = DQX.getNextUniqueID();
+                var content = '<div id="'+ id + '"style="padding:8px">';
                 if (viewSettings.Introduction)
                     content += viewSettings.Introduction+'<p>';
                 content += "<table>";
@@ -78,12 +81,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += "</table>";
                 content += "</div>";
 
-
-
                 that.frameFields.setContentHtml(content);
-
             };
 
+            that.update = function(newItemData) {
+                $('#'+that.id).remove();
+                that.setContent(newItemData);
+            };
 
             that.onClose = function() {
             }
