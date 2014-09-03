@@ -45,7 +45,11 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         return
     with calculationObject.LogHeader('Creating documentation'):
         destDocFolder = os.path.join(config.BASEDIR, 'Docs', datasetId)
-        shutil.rmtree(destDocFolder)
+        try:
+            shutil.rmtree(destDocFolder)
+        except OSError:
+            #Don't fail if exists
+            pass
         shutil.copytree(sourceDocFolder, destDocFolder)
 
 
