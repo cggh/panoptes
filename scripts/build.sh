@@ -93,6 +93,7 @@ USE ${DB};
 CREATE TABLE IF NOT EXISTS datasetindex  (
    id  varchar(20) DEFAULT NULL,
    name  varchar(50) DEFAULT NULL,
+   name  varchar(50) DEFAULT NULL,
    importtime varchar(50) DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS calculations (
@@ -126,6 +127,7 @@ mkdir -p $BASEDIR
 mkdir -p $BASEDIR/temp
 mkdir -p $BASEDIR/SummaryTracks
 mkdir -p $BASEDIR/Uploads
+mkdir -p $BASEDIR/Docs
 if ! [ -w $BASEDIR ]; then
     echo -e "${red}  WARNING ${BASEDIR} is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
@@ -138,6 +140,16 @@ fi
 if ! [ -w $BASEDIR/Uploads ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Uploads is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
+if ! [ -w $BASEDIR/Docs ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/Docs is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+
+echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
+cd $PROJECT_ROOT
+cd webapp
+rm -rf Docs
+ln -s BASEDIR/Docs Docs
+
 
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
 echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist"
