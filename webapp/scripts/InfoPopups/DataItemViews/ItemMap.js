@@ -12,34 +12,43 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var ItemMap = {};
 
-        ItemMap.create = function(viewSettings, tableInfo, itemData) {
+        ItemMap.create = function(viewSettings, initialItemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
 
             if (!tableInfo.hasGeoCoord)
                 DQX.reportError('Table does not have geographic coordinates: '+tableInfo.id);
 
-            that.createFrames = function() {
-                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise);
+            that.createFrames = function(parent) {
+                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise)
+                    .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameMap);
                 return that.frameMap;
             };
 
             that.initialise = function() {
 
-                var initialMapCenter = Map.Coord(longitude, lattitude);
-                var initialZoom = 4;
-                if (viewSettings.MapZoom)
-                    initialZoom = viewSettings.MapZoom;
-
                 that.theMap = Map.GMap(that.frameMap/*, null, null, false*/);
+                that.pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
+                that.setPoints(initialItemData);
+            };
 
-                var pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
+
+            that.createPanels = function() {
+            };
+
+            that.update = function(newItemData) {
+                that.setPoints(newItemData);
+            };
+
+            that.setPoints = function(itemData) {
                 var longitude = itemData.fields[tableInfo.propIdGeoCoordLongit];
                 var lattitude = itemData.fields[tableInfo.propIdGeoCoordLattit];
-                pointSet.setPoints([{
+                that.pointSet.setPoints([{
                     id: '',
                     longit: longitude,
                     lattit: lattitude
-                }])
+                }]);
                 setTimeout(function() {
                     var initialMapCenter = Map.Coord(longitude, lattitude);
                     var initialZoom = 4;
@@ -50,18 +59,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             };
 
-
-            that.createPanels = function() {
-            };
-
-
             that.onClose = function() {
                 if (that.theMap)
                     that.theMap.tearDown();
-            }
+            };
 
             return that;
-        }
+        };
 
         return ItemMap;
     });

@@ -12,17 +12,28 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var PropertyGroup = {};
 
-        PropertyGroup.create = function(viewSettings, tableInfo, itemData) {
+        PropertyGroup.create = function(viewSettings, initialItemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
 
-            that.createFrames = function() {
-                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true);
+            that.createFrames = function(parent) {
+                var name = '-Absent-';
+                var groupInfo = tableInfo.propertyGroupMap[viewSettings.GroupId];
+                if (groupInfo)
+                    name = groupInfo.Name;
+                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true)
+                    .setDisplayTitle(name);
+                parent.addMemberFrame(that.frameFields);
                 return that.frameFields;
             };
 
             that.createPanels = function() {
+                that.setContent(initialItemData)
+            };
 
-                var content = '<div style="padding:8px">';
+            that.setContent = function (itemData) {
+                that.id = DQX.getNextUniqueID();
+                var content = '<div id="'+ id + '" style="padding:8px">';
                 content += "<table>";
                 var groupInfo = tableInfo.propertyGroupMap[viewSettings.GroupId];
                 if (groupInfo) {
@@ -41,6 +52,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 content += "</div>";
 
                 that.frameFields.setContentHtml(content);
+            };
+
+            that.update = function(newItemData) {
+                $('#'+that.id).remove();
+                that.setContent(newItemData);
             };
 
 

@@ -52,7 +52,7 @@ require.config({
 require([
     "_", "jquery", "DQX/Application", "DQX/Framework", "DQX/Msg", "DQX/Utils", "DQX/Controls", "DQX/SQL", "DQX/Popup", "DQX/PopupFrame", "DQX/DataFetcher/DataFetchers",
     "MetaData",
-    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser", "Views/TableViewer",
+    "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser",  "Views/TableViewer","Views/ListViewer",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "InfoPopups/PropInfoPopup",
     "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
@@ -60,12 +60,13 @@ require([
     function (
         _, $, Application, Framework, Msg, DQX, Controls, SQL, Popup, PopupFrame, DataFetchers,
         MetaData,
-        Initialise, Intro, GenomeBrowser, TableViewer,
+        Initialise, Intro, GenomeBrowser, TableViewer, ListViewer,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PropInfoPopup,
         PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
         Serialise, ButtonChoiceBox, PlotStarter
         ) {
         $(function () {
+
 
             $(document).ajaxStart(function () {
                 $('.PanoptesLogoBox').addClass('fa-spin');
@@ -237,8 +238,13 @@ require([
                         }
 
                         $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                            TableViewer.init(tableInfo.id);
-                            tableInfo.tableViewId = 'table_'+tableInfo.id;
+                            if (tableInfo.settings.ListView) {
+                                ListViewer.init(tableInfo.id);
+                                tableInfo.listViewId = 'list_' + tableInfo.id;
+                            } else {
+                                TableViewer.init(tableInfo.id);
+                                tableInfo.tableViewId = 'table_'+tableInfo.id;
+                            }
                         })
 
                         Application.showViewsAsTabs();

@@ -12,11 +12,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var PieChartMap = {};
 
-        PieChartMap.create = function(viewSettings, tableInfo, itemData) {
+        PieChartMap.create = function(viewSettings, initialItemData) {
             var that = {};
+            var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
+            that.itemData = initialItemData;
+            that.pies = [];
+            that.initialised = false;
 
-            that.createFrames = function() {
-                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise);
+
+            that.createFrames = function(parent) {
+                that.frameMap = Framework.FrameFinal('', 1).setAllowScrollBars(false,false).setInitialiseFunction(that.initialise)
+                    .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameMap);
                 return that.frameMap;
             };
 
@@ -42,6 +49,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         DQX.reportError('Locations table does not have coordinates: '+viewSettings.LocationDataTable);
                     that.locationTable.loadFullDataItemInfo(that._buildPieChartsFromLocationTable);
                 };
+                that.initialised = true;
 
             };
 
@@ -50,13 +58,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (!viewSettings.pieCharts) {
                     //Initialise pie chart data
                     viewSettings.pieCharts = [];
-                    $.each(locationData, function(idx, locInfo) {
+                    $.each(locationData, function (idx, locInfo) {
                         var name = locInfo[that.locationTable.primkey];
                         if (viewSettings.LocationNameProperty)
                             name = locInfo[viewSettings.LocationNameProperty];
                         var sizeFac = 1;
                         if (viewSettings.LocationSizeProperty)
-                            sizeFac = 10*Math.sqrt(locInfo[viewSettings.LocationSizeProperty]);
+                            sizeFac = 10 * Math.sqrt(locInfo[viewSettings.LocationSizeProperty]);
                         viewSettings.pieCharts.push({
                             name: name,
                             locid: locInfo[that.locationTable.primkey],
@@ -71,20 +79,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (viewSettings.PieChartSize)
                         pieChartSize = viewSettings.PieChartSize;
                     var maxSizeFac = 1.0e-9;
-                    $.each(viewSettings.pieCharts, function(idx, pieChart) {
-                        maxSizeFac= Math.max(maxSizeFac, pieChart.sizeFac);
+                    $.each(viewSettings.pieCharts, function (idx, pieChart) {
+                        maxSizeFac = Math.max(maxSizeFac, pieChart.sizeFac);
                     });
-                    $.each(viewSettings.pieCharts, function(idx, pieChart) {
-                        pieChart.sizeFac *= (pieChartSize/maxSizeFac);
+                    $.each(viewSettings.pieCharts, function (idx, pieChart) {
+                        pieChart.sizeFac *= (pieChartSize / maxSizeFac);
                     });
 
                     if (viewSettings.PositionOffsetFraction) {
                         var layouter = Map.MapItemLayouter(that.theMap, '', viewSettings.PositionOffsetFraction);
-                        $.each(viewSettings.pieCharts, function(idx, pieChart) {
+                        $.each(viewSettings.pieCharts, function (idx, pieChart) {
                             layouter.addItem(pieChart.longit, pieChart.lattit, pieChart.sizeFac);
                         });
                         layouter.calculatePositions();
-                        $.each(viewSettings.pieCharts, function(idx, pieChart) {
+                        $.each(viewSettings.pieCharts, function (idx, pieChart) {
                             pieChart.longit0 = pieChart.longit;
                             pieChart.lattit0 = pieChart.lattit;
                             pieChart.longit = layouter.items[idx].longit2;
@@ -92,10 +100,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                     }
 
+                    that._drawPies(initialItemData);
+
                 }
+            }
 
 
-
+            that._drawPies = function(itemData) {
+                $.each(that.pies, function(idx, pie) {
+                    //FIXME - Poss memeory leak due to DQX.ObjectMapper in overlay._base
+                    that.theMap.removeOverlay(pie.myID);
+                });
+                that.pies = [];
 
                 $.each(viewSettings.pieCharts, function(idx, pieChartInfo) {
 
@@ -134,7 +150,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                     var pie = Map.Overlay.PieChart(
                         that.theMap,
-                        '1',
+                        DQX.getNextUniqueID(),
                         Map.Coord(pieChartInfo.longit, pieChartInfo.lattit),
                         pieChartInfo.sizeFac,
                         chart);
@@ -148,7 +164,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             } );
                         }
                     };
+                    that.pies.push(pie);
                 });
+            };
+
+            that.update = function(newItemData) {
+                if (viewSettings.pieCharts && that.initialised)
+                    that._drawPies(newItemData);
             }
 
             that.createPanels = function() {

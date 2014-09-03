@@ -12,11 +12,12 @@ Description: >
   and a <a class="doclink" href="intro">link</a> to documentation part of this deployment.
 
 # Optional: a list of all the data table identifiers in the dataset
-# These names should correspond to the folder banes in [datatables]
+# These names should correspond to the folder names in [datatables]
 # The main reason for including this is to provide an explicit ordering of the data tables
 DataTables:
 - variants
 - samples
+- contributors
 - samplingsites
 - sampletypes
 - populations

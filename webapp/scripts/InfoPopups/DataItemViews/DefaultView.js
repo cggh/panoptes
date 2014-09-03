@@ -12,20 +12,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         var DefaultView = {};
 
-        DefaultView.create = function(viewSettings, tableInfo, itemData) {
+        DefaultView.create = function(viewSettings, initialItemData) {
             var that = {};
 
-            that.createFrames = function() {
-                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true);
+            that.createFrames = function(parent) {
+                that.frameFields = Framework.FrameFinal('', 1).setAllowScrollBars(true,true)
+                .setDisplayTitle(viewSettings.Name);
+                parent.addMemberFrame(that.frameFields);
                 return that.frameFields;
             };
 
-
-
-            that.createPanels = function() {
-
+            that.setContent = function (itemData) {
                 var content = '';
-                var content = '<div style="padding:8px">';
+                that.id = DQX.getNextUniqueID();
+                var content = '<div id="'+ id + '" style="padding:8px">';
                 function addLevelToContent(levelInfo) {
                     var tableInfo = MetaData.mapTableCatalog[levelInfo.tableid];
                     content += "<table>";
@@ -60,9 +60,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
                 addLevelToContent(itemData);
-                that.frameFields.setContentHtml(content);
                 content += '</div>';
+                that.frameFields.setContentHtml(content);
+            }
 
+            that.createPanels = function() {
+                that.setContent(initialItemData)
+            };
+
+
+            that.update = function(newItemData) {
+                $('#'+that.id).remove();
+                that.setContent(newItemData);
             };
 
 

@@ -63,12 +63,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
             dowait();
         }
-
         Initialise.parseTableSettings = function(table) {
             var settings = { GenomeMaxViewportSizeX:50000 };
             if (table.settings) {
+                //FIXME We need a proper escaping of the json
                 table.settings = table.settings.replace(/`/g, '\\"');
-//                console.log('\n\n\n'+table.settings);
+                table.settings = table.settings.replace(/\n/g, "\\n");
                 settings = $.extend(settings,JSON.parse(table.settings));
             }
             table.settings = settings;
@@ -242,6 +242,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     table.propertyGroupMap[groupInfo.Id] = groupInfo;
                 });
             }
+
         }
 
         Initialise.augment2DTableInfo = function(table) {
@@ -596,8 +597,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         }
                     );
                 }
-
-
+                tableInfo.properties = tableInfo.properties || [];
+                tableInfo.properties.push(prop)
             });
 
             // Determine of datatables have geographic info
@@ -605,6 +606,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
                     tableInfo.hasGeoCoord = true;
             });
+
+
         }
 
         Initialise.parse2DProperties = function() {
