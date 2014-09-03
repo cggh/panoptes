@@ -146,13 +146,15 @@ class BaseImport(object):
         
         return tableSettings, properties
     
-    def _fetchSettings(self, datatable):
+    def _fetchSettings(self, datatable, includeProperties = True):
                 
         settings, data = self._getDataFiles(datatable)
         
         tableSettings = SettingsLoader.SettingsLoader(settings)
 
-        properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
+        properties = None
+        if includeProperties:
+            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
         
         return tableSettings, properties
 
