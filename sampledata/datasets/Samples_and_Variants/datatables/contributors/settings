@@ -31,17 +31,23 @@ Properties:
   Description: Image
   DataType: Text
 
-ListView:
-    Template: |
-        <img style=\"float:right\" src={{{Image}}}>
-        <h4>ID: {{ID}}</h4>
-        <h2>Contributing Entity: {{Name}}<h2>
-        <h3>Contact Person: {{Contact}}<h3>
-        <h4>
-        {{#if SomeText}}
-                {{{SomeText}}}
-        {{else}}
-                <i>There is no description available for this entity</i>
-        {{/if}}
-        </h4>
+ListView: true
+
+DataItemViews: # Lists the custom views that should appear in the popup for an individual datatable item
+
+- Type: Template                                       # Specifies the default view of all fields
+  Name: Details
+  Content: |
+      <img style=\"float:right\" src={{{Image}}}>
+      <h4>ID: {{ID}}</h4>
+      <h2>Contributing Entity: {{Name}}<h2>
+      <h3>Contact Person: {{Contact}}<h3>
+      <h4>
+      {{#if SomeText}}
+              {{{SomeText}}}
+      {{else}}
+              <i>There is no description available for this entity</i>
+      {{/if}}
+      </h4>
+
 

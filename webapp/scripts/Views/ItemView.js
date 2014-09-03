@@ -8,12 +8,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/ItemGenomeTracksPopup",
         "InfoPopups/DataItemViews/DefaultView", "InfoPopups/DataItemViews/ItemMap", "InfoPopups/DataItemViews/PieChartMap",
         "InfoPopups/DataItemViews/FieldList", "InfoPopups/DataItemViews/PropertyGroup", "InfoPopups/ItemPopup",
-        "InfoPopups/DataItemViews/RelationTableView", "InfoPopups/DataItemViews/SubsetsView"
+        "InfoPopups/DataItemViews/RelationTableView", "InfoPopups/DataItemViews/SubsetsView","InfoPopups/DataItemViews/TemplatedView"
     ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, Wizard, Popup,
               PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap,
-              ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup, RelationTableView, SubsetsView) {
+              ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup, RelationTableView, SubsetsView, TemplatedView) {
 
         var ItemView = function (frameRoot, itemInfo, initialItemData) {
             var that = {};
@@ -65,6 +65,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                     if (dtViewInfo.Type == 'PropertyGroup') {
                         dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, initialItemData);
+                    }
+                    if (dtViewInfo.Type == 'Template') {
+                        dtViewObject = TemplatedView.create(dtViewInfo, initialItemData);
                     }
                     if (!dtViewObject)
                         DQX.reportError("Invalid dataitem view type " + dtViewInfo.Type);
