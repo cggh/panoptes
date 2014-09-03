@@ -93,7 +93,6 @@ USE ${DB};
 CREATE TABLE IF NOT EXISTS datasetindex  (
    id  varchar(20) DEFAULT NULL,
    name  varchar(50) DEFAULT NULL,
-   name  varchar(50) DEFAULT NULL,
    importtime varchar(50) DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS calculations (
@@ -145,12 +144,11 @@ if ! [ -w $BASEDIR/Docs ]; then
 fi
 
 echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
-cd $PROJECT_ROOT
-cd webapp
+cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Docs
-ln -s BASEDIR/Docs Docs
+ln -s $BASEDIR/Docs Docs
 
-
+cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
 echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist"
 mkdir -p $SOURCEDATADIR
