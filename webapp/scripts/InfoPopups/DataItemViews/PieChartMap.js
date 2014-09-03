@@ -17,6 +17,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
             that.itemData = initialItemData;
             that.pies = [];
+            that.initialised = false;
 
 
             that.createFrames = function(parent) {
@@ -48,6 +49,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         DQX.reportError('Locations table does not have coordinates: '+viewSettings.LocationDataTable);
                     that.locationTable.loadFullDataItemInfo(that._buildPieChartsFromLocationTable);
                 };
+                that.initialised = true;
 
             };
 
@@ -167,7 +169,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.update = function(newItemData) {
-                that._drawPies(newItemData);
+                if (viewSettings.pieCharts && that.initialised)
+                    that._drawPies(newItemData);
             }
 
             that.createPanels = function() {
