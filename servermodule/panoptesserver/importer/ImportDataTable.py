@@ -40,6 +40,7 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'relations'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'tablebasedsummaryvalues'))
 
+
         tableSettings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
         tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
@@ -48,11 +49,16 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableSettings.AddTokenIfMissing('MaxCountQueryRecords', 200000)
         tableSettings.AddTokenIfMissing('MaxCountQueryAggregated', 1000000)
         tableSettings.AddTokenIfMissing('AllowSubSampling', False)
+
+        if tableSettings.HasToken('Description'):
+            tableSettings.SetToken('Description', tableSettings['Description'].replace('\n', ' ').replace('\r', ' '))
+
         extraSettings = tableSettings.Clone()
         extraSettings.DropTokens(['PrimKey', 'Properties'])
 
         if tableSettings['MaxTableSize'] is not None:
             print('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
+
 
         # Drop existing tablecatalog record
         sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)

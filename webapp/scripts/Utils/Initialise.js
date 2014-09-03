@@ -66,8 +66,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
         Initialise.parseTableSettings = function(table) {
             var settings = { GenomeMaxViewportSizeX:50000 };
-            if (table.settings)
+            if (table.settings) {
+                table.settings = table.settings.replace(/`/g, '\\"');
+//                console.log('\n\n\n'+table.settings);
                 settings = $.extend(settings,JSON.parse(table.settings));
+            }
             table.settings = settings;
         }
 

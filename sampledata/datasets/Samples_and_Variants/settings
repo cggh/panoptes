@@ -6,9 +6,10 @@ NameBanner: Samples and Variants # Name as it appears in the top banner of the a
 
 # A description of the dataset that will appear on the start page
 Description: >
-  This is a sample dataset<br>
+  This is the description of this sample dataset.
   <div style="color:red">A second line, html formatted</div>
-  <a href="http://panoptes.readthedocs.org/en/latest//" target="_blank">A hyperlink</a>
+  An <a href="http://panoptes.readthedocs.org/en/latest//" target="_blank">external hyperlink</a>
+  and a <a class="doclink" href="introdoc">link</a> to documentation part of this deployment.
 
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder banes in [datatables]

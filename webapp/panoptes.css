@@ -83,10 +83,15 @@ input[type="checkbox"]:checked + label:before {
 
 
 
-a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHeader, .DQXQueryTableSortHeader
+a:link, a:visited, .DQXHyperlink, .DQXQueryTableLinkCell, .DQXQueryTableLinkHeader, .DQXQueryTableSortHeader, .doclink
 {
     color:rgb(0,107,117) !important;
     /*border-bottom: 1px solid rgb(130,200,210);*/
+}
+
+.doclink
+{
+    cursor: pointer;
 }
 
 a:link, a:visited

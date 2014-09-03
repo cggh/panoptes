@@ -75,6 +75,11 @@ require([
             });
 
             function Start_Part0() {
+                $(document).on('click', '.doclink', function() {
+                    var target = $(this).attr('href');
+                    Msg.send({ type: 'OpenDoc'}, { target: target});
+                    return false;
+                });
                 PopupFrame.setHasThumbNails();
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'serverstatus', {}, function(resp) {
                     if ('issue' in resp) {

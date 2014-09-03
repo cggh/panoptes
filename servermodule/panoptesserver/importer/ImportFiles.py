@@ -75,6 +75,10 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             calculationObject.SetInfo('Creating database')
             print('Creating new database')
             ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
+            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
+                schemaversion.major,
+                schemaversion.minor
+            ))
         else:
             #Check existence of database
             sql = "SELECT SCHEMA_NAME FROM information_schema.SCHEMATA  WHERE SCHEMA_NAME='{0}'".format(datasetId)
@@ -91,7 +95,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings')
+        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings WHERE id<>"DBSchemaVersion"')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog')
 
         datatables = []
@@ -131,11 +135,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
-
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
-                schemaversion.major,
-                schemaversion.minor
-            ))
 
             importtime = 0
             if not importSettings['ConfigOnly']:
