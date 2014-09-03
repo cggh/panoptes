@@ -9,7 +9,7 @@ Description: >
   This is the description of this sample dataset.
   <div style="color:red">A second line, html formatted</div>
   An <a href="http://panoptes.readthedocs.org/en/latest//" target="_blank">external hyperlink</a>
-  and a <a class="doclink" href="introdoc">link</a> to documentation part of this deployment.
+  and a <a class="doclink" href="intro">link</a> to documentation part of this deployment.
 
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder banes in [datatables]

@@ -2,7 +2,7 @@ NameSingle: sample    # Display name referring to a table item (single, no capit
 NamePlural: samples    # Display name referring to a table item (plural, no capital)
 
 Description: >
-  A table containing a number of samples. <a class="doclink" href="samplesdoc">More information...</a>.
+  A table containing a number of samples. <a class="doclink" href="samples">More information...</a>.
 
 Icon: fa-flask
 

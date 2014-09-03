@@ -4,6 +4,7 @@
 
 import os
 import sys
+import shutil
 try:
     import DQXDbTools
 except:
@@ -37,6 +38,16 @@ def GetCurrentSchemaVersion(calculationObject, datasetId):
             majorversion = int(rs[0].split('.')[0])
             minorversion = int(rs[0].split('.')[1])
             return (majorversion, minorversion)
+
+def ImportDocs(calculationObject, datasetFolder, datasetId):
+    sourceDocFolder = os.path.join(datasetFolder, 'doc')
+    if not(os.path.exists(sourceDocFolder)):
+        return
+    with calculationObject.LogHeader('Creating documentation'):
+        destDocFolder = os.path.join(config.BASEDIR, 'Docs', datasetId)
+        shutil.rmtree(destDocFolder)
+        shutil.copytree(sourceDocFolder, destDocFolder)
+
 
 
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
@@ -126,6 +137,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         if os.path.exists(os.path.join(datasetFolder, 'refgenome')):
             ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'), importSettings)
             globalSettings.AddTokenIfMissing('hasGenomeBrowser', True)
+
+        ImportDocs(calculationObject, datasetFolder, datasetId)
+
 
         ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId, importSettings)
 

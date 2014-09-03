@@ -83,7 +83,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.bt_back.enable(that.topicStackPointer > 0);
                 that.bt_forw.enable(that.topicStackPointer < that.topicStack.length - 1);
 
-                var url = "Doc/{target}".DQXformat({target: target});
+                var url = "Docs/{datasetid}/{target}".DQXformat({datasetid: MetaData.database, target: target});
                 DQX.setProcessing();
                 $.get(url, {})
                     .done(function (data) {
