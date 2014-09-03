@@ -25,7 +25,7 @@ NameBanner
 
 Description
   *Text.* A description of the dataset that appears on the start page.
-  Note: this text may contain html markup.
+  Note: this text may contain html markup, and documentation links (see :ref:`def-source-docs`).
   A longer description can be split over several lines by writing a ``>`` sign on the key line,
   and indent subsequent lines::
      Description: >

@@ -25,6 +25,7 @@ NamePlural
 Description
   *Text (required).* A short description of this data table.
   This text will appear on the intro page, and on the table view page of this data table.
+  Note: this text may contain documentation links (see :ref:`def-source-docs`).
 
 Icon:
   *Text.* Specifies an icon that will be associated with the data table.
