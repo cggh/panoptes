@@ -15,7 +15,6 @@ class Level:
 
 class Summariser:
     def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, categories):
-        print('##### Start processing chromosome '+chromosome)
         
         self._chromosome = chromosome
         self._baseDir = baseDir
@@ -179,6 +178,7 @@ if __name__ == "__main__":
         if chromosome != currentChromosome:
             if summariser != None:
                 summariser.Finalise()
+            print('##### Start processing chromosome '+chromosome)
             summariser = Summariser(chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax)
             if chromosome in processedChromosomes:
                 raise Exception('File should be ordered by chromosome')
