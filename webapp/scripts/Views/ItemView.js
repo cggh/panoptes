@@ -15,10 +15,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap,
               ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup, RelationTableView, SubsetsView) {
 
-        var ItemView = function (frameRoot, itemInfo, data) {
+        var ItemView = function (frameRoot, itemInfo, initialItemData) {
             var that = {};
             that.frameRoot = frameRoot;
-            that.itemid = itemInfo.itemid;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
 
             that.eventids = [];//Add event listener id's to this list to have them removed when the view closes
@@ -53,19 +52,19 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 $.each(dataItemViews, function (idx, dtViewInfo) {
                     var dtViewObject = null;
                     if (dtViewInfo.Type == 'Overview') {
-                        dtViewObject = ItemView_DefaultView.create(dtViewInfo, data);
+                        dtViewObject = ItemView_DefaultView.create(dtViewInfo, initialItemData);
                     }
                     if (dtViewInfo.Type == 'PieChartMap') {
-                        dtViewObject = ItemView_PieChartMap.create(dtViewInfo, data);
+                        dtViewObject = ItemView_PieChartMap.create(dtViewInfo, initialItemData);
                     }
                     if (dtViewInfo.Type == 'ItemMap') {
-                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, data);
+                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, initialItemData);
                     }
                     if (dtViewInfo.Type == 'FieldList') {
-                        dtViewObject = ItemView_FieldList.create(dtViewInfo, data);
+                        dtViewObject = ItemView_FieldList.create(dtViewInfo, initialItemData);
                     }
                     if (dtViewInfo.Type == 'PropertyGroup') {
-                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, data);
+                        dtViewObject = ItemView_PropertyGroup.create(dtViewInfo, initialItemData);
                     }
                     if (!dtViewObject)
                         DQX.reportError("Invalid dataitem view type " + dtViewInfo.Type);
@@ -73,12 +72,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 $.each(that.tableInfo.relationsParentOf, function (idx, relationInfo) {
-                    var relationView = RelationTableView.create(data, relationInfo);
+                    var relationView = RelationTableView.create(initialItemData, relationInfo);
                     that.itemViewObjects.push(relationView);
                 });
 
                 if (!that.tableInfo.settings.DisableSubsets) {
-                    var subsetView = SubsetsView.create(data);
+                    var subsetView = SubsetsView.create(initialItemData);
                     that.itemViewObjects.push(subsetView);
                 }
 
@@ -90,17 +89,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             };
 
-            that.createPanels = function () {
-                that.panelButtons = Framework.Form(that.frameButtons);
+            that.createButtons = function(itemData) {
                 that.buttonWidth = 160;
                 that.buttonHeight = 30;
+                var itemid = itemData.fields[that.tableInfo.primkey];
 
 
                 var buttons = [];
 
                 if (that.tableInfo.hasGenomePositions) {
-                    var genome_chromosome = data.fields[that.tableInfo.ChromosomeField];
-                    var genome_position = parseInt(data.fields[that.tableInfo.PositionField]);
+                    var genome_chromosome = itemData.fields[that.tableInfo.ChromosomeField];
+                    var genome_position = parseInt(itemData.fields[that.tableInfo.PositionField]);
                     if (genome_chromosome) {
                         var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width: that.buttonWidth, height: that.buttonHeight, bitmap: 'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function () {
                             PopupFrame.minimiseAll({ slow: true});
@@ -143,9 +142,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     var bt = Controls.Button(null, { content: 'Show on genome', buttonClass: 'PnButtonGrid', width: that.buttonWidth, height: that.buttonHeight, bitmap: 'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function () {
                         PopupFrame.minimiseAll({ slow: true});
                         Msg.send({ type: 'JumpgenomeRegion' }, {
-                            chromoID: data.fields[that.tableInfo.settings.Chromosome],
-                            start: parseInt(data.fields[that.tableInfo.settings.RegionStart]),
-                            end: parseInt(data.fields[that.tableInfo.settings.RegionStop])
+                            chromoID: itemData.fields[that.tableInfo.settings.Chromosome],
+                            start: parseInt(itemData.fields[that.tableInfo.settings.RegionStart]),
+                            end: parseInt(itemData.fields[that.tableInfo.settings.RegionStop])
                         });
                     })
                     buttons.push(bt);
@@ -162,9 +161,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             }).setOnChanged(function () {
                                 Msg.send({type: 'ShowItemsInGenomeRange', tableid: tableInfo.id}, {
                                     preservecurrentquery: false,
-                                    chrom: data.fields[that.tableInfo.settings.Chromosome],
-                                    start: parseInt(data.fields[that.tableInfo.settings.RegionStart]),
-                                    stop: parseInt(data.fields[that.tableInfo.settings.RegionStop])
+                                    chrom: itemData.fields[that.tableInfo.settings.Chromosome],
+                                    start: parseInt(itemData.fields[that.tableInfo.settings.RegionStart]),
+                                    stop: parseInt(itemData.fields[that.tableInfo.settings.RegionStop])
                                 });
                             })
                             buttons.push(bt);
@@ -172,7 +171,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 }
 
-                var reverseCrossLinkInfoList = MiscUtils.getReverseCrossLinkList(that.tableInfo.id, that.itemid);
+                var reverseCrossLinkInfoList = MiscUtils.getReverseCrossLinkList(that.tableInfo.id, itemid);
                 $.each(reverseCrossLinkInfoList, function (idx, linkInfo) {
                     var bt = Controls.Button(null, { content: 'Show associated ' + linkInfo.dispName, buttonClass: 'PnButtonGrid', width: that.buttonWidth, height: that.buttonHeight, bitmap: linkInfo.bitmap, bitmapHeight: 20}).setOnChanged(function () {
                         MiscUtils.openReverseCrossLink(linkInfo);
@@ -182,7 +181,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (that.tableInfo.tableBasedSummaryValues.length > 0) {
                     var bt = Controls.Button(null, { content: 'Show genome tracks...', buttonClass: 'PnButtonGrid', width: that.buttonWidth, height: that.buttonHeight, bitmap: 'Bitmaps/GenomeBrowserSmall.png'}).setOnChanged(function () {
-                        ItemGenomeTracksPopup.show(that.tableInfo, that.itemid);
+                        ItemGenomeTracksPopup.show(that.tableInfo, itemid);
                     })
                     buttons.push(bt)
                 }
@@ -190,7 +189,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (that.tableInfo.settings.ExternalLinks) {
                     $.each(that.tableInfo.settings.ExternalLinks, function (idx, linkInfo) {
                         var bt = Controls.Button(null, { content: linkInfo.Name, buttonClass: 'PnButtonGrid', width: that.buttonWidth, height: that.buttonHeight, icon: "fa-link"}).setOnChanged(function () {
-                            var url = linkInfo.Url.DQXformat(data.fields);
+                            var url = linkInfo.Url.DQXformat(itemData.fields);
                             window.open(url, '_blank');
                         })
                         buttons.push(bt)
@@ -198,14 +197,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
 
                 that._updateSelectButton = function() {
-                    var isSelected = that.tableInfo.isItemSelected(that.itemid);
+                    var isSelected = that.tableInfo.isItemSelected(itemid);
                     if (isSelected)
                         that._btchk.changeIcon('fa-check-circle', DQX.Color(0.8,0.2,0), 'Selected');
                     else
                         that._btchk.changeIcon('fa-circle-thin', 'inherit', 'Select');
                 };
 
-                var isSelected = that.tableInfo.isItemSelected(that.itemid);
+                var isSelected = that.tableInfo.isItemSelected(itemid);
                 that._btchk = Controls.Button(null, {
                     buttonClass: 'PnButtonGrid',
                     width:that.buttonWidth, height:that.buttonHeight,
@@ -213,7 +212,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     icon:isSelected?'fa-check-circle':"fa-circle-thin",
                     iconColor:isSelected?DQX.Color(0.8,0.2,0):null
                 }).setOnChanged(function() {
-                    that.tableInfo.selectItem(that.itemid, !that.tableInfo.isItemSelected(that.itemid));
+                    that.tableInfo.selectItem(itemid, !that.tableInfo.isItemSelected(itemid));
                     that._updateSelectButton();
                     Msg.broadcast({type:'SelectionUpdated'}, that.tableInfo.id);
                 });
@@ -236,7 +235,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     rowNr += 1;
                 });
 
-                that.panelButtons.addControl(Controls.CompoundHor(cols));
+                return Controls.CompoundHor(cols);
+            }
+
+            that.createPanels = function () {
+                that.panelButtons = Framework.Form(that.frameButtons);
+                that.panelButtons.addControl(that.createButtons(initialItemData));
 
                 $.each(that.itemViewObjects, function (idx, dtViewObject) {
                     dtViewObject.createPanels();
@@ -264,6 +268,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.update = function(newItemData) {
+                that.panelButtons.clear();
+                that.panelButtons.addControl(that.createButtons(newItemData));
+                that.panelButtons.render();
+
                 $.each(that.itemViewObjects, function (idx, dtViewObject) {
                     if (dtViewObject.update)
                         dtViewObject.update(newItemData);
