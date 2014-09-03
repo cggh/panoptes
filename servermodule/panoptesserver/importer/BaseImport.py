@@ -161,7 +161,7 @@ class BaseImport(object):
         subDir = 'datatables'
         for directory in os.listdir(os.path.join(self._datasetFolder, subDir)):
             if os.path.isdir(os.path.join(self._datasetFolder, subDir, directory)):
-                if dir not in datatables:
+                if directory not in datatables:
                     datatables.append(directory)
         
         print 'Data tables: ' + str(datatables)
