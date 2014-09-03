@@ -24,13 +24,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
-                that.setContent(initialItemData);
+                if (!that.tableInfo.settings.DisableSubsets) {
+                    that.panelSubsets = Framework.Form(that.frameSubsets);
+                    that.setContent(initialItemData);
+                }
             };
 
             that.setContent = function(itemData) {
                 if (!that.tableInfo.settings.DisableSubsets) {
-                    that.panelSubsets = Framework.Form(that.frameSubsets);
-
                     var subsetCheckList = [];
                     var subsetCheckMap = {};
                     $.each(that.tableInfo.storedSubsets, function (idx, subset) {
@@ -89,7 +90,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.update = function(newItemData) {
-                that.setContent(newItemData);
+                if (!that.tableInfo.settings.DisableSubsets) {
+                    that.panelSubsets.clear();
+                    that.setContent(newItemData);
+                    that.panelSubsets.render();
+                }
             }
 
 
