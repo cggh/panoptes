@@ -110,6 +110,7 @@ class ProcessFilterBank(BaseImport):
                         fields = [columns[colindex] for colindex in outputs[0]["colindices"]]
                         chromosome = fields[0]
                         if chromosome != currentChromosome:
+                            self._log('##### Start processing chromosome '+chromosome)
                             if chromosome in processedChromosomes:
                                 raise Exception('File should be ordered by chromosome')
                             processedChromosomes[chromosome] = True
