@@ -99,10 +99,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             pieChart.lattit = layouter.items[idx].lattit2;
                         });
                     }
-
-                    that._drawPies(initialItemData);
-
                 }
+                that._drawPies(initialItemData);
             }
 
 
