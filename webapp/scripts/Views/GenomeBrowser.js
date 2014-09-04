@@ -170,7 +170,10 @@ define([
                     that.panelBrowser.setOnRangeSelected(function() {
                         var range = that.panelBrowser.getMark();
                         if (range)
-                            that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(), range.min, range. max);
+                            that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(),
+                                Math.min(range.min, range. max),
+                                Math.max(range.min, range. max)
+                            );
                     });
 
 
