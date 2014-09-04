@@ -364,17 +364,22 @@ a:link, a:visited
     /*outline: 1px solid rgb(0,122,132);*/
 }
 
+.PnGenotypesPageBox{
+    background-color: rgba(230,230,230,0.6);
+    border-radius: 14px;
+}
+
 label.PnGenotypesPageEdit{
-    border-radius: 4px;
-    border:1px solid rgb(128,128,128);
-    background-color: rgba(255,255,255,0.75);
-    vertical-align: middle;
-    padding: 2px;
-    margin: 0px;
+    /*border-radius: 4px;*/
+    /*border:1px solid rgb(128,128,128);*/
+    /*background-color: rgba(255,255,255,0.75);*/
+    /*vertical-align: middle;*/
+    /*padding: 2px;*/
+    /*margin: 0px;*/
 }
 input.PnGenotypesPageEdit{
-    border-radius: 4px;
-    border:1px solid rgb(128,128,128);
+    /*border-radius: 3px;*/
+    border:1px solid rgb(170,170,170);
     background-color: rgba(255,255,255,0.75);
     vertical-align: middle;
     margin: 0px;
@@ -382,14 +387,14 @@ input.PnGenotypesPageEdit{
 }
 
 .PnGenotypesPageArrow{
-    border-radius: 4px;
-    border:1px solid rgb(128,128,128);
+    border-radius: 14px;
+    border:1px solid rgb(150,150,150);
     display:inline-block;
-    margin-left:5px;
-    margin-right:5px;
+    /*margin-left:5px;*/
+    /*margin-right:5px;*/
     padding:8px;
     height:17px;
-    box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.30);
+    /*box-shadow: 1.5px 1.5px 4px rgba(0,0,0,0.30);*/
     cursor:pointer;
     font-weight:bold;
     vertical-align: middle;
@@ -406,7 +411,7 @@ input.PnGenotypesPageEdit{
 .PnGenotypesPageArrow:hover
 {
     /*background-color:rgb(255,255,240);*/
-    border:1px solid rgb(0,0,0);
+    border:1px solid rgb(128,128,128);
     box-shadow: 1.5px 1.5px 6px rgba(0,0,0,0.50);
     background: #f3f9ac; /* Old browsers */
     background: -moz-linear-gradient(top, #f3f9ac 0%, #ffe36b 100%); /* FF3.6+ */
@@ -417,6 +422,17 @@ input.PnGenotypesPageEdit{
     background: linear-gradient(to bottom, #f3f9ac 0%,#ffe36b 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f9ac', endColorstr='#ffe36b',GradientType=0 ); /* IE6-9 */
 }
+
+.PnGenotypesPageArrow .buttonicon
+{
+    color:rgb(90,90,90);
+}
+
+.PnGenotypesPageArrow:hover .buttonicon
+{
+    color:rgb(0,0,0);
+}
+
 
 
 .GenomeBrowserControlBackground

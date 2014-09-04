@@ -132,7 +132,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 groupList.setItem(rowNr, 0, Controls.Static(item.aspectInfo.name+':'));
                 groupList.setItem(rowNr, 1, item.ctrl);
                 groupList.setItem(rowNr, 0, Controls.Static(item.aspectInfo.name+':'));
-                groupList.setItem(rowNr, 2, Controls.Static(item.required?'<i><span style="color:rgb(128,128,128)">(required)</span></i>':''));
+                groupList.setItem(rowNr, 2, Controls.Static((!item.required)?'<i><span style="color:rgb(128,128,128)">(optional)</span></i>':''));
                 rowNr++;
             });
             controls.addControl(groupList);

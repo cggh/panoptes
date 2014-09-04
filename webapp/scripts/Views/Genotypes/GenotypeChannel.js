@@ -46,7 +46,6 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 //Create controls
                 that.download_button = Controls.Button(null, {content:'Download View', buttonClass: 'PnButtonGrid', width:120, height:30, icon:'fa-download'})
                 .setOnChanged(that.download_view);
-                controls_group.addControl(that.download_button);
 
                 var view_controls = Controls.CompoundVert([]);
                 view_controls.addControl(that.createVisibilityControl());
@@ -81,49 +80,43 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                             states.push({id: propInfo.propid, name: propInfo.name})
                     });
                 });
-                var sampleProperty_channel = Controls.Combo(null, { label:'{name} label:'.DQXformat({name: that.rowTableInfo.tableCapNamePlural}), states:states})
+
+                var controlsGridData = [];
+
+                var sampleProperty_channel = Controls.Combo(null, { label:'', states:states, width:140})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
-                var buttonSortSamplesByField = Controls.Button(null,
-                    {
-                        icon:'fa-sort-amount-asc',
-                        height: 14,
-                        hint:"Sort {name} by field".DQXformat({name: that.rowTableInfo.tableNamePlural}),
-                        buttonClass:'PnButtonGrid'
-                    })
-                    .setOnChanged(function() {
+
+                var buttonSortSamplesByField = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
                       model_params.set('row_order', view_params.get('samples_property'));
-                    });
-                view_controls.addControl(Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(5), buttonSortSamplesByField]));
+                });
+
+                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField]) })
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
                 });
                 states.push({id:'__null', name:'None'});
-                var alpha_channel = Controls.Combo(null, { label:'Alpha:', states:states})
+                var alpha_channel = Controls.Combo(null, { label:'', states:states, width:140 })
                     .bindToModel(view_params, 'alpha_channel').setClassID(that.table_info.id + 'ChannelAlpha');
-                view_controls.addControl(alpha_channel);
-                var height_channel = Controls.Combo(null, { label:'Height:', states:states })
+                controlsGridData.push({ label:'Alpha', ctrl: alpha_channel })
+                var height_channel = Controls.Combo(null, { label:'', states:states, width:140 })
                     .bindToModel(view_params, 'height_channel').setClassID(that.table_info.id + 'ChannelHeight');
-                view_controls.addControl(height_channel);
+                controlsGridData.push({ label:'Height', ctrl: height_channel })
 
-                var states = [{id:'auto', name:'Automatic'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
-                var width_mode = Controls.Combo(null, { label:'Column Mode', states:states, width:90 })
+                var states = [{id:'auto', name:'Automatic width'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
+                var width_mode = Controls.Combo(null, { label:'', states:states, width:140 })
                     .bindToModel(model_params, 'width_mode').setClassID(that.table_info.id + 'ColumnMode');
-                view_controls.addControl(width_mode);
+                controlsGridData.push({ label:'Columns', ctrl: width_mode })
 
-                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:220, minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
+                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:210, minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
                     .bindToModel(model_params, 'user_column_width').setClassID(that.table_info.id + 'ColumnWidth');
                 var show_hide_width = Controls.ShowHide(column_width);
-                view_controls.addControl(show_hide_width);
                 model_params.on({change:'width_mode'}, function() {
                   show_hide_width.setVisible(this.get('width_mode') == 'manual');
                 });
                 show_hide_width.setVisible(false);
 
-                var page_length = Controls.Edit(null, {
-                    label:'Page Size:',
-                    size:5
-                });
+                var page_length = Controls.Edit(null, { label:'', size:5 });
                 page_length.bindToModel(model_params, 'page_length', function(input) {
                     var num = parseInt(input);
                     if (num != num) //Check for NaN
@@ -131,12 +124,25 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     else
                         return num;
                 });
-                view_controls.addControl(page_length);
+                controlsGridData.push({ label:'Page size', ctrl: page_length })
+
+
+                var controlsGrid = Controls.CompoundGrid().setSeparation(2,4);
+                $.each(controlsGridData, function(idx, item) {
+                    controlsGrid.setItem(idx, 0, Controls.Static('<span class="DescriptionText">'+item.label+':</span>'));
+                    controlsGrid.setItem(idx, 1, item.ctrl);
+                });
+                view_controls.addControl(controlsGrid);
+
+                view_controls.addControl(show_hide_width);
 
                 view_controls.addControl(Controls.VerticalSeparator(3));
-                var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:220, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:210, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
+
+                view_controls.addControl(Controls.VerticalSeparator(15));
+                view_controls.addControl(that.download_button);
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = function() {
@@ -151,6 +157,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 };
                 var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
+
 
                 controls_group.addControl(Controls.Section(view_controls, {
                     title: 'Display settings',
@@ -225,7 +232,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         .setOnChanged(function() {
                             that.model_params.set('page', that.model_params.get('page')+1);
                         });
-                    var compound = Controls.CompoundHor([page_up, edit, that.page_down]);
+                    var compound = Controls.Wrapper(Controls.CompoundHor([page_up, Controls.HorizontalSeparator(6), edit, Controls.HorizontalSeparator(6), that.page_down]),"PnGenotypesPageBox");
                     that.page_controls.append(compound.renderHtml());
                     that.getCanvasElementJQ('center').after(that.page_controls);
                     Controls.ExecPostCreateHtml();
