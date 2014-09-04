@@ -17,7 +17,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
         ButtonChoiceBox.create = function(title, header, buttonsMatrix) {
-            var content = header + '<p>';
+            var content = '<p>' + header + '<p>';
 
             $.each(buttonsMatrix, function(idx, buttonsRow) {
                 if (idx>0)

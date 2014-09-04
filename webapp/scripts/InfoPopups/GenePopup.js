@@ -56,7 +56,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             $.each(MetaData.tableCatalog, function(idx, table) {
                 if (table.hasGenomePositions) {
-                    var button_snps = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: '{name} in this gene'.DQXformat({name: table.tableCapNamePlural}), width:140, height:50, bitmap:'Bitmaps/datagrid2.png' }).setOnChanged(function() {
+                    var button_snps = Controls.Button(null, {
+                        buttonClass: 'DQXToolButton2',
+                        content: '{name} in this gene'.DQXformat({name: table.tableCapNamePlural}),
+                        width:140, height:50,
+                        bitmap: (!table.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                        icon: table.settings.Icon
+                    }).setOnChanged(function() {
                         Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
                             preservecurrentquery:false,
                             chrom:data.chromid,
@@ -72,7 +78,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             // Create buttons to show genomic regions spanning this position
             $.each(MetaData.tableCatalog, function(idx, oTableInfo) {
                 if (oTableInfo.hasGenomeRegions) {
-                    var bt = Controls.Button(null, { content: 'Show '+oTableInfo.tableNamePlural, buttonClass: 'DQXToolButton2', width:150, height:50, bitmap:'Bitmaps/datagrid2.png'}).setOnChanged(function() {
+                    var bt = Controls.Button(null, {
+                        content: 'Show '+oTableInfo.tableNamePlural,
+                        buttonClass: 'DQXToolButton2',
+                        width:150, height:50,
+                        bitmap: (!oTableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                        icon: oTableInfo.settings.Icon
+                    }).setOnChanged(function() {
                         var qry = SQL.WhereClause.AND([
                             SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', data.chromid),
                             SQL.WhereClause.CompareFixed(oTableInfo.settings.RegionStart, '<=', data.fstop),

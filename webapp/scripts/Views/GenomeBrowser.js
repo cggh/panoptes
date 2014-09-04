@@ -987,7 +987,13 @@ define([
                                 qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.ChromosomeField, chromosome);
                                 qry = SQL.WhereClause.createRangeRestriction(qry, tableInfo.PositionField, rangeMin, rangeMax);
 
-                                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: tableInfo.tableCapNamePlural+' in range', bitmap:'Bitmaps/datagrid2.png', width:160, height:50 }).setOnChanged(function() {
+                                var bt = Controls.Button(null, {
+                                    buttonClass: 'DQXToolButton2',
+                                    content: tableInfo.tableCapNamePlural+' in range',
+                                    bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                                    icon: tableInfo.settings.Icon,
+                                    width:160, height:50
+                                }).setOnChanged(function() {
                                     Msg.send({type: 'DataItemTablePopup'}, {
                                         tableid: tableInfo.id,
                                         query: qry,
@@ -1005,7 +1011,13 @@ define([
                                 qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.settings.RegionStart, rangeMax, '<=');
                                 qry = SQL.WhereClause.createValueRestriction(qry, tableInfo.settings.RegionStop, rangeMin, '>=');
 
-                                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: tableInfo.tableCapNamePlural+' spanning range', bitmap:'Bitmaps/datagrid2.png', width:160, height:50 }).setOnChanged(function() {
+                                var bt = Controls.Button(null, {
+                                    buttonClass: 'DQXToolButton2',
+                                    content: tableInfo.tableCapNamePlural+' spanning range',
+                                    bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
+                                    icon: tableInfo.settings.Icon,
+                                    width:160, height:50
+                                }).setOnChanged(function() {
                                     Msg.send({type: 'DataItemTablePopup'}, {
                                         tableid: tableInfo.id,
                                         query: qry,
