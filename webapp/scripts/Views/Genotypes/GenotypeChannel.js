@@ -225,7 +225,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         .setOnChanged(function() {
                             that.model_params.set('page', that.model_params.get('page')+1);
                         });
-                    var compound = Controls.CompoundHor([page_up, edit, that.page_down]);
+                    var compound = Controls.Wrapper(Controls.CompoundHor([page_up, Controls.HorizontalSeparator(6), edit, Controls.HorizontalSeparator(6), that.page_down]),"PnGenotypesPageBox");
                     that.page_controls.append(compound.renderHtml());
                     that.getCanvasElementJQ('center').after(that.page_controls);
                     Controls.ExecPostCreateHtml();
