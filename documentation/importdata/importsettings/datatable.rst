@@ -37,6 +37,10 @@ PrimKey:
   The primary key should refer to a column containing a unique value for each record in the table.
   Optionally, this parameter can be set to '``AutoKey``' to instruct the software to automatically generate a primary key.
 
+ItemTitle:
+  *Text.* A  `handlebars <http://handlebarsjs.com/>`_ template. Defaults to the primary key.
+  The rendered template will be used when a data item title is needed.
+
 SortDefault
   *Property ID (required)*. Specifies the property ID (i.e. column name in the ``data`` source file) used as the default sort field.
 
@@ -101,6 +105,9 @@ ExternalLinks
       Example: ``http://maps.google.com/maps?q={Lattitude},{Longitude}``.
     Name:
       *Text (required).* Display name for this external link.
+
+ListView
+  *Boolean.* Default false. Replaces the normal table view with a list view, showing rows on left and a single selected row on the right.
 
 IsPositionOnGenome
   *Boolean.* Instructs Panoptes that records in this data table should be interpreted as genomic positions.

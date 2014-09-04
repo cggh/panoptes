@@ -12,6 +12,16 @@ Specifies the default data item view of Panoptes, including all fields. Other ke
 Name
   *Text (required)*. Display name of this view.
 
+Template
+::::::::
+A view that is defined by a template that is filled with row item properties.
+
+Name
+  *Text (required)*. Display name of this view.
+Content
+  *Text (required)*. A  `handlebars <http://handlebarsjs.com/>`_ template.
+
+
 PropertyGroup
 :::::::::::::
 Displays all properties that are member of a specific property group.
