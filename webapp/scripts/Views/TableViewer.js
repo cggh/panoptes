@@ -284,7 +284,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                     var content = '';
                     content += that.tableInfo.createIcon({floatLeft: true});
                     if (that.tableInfo.settings.Description) {
-                        content += '<span style="color:rgb(100,100,100)">'+that.tableInfo.settings.Description + '</span>';
+                        content += '<span class="DescriptionText">'+that.tableInfo.settings.Description + '</span>';
                         content += '<p>';
                     }
                     content += '<i><b>Query: </b>';

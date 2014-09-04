@@ -227,7 +227,14 @@ define([
                     });
 
 
+                    var content = '';
+                    content += '<img SRC="Bitmaps/GenomeBrowser.png" style="float:left;margin-right:10px;margin-bottom:5px;opacity:0.7" ></img>';
+                    content += '<span class="DescriptionText">'+MetaData.generalSettings.GenomeBrowserDescr||'Genome browser' + '</span>';
+
+                    that.introText = Controls.Html(null, content);
+
                     this.panelControls.addControl(Controls.CompoundVert([
+                        Controls.Wrapper(that.introText, "ControlsSectionBody"),
                         that.visibilityControlsGroup,
                         that.buttonsGroup
                     ]).setMargin(0));

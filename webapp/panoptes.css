@@ -764,6 +764,11 @@ input.PnGenotypesPageEdit{
     color: rgb(70,70,70);
 }
 
+.DescriptionText
+{
+    color: rgb(90,90,90);
+}
+
 .InfoBox
 {
     /*color: rgb(100,100,100);*/
