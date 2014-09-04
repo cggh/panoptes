@@ -14,4 +14,4 @@ ExternalGeneLinks:
   Name: Google search
 
 # Descriptive text that will be displayed in the genome browser section of the main page
-GenomeBrowserDescr: Some information about what is possible with the genome browser.
+GenomeBrowserDescr: Some information about what is possible with the genome browser. <a class="doclink" href="genomebrowser">Read more...</a>
