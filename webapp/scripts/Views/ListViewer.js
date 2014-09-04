@@ -29,15 +29,16 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                 that.storeSettings = function () {
                     var obj = {};
-                    obj.selected_item = that.selectedItem;
+                    obj.selectedItem = that.selectedItem;
                     return obj;
                 };
 
                 that.recallSettings = function (settObj) {
-                    if (that.list_loaded)
-                        that.panelList.setActiveItem(settObj.selected_item);
-                    else
-                        that.load_item = settObj.selected_item;
+                    if (settObj.selectedItem)
+                        if (that.list_loaded)
+                            that.panelList.setActiveItem(settObj.selectedItem);
+                        else
+                            that.load_item = settObj.selectedItem;
                 };
 
 
