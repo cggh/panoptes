@@ -152,6 +152,46 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
               DQX.reportError("Invalid width_mode")
             };
 
+            that.interpolator = function(pts1, pts2, posValue) {
+                var smoothscale = true;
+                if (pts1.length<2)
+                    return posValue;
+                var bkt_min = 0;
+                var bkt_max = pts1.length-1;
+                if (posValue<pts1[bkt_min]) {//Left of first data point
+                    if (smoothscale)
+                        return pts2[bkt_min]+(posValue-pts1[bkt_min]);
+                    else
+                        return pts2[bkt_min];
+                }
+                if (posValue>pts1[bkt_max]) {//Right of last data point
+                    if (smoothscale)
+                        return pts2[bkt_max]+(posValue-pts1[bkt_max]);
+                    else
+                        return pts2[bkt_max];
+                }
+                while (bkt_max>bkt_min+1) {//Inbetween: bracket find interval
+                    var bkt_center = Math.round((bkt_min+bkt_max)/2);
+                    if (pts1[bkt_center]<posValue)
+                        bkt_min = bkt_center;
+                    else
+                        bkt_max = bkt_center;
+                }
+                var fr = 0.5;
+                if (smoothscale)
+                    var fr = (posValue-pts1[bkt_min])/(pts1[bkt_max]-pts1[bkt_min]);
+                return (1-fr)*pts2[bkt_min] + fr*pts2[bkt_max];
+            }
+
+            that.mapOrdinal2Pos = function(ordinal) {//Maps ordinal to position by interpolation of the data points
+                return that.interpolator(that.col_ordinal, that.col_positions, ordinal);
+            }
+
+            that.mapPos2Ordinal = function(pos) {//Maps position to ordinal by interpolation of the data points
+                return that.interpolator(that.col_positions, that.col_ordinal, pos);
+            }
+            
+
             that.refresh_data = function() {
                 var overdraw = (that.col_end - that.col_start)*0.00;
                 var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page-1);

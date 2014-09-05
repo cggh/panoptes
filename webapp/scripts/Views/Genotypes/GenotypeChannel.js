@@ -286,10 +286,60 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                                that.model);
                 that.drawMark(draw_info);
 
+
                 that.download_button.enable(that.model.intervals_being_fetched.length == 0);
 
                 that.drawing = false;
             };
+
+
+            that.drawMark = function(drawInfo, showText) {//override default implementation
+                if (!that._isMarkVisible)
+                    return;
+                if (!drawInfo.mark.present)
+                    return;
+
+                var voffset = that.view.link_height;
+                var ctx = drawInfo.centerContext;
+
+                var mark1Ordinal = Math.min(drawInfo.mark.pos1, drawInfo.mark.pos2);
+                var mark2Ordinal = Math.max(drawInfo.mark.pos1, drawInfo.mark.pos2);
+                var mark1Pos = that.model.mapOrdinal2Pos(mark1Ordinal);
+                var mark2Pos = that.model.mapOrdinal2Pos(mark2Ordinal);
+                var mark1OrdScreen = Math.round((mark1Ordinal) * drawInfo.zoomFactX - drawInfo.offsetX) - 0.5;
+                var mark2OrdScreen = Math.round((mark2Ordinal) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
+                var mark1PosScreen = Math.round((mark1Pos) * drawInfo.zoomFactX - drawInfo.offsetX) - 0.5;
+                var mark2PosScreen = Math.round((mark2Pos) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
+
+                var markgrad = ctx.createLinearGradient(mark1PosScreen, 0, mark2PosScreen, 0);
+                var markWidth = Math.max(1, mark2PosScreen - mark1PosScreen);
+                markgrad.addColorStop(0, "rgba(255,50,0,0.2)");
+                markgrad.addColorStop(Math.min(0.45, 30 / markWidth), "rgba(255,50,0,0.05)");
+                markgrad.addColorStop(Math.max(0.55, 1 - 30 / markWidth), "rgba(255,50,0,0.05)");
+                markgrad.addColorStop(1, "rgba(255,50,0,0.2)");
+                ctx.fillStyle = markgrad;
+                ctx.fillRect(mark1PosScreen, voffset, mark2PosScreen - mark1PosScreen, drawInfo.sizeY-voffset);
+                ctx.beginPath();
+                ctx.moveTo(mark1OrdScreen,0);
+                ctx.bezierCurveTo(mark1OrdScreen, voffset/2, mark1PosScreen, voffset/2, mark1PosScreen, voffset);
+                ctx.lineTo(mark2PosScreen, voffset);
+                ctx.bezierCurveTo(mark2PosScreen, voffset/2, mark2OrdScreen, voffset/2, mark2OrdScreen, 0);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.globalAlpha = 0.5;
+                ctx.strokeStyle = "rgb(255,50,0)";
+                ctx.beginPath();
+                ctx.moveTo(mark1OrdScreen,0);
+                ctx.bezierCurveTo(mark1OrdScreen, voffset/2, mark1PosScreen, voffset/2, mark1PosScreen, voffset);
+                ctx.lineTo(mark1PosScreen, drawInfo.sizeY);
+                ctx.moveTo(mark2OrdScreen, 0);
+                ctx.bezierCurveTo(mark2OrdScreen, voffset/2, mark2PosScreen, voffset/2, mark2PosScreen, voffset);
+                ctx.lineTo(mark2PosScreen, drawInfo.sizeY);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+
+            }
 
             that.download_view = function() {
               var data = '';
