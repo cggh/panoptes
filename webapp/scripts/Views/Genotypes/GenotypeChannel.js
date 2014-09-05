@@ -118,7 +118,9 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
                 show_hide_width.setVisible(false);
 
-                var page_length = Controls.Edit(null, { label:'', size:5 });
+                //var page_length = Controls.Edit(null, { label:'', size:5 });
+                var states = [{id:'20', name:'20'}, {id:'50', name:'50'}, {id:'100', name:'100'}, {id:'200', name:'200'}, {id:'500', name:'500'}, {id:'1000', name:'1000'}, {id:'100000', name:'All'}];
+                var page_length = Controls.Combo(null, { label:'', states:states, width:controlWidth });
                 page_length.bindToModel(model_params, 'page_length', function(input) {
                     var num = parseInt(input);
                     if (num != num) //Check for NaN
