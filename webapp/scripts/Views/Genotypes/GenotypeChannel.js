@@ -83,7 +83,9 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 var controlsGridData = [];
 
-                var sampleProperty_channel = Controls.Combo(null, { label:'', states:states, width:140})
+                var controlWidth = 125;
+
+                var sampleProperty_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
 
                 var buttonSortSamplesByField = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
@@ -96,19 +98,19 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     return {id:prop, name:that.table_info.properties[prop].name};
                 });
                 states.push({id:'__null', name:'None'});
-                var alpha_channel = Controls.Combo(null, { label:'', states:states, width:140 })
+                var alpha_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'alpha_channel').setClassID(that.table_info.id + 'ChannelAlpha');
                 controlsGridData.push({ label:'Alpha', ctrl: alpha_channel })
-                var height_channel = Controls.Combo(null, { label:'', states:states, width:140 })
+                var height_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'height_channel').setClassID(that.table_info.id + 'ChannelHeight');
                 controlsGridData.push({ label:'Height', ctrl: height_channel })
 
                 var states = [{id:'auto', name:'Automatic width'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
-                var width_mode = Controls.Combo(null, { label:'', states:states, width:140 })
+                var width_mode = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(model_params, 'width_mode').setClassID(that.table_info.id + 'ColumnMode');
                 controlsGridData.push({ label:'Columns', ctrl: width_mode })
 
-                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:210, minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
+                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:(controlWidth+75), minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
                     .bindToModel(model_params, 'user_column_width').setClassID(that.table_info.id + 'ColumnWidth');
                 var show_hide_width = Controls.ShowHide(column_width);
                 model_params.on({change:'width_mode'}, function() {
@@ -137,7 +139,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 view_controls.addControl(show_hide_width);
 
                 view_controls.addControl(Controls.VerticalSeparator(3));
-                var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:210, minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
+                var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:(controlWidth+75), minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
                 view_controls.addControl(row_height);
 
