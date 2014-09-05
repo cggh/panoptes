@@ -133,11 +133,13 @@ class ProcessFilterBank(BaseImport):
             for output in outputs:
                 if output["summariser"] != None:
                     output["summariser"].Finalise()
-                output["destFile"].close()
+                if writeColumnFiles:
+                    output["destFile"].close()
             for output in outputc:
                 if output["summariser"] != None:
                     output["summariser"].Finalise()
-                output["destFile"].close()
+                if writeColumnFiles:
+                    output["destFile"].close()
 
 
     def _replaceSummaryValuesDB(self, tableid, propid, name, summSettings, minVal):
