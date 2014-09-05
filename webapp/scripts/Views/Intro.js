@@ -57,7 +57,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
 
                         var findGeneButton = Controls.Button(null,
                             {
-                                buttonClass: 'DQXToolButton1',
+                                buttonClass: 'DQXToolButton2',
                                 content: "Find gene...",
                                 icon: 'fa-search',
                                 width:100, height:35
