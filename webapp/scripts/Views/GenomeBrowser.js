@@ -503,7 +503,7 @@ define([
                                 densChannel._scaleRelative = ctrl.getValue();
                                 that.panelBrowser.render();
                             });
-                            chk_densPercent.modifyEnabled(false);
+                            chk_densPercent.modifyEnabled(channelDefaultVisible);
                             controlsSubList.push(chk_densPercent);
                             densChannel.chk_percent = chk_densPercent;
                         }
