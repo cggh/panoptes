@@ -153,23 +153,16 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
             };
 
             that.interpolator = function(pts1, pts2, posValue) {
-                var smoothscale = true;
-                if (pts1.length<2)
+                if (pts1.length == 0)//No mapping is required in case of 0 points
                     return posValue;
+                if (pts1.length == 1)//Shift in case of 1 points
+                    return posValue + (pts2[0]-pts1[0]);
                 var bkt_min = 0;
                 var bkt_max = pts1.length-1;
-                if (posValue<pts1[bkt_min]) {//Left of first data point
-                    if (smoothscale)
-                        return pts2[bkt_min]+(posValue-pts1[bkt_min]);
-                    else
-                        return pts2[bkt_min];
-                }
-                if (posValue>pts1[bkt_max]) {//Right of last data point
-                    if (smoothscale)
-                        return pts2[bkt_max]+(posValue-pts1[bkt_max]);
-                    else
-                        return pts2[bkt_max];
-                }
+                if (posValue<pts1[bkt_min])//Left of first data point - linear extension
+                    return pts2[bkt_min]+(posValue-pts1[bkt_min]);
+                if (posValue>pts1[bkt_max])//Right of last data point - linear extension
+                    return pts2[bkt_max]+(posValue-pts1[bkt_max]);
                 while (bkt_max>bkt_min+1) {//Inbetween: bracket find interval
                     var bkt_center = Math.round((bkt_min+bkt_max)/2);
                     if (pts1[bkt_center]<posValue)
@@ -178,8 +171,8 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                         bkt_max = bkt_center;
                 }
                 var fr = 0.5;
-                if (smoothscale)
-                    var fr = (posValue-pts1[bkt_min])/(pts1[bkt_max]-pts1[bkt_min]);
+                if (pts1[bkt_max]>pts1[bkt_min])//linear interpolation of final interval
+                    fr = (posValue-pts1[bkt_min])/(pts1[bkt_max]-pts1[bkt_min]);
                 return (1-fr)*pts2[bkt_min] + fr*pts2[bkt_max];
             }
 

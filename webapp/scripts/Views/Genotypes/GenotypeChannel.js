@@ -110,7 +110,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     .bindToModel(model_params, 'width_mode').setClassID(that.table_info.id + 'ColumnMode');
                 controlsGridData.push({ label:'Columns', ctrl: width_mode })
 
-                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width', width:(controlWidth+75), minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
+                var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width (bp)', width:(controlWidth+75), minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
                     .bindToModel(model_params, 'user_column_width').setClassID(that.table_info.id + 'ColumnWidth');
                 var show_hide_width = Controls.ShowHide(column_width);
                 model_params.on({change:'width_mode'}, function() {
