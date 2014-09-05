@@ -293,19 +293,28 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
             };
 
 
+            that.mapPositionsReverse = function(posx) {
+                return that.model.mapPos2Ordinal(posx);
+            }
+
             that.drawMark = function(drawInfo, showText) {//override default implementation
                 if (!that._isMarkVisible)
                     return;
                 if (!drawInfo.mark.present)
                     return;
 
-                var voffset = that.view.link_height;
+                var voffset = /*that.view.col_header_height +*/ that.view.link_height;
+                //that.view.row_header_width;
+
+
                 var ctx = drawInfo.centerContext;
 
                 var mark1Ordinal = Math.min(drawInfo.mark.pos1, drawInfo.mark.pos2);
                 var mark2Ordinal = Math.max(drawInfo.mark.pos1, drawInfo.mark.pos2);
-                var mark1Pos = that.model.mapOrdinal2Pos(mark1Ordinal);
-                var mark2Pos = that.model.mapOrdinal2Pos(mark2Ordinal);
+
+                mark1Pos = that.model.mapOrdinal2Pos(mark1Ordinal);
+                mark2Pos = that.model.mapOrdinal2Pos(mark2Ordinal);
+
                 var mark1OrdScreen = Math.round((mark1Ordinal) * drawInfo.zoomFactX - drawInfo.offsetX) - 0.5;
                 var mark2OrdScreen = Math.round((mark2Ordinal) * drawInfo.zoomFactX - drawInfo.offsetX) + 0.5;
                 var mark1PosScreen = Math.round((mark1Pos) * drawInfo.zoomFactX - drawInfo.offsetX) - 0.5;
@@ -319,6 +328,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 markgrad.addColorStop(1, "rgba(255,50,0,0.2)");
                 ctx.fillStyle = markgrad;
                 ctx.fillRect(mark1PosScreen, voffset, mark2PosScreen - mark1PosScreen, drawInfo.sizeY-voffset);
+
                 ctx.beginPath();
                 ctx.moveTo(mark1OrdScreen,0);
                 ctx.bezierCurveTo(mark1OrdScreen, voffset/2, mark1PosScreen, voffset/2, mark1PosScreen, voffset);
