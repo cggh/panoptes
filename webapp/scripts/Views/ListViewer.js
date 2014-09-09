@@ -1,12 +1,12 @@
 // This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/FrameList", "DQX/Msg", "DQX/DocEl", "DQX/Popup",
+define(["handlebars", "require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/FrameList", "DQX/Msg", "DQX/DocEl", "DQX/Popup",
         "DQX/PopupFrame", "DQX/Utils", "DQX/SQL", "DQX/QueryTable", "DQX/QueryBuilder", "DQX/DataFetcher/DataFetchers",
         "MetaData", "Wizards/EditQuery", "Wizards/ManageStoredSubsets", "Utils/QueryTool", "Utils/MiscUtils", "Utils/GetFullDataItemInfo",
         "Views/ItemView"
     ],
-    function (require, Application, Framework, Controls, FrameList, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable,
+    function (Handlebars, require, Application, Framework, Controls, FrameList, Msg, DocEl, Popup, PopupFrame, DQX, SQL, QueryTable,
               QueryBuilder, DataFetchers, MetaData, EditQuery, ManageStoredSubsets, QueryTool, MiscUtils, GetFullDataItemInfo,
         ItemView) {
         var ListViewerModule = {
@@ -24,8 +24,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                 that.tableid = tableid;
                 that.tableInfo = MetaData.getTableInfo(tableid);
                 that.tableInfo.templatedViewer = that;
-                //that.template = that.tableInfo.settings.TemplatedView.Template;
-                that.titleTemplate = Handlebars.compile(that.tableInfo.settings.ItemTitle || '{{'+that.tableInfo.primkey+'}}');
+                that.titleTemplate = that.tableInfo.settings.ItemTitle || '{{'+that.tableInfo.primkey+'}}'
+                that.compiledTitleTemplate = Handlebars.compile(that.titleTemplate);
 
                 that.storeSettings = function () {
                     var obj = {};
@@ -146,7 +146,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
                         _.forEach(that.titleFields, function(field) {
                             fields[field] = that.tableFetcher.getColumnPoint(index, field)
                         });
-                        return that.titleTemplate(fields)
+                        return that.compiledTitleTemplate(fields)
                     }
                     for (var i = 0; i < that.tableFetcher.totalRecordCount; i++) {
                         items.push({
@@ -174,7 +174,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Fram
 
                 that.render = function(item) {
                     that.try_cache(item, function(data) {
-                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.titleTemplate(data.fields) +"</div>");
+                        that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.compiledTitleTemplate(data.fields) +"</div>");
                         if (!that.itemView) {
                             that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, data);
                             that.itemView.render()
