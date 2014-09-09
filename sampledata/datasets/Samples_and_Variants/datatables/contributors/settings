@@ -49,5 +49,13 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
               <i>There is no description available for this entity</i>
       {{/if}}
       </h4>
+      <h3>Samples:</h3>
+      <ul>
+      {{#each samples}}
+        <li>{{key}}</li>
+      {{else}}
+        No samples from this contributor
+      {{/each}}
+      </ul>
 
 
