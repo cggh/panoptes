@@ -124,7 +124,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 page_length.bindToModel(model_params, 'page_length', function(input) {
                     var num = parseInt(input);
                     if (num != num) //Check for NaN
-                        return 0;
+                        return 1;
                     else
                         return num;
                 });
