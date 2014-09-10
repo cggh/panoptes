@@ -43,6 +43,17 @@ Properties:
   Name: Lattitude
   DataType: GeoLattitude     # Specifies a geographic lattitude property
 
+- Id: Contributor_ID
+  Name: Contributor_ID
+  Description: Identifier of the contributing entity
+  DataType: Text
+  ShowInTable: true
+  Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  Search: StartPattern
+  Relation:                         # This block defines a many-to-one foreign relation to a parent table
+    TableId: contributors           # Datatable id of the parent table
+    ForwardName: is contributed by  # Display name of the relation from child to parent
+    ReverseName: contributed from   # Display name of the relation from parent to child
 
 
 
