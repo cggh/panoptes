@@ -22,7 +22,7 @@ Genome browser
   Data points that correspond to positions or regions on a genome (such as SNPs or other variants) can be visualised on a genome browser. Numerical properties can be shown as graphics tracks in that browser. An powerful feature of Panoptes is the concept of multiresolution data summarisation, which allows the browser to show properties over the genome in real-time, regardless the zoom level or genome size. 
   
 Genotype browser
-  @TODO.
+  For a set of sequences, genotypes for a set of variants can be visualised as a matrix of variations in the genome browser. Monoploid and diploid organisms are supported.
   
 Visual Analytics
   Panoptes implements some basic concepts of Visual Analytics, offering near-realtime visualisations with a high level of interactivity, and extensive selection methods that can be used to drill down in the dataset.

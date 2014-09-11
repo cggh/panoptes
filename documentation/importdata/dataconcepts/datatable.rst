@@ -9,6 +9,8 @@ A record in a *data table* is called a :ref:`data item<dataconcept_dataitem>`.
 Each *data table* has a number of columns
 called :ref:`properties<dataconcept_property>`.
 
+Optionally, a data table can be defines as containing a set of genomic positions, or genomic regions.
+
 Examples:
 `samples table
 <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/datatables/samples/data>`_
