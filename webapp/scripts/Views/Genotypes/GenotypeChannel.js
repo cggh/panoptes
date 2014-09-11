@@ -423,16 +423,18 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that._myPlotter.render();
             };
 
+            var stored_params = ['row_order', 'page'];
             that.storeSettings = function() {
-                return {
-                    rowOrderField: that.model_params.get('row_order')
-                };
+                return _.zipObject(stored_params, _.map(stored_params, function (param) {
+                    return that.model_params.get(param)
+                }));
             };
 
             that.recallSettings = function(settObj) {
-                if (settObj.rowOrderField) {
-                    that.model_params.set('row_order',settObj.rowOrderField);
-                }
+                _.each(stored_params, function(param) {
+                    if (settObj[param])
+                        that.model_params.set(param,settObj[param]);
+                });
             };
 
             that.getToolTipInfo = function (px, py) {
