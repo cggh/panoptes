@@ -21,7 +21,7 @@ The formatting of the source data relies a few concepts:
    dataset
    refgenome
    datatable
-   genotype
+   twoddatatable
    workspace
    customdata
    docs

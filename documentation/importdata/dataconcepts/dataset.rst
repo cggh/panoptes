@@ -10,7 +10,7 @@ A dataset can consist of:
 - A set of :ref:`data tables<dataconcept_datatable>`.
 - A :ref:`reference genome<dataconcept_refgenome>`, including annotation.
 - A set of :ref:`summary values<dataconcept_summaryvalue>`, defined on the reference genome.
-- :ref:`dataconcept_genotype`.
+- :ref:`dataconcept_twoddatatable`.
 - Various settings that define the structure of these components, and the interactions between them.
 
 See also:

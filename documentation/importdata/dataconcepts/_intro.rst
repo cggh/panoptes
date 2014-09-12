@@ -13,7 +13,7 @@ The data served by Panoptes is structured according to a number of central conce
    property
    refgenome
    summaryvalue
-   genotype
+   twoddatatable
    customdata
 
 

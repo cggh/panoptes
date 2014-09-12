@@ -6,7 +6,7 @@
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-This YAML_ file contains settings for :ref:`genotype data<dataconcept_genotype>`. See also:
+This YAML_ file contains settings for :ref:`genotype data<dataconcept_twoddatatable>`. See also:
 
 - :ref:`data-import-settings`
 - `Example file
@@ -15,48 +15,52 @@ This YAML_ file contains settings for :ref:`genotype data<dataconcept_genotype>`
 Possible keys
 .............
 NameSingle
-  *Text (required).* Display name referring to an individual genotype call (single, without starting capital).
+  *Text (required).* Display name referring to data of an individual cell (single, without starting capital).
 
 NamePlural
-  *Text (required).* Display name referring to several genotype call (plural, without starting capital).
+  *Text (required).* Display name referring to data of several cells (plural, without starting capital).
 
 Description
-  *Text (required).* A short description of this genotype data set.
+  *Text (required).* A short description of this 2D data table.
   Note: this text may contain documentation links (see :ref:`def-source-docs`).
 
 
 ColumnDataTable
-  *Text (required).* Identifier of the data table where each item corresponds to a column (the variants).
+  *Text (required).* Identifier of the (1D) data table defining the columns of the matrix
+  (In case of genotype data: the variants). This links the 2D data table to the 1D data table containing the column information.
 
 ColumnIndexField
-  *Text (required).* The column name in the ``ColumnDataTable`` data table that maps into ``ColumnIndexArray``
+  *Text (required).* The property ID in the ``ColumnDataTable`` data table that maps into the ``ColumnIndexArray``
+  array in the HDF5 source file. ``ColumnIndexField`` and ``ColumnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.
   Note that "AutoKey" can be used if your rows do not have Unique IDs
 
 ColumnIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of ColumnDataField for each column.
+  *Text.* 1D Array in the HDF5 source file that gives the value of ``ColumnDataField`` for each column. [@@TODO_GN: shouldn't this be ColumnIndexField?]
   If this is missing then it is assumed that the HDF5 columns are in the same
-  order as the``ColumnDataTable`` sorted by ``ColumnIndexField``.
+  order as the ``ColumnDataTable`` data table, sorted by the ``ColumnIndexField`` property.
 
 RowDataTable
-  *Text (required).* Identifier of the data table where each item corresponds to a row (the samples / sequences).
+  *Text (required).* Identifier of the (1D) data table defining the rows of the matrix
+  (in case of genotype data: the samples). This links the 2D data table to the 1D data table containing the row information.
 
 RowIndexField
-  *Text (required).* The column name in RowDataTable that maps into RowIndexArray.
+  *Text (required).* The property ID in the ``RowDataTable`` data table that maps into ``RowIndexArray``
+  array in the HDF5 source file. ``RowIndexField`` and ``RowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.
   Note that "AutoKey" can be used if your rows do not have Unique IDs
 
 RowIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of RowDataField for each row.
+  *Text.* 1D Array in the HDF5 source file that gives the value of ``RowDataField`` for each row. [@@TODO_GN: shouldn't this be RowIndexField?]
   If this is missing then it is assumed that the HDF5 rows are in the same
-  order as the ``RowDataTable`` sorted by ``RowIndexField``.
+  order as the ``RowDataTable`` data table, sorted by the ``RowIndexField`` property.
 
 FirstArrayDimension
   Either 'row' or 'column' to indicate the first dimension in the HDF5 array.
-  For example, array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better. @@TODO_GN: clarify?
+  'column' will generally perform better.
 
 ShowInGenomeBrowser
-  *Block.* If this key is present, the data will be visualised in the genome browser.
+  *Block.* If this key is present, the data will be visualised as a channel in the genome browser.
   This requires that data table used as ``ColumnDataTable`` is defined as "IsPositionOnGenome" (see :ref:`def-settings-datatable`)
-  This key contains a may have the following subkeys:
+  This key contains the following subkeys:
 
     Type
        *Text (required)* Possible values:
@@ -70,16 +74,16 @@ ShowInGenomeBrowser
           Can be used for monoploid organisms with mixed states.
 
     FirstAllele
-       *Text.* Reference to the genotype property that contains first allele information (in case of diploid data).
+       *Text.* Reference to the 2D data table property that contains first allele information (in case of diploid data).
 
     SecondAllele
-       *Text.* Reference to the genotype property that contains second allele information (in case of diploid data).
+       *Text.* Reference to the 2D data table property that contains second allele information (in case of diploid data).
 
     Ref
-       *Text.* Genotype property containing the reference read count (in case of fractional data).
+       *Text.* 2D data table property containing the reference read count (in case of fractional data).
 
     NonRef
-       *Text.* Genotype property containing the non-reference read count (in case of fractional data).
+       *Text.* 2D data table property containing the non-reference read count (in case of fractional data).
 
     DepthMin
        *Value.* Minimum coverage depth displayed in the genotype channel.
@@ -88,12 +92,13 @@ ShowInGenomeBrowser
        *Value.* Maximum coverage depth displayed in the genotype channel.
 
     ExtraProperties
-      *List.* A list of the extra genotype properties that are displayed in the genotype channel.
+      *List.* A list of the extra 2D data table properties that are displayed in the genotype channel.
 
-GenomeMaxViewportSizeX: 5000
+GenomeMaxViewportSizeX
+  *Value.* Maximum size of the genome browser viewport (in bp) for which genotype calls will be displayed.
 
 Properties:
-   *List (required).* Contains a list of all properties defined for each genotype call.
+   *List (required).* Contains a list of all properties defined for each cell of the 2D data table.
    An item in this list can have the following keys:
 
 
