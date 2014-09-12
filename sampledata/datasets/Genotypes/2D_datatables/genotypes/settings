@@ -4,13 +4,13 @@ Description: A table of diploid genotypes
 
 ColumnDataTable: variants            #The 1D datatable where each entry corresponds to a column
 ColumnIndexField: SnpName            #The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-ColumnIndexArray: col_index          #1D Array in HDF5 that gives the value of ColumnDataField for each column,
+ColumnIndexArray: col_index          #1D Array in HDF5 that gives the value of ColumnIndexField for each column,
                                      #if this is missing then it is assumed that the HDF5 columns are in the same
                                      #order as the "ColumnDataTable" sorted by "ColumnIndexField"
 
 RowDataTable: samples                #The 1D datatable where each entry corresponds to a row
 RowIndexField: ID                    #The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowDataField for each row
+RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowIndexField for each row
                                      #if this is missing then it is assumed that the HDF5 rows are in the same
                                      #order as the "RowDataTable" sorted by "RowIndexField"
 

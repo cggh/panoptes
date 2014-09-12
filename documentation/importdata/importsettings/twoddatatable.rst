@@ -36,7 +36,7 @@ ColumnIndexField
   Note that "AutoKey" can be used if your rows do not have Unique IDs
 
 ColumnIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of ``ColumnDataField`` for each column. [@@TODO_GN: shouldn't this be ColumnIndexField?]
+  *Text.* 1D Array in the HDF5 source file that gives the value of ``ColumnIndexField`` for each column.
   If this is missing then it is assumed that the HDF5 columns are in the same
   order as the ``ColumnDataTable`` data table, sorted by the ``ColumnIndexField`` property.
 
@@ -50,7 +50,7 @@ RowIndexField
   Note that "AutoKey" can be used if your rows do not have Unique IDs
 
 RowIndexArray
-  *Text.* 1D Array in the HDF5 source file that gives the value of ``RowDataField`` for each row. [@@TODO_GN: shouldn't this be RowIndexField?]
+  *Text.* 1D Array in the HDF5 source file that gives the value of ``RowIndexField`` for each row.
   If this is missing then it is assumed that the HDF5 rows are in the same
   order as the ``RowDataTable`` data table, sorted by the ``RowIndexField`` property.
 
