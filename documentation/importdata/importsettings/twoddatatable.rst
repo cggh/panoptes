@@ -6,9 +6,10 @@
 ~~~~~~~~~~~~~~~~~~~~~
 
 
-This YAML_ file contains settings for :ref:`genotype data<dataconcept_twoddatatable>`. See also:
+This YAML_ file contains settings for a :ref:`2D data table<dataconcept_twoddatatable>`. See also:
 
 - :ref:`data-import-settings`
+- :ref:`def-source-twoddatatable`
 - `Example file
   <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Genotypes/2D_datatables/genotypes/settings>`_
 
