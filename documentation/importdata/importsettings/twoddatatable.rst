@@ -33,11 +33,12 @@ ColumnDataTable
 ColumnIndexField
   *Text (required).* The property ID in the ``ColumnDataTable`` data table that maps into the ``ColumnIndexArray``
   array in the HDF5 source file. ``ColumnIndexField`` and ``ColumnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.
-  Note that "AutoKey" can be used if your rows do not have Unique IDs
+  Alternatively ``ColumnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``ColumnIndexField`` sorted.
+  Note that "AutoKey" can be used if your rows do not have Unique IDs.
 
 ColumnIndexArray
   *Text.* 1D Array in the HDF5 source file that gives the value of ``ColumnIndexField`` for each column.
-  If this is missing then it is assumed that the HDF5 columns are in the same
+  If this is omitted then it is assumed that the HDF5 columns are in the same
   order as the ``ColumnDataTable`` data table, sorted by the ``ColumnIndexField`` property.
 
 RowDataTable
@@ -47,11 +48,12 @@ RowDataTable
 RowIndexField
   *Text (required).* The property ID in the ``RowDataTable`` data table that maps into ``RowIndexArray``
   array in the HDF5 source file. ``RowIndexField`` and ``RowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.
+  Alternatively ``RowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``RowIndexField`` sorted.
   Note that "AutoKey" can be used if your rows do not have Unique IDs
 
 RowIndexArray
   *Text.* 1D Array in the HDF5 source file that gives the value of ``RowIndexField`` for each row.
-  If this is missing then it is assumed that the HDF5 rows are in the same
+  If this is omitted then it is assumed that the HDF5 columns are in the same
   order as the ``RowDataTable`` data table, sorted by the ``RowIndexField`` property.
 
 FirstArrayDimension
@@ -75,10 +77,10 @@ ShowInGenomeBrowser
           Can be used for monoploid organisms with mixed states.
 
     FirstAllele
-       *Text.* Reference to the 2D data table property that contains first allele information (in case of diploid data).
+       *Text.* Reference to the 2D data table property that contains first allele information (in case of diploid data). -1 is the value used to indicate missingness.
 
     SecondAllele
-       *Text.* Reference to the 2D data table property that contains second allele information (in case of diploid data).
+       *Text.* Reference to the 2D data table property that contains second allele information (in case of diploid data). -1 is the value used to indicate missingness.
 
     Ref
        *Text.* 2D data table property containing the reference read count (in case of fractional data).
@@ -86,14 +88,8 @@ ShowInGenomeBrowser
     NonRef
        *Text.* 2D data table property containing the non-reference read count (in case of fractional data).
 
-    DepthMin
-       *Value.* Minimum coverage depth displayed in the genotype channel.
-
-    DepthMax
-       *Value.* Maximum coverage depth displayed in the genotype channel.
-
     ExtraProperties
-      *List.* A list of the extra 2D data table properties that are displayed in the genotype channel.
+      *List.* A list of the extra 2D data table properties that are displayed in the genotype channel. This will populate options for alpha and height control.
 
 GenomeMaxViewportSizeX
   *Value.* Maximum size of the genome browser viewport (in bp) for which genotype calls will be displayed.
@@ -111,3 +107,9 @@ Properties:
 
    Description
      *Text.* Short description of this property.
+
+   MinVal
+     *Value.* For continuous properties the lower level at which values will be clipped on display.
+
+   MinVal
+     *Value.* For continuous properties the upper level at which values will be clipped on display.
