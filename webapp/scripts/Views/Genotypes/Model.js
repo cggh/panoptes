@@ -234,6 +234,8 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
                 myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.row_query));
                 myurl.addUrlQueryItem("col_order", that.col_order);
+                if (that.row_order == 'columns')
+                    myurl.addUrlQueryItem("row_sort_cols", _.keys(that.table.col_table.currentSelection).join('~'));
                 myurl.addUrlQueryItem("row_order", that.row_order);
                 myurl.addUrlQueryItem("row_offset", row_index_start);
                 myurl.addUrlQueryItem("row_limit", row_index_end-row_index_start);

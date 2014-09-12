@@ -92,7 +92,11 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                       model_params.set('row_order', view_params.get('samples_property'));
                 });
 
-                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField]) })
+                var buttonSortSamplesByColumn = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
+                    model_params.set('row_order', 'columns');
+                });
+
+                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField, buttonSortSamplesByColumn]) })
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
