@@ -92,9 +92,19 @@ define([
                         Serialise._recall(resp.settings);
                         proceedFunction();
                     });
+                return;
             }
-            else
-                proceedFunction();
+
+            var tableid  = DQX.getUrlSearchString('tableid');
+            var itemid  = DQX.getUrlSearchString('itemid');
+            if (tableid && itemid) {
+                HistoryManager.__preventSetFragment = true;
+                Application.activateView('table_' + tableid);
+                HistoryManager.__preventSetFragment = false;
+                Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: itemid } );
+            }
+
+            proceedFunction();
         };
 
 

@@ -31,7 +31,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             var keylist = DQX.parseResponse(resp);
                             resultLevel.tableid = curtableid;
                             if ("Error" in keylist) {
-                                alert(keylist.Error);
+                                alert('Unable to fetch {tableid}, {itemid}: \n{error}'.DQXformat({tableid: curtableid,itemid:curitemid, error:keylist.Error}));
                                 resultLevel.fields = {};
                                 return;
                             }
