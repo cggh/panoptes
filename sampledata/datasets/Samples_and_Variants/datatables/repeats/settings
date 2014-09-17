@@ -1,11 +1,9 @@
-NameSingle: genomic region     # Display name referring to a table item (single, no capital)
-NamePlural: genomic regions    # Display name referring to a table item (plural, no capital)
-Description: Contains a number of regions defined on the genome     # A description of this dataset
+NameSingle: repeat region
+NamePlural: repeat regions
+Description: Contains a number of repeat regions defined on the genome
 
-Icon: fa-arrows-h
+Icon: fa-align-center
 
-# The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
-# Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
 PrimKey: regid
 SortDefault: regionstart            # Set the start position as default sort field
 
