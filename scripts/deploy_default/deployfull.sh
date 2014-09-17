@@ -8,7 +8,7 @@ NC='\e[0m'
 release='master'
 
 
-# target: ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9)
+# target: Ubuntu 14.04.1 LTS
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
@@ -54,6 +54,8 @@ mkdir basedir/Docs
 chmod a+w basedir/Docs
 mkdir basedir/Graphs
 chmod a+w basedir/Graphs
+mkdir basedir/2D_data
+chmod a+w basedir/2D_data
 mkdir sourcedata
 chmod a+w sourcedata
 
@@ -74,4 +76,4 @@ ln -s /panoptes/source/build/DQXServer/wsgi_server.py /var/www/.
 
 /etc/init.d/apache2 restart
 
-echo -e "${green}Serving from [ServerName]/DQXServer/app/index.html or [ServerName]/panoptes/index.html${NC}"
+echo -e "${green}Serving from [ServerName]/index.html"

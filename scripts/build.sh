@@ -128,6 +128,7 @@ mkdir -p $BASEDIR/SummaryTracks
 mkdir -p $BASEDIR/Uploads
 mkdir -p $BASEDIR/Docs
 mkdir -p $BASEDIR/Graphs
+mkdir -p $BASEDIR/2D_data
 if ! [ -w $BASEDIR ]; then
     echo -e "${red}  WARNING ${BASEDIR} is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
@@ -145,6 +146,9 @@ if ! [ -w $BASEDIR/Docs ]; then
 fi
 if ! [ -w $BASEDIR/Graphs ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Graphs is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/2D_data ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/2D_data is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
 
 echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"

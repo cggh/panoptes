@@ -127,7 +127,7 @@ In this configuration, the app is served from::
 Automatic deployment on a new Ubuntu EC2 image
 ----------------------------------------------
 
-For testing purposes, a script is provided that performs a full deployment on a fresh Ubuntu 12.04 image, including
+For testing purposes, a script is provided that performs a full deployment on a fresh Ubuntu 14.04.1 LTS image, including
 
 - Installation of all dependencies
 - Deployment and configuration of MySQL
@@ -136,14 +136,14 @@ For testing purposes, a script is provided that performs a full deployment on a 
 .. caution::
   This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
 
-The following steps will create a fully working Panoptes instance on a Amazon EC2 ubuntu-precise-12.04-amd64-server-20131003 (ami-8e987ef9) image::
+The following steps will create a fully working Panoptes instance on a Amazon EC2 Ubuntu 14.04.1 LTS image::
 
   cd /
   sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
   sudo chmod +x deployfull.sh
   sudo ./deployfull.sh
 
-The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/DQXServer/app/index.html` or `[ServerName]/panoptes/index.html`.
+The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/index.html`.
 
 .. _authorization:
 
