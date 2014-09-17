@@ -31,8 +31,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         width:140,
                         height:50
                     }).setOnChanged(function() {
-                        button.handler();
                         Popup.closeIfNeeded(popupid);
+                        button.handler();
                     });
                     content += bt.renderHtml();
                 });

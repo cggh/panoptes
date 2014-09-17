@@ -2,12 +2,12 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame",
     "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation", "DQX/ChannelPlot/ChannelMultiCatDensity",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
     "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/GenotypeChannel"
 ],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup,
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame,
               GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation, ChannelMultiCatDensity,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
               EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel
@@ -32,6 +32,9 @@ define([
                     }
                 } );
 
+                Msg.listen('',{ type: 'FindGenomeRegion'}, function(scope, settings) {
+                    that.genomeRangePopup(settings.chromosome, settings.start, settings.end, settings);
+                } );
 
                 that.storeSettings = function() {
                     var obj= {};
@@ -172,7 +175,8 @@ define([
                         if (range)
                             that.genomeRangePopup(that.panelBrowser.getCurrentChromoID(),
                                 Math.min(range.min, range. max),
-                                Math.max(range.min, range. max)
+                                Math.max(range.min, range. max),
+                                {}
                             );
                     });
 
@@ -978,10 +982,58 @@ define([
                     }
 
 
-                    that.genomeRangePopup = function(chromosome, rangeMin, rangeMax) {
+                    that.formatBpValue = function(value) {
+                        var valtxt = value.toFixed(0);
+                        valtxt = valtxt.split("").reverse().join("");
+                        var valtxt2 = [];
+                        for (var sp = 0; sp<valtxt.length; sp++) {
+                            if ((sp>0) && (sp%3 == 0))
+                                valtxt2.push(",");
+                            valtxt2.push(valtxt[sp]);
+                        }
+                        valtxt = valtxt2.reverse().join("");
+                        return valtxt;
+                    }
+
+                    that.genomeRangePopup = function(chromosome, rangeMin, rangeMax, settings) {
                         var content = '';
                         var hasButtons  = false;
                         var regionString = chromosome + ':' + parseInt(rangeMin) + '-' + parseInt(rangeMax);
+
+                        var grd = Controls.CompoundGrid();
+                        grd.setSeparation(12,2);
+                        grd.setItem(0,0,Controls.Static('Chromosome'));
+                        grd.setItem(0,1,Controls.Static(chromosome));
+                        grd.setItem(1,0,Controls.Static('Begin'));
+                        grd.setItem(1,1,Controls.Static(that.formatBpValue(rangeMin)+' bp'));
+                        grd.setItem(2,0,Controls.Static('End'));
+                        grd.setItem(2,1,Controls.Static(that.formatBpValue(rangeMax)+' bp'));
+                        grd.setItem(3,0,Controls.Static('Length'));
+                        grd.setItem(3,1,Controls.Static(that.formatBpValue(rangeMax-rangeMin + 1)+' bp'));
+                        content += '<p>' + regionString + "<p>";
+                        content += grd.renderHtml();
+                        content += "<p>";
+
+
+
+                        if (settings && settings.buttonShowRegion) {
+                            var bt = Controls.Button(null, {
+                                buttonClass: 'DQXToolButton2',
+                                content: 'Show in genome browser',
+                                bitmap: 'Bitmaps/GenomeBrowserSmall.png',
+                                width:160, height:50
+                            }).setOnChanged(function() {
+                                    Popup.closeIfNeeded(popupid);
+                                    PopupFrame.minimiseAll({ slow: true});
+                                    Msg.send({ type: 'JumpgenomeRegion' }, {
+                                        chromoID: chromosome,
+                                        start: rangeMin,
+                                        end: rangeMax
+                                    });
+                                });
+                            content += bt.renderHtml();
+                        }
+
                         $.each(MetaData.mapTableCatalog, function(idx, tableInfo) {
 
                             if (tableInfo.hasGenomePositions) {
@@ -1033,10 +1085,7 @@ define([
 
                         });
 
-                        if (hasButtons) {
-                            var popupid = Popup.create('Genome region '+regionString, content);
-
-                        }
+                        var popupid = Popup.create('Genome region', content);
                     };
 
 

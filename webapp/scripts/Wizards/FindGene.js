@@ -239,6 +239,64 @@
 
         }
 
+
+        FindGene.findRegion = function() {
+            var content  = '';
+
+            var searchChromosome = Controls.Combo('SearchRegionChromosome', { label: '', value: FindGene.findRegion_chromosome?FindGene.findRegion_chromosome:MetaData.chromosomes[0].id, states: MetaData.chromosomes }).setHasDefaultFocus();
+            var searchStart = Controls.Edit('SearchRegionStart', { size: 10, value: FindGene.findRegion_start?FindGene.findRegion_start:'' });
+            var searchEnd = Controls.Edit('SearchRegionEnd', { size: 10, value: FindGene.findRegion_end?FindGene.findRegion_end:'' });
+            var searchUnit = Controls.Combo('SearchRegionUnit', { label: '', value: FindGene.findRegion_unit?FindGene.findRegion_unit:'bp', states: [{id:'bp', name:'bp'}, {id:'kb', name:'kb'}, {id:'Mb', name:'Mb'}] }).setHasDefaultFocus();
+
+            var grid = Controls.CompoundGrid();
+            grid.setSeparation(16,5);
+            grid.setItem(0,0,Controls.Static('Chromosome:'));
+            grid.setItem(0,1,searchChromosome);
+            grid.setItem(1,0,Controls.Static('Start:'));
+            grid.setItem(1,1,searchStart);
+            grid.setItem(2,0,Controls.Static('End:'));
+            grid.setItem(2,1,searchEnd);
+            grid.setItem(3,0,Controls.Static('Unit:'));
+            grid.setItem(3,1,searchUnit);
+
+            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-arrow-circle-right', content: 'Find', width:120, height:35 }).setOnChanged(function() {
+                var startPos = parseFloat(searchStart.getValue());
+                var endPos = parseFloat(searchEnd.getValue());
+                if (!startPos) {
+                    alert('Please provide a start position');
+                    return;
+                }
+                if (!endPos) {
+                    alert('Please provide an end position');
+                    return;
+                }
+                if (endPos<startPos) {
+                    alert('Invalid region');
+                    return;
+                }
+                Popup.closeIfNeeded(popupid);
+                FindGene.findRegion_chromosome = searchChromosome.getValue();
+                FindGene.findRegion_unit = searchUnit.getValue();
+                FindGene.findRegion_start = startPos;
+                FindGene.findRegion_end = endPos;
+                var factor = 1;
+                if (FindGene.findRegion_unit=='kb')
+                    factor = 1000;
+                if (FindGene.findRegion_unit=='Mb')
+                    factor = 1000000;
+                Msg.send({type:'FindGenomeRegion'}, {
+                    chromosome: searchChromosome.getValue(),
+                    start: Math.round(startPos*factor),
+                    end: Math.round(endPos*factor),
+                    buttonShowRegion: true
+                });
+            });
+
+            content += '<div style="padding:5px">' + grid.renderHtml()+ '<p>' + bt.renderHtml()+ '</div>';
+            var popupid = Popup.create('Find genomic region', content);
+
+        }
+
         return FindGene;
     });
 

@@ -255,7 +255,11 @@ require([
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
                                 actions.push( { content:'Find gene', bitmap:'Bitmaps/GenomeBrowserSmall.png', handler:function() {
-                                    FindGene.execute()
+                                    FindGene.execute();
+                                }
+                                });
+                                actions.push( { content:'Find genomic region', bitmap:'Bitmaps/GenomeBrowserSmall.png', handler:function() {
+                                    FindGene.findRegion();
                                 }
                                 });
                             }
@@ -291,7 +295,7 @@ require([
                                 actionRows[actionRows.length-1].push(action);
                                 rowCnt++;
                             });
-                            ButtonChoiceBox.create('Find item','Please select what kind of item you want to search for:', actionRows);
+                            ButtonChoiceBox.create('Find item','Please select what kind of element you want to search for:', actionRows);
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
