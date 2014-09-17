@@ -25,6 +25,8 @@ mysqlcommand = 'mysql'
 # Command to invoke python
 pythoncommand = 'python'
 
+# Timeout for server query
+TIMEOUT = 60
 
 ###########################################################################################################
 # Server side file structure location

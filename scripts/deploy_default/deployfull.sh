@@ -50,6 +50,10 @@ mkdir basedir/SummaryTracks
 chmod a+w basedir/SummaryTracks
 mkdir basedir/Uploads
 chmod a+w basedir/Uploads
+mkdir basedir/Docs
+chmod a+w basedir/Docs
+mkdir basedir/Graphs
+chmod a+w basedir/Graphs
 mkdir sourcedata
 chmod a+w sourcedata
 
@@ -63,8 +67,8 @@ cp scripts/deploy_default/config.py config.py
 
 ./scripts/build.sh
 
-cp /etc/apache2/sites-enabled/000-default /panoptes/bck_000-default
-cp scripts/deploy_default/apache_settings /etc/apache2/sites-enabled/000-default
+cp /etc/apache2/sites-enabled/000-default.conf /panoptes/bck_000-default
+cp scripts/deploy_default/apache_settings /etc/apache2/sites-enabled/000-default.conf
 
 ln -s /panoptes/source/build/DQXServer/wsgi_server.py /var/www/.
 
