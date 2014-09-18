@@ -189,7 +189,10 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 var overdraw = (that.col_end - that.col_start)*0.00;
                 var data = that.cache_for_chrom[that.chrom].get_by_ordinal(that.col_start-overdraw,  that.col_end+overdraw, that.page-1);
                 that.col_ordinal = data.col[that.col_order] || [];
-                that.row_ordinal = data.row[that.row_order] || [];
+                if (that.row_order == 'columns')
+                    that.row_ordinal = data.row[that.table.row_table.primkey]|| [];
+                else
+                    that.row_ordinal = data.row[that.row_order] || [];
                 that.row_primary_key = data.row[that.table.row_table.primkey] || [];
                 that.col_primary_key = data.col[that.table.col_table.primkey] || [];
                 _.each(that.properties, function(prop) {
@@ -234,8 +237,22 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("col_qry", SQL.WhereClause.encode(col_query));
                 myurl.addUrlQueryItem("row_qry", SQL.WhereClause.encode(that.row_query));
                 myurl.addUrlQueryItem("col_order", that.col_order);
-                if (that.row_order == 'columns')
+                if (that.row_order == 'columns') {
+                    myurl.addUrlQueryItem("row_properties", that.table.row_table.primkey);
                     myurl.addUrlQueryItem("row_sort_cols", _.keys(that.table.col_table.currentSelection).join('~'));
+                    myurl.addUrlQueryItem("col_key", that.table.col_table.primkey);
+                    myurl.addUrlQueryItem("sort_mode", that.data_type);
+                    if (that.data_type == 'diploid') {
+                        myurl.addUrlQueryItem("row_sort_properties", that.settings.FirstAllele+'~'+that.settings.SecondAllele)
+                    }
+                    if (that.data_type == 'fractional') {
+                        myurl.addUrlQueryItem("row_sort_properties", that.settings.Ref+'~'+that.settings.NonRef)
+                    }
+                } else
+                    if (that.table.row_table.primkey == that.row_order)
+                            myurl.addUrlQueryItem("row_properties", that.row_order);
+                        else
+                            myurl.addUrlQueryItem("row_properties", that.row_order+'~'+that.table.row_table.primkey);
                 myurl.addUrlQueryItem("row_order", that.row_order);
                 myurl.addUrlQueryItem("row_offset", row_index_start);
                 myurl.addUrlQueryItem("row_limit", row_index_end-row_index_start);
@@ -244,10 +261,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                   myurl.addUrlQueryItem("col_properties", that.col_order);
                 else
                   myurl.addUrlQueryItem("col_properties", that.col_order+'~'+that.table.col_table.primkey);
-                if (that.table.row_table.primkey == that.row_order)
-                  myurl.addUrlQueryItem("row_properties", that.row_order);
-                else
-                  myurl.addUrlQueryItem("row_properties", that.row_order+'~'+that.table.row_table.primkey);
+
                 myurl.addUrlQueryItem("2D_properties", that.properties.join('~'));
                 ArrayBufferClient.request(myurl.toString(),
                     function(data) {
