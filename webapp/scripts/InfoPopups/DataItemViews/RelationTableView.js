@@ -84,7 +84,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 buttons.push(that.button_OpenInTable);
 
                 if (that.childTableInfo.hasGeoCoord) {
-                    var button_OpenInMap = Controls.Button(null, { content: 'Show on map'}).setOnChanged(function () {
+                    var button_OpenInMap = Controls.Button(null, { content: 'Show on map', icon: 'fa-globe', buttonClass: 'PnButtonGrid', width: 135, height: 35}).setOnChanged(function () {
                             Msg.send({type: 'CreateGeoMapPoint' },
                                 {
                                     tableid: that.childTableInfo.id,

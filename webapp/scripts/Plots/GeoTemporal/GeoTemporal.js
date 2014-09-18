@@ -29,12 +29,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
         ];
 
-
-
-
-
-
-
+        Msg.listen('',{type:'CreateGeoMapPoint'}, function(scope, info) {
+            GeoTemporal.Create(
+                info.tableid,
+                info.startQuery,
+                {},
+                {
+                    zoomFit: true,
+                    showAsMarker: true
+                }
+                );
+        });
 
 
 
@@ -106,13 +111,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
 
             that.createControlsMap = function() {
 
+                var defaultShape = 'rectangle';
+                var defaultSize = 2.5;
+                if (plotSettings && plotSettings.showAsMarker) {
+                    defaultShape = 'marker';
+                    defaultSize = 6;
+                }
 
-                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}, {id: 'marker', 'name':'Marker'}], value:'rectangle' }).setClassID('pointShape')
+
+                that.ctrl_PointShape = Controls.Combo(null,{ label:'Point shape:', states: [{id: 'rectangle', 'name':'Rectangle'}, {id: 'circle', 'name':'Circle'}, {id: 'fuzzy', 'name':'Fuzzy'}, {id: 'marker', 'name':'Marker'}], value:defaultShape}).setClassID('pointShape')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
 
-                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:2, digits: 2}).setClassID('pointSize')
+                that.ctrl_PointSize = Controls.ValueSlider(null, {label: 'Point size', width: 170, minval:0.1, maxval:10, value:defaultSize, digits: 2}).setClassID('pointSize')
                     .setNotifyOnFinished()
                     .setOnChanged(function() {
                         that.reDraw();
