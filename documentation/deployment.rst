@@ -2,15 +2,42 @@ Installation and deployment guide
 =================================
 
 .. note::
-  Panoptes is currently in an early stage of development, and does not yet come in a polished distribution. Successfully deploying it requires familiarity with the following technologies:
+  Successfully deploying and administering Panoptes requires familiarity with the following technologies:
   - MySQL
   - Python
   - WSGI
   - Web servers (e.g. Apache2)
   - Unix system administration
 
+
+Automatic deployment on a new Ubuntu EC2 image
+----------------------------------------------
+
+For testing purposes, the simplest way to obtain a running instance of Panoptes is to do a full deployment on a fresh a fresh Ubuntu 14.04.1 LTS image,
+e.g. on an EC2 virtual machine.
+A script is provided that performs a fully automatic installation, including
+
+- Installation of all dependencies
+- Deployment and configuration of MySQL
+- Deployment and configuration of Apache2
+
+.. caution::
+  This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
+
+The following steps will create a fully working Panoptes instance on a Amazon EC2 Ubuntu 14.04.1 LTS image::
+
+  cd /
+  sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
+  sudo chmod +x deployfull.sh
+  sudo ./deployfull.sh
+
+The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/index.html`.
+
+Manual installation
+-------------------
+
 Download & dependencies
------------------------
+.......................
 Download the code from the GitHub repository::
 
     wget https://github.com/cggh/panoptes/archive/master.zip
@@ -19,7 +46,7 @@ Download the code from the GitHub repository::
 
 Panoptes needs a running MySQL version **5.6 or later** with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
 
-    sudo apt-get install mysql-server-5.6 mysql-client
+    sudo apt-get install mysql-server-5.6 mysql-client-5.6
 
 .. caution::
   Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
@@ -36,7 +63,7 @@ You will also need libhdf5-dev. This is a virtual package satisfied by the sever
 unless you want a specific HDF5 setup.
 
 Build
------
+.....
 In the directory where the code was unzipped, copy 'config.py.example' to 'config.py'.
 Edit the file and specify the following components:
 
@@ -63,7 +90,7 @@ This will attempt to install the needed python packages and link Panoptes into t
 .. _server-data-structure:
 
 Server data file structure
---------------------------
+..........................
 Panoptes uses two file directories, and the location of both has to be specified in config.py
 (example: `config.py.sample <https://github.com/cggh/DQXServer/blob/master/config.py.sample#L38>`_).
 
@@ -80,7 +107,7 @@ This directory contains the file-bases data sources that are used to import into
 See section :doc:`importdata/_intro` for more information on how to populate the Panoptes instance with data.
 
 Simple Server
--------------
+.............
 The simplest way to run Panoptes is using::
 
 	./scripts/run.sh
@@ -93,7 +120,7 @@ To run on your external network interface use (with the port you desire)::
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
 
 Deployment on Apache2
----------------------
+.....................
 
 .. note::
   This section describes a deployment strategy where the static files (html, css, js)
@@ -124,26 +151,7 @@ In this configuration, the app is served from::
 
   [ServerName]:80/
 
-Automatic deployment on a new Ubuntu EC2 image
-----------------------------------------------
 
-For testing purposes, a script is provided that performs a full deployment on a fresh Ubuntu 14.04.1 LTS image, including
-
-- Installation of all dependencies
-- Deployment and configuration of MySQL
-- Deployment and configuration of Apache2
-
-.. caution::
-  This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
-
-The following steps will create a fully working Panoptes instance on a Amazon EC2 Ubuntu 14.04.1 LTS image::
-
-  cd /
-  sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
-  sudo chmod +x deployfull.sh
-  sudo ./deployfull.sh
-
-The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/index.html`.
 
 .. _authorization:
 

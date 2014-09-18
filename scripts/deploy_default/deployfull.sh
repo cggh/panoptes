@@ -58,6 +58,8 @@ mkdir basedir/2D_data
 chmod a+w basedir/2D_data
 mkdir sourcedata
 chmod a+w sourcedata
+mkdir sourcedata/datasets
+chmod a+w sourcedata/datasets
 
 wget --output-document=panoptes.zip https://github.com/cggh/panoptes/archive/${release}.zip
 unzip panoptes.zip
