@@ -85,62 +85,64 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     }
 
                     $.each(MetaData.tableCatalog, function(idx, tableInfo) {
-                        if (tableInfo.settings.ListView) {
-                            var tableViewerButton = Application.getView('list_' + tableInfo.id).createActivationButton({
-                                content: "Show list",
-                                icon: 'fa-list'
-                            });
-                        } else {
-                            var tableViewerButton = Application.getView('table_' + tableInfo.id).createActivationButton({
-                                content: "Show table",
-                                icon: 'fa-table'
-                            });
-                        }
+                        if (!tableInfo.settings.IsHidden) {
+                            if (tableInfo.settings.ListView) {
+                                var tableViewerButton = Application.getView('list_' + tableInfo.id).createActivationButton({
+                                    content: "Show list",
+                                    icon: 'fa-list'
+                                });
+                            } else {
+                                var tableViewerButton = Application.getView('table_' + tableInfo.id).createActivationButton({
+                                    content: "Show table",
+                                    icon: 'fa-table'
+                                });
+                            }
 
-                        if (!tableInfo.settings.DisablePlots) {
-                            var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
-                                Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
-                            });
-                        }
-                        else {
-                            var button_Showplots = Controls.HorizontalSeparator(100);
-                        }
+                            if (!tableInfo.settings.DisablePlots) {
+                                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
+                                    Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
+                                });
+                            }
+                            else {
+                                var button_Showplots = Controls.HorizontalSeparator(100);
+                            }
 
-                        var descr = '';
-//                        descr += tableInfo.createIcon({floatLeft: true});
-                        descr += tableInfo.settings.Description||'<i>No description</i>';
-//                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
-//                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
-//                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
-//                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
-//                            });
-//                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
-//                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
-//                            });
-//                            descr += '</div>';
-//                        }
-                        var info = Controls.Static(descr);
-                        var grp = Controls.CompoundVert([
-                            Controls.CompoundHor([
-                                Controls.Static(tableInfo.createIcon({floatLeft: false})),
-                                Controls.HorizontalSeparator(18),
-                                Controls.CompoundVert([
-                                    Controls.VerticalSeparator(4),
-                                    Controls.CompoundHor([
-                                        tableViewerButton,
-                                        button_Showplots
-                                    ])
-                                ]).setTreatAsBlock().setMargin(0)
-                            ]),
-                            info,
-                            Controls.Static('')
-                        ]);;
-                        tableButtons.push(Controls.Section(grp, {
-                            title: tableInfo.tableCapNamePlural,
-                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
-                            bodyStyleClass: 'ControlsSectionBodyIntro',
-                            canCollapse: false
-                        }));
+                            var descr = '';
+    //                        descr += tableInfo.createIcon({floatLeft: true});
+                            descr += tableInfo.settings.Description||'<i>No description</i>';
+    //                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
+    //                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
+    //                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
+    //                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
+    //                            });
+    //                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
+    //                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
+    //                            });
+    //                            descr += '</div>';
+    //                        }
+                            var info = Controls.Static(descr);
+                            var grp = Controls.CompoundVert([
+                                Controls.CompoundHor([
+                                    Controls.Static(tableInfo.createIcon({floatLeft: false})),
+                                    Controls.HorizontalSeparator(18),
+                                    Controls.CompoundVert([
+                                        Controls.VerticalSeparator(4),
+                                        Controls.CompoundHor([
+                                            tableViewerButton,
+                                            button_Showplots
+                                        ])
+                                    ]).setTreatAsBlock().setMargin(0)
+                                ]),
+                                info,
+                                Controls.Static('')
+                            ]);;
+                            tableButtons.push(Controls.Section(grp, {
+                                title: tableInfo.tableCapNamePlural,
+                                headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                                bodyStyleClass: 'ControlsSectionBodyIntro',
+                                canCollapse: false
+                            }));
+                        }
                     })
 
 

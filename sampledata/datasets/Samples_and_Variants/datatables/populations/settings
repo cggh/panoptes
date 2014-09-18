@@ -1,6 +1,7 @@
 NameSingle: population
 NamePlural: populations
-#Description:
+
+IsHidden: true #If set to true, this data table will not be displayed as a standalone entity (e.g. no tab)
 
 Icon: fa-group # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
 

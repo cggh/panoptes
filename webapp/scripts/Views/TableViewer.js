@@ -118,6 +118,8 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
 
                 that.createFrames = function(rootFrame) {
+                    if (that.tableInfo.settings.IsHidden)
+                        rootFrame.isHiddenPanel = true;
                     this.frameControls = Framework.FrameFinal('',0.2);
                     this.frameTable = Framework.FrameFinal('', 0.8)//Create frame that will contain the table viewer
                         .setAllowScrollBars(false,false);

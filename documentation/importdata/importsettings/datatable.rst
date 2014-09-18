@@ -31,13 +31,18 @@ Icon:
   *Text.* Specifies an icon that will be associated with the data table.
   The icon name can be chosen from the list specified in http://fortawesome.github.io/Font-Awesome/icons/.
 
-PrimKey:
+IsHidden
+  *Boolean.* If set to true, the data table will not be displayed as a standalone entity
+  (i.e. not mentioned on the intro page and no tab)
+
+
+PrimKey
   *Property ID (required)*. The primary key *property ID* for this table.
   A data item *property* is a column in the TAB-delimited source file ``data``, and the *ID* corresponds to the column header.
   The primary key should refer to a column containing a unique value for each record in the table.
   Optionally, this parameter can be set to '``AutoKey``' to instruct the software to automatically generate a primary key.
 
-ItemTitle:
+ItemTitle
   *Text.* A  `handlebars <http://handlebarsjs.com/>`_ template. Defaults to the primary key.
   The rendered template will be used when a data item title is needed.
 
