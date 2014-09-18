@@ -58,7 +58,7 @@ pip install -q numpy
 echo -e "${green}      Panoptes requirements...${NC}"
 pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
 echo -e "${green}      gunicorn...${NC}"
-pip install -q gunicorn #For testing and instant run, not a strict requirement of DQXServer
+pip install -q gunicorn==19.1.0 #For testing and instant run, not a strict requirement of DQXServer
 
 echo -e "${green}  Linking DQX${NC}"
 cd $PROJECT_ROOT
