@@ -54,21 +54,20 @@ define([
                             viewbitmap = 'Bitmaps/CustomButtonBitmaps/' + viewicon+'.png';
                             viewicon = null;
                         }
-                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon, bitmap:viewbitmap, bitmapHeight:27 });
-                        content = ctrl.renderHtml();
-                        if (MetaData.isManager) {
+                        var theButton = Controls.Button(null, { content: introview.name, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon, bitmap:viewbitmap, bitmapHeight:27 });
+                        content = theButton.renderHtml();
+                        if (MetaData.isManager /*&& false*/) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});
                             content += '<img class="IntroViewItemDelete" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/delete.png'});
                         }
+                        if (introview.description)
+                            content += '<img class="IntroViewItemInfo" style="height:20px" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/info3.png'});
                         var ctrl = Controls.Html(null, content, 'IntroViewItem');
                         getSectionGroup(introview.section).addControl(ctrl);
                         introview.divid = ctrl.getID();
-                    });
-                    var st = group.renderHtml();
-                    IntroViews.storedViewsContainer.modifyValue(st);
-                    group.postCreateHtml();
-                    $.each(introviews, function(idx, introview) {
-                        $('#' + introview.divid).click(function() {
+
+                        introview.theButton = theButton;
+                        theButton.setOnChanged(function() {
                             var handled = false;
                             if (introview.url=='plot') {
                                 Msg.send({type:'LoadStoredPlot'}, introview.storedviewid);
@@ -85,6 +84,11 @@ define([
                             if (!handled)
                                 window.location.replace(Base64.decode(introview.url));
                         });
+                    });
+                    var st = group.renderHtml();
+                    IntroViews.storedViewsContainer.modifyValue(st);
+                    group.postCreateHtml();
+                    $.each(introviews, function(idx, introview) {
                         if (MetaData.isManager) {
                             $('#' + introview.divid).find('.IntroViewItemDelete').click(function(ev) {
                                 ev.preventDefault();
@@ -104,6 +108,20 @@ define([
                                 ev.preventDefault();
                                 ev.stopPropagation();
                                 IntroViews.editIntroView(introview);
+                            });
+                            $('#' + introview.divid).find('.IntroViewItemInfo').click(function(ev) {
+                                ev.preventDefault();
+                                ev.stopPropagation();
+                                var content = '<div style="padding:10px;max-width:400px">'+introview.description;
+                                content += '<p></p>';
+                                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-arrow-circle-right', content: 'Show', width:90, height:30});
+                                bt.setOnChanged(function() {
+                                    Popup.closeIfNeeded(popupid);
+                                    introview.theButton.onChanged();
+                                });
+                                content += bt.renderHtml();
+                                content += '</div>';
+                                var popupid = Popup.create(introview.name, content);
                             });
                         }
                     });

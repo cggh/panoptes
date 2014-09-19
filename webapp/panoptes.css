@@ -673,7 +673,7 @@ input.PnGenotypesPageEdit{
 }
 
 
-.IntroViewItemDelete, .IntroViewItemEdit {
+.IntroViewItemDelete, .IntroViewItemEdit, .IntroViewItemInfo {
     opacity:0.0;
     /*float:right;*/
     position:absolute;
@@ -687,7 +687,14 @@ input.PnGenotypesPageEdit{
     left: 165px;
 }
 
-.IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit {
+.IntroViewItemInfo {
+    opacity: 0.4;
+    left: 160px;
+    bottom:0px;
+}
+
+
+.IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit, .IntroViewItem:hover .IntroViewItemInfo {
     opacity: 1
 }
 
