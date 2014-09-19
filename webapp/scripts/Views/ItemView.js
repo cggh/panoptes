@@ -19,6 +19,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var that = {};
             that.frameRoot = frameRoot;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
+            that.itemid = itemInfo.itemid;
 
             that.eventids = [];//Add event listener id's to this list to have them removed when the view closes
             var eventid = DQX.getNextUniqueID();
@@ -274,6 +275,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.panelButtons.clear();
                 that.panelButtons.addControl(that.createButtons(newItemData));
                 that.panelButtons.render();
+                that.itemid = newItemData.fields[that.tableInfo.primkey];
 
                 $.each(that.itemViewObjects, function (idx, dtViewObject) {
                     if (dtViewObject.update)
