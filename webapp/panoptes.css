@@ -602,6 +602,15 @@ input.PnGenotypesPageEdit{
     min-height: 75px;
 }
 
+.IntroButtonsSectionHeader {
+    font-size: 11pt;
+    font-weight: bold;
+    padding:7px;
+    padding-left:20px;
+    color: rgb(0, 102, 109);
+    /*border-top: 2px solid rgb(240, 240, 240);*/
+}
+
 .GenomeBrowserMainSectionHeader {
     /*background-color: rgb(140,195,200);*/
     background-color: rgb(170,215,220);
@@ -630,7 +639,8 @@ input.PnGenotypesPageEdit{
 
 .IntroViewSection {
     padding:20px;
-    padding-bottom: 27px;
+    padding-top:7px;
+    padding-bottom: 25px;
 }
 
 

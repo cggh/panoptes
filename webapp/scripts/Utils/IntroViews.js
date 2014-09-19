@@ -33,7 +33,7 @@ define([
 //                        var sectionGroup = Controls.CompoundVert([]).setMargin(0);
                         var sectionGroup = Controls.CompoundHor([]);
                         if (sectionName) {
-                            var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName, /*headerStyleClass:'GenomeBrowserMainSectionHeader',*/ canCollapse:false })
+                            var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName, headerStyleClass:'IntroButtonsSectionHeader', canCollapse:false })
                             group.addControl(sect);
                         }
                         else
@@ -49,7 +49,7 @@ define([
                         var viewicon = introview.viewicon;
                         if (!viewicon)
                             viewicon = 'fa-external-link-square';
-                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:150, height:50, icon:viewicon });
+                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:160, height:50, icon:viewicon });
                         content = ctrl.renderHtml();
                         if (MetaData.isManager) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});
