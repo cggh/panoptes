@@ -595,8 +595,8 @@ input.PnGenotypesPageEdit{
 }
 
 .ControlsSectionBodyIntro {
-    margin-left:15px;
-    margin-top:20px;
+    margin-left:20px;
+    margin-top:0px;
     margin-right:15px;
     margin-bottom:20px;
     min-height: 75px;
@@ -631,6 +631,11 @@ input.PnGenotypesPageEdit{
     /*color: white;*/
     /*padding:5px;*/
     /*border:none*/
+}
+
+
+.IntroTableGroup {
+    padding: 15px;
 }
 
 .IntroPanelInfo {
@@ -672,14 +677,14 @@ input.PnGenotypesPageEdit{
     opacity:0.0;
     /*float:right;*/
     position:absolute;
-    left: 115px;
+    left: 145px;
     margin-left:8px;
     margin-bottom:5px;
     margin-top:2px
 }
 
 .IntroViewItemEdit {
-    left: 135px;
+    left: 165px;
 }
 
 .IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit {

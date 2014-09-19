@@ -49,7 +49,7 @@ define([
                         var viewicon = introview.viewicon;
                         if (!viewicon)
                             viewicon = 'fa-external-link-square';
-                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:160, height:50, icon:viewicon });
+                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon });
                         content = ctrl.renderHtml();
                         if (MetaData.isManager) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});

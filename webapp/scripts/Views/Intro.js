@@ -42,6 +42,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     var miscButtonList = [];
 
                     var tableButtons = [];
+                    tableButtons.push(Controls.VerticalSeparator(10));
 
                     if (MetaData.generalSettings.hasGenomeBrowser) {
                         var browserButton = Application.getView('genomebrowser').createActivationButton({
@@ -77,7 +78,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         ]);
                         tableButtons.push(Controls.Section(grp, {
                             title: "Genome browser",
-                            headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                            headerStyleClass: 'IntroButtonsSectionHeader',
                             bodyStyleClass: 'ControlsSectionBodyIntro',
                             canCollapse: false
                         }));
@@ -122,23 +123,23 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
     //                        }
                             var info = Controls.Static(descr);
                             var grp = Controls.CompoundVert([
+                                info,
                                 Controls.CompoundHor([
                                     Controls.Static(tableInfo.createIcon({floatLeft: false})),
-                                    Controls.HorizontalSeparator(18),
+                                    Controls.HorizontalSeparator(12),
                                     Controls.CompoundVert([
-                                        Controls.VerticalSeparator(4),
+                                        Controls.VerticalSeparator(5),
                                         Controls.CompoundHor([
                                             tableViewerButton,
                                             button_Showplots
                                         ])
                                     ]).setTreatAsBlock().setMargin(0)
                                 ]),
-                                info,
                                 Controls.Static('')
                             ]);;
                             tableButtons.push(Controls.Section(grp, {
                                 title: tableInfo.tableCapNamePlural,
-                                headerStyleClass: 'GenomeBrowserMainSectionHeader',
+                                headerStyleClass: 'IntroButtonsSectionHeader',
                                 bodyStyleClass: 'ControlsSectionBodyIntro',
                                 canCollapse: false
                             }));
