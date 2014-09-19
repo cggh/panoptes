@@ -46,10 +46,15 @@ define([
                     $.each(introviews, function(idx, introview) {
                         if (!introview.description)
                             introview.description = '';
+                        var viewbitmap = null;
                         var viewicon = introview.viewicon;
                         if (!viewicon)
                             viewicon = 'fa-external-link-square';
-                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon });
+                        if (viewicon.indexOf('fa-')!=0) {
+                            viewbitmap = 'Bitmaps/CustomButtonBitmaps/' + viewicon+'.png';
+                            viewicon = null;
+                        }
+                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon, bitmap:viewbitmap, bitmapHeight:27 });
                         content = ctrl.renderHtml();
                         if (MetaData.isManager) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});

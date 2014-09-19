@@ -48,7 +48,8 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         var browserButton = Application.getView('genomebrowser').createActivationButton({
                             content: "Genome browser",
                             buttonClass: "DQXToolButton2",
-                            bitmap: 'Bitmaps/GenomeBrowserSmall.png'
+                            bitmap: 'Bitmaps/GenomeBrowserSmall.png',
+                            width:90
                         });
 //                        var findGeneButton = Application.getView('genomebrowser').createActivationButton({
 //                            content: "Fine gene...",
@@ -90,17 +91,19 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             if (tableInfo.settings.ListView) {
                                 var tableViewerButton = Application.getView('list_' + tableInfo.id).createActivationButton({
                                     content: "Show list",
-                                    icon: 'fa-list'
+                                    icon: 'fa-list',
+                                    width:85
                                 });
                             } else {
                                 var tableViewerButton = Application.getView('table_' + tableInfo.id).createActivationButton({
                                     content: "Show table",
-                                    icon: 'fa-table'
+                                    icon: 'fa-table',
+                                    width:85
                                 });
                             }
 
                             if (!tableInfo.settings.DisablePlots) {
-                                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:100, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
+                                var button_Showplots = Controls.Button(null, {content: 'Create plot...', buttonClass: 'DQXToolButton2', width:85, height:35, icon:'fa-bar-chart-o'}).setOnChanged(function() {
                                     Msg.send({type: 'CreateDataItemPlot'}, { query: null , tableid: tableInfo.id });
                                 });
                             }
