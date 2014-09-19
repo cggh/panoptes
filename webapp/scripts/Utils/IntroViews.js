@@ -144,7 +144,7 @@ define([
             var edt_descr = Controls.Textarea('', { size:60, linecount:4, value: introview.description});
             str += edt_descr.renderHtml();
 
-            str += '<p><b>Icon:</b> (<a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">list</a>)<br>';
+            str += '<p><b>Icon:</b> (<a href="http://panoptes.readthedocs.org/en/latest/Misc/StartPageButtons.html" target="_blank">list</a>)<br>';
             var edt_icon = Controls.Textarea('', { size:60, linecount:1, value: introview.viewicon?introview.viewicon:''});
             str += edt_icon.renderHtml();
 
@@ -212,7 +212,7 @@ define([
             var edt_descr = Controls.Textarea('', { size:60, linecount:4, value: ''});
             str += edt_descr.renderHtml();
 
-            str += '<p><b>Icon:</b> (<a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">list</a>)<br>';
+            str += '<p><b>Icon:</b> (<a href="http://panoptes.readthedocs.org/en/latest/Misc/StartPageButtons.html" target="_blank">list</a>)<br>';
             var edt_icon = Controls.Textarea('', { size:60, linecount:1, value: ''});
             str += edt_icon.renderHtml();
 

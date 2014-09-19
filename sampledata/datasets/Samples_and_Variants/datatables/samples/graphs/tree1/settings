@@ -1,4 +1,4 @@
 Name: Sample tree 1
 Format: newick
 Description: This is the first example tree
-CrossLink: regions::R01
+CrossLink: repeats::R01
