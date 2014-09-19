@@ -19,7 +19,7 @@ define([
 
         IntroViews.loadIntroViews = function() {
             var getter = DataFetchers.ServerDataGetter();
-            getter.addTable('introviews',['id','name','section', 'description', 'url', 'storedviewid'], 'ordr',
+            getter.addTable('introviews',['id','name','section', 'description', 'viewicon', 'url', 'storedviewid'], 'ordr',
                 SQL.WhereClause.CompareFixed('workspaceid','=',MetaData.workspaceid)
             );
             getter.execute(MetaData.serverUrl,MetaData.database,
@@ -30,7 +30,8 @@ define([
                     var getSectionGroup = function(sectionName) {
                         if (sectionMapper[sectionName])
                             return sectionMapper[sectionName];
-                        var sectionGroup = Controls.CompoundVert([]).setMargin(0);
+//                        var sectionGroup = Controls.CompoundVert([]).setMargin(0);
+                        var sectionGroup = Controls.CompoundHor([]);
                         if (sectionName) {
                             var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName, /*headerStyleClass:'GenomeBrowserMainSectionHeader',*/ canCollapse:false })
                             group.addControl(sect);
@@ -45,14 +46,15 @@ define([
                     $.each(introviews, function(idx, introview) {
                         if (!introview.description)
                             introview.description = '';
-                        var content = '';
-                        content += '<img class="IntroViewItemImage" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/open.png'});
+                        var viewicon = introview.viewicon;
+                        if (!viewicon)
+                            viewicon = 'fa-external-link-square';
+                        var ctrl = Controls.Button(null, { content: introview.name, hint:introview.description, buttonClass: 'PnButtonGrid', width:150, height:50, icon:viewicon });
+                        content = ctrl.renderHtml();
                         if (MetaData.isManager) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});
                             content += '<img class="IntroViewItemDelete" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/delete.png'});
                         }
-
-                        content += '<div class="DQXLarge">'+introview.name+'</div>'+introview.description;
                         var ctrl = Controls.Html(null, content, 'IntroViewItem');
                         getSectionGroup(introview.section).addControl(ctrl);
                         introview.divid = ctrl.getID();
@@ -119,6 +121,10 @@ define([
             var edt_descr = Controls.Textarea('', { size:60, linecount:4, value: introview.description});
             str += edt_descr.renderHtml();
 
+            str += '<p><b>Icon:</b> (<a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">list</a>)<br>';
+            var edt_icon = Controls.Textarea('', { size:60, linecount:1, value: introview.viewicon?introview.viewicon:''});
+            str += edt_icon.renderHtml();
+
             var btOpen = Controls.Button(null, {  content: 'Update' }).setOnChanged(function() {
                 if (!edt_name.getValue()) {
                     alert('No name provided');
@@ -134,7 +140,8 @@ define([
                         id:introview.id,
                         name: edt_name.getValue(),
                         section: edt_section.getValue(),
-                        description: edt_descr.getValue()
+                        description: edt_descr.getValue(),
+                        viewicon: edt_icon.getValue()
                     },
                     function(resp) {
                         Msg.send({ type: 'LoadIntroViews' }, {} );
@@ -182,6 +189,10 @@ define([
             var edt_descr = Controls.Textarea('', { size:60, linecount:4, value: ''});
             str += edt_descr.renderHtml();
 
+            str += '<p><b>Icon:</b> (<a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_blank">list</a>)<br>';
+            var edt_icon = Controls.Textarea('', { size:60, linecount:1, value: ''});
+            str += edt_icon.renderHtml();
+
             var btOpen = Controls.Button(null, {  content: 'Save to intro page' }).setOnChanged(function() {
                 if (!edt_name.getValue()) {
                     alert('No name provided');
@@ -198,6 +209,7 @@ define([
                         name: edt_name.getValue(),
                         section: edt_section.getValue(),
                         description: edt_descr.getValue(),
+                        viewicon: edt_icon.getValue(),
                         url: encodedUrl,
                         storeid: storeid,
                         viewstate: viewstate

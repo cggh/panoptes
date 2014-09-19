@@ -19,6 +19,9 @@ def response(returndata):
     description = ''
     if 'description' in returndata:
         description = returndata['description']
+    viewicon = ''
+    if 'viewicon' in returndata:
+        viewicon = returndata['viewicon']
     url = returndata['url']
     storeid = DQXDbTools.ToSafeIdentifier(returndata['storeid'])
     viewstate = DQXDbTools.ToSafeIdentifier(returndata['viewstate'])
@@ -36,11 +39,12 @@ def response(returndata):
             rank = dbrank+1
 
 
-        sql = 'INSERT INTO introviews VALUES (0, "{workspace}", "{name}", "{section}", "{description}", {rank}, "{url}", "{id}", "{state}")'.format(
+        sql = 'INSERT INTO introviews VALUES (0, "{workspace}", "{name}", "{section}", "{description}", "{viewicon}", {rank}, "{url}", "{id}", "{state}")'.format(
             workspace=workspaceid,
             name=name,
             section=section,
             description=description,
+            viewicon=viewicon,
             rank=rank,
             url=url,
             id=storeid,

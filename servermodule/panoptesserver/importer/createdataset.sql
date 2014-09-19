@@ -161,6 +161,7 @@ CREATE TABLE `introviews` (
   `name` varchar(100),
   `section` varchar(100),
   `description` varchar(500),
+  `viewicon` varchar(100),
   `ordr` int(11),
   `url` varchar(1000),
   `storedviewid` varchar(50),

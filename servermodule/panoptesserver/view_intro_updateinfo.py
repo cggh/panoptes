@@ -19,15 +19,19 @@ def response(returndata):
     description = ''
     if 'description' in returndata:
         description = returndata['description']
+    viewicon = ''
+    if 'viewicon' in returndata:
+        viewicon = returndata['viewicon']
 
     #Obtain the settings from storeddata
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
         authorization.VerifyIsDataSetManager(cur.credentials, databaseName)
         cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
-        sql = 'UPDATE introviews SET name="{name}", section="{section}", description="{description}" WHERE id="{id}"'.format(
+        sql = 'UPDATE introviews SET name="{name}", section="{section}", description="{description}", viewicon="{viewicon}" WHERE id="{id}"'.format(
             name=name,
             section=section,
             description=description,
+            viewicon=viewicon,
             id=id
         )
         cur.execute(sql)

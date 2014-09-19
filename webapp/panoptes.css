@@ -629,12 +629,15 @@ input.PnGenotypesPageEdit{
 }
 
 .IntroViewSection {
-    padding-top:9px;
-    padding-bottom:12px
+    padding:20px;
+    padding-bottom: 27px;
 }
 
+
 .IntroViewItem {
-    padding: 12px;
+    /*padding: 12px;*/
+    display: inline-block;
+    position:relative;
     cursor: pointer;
 }
 
@@ -657,10 +660,16 @@ input.PnGenotypesPageEdit{
 
 .IntroViewItemDelete, .IntroViewItemEdit {
     opacity:0.0;
-    float:right;
+    /*float:right;*/
+    position:absolute;
+    left: 115px;
     margin-left:8px;
     margin-bottom:5px;
     margin-top:2px
+}
+
+.IntroViewItemEdit {
+    left: 135px;
 }
 
 .IntroViewItem:hover .IntroViewItemDelete, .IntroViewItem:hover .IntroViewItemEdit {

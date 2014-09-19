@@ -82,7 +82,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
                         { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
                         function (resp) {
-                            require("Utils/IntroViews").createIntroView('dataitem', id, '-', 'Add {name} to start page'.DQXformat({itemView:that.tableInfo.tableNameSingle}));
+                            require("Utils/IntroViews").createIntroView('dataitem', id, '-', 'Add {name} to start page'.DQXformat({itemView:tableInfo.tableNameSingle}));
                         });
                 });
             }
