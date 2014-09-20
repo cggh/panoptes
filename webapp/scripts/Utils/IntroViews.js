@@ -49,7 +49,7 @@ define([
                         var viewbitmap = null;
                         var viewicon = introview.viewicon;
                         if (!viewicon)
-                            viewicon = 'fa-external-link-square';
+                            viewicon = 'fa-angle-right';
                         if (viewicon.indexOf('fa-')!=0) {
                             viewbitmap = 'Bitmaps/CustomButtonBitmaps/' + viewicon+'.png';
                             viewicon = null;
@@ -79,6 +79,10 @@ define([
                             }
                             if (introview.url=='itemtable') {
                                 Msg.send({type:'LoadStoredItemTable'}, introview.storedviewid);
+                                handled = true;
+                            }
+                            if (introview.url=='view') {
+                                Msg.send({type:'LoadStoredView'}, introview.storedviewid);
                                 handled = true;
                             }
                             if (!handled)

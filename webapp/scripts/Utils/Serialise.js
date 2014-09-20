@@ -59,16 +59,20 @@ define([
               str += edt.renderHtml();
               str += '<p>Press Ctrl+C to copy the url to the clipboard';
 
-              var btOpen = Controls.Button(null, {  content: 'Open in browser' }).setOnChanged(function () {
+              var btOpen = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-external-link-square', width:120, height:45, content: 'Open in browser' }).setOnChanged(function () {
                 window.open(url, '_blank');
               });
               str += btOpen.renderHtml();
 
               if (MetaData.isManager) {
-                var btCreateIntroView = Controls.Button(null, {  content: 'Add to start page' }).setOnChanged(function () {
+                var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:160, height:45, content: 'Add to start page <b>(full app state)</b>' }).setOnChanged(function () {
                   require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
                 });
                 str += btCreateIntroView.renderHtml();
+                  var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:160, height:45, content: 'Add to start page <b>(current view)</b>' }).setOnChanged(function () {
+                      Serialise.createCurrentViewIntroView();
+                  });
+                  str += btCreateIntroView.renderHtml();
               }
 
               str += '<p></p>';
@@ -76,6 +80,41 @@ define([
               Popup.create('Permanent link to view', str);
             });
         };
+
+        Serialise.createCurrentViewIntroView = function() {
+
+            var theView = null;
+            $.each(Application.getViewList(), function (idx, view) {
+                if (view.isActive())
+                    theView = view;
+            });
+            if (!theView || !theView.storeSettings) {
+                alert('No view to store');
+                return;
+            }
+
+            var obj = {};
+            obj.tableData = {};
+            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                obj.tableData[tableInfo.id] = tableInfo.storeSettings();
+            });
+            obj.viewData = {};
+            obj.viewData[theView.getStateID()] = theView.storeSettings();
+            obj.activeView = theView.getStateID();
+
+
+            var content = Base64.encode(JSON.stringify(obj));
+            DQX.serverDataStore(MetaData.serverUrl, content, function (id) {
+                DQX.customRequest(MetaData.serverUrl, PnServerModule, 'view_store',
+                    { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                    function (resp) {
+                        require("Utils/IntroViews").createIntroView('view', id, theView.getStateID(), 'Add to start page');
+                    });
+            });
+
+            //require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
+        };
+
 
 
         Serialise.checkLoadView = function(proceedFunction) {
@@ -148,6 +187,24 @@ define([
                 require("InfoPopups/ItemPopup").recall(obj.itemPopupData);
 
         }
+
+        Msg.listen('',{ type: 'LoadStoredView' }, function(scope, storeid) {
+            DQX.serverDataFetch(MetaData.serverUrl, storeid, function(content) {
+                var obj = JSON.parse(Base64.decode(content));
+                Application.activateView(obj.activeView);
+                if (obj.tableData) {
+                    $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                        if (obj.tableData[tableInfo.id])
+                            tableInfo.recallSettings(obj.tableData[tableInfo.id]);
+                    });
+                }
+                $.each(Application.getViewList(), function(idx,view) {
+                    if ( (view.recallSettings) && (obj.viewData[view.getStateID()]) )
+                        view.recallSettings(obj.viewData[view.getStateID()]);
+                });
+            });
+        });
+
 
         return Serialise;
     });

@@ -72,6 +72,8 @@ define([
                         that.panelBrowser.setPosition((settObj.range.max+settObj.range.min)/2, settObj.range.max-settObj.range.min);
                         if (settObj.mark)
                             that.panelBrowser.setMark(settObj.mark.min, settObj.mark.max);
+                        else
+                            that.panelBrowser.delMark();
                     }
                     if ((settObj.settings) && (that.visibilityControlsGroup) )
                         Controls.recallSettings(that.visibilityControlsGroup, settObj.settings, false);
