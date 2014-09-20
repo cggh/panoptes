@@ -1047,8 +1047,7 @@ define([
                                 var bt = Controls.Button(null, {
                                     buttonClass: 'DQXToolButton2',
                                     content: tableInfo.tableCapNamePlural+' in range',
-                                    bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
-                                    icon: tableInfo.settings.Icon,
+                                    icon: tableInfo.settings.Icon?tableInfo.settings.Icon:'fa-table',
                                     width:160, height:50
                                 }).setOnChanged(function() {
                                     Msg.send({type: 'DataItemTablePopup'}, {
@@ -1071,8 +1070,7 @@ define([
                                 var bt = Controls.Button(null, {
                                     buttonClass: 'DQXToolButton2',
                                     content: tableInfo.tableCapNamePlural+' spanning range',
-                                    bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
-                                    icon: tableInfo.settings.Icon,
+                                    icon: tableInfo.settings.Icon?tableInfo.settings.Icon:'fa-table',
                                     width:160, height:50
                                 }).setOnChanged(function() {
                                     Msg.send({type: 'DataItemTablePopup'}, {

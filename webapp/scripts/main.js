@@ -277,8 +277,7 @@ require([
                                     content += 'Find '+tableInfo.tableNameSingle;
                                     actions.push( {
                                         content:content,
-                                        bitmap: (!tableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
-                                        icon: tableInfo.settings.Icon,
+                                        icon: tableInfo.settings.Icon?tableInfo.settings.Icon:'fa-table',
                                         handler:function() {
                                         FindDataItem.execute(tableInfo.id);
                                     }

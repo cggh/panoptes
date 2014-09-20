@@ -60,8 +60,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         buttonClass: 'DQXToolButton2',
                         content: '{name} in this gene'.DQXformat({name: table.tableCapNamePlural}),
                         width:140, height:50,
-                        bitmap: (!table.settings.Icon)?'Bitmaps/datagrid2.png':null,
-                        icon: table.settings.Icon
+                        icon: table.settings.Icon?table.settings.Icon:'fa-table'
                     }).setOnChanged(function() {
                         Msg.send({type: 'ShowItemsInGenomeRange', tableid:table.id}, {
                             preservecurrentquery:false,
@@ -82,8 +81,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         content: 'Show '+oTableInfo.tableNamePlural,
                         buttonClass: 'DQXToolButton2',
                         width:150, height:50,
-                        bitmap: (!oTableInfo.settings.Icon)?'Bitmaps/datagrid2.png':null,
-                        icon: oTableInfo.settings.Icon
+                        icon: oTableInfo.settings.Icon?oTableInfo.settings.Icon:'fa-table'
                     }).setOnChanged(function() {
                         var qry = SQL.WhereClause.AND([
                             SQL.WhereClause.CompareFixed(oTableInfo.settings.Chromosome, '=', data.chromid),

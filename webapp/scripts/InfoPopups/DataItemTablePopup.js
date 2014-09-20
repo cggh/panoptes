@@ -154,17 +154,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         setNewQuery(that.theQuery.get());
                     }
                     else {
-                        choices.push( { content:'REPLACE<br>current query', bitmap:'Bitmaps/venn2.png', handler:function() {
+                        choices.push( { content:'REPLACE<br>current query', bitmap:'Bitmaps/venn2.png', bitmapHeight:15, handler:function() {
                             setNewQuery(that.theQuery.get());
                         }
                         });
 
-                        choices.push( { content:'ADD<br>to current query', bitmap:'Bitmaps/venn3.png', handler:function() {
+                        choices.push( { content:'ADD<br>to current query', bitmap:'Bitmaps/venn3.png', bitmapHeight:15, handler:function() {
                             setNewQuery(SQL.WhereClause.OR([currentQuery, that.theQuery.get()]));
                         }
                         });
 
-                        choices.push( { content:'RESTRICT<br>current query', bitmap:'Bitmaps/venn1.png', handler:function() {
+                        choices.push( { content:'RESTRICT<br>current query', bitmap:'Bitmaps/venn1.png', bitmapHeight:15, handler:function() {
                             setNewQuery(SQL.WhereClause.AND([currentQuery, that.theQuery.get()]));
                         }
                         });
@@ -176,7 +176,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         content += '<p>'
                         content += '</div>';
                         $.each(choices, function(idx, button) {
-                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, width:140, height:50 }).setOnChanged(function() {
+                            var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, bitmapHeight:button.bitmapHeight, width:140, height:50 }).setOnChanged(function() {
                                 button.handler();
                                 Popup.closeIfNeeded(popupid);
                             });

@@ -27,6 +27,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         buttonClass: 'DQXToolButton2',
                         content: button.content,
                         bitmap:button.bitmap,
+                        bitmapHeight:button.bitmapHeight,
                         icon:button.icon,
                         width:140,
                         height:50
@@ -51,7 +52,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (selectionListGenerator) {
                 var choicesRow = [];
 
-                choicesRow.push( { content:'Select<br>(REPLACE)', bitmap:'Bitmaps/venn2.png', handler:function() {
+                choicesRow.push( { content:'Select<br>(REPLACE)', bitmap:'Bitmaps/venn2.png', bitmapHeight:15, handler:function() {
                     var lst = selectionListGenerator();
                     tableInfo.currentSelection = {};
                     $.each(lst, function(idx,id) {
@@ -61,7 +62,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 });
 
-                choicesRow.push( { content:'Select<br>(ADD)', bitmap:'Bitmaps/venn3.png', handler:function() {
+                choicesRow.push( { content:'Select<br>(ADD)', bitmap:'Bitmaps/venn3.png', bitmapHeight:15, handler:function() {
                     var lst = selectionListGenerator();
                     $.each(lst, function(idx,id) {
                         tableInfo.selectItem(id, true);
@@ -70,7 +71,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 });
 
-                choicesRow.push( { content:'Select<br>(RESTRICT)', bitmap:'Bitmaps/venn1.png', handler:function() {
+                choicesRow.push( { content:'Select<br>(RESTRICT)', bitmap:'Bitmaps/venn1.png', bitmapHeight:15, handler:function() {
                     var curSelList = tableInfo.getSelectedList();
                     var newSelList = selectionListGenerator();
                     var newSelMap = {};
@@ -85,7 +86,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 });
 
-                choicesRow.push( { content:'Select<br>(EXCLUDE)', bitmap:'Bitmaps/venn4.png', handler:function() {
+                choicesRow.push( { content:'Select<br>(EXCLUDE)', bitmap:'Bitmaps/venn4.png', bitmapHeight:15, handler:function() {
                     var curSelList = tableInfo.getSelectedList();
                     var newSelList = selectionListGenerator();
                     var newSelMap = {};
@@ -106,7 +107,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             if (newQueryInfo) {
                 var choicesRow = [];
-                choicesRow.push( { content:'Show items in query', bitmap: 'Bitmaps/datagrid2.png', handler: function() {
+                choicesRow.push( { content:'Show items in query', icon: 'fa-table', handler: function() {
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: tableInfo.id,
                         query: newQueryInfo.query,
@@ -115,7 +116,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 }
                 } );
-                choicesRow.push( { content:'Restrict plot query', bitmap: DQX.BMP('filter1.png'), handler: function() {
+                choicesRow.push( { content:'Restrict plot query', icon: 'fa-filter', handler: function() {
                     thePlot.theQuery.modify(newQueryInfo.query);
                 }
                 } );
@@ -133,22 +134,22 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             var choicesRow = [];
 
-            choicesRow.push( { content:'REPLACE', bitmap:'Bitmaps/venn2.png', handler:function() {
+            choicesRow.push( { content:'REPLACE', bitmap:'Bitmaps/venn2.png', bitmapHeight:15, handler:function() {
                 MiscUtils.selectQuery(tableInfo, theQueryObject, 'replace');
             }
             });
 
-            choicesRow.push( { content:'ADD', bitmap:'Bitmaps/venn3.png', handler:function() {
+            choicesRow.push( { content:'ADD', bitmap:'Bitmaps/venn3.png', bitmapHeight:15, handler:function() {
                 MiscUtils.selectQuery(tableInfo, theQueryObject, 'add');
             }
             });
 
-            choicesRow.push( { content:'RESTRICT', bitmap:'Bitmaps/venn1.png', handler:function() {
+            choicesRow.push( { content:'RESTRICT', bitmap:'Bitmaps/venn1.png', bitmapHeight:15, handler:function() {
                 MiscUtils.selectQuery(tableInfo, theQueryObject, 'restrict');
             }
             });
 
-            choicesRow.push( { content:'EXCLUDE', bitmap:'Bitmaps/venn4.png', handler:function() {
+            choicesRow.push( { content:'EXCLUDE', bitmap:'Bitmaps/venn4.png', bitmapHeight:15, handler:function() {
                 MiscUtils.selectQuery(tableInfo, theQueryObject, 'exclude');
             }
             });

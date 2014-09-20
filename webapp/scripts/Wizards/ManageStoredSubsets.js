@@ -180,22 +180,22 @@ define([
                 else {
                     content += '<div style="max-width:500px"><p><i>There are currently {count} {names} selected</i></p></div>'.DQXformat({count: keylist.length, names: that.tableInfo.tableNamePlural});
                     var choices = [];
-                    choices.push( { content:'Replace<br>by selection', bitmap:'Bitmaps/venn2.png', handler:function() {
+                    choices.push( { content:'Replace<br>by selection', bitmap:'Bitmaps/venn2.png', bitmapHeight:15, handler:function() {
                         that.storeSelection(id, 'replace');
                     }
                     });
 
-                    choices.push( { content:'Add<br>selection', bitmap:'Bitmaps/venn3.png', handler:function() {
+                    choices.push( { content:'Add<br>selection', bitmap:'Bitmaps/venn3.png', bitmapHeight:15, handler:function() {
                         that.storeSelection(id, 'add');
                     }
                     });
 
-                    choices.push( { content:'Remove<br>selection', bitmap:'Bitmaps/venn4.png', handler:function() {
+                    choices.push( { content:'Remove<br>selection', bitmap:'Bitmaps/venn4.png', bitmapHeight:15, handler:function() {
                         that.storeSelection(id, 'remove');
                     }
                     });
                     $.each(choices, function(idx, button) {
-                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, width:140, height:50 }).setOnChanged(function() {
+                        var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: button.content, bitmap:button.bitmap, bitmapHeight:button.bitmapHeight, width:140, height:50 }).setOnChanged(function() {
                             button.handler();
                             Popup.closeIfNeeded(popupid);
                         });

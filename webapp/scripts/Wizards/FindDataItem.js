@@ -41,7 +41,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.frameRoot.makeGroupVert();
 
                 that.frameButtons = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.3))
-                    .setFixedSize(Framework.dimY, 40).setFrameClassClient('DQXGrayClient').setMargins(5);
+                    .setFixedSize(Framework.dimY, 80).setFrameClassClient('DQXGrayClient').setMargins(5);
 
                 that.frameBody = that.frameRoot.addMemberFrame(Framework.FrameFinal('', 0.7));
             };
@@ -80,7 +80,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     });
                 that.myTable = that.panelTable.getTable();
 
-                that.ctrl_searchString = Controls.Edit(null,{ size: 20, value: '' }).setOnChanged(DQX.debounce(that.updateQuery,200)).setHasDefaultFocus();
+                that.ctrl_searchString = Controls.Edit(null,{ size: 30, value: '' }).setOnChanged(DQX.debounce(that.updateQuery,200)).setHasDefaultFocus();
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
@@ -95,13 +95,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                 });
 
-                that.panelButtons.addControl(Controls.CompoundHor([
-                    Controls.Static('<b>Search for:</b>'),
-                    Controls.HorizontalSeparator(7),
-                    that.ctrl_searchString,
-                    Controls.HorizontalSeparator(7),
+                that.panelButtons.addControl(Controls.CompoundVert([
+                    Controls.CompoundHor([
+                        Controls.Static('<b>Search for:</b>'),
+                        Controls.HorizontalSeparator(7),
+                        that.ctrl_searchString,
+                        Controls.HorizontalSeparator(7)
+                    ]),
                     Controls.Static(' in ' + findstr)
                 ]));
+
 
             };
 

@@ -54,7 +54,7 @@ define([
                             viewbitmap = 'Bitmaps/CustomButtonBitmaps/' + viewicon+'.png';
                             viewicon = null;
                         }
-                        var theButton = Controls.Button(null, { content: introview.name, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon, bitmap:viewbitmap, bitmapHeight:27 });
+                        var theButton = Controls.Button(null, { content: introview.name, buttonClass: 'PnButtonGrid', width:180, height:50, icon:viewicon, bitmap:viewbitmap });
                         content = theButton.renderHtml();
                         if (MetaData.isManager /*&& false*/) {
                             content += '<img class="IntroViewItemEdit" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/edit.png'});
@@ -116,7 +116,11 @@ define([
                             $('#' + introview.divid).find('.IntroViewItemInfo').click(function(ev) {
                                 ev.preventDefault();
                                 ev.stopPropagation();
-                                var content = '<div style="padding:10px;max-width:400px">'+introview.description;
+                                var content = '<div style="padding:10px;max-width:450px">';
+                                content += '<p></p>';
+                                content += '<b>'+introview.name+'</b>';
+                                content += '<p></p>';
+                                content += introview.description;
                                 content += '<p></p>';
                                 var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-arrow-circle-right', content: 'Show', width:90, height:30});
                                 bt.setOnChanged(function() {
@@ -125,7 +129,7 @@ define([
                                 });
                                 content += bt.renderHtml();
                                 content += '</div>';
-                                var popupid = Popup.create(introview.name, content);
+                                var popupid = Popup.create('', content);
                             });
                         }
                     });
