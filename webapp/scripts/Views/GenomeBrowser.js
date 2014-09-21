@@ -560,7 +560,7 @@ define([
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
                             var pos = dataFetcher.getPosition(pointIndex);
                             var value = dataFetcher.getColumnPoint(pointIndex, compID);
-                            return itemid+'<br/>Position= '+pos+'<br/>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+value.toFixed(4);
+                            return itemid+'<br/>Position= '+pos+'<br/>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+propInfo.toDisplayString(value);
                         };
                         theChannel.handlePointClicked = function(compID, pointIndex) {
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
