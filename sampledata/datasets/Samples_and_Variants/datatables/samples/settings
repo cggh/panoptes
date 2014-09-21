@@ -34,7 +34,6 @@ Properties:
   DataType: Text
   ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
-  Search: StartPattern
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: samplingsites          # Datatable id of the parent table
     ForwardName: is sampled from    # Display name of the relation from child to parent
@@ -46,7 +45,6 @@ Properties:
   DataType: Text
   ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
-  Search: StartPattern
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: contributors           # Datatable id of the parent table
     ForwardName: is contributed by    # Display name of the relation from child to parent
@@ -71,7 +69,6 @@ Properties:
   Name: Sample type ID
   DataType: Text
   ShowInTable: true
-  Search: StartPattern
   Relation:
     TableId: sampletypes
     ForwardName: is

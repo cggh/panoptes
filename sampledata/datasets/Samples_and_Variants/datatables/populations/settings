@@ -13,11 +13,13 @@ Properties:
   Description: Population identifier
   DataType: Text
   ShowInTable: true
+  Search: Pattern
 
 - Id: Name
   Description: Population name
   DataType: Text
   ShowInTable: true
+  Search: Pattern
 
 - Id: Longitude
   Description: Longitude of the center of gravity of the population

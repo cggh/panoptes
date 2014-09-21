@@ -12,19 +12,23 @@ Properties:
 - Id: ID
   Description: Contributor identifier
   DataType: Text
+  Search: Pattern
 
 - Id: Name
   Description: Contributor name
   DataType: Text
+  Search: Pattern
 
 - Id: Contact
   Description: The highly-coupled knowledge-system that is responsible for the contribution
   DataType: Text
+  Search: Pattern
 
 - Id: SomeText
   Name: Sample count
   Description: A description about the entity's relationship to the samples
   DataType: Text
+  Search: Pattern
 
 - Id: Image
   Name: Image

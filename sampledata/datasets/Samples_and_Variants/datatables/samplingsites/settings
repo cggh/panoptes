@@ -27,6 +27,7 @@ Properties:
   Description: Unique identifier of a sampling site  # Description of the property
   DataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
   ShowInTable: true                                  # If true, this property will appear by default in data table grids in the application
+  Search: StartPattern
 
 - Id: Country
   Name: Country Code
@@ -34,6 +35,7 @@ Properties:
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   ShowInTable: true
   Index: true                # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  Search: Pattern
 
 - Id: Longitude
   Name: Longitude
@@ -49,7 +51,6 @@ Properties:
   DataType: Text
   ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
-  Search: StartPattern
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: contributors           # Datatable id of the parent table
     ForwardName: is contributed by  # Display name of the relation from child to parent

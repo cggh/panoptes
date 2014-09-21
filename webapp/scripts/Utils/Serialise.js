@@ -64,16 +64,20 @@ define([
               });
               str += btOpen.renderHtml();
 
-              if (MetaData.isManager) {
-                var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:160, height:45, content: 'Add to start page <b>(full app state)</b>' }).setOnChanged(function () {
-                  require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
-                });
-                str += btCreateIntroView.renderHtml();
-                  var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:160, height:45, content: 'Add to start page <b>(current view)</b>' }).setOnChanged(function () {
-                      Serialise.createCurrentViewIntroView();
-                  });
-                  str += btCreateIntroView.renderHtml();
-              }
+                if (MetaData.isManager) {
+                    var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:130, height:45, content: 'Add to start page <b>(full app state)</b>' }).setOnChanged(function () {
+                        require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
+                    });
+                    str += btCreateIntroView.renderHtml();
+                    var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:130, height:45, content: 'Add to start page <b>(current view)</b>' }).setOnChanged(function () {
+                        Serialise.createCurrentViewIntroView();
+                    });
+                    str += btCreateIntroView.renderHtml();
+                    var btCreateIntroView = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-plus-square', width:130, height:45, content: 'Add to start page <b>(predefined action)</b>' }).setOnChanged(function () {
+                        Serialise.createPredefinedIntroView();
+                    });
+                    str += btCreateIntroView.renderHtml();
+                }
 
               str += '<p></p>';
 
@@ -114,6 +118,25 @@ define([
 
             //require("Utils/IntroViews").createIntroView(Base64.encode(url), id, theState, 'Add view to start page');
         };
+
+
+        Serialise.createPredefinedIntroView = function() {
+            var options = [];
+            options.push({id:'find:_gene_', name:'Find gene'});
+            options.push({id:'find:_genomicregion_', name:'Find genomic region'});
+            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                options.push({id:'find:'+tableInfo.id, name:'Find '+tableInfo.tableNameSingle});
+            });
+            var content = '';
+            $.each(options, function(idx, option) {
+                var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', width:300, height:20, content: option.name }).setOnChanged(function () {
+                    Popup.closeIfNeeded(popupid);
+                    require("Utils/IntroViews").createIntroView(option.id, '-', '-', 'Add to start page');
+                });
+                content += bt.renderHtml()+'<br>';
+            });
+            var popupid = Popup.create('Create predefined view button', content);
+        }
 
 
 
