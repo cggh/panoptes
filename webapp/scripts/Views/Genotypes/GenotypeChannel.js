@@ -75,8 +75,10 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
 
                 var states = [];
+                var property_names = {};
                 $.each(that.rowTableInfo.propertyGroups, function(idx1, propertyGroup) {
                     $.each(propertyGroup.properties, function(idx2, propInfo) {
+                        property_names[propInfo.propid] = propInfo.name;
                         if (propInfo.settings.showInTable || propInfo.isPrimKey)
                             states.push({id: propInfo.propid, name: propInfo.name})
                     });
@@ -101,7 +103,13 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 });
 
-                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField, buttonSortSamplesByColumn]) })
+                that.sort_display = Controls.Html(null, that.model.row_order);
+                that.sort_display.bindToModel(model_params, 'row_order', function(id) {
+                    return property_names[id];
+                });
+                controlsGridData.push({ label:'Current Sort', ctrl: that.sort_display });
+                controlsGridData.push({ label:null, ctrl: buttonSortSamplesByColumn});
+                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField]) })
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
@@ -109,15 +117,15 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 states.push({id:'__null', name:'None'});
                 var alpha_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'alpha_channel').setClassID(that.table_info.id + 'ChannelAlpha');
-                controlsGridData.push({ label:'Alpha', ctrl: alpha_channel })
+                controlsGridData.push({ label:'Alpha', ctrl: alpha_channel });
                 var height_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'height_channel').setClassID(that.table_info.id + 'ChannelHeight');
-                controlsGridData.push({ label:'Height', ctrl: height_channel })
+                controlsGridData.push({ label:'Height', ctrl: height_channel });
 
                 var states = [{id:'auto', name:'Automatic width'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
                 var width_mode = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(model_params, 'width_mode').setClassID(that.table_info.id + 'ColumnMode');
-                controlsGridData.push({ label:'Columns', ctrl: width_mode })
+                controlsGridData.push({ label:'Columns', ctrl: width_mode });
 
                 var column_width = Controls.ValueSlider(null, {label: 'Manual Column Width (bp)', width:(controlWidth+75), minval:1, maxval:150, scaleDistance: 20, value:model_params.get('user_column_width')})
                     .bindToModel(model_params, 'user_column_width').setClassID(that.table_info.id + 'ColumnWidth');
@@ -142,7 +150,10 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 var controlsGrid = Controls.CompoundGrid().setSeparation(2,4);
                 $.each(controlsGridData, function(idx, item) {
-                    controlsGrid.setItem(idx, 0, Controls.Static('<span class="DescriptionText">'+item.label+':</span>'));
+                    if (item.label)
+                        controlsGrid.setItem(idx, 0, Controls.Static('<span class="DescriptionText">'+item.label+':</span>'));
+                    else
+                        controlsGrid.setItem(idx, 0, Controls.Static('<span class="DescriptionText"></span>'));
                     controlsGrid.setItem(idx, 1, item.ctrl);
                 });
                 view_controls.addControl(controlsGrid);
