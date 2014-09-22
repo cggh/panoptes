@@ -262,7 +262,6 @@ def handler(start_response, request_data):
                         rows.sort(key=key_func)
                 else:
                     print "Unimplemented sort_mode"
-                print rows
                 #Now just get the row_idx to pass to 2d extract for the slice we need
                 row_idx = np.array(map(itemgetter(0), rows)[row_offset: row_offset+row_limit])
                 #Use this row idx to retieve the row data from the initial query

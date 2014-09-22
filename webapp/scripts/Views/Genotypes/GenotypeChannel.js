@@ -34,7 +34,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   width_mode:'auto',
                   user_column_width: 1,
                   page_length: 50,
-                  page: 1
+                  page: 1,
+                  row_sort_columns: []
                 });
 
                 that.model = Model(table_info,
@@ -93,7 +94,11 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
 
                 var buttonSortSamplesByColumn = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
-                    model_params.set('row_order', 'columns');
+                    model_params.set({
+                            row_order: 'columns',
+                            row_sort_columns: _.keys(that.table_info.col_table.currentSelection)
+                        });
+
                 });
 
                 controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField, buttonSortSamplesByColumn]) })
@@ -427,7 +432,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that._myPlotter.render();
             };
 
-            var stored_params = ['row_order', 'page'];
+            var stored_params = ['row_order', 'row_sort_columns', 'page'];
             that.storeSettings = function() {
                 return _.zipObject(stored_params, _.map(stored_params, function (param) {
                     return that.model_params.get(param)

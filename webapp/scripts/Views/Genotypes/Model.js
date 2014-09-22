@@ -24,6 +24,12 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.row_query = SQL.WhereClause.Trivial();
                 that.col_order = '1';
                 that.row_order = '1';
+                that.width_mode = 'auto';
+                that.user_column_width = 1;
+                that.page_length = 50;
+                that.page =  1;
+
+                    that.row_sort_columns = [];
                 //Vars set by params - can override those above
                 _.extend(that, initial_params);
                 that.data = {};
@@ -50,7 +56,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
 
             that.update_params = function(new_params){
               var invalidating_change = false;
-              _.each(['col_query', 'row_query', 'col_order', 'row_order', 'page_length'], function (param){
+              _.each(['col_query', 'row_query', 'col_order', 'row_order', 'row_sort_columns', 'page_length'], function (param){
                 if (that[param] !== new_params[param])
                   invalidating_change = true;
               });
@@ -239,7 +245,7 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 myurl.addUrlQueryItem("col_order", that.col_order);
                 if (that.row_order == 'columns') {
                     myurl.addUrlQueryItem("row_properties", that.table.row_table.primkey);
-                    myurl.addUrlQueryItem("row_sort_cols", _.keys(that.table.col_table.currentSelection).join('~'));
+                    myurl.addUrlQueryItem("row_sort_cols", that.row_sort_columns.join('~'));
                     myurl.addUrlQueryItem("col_key", that.table.col_table.primkey);
                     myurl.addUrlQueryItem("sort_mode", that.data_type);
                     if (that.data_type == 'diploid') {
