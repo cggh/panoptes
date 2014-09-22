@@ -79,7 +79,10 @@ input[type="checkbox"]:checked + label:before {
 }
 
 
-
+.DQXQBQuerybox div.DQXSelectWrapper {
+    background-color: transparent;
+    border:none;
+}
 
 
 

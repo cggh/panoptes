@@ -155,11 +155,11 @@ define([
             var str='';
 
             str += '<b>Name:</b><br>';
-            var edt_name = Controls.Textarea('', { size:60, linecount:1, value: introview.name}).setHasDefaultFocus();
+            var edt_name = Controls.Textarea('', { size:60, linecount:2, value: introview.name}).setHasDefaultFocus();
             str += edt_name.renderHtml();
 
             str += '<p><b>Section:</b><br>';
-            var edt_section = Controls.Textarea('', { size:60, linecount:1, value: introview.section});
+            var edt_section = Controls.Textarea('', { size:60, linecount:2, value: introview.section});
             str += edt_section.renderHtml();
 
             str += '<p><b>Description:</b><br>';
@@ -223,11 +223,11 @@ define([
             var str='';
 
             str += '<b>Name:</b><br>';
-            var edt_name = Controls.Textarea('', { size:60, linecount:1, value: ''}).setHasDefaultFocus();
+            var edt_name = Controls.Textarea('', { size:60, linecount:2, value: ''}).setHasDefaultFocus();
             str += edt_name.renderHtml();
 
             str += '<p><b>Section:</b><br>';
-            var edt_section = Controls.Textarea('', { size:60, linecount:1, value: 'Predefined views'});
+            var edt_section = Controls.Textarea('', { size:60, linecount:2, value: 'Predefined views'});
             str += edt_section.renderHtml();
 
             str += '<p><b>Description:</b><br>';
