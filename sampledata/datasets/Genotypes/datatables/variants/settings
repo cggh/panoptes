@@ -1,3 +1,5 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
 NameSingle: variant
 NamePlural: variants
 Description: A table containing a number of genomic variants

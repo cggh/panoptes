@@ -1,20 +1,22 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/twoddatatable.html
+
 NameSingle: genotype
 NamePlural: genotypes
 Description: A table of diploid genotypes
 
-ColumnDataTable: variants            #The 1D datatable where each entry corresponds to a column
-ColumnIndexField: SnpName            #The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-ColumnIndexArray: col_index          #1D Array in HDF5 that gives the value of ColumnIndexField for each column,
-                                     #if this is missing then it is assumed that the HDF5 columns are in the same
-                                     #order as the "ColumnDataTable" sorted by "ColumnIndexField"
+ColumnDataTable: variants            # The 1D data table where each entry corresponds to a column
+ColumnIndexField: SnpName            # The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+ColumnIndexArray: col_index          # 1D Array in HDF5 that gives the value of ColumnIndexField for each column,
+                                     # if this is missing then it is assumed that the HDF5 columns are in the same
+                                     # order as the "ColumnDataTable" sorted by "ColumnIndexField"
 
-RowDataTable: samples                #The 1D datatable where each entry corresponds to a row
-RowIndexField: ID                    #The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-RowIndexArray: row_index             #1D Array in HDF5 that gives the value of RowIndexField for each row
-                                     #if this is missing then it is assumed that the HDF5 rows are in the same
-                                     #order as the "RowDataTable" sorted by "RowIndexField"
+RowDataTable: samples                # The 1D datatable where each entry corresponds to a row
+RowIndexField: ID                    # The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+RowIndexArray: row_index             # 1D Array in HDF5 that gives the value of RowIndexField for each row
+                                     # if this is missing then it is assumed that the HDF5 rows are in the same
+                                     # order as the "RowDataTable" sorted by "RowIndexField"
 
-FirstArrayDimension: row             #Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better
+FirstArrayDimension: row             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better
 
 Properties:
     -  Id: first_allele                            #Name of dataset in HDF5
@@ -37,9 +39,9 @@ Properties:
        MinVal: 0
        MaxVal: 100
 
-ShowInGenomeBrowser:                 #Requires that ColumnDataTable "IsPositionOnGenome"
-    Type: diploid                    #Either 'diploid' or 'fractional'
-    FirstAllele:  first_allele       #Reference to property that is first allele
+ShowInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
+    Type: diploid                    # Either 'diploid' or 'fractional'
+    FirstAllele:  first_allele       # Reference to property that is first allele
     SecondAllele: second_allele
     ExtraProperties:
     - gq

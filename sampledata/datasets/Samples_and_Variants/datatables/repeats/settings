@@ -1,3 +1,5 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
 NameSingle: repeat region
 NamePlural: repeat regions
 Description: Contains a number of repeat regions defined on the genome

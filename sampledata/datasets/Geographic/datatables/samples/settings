@@ -1,13 +1,15 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
 NameSingle: sample
 NamePlural: samples
-Description: A synthetic set of samples collected from a large area of Africa. The dataset contains GPS coordinates, collection datas, and some fictitious properties.
+Description: A synthetic set of samples collected from a large area of Africa. The data table contains GPS coordinates, collection dates, and some fictitious properties.
 PrimKey: ID
 QuickFindFields: ID,CatId,RegionId
 
 MaxCountQueryRecords: 250000
 MaxCountQueryAggregated: 500000
 AllowSubSampling: Yes
-CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
+CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large data tables than the standard option, based on a JOIN statement
 
 Properties:
 
@@ -78,7 +80,7 @@ ExternalLinks:
   Name: Show on Google Maps
 
 
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists all the custom views that should appear in the popup for an individual data table item
 
 - Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
   Name: Location                                       # Name of the view

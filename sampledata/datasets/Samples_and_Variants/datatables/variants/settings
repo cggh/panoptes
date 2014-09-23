@@ -1,6 +1,8 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
 NameSingle: variant     # Display name referring to a table item (single, no capital)
 NamePlural: variants    # Display name referring to a table item (plural, no capital)
-Description: A table containing a number of genomic variants     # A description of this dataset
+Description: A table containing a number of genomic variants     # A description of this data table
 
 CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
 

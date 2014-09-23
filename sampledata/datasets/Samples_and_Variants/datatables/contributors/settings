@@ -1,3 +1,5 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
 NameSingle: contributor
 NamePlural: contributors
 Description: The entities that contributed the samples
@@ -37,7 +39,7 @@ Properties:
 
 ListView: true
 
-DataItemViews: # Lists the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists the custom views that should appear in the popup for an individual data table item
 
 - Type: Template                                       # Specifies the default view of all fields
   Name: Details

@@ -1,6 +1,10 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/customdata.html
+
 PropertyGroups:
 - Id: Custom
   Name: Custom data
+
+
 
 Properties:
 
@@ -28,8 +32,6 @@ Properties:
   ShowInBrowser: false
   IsCategorical: true
 
-
-
 - Id: EditBoolean1
   Name: Editable boolean
   GroupId: Info
@@ -37,6 +39,8 @@ Properties:
   ReadData: false
   ShowInTable: true
   CanUpdate: true
+
+
 
 DataItemViews:
 

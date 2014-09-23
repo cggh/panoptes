@@ -1,3 +1,5 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/customdata.html
+
 Properties:
 
 - Id: Year
@@ -6,6 +8,8 @@ Properties:
   DataType: Value
   ShowInTable: true
   DecimDigits: 2
+
+
 
 
 DataItemViews:

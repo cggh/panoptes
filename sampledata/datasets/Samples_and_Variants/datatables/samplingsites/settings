@@ -1,6 +1,8 @@
-NameSingle: sampling site    # Display name referring to a table item (single, no capital)
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
+NameSingle: sampling site     # Display name referring to a table item (single, no capital)
 NamePlural: sampling sites    # Display name referring to a table item (plural, no capital)
-Description: Information about the sites where samples were collected     # A description of this dataset
+Description: Information about the sites where samples were collected     # A description of this data table
 
 Icon: fa-map-marker
 
@@ -18,7 +20,7 @@ SortDefault: Country
 ListView: true
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
-# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
+# NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all data table columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties
 Properties:
 
@@ -34,7 +36,7 @@ Properties:
   DataType: Text
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   ShowInTable: true
-  Index: true                # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  Index: true                # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Search: Pattern
 
 - Id: Longitude
@@ -43,16 +45,16 @@ Properties:
 
 - Id: Lattitude
   Name: Lattitude
-  DataType: GeoLattitude     # Specifies a geographic lattitude property
+  DataType: GeoLattitude     # Specifies a geographic latitude property
 
 - Id: Contributor_ID
   Name: Contributor_ID
   Description: Identifier of the contributing entity
   DataType: Text
   ShowInTable: true
-  Index: true                       # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
-    TableId: contributors           # Datatable id of the parent table
+    TableId: contributors           # Data table id of the parent table
     ForwardName: is contributed by  # Display name of the relation from child to parent
     ReverseName: contributed from   # Display name of the relation from parent to child
 
@@ -64,7 +66,7 @@ ExternalLinks:
 
 
 
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual datatable item
+DataItemViews: # Lists all the custom views that should appear in the popup for an individual data table item
 
 - Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
   Name: Location                                       # Name of the view
