@@ -18,9 +18,13 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
         var col_primary_key = model.col_primary_key;
         var ord = model.col_ordinal;
         var fncIsColSelected = model.table.col_table.isItemSelected;
+        var sort = _.zipObject(model.row_sort_columns, _.times(model.row_sort_columns.length, function(){return true;}));
 
         var alpha = tween.manual(snp_width, 5, 20);
         //Little hat and area fill
+        ctx.font = "12px sans-serif";
+        ctx.fillStyle = 'rgb(0,0,0)';
+        ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.lineWidth = 1;
         for (var i = 0, end = pos.length; i < end; ++i) {
           var p = pos[i];
@@ -45,15 +49,24 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
             ctx.lineWidth = 1;
             ctx.fill();
             ctx.stroke();
-              if (labelH>0) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(snp_width, 0);
-                ctx.lineTo(snp_width, that.height - curveH);
-                ctx.lineTo(0, that.height - curveH);
-                ctx.closePath();
-                ctx.stroke();
-              }
+            if (labelH>0) {
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(snp_width, 0);
+              ctx.lineTo(snp_width, that.height - curveH);
+              ctx.lineTo(0, that.height - curveH);
+              ctx.closePath();
+              ctx.stroke();
+            }
+            if (sort[col_primary_key[i]]) {
+                ctx.fillStyle = 'rgba(0,0,0, 0.75)';
+                ctx.textAlign = 'center';
+                if (snp_width < 60)
+                    ctx.fillText('s', 0.5 * snp_width, -3);
+                else
+                    ctx.fillText('Sort', 0.5 * snp_width, -3);
+
+            }
             ctx.restore();
           } else {
             ctx.save();

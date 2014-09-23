@@ -91,11 +91,21 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 var sampleProperty_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth})
                     .bindToModel(view_params, 'samples_property').setClassID(that.table_info.id + 'SamplesLabel');
 
-                var buttonSortSamplesByField = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
-                      model_params.set('row_order', view_params.get('samples_property'));
+//                var buttonSortSamplesByField = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
+//                      model_params.set({
+//                          row_order: view_params.get('samples_property'),
+//                          row_sort_columns: []
+//                      });
+//                });
+
+                var buttonSortSamplesByField = Controls.Button(null, {content: 'Current Label', buttonClass: 'PnButtonGrid', width:120, height:10, iconWidth:16, icon:'fa-sort-amount-asc'}).setOnChanged(function() {
+                    model_params.set({
+                        row_order: view_params.get('samples_property'),
+                        row_sort_columns: []
+                    });
                 });
 
-                var buttonSortSamplesByColumn = Controls.Hyperlink(null, {content: '&nbsp;<span class="fa fa-sort-amount-asc" style="font-size:110%"></span>&nbsp;'}).setOnChanged(function() {
+                var buttonSortSamplesByColumn = Controls.Button(null, {content: 'Selected ' + that.table_info.col_table.tableCapNamePlural, buttonClass: 'PnButtonGrid', width:120, height:10, iconWidth:16, icon:'fa-sort-amount-asc'}).setOnChanged(function() {
                     model_params.set({
                             row_order: 'columns',
                             row_sort_columns: _.keys(that.table_info.col_table.currentSelection)
@@ -104,12 +114,15 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 });
 
                 that.sort_display = Controls.Html(null, that.model.row_order);
-                that.sort_display.bindToModel(model_params, 'row_order', function(id) {
-                    return property_names[id];
+                that.sort_display.bindToModel(model_params, 'row_order', null, function(id) {
+                    if (id == 'columns')
+                        return that.table_info.col_table[that.model.row_sort_columns.length === 1 ? 'tableCapNameSingle' : 'tableCapNamePlural'];
+                    return property_names[id] || 'Unset';
                 });
+                controlsGridData.push({ label:'Row Label', ctrl: sampleProperty_channel })
                 controlsGridData.push({ label:'Current Sort', ctrl: that.sort_display });
                 controlsGridData.push({ label:null, ctrl: buttonSortSamplesByColumn});
-                controlsGridData.push({ label:'Label', ctrl: Controls.CompoundHor([sampleProperty_channel, Controls.HorizontalSeparator(2), buttonSortSamplesByField]) })
+                controlsGridData.push({ label:null, ctrl: buttonSortSamplesByField});
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
@@ -117,10 +130,10 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 states.push({id:'__null', name:'None'});
                 var alpha_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'alpha_channel').setClassID(that.table_info.id + 'ChannelAlpha');
-                controlsGridData.push({ label:'Alpha', ctrl: alpha_channel });
+                controlsGridData.push({ label:'Cell Alpha', ctrl: alpha_channel });
                 var height_channel = Controls.Combo(null, { label:'', states:states, width:controlWidth })
                     .bindToModel(view_params, 'height_channel').setClassID(that.table_info.id + 'ChannelHeight');
-                controlsGridData.push({ label:'Height', ctrl: height_channel });
+                controlsGridData.push({ label:'Cell Height', ctrl: height_channel });
 
                 var states = [{id:'auto', name:'Automatic width'}, {id:'fill', name:'Fill Width'}, {id:'manual', name:'Manual Width'}];
                 var width_mode = Controls.Combo(null, { label:'', states:states, width:controlWidth })
