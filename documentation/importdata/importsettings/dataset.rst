@@ -37,3 +37,25 @@ DataTables
   These names should correspond to directory names in the *datatables* source directory (see :ref:`def-source-datatable`).
   This can be included in the settings in order to provide an explicit ordering of the data tables in the app.
   If this key is not provided, a default ordering wil be used.
+
+
+IntroRightPanelFrac
+  *Value.* Controls the proportion of left and right columns on the start page. If set to zero, the right column will be absent.
+
+
+IntroSections
+  *List.* Enumerates sections on the intro page that can contain quick start buttons to specific views in the app.
+  Buttons can be added to these sections by (1) clicking on the "Get Link" button in the top right corner of the app,
+  (2) clicking on one of the "Add to start page" options, and (3) entering the right section id in the "Section" edit box.
+  Similarly, a button displaying a plot can be created by clicking the link button in the plot popup.
+
+  Each item in the list may contain the following tags:
+
+  Id
+     *Text.* Unique identifier of the section.
+  Name
+     *Text.* Displayed title.
+  Content
+     *Text.* Intro text of the section, appearing above the buttons. This text can be HTML formatted.
+  RightPanel
+     *Boolean.* If set, the section will appear in the right column, replacing the default content of this column.

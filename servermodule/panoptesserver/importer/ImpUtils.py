@@ -180,6 +180,16 @@ def ImportGlobalSettings(calculationObject, datasetId, settings):
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))
     for token in settings.GetTokenList():
         st =settings[token]
+
+        if token == 'IntroSections':
+            if not(type(st) is list):
+                raise Exception('IntroSections token should be a list')
+            for sect in st:
+                if not(type(sect) is dict):
+                    raise Exception('IntroSections token should be a list of maps')
+                if 'Content' in sect:
+                    sect['Content'] = sect['Content'].replace('\r', '\\r').replace('\n', '\\n').replace('"', '\\"')
+
         if (type(st) is list) or (type(st) is dict):
             st = simplejson.dumps(st)
         ExecuteSQL(calculationObject, datasetId, "INSERT INTO settings VALUES ('{0}', '{1}')".format(

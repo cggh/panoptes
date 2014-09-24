@@ -191,6 +191,9 @@ require([
                         $.each(getter.getTableRecords('settings'), function(idx,sett) {
                             if (sett.content=='False')
                                 sett.content = false;
+                            if (sett.id == 'IntroSections') {
+                                sett.content = JSON.parse(sett.content);
+                            }
                             MetaData.generalSettings[sett.id] = sett.content;
                         });
                         MetaData.mapTableCatalog = {};

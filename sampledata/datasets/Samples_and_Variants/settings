@@ -21,3 +21,28 @@ DataTables:
 - sampletypes
 - populations
 - repeats
+
+
+IntroRightPanelFrac: 0.4 # Use this parameter to control the proportion of left and right columns on the start page. If zero, the right column will be absent
+
+# The intro page may contain sections that contain quick start buttons to specific views in the app
+IntroSections:
+- Id: Sect1                 # Id of the section
+  Name: Intro section 1     # Display name of the section
+#  RightPanel: True         # If true, the section will appear in the right column, replacing the default content
+  Content: >                # Text content of the section, appearing about any quick start buttons
+    This is a section on the main page. You can add custom buttons to this section by
+    <ul>
+    <li>Click on the "Get link" button in the top right corner</li>
+    <li>Click on one of the "Add to start page" option</li>
+    <li>Enter the section id in the "Section" edit box</li>
+    </ul>
+    Note that you can use <a class="doclink" href="intro">links</a> to deployment documentation in this section.
+
+- Id: Sect2
+  Name: Intro section 2
+  Content: This is the intro text of Intro section 3
+
+- Id: Sect3
+  Name: Intro section 3
+  Content: This is the intro text of Intro section 3

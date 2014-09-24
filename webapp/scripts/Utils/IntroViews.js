@@ -13,8 +13,9 @@ define([
         var IntroViews = {};
 
 
-        IntroViews.setContainer = function(storedViewsContainer) {
-            IntroViews.storedViewsContainer = storedViewsContainer;
+        IntroViews.setContainer = function(storedViewsContainerLeft, storedViewsContainerRight) {
+            IntroViews.storedViewsContainerLeft = storedViewsContainerLeft;
+            IntroViews.storedViewsContainerRight = storedViewsContainerRight;
         }
 
         IntroViews.loadIntroViews = function() {
@@ -24,23 +25,46 @@ define([
             );
             getter.execute(MetaData.serverUrl,MetaData.database,
                 function() { // Upon completion of data fetching
-                    var group = Controls.CompoundVert([]).setMargin(0);
+                    var controlsGroupLeft = Controls.CompoundVert([]).setMargin(0);
+                    if (IntroViews.storedViewsContainerRight)
+                        var controlsGroupRight = Controls.CompoundVert([]).setMargin(0);
                     var sectionMapper = {};
+                    var predefSectionMapper = {};
 
-                    var getSectionGroup = function(sectionName) {
+
+                    var getSectionGroup = function(sectionName, sectionContent, inRightPanel) {
+                        if (predefSectionMapper[sectionName])
+                            return predefSectionMapper[sectionName].group;
                         if (sectionMapper[sectionName])
                             return sectionMapper[sectionName];
-//                        var sectionGroup = Controls.CompoundVert([]).setMargin(0);
                         var sectionGroup = Controls.CompoundHor([]);
+                        var sectionGroupWrapper = sectionGroup;
+                        if (sectionContent) {
+                            sectionGroupWrapper = Controls.CompoundVert([
+                                Controls.Html(null,sectionContent),
+                                Controls.VerticalSeparator(4),
+                                sectionGroup
+                            ]);
+                        }
+                        var controlsGroup = inRightPanel?controlsGroupRight:controlsGroupLeft;
                         if (sectionName) {
-                            var sect = Controls.Section(Controls.Wrapper(sectionGroup, 'IntroViewSection'), { title: sectionName, headerStyleClass:'IntroButtonsSectionHeader', canCollapse:false })
-                            group.addControl(sect);
+                            var sect = Controls.Section(Controls.Wrapper(sectionGroupWrapper, 'IntroViewSection'), { title: sectionName, headerStyleClass:'IntroButtonsSectionHeader', canCollapse:false })
+                            controlsGroup.addControl(sect);
                         }
                         else
-                            group.addControl(sectionGroup);
+                            cntrolsGroup.addControl(sectionGroup);
                         sectionMapper[sectionName] = sectionGroup;
                         return sectionGroup;
                     };
+
+
+
+                    if (MetaData.generalSettings.IntroSections) {
+                        $.each(MetaData.generalSettings.IntroSections, function(idx, sectInfo) {
+                            predefSectionMapper[sectInfo.Id] = sectInfo;
+                            sectInfo.group = getSectionGroup(sectInfo.Name, sectInfo.Content, sectInfo.RightPanel);
+                        });
+                    }
 
                     var introviews = getter.getTableRecords('introviews');
                     $.each(introviews, function(idx, introview) {
@@ -103,9 +127,13 @@ define([
                                 window.location.replace(Base64.decode(introview.url));
                         });
                     });
-                    var st = group.renderHtml();
-                    IntroViews.storedViewsContainer.modifyValue(st);
-                    group.postCreateHtml();
+                    IntroViews.storedViewsContainerLeft.modifyValue(controlsGroupLeft.renderHtml());
+                    controlsGroupLeft.postCreateHtml();
+                    if (IntroViews.storedViewsContainerRight) {
+                        IntroViews.storedViewsContainerRight.modifyValue('<p></p>'+controlsGroupRight.renderHtml());
+                        controlsGroupRight.postCreateHtml();
+                    }
+
                     $.each(introviews, function(idx, introview) {
                         if (MetaData.isManager) {
                             $('#' + introview.divid).find('.IntroViewItemDelete').click(function(ev) {

@@ -22,23 +22,73 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     rootFrame.makeGroupHor();
                     rootFrame.setSeparatorSize(7);
 
-                    this.frameButtons2 = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.65));
-                    this.frameButtons = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.35))/*.setFixedSize(Framework.dimX, 400)*/;
-                    this.frameButtons.setMargins(0);
-                    this.frameButtons2.setMargins(0);
+                    var rightPanelFraction = parseFloat(MetaData.generalSettings.IntroRightPanelFrac || 0.35);
+                    that.hasRightPanel = rightPanelFraction > 0;
+
+                    //Figure out if we have some sections in the right panel
+                    that.rightPanelHasSections = false;
+                    if (MetaData.generalSettings.IntroSections) {
+                        $.each(MetaData.generalSettings.IntroSections, function(idx, sectInfo) {
+                            if (sectInfo.RightPanel)
+                                that.rightPanelHasSections = true;
+                        });
+                    }
+                    if (that.rightPanelHasSections && (!that.hasRightPanel))
+                        DQX.reportError('Sections are defined in the right intro panel, but the panel is not defined');
+
+
+                    this.frameIntroLeft = rootFrame.addMemberFrame(Framework.FrameFinal('', 1-rightPanelFraction));
+                    this.frameIntroLeft.setMargins(0);
+                    if (that.hasRightPanel) {
+                        this.frameIntroRight = rootFrame.addMemberFrame(Framework.FrameFinal('', rightPanelFraction))/*.setFixedSize(Framework.dimX, 400)*/;
+                        this.frameIntroRight.setMargins(0);
+                    }
                     //this.frameCalculations = rootFrame.addMemberFrame(Framework.FrameFinal('', 0.5)).setDisplayTitle("Server calculations");
                 }
 
                 // This function is called during the initialisation. Create the panels that will populate the frames here
                 that.createPanels = function() {
-                    this.panelButtons = Framework.Form(this.frameButtons);
-                    this.panelButtons.setPadding(0);
-                    this.panelButtons2 = Framework.Form(this.frameButtons2);
-                    this.panelButtons2.setPadding(0);
+                    if (that.hasRightPanel) {
+                        this.panelIntroRight = Framework.Form(this.frameIntroRight);
+                        this.panelIntroRight.setPadding(0);
+                    }
+                    this.panelIntroLeft = Framework.Form(this.frameIntroLeft);
+                    this.panelIntroLeft.setPadding(0);
 
-                    //this.panelChannels = FrameTree.Tree(this.frameChannels);
-                    //that.updateChannelInfo();
+                    Msg.listen('', {type: 'LoadIntroViews'}, function() {
+                        IntroViews.loadIntroViews();
+                    });
 
+                    that.storedViewsLeft = Controls.Html(null,'', '___');
+
+                    this.panelIntroLeft.addControl(Controls.CompoundVert([
+                        //Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
+                        Controls.Wrapper(
+                            Controls.CompoundVert([
+                                Controls.Static('<div style="font-weight:bold;font-size:17px;">'+MetaData.generalSettings.Name+'</div><p>'),
+                                Controls.Static(MetaData.generalSettings.Description||'<i>No description</i>'),
+                                //Controls.VerticalSeparator(20),
+                                //Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
+                                //Controls.VerticalSeparator(5)
+                            ]).setMargin(0)
+                            ,'IntroPanelInfo'),
+                        that.storedViewsLeft
+                    ])).setMargin(0);
+
+                    if ((!that.rightPanelHasSections) && (that.hasRightPanel))
+                        that.createDefaultRightPanel();
+
+                    if (that.rightPanelHasSections) {
+                        that.storedViewsRight = Controls.Html(null,'', '___');
+                        this.panelIntroRight.addControl(that.storedViewsRight);
+                    }
+
+                    IntroViews.setContainer(that.storedViewsLeft, that.storedViewsRight);
+                    IntroViews.loadIntroViews();
+
+                }
+
+                that.createDefaultRightPanel = function() {
                     var miscButtonList = [];
 
                     var tableButtons = [];
@@ -51,11 +101,6 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             bitmap: 'Bitmaps/GenomeBrowserSmall.png',
                             width:90
                         });
-//                        var findGeneButton = Application.getView('genomebrowser').createActivationButton({
-//                            content: "Fine gene...",
-//                            buttonClass: "DQXToolButton1",
-//                            bitmap: 'Bitmaps/Find.png'
-//                        });
 
                         var findGeneButton = Controls.Button(null,
                             {
@@ -67,8 +112,6 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                         findGeneButton.setOnChanged(function() {
                             FindGene.execute()
                         })
-
-                        //miscButtonList.push(browserButton);
 
                         var descr = MetaData.generalSettings.GenomeBrowserDescr||'<i>No description</i>';
 
@@ -112,18 +155,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             }
 
                             var descr = '';
-    //                        descr += tableInfo.createIcon({floatLeft: true});
                             descr += tableInfo.settings.Description||'<i>No description</i>';
-    //                        if ((tableInfo.relationsChildOf.length>0) || (tableInfo.relationsParentOf.length>0)) {
-    //                            descr += '<br><br><div style="color:rgb(128,128,128);margin-left:15px"><b>Relations:</b>'
-    //                            $.each(tableInfo.relationsChildOf, function(idx, relationInfo) {
-    //                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.forwardname+'</i> a '+MetaData.mapTableCatalog[relationInfo.parenttableid].tableNameSingle;
-    //                            });
-    //                            $.each(tableInfo.relationsParentOf, function(idx, relationInfo) {
-    //                                descr += '<br>A ' + tableInfo.tableNameSingle + ' <i>' + relationInfo.reversename+'</i> '+MetaData.mapTableCatalog[relationInfo.childtableid].tableNamePlural;
-    //                            });
-    //                            descr += '</div>';
-    //                        }
                             var info = Controls.Static(descr);
                             var grp = Controls.CompoundVert([
                                 info,
@@ -150,34 +182,9 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                     })
 
 
-
-                    this.panelButtons.addControl(Controls.CompoundVert([
+                    this.panelIntroRight.addControl(Controls.CompoundVert([
                         Controls.CompoundVert(tableButtons)
                     ]));
-
-                    that.storedViews = Controls.Html(null,'', '___');
-
-                    this.panelButtons2.addControl(Controls.CompoundVert([
-                        //Controls.Static('<small>Workspace ID: '+MetaData.workspaceid+'</small>')
-                        Controls.Wrapper(
-                            Controls.CompoundVert([
-                                Controls.Static('<div style="font-weight:bold;font-size:17px;">'+MetaData.generalSettings.Name+'</div><p>'),
-                                Controls.Static(MetaData.generalSettings.Description||'<i>No description</i>'),
-                                //Controls.VerticalSeparator(20),
-                                //Controls.CompoundVert(miscButtonList).setTreatAsBlock(),
-                                //Controls.VerticalSeparator(5)
-                            ]).setMargin(0)
-                            ,'IntroPanelInfo'),
-                        that.storedViews
-                    ])).setMargin(0);
-
-                    Msg.listen('', {type: 'LoadIntroViews'}, function() {
-                        IntroViews.loadIntroViews();
-                    });
-
-                    IntroViews.setContainer(that.storedViews);
-                    IntroViews.loadIntroViews();
-
 
                 }
 
