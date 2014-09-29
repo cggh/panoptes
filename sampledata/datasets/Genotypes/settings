@@ -8,5 +8,5 @@ DataTables:
 
 #List the 2D data tables that should be exposed in the app.
 2D_DataTables:
-    - genotypes
-    - genotypes_frac
+    - diploid
+    - haploid
