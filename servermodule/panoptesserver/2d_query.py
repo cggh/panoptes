@@ -75,20 +75,36 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
 
 def select_by_list(properties, row_idx, col_idx, first_dimension):
     num_cells = len(col_idx) * len(row_idx)
+    arities = {}
+    for prop, array in properties.items():
+        if len(array.shape) == 2:
+            arities[prop] = 1
+        else:
+            arities[prop] = array.shape[2]
+    coords = {}
     if first_dimension == 'row':
-        coords = ((row, col) for row in row_idx for col in col_idx)
+        for arity in arities.values():
+            if arity == 1:
+                coords[arity] = [(row, col) for row in row_idx for col in col_idx]
+            else:
+                coords[arity] = [(row, col, i) for row in row_idx for col in col_idx for i in xrange(arity)]
     elif first_dimension == 'column':
-        coords = ((col, row) for row in row_idx for col in col_idx)
+        for arity in arities.values():
+            if arity == 1:
+                coords[arity] = [(col, row) for row in row_idx for col in col_idx]
+            else:
+                coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
     else:
         print "Bad first_dimension"
     result = {}
     for prop, array in properties.items():
-        result[prop] = np.empty((num_cells,), dtype=array.id.dtype)
-    num_chunks = num_cells / CHUNK_SIZE
-    num_chunks = num_chunks + 1 if num_cells % CHUNK_SIZE else num_chunks
-    for i in xrange(num_chunks):
-        selection = np.asarray(list(itertools.islice(coords, CHUNK_SIZE)))
-        for prop, array in properties.items():
+        arity = arities[prop]
+        result[prop] = np.empty((num_cells * arity,), dtype=array.id.dtype)
+        num_chunks = num_cells*arity / CHUNK_SIZE
+        num_chunks = num_chunks + 1 if num_cells % CHUNK_SIZE else num_chunks
+        i_coords = iter(coords[arity])
+        for i in xrange(num_chunks):
+            selection = np.asarray(list(itertools.islice(i_coords, CHUNK_SIZE)))
             sel = h5py._hl.selections.PointSelection(array.shape)
             sel.set(selection)
             out = np.ndarray(sel.mshape, array.id.dtype)
@@ -97,8 +113,7 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
                           out,
                           h5py.h5t.py_create(array.id.dtype))
             result[prop][i * CHUNK_SIZE: (i * CHUNK_SIZE) + len(selection)] = out[:]
-    for prop, array in result.items():
-        array.shape = (len(row_idx), len(col_idx))
+        result[prop].shape = (len(row_idx), len(col_idx)) if arities[prop] == 1 else (len(row_idx), len(col_idx), arity)
     return result
 
 def get_table_ids(cur, datatable):
