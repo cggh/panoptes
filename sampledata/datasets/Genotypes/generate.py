@@ -135,6 +135,11 @@ for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 0.6)):
     genotype = (count % 9) + 1
     second_allele[y, x] = genotype
 
+ref_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
+alt_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
+for i in xrange(NUM_SAMPLES):
+    ref_depth[i, :] = range(NUM_VARIANTS)
+    alt_depth[i, :] = range(NUM_VARIANTS/100)*100
 
 #We now want to shuffle the array to check that the import process is able to map the
 #primary keys properly - for actual data you'll want the order to be the most common access
@@ -147,33 +152,48 @@ shuffled_var_ids = [var_ids[i] for i in var_shuffle]
 shuffled_sample_ids = [sample_ids[i] for i in sample_shuffle]
 shuffled_first_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
 shuffled_second_allele = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int8")
+shuffled_ref_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
+shuffled_alt_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
 for i,s in enumerate(sample_shuffle):
     for j,v in enumerate(var_shuffle):
         shuffled_first_allele[i,j] = first_allele[s,v]
         shuffled_second_allele[i,j] = second_allele[s,v]
-shuffled_total_depth = np.array(np.random.randint(0,1000,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
+        shuffled_ref_depth[i,j] = ref_depth[s,v]
+        shuffled_alt_depth[i,j] = alt_depth[s,v]
+shuffled_total_depth = shuffled_ref_depth + shuffled_alt_depth
 shuffled_gq = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int16")
 
-with h5py.File('2D_datatables/genotypes/data.hdf5', 'w') as f:
+genotype = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int8")
+genotype[:, :, 0] = shuffled_first_allele
+genotype[:, :, 1] = shuffled_second_allele
+allele_depth = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int8")
+allele_depth[:, :, 0] = shuffled_ref_depth
+allele_depth[:, :, 1] = shuffled_alt_depth
+
+with h5py.File('2D_datatables/diploid/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
     row_index[:] = shuffled_sample_ids
-    first_allele = f.create_dataset("first_allele", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
-    first_allele[:, :] = shuffled_first_allele
-    second_allele = f.create_dataset("second_allele", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
-    second_allele[:, :] = shuffled_second_allele
+    gt = f.create_dataset("genotype", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int8')
+    gt[:, :, :] = genotype
+    ad = f.create_dataset("allele_depth", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int16')
+    ad[:, :, :] = allele_depth
     total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
     total_depth[:, :] = shuffled_total_depth
     gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
     gq[:, :] = shuffled_gq
 
-with h5py.File('2D_datatables/genotypes_frac/data.hdf5', 'w') as f:
+with h5py.File('2D_datatables/haploid/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
     row_index[:] = shuffled_sample_ids
-    ref = f.create_dataset("ref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
-    ref[:, :] = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")
-    ref = f.create_dataset("nonref", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
-    ref[:, :] = np.array(np.random.randint(0,50,(NUM_SAMPLES, NUM_VARIANTS)), dtype="int8")
+    gt = f.create_dataset("genotype", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
+    gt[:, :] = shuffled_first_allele
+    ad = f.create_dataset("allele_depth", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int16')
+    ad[:, :, :] = allele_depth
+    total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
+    total_depth[:, :] = shuffled_total_depth
+    gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
+    gq[:, :] = shuffled_gq
