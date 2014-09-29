@@ -35,21 +35,14 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 that.data = {};
                 that.settings = table_info.settings.ShowInGenomeBrowser;
                 that.data_type = that.settings.Type;
-                if (that.data_type != 'diploid' && that.data_type != 'fractional')
-                    DQX.reportError("Genotype data type is not diploid or fractional");
-                if (that.data_type == 'diploid') {
-                    that.properties = [that.settings.FirstAllele, that.settings.SecondAllele];
-                    _.each(that.settings.ExtraProperties, function(prop) {
-                        that.properties.push(prop);
-                    });
-                }
-                if (that.data_type == 'fractional') {
-                    that.properties = [that.settings.Ref, that.settings.NonRef];
-                    _.each(that.settings.ExtraProperties, function(prop) {
-                        that.properties.push(prop);
-                    });
-
-                }
+                if (!that.settings.Call)
+                    DQX.reportError("Call property is required for genotypes");
+                that.properties = [that.settings.Call];
+                if (that.settings.AlleleDepth)
+                    that.properties.push([that.settings.AlleleDepth]);
+                _.each(that.settings.ExtraProperties, function(prop) {
+                    that.properties.push(prop);
+                });
                 that.reset_cache();
 
             };
