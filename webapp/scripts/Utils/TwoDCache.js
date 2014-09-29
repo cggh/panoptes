@@ -97,7 +97,7 @@ define(["Utils/RequestCounter", "Utils/Interval"],
       };
       that.twoD_col_slice = function (array, start, end) {
         return _.map(array, function (row) {
-          return that.slice(row, start, end);
+          return that.slice(row, start * (array.shape[2] || 1), end * (array.shape[2] || 1));
         });
       };
 
@@ -320,8 +320,9 @@ define(["Utils/RequestCounter", "Utils/Interval"],
             if (type == '2D') {
               var packed = data[full_prop];
               match.pages[page].twoD[prop] = _.times(packed.shape[0], function (i) {
-                return that.slice(packed.array, i * packed.shape[1], (i + 1) * packed.shape[1]);
+                return that.slice(packed.array, i * packed.shape[1] * (packed.shape[2] || 1), (i + 1) * packed.shape[1] * (packed.shape[2] || 1));
               });
+              match.pages[page].twoD[prop].shape = packed.shape;
             }
           }
         }
