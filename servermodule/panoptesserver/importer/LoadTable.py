@@ -168,7 +168,7 @@ def LoadTable(calculationObject, sourceFileName, databaseid, tableid, columns, l
                             calculationObject.Log('WARNING:Terminating import at {0} lines'.format(lineCount))
                             break
                 except Exception as e:
-                    calculationObject.Log('Offending line: '+line);
+                    calculationObject.Log('Offending line: '+line)
                     raise Exception('Error while parsing line {0} of file "{1}": {2}'.format(
                         lineCount+1,
                         sourceFileName,

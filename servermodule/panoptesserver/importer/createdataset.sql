@@ -146,7 +146,8 @@ CREATE TABLE `2D_propertycatalog` (
   `name` varchar(50),
   `ordr` int,
   `dtype` varchar(20),
-  `settings` text
+  `settings` text,
+  `arity` int
 );
 
 CREATE TABLE `workspaces` (
