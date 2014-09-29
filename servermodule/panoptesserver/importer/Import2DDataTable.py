@@ -134,9 +134,10 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         for property in table_settings['Properties']:
             extra_settings = copy.deepcopy(property)
             dtype = arraybuffer._strict_dtype_string(remote_hdf5[property['Id']].dtype)
+            arity = 1 if len(remote_hdf5[property['Id']].shape) == 2 else remote_hdf5[property['Id']].shape[2]
             del extra_settings['Id']
             del extra_settings['Name']
-            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}')".format(
+            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}', {8})".format(
                 property['Id'],
                 tableid,
                 table_settings['ColumnDataTable'],
@@ -144,7 +145,8 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                 property['Name'],
                 property_order,
                 dtype,
-                simplejson.dumps(extra_settings)
+                simplejson.dumps(extra_settings),
+                arity
             )
             ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
             property_order += 1
@@ -288,10 +290,13 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                 prop_in = remote_hdf5[property['Id']]
                 #Make some choices assuming data is variants/samples
                 if prop_in.shape[0] > prop_in.shape[1]:
-                    chunks = (min(1000, prop_in.shape[0]), min(10, prop_in.shape[1]))
+                    chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
                 else:
-                    chunks = (min(10, prop_in.shape[0]), min(1000, prop_in.shape[1]))
-                prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=chunks, maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
+                    chunks = [min(10, prop_in.shape[0]), min(1000, prop_in.shape[1])]
+                arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
+                if arity > 1:
+                    chunks.append(arity)
+                prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
                 hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
                 print "done"
             print "all copies complete"
