@@ -31,21 +31,25 @@ def hdf5_copy(src, dest, func=None, limit=None):
         if func:
             for start in xrange(0, limit[0] or len(src), step_size):
                  end = min(start + step_size, limit[0] or len(src))
-                 if len(shape) == 2:
+                 if len(shape) == 3:
+                     dest[start:end, :limit[1], :] = func(src[start:end, :limit[1], :])
+                 elif len(shape) == 2:
                      dest[start:end, :limit[1]] = func(src[start:end, :limit[1]])
                  elif len(shape) == 1:
                      dest[start:end] = func(src[start:end])
                  else:
-                     print "shape", shape, "not of dimension 1 or 2"
+                     raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
         else:
             for start in xrange(0, limit[0] or len(src), step_size):
                  end = min(start + step_size, limit[0] or len(src))
-                 if len(shape) == 2:
+                 if len(shape) == 3:
+                     dest[start:end, :limit[1], :] = src[start:end, :limit[1], :]
+                 elif len(shape) == 2:
                      dest[start:end, :limit[1]] = src[start:end, :limit[1]]
                  elif len(shape) == 1:
                      dest[start:end] = src[start:end]
                  else:
-                     print "shape", shape, "not of dimension 1 or 2"
+                     raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
 
 def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_settings):
     global tableOrder, property_order

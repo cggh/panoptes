@@ -96,15 +96,17 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
                 coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
     else:
         print "Bad first_dimension"
+
     result = {}
     for prop, array in properties.items():
         arity = arities[prop]
         result[prop] = np.empty((num_cells * arity,), dtype=array.id.dtype)
         num_chunks = num_cells*arity / CHUNK_SIZE
-        num_chunks = num_chunks + 1 if num_cells % CHUNK_SIZE else num_chunks
+        num_chunks = num_chunks + 1 if (num_cells*arity) % CHUNK_SIZE else num_chunks
         i_coords = iter(coords[arity])
         for i in xrange(num_chunks):
-            selection = np.asarray(list(itertools.islice(i_coords, CHUNK_SIZE)))
+            slice = list(itertools.islice(i_coords, CHUNK_SIZE))
+            selection = np.asarray(slice)
             sel = h5py._hl.selections.PointSelection(array.shape)
             sel.set(selection)
             out = np.ndarray(sel.mshape, array.id.dtype)
