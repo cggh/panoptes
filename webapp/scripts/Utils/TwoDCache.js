@@ -64,6 +64,7 @@ define(["Utils/RequestCounter", "Utils/Interval"],
                 result[i][j + pos] = array[i][j];
           pos += array[0].length;
         });
+        result.shape = [arrays[0].shape[0], col_length, arrays[0].shape[2]];
         return result;
       };
 
@@ -96,9 +97,11 @@ define(["Utils/RequestCounter", "Utils/Interval"],
         DQX.reportError('No slice available for array');
       };
       that.twoD_col_slice = function (array, start, end) {
-        return _.map(array, function (row) {
+        var result =  _.map(array, function (row) {
           return that.slice(row, start * (array.shape[2] || 1), end * (array.shape[2] || 1));
         });
+        result.shape = [array.shape[0], end-start, array.shape[2]];
+        return result
       };
 
       that._collate_data_for = function(req_interval, page) {
