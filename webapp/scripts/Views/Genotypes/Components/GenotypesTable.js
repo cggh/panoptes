@@ -17,6 +17,7 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              var call_rows = model.data[model.settings.Call];
              if (call_rows.shape)
                var ploidy = call_rows.shape[2] || 1;
+             var call_summary_rows = model.data.call_summary;
              var alpha_rows = (view.alpha_channel == '__null') ? false : model.data[view.alpha_channel];
              var height_rows = (view.height_channel == '__null') ? false : model.data[view.height_channel];
              var alpha_offset = (view.alpha_channel == '__null') ? 0 : model.table.properties[view.alpha_channel].settings.MinVal;
@@ -36,48 +37,24 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                //Don't draw off screen genotypes
                if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
                  continue;
-               var raw_calls = call_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
+               var calls = call_rows[r], call_summarys = call_summary_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
                //Convert the calls into homref/homalt/het/missing overkill for haploid/diploid I know...
-               var calls = new Int8Array(raw_calls.length / ploidy);
                for (var i = 0, end = pos.length; i < end; ++i) {
-                 var call = -2; //init
-                 for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
-                   var c = raw_calls[k];
-                   c = c > 0 ? 1: c;
-                   if (c == -1) { //Missing
-                     call = -1;
-                     break;
-                   }
-                   if (c == 0 && call == 1) { //REF BUT WAS PREVIOUSLY ALT
-                     call = 2; //HET
-                     break;
-                   }
-                   if (c == 1 && call == 0) { //ALT BUT WAS PREVIOUSLY REF
-                     call = 2; //HET
-                     break;
-                   }
-                   call = c;
-                 }
-                 calls[i] = call;
-               }
-
-               for (i = 0, end = pos.length; i < end; ++i) {
-                 call = calls[i];
+                 var call_summary = call_summarys[i];
                  var alpha = alphas ? ((alphas[i] - alpha_offset) / alpha_scale) * 0.8 + 0.2 : 1;
                  alpha = Math.min(Math.max(alpha, 0), 1);
                  var height = heights ? ((heights[i] - height_offset) / height_scale) * 0.8 + 0.2 : 1;
                  height = Math.min(Math.max(height, 0), 1);
-
-                 if (call == -1 || call == -2) {
+                 if (call_summary == -1 || call_summary == -2) {
                    height = 0.2;
                    alpha = 0.2;
                    ctx.fillStyle = 'rgb(230,230,230)';
                  }
-                 if (call == 0)
+                 if (call_summary == 0)
                    ctx.fillStyle = 'rgba(0,55,135,' + alpha + ')';
-                 if (call == 1)
+                 if (call_summary == 1)
                    ctx.fillStyle = 'rgba(180,0,0,' + alpha + ')';
-                 if (call == 2)
+                 if (call_summary == 2)
                    ctx.fillStyle = 'rgba(78,154,0,' + alpha + ')';
                  var spos = x_scale(pos[i]) - (snp_width * 0.5);
                  if (snp_width > text_width + 38 && row_height >= 6)
@@ -93,19 +70,19 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  ctx.fillStyle = 'rgb(40,40,40)';
                  var style = 1;
                  for (i = 0, end = pos.length; i < end; ++i) {
-                   call = calls[i];
+                   call_summary = call_summarys[i];
                    var text = '';
-                   for (k = i * ploidy, refk = k + ploidy; k < refk; k++) {
-                     text += raw_calls[k];
+                   for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
+                     text += calls[k];
                    }
 
                    var x = x_scale(pos[i]) + (snp_width / 2) - (text_width / 2);
-                   if (call == -1 || call == -2) {
+                   if (call_summary == -1 || call_summary == -2) {
                      if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
                      ctx.fillText('●', x, y);
                      continue;
                    }
-                   if (call == 0) {
+                   if (call_summary == 0) {
                      if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
                      ctx.fillText(text, x, y);
                    } else {
@@ -144,8 +121,8 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  var snp_width = x_scale(model.col_width) - x_scale(0);
 
                  var rowNr = -1;
-                 for (j = 0, ref = model.row_index.length; j < ref; j++) {
-                     r = model.row_index[j], y = (r * row_height);
+                 for (var j = 0, ref = model.row_index.length; j < ref; j++) {
+                     var r = model.row_index[j], y = (r * row_height);
                      if ( (py>=y) && (py<=y+row_height) )
                         rowNr = j;
                  }
