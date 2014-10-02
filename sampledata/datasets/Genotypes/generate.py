@@ -1,6 +1,7 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
+from itertools import cycle, islice
 
 NUM_SAMPLES = 100
 NUM_VARIANTS = 2000
@@ -138,8 +139,8 @@ for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 0.6)):
 ref_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
 alt_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
 for i in xrange(NUM_SAMPLES):
-    ref_depth[i, :] = range(NUM_VARIANTS)
-    alt_depth[i, :] = range(NUM_VARIANTS/100)*100
+    ref_depth[i, :] = list(islice(cycle(range(101)), NUM_VARIANTS))
+    alt_depth[i, :] = list(islice(cycle(range(57,0,-1)), NUM_VARIANTS))
 
 #We now want to shuffle the array to check that the import process is able to map the
 #primary keys properly - for actual data you'll want the order to be the most common access
@@ -166,7 +167,7 @@ shuffled_gq = np.array(np.random.randint(0,100,(NUM_SAMPLES, NUM_VARIANTS)), dty
 genotype = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int8")
 genotype[:, :, 0] = shuffled_first_allele
 genotype[:, :, 1] = shuffled_second_allele
-allele_depth = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int8")
+allele_depth = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int16")
 allele_depth[:, :, 0] = shuffled_ref_depth
 allele_depth[:, :, 1] = shuffled_alt_depth
 

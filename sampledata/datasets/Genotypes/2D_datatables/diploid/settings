@@ -20,20 +20,20 @@ FirstArrayDimension: row             # Either 'row' or 'column' to indicate the 
 
 Properties:
     -  Id: genotype                            #Name of dataset in HDF5
-       Name: Genotype
+       Name: Call
        Description: Genotype call
 
     -  Id: allele_depth
        Name: Allele depth
        Description: Number of reads for each allele
        MinVal: 0
-       MaxVal: 1000
+       MaxVal: 200
 
     -  Id: total_depth
        Name: Total Depth
        Description: Total number of reads for all alleles
        MinVal: 0
-       MaxVal: 1000
+       MaxVal: 200
 
     -  Id: gq
        Name: Genotype Quality

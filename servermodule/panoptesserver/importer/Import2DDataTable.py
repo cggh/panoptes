@@ -75,6 +75,8 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         table_settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         table_settings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])
         table_settings.AddTokenIfMissing('ShowInGenomeBrowser', False)
+        if table_settings['ShowInGenomeBrowser'] and not (table_settings.GetSubSettings('ShowInGenomeBrowser').HasToken('Call') or table_settings.GetSubSettings('ShowInGenomeBrowser').HasToken('AlleleDepth')):
+            raise ValueError('Genome browsable 2D table must have call or allele depth')
         table_settings.AddTokenIfMissing('ColumnDataTable', '')
         table_settings.AddTokenIfMissing('RowDataTable', '')
         extra_settings = table_settings.Clone()

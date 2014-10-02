@@ -60,7 +60,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that.model.settings.ExtraProperties[0] : '__null'),
                   height_channel:(that.model.settings.ExtraProperties &&
                     that.model.settings.ExtraProperties[1] ?
-                    that.model.settings.ExtraProperties[1] : '__null')
+                    that.model.settings.ExtraProperties[1] : '__null'),
+                  colour_channel: that.model.settings.Call ? 'call' : 'fraction'
                 });
 
                 view_params.on({}, function() {
@@ -119,10 +120,19 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         return that.table_info.col_table[that.model.row_sort_columns.length === 1 ? 'tableCapNameSingle' : 'tableCapNamePlural'];
                     return property_names[id] || 'Unset';
                 });
-                controlsGridData.push({ label:'Row Label', ctrl: sampleProperty_channel })
                 controlsGridData.push({ label:'Current Sort', ctrl: that.sort_display });
                 controlsGridData.push({ label:null, ctrl: buttonSortSamplesByColumn});
                 controlsGridData.push({ label:null, ctrl: buttonSortSamplesByField});
+                controlsGridData.push({ label:'Row Label', ctrl: sampleProperty_channel });
+
+                var cell_colour_states = [];
+                if (that.model.settings.Call)
+                    cell_colour_states.push({id:'call', name:'Call'});
+                if (that.model.settings.AlleleDepth)
+                    cell_colour_states.push({id:'fraction', name:'Alt Read Fraction'});
+                var colour_channel = Controls.Combo(null, { label:'', states:cell_colour_states, width:controlWidth })
+                    .bindToModel(view_params, 'colour_channel').setClassID(that.table_info.id + 'ChannelColour');
+                controlsGridData.push({ label:'Cell Colour', ctrl: colour_channel });
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
