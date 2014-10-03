@@ -23,7 +23,11 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
 
              var call_rows = model.data[model.settings.Call] || false;
              if (call_rows.shape)
-               var ploidy = call_rows.shape[2] || 1;
+             var ploidy = call_rows.shape[2] || 1;
+
+             var ad_rows = model.data[model.settings.AlleleDepth] || false;
+             if (ad_rows.shape)
+                 var ad_arity = ad_rows.shape[2] || 1;
              var call_summary_rows = model.data.call_summary || false;
              var fraction_rows = model.data.fractional_reads || false;
              var alpha_rows = (view.alpha_channel == '__null') ? false : model.data[view.alpha_channel];
@@ -39,13 +43,13 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              ctx.save();
              ctx.font = "" + row_height + "px sans-serif";
              ctx.lineWidth = 1;
-             var text_width = ctx.measureText('10/10').width;
+             var text_width = ctx.measureText('88/88').width;
              for (var j = 0, ref = model.row_index.length; j < ref; j++) {
                var r = model.row_index[j], y = (r * row_height);
                //Don't draw off screen genotypes
                if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
                  continue;
-               var calls = call_rows[r], call_summarys = call_summary_rows[r], fractions = fraction_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
+               var calls = call_rows[r], ads = ad_rows[r], call_summarys = call_summary_rows[r], fractions = fraction_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
                for (var i = 0, end = pos.length; i < end; ++i) {
                  var call_summary = call_summarys ? call_summarys[i] : -1;
                  var fraction = fractions ? fractions[i] : -1;
@@ -83,25 +87,39 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  ctx.fillStyle = 'rgb(40,40,40)';
                  var style = 1;
                  for (i = 0, end = pos.length; i < end; ++i) {
-                   call_summary = call_summarys[i];
+                   var call_summary = call_summarys ? call_summarys[i] : -1;
+                   var ad = ads ? ads[i] : -1;
                    var text = '';
-                   for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
-                     text += calls[k];
-                     if (k < refk - 1)
-                      text += '/';
+                   if (model.settings.Call) {
+                     for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
+                       text += calls[k];
+                       if (k < refk - 1)
+                         text += '/';
+                     }
+                   } else {
+                     for (var k = i * ad_arity, refk = k + ad_arity; k < refk; k++) {
+                       text += ads[k];
+                       if (k < refk - 1)
+                         text += ',';
+                     }
                    }
 
+
                    var x = x_scale(pos[i]) + (snp_width / 2) - (text_width / 2);
-                   if (call_summary == -1 || call_summary == -2) {
-                     if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
-                     ctx.fillText('●', x, t_y);
-                     continue;
-                   }
-                   if (call_summary == 0) {
-                     if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
-                     ctx.fillText(text, x, t_y);
+                   if (model.settings.Call) {
+                     if (call_summary == -1 || call_summary == -2) {
+                       if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
+                       ctx.fillText('●', x, t_y);
+                       continue;
+                     }
+                     if (call_summary == 0) {
+                       if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
+                       ctx.fillText(text, x, t_y);
+                     } else {
+                       if (style != 1) ctx.fillStyle = 'rgb(40,40,40)', style = 1;
+                       ctx.fillText(text, x, t_y);
+                     }
                    } else {
-                     if (style != 1) ctx.fillStyle = 'rgb(40,40,40)', style = 1;
                      ctx.fillText(text, x, t_y);
                    }
                  }

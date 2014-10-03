@@ -139,8 +139,8 @@ for count, (x, y) in enumerate(ellipse_points(NUM_VARIANTS, NUM_SAMPLES, 0.6)):
 ref_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
 alt_depth = np.zeros((NUM_SAMPLES, NUM_VARIANTS), dtype="int16")
 for i in xrange(NUM_SAMPLES):
-    ref_depth[i, :] = list(islice(cycle(range(101)), NUM_VARIANTS))
-    alt_depth[i, :] = list(islice(cycle(range(57,0,-1)), NUM_VARIANTS))
+    ref_depth[i, :] = list(islice(cycle(range(i+10)), NUM_VARIANTS))
+    alt_depth[i, :] = list(islice(cycle(range(i+33,0,-1)), NUM_VARIANTS))
 
 #We now want to shuffle the array to check that the import process is able to map the
 #primary keys properly - for actual data you'll want the order to be the most common access
