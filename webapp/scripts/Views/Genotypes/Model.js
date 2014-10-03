@@ -34,7 +34,6 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                 _.extend(that, initial_params);
                 that.data = {};
                 that.settings = table_info.settings.ShowInGenomeBrowser;
-                that.data_type = that.settings.Type;
                 that.properties = [];
                 that.derived_properties = [];
                 if (that.settings.Call) {
