@@ -1,0 +1,5 @@
+NameSingle: Sample
+NamePlural: Samples
+
+PrimKey: sample_id
+AutoScanProperties: True
