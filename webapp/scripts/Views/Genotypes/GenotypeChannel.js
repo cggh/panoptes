@@ -132,7 +132,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     cell_colour_states.push({id:'fraction', name:'Ref Read Fraction'});
                 var colour_channel = Controls.Combo(null, { label:'', states:cell_colour_states, width:controlWidth })
                     .bindToModel(view_params, 'colour_channel').setClassID(that.table_info.id + 'ChannelColour');
-                controlsGridData.push({ label:'Cell Colour', ctrl: colour_channel });
+                controlsGridData.push({ label:'Cell', ctrl: colour_channel });
 
                 var states = _.map(that.model.settings.ExtraProperties, function(prop) {
                     return {id:prop, name:that.table_info.properties[prop].name};
@@ -398,7 +398,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
               var data = '';
               data += '#Dataset: ' + MetaData.database + '\n';
               data += '#Workspace: ' + MetaData.workspaceid + '\n';
-              data += '#Table:' + that.table_info.tableCapNamePlural + '\n';
+              data += '#Table:' + that.table_info.tableCapNamePlural + that.view.colour_channel == 'call' ? ' Calls' : ' Allele Depths' + '\n';
               data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.col_query) + '\n';
               data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.row_query) + '\n';
               data += '#Choromosome:' + that.model.chrom + '\n';
@@ -410,34 +410,23 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 for(var i=0; i<that.model.row_primary_key.length; i++)
                   data += that.model.row_primary_key[i] +'\t'
                 data += "\n";
-                if (that.model.data_type == 'diploid') {
-                  for(i=0; i<that.model.col_ordinal.length; i++) {
+                var prop = that.view.colour_channel == 'call' ? that.model.settings.Call : that.model.settings.AlleleDepth;
+                var prop_array = that.model.data[prop];
+                var arity = prop_array.shape[2] || 1;
+                for(i=0; i<that.model.col_ordinal.length; i++) {
                     data += that.model.col_ordinal[i] + '\t';
                     for(var j=0; j<that.model.row_ordinal.length; j++) {
-                      data += that.model.data[that.model.settings.FirstAllele][j][i];
-                      data += ',';
-                      data += that.model.data[that.model.settings.SecondAllele][j][i];
+                      for (var k = 0; k < arity; k++) {
+                        data += prop_array[j][i * arity + k];
+                        if ( k < arity-1 )
+                          data += ','
+                      }
                       data += '\t';
                     }
                     data += '\n';
                   }
-                } else if (that.model.data_type == 'fractional') {
-                  for(i=0; i<that.model.col_ordinal.length; i++) {
-                    data += that.model.col_ordinal[i] + '\t';
-                    for(var j=0; j<that.model.row_ordinal.length; j++) {
-                      data += that.model.data[that.model.settings.Ref][j][i];
-                      data += ',';
-                      data += that.model.data[that.model.settings.NonRef][j][i];
-
-                      data += '\t';
-                    }
-                    data += '\n';
-                  }
-                }
-
-
                 var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
-                FileSaver(blob, MetaData.database + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
+                FileSaver(blob, MetaData.database + '-' + that.view.colour_channel == 'call' ? ' Calls' : ' Allele Depths' + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
               });
             };
 

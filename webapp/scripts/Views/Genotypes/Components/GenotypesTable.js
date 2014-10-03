@@ -90,7 +90,7 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                    var call_summary = call_summarys ? call_summarys[i] : -1;
                    var ad = ads ? ads[i] : -1;
                    var text = '';
-                   if (model.settings.Call) {
+                   if (view.colour_channel == 'call') {
                      for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
                        text += calls[k];
                        if (k < refk - 1)
