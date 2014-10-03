@@ -1,0 +1,4 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/refgenome.html
+
+AnnotMaxViewPortSize: 750000
+RefSequenceSumm: Yes

@@ -1,0 +1,9 @@
+NameSingle: Variant
+NamePlural: Variants
+
+PrimKey: AutoKey
+AutoScanProperties: True
+
+IsPositionOnGenome: true      
+Chromosome: CHROM
+Position: POS
