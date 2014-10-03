@@ -251,13 +251,11 @@ define(["_", "Utils/TwoDCache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
                     myurl.addUrlQueryItem("row_properties", that.table.row_table.primkey);
                     myurl.addUrlQueryItem("row_sort_cols", that.row_sort_columns.join('~'));
                     myurl.addUrlQueryItem("col_key", that.table.col_table.primkey);
-                    myurl.addUrlQueryItem("sort_mode", that.data_type);
-                    if (that.data_type == 'diploid') {
-                        myurl.addUrlQueryItem("row_sort_properties", that.settings.FirstAllele+'~'+that.settings.SecondAllele)
-                    }
-                    if (that.data_type == 'fractional') {
-                        myurl.addUrlQueryItem("row_sort_properties", that.settings.Ref+'~'+that.settings.NonRef)
-                    }
+                    myurl.addUrlQueryItem("sort_mode", that.settings.Call ? 'call' : 'fraction');
+                    if (that.settings.Call)
+                        myurl.addUrlQueryItem("row_sort_property", that.settings.Call);
+                    else
+                        myurl.addUrlQueryItem("row_sort_property", that.settings.AlleleDepth);
                 } else
                     if (that.table.row_table.primkey == that.row_order)
                             myurl.addUrlQueryItem("row_properties", that.row_order);

@@ -146,6 +146,22 @@ def extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_prope
         two_d_result = select_by_list(two_d_properties, row_idx, col_idx, first_dimension)
     return two_d_result
 
+def summarise_call(calls):
+    call = -2
+    for oc in calls:
+        c = 1 if oc > 0 else oc
+        if c == -1: #Missing
+            call = -1
+            break
+        if c == 0 and call == 1: #REF BUT WAS PREVIOUSLY ALT
+            call = 2 #HET
+            break
+        if c == 1 and call == 0: #ALT BUT WAS PREVIOUSLY REF
+            call = 2 #HET
+            break
+        call = c
+    return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
+
 def handler(start_response, request_data):
     datatable = request_data['datatable']
     dataset = request_data['dataset']
@@ -187,9 +203,9 @@ def handler(start_response, request_data):
     except KeyError:
         col_fail_limit = None
     try:
-        row_sort_properties = request_data['row_sort_properties'].split('~')
+        row_sort_property = request_data['row_sort_property']
     except KeyError:
-        row_sort_properties = []
+        row_sort_property = None
     try:
         col_key = request_data['col_key']
     except KeyError:
@@ -251,7 +267,7 @@ def handler(start_response, request_data):
             del col_result[col_index_field]
             del row_result[row_index_field]
 
-            if len(row_order_columns) > 0:
+            if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
                 sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
                     idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
@@ -264,19 +280,20 @@ def handler(start_response, request_data):
                 #Sort by the order specified - reverse so last clicked is major sort
                 sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
                 #grab the data needed to sort
-                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, row_sort_properties)
-                rows = []
-                for i, row in enumerate(row_idx):
-                    data = [[sort_data[prop][i][j] for prop in row_sort_properties] for j, col in enumerate(sort_col_idx)]
-                    rows.append((row, data))
-                if sort_mode == 'diploid':
-                    #Naively we don't expect more than a hundered alleles.....
-                    key_func = lambda row: ''.join([str(prop).zfill(2) for col in row[1] for prop in col])
-                    rows.sort(key=key_func, reverse=True)
-                elif sort_mode == 'fractional':
+                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, [row_sort_property])
+                rows = zip(row_idx, sort_data[row_sort_property])
+                if sort_mode == 'call':
+                    polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
+                    haploid_key_func = lambda row: ''.join(map(lambda c: str(c).zfill(2), row[1]))
+                    if len(rows[0][1].shape) == 1:
+                        rows.sort(key=haploid_key_func, reverse=True)
+                    else:
+                        rows.sort(key=polyploid_key_func, reverse=True)
+                elif sort_mode == 'fraction':
                     for i in range(len(sort_col_idx)):
-                        key_func = lambda row: float(row[1][i][0])/sum(row[1][i])
-                        rows.sort(key=key_func)
+                        #TODO Shuld be some fancy bayesian shizzle
+                        key_func = lambda row: str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
+                        rows.sort(key=key_func, reverse=True)
                 else:
                     print "Unimplemented sort_mode"
                 #Now just get the row_idx to pass to 2d extract for the slice we need
