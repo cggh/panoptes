@@ -119,7 +119,7 @@ define(["require", "DQX/Utils"],
 
 
 
-            that.layout = function() {
+            that.layout = function(preferreditemAnglesMap) {
                 if (!that.root)
                     return;
 
@@ -135,9 +135,13 @@ define(["require", "DQX/Utils"],
                 }
                 countItems(that.root);
 
+                var actualAnglesMap = {};
+
                 var angularSpread = function(branch, ang1, ang2, parentPosX, parentPosY, parentAngle) {
                     branch.relativeAngle = (ang1+ang2)/2;
                     branch.absoluteAngle = parentAngle + branch.relativeAngle;
+                    if (branch.itemid)
+                        actualAnglesMap[branch.itemid] = branch.absoluteAngle;
                     branch.posX = parentPosX + branch.distance * Math.cos(branch.absoluteAngle);
                     branch.posY = parentPosY + branch.distance * Math.sin(branch.absoluteAngle);
                     branch.pointingLeft = Math.cos(branch.absoluteAngle)<0;
@@ -151,6 +155,40 @@ define(["require", "DQX/Utils"],
                     });
                 }
                 angularSpread(that.root, 0, 2*Math.PI, 0, 0, 0);
+
+                if (preferreditemAnglesMap) {
+                    var maxscore = 0;
+                    var bestangle = 0;
+                    for (var corrAng = 0; corrAng<Math.PI; corrAng += Math.PI/100) {
+                        var score = 0;
+                        $.each(actualAnglesMap, function(key, ang1) {
+                            if (preferreditemAnglesMap[key]) {
+                                var ang2 =preferreditemAnglesMap[key];
+                                var angdiff = ang2 - ang1 - corrAng;
+                                while (angdiff>+Math.PI) angdiff -= 2*Math.PI;
+                                while (angdiff<-Math.PI) angdiff += 2*Math.PI;
+//                                if (Math.abs(angdiff)<Math.PI/4)
+                                score += 1.0/(1.0+10*Math.pow(angdiff,2));
+                            }
+                        });
+                        if (score>maxscore) {
+                            maxscore = score;
+                            bestangle = corrAng;
+                        }
+                    };
+
+                    var addAngle = function(branch, parentPosX, parentPosY) {
+                        branch.absoluteAngle += bestangle;
+                        branch.posX = parentPosX + branch.distance * Math.cos(branch.absoluteAngle);
+                        branch.posY = parentPosY + branch.distance * Math.sin(branch.absoluteAngle);
+                        branch.pointingLeft = Math.cos(branch.absoluteAngle)<0;
+                        $.each(branch.children, function(idx, child) {
+                            addAngle(child, branch.posX, branch.posY);
+                        });
+                    }
+                    addAngle(that.root, 0, 0);
+                }
+
 
                 that.calcBoundingBox();
             };
@@ -166,6 +204,28 @@ define(["require", "DQX/Utils"],
                 };
                 addBB(that.root);
             };
+
+
+            that.optimizeOrdering = function(indexMap) {
+
+                var calcAvIndex = function(branch) {
+                    var cnt = 0;
+                    var vl = 0;
+                    $.each(branch.children, function(idx, child) {
+                        var rs = calcAvIndex(child);
+                        vl += rs[0]
+                        cnt += rs[1];
+                    });
+                    if (branch.itemid) {
+                        cnt = 1;
+                        vl = indexMap[branch.itemid];
+                    }
+                    branch.avIndex = vl/cnt;
+                    branch.children.sort(DQX.ByProperty('avIndex'));
+                    return [vl, cnt];
+                }
+                calcAvIndex(that.root);
+            }
 
             return that;
         }

@@ -109,6 +109,12 @@ define([
                     that.reDraw();
                 });
 
+                that.ctrl_Stabilise = Controls.Check(null,{label:'Stabilise', value:false}).setClassID('stabilise')
+                    .setOnChanged(function() {
+                        that.tuneTree();
+                        that.reDraw();
+                    });
+
                 that.colorLegend = Controls.Html(null,'');
 
                 that.ctrl_Description = Controls.Html(null,'');
@@ -203,7 +209,8 @@ define([
                         that.ctrl_ColorDrawing,
                         that.ctrl_SelDrawing,
                         that.ctrl_RotateLabels,
-                        that.ctrl_ShowInternalNodes
+                        that.ctrl_ShowInternalNodes,
+                        that.ctrl_Stabilise
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -303,6 +310,7 @@ define([
                                     resultpointcount = values.length;
                                 });
                             that.itemDataLoaded = true;
+                            that.tuneTree();
                             that.reDraw();
                         }
                     },
@@ -337,12 +345,35 @@ define([
                     that.currentTree = Tree();
                     that.currentTree.name = resp.name;
                     that.currentTree.load(JSON.parse(resp.settings), resp.data);
-                    that.currentTree.layout();
+                    that.tuneTree();
+                    that.currentTree.layout(that.ctrl_Stabilise.getValue()?that.mapItemAngles:null);
                     that.panelPlot.setXRange(0,1);
                     that.panelPlot.setYRange(0,1);
                     that.updateTreeInfo();
                     that.reDraw();
                 });
+
+            }
+
+
+            that.tuneTree = function() {
+                if ( (!that.currentTree) || (!that.pointIndex) )
+                    return;
+
+                if (that.ctrl_Stabilise.getValue()) {
+                    var rndIter = function(val) {
+                        for (var i=0; i<5; i++)
+                            val =  (val * 9301 + 49297) % 233280;
+                        return val;
+                    }
+
+                    var rndIndex = {};
+                    $.each(that.pointIndex, function(key, val) {
+                        rndIndex[key] = rndIter(val);
+                    });
+
+                    that.currentTree.optimizeOrdering(rndIndex);
+                }
 
             }
 
@@ -462,6 +493,8 @@ define([
                 }
                 that.colorLegend.modifyValue(legendStr);
 
+                that.mapItemAngles = {};
+
                 var drawBranch = function(branch) {
                     branch.colorIndexNode = -1;
                     branch.colorIndexBranch = -1;
@@ -469,6 +502,7 @@ define([
                     if (branch.itemid) {
                         var idx = that.pointIndex[branch.itemid];
                         if (idx!=null) {
+                            that.mapItemAngles[branch.itemid] = branch.absoluteAngle;
                             if (colorDataNodes)
                                 branch.colorIndexNode = colorDataNodes[idx];
                             if (colorDataBranches)
