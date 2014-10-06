@@ -6,9 +6,9 @@ import config
 import asyncresponder
 import os
 
-import importer.ImportDataTable
-import importer.Import2DDataTable
-import importer.ImportWorkspaces
+from importer.ImportDataTable import ImportDataTable
+from importer.Import2DDataTable import Import2DDataTable
+from importer.ImportWorkspaces import ImportWorkspaces
 import importer.ImportError
 
 
@@ -26,27 +26,27 @@ def ResponseExecute(data, calculationObject):
     if type == 'datatable':
         datatableFolder = os.path.join(datasetFolder, 'datatables', tableid)
         try:
-            importer.ImportDataTable.ImportDataTable(
+            idt = ImportDataTable(
                 calculationObject,
                 datasetid,
-                tableid,
-                datatableFolder,
                 importSettings
             )
+            idt.ImportDataTable(tableid)
         except importer.ImportError.ImportException as e:
             calculationObject.fail(str(e))
-        importer.ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetid, importSettings)
+        iw = ImportWorkspaces(calculationObject, datasetid, importSettings, dataDir = 'workspaces')
+        iw.importAllWorkspaces()
 
     if type == '2D_datatable':
         datatableFolder = os.path.join(datasetFolder, '2D_datatables', tableid)
         try:
-            importer.Import2DDataTable.ImportDataTable(
+            i2d = Import2DDataTable(
                 calculationObject,
                 datasetid,
-                tableid,
-                datatableFolder,
-                importSettings
+                importSettings,
+                dataDir = '2D_datatables'
             )
+            i2d.ImportDataTable(tableid)
         except importer.ImportError.ImportException as e:
             calculationObject.fail(str(e))
 
