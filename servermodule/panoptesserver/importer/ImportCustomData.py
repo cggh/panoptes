@@ -221,7 +221,7 @@ class ImportCustomData(BaseImport):
     
                 cur.commit()
     
-            print('Creating summary values')
+            print('Creating custom summary values')
             for property in properties:
                 propid = property['propid']
                 settings = property['Settings']
