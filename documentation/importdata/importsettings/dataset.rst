@@ -28,6 +28,7 @@ Description
   Note: this text may contain html markup, and documentation links (see :ref:`def-source-docs`).
   A longer description can be split over several lines by writing a ``>`` sign on the key line,
   and indent subsequent lines::
+
      Description: >
         This web application provides an interactive view
         on the data ...

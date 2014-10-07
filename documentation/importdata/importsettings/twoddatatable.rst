@@ -63,30 +63,13 @@ FirstArrayDimension
 ShowInGenomeBrowser
   *Block.* If this key is present, the data will be visualised as a channel in the genome browser.
   This requires that data table used as ``ColumnDataTable`` is defined as "IsPositionOnGenome" (see :ref:`def-settings-datatable`)
-  This key contains the following subkeys:
+  This key contains the following subkeys, Either 'Call' or 'AlleleDepth' or both must be present:
 
-    Type
-       *Text (required)* Possible values:
+    Call
+       *Text.* Reference to the 2D data table property that contains call information.
 
-       diploid
-          Genotype calls for two alleles are reported.
-          Can be used for diploid organisms.
-
-       fractional
-          The fraction of reference and non-reference reads at the variant position are reported.
-          Can be used for monoploid organisms with mixed states.
-
-    FirstAllele
-       *Text.* Reference to the 2D data table property that contains first allele information (in case of diploid data). -1 is the value used to indicate missingness.
-
-    SecondAllele
-       *Text.* Reference to the 2D data table property that contains second allele information (in case of diploid data). -1 is the value used to indicate missingness.
-
-    Ref
-       *Text.* 2D data table property containing the reference read count (in case of fractional data).
-
-    NonRef
-       *Text.* 2D data table property containing the non-reference read count (in case of fractional data).
+    AlleleDepth
+       *Text.* Reference to the 2D data table property that contains depth information.
 
     ExtraProperties
       *List.* A list of the extra 2D data table properties that are displayed in the genotype channel. This will populate options for alpha and height control.
