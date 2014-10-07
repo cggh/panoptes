@@ -124,6 +124,67 @@ class Summariser:
             fp.write('\n')
             fp.close()
 
+class MultiCategoryFilterBank:
+    
+    def __init__(self, basedir, sourcefile, blockSizeStart, blockSizeIncrFactor, blockSizeMax, categories):
+        self._propid=sourcefile.split('.')[0]
+        self._processfile = basedir+'/'+sourcefile
+        self._basedir = basedir
+        self._sourcefile = sourcefile
+        self._blockSizeStart = blockSizeStart
+        self._blockSizeIncrFactor = blockSizeIncrFactor
+        self._blockSizeMax = blockSizeMax
+        self._categories = categories
+        
+    def __str__ (self):
+        return("MultiCategoryDensityFilterBank %s %d %d %d %s" % (self._sourcefile, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, ";".join(categories)))
+    
+
+    def _getNewSummarizer(self, chromosome):
+        return Summariser(chromosome, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, self._basedir, self._categories)
+    
+    def parse(self):
+        
+        with open(self._processfile, 'r+b') as f:
+        
+            currentChromosome=''
+            summariser = None
+            processedChromosomes = {}
+            
+            sf = f
+            
+            linecount = 0
+            while True:
+                line=sf.readline().rstrip('\n')
+                if not(line):
+                    break
+                else:
+                    linecount += 1
+                    if linecount % 500000 ==0:
+                        print(str(linecount))
+                comps = line.split('\t')
+                chromosome = comps[0]
+                pos = int(comps[1])
+                val = None
+                try:
+                    val = float(comps[2])
+                except:
+                    pass
+                if chromosome != currentChromosome:
+                    if summariser != None:
+                        summariser.Finalise()
+                    print('##### Start processing chromosome '+chromosome)
+                    summariser = self._getNewSummarizer(chromosome)
+                    if chromosome in processedChromosomes:
+                        raise Exception('File should be ordered by chromosome')
+                    processedChromosomes[chromosome] = True
+                    currentChromosome = chromosome
+                summariser.Add(pos,val)
+            
+            if summariser != None:
+                summariser.Finalise()
+        
+        print(str(linecount))
 
 if __name__ == "__main__":
     
@@ -147,47 +208,10 @@ if __name__ == "__main__":
     blockSizeMax = int(sys.argv[4])
     
     categories  = sys.argv[5].split(';')
-    print('Categories: ' + str(categories))
-    categorymap = {categories[i]:i for i in range(len(categories))}
-    otherCategoryNr = None
-    for i in range(len(categories)):
-        if categories[i] == '_other_':
-            otherCategoryNr = i
        
-    propid=sourcefile.split('.')[0]
-      
-    sf = open(basedir+'/'+sourcefile,'r')
+       
+    mcfb = MultiCategoryFilterBank(basedir, sourcefile, blockSizeStart, blockSizeIncrFactor, blockSizeMax, categories)
+
+    print(str(mcfb))
+    mcfb.parse()
     
-    currentChromosome = ''
-    summariser = None
-    processedChromosomes = {}
-        
-    linecount = 0
-    while True:
-        line=sf.readline().rstrip('\n')
-        if not(line):
-            break
-        else:
-            linecount += 1
-            if linecount % 500000 ==0:
-                print(str(linecount))
-        comps = line.split('\t')
-        chromosome = comps[0]
-        pos = int(float(comps[1]))
-        val = comps[2]
-        if chromosome != currentChromosome:
-            if summariser != None:
-                summariser.Finalise()
-            print('##### Start processing chromosome '+chromosome)
-            summariser = Summariser(chromosome, blockSizeStart, blockSizeIncrFactor, blockSizeMax)
-            if chromosome in processedChromosomes:
-                raise Exception('File should be ordered by chromosome')
-            processedChromosomes[chromosome] = True
-            currentChromosome = chromosome
-        summariser.Add(pos,val)
-    
-    
-    if summariser != None:
-        summariser.Finalise()
-    
-    print(str(linecount))
