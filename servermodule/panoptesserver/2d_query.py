@@ -75,20 +75,38 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
 
 def select_by_list(properties, row_idx, col_idx, first_dimension):
     num_cells = len(col_idx) * len(row_idx)
+    arities = {}
+    for prop, array in properties.items():
+        if len(array.shape) == 2:
+            arities[prop] = 1
+        else:
+            arities[prop] = array.shape[2]
+    coords = {}
     if first_dimension == 'row':
-        coords = ((row, col) for row in row_idx for col in col_idx)
+        for arity in arities.values():
+            if arity == 1:
+                coords[arity] = [(row, col) for row in row_idx for col in col_idx]
+            else:
+                coords[arity] = [(row, col, i) for row in row_idx for col in col_idx for i in xrange(arity)]
     elif first_dimension == 'column':
-        coords = ((col, row) for row in row_idx for col in col_idx)
+        for arity in arities.values():
+            if arity == 1:
+                coords[arity] = [(col, row) for row in row_idx for col in col_idx]
+            else:
+                coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
     else:
         print "Bad first_dimension"
+
     result = {}
     for prop, array in properties.items():
-        result[prop] = np.empty((num_cells,), dtype=array.id.dtype)
-    num_chunks = num_cells / CHUNK_SIZE
-    num_chunks = num_chunks + 1 if num_cells % CHUNK_SIZE else num_chunks
-    for i in xrange(num_chunks):
-        selection = np.asarray(list(itertools.islice(coords, CHUNK_SIZE)))
-        for prop, array in properties.items():
+        arity = arities[prop]
+        result[prop] = np.empty((num_cells * arity,), dtype=array.id.dtype)
+        num_chunks = num_cells*arity / CHUNK_SIZE
+        num_chunks = num_chunks + 1 if (num_cells*arity) % CHUNK_SIZE else num_chunks
+        i_coords = iter(coords[arity])
+        for i in xrange(num_chunks):
+            slice = list(itertools.islice(i_coords, CHUNK_SIZE))
+            selection = np.asarray(slice)
             sel = h5py._hl.selections.PointSelection(array.shape)
             sel.set(selection)
             out = np.ndarray(sel.mshape, array.id.dtype)
@@ -97,8 +115,7 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
                           out,
                           h5py.h5t.py_create(array.id.dtype))
             result[prop][i * CHUNK_SIZE: (i * CHUNK_SIZE) + len(selection)] = out[:]
-    for prop, array in result.items():
-        array.shape = (len(row_idx), len(col_idx))
+        result[prop].shape = (len(row_idx), len(col_idx)) if arities[prop] == 1 else (len(row_idx), len(col_idx), arity)
     return result
 
 def get_table_ids(cur, datatable):
@@ -128,6 +145,22 @@ def extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_prope
     else:
         two_d_result = select_by_list(two_d_properties, row_idx, col_idx, first_dimension)
     return two_d_result
+
+def summarise_call(calls):
+    call = -2
+    for oc in calls:
+        c = 1 if oc > 0 else oc
+        if c == -1: #Missing
+            call = -1
+            break
+        if c == 0 and call == 1: #REF BUT WAS PREVIOUSLY ALT
+            call = 2 #HET
+            break
+        if c == 1 and call == 0: #ALT BUT WAS PREVIOUSLY REF
+            call = 2 #HET
+            break
+        call = c
+    return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
 
 def handler(start_response, request_data):
     datatable = request_data['datatable']
@@ -170,9 +203,9 @@ def handler(start_response, request_data):
     except KeyError:
         col_fail_limit = None
     try:
-        row_sort_properties = request_data['row_sort_properties'].split('~')
+        row_sort_property = request_data['row_sort_property']
     except KeyError:
-        row_sort_properties = []
+        row_sort_property = None
     try:
         col_key = request_data['col_key']
     except KeyError:
@@ -234,7 +267,7 @@ def handler(start_response, request_data):
             del col_result[col_index_field]
             del row_result[row_index_field]
 
-            if len(row_order_columns) > 0:
+            if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
                 sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
                     idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
@@ -247,19 +280,20 @@ def handler(start_response, request_data):
                 #Sort by the order specified - reverse so last clicked is major sort
                 sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
                 #grab the data needed to sort
-                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, row_sort_properties)
-                rows = []
-                for i, row in enumerate(row_idx):
-                    data = [[sort_data[prop][i][j] for prop in row_sort_properties] for j, col in enumerate(sort_col_idx)]
-                    rows.append((row, data))
-                if sort_mode == 'diploid':
-                    #Naively we don't expect more than a hundered alleles.....
-                    key_func = lambda row: ''.join([str(prop).zfill(2) for col in row[1] for prop in col])
-                    rows.sort(key=key_func, reverse=True)
-                elif sort_mode == 'fractional':
+                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, [row_sort_property])
+                rows = zip(row_idx, sort_data[row_sort_property])
+                if sort_mode == 'call':
+                    polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
+                    haploid_key_func = lambda row: ''.join(map(lambda c: str(c).zfill(2), row[1]))
+                    if len(rows[0][1].shape) == 1:
+                        rows.sort(key=haploid_key_func, reverse=True)
+                    else:
+                        rows.sort(key=polyploid_key_func, reverse=True)
+                elif sort_mode == 'fraction':
                     for i in range(len(sort_col_idx)):
-                        key_func = lambda row: float(row[1][i][0])/sum(row[1][i])
-                        rows.sort(key=key_func)
+                        #TODO Shuld be some fancy bayesian shizzle
+                        key_func = lambda row: str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
+                        rows.sort(key=key_func, reverse=True)
                 else:
                     print "Unimplemented sort_mode"
                 #Now just get the row_idx to pass to 2d extract for the slice we need

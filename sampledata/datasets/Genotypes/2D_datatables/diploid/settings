@@ -1,7 +1,7 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/twoddatatable.html
 
-NameSingle: genotype
-NamePlural: genotypes
+NameSingle: diploid
+NamePlural: diploid
 Description: A table of diploid genotypes
 
 ColumnDataTable: variants            # The 1D data table where each entry corresponds to a column
@@ -19,19 +19,21 @@ RowIndexArray: row_index             # 1D Array in HDF5 that gives the value of 
 FirstArrayDimension: row             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better
 
 Properties:
-    -  Id: first_allele                            #Name of dataset in HDF5
-       Name: First Allele
-       Description: Genotype of the first allele
+    -  Id: genotype                            #Name of dataset in HDF5
+       Name: Call
+       Description: Genotype call
 
-    -  Id: second_allele
-       Name: Second Allele
-       Description: Genotype of the first Allele
+    -  Id: allele_depth
+       Name: Allele depth
+       Description: Number of reads for each allele
+       MinVal: 0
+       MaxVal: 200
 
     -  Id: total_depth
        Name: Total Depth
-       Description: Total number of reads for this variant
+       Description: Total number of reads for all alleles
        MinVal: 0
-       MaxVal: 1000
+       MaxVal: 200
 
     -  Id: gq
        Name: Genotype Quality
@@ -40,10 +42,9 @@ Properties:
        MaxVal: 100
 
 ShowInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
-    Type: diploid                    # Either 'diploid' or 'fractional'
-    FirstAllele:  first_allele       # Reference to property that is first allele
-    SecondAllele: second_allele
-    ExtraProperties:
+    Call:  genotype                  # Reference to property that holds the calls
+    AlleleDepth: allele_depth        # Reference to property that holds allele depths, if avaliable
+    ExtraProperties:                 # Properties that will be available to map to display properties
     - gq
     - total_depth
 

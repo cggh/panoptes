@@ -6,6 +6,13 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
            var that = {};
            that.last_clip = {l: 0, t: 0, r: 0, b: 0};
 
+           that.fractional_colourmap = [];
+           for (var i=0; i < 255; i++) {
+             that.fractional_colourmap[i+1] = 'hsla(' + Math.round(240 + ((i/256) * 120)) + ',100%,35%,';
+           }
+           that.fractional_colourmap[0] = 'hsl(0,50%,0%)';
+
+
            that.draw = function (ctx, clip, model, view) {
              that.last_clip = clip;
              var x_scale = view.col_scale;
@@ -14,165 +21,127 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              var pos = model.col_positions;
              var col_len = DQX.niceColours.length;
 
-             if (model.data_type == 'diploid') {
-               var firsts_rows = model.data[model.settings.FirstAllele];
-               var seconds_rows = model.data[model.settings.SecondAllele];
-               var alpha_rows = (view.alpha_channel == '__null') ? false : model.data[view.alpha_channel];
-               var height_rows = (view.height_channel == '__null') ? false : model.data[view.height_channel];
-               var alpha_offset = (view.alpha_channel == '__null') ? 0 : model.table.properties[view.alpha_channel].settings.MinVal;
-               var alpha_scale = (view.alpha_channel == '__null') ? 1 : model.table.properties[view.alpha_channel].settings.MaxVal - alpha_offset;
-               var height_offset = (view.height_channel == '__null') ? 0 : model.table.properties[view.height_channel].settings.MinVal;
-               var height_scale = (view.height_channel == '__null') ? 1 : model.table.properties[view.height_channel].settings.MaxVal - height_offset;
+             var call_rows = model.data[model.settings.Call] || false;
+             if (call_rows.shape)
+             var ploidy = call_rows.shape[2] || 1;
 
-               if (firsts_rows == undefined || seconds_rows == undefined || alpha_rows == undefined || height_rows == undefined)
-                 return model.row_index.length * row_height;
+             var ad_rows = model.data[model.settings.AlleleDepth] || false;
+             if (ad_rows.shape)
+                 var ad_arity = ad_rows.shape[2] || 1;
+             var call_summary_rows = model.data.call_summary || false;
+             var fraction_rows = model.data.fractional_reads || false;
+             var alpha_rows = (view.alpha_channel == '__null') ? false : model.data[view.alpha_channel];
+             var height_rows = (view.height_channel == '__null') ? false : model.data[view.height_channel];
+             var alpha_offset = (view.alpha_channel == '__null') ? 0 : model.table.properties[view.alpha_channel].settings.MinVal;
+             var alpha_scale = (view.alpha_channel == '__null') ? 1 : model.table.properties[view.alpha_channel].settings.MaxVal - alpha_offset;
+             var height_offset = (view.height_channel == '__null') ? 0 : model.table.properties[view.height_channel].settings.MinVal;
+             var height_scale = (view.height_channel == '__null') ? 1 : model.table.properties[view.height_channel].settings.MaxVal - height_offset;
 
+             if (!(call_summary_rows || fraction_rows) || alpha_rows == undefined || height_rows == undefined)
+               return model.row_index.length * row_height;
 
-
-               ctx.save();
-               ctx.font = "" + row_height + "px sans-serif";
-               ctx.lineWidth = 1;
-               var text_width = ctx.measureText('10/10').width;
-               for (var j = 0, ref = model.row_index.length; j < ref; j++) {
-                 var r = model.row_index[j], y = (r * row_height);
-                 //Don't draw off screen genotypes
-                 if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
-                   continue;
-                 var firsts = firsts_rows[r], seconds = seconds_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
-                 for (var i = 0, end = pos.length; i < end; ++i) {
-                   var alpha = alphas ? ((alphas[i] - alpha_offset) / alpha_scale) * 0.8 + 0.2 : 1;
-                   alpha = Math.min(Math.max(alpha, 0), 1);
-                   var height = heights ? ((heights[i] - height_offset) / height_scale) * 0.8 + 0.2 : 1;
-                   height = Math.min(Math.max(height, 0), 1);
-                   var first = firsts[i], second = seconds[i];
-                   if (first == -1 && second == -1) {
+             ctx.save();
+             ctx.font = "" + row_height + "px sans-serif";
+             ctx.lineWidth = 1;
+             var text_width = ctx.measureText('88/88').width;
+             for (var j = 0, ref = model.row_index.length; j < ref; j++) {
+               var r = model.row_index[j], y = (r * row_height);
+               //Don't draw off screen genotypes
+               if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
+                 continue;
+               var calls = call_rows[r], ads = ad_rows[r], call_summarys = call_summary_rows[r], fractions = fraction_rows[r], alphas = alpha_rows[r], heights = height_rows[r];
+               for (var i = 0, end = pos.length; i < end; ++i) {
+                 var call_summary = call_summarys ? call_summarys[i] : -1;
+                 var fraction = fractions ? fractions[i] : -1;
+                 var alpha = alphas ? ((alphas[i] - alpha_offset) / alpha_scale) * 0.8 + 0.2 : 1;
+                 alpha = Math.min(Math.max(alpha, 0), 1);
+                 var height = heights ? ((heights[i] - height_offset) / height_scale) * 0.8 + 0.2 : 1;
+                 height = Math.min(Math.max(height, 0), 1);
+                 if (view.colour_channel == 'call') {
+                   if (call_summary == -1 || call_summary == -2) {
                      height = 0.2;
                      alpha = 0.2;
-                   }
-                   if (first == second) {
-                     if (first == 0)
-                       ctx.fillStyle = 'rgba(0,55,135,' + alpha + ')'; else
-                       ctx.fillStyle = 'rgba(180,0,0,' + alpha + ')';
-                   } else
-                     ctx.fillStyle = 'rgba(78,154,0,' + alpha + ')';
-                   if (first == -1 || second == -1) {
                      ctx.fillStyle = 'rgb(230,230,230)';
-                       height = 1;
                    }
-                   var spos = x_scale(pos[i]) - (snp_width * 0.5);
-                   if (snp_width > text_width + 38 && row_height >= 6)
-                     ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width - text_width), height * row_height); else
-                     ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
-                     if (first == -1 || second == -1) {
-                         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                         ctx.fillRect(x_scale(pos[i]), y + 0.5* row_height, 1, 1);
-                     }
+                   if (call_summary == 0)
+                     ctx.fillStyle = 'rgba(0,55,135,' + alpha + ')';
+                   if (call_summary == 1)
+                     ctx.fillStyle = 'rgba(180,0,0,' + alpha + ')';
+                   if (call_summary == 2)
+                     ctx.fillStyle = 'rgba(78,154,0,' + alpha + ')';
                  }
+                 if (view.colour_channel == 'fraction') {
+                   ctx.fillStyle = fraction > 0 ? that.fractional_colourmap[fraction] + alpha + ')' : that.fractional_colourmap[fraction];
+                 }
+                 var spos = x_scale(pos[i]) - (snp_width * 0.5);
+                 if (snp_width > text_width + 38 && row_height >= 6)
+                   ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width - text_width), height * row_height);
+                 else
+                   ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
                }
                //Genotype text
                if (snp_width > text_width + 38 && row_height >= 6) {
+                 var t_y = ((r + 0.5) * row_height);
                  ctx.textBaseline = 'middle';
                  ctx.textAlign = 'center';
                  ctx.fillStyle = 'rgb(40,40,40)';
                  var style = 1;
-                 for (j = 0, ref = model.row_index.length; j < ref; j++) {
-                   r = model.row_index[j], y = ((r + 0.5) * row_height);
-                   if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
-                     continue;
-                   firsts = firsts_rows[r], seconds = seconds_rows[r];
-                   for (i = 0, end = pos.length; i < end; ++i) {
-                     first = firsts[i], second = seconds[i];
-                     var x = x_scale(pos[i]) + (snp_width / 2) - (text_width / 2);
-                     if (first == -1 || second == -1) {
+                 for (i = 0, end = pos.length; i < end; ++i) {
+                   var call_summary = call_summarys ? call_summarys[i] : -1;
+                   var ad = ads ? ads[i] : -1;
+                   var text = '';
+                   if (view.colour_channel == 'call') {
+                     for (var k = i * ploidy, refk = k + ploidy; k < refk; k++) {
+                       text += calls[k];
+                       if (k < refk - 1)
+                         text += '/';
+                     }
+                   } else {
+                     for (var k = i * ad_arity, refk = k + ad_arity; k < refk; k++) {
+                       text += ads[k];
+                       if (k < refk - 1)
+                         text += ',';
+                     }
+                   }
+
+
+                   var x = x_scale(pos[i]) + (snp_width / 2) - (text_width / 2);
+                   if (model.settings.Call) {
+                     if (call_summary == -1 || call_summary == -2) {
                        if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
-                       ctx.fillText('●', x, y);
+                       ctx.fillText('●', x, t_y);
                        continue;
                      }
-                     if (first == second && first == 0) {
+                     if (call_summary == 0) {
                        if (style != 0) ctx.fillStyle = 'rgb(150,150,150)', style = 0;
-                       ctx.fillText(first + '/' + second, x, y);
+                       ctx.fillText(text, x, t_y);
                      } else {
                        if (style != 1) ctx.fillStyle = 'rgb(40,40,40)', style = 1;
-                       ctx.fillText(first + '/' + second, x, y);
+                       ctx.fillText(text, x, t_y);
                      }
-                   }
-                 }
-               }
-               ctx.restore();
-             }
-
-             if (model.data_type == 'fractional') {
-               var ref_rows = model.data[model.settings.Ref];
-               var non_rows = model.data[model.settings.NonRef];
-               var depth_offset = model.settings.DepthMin;
-               var depth_scale = model.settings.DepthMax - depth_offset;
-
-               if (ref_rows == undefined || non_rows == undefined)
-                 return model.row_index.length * row_height;
-
-               ctx.save();
-               ctx.font = "" + row_height + "px sans-serif";
-               ctx.lineWidth = 1;
-               text_width = ctx.measureText('100/100').width;
-               for (j = 0, ref = model.row_index.length; j < ref; j++) {
-                 r = model.row_index[j], y = (r * row_height);
-                 //Don't draw off screen genotypes
-                 if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
-                   continue;
-                 var refs = ref_rows[r], nons = non_rows[r];
-                 for (i = 0, end = pos.length; i < end; ++i) {
-                   var ref_ = refs[i], non = nons[i];
-                   var depth = ref_ + non;
-                   height = ((depth - depth_offset) / depth_scale) * 0.8 + 0.2;
-                   height = Math.min(Math.max(height, 0), 1);
-                   if (ref_ + non == 0) {
-                     ctx.fillStyle = 'rgb(40,40,40)';
                    } else {
-                     ctx.fillStyle = 'hsl(' + (240 + ((non / (ref_ + non)) * 120)) + ',100%,35%)';
-                   }
-                   spos = x_scale(pos[i]) - (snp_width * 0.5);
-                   if (snp_width > text_width + 38 && row_height >= 6)
-                     ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width - text_width), height * row_height); else
-                     ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
-                 }
-               }
-               //Genotype text
-               if (snp_width > text_width + 38 && row_height >= 6) {
-                 ctx.textBaseline = 'middle';
-                 ctx.textAlign = 'left';
-                 ctx.fillStyle = 'rgb(40,40,40)';
-                 for (j = 0, ref = model.row_index.length; j < ref; j++) {
-                   r = model.row_index[j], y = ((r + 0.5) * row_height);
-                   if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
-                     continue;
-                   refs = ref_rows[r], nons = non_rows[r];
-                   for (i = 0, end = pos.length; i < end; ++i) {
-                     ref_ = refs[i], non = nons[i];
-                     var text = ref_ + ',' + non;
-                     x = x_scale(pos[i]) + (snp_width / 2) - text_width+1;
-                     ctx.fillText(text, x, y);
+                     ctx.fillText(text, x, t_y);
                    }
                  }
                }
-               ctx.restore();
              }
-
-
-               if (row_height>3) {
-                   ctx.save();
-                   ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                   ctx.lineWidth = 1;
-                   ctx.beginPath();
-                   for (var i=0; i<=model.row_index.length; i++) {
-                       var ypos = (i) * (row_height);
-                       if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
-                           ctx.moveTo(clip.l, ypos+0.5);
-                           ctx.lineTo(clip.r, ypos+0.5);
-                       }
-                   }
-                   ctx.stroke();
-                   ctx.restore();
-               }
+             ctx.restore();
+             //Lines between rows
+             if (row_height>3) {
+                 ctx.save();
+                 ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                 ctx.lineWidth = 1;
+                 ctx.beginPath();
+                 for (i=0; i<=model.row_index.length; i++) {
+                     var ypos = (i) * (row_height);
+                     if ((ypos + (row_height * 10) > clip.t) || (ypos - (row_height * 10) < clip.b)) {
+                         ctx.moveTo(clip.l, ypos+0.5);
+                         ctx.lineTo(clip.r, ypos+0.5);
+                     }
+                 }
+                 ctx.stroke();
+                 ctx.restore();
+             }
 
 
              return model.row_index.length * row_height;
@@ -185,8 +154,8 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  var snp_width = x_scale(model.col_width) - x_scale(0);
 
                  var rowNr = -1;
-                 for (j = 0, ref = model.row_index.length; j < ref; j++) {
-                     r = model.row_index[j], y = (r * row_height);
+                 for (var j = 0, ref = model.row_index.length; j < ref; j++) {
+                     var r = model.row_index[j], y = (r * row_height);
                      if ( (py>=y) && (py<=y+row_height) )
                         rowNr = j;
                  }
@@ -209,23 +178,17 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
 
                  var content = model.row_primary_key[rowNr] + ' / ' + model.col_primary_key[colNr];
 
-                 if (model.data_type == 'diploid') {
-                    var firsts_rows = model.data[model.settings.FirstAllele];
-                    var seconds_rows = model.data[model.settings.SecondAllele];
-                    if (firsts_rows && seconds_rows)
-                        content += '<br>Call: ' + firsts_rows[rowNr][colNr] + '/' + seconds_rows[rowNr][colNr];
-                     $.each(model.table.properties, function(idx, propInfo) {
-                         if ( (propInfo.id!=model.settings.FirstAllele) && (propInfo.id!=model.settings.SecondAllele) )
-                            if (model.data[propInfo.id])
-                                content += '<br>{name}: {value}'.DQXformat({name: propInfo.name, value: model.data[propInfo.id][rowNr][colNr]});
-                     });
-                 }
-
-                 if (model.data_type == 'fractional') {
-                     var ref_rows = model.data[model.settings.Ref];
-                     var non_rows = model.data[model.settings.NonRef];
-                     if (ref_rows &&  non_rows)
-                        content += '<br>Ref:' + ref_rows[rowNr][colNr] + ', Alt:' + non_rows[rowNr][colNr];
+                 for (var i = 0; i < model.properties.length; i++) {
+                   var prop = model.properties[i];
+                   var propInfo = model.table.properties[prop];
+                   var prop_array = model.data[prop];
+                   var arity = prop_array.shape[2] || 1;
+                   content += '<br>' + propInfo.name + ':';
+                   for (var j = 0; j < arity; j++) {
+                     content += prop_array[rowNr][colNr * arity + j];
+                     if ( j < arity-1 )
+                      content += ','
+                   }
                  }
 
                  return {

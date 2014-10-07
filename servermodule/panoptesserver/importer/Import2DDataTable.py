@@ -31,21 +31,25 @@ def hdf5_copy(src, dest, func=None, limit=None):
         if func:
             for start in xrange(0, limit[0] or len(src), step_size):
                  end = min(start + step_size, limit[0] or len(src))
-                 if len(shape) == 2:
+                 if len(shape) == 3:
+                     dest[start:end, :limit[1], :] = func(src[start:end, :limit[1], :])
+                 elif len(shape) == 2:
                      dest[start:end, :limit[1]] = func(src[start:end, :limit[1]])
                  elif len(shape) == 1:
                      dest[start:end] = func(src[start:end])
                  else:
-                     print "shape", shape, "not of dimension 1 or 2"
+                     raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
         else:
             for start in xrange(0, limit[0] or len(src), step_size):
                  end = min(start + step_size, limit[0] or len(src))
-                 if len(shape) == 2:
+                 if len(shape) == 3:
+                     dest[start:end, :limit[1], :] = src[start:end, :limit[1], :]
+                 elif len(shape) == 2:
                      dest[start:end, :limit[1]] = src[start:end, :limit[1]]
                  elif len(shape) == 1:
                      dest[start:end] = src[start:end]
                  else:
-                     print "shape", shape, "not of dimension 1 or 2"
+                     raise ValueError("shape", shape, "not of dimension 1, 2 or 3")
 
 def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_settings):
     global tableOrder, property_order
@@ -71,6 +75,8 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         table_settings = SettingsLoader.SettingsLoader(os.path.join(os.path.join(folder, 'settings')))
         table_settings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])
         table_settings.AddTokenIfMissing('ShowInGenomeBrowser', False)
+        if table_settings['ShowInGenomeBrowser'] and not (table_settings.GetSubSettings('ShowInGenomeBrowser').HasToken('Call') or table_settings.GetSubSettings('ShowInGenomeBrowser').HasToken('AlleleDepth')):
+            raise ValueError('Genome browsable 2D table must have call or allele depth')
         table_settings.AddTokenIfMissing('ColumnDataTable', '')
         table_settings.AddTokenIfMissing('RowDataTable', '')
         extra_settings = table_settings.Clone()
@@ -134,9 +140,10 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
         for property in table_settings['Properties']:
             extra_settings = copy.deepcopy(property)
             dtype = arraybuffer._strict_dtype_string(remote_hdf5[property['Id']].dtype)
+            arity = 1 if len(remote_hdf5[property['Id']].shape) == 2 else remote_hdf5[property['Id']].shape[2]
             del extra_settings['Id']
             del extra_settings['Name']
-            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}')".format(
+            sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}', {8})".format(
                 property['Id'],
                 tableid,
                 table_settings['ColumnDataTable'],
@@ -144,7 +151,8 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                 property['Name'],
                 property_order,
                 dtype,
-                simplejson.dumps(extra_settings)
+                simplejson.dumps(extra_settings),
+                arity
             )
             ImpUtils.ExecuteSQL(calculation_object, dataset_id, sql)
             property_order += 1
@@ -288,10 +296,13 @@ def ImportDataTable(calculation_object, dataset_id, tableid, folder, import_sett
                 prop_in = remote_hdf5[property['Id']]
                 #Make some choices assuming data is variants/samples
                 if prop_in.shape[0] > prop_in.shape[1]:
-                    chunks = (min(1000, prop_in.shape[0]), min(10, prop_in.shape[1]))
+                    chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
                 else:
-                    chunks = (min(10, prop_in.shape[0]), min(1000, prop_in.shape[1]))
-                prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=chunks, maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
+                    chunks = [min(10, prop_in.shape[0]), min(1000, prop_in.shape[1])]
+                arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
+                if arity > 1:
+                    chunks.append(arity)
+                prop_out = local_hdf5.create_dataset(property['Id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
                 hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
                 print "done"
             print "all copies complete"

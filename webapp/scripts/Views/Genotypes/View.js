@@ -70,7 +70,7 @@ define(['_', 'd3',
                 ctx.fillText(model.intervals_being_fetched.length > 0 ? "LOADING..." : model.table.tableCapNamePlural, 5, 15);
                 ctx.textBaseline = 'top';
 
-                if (model.data_type == 'diploid') {
+                if (that.colour_channel == 'call') {
                 ctx.fillStyle = 'rgb(0,55,135)';
                 ctx.fillRect(5, 25, 10, 10);
                 ctx.fillStyle = 'rgb(180,0,0)';
@@ -82,7 +82,7 @@ define(['_', 'd3',
                 ctx.fillText('Hom - Alt', 20, 40);
                 ctx.fillText('Het', 20, 55);
                 }
-                if (model.data_type == 'fractional'){
+                if (that.colour_channel ==  'fraction'){
                 ctx.fillText('Ref fraction:', 5, 25);
                 ctx.textAlign = 'center';
                 ctx.fillText('1', 5, 49);
