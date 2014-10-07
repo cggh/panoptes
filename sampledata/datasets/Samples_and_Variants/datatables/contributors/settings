@@ -32,11 +32,6 @@ Properties:
   DataType: Text
   Search: Pattern
 
-- Id: Image
-  Name: Image
-  Description: Image
-  DataType: Text
-
 ListView: true
 
 DataItemViews: # Lists the custom views that should appear in the popup for an individual data table item
@@ -44,7 +39,6 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
 - Type: Template                                       # Specifies the default view of all fields
   Name: Details
   Content: |
-      <img style=\"float:right\" src={{{Image}}}>
       <h4>ID: {{ID}}</h4>
       <h2>Contributing Entity: {{Name}}<h2>
       <h3>Contact Person: {{Contact}}<h3>
