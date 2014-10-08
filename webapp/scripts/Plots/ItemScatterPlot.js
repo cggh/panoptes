@@ -672,15 +672,42 @@ define([
                     }
                 }
 
-                ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
-                ctx.strokeStyle=DQX.Color(1,0,0,0.75*opacity).toStringCanvas();
-                for (var i=0; i<selpsX.length; i++) {
-                    ctx.beginPath();
-                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
+                if (true) {
+                    if (!valColorCat) {
+                        ctx.fillStyle=DQX.Color(1,0,0,0.25*(0.5+0.5*opacity)).toStringCanvas();
+                        ctx.strokeStyle=DQX.Color(1,0,0,0.75*(0.5+0.5*opacity)).toStringCanvas();
+                    }
+                    else
+                    {
+                        ctx.fillStyle=DQX.Color(0,0,0,0.0*(0.5+0.5*opacity)).toStringCanvas();
+                        ctx.strokeStyle=DQX.Color(0,0,0,1.0*(0.5+0.5*opacity)).toStringCanvas();
+//                    ctx.lineWidth = 2;
+                    }
+                    for (var i=0; i<selpsX.length; i++) {
+                        ctx.beginPath();
+                        ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    }
                 }
+//                else {
+//                    ctx.fillStyle=DQX.Color(0,0,0,0.2*(1+opacity)/2).toStringCanvas();
+//                    ctx.strokeStyle=DQX.Color(0,0,0,0.8*(1+opacity)/2).toStringCanvas();
+//                    var ox0 = -1*sizeFactor-1.5; var oy0 = 1*sizeFactor+1.5;
+//                    var sizeFactor2 = Math.min(Math.max(sizeFactor, 0.7), 2);
+//                    var ox1 = -10*sizeFactor2; var oy1 = 6*sizeFactor2;
+//                    var ox2 = -6*sizeFactor2; var oy2 = 10*sizeFactor2;
+//                    for (var i=0; i<selpsX.length; i++) {
+//                        ctx.beginPath();
+//                        ctx.moveTo(selpsX[i]+ox0, selpsY[i]+oy0);
+//                        ctx.lineTo(selpsX[i]+ox1, selpsY[i]+oy1);
+//                        ctx.lineTo(selpsX[i]+ox2, selpsY[i]+oy2);
+//                        ctx.closePath();
+//                        ctx.fill();
+//                        ctx.stroke();
+//                    }
+//                }
 
                 if (valSize) {
                     ctx.fillStyle=DQX.Color(0.8,0.8,0.8,opacity).toStringCanvas();

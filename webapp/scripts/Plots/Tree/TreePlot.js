@@ -104,7 +104,7 @@ define([
                         that.reDraw();
                     });
 
-                that.ctrl_ShowInternalNodes = Controls.Check(null,{label:'Show internal nodes', value:true}).setClassID('showinternalnodes')
+                that.ctrl_ShowInternalNodes = Controls.Check(null,{label:'Show internal nodes', value:false}).setClassID('showinternalnodes')
                     .setOnChanged(function() {
                     that.reDraw();
                 });
@@ -614,8 +614,15 @@ define([
                 var selpsY = [];
                 drawBranch(that.currentTree.root);
 
-                ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
-                ctx.strokeStyle=DQX.Color(1,0,0,opacity).toStringCanvas();
+                if (!that.colorNodePropId) {
+                    ctx.fillStyle=DQX.Color(1,0,0,0.25*opacity).toStringCanvas();
+                    ctx.strokeStyle=DQX.Color(1,0,0,opacity).toStringCanvas();
+                }
+                else {
+                    ctx.fillStyle=DQX.Color(0,0,0,0.0*(0.5+0.5*opacity)).toStringCanvas();
+                    ctx.strokeStyle=DQX.Color(0,0,0,1*(0.5+0.5*opacity)).toStringCanvas();
+                    ctx.lineWidth = 2;
+                }
                 for (var i=0; i<selpsX.length; i++) {
                     ctx.beginPath();
                     ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+3, 0, 2 * Math.PI, false);
