@@ -147,11 +147,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
+                that.ctrl_PieOffset = Controls.Check(null, {label: 'Use offset'}).setClassID('pieOffset')
+                    .setOnChanged(function() {
+                        that.reDraw();
+                    });
+
                 var grp = Controls.CompoundVert([
                     that.ctrl_PointShape,
                     that.ctrl_PointSize,
                     that.ctrl_Opacity,
-                    Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize]).setLegend('Aggregated points')
+                    Controls.CompoundVert([that.ctrl_AggrType, that.ctrl_AggrSize, Controls.VerticalSeparator(5), that.ctrl_PieOffset]).setLegend('Aggregated points')
                     ]);
                 return Controls.Section(grp, {
                     title: 'Map',
@@ -253,8 +258,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     function(pieChartInfo) { // pie chart click handler
                         var qry = that.theQuery.get();
                         var range = 0.0001;
-                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLongit, pieChartInfo.longit-range, pieChartInfo.longit+range);
-                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit, pieChartInfo.lattit-range, pieChartInfo.lattit+range);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLongit, pieChartInfo.longit0-range, pieChartInfo.longit0+range);
+                        qry = SQL.WhereClause.createRangeRestriction(qry, that.tableInfo.propIdGeoCoordLattit, pieChartInfo.lattit0-range, pieChartInfo.lattit0+range);
                         Msg.send({type: 'DataItemTablePopup'}, {
                             tableid: that.tableInfo.id,
                             query: qry,
@@ -584,7 +589,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     pointSize: that.ctrl_PointSize.getValue(),
                     pointShape: that.ctrl_PointShape.getValue(),
                     aggrSize: that.ctrl_AggrSize.getValue(),
-                    aggregateStyle: that.ctrl_AggrType.getValue()
+                    aggregateStyle: that.ctrl_AggrType.getValue(),
+                    usePiechartOffset: that.ctrl_PieOffset.getValue()
                 });
                 that.pointSet.draw();
 
