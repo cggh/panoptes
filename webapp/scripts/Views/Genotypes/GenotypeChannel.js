@@ -455,11 +455,14 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     that._myPlotter.render();
             };
 
-            var stored_params = ['row_order', 'row_sort_columns', 'page'];
+            var stored_params = ['row_order', 'row_sort_columns', 'page', 'page_length'];
             that.storeSettings = function() {
-                return _.zipObject(stored_params, _.map(stored_params, function (param) {
+                var settings =  _.zipObject(stored_params, _.map(stored_params, function (param) {
                     return that.model_params.get(param)
                 }));
+                settings['row_query'] = that.row_query.store();
+                settings['col_query'] = that.col_query.store();
+                return settings;
             };
 
             that.recallSettings = function(settObj) {
@@ -467,6 +470,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     if (settObj[param])
                         that.model_params.set(param,settObj[param]);
                 });
+                that.row_query.recall(settObj['row_query']);
+                that.col_query.recall(settObj['col_query']);
             };
 
             that.getToolTipInfo = function (px, py) {
