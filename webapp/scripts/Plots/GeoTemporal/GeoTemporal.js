@@ -428,12 +428,14 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 if (that.numPropId) {
                     var numPropInfo = MetaData.findProperty(that.tableInfo.id, that.numPropId);
                     var numProps = that.pointData[that.numPropId];
-                    that.numPropMin = 1.0e99;
-                    that.numPropMax = -1.0e99;
-                    $.each(numProps, function(idx, val) {
-                        that.numPropMax = Math.max(that.numPropMax, val);
-                        that.numPropMin = Math.min(that.numPropMin, val);
-                    });
+//                    that.numPropMin = 1.0e99;
+//                    that.numPropMax = -1.0e99;
+//                    $.each(numProps, function(idx, val) {
+//                        that.numPropMax = Math.max(that.numPropMax, val);
+//                        that.numPropMin = Math.min(that.numPropMin, val);
+//                    });
+                    that.numPropMin = numPropInfo.settings.minval;
+                    that.numPropMax = numPropInfo.settings.maxval;
                     that.numPropRange = that.numPropMax - that.numPropMin;
                     if (that.numPropRange <= 0)
                         that.numPropRange = 1;
