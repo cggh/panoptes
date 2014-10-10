@@ -6,6 +6,7 @@ import ImpUtils
 import logging
 from BaseImport import BaseImport
 import config
+import gzip
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -65,8 +66,13 @@ class ProcessFilterBank(BaseImport):
                     output["destFile"].write('\t'.join(output["columns"]) + '\n')
                     
         linecount = 0
+        if self._compression == 'gz':
+            sourceFile = gzip.open(sourceFileName)
+        else:
+            sourceFile = open(sourceFileName, 'r')
+            
         with self._logHeader('Creating summary values from {}'.format(sourceFileName)):
-            with open(sourceFileName, 'r') as sourceFile:
+            with sourceFile:
                 header = sourceFile.readline().rstrip('\r\n').split('\t')
                 self._log('Original header: {0}'.format(','.join(header)))
                 header = [colname.replace(' ', '_') for colname in header]
@@ -255,12 +261,12 @@ class ProcessFilterBank(BaseImport):
 
                
     def createAllSummaryValues(self):
-        logging.debug('Creating summary values')
+        self._log('Creating summary values')
         
         datatables = self._getGlobalSettingList('DataTables')
         
         datatables = self._getDatasetFolders(datatables)
-        
+                
         for datatable in datatables:
             self.createSummaryValues(datatable)
 
