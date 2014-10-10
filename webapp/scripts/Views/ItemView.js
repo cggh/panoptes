@@ -80,7 +80,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.itemViewObjects.push(relationView);
                 });
 
-                if (!that.tableInfo.settings.DisableSubsets) {
+                if ((!that.tableInfo.settings.DisableSubsets) || (!that.tableInfo.settings.DisableNotes) ){
                     var subsetView = SubsetsView.create(initialItemData);
                     that.itemViewObjects.push(subsetView);
                 }

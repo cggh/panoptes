@@ -17,17 +17,45 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.tableInfo = MetaData.getTableInfo(initialItemData.tableid);
 
             that.createFrames = function(parent) {
-                that.frameSubsets = Framework.FrameFinal('', 0.7)
-                    .setDisplayTitle('Subsets').setMargins(10);
-                parent.addMemberFrame(that.frameSubsets);
-                return that.frameSubsets;
+                that.frameGroup = Framework.FrameGroupVert('', 0.7)
+                    .setDisplayTitle('Notes').setMargins(0);
+                parent.addMemberFrame(that.frameGroup);
+                if (!that.tableInfo.settings.DisableNotes) {
+                    that.frameNotesGroup = Framework.FrameGroupVert('', 0.7).setMargins(0).setSeparatorSize(0);
+                    that.frameGroup.addMemberFrame(that.frameNotesGroup);
+                    that.frameNotesButtons = Framework.FrameFinal('', 0.7).setFixedSize(Framework.dimY, 45).setAllowScrollBars(false, false);
+                    that.frameNotesGroup.addMemberFrame(that.frameNotesButtons);
+                    that.frameNotes = Framework.FrameFinal('', 0.7)
+                        .setMargins(0);
+                    that.frameNotesGroup.addMemberFrame(that.frameNotes);
+                }
+                if (!that.tableInfo.settings.DisableSubsets) {
+                    that.frameSubsets = Framework.FrameFinal('', 0.7)
+                        .setMargins(0).setFixedSize(Framework.dimY, 50);
+                    that.frameGroup.addMemberFrame(that.frameSubsets);
+                }
+                return that.frameGroup;
             };
 
             that.createPanels = function() {
                 if (!that.tableInfo.settings.DisableSubsets) {
-                    that.panelSubsets = Framework.Form(that.frameSubsets);
+                    that.panelSubsets = Framework.Form(that.frameSubsets).setPadding(7);
                     that.setContent(initialItemData);
                 }
+
+                if (!that.tableInfo.settings.DisableNotes) {
+                    //that.panelNotes = Framework.Form(that.frameNotes).setPadding(7);
+                    that.frameNotes.setContentHtml('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed tempor nisi. Nulla cursus nibh ipsum, nec lacinia urna iaculis ut. Nam eleifend purus metus. Etiam ante neque, porttitor eget ullamcorper vel, tincidunt ut eros. Cras tempus eros vel condimentum congue. Pellentesque id gravida sapien. Cras ultrices sed quam in vehicula. Praesent nec quam aliquam, lobortis dolor nec, ullamcorper elit. Praesent lacus nulla, dignissim non egestas nec, tincidunt vitae nisl. Donec sed mauris rutrum, bibendum sapien nec, ornare nisi. Duis nec ligula nisi. Cras pellentesque, sem id porttitor varius, metus erat cursus urna, vel ultrices leo quam et massa. Curabitur ut rhoncus sem. Nullam tincidunt nulla non mauris vulputate tristique. Vestibulum faucibus tellus vitae sem eleifend, vitae condimentum arcu mattis. Praesent ultricies eros eu posuere porttitor. Quisque sed rutrum dui. Curabitur cursus sapien vulputate massa volutpat, eget condimentum tellus bibendum. ');
+
+                    that.panelNotesButtons = Framework.Form(that.frameNotesButtons);
+                    var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-comment', content: 'Add note', width:160, height:30 }).setOnChanged(function() {
+                        Popup.closeIfNeeded(popupid);
+                        Start_Part1();
+                    });
+                    that.panelNotesButtons.addControl(bt);
+
+                }
+
             };
 
             that.setContent = function(itemData) {
@@ -57,13 +85,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         });
                     });
                     if (subsetCheckList.length == 0) {
-                        that.panelSubsets.addControl(Controls.Static('There are currently no {name} subsets defined'.DQXformat({name: that.tableInfo.tableNameSingle})));
+                        that.panelSubsets.addControl(Controls.Static('<span class="SupportingText">There are currently no {name} subsets defined</span>'.DQXformat({name: that.tableInfo.tableNameSingle})));
                     }
                     else {
-                        that.panelSubsets.addControl(Controls.CompoundVert([
-                            Controls.Static('This {name} is member of the following subsets:<p>'.DQXformat({name: that.tableInfo.tableNameSingle})),
-                            Controls.CompoundVert(subsetCheckList)
-                        ]));
+                        var ctrls = [];
+                        ctrls.push(Controls.Static('Member of the following subsets:<p>'));
+                        $.each(subsetCheckList, function(idx, subset) {
+                            ctrls.push(Controls.HorizontalSeparator(12));
+                            ctrls.push(subset);
+                        });
+                        that.panelSubsets.addControl(Controls.CompoundHor(ctrls));
                     }
 
                     var isnumericalkey = !!(MetaData.findProperty(that.tableInfo.id, that.tableInfo.primkey).isFloat);
