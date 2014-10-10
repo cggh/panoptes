@@ -276,7 +276,7 @@ def handler(start_response, request_data):
                     col_field=DQXDbTools.ToSafeIdentifier(col_key))
                 print sqlquery
                 cur.execute(sqlquery)
-                idx_for_col = dict(cur.fetchall())
+                idx_for_col = dict((str(k), v) for k,v in cur.fetchall())
                 #Sort by the order specified - reverse so last clicked is major sort
                 sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
                 #grab the data needed to sort
@@ -292,7 +292,10 @@ def handler(start_response, request_data):
                 elif sort_mode == 'fraction':
                     for i in range(len(sort_col_idx)):
                         #TODO Shuld be some fancy bayesian shizzle
-                        key_func = lambda row: str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
+                        def key_func(row):
+                            if sum(row[1][i]) == 0:
+                                return '-1'
+                            return str(1-float(row[1][i][0])/sum(row[1][i]))+str(sum(row[1][i])).zfill(4)
                         rows.sort(key=key_func, reverse=True)
                 else:
                     print "Unimplemented sort_mode"
