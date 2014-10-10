@@ -23,7 +23,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (!that.tableInfo.settings.DisableNotes) {
                     that.frameNotesGroup = Framework.FrameGroupVert('', 0.7).setMargins(0).setSeparatorSize(0);
                     that.frameGroup.addMemberFrame(that.frameNotesGroup);
-                    that.frameNotesButtons = Framework.FrameFinal('', 0.7).setFixedSize(Framework.dimY, 45).setAllowScrollBars(false, false);
+                    that.frameNotesButtons = Framework.FrameFinal('', 0.7).setFixedSize(Framework.dimY, 50).setAllowScrollBars(false, false);
                     that.frameNotesGroup.addMemberFrame(that.frameNotesButtons);
                     that.frameNotes = Framework.FrameFinal('', 0.7)
                         .setMargins(0);
@@ -48,9 +48,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.frameNotes.setContentHtml('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed tempor nisi. Nulla cursus nibh ipsum, nec lacinia urna iaculis ut. Nam eleifend purus metus. Etiam ante neque, porttitor eget ullamcorper vel, tincidunt ut eros. Cras tempus eros vel condimentum congue. Pellentesque id gravida sapien. Cras ultrices sed quam in vehicula. Praesent nec quam aliquam, lobortis dolor nec, ullamcorper elit. Praesent lacus nulla, dignissim non egestas nec, tincidunt vitae nisl. Donec sed mauris rutrum, bibendum sapien nec, ornare nisi. Duis nec ligula nisi. Cras pellentesque, sem id porttitor varius, metus erat cursus urna, vel ultrices leo quam et massa. Curabitur ut rhoncus sem. Nullam tincidunt nulla non mauris vulputate tristique. Vestibulum faucibus tellus vitae sem eleifend, vitae condimentum arcu mattis. Praesent ultricies eros eu posuere porttitor. Quisque sed rutrum dui. Curabitur cursus sapien vulputate massa volutpat, eget condimentum tellus bibendum. ');
 
                     that.panelNotesButtons = Framework.Form(that.frameNotesButtons);
+                    that.panelNotesButtons.setPadding(7);
                     var bt = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon: 'fa-comment', content: 'Add note', width:160, height:30 }).setOnChanged(function() {
-                        Popup.closeIfNeeded(popupid);
-                        Start_Part1();
+                        that.addNote();
                     });
                     that.panelNotesButtons.addControl(bt);
 
@@ -127,6 +127,35 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.panelSubsets.render();
                 }
             }
+
+            that.addNote_submit = function(content) {
+                var contentb64 = base64.encode(content);
+                DQX.serverDataStore(MetaData.serverUrl, contentb64, function (id) {
+                    DQX.customRequest(MetaData.serverUrl, PnServerModule, 'note_add',
+                        { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                        function (resp) {
+                            alert('Note uploaded!');
+                        });
+                });
+            }
+
+            that.addNote = function() {
+                var str = '';
+                var str = '';
+                var edt = Controls.Textarea('', { size: 80, linecount: 12, value: ''}).setHasDefaultFocus();
+                str += 'Text:<p>';
+                str += edt.renderHtml();
+                str += '<p>';
+
+                var btAdd = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-comment', width:130, height:45, content: 'Add note' }).setOnChanged(function () {
+                    that.addNote_submit(edt.getValue());
+                });
+                str += btAdd.renderHtml();
+
+
+                Popup.create('Add note', str);
+            }
+
 
 
             that.onClose = function() {
