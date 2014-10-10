@@ -45,7 +45,7 @@ Example python HDF5 creation code:
     quality[:,:] = my_array_of_quality
     outfile.close()
 
-We recommend using `VCFNP <https://github.com/alimanfoo/vcfnp>`_ for converting from VCF.
+We recommend using `VCFNP <https://github.com/alimanfoo/vcfnp>`_ for converting from VCF. See the `VCF example <https://github.com/cggh/panoptes/tree/master/sampledata/datasets/vcf_example>`_ for details of how to do this.
 
 
 See also
