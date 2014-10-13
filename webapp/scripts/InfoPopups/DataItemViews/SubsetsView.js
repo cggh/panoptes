@@ -2,11 +2,11 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map", "DQX/SVG",
-        "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
+        "DQX/Wizard", "DQX/Popup", "DQX/MessageBox", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
         "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
     ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, SVG,
-              Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
+              Wizard, Popup, MessageBox, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils
         ) {
 
@@ -156,7 +156,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             ev.preventDefault();
                             ev.stopPropagation();
                             var noteid = $(this).parent().attr('id').split('__')[1];
-                            if (confirm('Are you sure you want to delete this note?')) {
+                            MessageBox.confirmationBox('Are you sure you want to delete this note?', function() {
                                 DQX.setProcessing();
                                 DQX.customRequest(MetaData.serverUrl, PnServerModule, 'note_del',
                                     {
@@ -169,12 +169,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                                     function (resp) {
                                         DQX.stopProcessing();
                                         if (resp.error) {
-                                            alert(resp.error);
+                                            MessageBox.errorBox('Unable to remove note', resp.error);
                                             return;
                                         }
                                         that.setContentNotes();
                                     });
-                            }
+                            });
                         });
 
                         contentdiv.stop().animate({
