@@ -23,7 +23,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (!that.tableInfo.settings.DisableNotes) {
                     that.frameNotesGroup = Framework.FrameGroupVert('', 0.7).setMargins(0).setSeparatorSize(0);
                     that.frameGroup.addMemberFrame(that.frameNotesGroup);
-                    that.frameNotesButtons = Framework.FrameFinal('', 0.7).setFixedSize(Framework.dimY, 50).setAllowScrollBars(false, false);
+                    that.frameNotesButtons = Framework.FrameFinal('', 0.7).setFixedSize(Framework.dimY, 55).setAllowScrollBars(false, false);
                     that.frameNotesGroup.addMemberFrame(that.frameNotesButtons);
                     that.frameNotes = Framework.FrameFinal('', 0.7)
                         .setMargins(0);
@@ -38,14 +38,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.createPanels = function() {
+                that.itemid = initialItemData.fields[that.tableInfo.primkey];
+
                 if (!that.tableInfo.settings.DisableSubsets) {
                     that.panelSubsets = Framework.Form(that.frameSubsets).setPadding(7);
-                    that.setContent(initialItemData);
+                    that.setContentSubsets(initialItemData);
                 }
 
                 if (!that.tableInfo.settings.DisableNotes) {
+                    that.setContentNotes();
+                }
+
+
+                if (!that.tableInfo.settings.DisableNotes) {
                     //that.panelNotes = Framework.Form(that.frameNotes).setPadding(7);
-                    that.frameNotes.setContentHtml('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sed tempor nisi. Nulla cursus nibh ipsum, nec lacinia urna iaculis ut. Nam eleifend purus metus. Etiam ante neque, porttitor eget ullamcorper vel, tincidunt ut eros. Cras tempus eros vel condimentum congue. Pellentesque id gravida sapien. Cras ultrices sed quam in vehicula. Praesent nec quam aliquam, lobortis dolor nec, ullamcorper elit. Praesent lacus nulla, dignissim non egestas nec, tincidunt vitae nisl. Donec sed mauris rutrum, bibendum sapien nec, ornare nisi. Duis nec ligula nisi. Cras pellentesque, sem id porttitor varius, metus erat cursus urna, vel ultrices leo quam et massa. Curabitur ut rhoncus sem. Nullam tincidunt nulla non mauris vulputate tristique. Vestibulum faucibus tellus vitae sem eleifend, vitae condimentum arcu mattis. Praesent ultricies eros eu posuere porttitor. Quisque sed rutrum dui. Curabitur cursus sapien vulputate massa volutpat, eget condimentum tellus bibendum. ');
 
                     that.panelNotesButtons = Framework.Form(that.frameNotesButtons);
                     that.panelNotesButtons.setPadding(7);
@@ -58,7 +64,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             };
 
-            that.setContent = function(itemData) {
+            that.setContentSubsets = function(itemData) {
                 if (!that.tableInfo.settings.DisableSubsets) {
                     var subsetCheckList = [];
                     var subsetCheckMap = {};
@@ -120,21 +126,93 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             };
 
+            that.setContentNotes = function() {
+                if (that.tableInfo.settings.DisableNotes)
+                    return;
+
+                that.frameNotes.setContentHtml("<i>Downloading...</i>");
+                DQX.customRequest(MetaData.serverUrl, PnServerModule, 'note_getitemlist',
+                    {
+                        database: MetaData.database,
+                        workspaceid: MetaData.workspaceid,
+                        tableid: that.tableInfo.id,
+                        itemid: that.itemid
+                    },
+                    function (resp) {
+                        var str = "";
+                        for (var notenr = 0; notenr<resp.notes_id.length; notenr++) {
+                            str += '<div class="PnItemNote" id="{id}">'.DQXformat({id: 'note__'+resp.notes_id[notenr]});
+                            str += '<div class="PnItemHeaderText">' + resp.notes_timestamp[notenr]+' ';
+                            str += resp.notes_userid[notenr]+'</div>';
+                            str += resp.notes_content[notenr];
+                            str += '<img class="PnItemNoteDelete" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/delete.png'});
+                            str += '</div>';
+                        }
+                        that.frameNotes.setContentHtml(str);
+
+                        var contentdiv = $('#' + that.frameNotes.getClientDivID());
+
+                        contentdiv.find('.PnItemNoteDelete').click(function(ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            var noteid = $(this).parent().attr('id').split('__')[1];
+                            if (confirm('Are you sure you want to delete this note?')) {
+                                DQX.setProcessing();
+                                DQX.customRequest(MetaData.serverUrl, PnServerModule, 'note_del',
+                                    {
+                                        database: MetaData.database,
+                                        workspaceid: MetaData.workspaceid,
+                                        tableid: that.tableInfo.id,
+                                        itemid: that.itemid,
+                                        noteid: noteid
+                                    },
+                                    function (resp) {
+                                        DQX.stopProcessing();
+                                        if (resp.error) {
+                                            alert(resp.error);
+                                            return;
+                                        }
+                                        that.setContentNotes();
+                                    });
+                            }
+                        });
+
+                        contentdiv.stop().animate({
+                            scrollTop: contentdiv[0].scrollHeight
+                        }, 800);
+                    });
+
+            };
+
+
             that.update = function(newItemData) {
+                that.itemid = newItemData.fields[that.tableInfo.primkey];
+
                 if (!that.tableInfo.settings.DisableSubsets) {
                     that.panelSubsets.clear();
                     that.setContent(newItemData);
                     that.panelSubsets.render();
                 }
+
+                if (!that.tableInfo.settings.DisableNotes) {
+                    that.setContentNotes();
+                }
             }
 
             that.addNote_submit = function(content) {
-                var contentb64 = base64.encode(content);
-                DQX.serverDataStore(MetaData.serverUrl, contentb64, function (id) {
+                DQX.setProcessing();
+                DQX.serverDataStoreLong(MetaData.serverUrl, content, function (id) {
                     DQX.customRequest(MetaData.serverUrl, PnServerModule, 'note_add',
-                        { database: MetaData.database, workspaceid: MetaData.workspaceid, id: id },
+                        {
+                            database: MetaData.database,
+                            workspaceid: MetaData.workspaceid,
+                            tableid: that.tableInfo.id,
+                            itemid: that.itemid,
+                            noteid: id
+                        },
                         function (resp) {
-                            alert('Note uploaded!');
+                            DQX.stopProcessing();
+                            that.setContentNotes();
                         });
                 });
             }
@@ -148,12 +226,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 str += '<p>';
 
                 var btAdd = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-comment', width:130, height:45, content: 'Add note' }).setOnChanged(function () {
-                    that.addNote_submit(edt.getValue());
+                    var content = edt.getValue();
+                    content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                    that.addNote_submit(content);
+                    Popup.closeIfNeeded(popupid);
                 });
                 str += btAdd.renderHtml();
 
 
-                Popup.create('Add note', str);
+                var popupid = Popup.create('Add note', str);
             }
 
 

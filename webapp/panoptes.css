@@ -815,3 +815,36 @@ input.PnGenotypesPageEdit{
     font-size: 20px;
 }
 
+.PnItemNote
+{
+    padding: 9px;
+    margin-bottom:-1px;
+    border-top: 1px solid rgb(210,210,210);
+    border-bottom: 1px solid rgb(210,210,210);
+    position: relative;
+}
+
+.PnItemHeaderText
+{
+    font-size: 90%;
+    color: rgb(91,144,148);
+    padding-bottom: 3px;
+}
+
+
+.PnItemNoteDelete {
+    opacity:0.0;
+    position:absolute;
+    right: 4px;
+    top: 4px;
+    cursor : pointer;
+}
+
+.PnItemNote:hover .PnItemNoteDelete {
+    opacity: 0.75;
+}
+
+.PnItemNoteDelete:hover {
+    opacity: 1 !important;
+    background-color: rgb(255,255,100);
+}

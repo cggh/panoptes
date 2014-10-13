@@ -170,3 +170,12 @@ CREATE TABLE `introviews` (
   PRIMARY KEY (`id`)
 );
 
+CREATE TABLE `notes` (
+  `id` varchar(80),
+  `tableid` varchar(50),
+  `itemid` varchar(50),
+  `timestamp` varchar(50),
+  `userid` varchar(100),
+  `content` text,
+  PRIMARY KEY (`id`)
+);
