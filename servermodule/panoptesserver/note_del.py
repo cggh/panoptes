@@ -21,7 +21,7 @@ def response(returndata):
     noteid = DQXDbTools.ToSafeIdentifier(returndata['noteid'])
 
     ismanager = authorization.IsDataSetManager(credInfo, databaseName)
-    ismanager = False#!!! need to be removed
+    #ismanager = False#!!! need to be removed
 
 
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:

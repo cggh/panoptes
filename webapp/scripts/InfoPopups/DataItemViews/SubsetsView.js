@@ -144,8 +144,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             str += '<div class="PnItemNote" id="{id}">'.DQXformat({id: 'note__'+resp.notes_id[notenr]});
                             str += '<div class="PnItemHeaderText">' + resp.notes_timestamp[notenr]+' ';
                             str += resp.notes_userid[notenr]+'</div>';
-                            str += resp.notes_content[notenr];
                             str += '<img class="PnItemNoteDelete" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/delete.png'});
+                            str += resp.notes_content[notenr];
                             str += '</div>';
                         }
                         that.frameNotes.setContentHtml(str);
