@@ -41,6 +41,8 @@ def CanDo(credInfo, operation):
     authRules = PnAuthRuleSet()
 
     if authRules.Match(credInfo, operation.databaseName, PnAuthRule.edit):
+        if operation.OnTable('notes'):
+            return DQXDbTools.DbAuthorization(True)
         if operation.OnColumn('StoredSelection'):
             return DQXDbTools.DbAuthorization(True)
 

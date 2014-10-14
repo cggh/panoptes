@@ -23,6 +23,9 @@ def response(returndata):
     notes_userid = []
     notes_content = []
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+
+        returndata['canedit'] = cur.credentials.CanDo(DQXDbTools.DbOperationWrite(databaseName, 'notes'))
+
         sql = "SELECT `id`, `timestamp`, `userid`, `content` FROM notes WHERE (tableid='{tableid}') and (itemid='{itemid}') ORDER BY `timestamp`".format(
             tableid=tableid,
             itemid=itemid

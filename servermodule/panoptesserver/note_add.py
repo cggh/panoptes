@@ -25,7 +25,14 @@ def response(returndata):
 
     notestring = notestring.replace("'", "\\'")
 
+
+
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+
+        if not(cur.credentials.CanDo(DQXDbTools.DbOperationWrite(databaseName, 'notes'))):
+            returndata['error'] = 'You do not have the right privilege to add notes'
+            return returndata
+
         sql = "INSERT INTO notes VALUES ('{noteid}', '{tableid}', '{itemid}', '{timestamp}', '{userid}', '{content}')".format(
             noteid=noteid,
             tableid=tableid,

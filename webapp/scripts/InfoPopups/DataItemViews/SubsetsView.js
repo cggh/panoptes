@@ -140,6 +140,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     },
                     function (resp) {
                         var str = "";
+                        that.canEditNotes = resp.canedit;
                         for (var notenr = 0; notenr<resp.notes_id.length; notenr++) {
                             str += '<div class="PnItemNote" id="{id}">'.DQXformat({id: 'note__'+resp.notes_id[notenr]});
                             str += '<div class="PnItemHeaderText">' + resp.notes_timestamp[notenr]+' ';
@@ -212,12 +213,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         },
                         function (resp) {
                             DQX.stopProcessing();
+                            if (resp.error) {
+                                MessageBox.errorBox('Error', resp.error);
+                                return;
+                            }
                             that.setContentNotes();
                         });
                 });
             }
 
             that.addNote = function() {
+                if (!that.canEditNotes) {
+                    MessageBox.errorBox('Error', 'You do not have the right privilege to add notes');
+                    return;
+                }
                 var str = '';
                 var str = '';
                 var edt = Controls.Textarea('', { size: 80, linecount: 12, value: ''}).setHasDefaultFocus();
