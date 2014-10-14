@@ -6,6 +6,7 @@ import DQXDbTools
 import os
 import config
 import datetime
+import cgi
 #from DQXDbTools import DBCOLESC
 #from DQXDbTools import DBTBESC
 
@@ -23,6 +24,7 @@ def response(returndata):
         notestring = fp.read()
     os.remove(filename)
 
+    notestring = cgi.escape(notestring)
     notestring = notestring.replace("'", "\\'")
 
 
