@@ -146,7 +146,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             str += '<div class="PnItemHeaderText">' + resp.notes_timestamp[notenr]+' ';
                             str += resp.notes_userid[notenr]+'</div>';
                             str += '<img class="PnItemNoteDelete" SRC="{bmp}"/>'.DQXformat({bmp:'Bitmaps/actionbuttons/delete.png'});
-                            str += resp.notes_content[notenr];
+                            var notecontent =resp.notes_content[notenr];
+                            notecontent = notecontent.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                            str += notecontent;
                             str += '</div>';
                         }
                         that.frameNotes.setContentHtml(str);
@@ -236,7 +238,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 var btAdd = Controls.Button(null, { buttonClass: 'DQXToolButton2', icon:'fa-comment', width:130, height:45, content: 'Add note' }).setOnChanged(function () {
                     var content = edt.getValue();
-                    content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
                     that.addNote_submit(content);
                     Popup.closeIfNeeded(popupid);
                 });
