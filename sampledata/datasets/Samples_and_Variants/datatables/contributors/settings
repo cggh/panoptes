@@ -6,6 +6,8 @@ Description: The entities that contributed the samples
 
 Icon: fa-institution # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
 
+DisableNotes: true
+
 PrimKey: ID
 
 ItemTitle: <b>{{ID}}</b> {{Name}}

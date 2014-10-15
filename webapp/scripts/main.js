@@ -54,7 +54,7 @@ require([
     "MetaData",
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser",  "Views/TableViewer","Views/ListViewer",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "InfoPopups/PropInfoPopup",
-    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem",
+    "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem", "Wizards/FindNote",
     "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
 ],
     function (
@@ -62,7 +62,7 @@ require([
         MetaData,
         Initialise, Intro, GenomeBrowser, TableViewer, ListViewer,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PropInfoPopup,
-        PromptWorkspace, PromptDataSet, FindGene, FindDataItem,
+        PromptWorkspace, PromptDataSet, FindGene, FindDataItem, FindNote,
         Serialise, ButtonChoiceBox, PlotStarter
         ) {
         $(function () {
@@ -255,6 +255,11 @@ require([
                         // Create a custom 'navigation button' that will appear in the right part of the app header
                         Application.addNavigationButton('Find','fa-search', 70, function(){
                             var actions = [];
+
+                            actions.push( { content:'Find note', icon:'fa-comment', handler:function() {
+                                FindNote.execute();
+                            }
+                            });
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
                                 actions.push( { content:'Find gene', bitmap:'Bitmaps/GenomeBrowserSmall.png', handler:function() {

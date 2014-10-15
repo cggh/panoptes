@@ -177,5 +177,6 @@ CREATE TABLE `notes` (
   `timestamp` varchar(50),
   `userid` varchar(100),
   `content` text,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FULLTEXT (`content`)
 );
