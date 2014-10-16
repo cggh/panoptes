@@ -190,6 +190,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 return wc;
             }
 
+            //Returns a query clause that restricts to items having a note with specific text
+            table.createNoteWhereclause = function(notetext) {
+                var wc = SQL.WhereClause.NoteContains();
+                wc.NoteItemTable = table.id;
+                wc.PrimKey = table.primkey;
+                wc.NoteText = notetext;
+                return wc;
+            }
+
             table.createQueryDisplayString = function(qry) {
                 if ((!qry) || (qry.isTrivial))
                     return 'All';

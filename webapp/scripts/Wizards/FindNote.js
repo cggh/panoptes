@@ -126,7 +126,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         states.push({id:tableInfo.id, name:tableInfo.tableCapNamePlural});
                 });
                 that.ctrl_searchIn = Controls.Combo(null,{label:'', value:'_all_', states: states})
-                    .setOnChanged(that.updateQuery);
+                    .setOnChanged(function() {
+                        that.checkShowQueryButton();
+                        that.updateQuery();
+                    });
 
                 that.panelButtons = Framework.Form(that.frameButtons);
 
@@ -139,6 +142,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 grd.setItem(0, 2, Controls.Static('<b>Search in:</b>'));
                 grd.setItem(0, 3, that.ctrl_searchIn);
 
+                var bt = Controls.Button(null, {buttonClass: 'DQXToolButton2', content: 'Show as query'});
+                that.showQuery = Controls.ShowHide(bt);
+                that.showQuery.setVisible(false);
+                bt.setOnChanged(that.createQuery);
+                grd.setItem(0, 4, that.showQuery);
+
+
                 that.panelButtons.addControl(grd);
 
                 that.ctrl_comment = Controls.Html(null, '', 'PnItemNoteSearchComment');
@@ -147,9 +157,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.updateQuery();
                 //that.frameBody.setContentHtml('dfkjgfkjfgjk');
-
-
             };
+
+            that.checkShowQueryButton = function() {
+                var tableid = that.ctrl_searchIn.getValue();
+                that.showQuery.setVisible(tableid!='_all_');
+            }
+
+
+            that.createQuery = function() {
+                var tableid = that.ctrl_searchIn.getValue();
+                var tableInfo = MetaData.mapTableCatalog[tableid];
+                var query = tableInfo.createNoteWhereclause(that.ctrl_searchString.getValue());
+                Msg.send({type: 'DataItemTablePopup'}, {
+                    tableid: tableInfo.id,
+                    query: query,
+                    subSamplingOptions: null,
+                    title: tableInfo.tableCapNamePlural
+                });
+            }
 
             that.onClose = function() {
                 $.each(that.eventids,function(idx,eventid) {

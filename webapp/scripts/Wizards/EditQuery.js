@@ -27,6 +27,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var subsetList = that.tableInfo.storedSubsets;
                 that.builder = MetaData.getTableInfo(that.tableInfo.id).tableViewer.panelTable.createPanelAdvancedQuery(that.frameBody, function() {
                 }, true, {
+                    tableName: that.tableInfo.id,
                     subsetTableName: that.tableInfo.id+'_subsets',
                     primKey: that.tableInfo.primkey,
                     subsetList: subsetList
