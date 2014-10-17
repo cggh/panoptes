@@ -197,7 +197,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') || (prop.datatype=='Value') || (prop.datatype=='Date') ) )
-                        propList.push({ id:prop.propid, name:prop.name });
+                        propList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                 });
                 that.ctrlColorProperty = Controls.Combo(null,{ label:'Color:', states: propList, value:that.providedAspect2Property('pointcolor') }).setClassID('pointcolor');
                 that.ctrlColorProperty.setOnChanged(function() {

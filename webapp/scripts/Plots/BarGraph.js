@@ -57,7 +57,7 @@ define([
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
-                        propList.push({ id:prop.propid, name:prop.name });
+                        propList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                 });
                 that.ctrlCatProperty1 = Controls.Combo(null,{ label:'Group by:<br>', states: propList, value:that.providedAspect2Property('groupby') }).setClassID('groupby');
                 that.ctrlCatProperty1.setOnChanged(function() {

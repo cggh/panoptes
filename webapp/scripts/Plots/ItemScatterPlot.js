@@ -218,7 +218,7 @@ define([
                                     included = true;
                             }
                             if (included)
-                                propList.push({ id:prop.propid, name:prop.name });
+                                propList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                         });
                         plotAspect.picker = Controls.Combo(null, { label:plotAspect.name+':<br>', states: propList, value:that.providedAspect2Property(plotAspect.id) }).setClassID(plotAspect.id).setOnChanged( function() { that.fetchData(plotAspect.id)} );
                         plotAspect.propid = that.providedAspect2Property(plotAspect.id);

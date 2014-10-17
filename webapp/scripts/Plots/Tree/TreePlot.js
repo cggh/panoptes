@@ -72,9 +72,9 @@ define([
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
                     if ( (prop.tableid==that.tableInfo.id) ) {
-                        propList.push({ id:prop.propid, name:prop.name });
+                        propList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                         if (prop.isText)
-                            propListText.push({ id:prop.propid, name:prop.name });
+                            propListText.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                     }
                 });
                 that.ctrlValueLabel = Controls.Combo(null,{ label:'Label:<br>', states: propList, value:that.providedAspect2Property('label') }).setClassID('label');

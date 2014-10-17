@@ -51,13 +51,13 @@ define([
                 var numPropList = [ {id:'', name:'-- Select --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
-                        numPropList.push({ id:prop.propid, name:prop.name });
+                        numPropList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                 });
 
                 var catPropList = [ {id:'', name:'-- Select --'}];
                 $.each(MetaData.customProperties, function(idx, prop) {
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.datatype=='Text') || (prop.datatype=='Boolean') ) )
-                        catPropList.push({ id:prop.propid, name:prop.name });
+                        catPropList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                 });
                 
                 that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: numPropList, value:that.providedAspect2Property('value') }).setClassID('value');

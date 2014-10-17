@@ -54,7 +54,7 @@ define([
                 $.each(MetaData.customProperties, function(idx, prop) {
                     var included = false;
                     if ( (prop.tableid==that.tableInfo.id) && ( (prop.isFloat) ) )
-                        propList.push({ id:prop.propid, name:prop.name });
+                        propList.push({ id:prop.propid, name:prop.name, group:prop.group.Name });
                 });
                 that.ctrlValueProperty = Controls.Combo(null,{ label:'Value:<br>', states: propList, value:that.providedAspect2Property('value') }).setClassID('value');
                 that.ctrlValueProperty.setOnChanged(function() {
