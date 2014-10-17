@@ -299,10 +299,10 @@ def handler(start_response, request_data):
                         rows.sort(key=key_func, reverse=True)
                 else:
                     print "Unimplemented sort_mode"
+                row_pos_for_idx = dict(zip(row_idx, range(len(row_idx))))
                 #Now just get the row_idx to pass to 2d extract for the slice we need
                 row_idx = np.array(map(itemgetter(0), rows)[row_offset: row_offset+row_limit])
                 #Use this row idx to retieve the row data from the initial query
-                row_pos_for_idx = dict(zip(row_idx, range(len(row_idx))))
                 for name, array in row_result.items():
                     row_result[name] = array[[row_pos_for_idx[idx] for idx in row_idx]]
 
