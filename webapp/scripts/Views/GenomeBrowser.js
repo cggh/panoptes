@@ -766,6 +766,9 @@ define([
                             tableInfo.genomeBrowserColorChoice = Controls.Combo(null,{label:'Color: ', states: states, value:''}).setClassID('region_color_'+tableInfo.id);
                             tableInfo.genomeBrowserColorChoice.setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.dataFetcher.extrafield1 = tableInfo.genomeBrowserColorChoice.getValue();
+                                if (!tableInfo.genomeBrowserInfo.dataFetcher.extrafield1) {
+                                    tableInfo.genomeBrowserColorLegend.modifyValue('');
+                                }
                                 tableInfo.genomeBrowserInfo.dataFetcher.clearData();
                                 tableInfo.genomeBrowserInfo.regionChannel.funcMapExtraField2Color = function(lst) {
                                     var propInfo = MetaData.findProperty(tableInfo.id, tableInfo.genomeBrowserInfo.dataFetcher.extrafield1);
