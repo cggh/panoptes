@@ -45,6 +45,7 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              ctx.lineWidth = 1;
              var text_width = ctx.measureText('88/88').width;
              for (var j = 0, ref = model.row_index.length; j < ref; j++) {
+               var last_end = NaN;
                var r = model.row_index[j], y = (r * row_height);
                //Don't draw off screen genotypes
                if ((y + (row_height * 10) < clip.t) || (y - (row_height * 10) > clip.b))
@@ -73,11 +74,14 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
                  if (view.colour_channel == 'fraction') {
                    ctx.fillStyle = fraction > 0 ? that.fractional_colourmap[fraction] + alpha + ')' : that.fractional_colourmap[fraction];
                  }
-                 var spos = x_scale(pos[i]) - (snp_width * 0.5);
-                 if (snp_width > text_width + 38 && row_height >= 6)
-                   ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width - text_width), height * row_height);
-                 else
-                   ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), Math.ceil(snp_width), height * row_height);
+                 var spos = Math.floor(x_scale(pos[i]) - (snp_width * 0.5));
+                 var spos_end = Math.ceil(spos + ((snp_width > text_width + 38 && row_height >= 6) ? snp_width - text_width : snp_width));
+                 if (spos < last_end)
+                   spos = last_end;
+                 last_end = spos_end;
+                 if (spos >= spos_end)
+                   continue;
+                 ctx.fillRect(spos, y + ((1 - height) * row_height * 0.5), spos_end-spos, height * row_height);
                }
                //Genotype text
                if (snp_width > text_width + 38 && row_height >= 6) {

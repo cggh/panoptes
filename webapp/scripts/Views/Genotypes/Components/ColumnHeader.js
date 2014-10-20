@@ -26,6 +26,7 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
         ctx.fillStyle = 'rgb(0,0,0)';
         ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.lineWidth = 1;
+        var last_end = NaN;
         for (var i = 0, end = pos.length; i < end; ++i) {
           var p = pos[i];
           var key = col_primary_key[i];
@@ -35,16 +36,24 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
               var colour = 'rgba(190,80,80, 0.75)';
               ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
           }
-            ctx.fillStyle = colour;
-            var labelH = 0;
-            var curveH = that.height-labelH;
+          ctx.fillStyle = colour;
+          var labelH = 0;
+          var curveH = that.height-labelH;
+          var spos = Math.floor(scale(p) - (snp_width * 0.5));
+          var spos_end = Math.ceil(spos + (snp_width));
+          if (spos < last_end)
+            spos = last_end;
+          last_end = spos_end;
+          var width = spos_end - spos;
+          var middle = Math.round(width/2);
+
           if (alpha > 0) {
             ctx.save();
-            ctx.translate(scale(p) - 0.5 * snp_width, curveH);
+            ctx.translate(spos, curveH);
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(0, -10, 0.5 * snp_width, -10, 0.5 * snp_width, -curveH);
-            ctx.bezierCurveTo(0.5 * snp_width, -10, snp_width, -10, snp_width, 0);
+            ctx.bezierCurveTo(0, -10, middle, -10, middle, -curveH);
+            ctx.bezierCurveTo(middle, -10, width, -10, width, 0);
             ctx.closePath();
             ctx.lineWidth = 1;
             ctx.fill();
@@ -52,8 +61,8 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
             if (labelH>0) {
               ctx.beginPath();
               ctx.moveTo(0, 0);
-              ctx.lineTo(snp_width, 0);
-              ctx.lineTo(snp_width, that.height - curveH);
+              ctx.lineTo(width, 0);
+              ctx.lineTo(width, that.height - curveH);
               ctx.lineTo(0, that.height - curveH);
               ctx.closePath();
               ctx.stroke();
@@ -71,8 +80,9 @@ define(["tween", "DQX/Utils", "DQX/Msg"],
           } else {
             ctx.save();
             ctx.beginPath();
-            ctx.moveTo(scale(p), 0);
-            ctx.bezierCurveTo(scale(p), that.height, scale(p), that.height, scale(p), that.height);
+            ctx.moveTo(Math.round(spos + (width/2)), 0);
+            //ctx.bezierCurveTo(spos + (width/2), that.height, spos + (width/2), that.height, spos + (width/2), that.height);
+            ctx.lineTo(Math.round(spos + (width/2)), that.height);
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
