@@ -89,8 +89,8 @@ define(['_', 'd3',
                 ctx.fillText('0.5', 5+((ctx.canvas.width-10)/2), 49);
                 ctx.fillText('0', ctx.canvas.width-5, 49);
                 var grd = ctx.createLinearGradient(0, 0, ctx.canvas.width-10, 10);
-                grd.addColorStop(0, 'hsl(240,100%,35%');
-                grd.addColorStop(1, 'hsl(360,100%,35%');
+                grd.addColorStop(0, 'hsl(240,100%,35%)');
+                grd.addColorStop(1, 'hsl(360,100%,35%)');
                 ctx.fillStyle = grd;
                 ctx.fillRect(5,37,ctx.canvas.width-10, 10);
                 }
