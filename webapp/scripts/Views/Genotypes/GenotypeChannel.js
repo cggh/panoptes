@@ -129,7 +129,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 if (that.model.settings.Call)
                     cell_colour_states.push({id:'call', name:'Call'});
                 if (that.model.settings.AlleleDepth)
-                    cell_colour_states.push({id:'fraction', name:'Ref Read Fraction'});
+                    cell_colour_states.push({id:'fraction', name:'Alt Read Fraction'});
                 var colour_channel = Controls.Combo(null, { label:'', states:cell_colour_states, width:controlWidth })
                     .bindToModel(view_params, 'colour_channel').setClassID(that.table_info.id + 'ChannelColour');
                 controlsGridData.push({ label:'Cell', ctrl: colour_channel });

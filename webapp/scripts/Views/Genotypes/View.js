@@ -83,11 +83,11 @@ define(['_', 'd3',
                 ctx.fillText('Het', 20, 55);
                 }
                 if (that.colour_channel ==  'fraction'){
-                ctx.fillText('Ref fraction:', 5, 25);
+                ctx.fillText('Alt read fraction:', 5, 25);
                 ctx.textAlign = 'center';
-                ctx.fillText('1', 5, 49);
+                ctx.fillText('0', 5, 49);
                 ctx.fillText('0.5', 5+((ctx.canvas.width-10)/2), 49);
-                ctx.fillText('0', ctx.canvas.width-5, 49);
+                ctx.fillText('1', ctx.canvas.width-5, 49);
                 var grd = ctx.createLinearGradient(0, 0, ctx.canvas.width-10, 10);
                 grd.addColorStop(0, 'hsl(240,100%,35%');
                 grd.addColorStop(1, 'hsl(360,100%,35%');
