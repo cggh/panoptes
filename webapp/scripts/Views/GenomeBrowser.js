@@ -5,12 +5,12 @@ define([
     "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame",
     "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence", "DQX/ChannelPlot/ChannelAnnotation", "DQX/ChannelPlot/ChannelMultiCatDensity",
     "DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary", "DQX/DataFetcher/DataFetcherAnnotation",
-    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/GenotypeChannel", "Views/Genotypes/Components/AssemblyChannel"
+    "Wizards/EditTableBasedSummaryValues", "MetaData", "Utils/QueryTool", "Views/Genotypes/GenotypeChannel", "Views/Alignment/AlignmentChannel"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame,
               GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, ChannelAnnotation, ChannelMultiCatDensity,
               DataFetchers, DataFetcherSummary, DataFetcherAnnotation,
-              EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel, AssemblyChannel
+              EditTableBasedSummaryValues, MetaData, QueryTool, GenotypeChannel, AlignmentChannel
         ) {
 
         var GenomeBrowserModule = {
@@ -840,7 +840,7 @@ define([
 
                     //Add assembly channel
                     $.each(MetaData.mapTableCatalog,function(tableid,table_info) {
-                      if (!table_info.settings.Assembly) {
+                      if (!table_info.settings.Alignment) {
                         return;
                       }
                       var controls_group = Controls.CompoundVert([]).setMargin(0);
@@ -848,7 +848,9 @@ define([
                         title: table_info.tableCapNameSingle + ' Assembly',
                         headerStyleClass: 'GenomeBrowserMainSectionHeader'
                       }));
-                      var the_channel = AssemblyChannel.Channel(table_info, 'AC0090_C', controls_group, that.panelBrowser);
+                      var sample_id = 'PH0745_C';
+                      var the_channel = AlignmentChannel.Channel(table_info.id+'_'+sample_id+'_alignment', table_info.settings.Alignment.URL, table_info.settings.Alignment.Set, sample_id, controls_group, that.panelBrowser);
+                      the_channel.setMaxViewportSizeX(table_info.settings.Alignment.GenomeMaxViewportSizeX);
                       that.panelBrowser.addChannel(the_channel, false);//Add the channel to the browser
                     });
 

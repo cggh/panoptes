@@ -13,7 +13,7 @@ define(['_', 'd3',
     function (_, d3, Container, TabContainer, ColumnHeader, GenotypesTable, Link, Gradient, SamplesHeader) {
         return function View(initial_params) {
             var that = {};
-            that.init = function(inital_params) {
+            that.init = function(initial_params) {
                 that.col_header_height = 30;
                 that.link_height = 40;
                 that.row_header_width = 150;

@@ -8,6 +8,11 @@ IsPositionOnGenome: false
 FetchRecordCount: true
 QuickFindFields: ID
 
+Alignment:
+  URL: http://localhost:9000
+  Set: test
+  GenomeMaxViewportSizeX: 50000
+
 Properties:
 
 - Id: ID

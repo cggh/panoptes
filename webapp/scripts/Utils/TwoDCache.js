@@ -135,7 +135,7 @@ define(["Utils/RequestCounter", "Utils/Interval"],
             result.twoD[prop] = [that.twoD_col_slice(array, start_index, end_index)];
           });
           //Then add in the intervals that are fully covered
-          for (i = 1; i < matching_intervals_with_data.length - 1; i++) {
+          for (var i = 1; i < matching_intervals_with_data.length - 1; i++) {
             interval = matching_intervals_with_data[i];
             _.forEach(interval.col, function (array, prop) {
               result.col[prop].push(array);
