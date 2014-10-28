@@ -27,13 +27,8 @@ define(['_', 'd3',
         var chunks = model.chunks;
         var start = model.start;
         var end = model.end;
-        that.scale.domain([start, end]).range([0,clip.r - clip.l]);
-        ctx.save();
-        ctx.font = "" + row_height + "px monospace";
-        ctx.textBaseline = 'bottom';
-        ctx.textAlign = 'left';
-        ctx.strokeStyle = 'rgb(40,40,40)';
-        ctx.fillStyle = 'rgb(140,140,140)';
+        var scale = that.scale;
+        that.scale.domain([start-0.5, end-0.5]).range([0,clip.r - clip.l]);
 
         //First try to lay everything out so we know how high we are going to go.
         //This array keeps track of the point at which a row becomes free
@@ -41,7 +36,7 @@ define(['_', 'd3',
         //Store the final row position of each read.
         var rows = [];
         for (var c = 0; c < chunks.length; c++) {
-          var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array, seqs = chunks[c].seq.array[0];
+          var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
           for (var r = 0; r < lens.length; r++) {
             var len = lens[r], pos = poss[r];
             //Skip reads outside the display and For chunks other than the first skip reads starting before the chunk
@@ -60,10 +55,20 @@ define(['_', 'd3',
         }
         //Now we know how many rows we need we can set the row height
         var row_height = that.height/row_reservations.length;
-        //Loop again to draw
+        var base_width = scale(1) - scale(0);
+
+        ctx.save();
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = 'rgb(40,40,40)';
+        ctx.fillStyle = 'rgb(140,140,140)';
+
+        ctx.font =  Math.floor(Math.min(row_height, base_width))-2 + 'px monospace';
+
         var read = 0;
+        //Loop again to draw
         for (var c = 0; c < chunks.length; c++) {
-          chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array
+          chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
           var seqs = chunks[c].seq.array[0];
           var seq_start = 0;
           for ( r = 0; r < lens.length; r++) {
@@ -74,9 +79,13 @@ define(['_', 'd3',
               continue;
             }
             row = rows[read];
-            //  ctx.fillText(seqs.slice(seq_start, seq_start+len), that.scale(pos), that.height - row*row_height);
-            ctx.fillRect(that.scale(pos), that.height - row*row_height - row_height, that.scale(len)-that.scale(0), row_height);
-            ctx.strokeRect(that.scale(pos), that.height - row*row_height - row_height, that.scale(len)-that.scale(0), row_height);
+            ctx.fillStyle = 'rgb(140,140,140)';
+            ctx.fillRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
+            ctx.strokeRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
+            var seq = seqs.slice(seq_start, seq_start+len);
+            ctx.fillStyle = 'rgb(40,40,40)';
+            for (var s = 0; s < seq.length; s++)
+              ctx.fillText(seq[s], scale(pos+s)+(base_width/2), that.height - row*row_height - row_height/2);
             seq_start += len;
             read++
           }
