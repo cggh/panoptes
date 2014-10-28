@@ -8,7 +8,7 @@ define(['_', 'd3',
     return function View(initial_params) {
       var that = {};
       that.init = function (initial_params) {
-        that.height = 300;
+        that.height = 200;
         that.scale =  d3.scale.linear();
 
         //Vars set by params
@@ -29,7 +29,6 @@ define(['_', 'd3',
         var end = model.end;
         that.scale.domain([start, end]).range([0,clip.r - clip.l]);
         ctx.save();
-        var row_height = 5;//Math.floor(that.scale(1) - that.scale(0));
         ctx.font = "" + row_height + "px monospace";
         ctx.textBaseline = 'bottom';
         ctx.textAlign = 'left';
@@ -39,21 +38,15 @@ define(['_', 'd3',
         //First try to lay everything out so we know how high we are going to go.
         //This array keeps track of the point at which a row becomes free
         var row_reservations = [];
+        //Store the final row position of each read.
+        var rows = [];
         for (var c = 0; c < chunks.length; c++) {
           var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array, seqs = chunks[c].seq.array[0];
-          var seq_start = 0;
           for (var r = 0; r < lens.length; r++) {
             var len = lens[r], pos = poss[r];
-            //Skip reads outside the display
-            if (pos+len < start) {
-              seq_start += len;
+            //Skip reads outside the display and For chunks other than the first skip reads starting before the chunk
+            if (pos+len < start || pos > end || (c != 0 && pos < chunk.start))
               continue;
-            }
-            //For chunks other than the first skip reads starting before the chunk
-            if (c != 0 && pos < chunk.start) {
-              seq_start += len;
-              continue;
-            }
             //Find the first slot that is empty
             var row = _.findIndex(row_reservations, function(row_taken_until) {
               return row_taken_until < pos;
@@ -62,12 +55,33 @@ define(['_', 'd3',
               row = row_reservations.length;
             //Mark the row as reserved until we end
             row_reservations[row] = pos+len;
-          //  ctx.fillText(seqs.slice(seq_start, seq_start+len), that.scale(pos), that.height - row*row_height);
+            rows.push(row);
+          }
+        }
+        //Now we know how many rows we need we can set the row height
+        var row_height = that.height/row_reservations.length;
+        //Loop again to draw
+        var read = 0;
+        for (var c = 0; c < chunks.length; c++) {
+          chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array
+          var seqs = chunks[c].seq.array[0];
+          var seq_start = 0;
+          for ( r = 0; r < lens.length; r++) {
+            len = lens[r], pos = poss[r];
+            //Skip reads outside the display
+            if (pos+len < start || pos > end || (c != 0 && pos < chunk.start)) {
+              seq_start += len;
+              continue;
+            }
+            row = rows[read];
+            //  ctx.fillText(seqs.slice(seq_start, seq_start+len), that.scale(pos), that.height - row*row_height);
             ctx.fillRect(that.scale(pos), that.height - row*row_height - row_height, that.scale(len)-that.scale(0), row_height);
             ctx.strokeRect(that.scale(pos), that.height - row*row_height - row_height, that.scale(len)-that.scale(0), row_height);
             seq_start += len;
+            read++
           }
         }
+
         ctx.restore();
       };
 
