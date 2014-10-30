@@ -37,7 +37,7 @@ define(['_', 'd3',
         //Store the final row position of each read.
         var rows = [];
         for (var c = 0; c < chunks.length; c++) {
-          var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
+          var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array
           for (var r = 0; r < lens.length; r++) {
             var len = lens[r], pos = poss[r];
             //Skip reads outside the display and For chunks other than the first skip reads starting before the chunk
@@ -69,11 +69,13 @@ define(['_', 'd3',
         //Loop again to draw
         for (var c = 0; c < chunks.length; c++) {
           chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
+          var cigars = chunks[c].cigar.array;
           var ref = chunks[c].ref_seq;
           var seqs = chunks[c].seq.array[0];
           var seq_start = 0;
           for ( r = 0; r < lens.length; r++) {
             len = lens[r], pos = poss[r];
+            var cigar = cigars[r];
             //Skip reads outside the display
             if (pos + len < start || pos > end || (c != 0 && pos < chunk.start)) {
               seq_start += len;
@@ -88,6 +90,10 @@ define(['_', 'd3',
             ctx.fillStyle = 'rgb(180,0,0)';
             for (var s = 0; s < seq.length; s++)
               if (seq[s] != ref_slice[s])
+                ctx.fillRect(Math.round(scale(pos + s)), height - row * row_height - row_height, Math.round(base_width), row_height);
+            ctx.fillStyle = 'rgb(40,40,40)';
+            for (var s = 0; s < seq.length; s++)
+              if (seq[s] === 'N')
                 ctx.fillRect(Math.round(scale(pos + s)), height - row * row_height - row_height, Math.round(base_width), row_height);
 
             if (fontsize >= 3) {
