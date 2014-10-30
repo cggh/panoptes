@@ -8,7 +8,6 @@ import DQXUtils
 import config
 import shutil
 import SettingsLoader
-import ImpUtils
 from ProcessDatabase import ProcessDatabase
 from ProcessFilterBank import ProcessFilterBank
 
@@ -80,50 +79,7 @@ class ImportDataTable(BaseImport):
         return tableSettings, properties
                 
 
-    def createSummaryFilterBank(self, tableid, summSettings, summaryid):
-        global config
-        if self._getImportSetting('ScopeStr') == 'all':
-            itemtracknr = 0
-            parentdir = os.path.join(self._datatablesFolder, tableid, summaryid)
-            for fileid in os.listdir(parentdir):
-                fileName = os.path.join(parentdir, fileid)
-                if not (os.path.isdir(fileName)):
-                    itemtracknr += 1
-                    self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
-                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, 'TableTracks', tableid, summaryid, fileid)
-                    self._log('Destination: ' + destFolder)
-                    if not os.path.exists(destFolder):
-                        os.makedirs(destFolder)
-                    shutil.copyfile(fileName, os.path.join(destFolder, summaryid + '_' + fileid))
-                    ImpUtils.ExecuteFilterbankSummary_Value(self._calculationObject, destFolder, summaryid + '_' + fileid, summSettings)
 
-
-    def createTableBasedSummaryValues(self, tableid, tableSettings):
-        sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
-        self._execSql(sql)
-        if tableSettings.HasToken('TableBasedSummaryValues'):
-            self._log('Processing table-based summary values')
-            if not type(tableSettings['TableBasedSummaryValues']) is list:
-                raise Exception('TableBasedSummaryValues token should be a list')
-            for stt in tableSettings['TableBasedSummaryValues']:
-                summSettings = SettingsLoader.SettingsLoader()
-                summSettings.LoadDict(stt)
-                summSettings.AddTokenIfMissing('MinVal', 0)
-                summSettings.AddTokenIfMissing('BlockSizeMin', 1)
-                summSettings.DefineKnownTokens(['channelColor'])
-                summaryid = summSettings['Id']
-                with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
-                    extraSummSettings = summSettings.Clone()
-                    extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                    sql = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)".format(tableid, 
-                        summaryid, 
-                        summSettings['Name'], 
-                        extraSummSettings.ToJSON(), 
-                        summSettings['MinVal'], 
-                        summSettings['MaxVal'], 
-                        summSettings['BlockSizeMin'])
-                    self._execSql(sql)
-                    self.createSummaryFilterBank(tableid, summSettings, summaryid)
 
     def ImportDataTable(self, tableid):
         
@@ -200,10 +156,9 @@ class ImportDataTable(BaseImport):
             filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
             filterBanker.createSummaryValues(tableid)
            
-            if not self._importSettings['ConfigOnly']:
-                importer.cleanUp()
+            importer.cleanUp()
     
-            self.createTableBasedSummaryValues(tableid, tableSettings)
+            filterBanker.createTableBasedSummaryValues(tableid)
                 
             self.importGraphs(tableid)
 
