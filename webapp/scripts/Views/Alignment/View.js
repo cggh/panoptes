@@ -28,6 +28,7 @@ define(['_', 'd3',
         var start = model.start;
         var end = model.end;
         var scale = that.scale;
+        var height = that.height;
         that.scale.domain([start-0.5, end-0.5]).range([0,clip.r - clip.l]);
 
         //First try to lay everything out so we know how high we are going to go.
@@ -54,16 +55,15 @@ define(['_', 'd3',
           }
         }
         //Now we know how many rows we need we can set the row height
-        var row_height = that.height/row_reservations.length;
+        var row_height = Math.min(Math.floor(that.height/row_reservations.length), 20);
         var base_width = scale(1) - scale(0);
+        var fontsize = Math.max(1, Math.floor(Math.min(row_height, base_width/0.5))-2);
 
         ctx.save();
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         ctx.strokeStyle = 'rgb(40,40,40)';
         ctx.fillStyle = 'rgb(140,140,140)';
-
-        ctx.font =  Math.max(1, Math.floor(Math.min(row_height, base_width))-2) + 'px monospace';
 
         var read = 0;
         //Loop again to draw
@@ -75,25 +75,26 @@ define(['_', 'd3',
           for ( r = 0; r < lens.length; r++) {
             len = lens[r], pos = poss[r];
             //Skip reads outside the display
-            if (pos+len < start || pos > end || (c != 0 && pos < chunk.start)) {
+            if (pos + len < start || pos > end || (c != 0 && pos < chunk.start)) {
               seq_start += len;
               continue;
             }
             row = rows[read];
-            ctx.fillStyle = 'rgb(140,140,140)';
-            ctx.fillRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
-            ctx.strokeRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
-            var seq = seqs.slice(seq_start, seq_start+len);
+            //TODO Fair Integer pixel allocation similar to genotypes
+            ctx.fillStyle = 'rgb(0,55,135)';
+            ctx.fillRect(scale(pos), height - row * row_height - row_height, scale(len) - scale(0), row_height);
+            var seq = seqs.slice(seq_start, seq_start + len);
             var ref_slice = ref.slice(pos - chunk.start, pos - chunk.start + len);
-            ctx.fillStyle = 'rgb(40,40,40)';
-            for (var s = 0; s < seq.length; s++) {
+            ctx.fillStyle = 'rgb(180,0,0)';
+            for (var s = 0; s < seq.length; s++)
               if (seq[s] != ref_slice[s])
-                ctx.fillStyle = 'rgb(255,0,0)';
+                ctx.fillRect(Math.round(scale(pos + s)), height - row * row_height - row_height, Math.round(base_width), row_height);
 
-              ctx.fillText(seq[s], scale(pos + s) + (base_width / 2), that.height - row * row_height - row_height / 2);
-
-              if (seq[s] != ref_slice[s])
-                ctx.fillStyle = 'rgb(40,40,40)';
+            if (fontsize >= 3) {
+              ctx.font = fontsize + 'px monospace';
+              ctx.fillStyle = 'rgb(255,255,255)';
+              for (var s = 0; s < seq.length; s++)
+                ctx.fillText(seq[s], scale(pos + s) + (base_width / 2), that.height - row * row_height - row_height / 2);
             }
             seq_start += len;
             read++
