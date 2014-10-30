@@ -19,17 +19,19 @@ def BoolIsTrueish(val):
 
 
 class SettingsLoader:
-    def __init__(self, fileName = None):
+    def __init__(self, fileName = None, log = True):
         if fileName is not None:
             self.fileName = fileName
             with open(self.fileName, 'r') as configfile:
-                print('Loading settings from: '+fileName)
+                if log:
+                    print('Loading settings from: '+fileName)
                 try:
                     self.settings = yaml.load(configfile.read())
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
                     raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
-                print('Settings: '+str(self.settings))
+                if log:
+                    print('Settings: '+str(self.settings))
         else:
             self.fileName = ''
 
