@@ -63,12 +63,13 @@ define(['_', 'd3',
         ctx.strokeStyle = 'rgb(40,40,40)';
         ctx.fillStyle = 'rgb(140,140,140)';
 
-        ctx.font =  Math.floor(Math.min(row_height, base_width))-2 + 'px monospace';
+        ctx.font =  Math.max(1, Math.floor(Math.min(row_height, base_width))-2) + 'px monospace';
 
         var read = 0;
         //Loop again to draw
         for (var c = 0; c < chunks.length; c++) {
           chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
+          var ref = chunks[c].ref_seq;
           var seqs = chunks[c].seq.array[0];
           var seq_start = 0;
           for ( r = 0; r < lens.length; r++) {
@@ -83,9 +84,17 @@ define(['_', 'd3',
             ctx.fillRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
             ctx.strokeRect(scale(pos), that.height - row*row_height - row_height, scale(len)-scale(0), row_height);
             var seq = seqs.slice(seq_start, seq_start+len);
+            var ref_slice = ref.slice(pos - chunk.start, pos - chunk.start + len);
             ctx.fillStyle = 'rgb(40,40,40)';
-            for (var s = 0; s < seq.length; s++)
-              ctx.fillText(seq[s], scale(pos+s)+(base_width/2), that.height - row*row_height - row_height/2);
+            for (var s = 0; s < seq.length; s++) {
+              if (seq[s] != ref_slice[s])
+                ctx.fillStyle = 'rgb(255,0,0)';
+
+              ctx.fillText(seq[s], scale(pos + s) + (base_width / 2), that.height - row * row_height - row_height / 2);
+
+              if (seq[s] != ref_slice[s])
+                ctx.fillStyle = 'rgb(40,40,40)';
+            }
             seq_start += len;
             read++
           }

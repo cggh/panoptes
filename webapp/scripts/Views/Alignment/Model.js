@@ -1,8 +1,8 @@
 // This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["_", "Utils/Cache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
-  function (_, Cache, MetaData, ArrayBufferClient, SQL) {
+define(["_", "async", "Utils/Cache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
+  function (_, async, Cache, MetaData, ArrayBufferClient, SQL) {
     return function Model(update_callback, initial_params) {
       var that = {};
       that.init = function (update_callback, initial_params) {
@@ -65,23 +65,60 @@ define(["_", "Utils/Cache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
         that.refresh_data();
       };
 
-      that.data_provider = function (skey, callback) {
-        var key = JSON.parse(skey);
+      that.read_provider = function(key, callback) {
         var myurl = that.bamserve_url + '/bam/' +
           that.bam_set + '/' +
           that.sample_id + '/' +
           key.chrom + '/' +
           key.start + '/' +
           key.end;
-
         ArrayBufferClient.request(myurl,
           function (data) {
-            data.start = key.start;
-            data.end = key.end;
-            callback(skey, data);
+            callback(null, data);
           },
           function (error) {
-            callback(skey, null);
+            callback(error);
+          }
+        );
+      };
+
+      that.seq_provider = function(key, callback) {
+        //prepare the url
+        var myurl = DQX.Url(MetaData.serverUrl);
+        myurl.addUrlQueryItem("datatype", 'summinfo');
+        myurl.addUrlQueryItem("dataid", key.chrom);
+        myurl.addUrlQueryItem("ids", 'SummaryTracks/' + MetaData.database+'/Sequence~Summ~Base_avg');
+        myurl.addUrlQueryItem("blocksize", 1);
+        myurl.addUrlQueryItem("blockstart", key.start);
+        myurl.addUrlQueryItem("blockcount", key.end - key.start);
+        var urlstring = myurl.toString();
+        $.ajax({
+          url: urlstring,
+          success: function (data) {
+            callback(null, {ref_seq: data.results['SummaryTracks/'+MetaData.database+'/Sequence_Summ_Base_avg'].data});
+          },
+          error: function (error) { callback(error) }
+        });
+      };
+
+
+      that.data_provider = function (skey, callback) {
+        var key = JSON.parse(skey);
+        async.parallel({
+            reads: function (callback) {
+              that.read_provider(key, callback);
+            },
+            ref_seq: function (callback) {
+              that.seq_provider(key, callback);
+            }
+          },
+          function (err, results) {
+            if (err)
+              callback(null);
+            var data = _.extend({}, key);
+            _.extend(data, results.reads);
+            _.extend(data, results.ref_seq);
+            callback(skey, data);
           }
         );
       };
@@ -92,3 +129,5 @@ define(["_", "Utils/Cache", "MetaData", "DQX/ArrayBufferClient", "DQX/SQL"],
     };
   }
 );
+
+

@@ -20,8 +20,8 @@ require.config({
         tween: "Externals/Tween",
         datastream: "DQX/Externals/DataStream",
         blob: "DQX/Externals/Blob",
-        filesaver: "DQX/Externals/FileSaver"
-
+        filesaver: "DQX/Externals/FileSaver",
+        async: "Externals/async"
     },
     shim: {
         d3: {
