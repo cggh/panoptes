@@ -162,11 +162,10 @@ class ImportCustomData(BaseImport):
                     importer._sourceId = self._sourceId
             
                     tableSettings = {'PrimKey': primkey}
-                    loader = importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), properties = properties, loadSettings = tableSettings, addPrimaryKey = True)
-                    loader.join()
-                    if loader.status is not None:
-                        self._log(loader.status)
-                        raise Exception("Database loading failed")
+                    importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), properties = properties, loadSettings = tableSettings, addPrimaryKey = True)
+                    
+                    importer.cleanUp()
+                    
 
                     print('Checking column existence')
                     existingcols = []
