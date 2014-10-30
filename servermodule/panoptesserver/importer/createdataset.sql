@@ -17,25 +17,25 @@ CREATE TABLE `annotation` (
 );
 
 CREATE TABLE `chromosomes` (
-  `id` varchar(20),
+  `id` varchar(255),
   `len` float
 );
 
 
 CREATE TABLE `externallinks` (
-  `linktype` varchar(20),
-  `linkname` varchar(50),
-  `linkurl` varchar(200)
+  `linktype` varchar(255),
+  `linkname` varchar(255),
+  `linkurl` varchar(2000)
 );
 
 
  CREATE TABLE `propertycatalog` (
-  `workspaceid` varchar(50),
-  `source` varchar(50),
-  `datatype` varchar(20),
-  `propid` varchar(50),
-  `tableid` varchar(20),
-  `name` varchar(50),
+  `workspaceid` varchar(255),
+  `source` varchar(255),
+  `datatype` varchar(255),
+  `propid` varchar(255),
+  `tableid` varchar(255),
+  `name` varchar(255),
   `ordr`  int(11) NOT NULL AUTO_INCREMENT,
   `settings` text,
   PRIMARY KEY (`ordr`)
@@ -43,34 +43,34 @@ CREATE TABLE `externallinks` (
 
 
 CREATE TABLE `settings` (
-  `id` varchar(20),
+  `id` varchar(255),
   `content` text
 );
 
 CREATE TABLE `storedqueries` (
-  `id` varchar(50),
-  `name` varchar(50),
-  `tableid` varchar(50),
-  `workspaceid` varchar(50),
+  `id` varchar(255),
+  `name` varchar(255),
+  `tableid` varchar(255),
+  `workspaceid` varchar(255),
   `content` text
 );
 
 CREATE TABLE `storedsubsets` (
   `subsetid` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(150),
-  `tableid` varchar(50),
-  `workspaceid` varchar(50),
+  `name` varchar(255),
+  `tableid` varchar(255),
+  `workspaceid` varchar(255),
   `membercount` int,
   PRIMARY KEY (`subsetid`)
 );
 
 
 CREATE TABLE `summaryvalues` (
-  `workspaceid` varchar(50),
-  `source` varchar(20),
-  `propid` varchar(20),
-  `tableid` varchar(20),
-  `name` varchar(50),
+  `workspaceid` varchar(255),
+  `source` varchar(255),
+  `propid` varchar(255),
+  `tableid` varchar(255),
+  `name` varchar(255),
   `ordr` int,
   `settings` text,
   `minval` float,
@@ -80,10 +80,10 @@ CREATE TABLE `summaryvalues` (
 
 
 CREATE TABLE `tablebasedsummaryvalues` (
-  `tableid` varchar(50),
-  `trackid` varchar(50),
-  `trackname` varchar(50),
-  `settings` varchar(5000),
+  `tableid` varchar(255),
+  `trackid` varchar(255),
+  `trackname` varchar(255),
+  `settings` text,
   `minval` float,
   `maxval` float,
   `minblocksize` int,
@@ -93,89 +93,89 @@ CREATE TABLE `tablebasedsummaryvalues` (
 
 
  CREATE TABLE `graphs` (
-  `graphid` varchar(50),
-  `tableid` varchar(20),
-  `tpe` varchar(20),
-  `dispname` varchar(50),
+  `graphid` varchar(255),
+  `tableid` varchar(255),
+  `tpe` varchar(255),
+  `dispname` varchar(255),
   `settings` text,
-  `crosslnk` varchar(50),
+  `crosslnk` varchar(255),
   `ordr`  int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`ordr`)
 );
 
 
 CREATE TABLE `tablecatalog` (
-  `id` varchar(20),
-  `name` varchar(50),
-  `primkey` varchar(20),
+  `id` varchar(255),
+  `name` varchar(255),
+  `primkey` varchar(255),
   `IsPositionOnGenome` int,
   `settings` text,
   `ordr` int
 );
 
 CREATE TABLE `customdatacatalog` (
-  `tableid` varchar(20),
-  `sourceid` varchar(50),
+  `tableid` varchar(255),
+  `sourceid` varchar(255),
   `settings` text
 );
 
 CREATE TABLE `relations` (
-  `childtableid` varchar(40),
-  `childpropid` varchar(40),
-  `parenttableid` varchar(40),
-  `parentpropid` varchar(40),
-  `forwardname` varchar(50),
-  `reversename` varchar(50)
+  `childtableid` varchar(255),
+  `childpropid` varchar(255),
+  `parenttableid` varchar(255),
+  `parentpropid` varchar(255),
+  `forwardname` varchar(255),
+  `reversename` varchar(255)
 );
 
 CREATE TABLE `2D_tablecatalog` (
-  `id` varchar(20),
-  `name` varchar(50),
-  `col_table` varchar(20),
-  `row_table` varchar(20),
-  `first_dimension` varchar(20),
+  `id` varchar(255),
+  `name` varchar(255),
+  `col_table` varchar(255),
+  `row_table` varchar(255),
+  `first_dimension` varchar(255),
   `settings` text,
   `ordr` int
 );
 
 CREATE TABLE `2D_propertycatalog` (
-  `id` varchar(50),
-  `tableid` varchar(20),
-  `col_table` varchar(20),
-  `row_table` varchar(20),
-  `name` varchar(50),
+  `id` varchar(255),
+  `tableid` varchar(255),
+  `col_table` varchar(255),
+  `row_table` varchar(255),
+  `name` varchar(255),
   `ordr` int,
-  `dtype` varchar(20),
+  `dtype` varchar(255),
   `settings` text,
   `arity` int
 );
 
 CREATE TABLE `workspaces` (
-  `id` varchar(50),
-  `name` varchar(50)
+  `id` varchar(255),
+  `name` varchar(255)
 );
 
 
 CREATE TABLE `introviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `workspaceid` varchar(100),
-  `name` varchar(100),
-  `section` varchar(100),
-  `description` varchar(500),
-  `viewicon` varchar(100),
+  `workspaceid` varchar(255),
+  `name` varchar(255),
+  `section` varchar(255),
+  `description` varchar(255),
+  `viewicon` varchar(255),
   `ordr` int(11),
-  `url` varchar(1000),
-  `storedviewid` varchar(50),
-  `activetab` varchar(50),
+  `url` varchar(2000),
+  `storedviewid` varchar(255),
+  `activetab` varchar(255),
   PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `notes` (
-  `id` varchar(80),
-  `tableid` varchar(50),
-  `itemid` varchar(50),
-  `timestamp` varchar(50),
-  `userid` varchar(100),
+  `id` varchar(255),
+  `tableid` varchar(255),
+  `itemid` varchar(255),
+  `timestamp` varchar(255),
+  `userid` varchar(255),
   `content` text,
   PRIMARY KEY (`id`),
   FULLTEXT (`content`)
