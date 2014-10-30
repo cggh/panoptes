@@ -106,7 +106,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     });
                 });
 
-                var buttonSortSamplesByColumn = Controls.Button(null, {content: 'Selected ' + that.table_info.col_table.tableCapNamePlural, buttonClass: 'PnButtonGrid', width:120, height:10, iconWidth:16, icon:'fa-sort-amount-asc'}).setOnChanged(function() {
+                var buttonSortSamplesByColumn = Controls.Button(null, {content: 'Selected Columns', buttonClass: 'PnButtonGrid', width:120, height:10, iconWidth:16, icon:'fa-sort-amount-asc'}).setOnChanged(function() {
                     model_params.set({
                             row_order: 'columns',
                             row_sort_columns: _.keys(that.table_info.col_table.currentSelection)
