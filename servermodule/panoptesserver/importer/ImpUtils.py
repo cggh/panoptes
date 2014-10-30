@@ -198,8 +198,10 @@ def ImportGlobalSettings(calculationObject, datasetId, settings):
             ))
 
 
-def LoadPropertyInfo(calculationObject, impSettings, datafile):
-    calculationObject.Log('Determining properties')
+def LoadPropertyInfo(calculationObject, impSettings, datafile, log = False):
+    
+    if log:
+        calculationObject.Log('Determining properties')
     properties = []
     propidMap = {}
 
@@ -248,7 +250,8 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
         try:
-            calculationObject.Log('Auto determining columns')
+            if log:
+                calculationObject.Log('Auto determining columns')
             tb = VTTable.VTTable()
             tb.allColumnsText = True
             try:
@@ -337,12 +340,14 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
 
-    calculationObject.Log('Properties found:')
-    with calculationObject.LogDataDump():
-        for property in properties:
-            calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
-    for property in properties:
-        DQXUtils.CheckValidColumnIdentifier(property['propid'])
+    if log:
+        calculationObject.Log('Properties found:')
+    if log:
+        with calculationObject.LogDataDump():
+            for prop in properties:
+                calculationObject.Log(str(prop)+' | '+prop['Settings'].ToJSON())
+    for prop in properties:
+        DQXUtils.CheckValidColumnIdentifier(prop['propid'])
     return properties
 
 def CreateSummaryValues_Value(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):

@@ -51,7 +51,7 @@ class BaseImport(object):
             
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = SettingsLoader.SettingsLoader(settingsFile)
+            self._globalSettings = SettingsLoader.SettingsLoader(settingsFile, False)
         else:
             self._globalSettings = None
             
@@ -73,7 +73,10 @@ class BaseImport(object):
                 self._datasetFolder, self._datatablesFolder,self._datasetId, self._workspaceId, self._tablesToken, self._dataDir))
     
     def _getImportSetting(self, name):
-        return self._importSettings[name]
+        ret = None
+        if name in self._importSettings:
+            ret = self._importSettings[name]
+        return ret
     
     #Return the list of tables to process either as specified in the settings file or by looking at the directories
     def _getTables(self):
@@ -121,8 +124,8 @@ class BaseImport(object):
         folder = os.path.join(self._datatablesFolder, datatable)
             
         settings = os.path.join(folder, 'settings')
-        self._log(settings)
-        self._log(str(self))
+#        self._log("BaseImport._getDataFiles",settings)
+#        self._log("BaseImport._getDataFiles",str(self))
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
 #            raise Exception("Missing settings {}".format(settings))
@@ -138,7 +141,7 @@ class BaseImport(object):
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
         else:
-            tableSettings = SettingsLoader.SettingsLoader(settings)
+            tableSettings = SettingsLoader.SettingsLoader(settings, False)
 
         properties = None
         if includeProperties:
@@ -150,7 +153,7 @@ class BaseImport(object):
                 
         settings, data = self._getDataFiles(datatable)
         
-        tableSettings = SettingsLoader.SettingsLoader(settings)
+        tableSettings = SettingsLoader.SettingsLoader(settings, False)
 
         properties = None
         if includeProperties:
