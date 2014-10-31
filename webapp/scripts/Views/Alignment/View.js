@@ -58,6 +58,7 @@ define(['_', 'd3',
         var row_height = Math.min(Math.floor(that.height/row_reservations.length), 20);
         var base_width = scale(1) - scale(0);
         var fontsize = Math.max(1, Math.floor(Math.min(row_height, base_width/0.5))-2);
+        ctx.font = fontsize + 'px monospace';
 
         ctx.save();
         ctx.textBaseline = 'middle';
@@ -73,34 +74,71 @@ define(['_', 'd3',
           var ref = chunks[c].ref_seq;
           var seqs = chunks[c].seq.array[0];
           var seq_start = 0;
+          var i_cigar = 0;
           for ( r = 0; r < lens.length; r++) {
             len = lens[r], pos = poss[r];
-            var cigar = cigars[r];
             //Skip reads outside the display
             if (pos + len < start || pos > end || (c != 0 && pos < chunk.start)) {
               seq_start += len;
+              while (!(cigars[i_cigar++] === -1 & cigars[i_cigar++] === -1)) {
+              }
               continue;
             }
             row = rows[read];
             //TODO Fair Integer pixel allocation similar to genotypes
-            ctx.fillStyle = 'rgb(0,55,135)';
-            ctx.fillRect(scale(pos), height - row * row_height - row_height, scale(len) - scale(0), row_height);
+            var top = height - row * row_height - row_height
             var seq = seqs.slice(seq_start, seq_start + len);
-            var ref_slice = ref.slice(pos - chunk.start, pos - chunk.start + len);
-            ctx.fillStyle = 'rgb(180,0,0)';
-            for (var s = 0; s < seq.length; s++)
-              if (seq[s] != ref_slice[s])
-                ctx.fillRect(Math.round(scale(pos + s)), height - row * row_height - row_height, Math.round(base_width), row_height);
-            ctx.fillStyle = 'rgb(40,40,40)';
-            for (var s = 0; s < seq.length; s++)
-              if (seq[s] === 'N')
-                ctx.fillRect(Math.round(scale(pos + s)), height - row * row_height - row_height, Math.round(base_width), row_height);
-
-            if (fontsize >= 3) {
-              ctx.font = fontsize + 'px monospace';
-              ctx.fillStyle = 'rgb(255,255,255)';
-              for (var s = 0; s < seq.length; s++)
-                ctx.fillText(seq[s], scale(pos + s) + (base_width / 2), that.height - row * row_height - row_height / 2);
+            var ref_slice = ref.slice(pos - chunk.start, pos - chunk.start + len*2);
+            var i_seq = 0;
+            var i_ref =0;
+            var i;
+            var type, c_len;
+            while (!( (type = cigars[i_cigar++]) == -1 & (c_len = cigars[i_cigar++]) == -1)) {
+              if (type === 0 || type === 7 || type === 8) { //Align MATCH
+                ctx.fillStyle = 'rgb(0,55,135)';
+                ctx.fillRect(scale(pos), top, base_width * c_len, row_height);
+                ctx.fillStyle = 'rgb(180,0,0)';
+                for (i = 0; i < c_len; i++) {
+                  if (seq[i_seq + i] !== 'N' && seq[i_seq + i] !== ref_slice[i_ref + i])
+                    ctx.fillRect(Math.round(scale(pos + i)), top, Math.max(1, Math.round(base_width)), row_height);
+                  else if (seq[i_seq + i] === 'N') {
+                    ctx.fillStyle = 'rgb(40,40,40)';
+                    ctx.fillRect(Math.round(scale(pos + i)), top, Math.max(1, Math.round(base_width)), row_height);
+                    ctx.fillStyle = 'rgb(180,0,0)';
+                  }
+                }
+                ctx.fillStyle = 'rgb(255,255,255)';
+                if (fontsize >= 3) {
+                  for (i = 0; i < c_len; i++, i_ref++)
+                    ctx.fillText(seq[i_seq++], scale(pos++) + (base_width / 2), top + (row_height / 2));
+                }
+                else {
+                  i_seq += c_len;
+                  i_ref += c_len;
+                  pos += c_len
+                }
+              } else if (type === 1) { //INS
+                ctx.fillStyle = 'rgb(78,154,0)';
+                ctx.beginPath();
+                ctx.moveTo(scale(pos) - base_width, top);
+                ctx.lineTo(scale(pos) + base_width, top);
+                ctx.lineTo(scale(pos), top+(row_height/2));
+                ctx.closePath();
+                ctx.fill();
+                i_seq += c_len;
+              } else if (type === 2) { //DEL
+                ctx.fillStyle = 'rgb(40,40,40)';
+                ctx.fillRect(Math.round(scale(pos)), top + (row_height/3), Math.max(1, Math.round(base_width * c_len)), row_height/3);
+                pos += c_len;
+                i_ref += c_len;
+              } else if (type === 3) { //REF_SKIP
+                pos += c_len;
+                i_ref += c_len;
+              } else if (type === 4) { //SOFT CLIP
+                i_seq += c_len;
+              } else if (type === 5) { //HARD CLIP
+              } else if (type === 6) { //PAD
+              }
             }
             seq_start += len;
             read++

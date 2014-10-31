@@ -90,7 +90,7 @@ define(["_", "async", "Utils/Cache", "MetaData", "DQX/ArrayBufferClient", "DQX/S
         myurl.addUrlQueryItem("ids", 'SummaryTracks/' + MetaData.database+'/Sequence~Summ~Base_avg');
         myurl.addUrlQueryItem("blocksize", 1);
         myurl.addUrlQueryItem("blockstart", key.start);
-        myurl.addUrlQueryItem("blockcount", key.end - key.start);
+        myurl.addUrlQueryItem("blockcount", (key.end - key.start)*2); //Get twice the amount for reads that go beyond our chunk
         var urlstring = myurl.toString();
         $.ajax({
           url: urlstring,
