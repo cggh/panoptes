@@ -406,7 +406,7 @@ define([
                         var summInfo = MetaData.findSummaryValue(propInfo.tableid,propInfo.propid);
                         summInfo.isDisplayed = true; // Set this flag so that it does not get added twice
 
-                        var theFetcher = new DataFetcherSummary.Fetcher(MetaData.serverUrl,summInfo.minblocksize,500);
+                        var theFetcher = new DataFetcherSummary.Fetcher(MetaData.serverUrl,summInfo.minblocksize,800);
                         theFetcher.usedChannelCount = 0;
                         theFetcher.minblocksize=summInfo.minblocksize;
                         that.listDataFetcherProfiles.push(theFetcher);
