@@ -13,7 +13,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
            var that = ChannelCanvas.Base(id);
 
            that.init = function(bamserve_url, bam_set, sample_id, controls_group, parent) {
-             that._height = 500;
+             that._height = 250;
              that._toolTipHandler = null;
              that._clickHandler = null;
              that._always_call_draw = false;
@@ -29,7 +29,7 @@ define(["require", "_", "d3", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/Arra
              that.model = Model(that._draw, that.model_params.get());
 
              that.view_params = DQXModel({
-               height:500
+               height:250
              });
              that.view = View(that.view_params.get());
 

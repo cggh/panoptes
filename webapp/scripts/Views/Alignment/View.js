@@ -37,21 +37,38 @@ define(['_', 'd3',
         //Store the final row position of each read.
         var rows = [];
         for (var c = 0; c < chunks.length; c++) {
-          var chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array
+          var chunk = chunks[c];
+          var lens = chunks[c].len.array;
+          var poss = chunks[c].pos.array;
+          var cigars = chunks[c].cigar.array;
+          var i_cigar = 0;
+          var type, c_len;
           for (var r = 0; r < lens.length; r++) {
             var len = lens[r], pos = poss[r];
             //Skip reads outside the display and For chunks other than the first skip reads starting before the chunk
-            if (pos+len < start || pos > end || (c != 0 && pos < chunk.start))
+            if (pos+len < start || pos > end || (c != 0 && pos < chunk.start)) {
+              while (!(cigars[i_cigar++] === -1 & cigars[i_cigar++] === -1)) {
+              }
               continue;
-            //Find the first slot that is empty
-            var row = _.findIndex(row_reservations, function(row_taken_until) {
-              return row_taken_until < pos;
-            });
-            if (row === -1)
-              row = row_reservations.length;
-            //Mark the row as reserved until we end
-            row_reservations[row] = pos+len;
-            rows.push(row);
+            }
+            var this_reads_row = null;
+            while (!( (type = cigars[i_cigar++]) == -1 & (c_len = cigars[i_cigar++]) == -1)) {
+              //For those cigar types with impact on len, find a space to place them
+              if (type === 0 || type === 7 || type === 8 || type === 1  || type === 2  || type === 3) {
+                if (!this_reads_row) {
+                  this_reads_row = _.findIndex(row_reservations, function(row_taken_until) {
+                    return row_taken_until < pos;
+                  });
+                  if (this_reads_row === -1)
+                    this_reads_row = row_reservations.length;
+                  rows[r] = this_reads_row;
+                }
+                //Mark the row as reserved until the end of this cigar
+                if (type !== 1) //INS
+                  pos += c_len;
+                row_reservations[this_reads_row] = pos;
+              }
+            }
           }
         }
         //Now we know how many rows we need we can set the row height
@@ -66,33 +83,33 @@ define(['_', 'd3',
         ctx.strokeStyle = 'rgb(40,40,40)';
         ctx.fillStyle = 'rgb(140,140,140)';
 
-        var read = 0;
         //Loop again to draw
-        for (var c = 0; c < chunks.length; c++) {
-          chunk = chunks[c], lens = chunks[c].len.array, poss = chunks[c].pos.array;
-          var cigars = chunks[c].cigar.array;
+        for (c = 0; c < chunks.length; c++) {
+          chunk = chunks[c];
+          lens = chunks[c].len.array;
+          poss = chunks[c].pos.array;
+          cigars = chunks[c].cigar.array;
           var ref = chunks[c].ref_seq;
           var seqs = chunks[c].seq.array[0];
           var seq_start = 0;
-          var i_cigar = 0;
+          i_cigar = 0;
           for ( r = 0; r < lens.length; r++) {
             len = lens[r], pos = poss[r];
-            //Skip reads outside the display
-            if (pos + len < start || pos > end || (c != 0 && pos < chunk.start)) {
-              seq_start += len;
+            var row = rows[r];
+            //Skip rows that didn't get a position in the last step
+            if (!row) {
               while (!(cigars[i_cigar++] === -1 & cigars[i_cigar++] === -1)) {
               }
+              seq_start += len;
               continue;
             }
-            row = rows[read];
             //TODO Fair Integer pixel allocation similar to genotypes
-            var top = height - row * row_height - row_height
+            var top = height - row * row_height - row_height;
             var seq = seqs.slice(seq_start, seq_start + len);
             var ref_slice = ref.slice(pos - chunk.start, pos - chunk.start + len*2);
             var i_seq = 0;
             var i_ref =0;
             var i;
-            var type, c_len;
             while (!( (type = cigars[i_cigar++]) == -1 & (c_len = cigars[i_cigar++]) == -1)) {
               if (type === 0 || type === 7 || type === 8) { //Align MATCH
                 ctx.fillStyle = 'rgb(0,55,135)';
@@ -141,7 +158,6 @@ define(['_', 'd3',
               }
             }
             seq_start += len;
-            read++
           }
         }
 
