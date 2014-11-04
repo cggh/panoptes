@@ -409,10 +409,12 @@ require([
                     window.open('index.html');
                 }
                 });
-                actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
+                if (MetaData.isManager) {
+                    actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
                     window.open('admin.html');
                 }
                 });
+                }
 
                 ButtonChoiceBox.create('Panoptes','', [actions]);
             }
