@@ -1,12 +1,12 @@
 // This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map",
+define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map", "DQX/MessageBox",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
     "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils",
     "Plots/GenericPlot", "Plots/Histogram", "Plots/BarGraph"
 ],
-    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map,
+    function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, MessageBox,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
               MetaData, GetFullDataItemInfo, MiscUtils,
               GenericPlot, Histogram, BarGraph
@@ -61,8 +61,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var chk_promptAspects = Controls.Check(null,{ label: '<span style="color:rgb(80,80,80)"><i>Prompt for plot data before showing plot</i></span>', value: DataItemPlotPopup.promptAspects});
 
             content += chk_promptAspects.renderHtml();
-
-
 
             var popupID = Popup.create(tableInfo.tableCapNamePlural + ' plots', content);
 
@@ -155,7 +153,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     }
                 });
                 if (missingAspects.length>0) {
-                    alert('Please associate the following plot aspect(s) to data properties: \n\n'+missingAspects.join(', '));
+                    var errorText = 'Please associate the following plot aspect(s) to data properties:<br><b>'+missingAspects.join(', ')+'</b>';
+                    $('#plotaspectserrorbox').html(errorText);
                     return;
                 }
 
@@ -166,6 +165,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
             });
             content += '<p>' + buttonCreatePlot.renderHtml() + '<p>';
+            content += '<div id="plotaspectserrorbox" style="color: red"></div>'
             var popupID = Popup.create(plottype.name+' aspects', content);
             controls.postCreateHtml();
         };
