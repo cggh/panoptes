@@ -24,9 +24,58 @@ define([
             { id:'yaxis', name:'Y value', dataType:'Value', requiredLevel: 2 },
             { id:'color', name:'Point color', dataType:'', requiredLevel: 0 },
             { id:'size', name:'Point size', dataType:'Value', requiredLevel: 0 },
+            { id:'style', name:'Point style', dataType:'Text', requiredLevel: 0 },
             { id:'label', name:'Hover label', dataType:'', requiredLevel: 0 }
         ];
 
+        ItemScatterPlot.PointStyles = [
+            {
+                id:'circle', name: 'Circle', drawer: function(ctx, x, y, sz) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, sz, 0, 2 * Math.PI, false);
+                    ctx.closePath();
+            }
+            },
+            {
+                id:'triangle', name: 'Triangle', drawer: function(ctx, x, y, sz) {
+                sz *= 1.25;
+                ctx.beginPath();
+                ctx.moveTo(x-0.866*sz, y+0.5*sz);
+                ctx.lineTo(x, y-sz);
+                ctx.lineTo(x+0.866*sz, y+0.5*sz);
+                ctx.closePath();
+            }
+            },
+            {
+                id:'rectangle', name: 'Rectangle', drawer: function(ctx, x, y, sz) {
+                sz *= 0.85;
+                ctx.beginPath();
+                ctx.moveTo(x-sz, y-sz);
+                ctx.lineTo(x-sz, y+sz);
+                ctx.lineTo(x+sz, y+sz);
+                ctx.lineTo(x+sz, y-sz);
+                ctx.closePath();
+            }
+            },
+            {
+                id:'diamond', name: 'Diamond', drawer: function(ctx, x, y, sz) {
+                sz *= 1.1;
+                ctx.beginPath();
+                ctx.moveTo(x, y-sz);
+                ctx.lineTo(x+sz, y);
+                ctx.lineTo(x, y+sz);
+                ctx.lineTo(x-sz, y);
+                ctx.closePath();
+            }
+            },
+            {// Last style, used as overflow
+                id:'', name: '', drawer: function(ctx, x, y, sz) {
+                ctx.beginPath();
+                ctx.arc(x, y, 0.3*sz, 0, 2 * Math.PI, false);
+                ctx.closePath();
+            }
+            }
+            ];
 
 
         ItemScatterPlot.Create = function(tableid, startQuery, querySettings, plotSettings) {
@@ -241,6 +290,7 @@ define([
 
 
                 that.colorLegend = Controls.Html(null,'');
+                that.styleLegend = Controls.Html(null,'');
 
                 var controlsGroup = Controls.CompoundVert([
                     that.createIntroControls(),
@@ -264,9 +314,10 @@ define([
                     }),
 
                     Controls.Section(Controls.CompoundVert([
-                        that.colorLegend
+                        that.colorLegend,
+                        that.styleLegend
                     ]), {
-                        title: 'Color legend',
+                        title: 'Legend',
                         bodyStyleClass: 'ControlsSectionBody'
                     })
 
@@ -438,11 +489,37 @@ define([
                     }
                 }
 
+                if (plotAspectID=='style') {
+                    var legendStr = "";
+                    if (values) {
+                        var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
+                        legendStr += '<b>'+propInfo.name+'</b><br>';
+                        that.styleMapper = {};
+                        var usedStyleCount  = 0;
+                        $.each(values, function(idx, value) {
+                            if (!that.styleMapper[value]) {
+                                if (usedStyleCount<ItemScatterPlot.PointStyles.length) {
+                                    that.styleMapper[value] = ItemScatterPlot.PointStyles[usedStyleCount];
+                                    usedStyleCount++;
+                                    if (that.styleMapper[value].name)
+                                        legendStr += that.styleMapper[value].name + ': ' + value + '<br>';
+                                }
+                                else {
+                                    that.styleMapper[value] = ItemScatterPlot.PointStyles[ItemScatterPlot.PointStyles.length-1];
+                                }
+                            }
+                        });
+                    }
+                    that.styleLegend.modifyValue(legendStr);
+                }
+
                 if (plotAspectID=='color') {// Create categorical data
                     aspectInfo.catData = null;
                     var legendStr = '';
                     if (values) {
-                        var maprs = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid).mapColors(values);
+                        var propInfo = MetaData.findProperty(that.tableInfo.id,aspectInfo.propid);
+                        legendStr += '<b>'+propInfo.name+'</b><br>';
+                        var maprs = propInfo.mapColors(values);
                         aspectInfo.catData = maprs.indices;
                         that.mappedColors = maprs.colors;
                         $.each(maprs.legend,function(idx, legendItem) {
@@ -585,6 +662,7 @@ define([
                 var valY = aspectY.data;
                 var valColorCat = that.mapPlotAspects['color'].catData;
                 var valSize = that.mapPlotAspects['size'].data;
+                var valStyle = that.mapPlotAspects['style'].data;
                 var scaleX = that.panelPlot.getXScale();
                 var offsetX = that.panelPlot.getXOffset();
                 var scaleY = that.panelPlot.getYScale();
@@ -616,7 +694,7 @@ define([
                 var selpsX = [];
                 var selpsY = [];
 
-                var smallPoints = (!valSize)&&(sizeFactor<0.05);
+                var smallPoints = (!valSize)&&(!valStyle)&&(sizeFactor<0.05);
                 var sortIndex = that.sortIndex;
                 var ptcount = valX.length;
 
@@ -663,51 +741,39 @@ define([
                                 selpsX.push(px);
                                 selpsY.push(py);
                             }
-                            ctx.beginPath();
-                            ctx.arc(px, py, pointSize, 0, 2 * Math.PI, false);
-                            ctx.closePath();
-                            ctx.fill();
-                            //ctx.stroke();
+                            if ((!valStyle)||(!that.styleMapper)) {
+                                ctx.beginPath();
+                                ctx.arc(px, py, pointSize, 0, 2 * Math.PI, false);
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                            else {
+                                var mppr = that.styleMapper[valStyle[ii]];
+                                if (mppr) {
+                                    mppr.drawer(ctx, px, py, pointSize*3);
+                                    ctx.fill();
+                                }
+                            }
                         }
                     }
                 }
 
-                if (true) {
-                    if (!valColorCat) {
-                        ctx.fillStyle=DQX.Color(1,0,0,0.25*(0.5+0.5*opacity)).toStringCanvas();
-                        ctx.strokeStyle=DQX.Color(1,0,0,0.75*(0.5+0.5*opacity)).toStringCanvas();
-                    }
-                    else
-                    {
-                        ctx.fillStyle=DQX.Color(0,0,0,0.0*(0.5+0.5*opacity)).toStringCanvas();
-                        ctx.strokeStyle=DQX.Color(0,0,0,1.0*(0.5+0.5*opacity)).toStringCanvas();
-//                    ctx.lineWidth = 2;
-                    }
-                    for (var i=0; i<selpsX.length; i++) {
-                        ctx.beginPath();
-                        ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
-                    }
+                if (!valColorCat) {
+                    ctx.fillStyle=DQX.Color(1,0,0,0.25*(0.5+0.5*opacity)).toStringCanvas();
+                    ctx.strokeStyle=DQX.Color(1,0,0,0.75*(0.5+0.5*opacity)).toStringCanvas();
                 }
-//                else {
-//                    ctx.fillStyle=DQX.Color(0,0,0,0.2*(1+opacity)/2).toStringCanvas();
-//                    ctx.strokeStyle=DQX.Color(0,0,0,0.8*(1+opacity)/2).toStringCanvas();
-//                    var ox0 = -1*sizeFactor-1.5; var oy0 = 1*sizeFactor+1.5;
-//                    var sizeFactor2 = Math.min(Math.max(sizeFactor, 0.7), 2);
-//                    var ox1 = -10*sizeFactor2; var oy1 = 6*sizeFactor2;
-//                    var ox2 = -6*sizeFactor2; var oy2 = 10*sizeFactor2;
-//                    for (var i=0; i<selpsX.length; i++) {
-//                        ctx.beginPath();
-//                        ctx.moveTo(selpsX[i]+ox0, selpsY[i]+oy0);
-//                        ctx.lineTo(selpsX[i]+ox1, selpsY[i]+oy1);
-//                        ctx.lineTo(selpsX[i]+ox2, selpsY[i]+oy2);
-//                        ctx.closePath();
-//                        ctx.fill();
-//                        ctx.stroke();
-//                    }
-//                }
+                else
+                {
+                    ctx.fillStyle=DQX.Color(0,0,0,0.0*(0.5+0.5*opacity)).toStringCanvas();
+                    ctx.strokeStyle=DQX.Color(0,0,0,1.0*(0.5+0.5*opacity)).toStringCanvas();
+                }
+                for (var i=0; i<selpsX.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
 
                 if (valSize) {
                     ctx.fillStyle=DQX.Color(0.8,0.8,0.8,opacity).toStringCanvas();
@@ -723,11 +789,18 @@ define([
                             if (valColorCat) {
                                 ctx.fillStyle=colorStrings[valColorCat[ii]];
                             }
-                            ctx.beginPath();
-                            ctx.arc(px, py, rd, 0, 2 * Math.PI, false);
-                            ctx.closePath();
-                            ctx.fill();
-                            ctx.stroke();
+                            if (!valStyle) {
+                                ctx.beginPath();
+                                ctx.arc(px, py, rd, 0, 2 * Math.PI, false);
+                                ctx.closePath();
+                                ctx.fill();
+                                ctx.stroke();
+                            }
+                            else {
+                                that.styleMapper[valStyle[ii]].drawer(ctx, px, py, rd);
+                                ctx.fill();
+                                ctx.stroke();
+                            }
                         }
                     }
                 }

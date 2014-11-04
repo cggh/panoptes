@@ -11,9 +11,9 @@ MaxCountQueryAggregated: 500000
 AllowSubSampling: Yes
 CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large data tables than the standard option, based on a JOIN statement
 
-DisableNotes: Yes
-DisableSubsets: Yes
-DisablePlots: Yes
+#DisableNotes: Yes
+#DisableSubsets: Yes
+#DisablePlots: Yes
 
 Properties:
 
