@@ -465,10 +465,13 @@ define([
                     }
 
                     //Define a custom tooltip
-                    positionChannel.setToolTipHandler(function(id, index)
+                    positionChannel.setToolTipHandler(function(id, pointIndex)
                     {
-                        var posit = dataFetcher.getPosition(index);
-                        return 'Position: '+posit+'<br>Id: '+id;
+                        var posit = dataFetcher.getPosition(pointIndex);
+                        var value = dataFetcher.getColumnPoint(pointIndex, propInfo.propid);
+                        var str = id+'<br/>Position= '+posit;
+                        str += '<br/><b>'+propInfo.name+'= '+propInfo.toDisplayString(value)+'</b>';
+                        return str;
                     })
                     //Define a function that will be called when the user clicks a snp
                     positionChannel.setClickHandler(function(id) {
@@ -567,7 +570,7 @@ define([
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
                             var pos = dataFetcher.getPosition(pointIndex);
                             var value = dataFetcher.getColumnPoint(pointIndex, compID);
-                            return itemid+'<br/>Position= '+pos+'<br/>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+propInfo.toDisplayString(value);
+                            return itemid+'<br/>Position= '+pos+'<br/><b>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+propInfo.toDisplayString(value)+'</b>';
                         };
                         theChannel.handlePointClicked = function(compID, pointIndex) {
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
