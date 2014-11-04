@@ -756,7 +756,16 @@ define([
                                     states.push({id: propInfo.propid, name: propInfo.name});
                             });
 
-                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.primkey}).setClassID('region_name_'+tableInfo.id);
+                            tableInfo.genomeBrowserInfo.defaultRegionFieldName = tableInfo.primkey;
+                            if (tableInfo.settings.BrowserDefaultLabel) {
+                                if (tableInfo.settings.BrowserDefaultLabel == 'None')
+                                    tableInfo.genomeBrowserInfo.defaultRegionFieldName = '';
+                                else
+                                    tableInfo.genomeBrowserInfo.defaultRegionFieldName = tableInfo.settings.BrowserDefaultLabel;
+                            }
+
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.genomeBrowserInfo.defaultRegionFieldName})
+                                .setClassID('region_name_'+tableInfo.id);
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.dataFetcher.field_name = tableInfo.genomeBrowserFieldChoice.getValue();
                                 tableInfo.genomeBrowserInfo.dataFetcher.clearData();
@@ -814,7 +823,7 @@ define([
                             regionFetcher.field_stop = tableInfo.settings.RegionStop;
                             regionFetcher.field_chrom = tableInfo.settings.Chromosome;
                             regionFetcher.field_id = tableInfo.primkey;
-                            regionFetcher.field_name = tableInfo.primkey;
+                            regionFetcher.field_name = tableInfo.genomeBrowserInfo.defaultRegionFieldName;
                             regionFetcher.fetchSubFeatures = false;
                             that.panelBrowser.addDataFetcher(regionFetcher);
                             var regionChannel = ChannelAnnotation.Channel('regions_'+tableInfo.id, regionFetcher);
