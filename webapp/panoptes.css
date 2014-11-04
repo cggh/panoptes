@@ -126,6 +126,13 @@ a:link, a:visited
     background-repeat:repeat-x;
 }
 
+.DQXWizardBox
+{
+    border:1px solid rgb(110,110,110);
+    border:none;
+    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+
+}
 
 .DQXWizardBoxHeader
 {
@@ -160,21 +167,30 @@ a:link, a:visited
     border-width:4px;
     border-style:solid;
     border-color:rgb(80,80,80);
-    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
+    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.75);
 }
 
+.DQXPopupFrame
+{
+    border-width:1px;
+    border-style:solid;
+    border-color:rgb(110,110,110);
+    box-shadow: 2px 2px 20px 7px rgba(0,0,0,0.75);
+}
 
 
 
 .DQXFloatBox
 {
-    border-color:rgb(4,81,88);
+    border:1px solid rgb(110, 110, 110);
+    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.95);
 }
 
 .DQXFloatBoxHeader
 {
     color:rgb(255,255,255);
-    background-image:url(Bitmaps/misc/barback1a.png);
+    background-color: rgb(0,133,146);
+    background-image:none;
 }
 
 
@@ -231,11 +247,28 @@ a:link, a:visited
 
 }
 
+.DQXPopupFrameResizer1
+{
+    right:-12px;
+    bottom:-12px;
+    width:24px;
+    height:5px;
+}
+
+
+.DQXPopupFrameResizer2
+{
+    right:-12px;
+    bottom:-12px;
+    width:5px;
+    height:24px;
+}
 
 
 .DQXPopupFrameResizer1, .DQXPopupFrameResizer2
 {
     background-color:rgb(0,133,146);
+    border-color:rgb(0,81,88);
 }
 
 
