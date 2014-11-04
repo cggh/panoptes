@@ -125,6 +125,9 @@ IsRegionOnGenome
   *Boolean.* Instructs Panoptes that records in this datatable should be interpreted as genomic regions.
   In this case, the *Chromosome*, *RegionStart* and *RegionStop* keys should be defined.
 
+BrowserTrackHeightFactor
+  *Value.* Specifies a relative size factor for the genome browser track height (only applicable if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
+
 Chromosome
   *Property ID.* Specifies the table column ID that contains the chromosome
   (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).

@@ -421,8 +421,12 @@ define([
                             maxVal:maxVal,
                             categoryColors: propInfo.settings.categoryColors
                         });
+                        var trackH = 120;
+                        if (tableInfo.settings.BrowserTrackHeightFactor)
+                            trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
                         densChannel
                             .setTitle(propInfo.name)
+                            .setHeight(trackH)
                             .setSubTitle(tableInfo.tableCapNamePlural);
                         that.panelBrowser.addChannel(densChannel, false);
                         that.panelBrowser.channelModifyVisibility(densChannel.getID(), channelDefaultVisible, true);
@@ -542,10 +546,13 @@ define([
                         theChannel = ChannelYVals.Channel(trackid,
                             { minVal: propInfo.settings.minval, maxVal: propInfo.settings.maxval } // range
                         );
+                        var trackH = 150;
+                        if (tableInfo.settings.BrowserTrackHeightFactor)
+                            trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
                         theChannel
                             .setTitle(channelName)
                             .setSubTitle(tableInfo.tableCapNamePlural)
-                            .setHeight(150,true)
+                            .setHeight(trackH,true)
                             .setChangeYScale(true,true);
                         that.panelBrowser.addChannel(theChannel, false);
                         that.channelMap[channelId] = theChannel;
@@ -827,7 +834,10 @@ define([
                             regionFetcher.fetchSubFeatures = false;
                             that.panelBrowser.addDataFetcher(regionFetcher);
                             var regionChannel = ChannelAnnotation.Channel('regions_'+tableInfo.id, regionFetcher);
-                            regionChannel.setHeight(60);
+                            var trackH = 60;
+                            if (tableInfo.settings.BrowserTrackHeightFactor)
+                                trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
+                            regionChannel.setHeight(trackH);
                             regionChannel.setTitle(tableInfo.tableCapNamePlural);
                             regionChannel.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
                             regionChannel.setMinDrawZoomFactX(1.0/99999999);

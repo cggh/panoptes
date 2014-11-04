@@ -20,7 +20,8 @@ RegionStart: regionstart            # Specifies the table column ID that contain
 RegionStop: regionstop              # Specifies the table column ID that contains the end position of the region
 GenomeMaxViewportSizeX: 10000000    # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
 BrowserDefaultVisible: true         # Specifies the default visibility status of this track in the genome browser
-BrowserDefaultLabel: None           # Specifies the default label that is used in the genome browser ('None' indicates that no label is displayed)
+BrowserDefaultLabel: None           # Specifies the default label that is used in the genome browser (used for genome regions; 'None' indicates that no label is displayed)
+BrowserTrackHeightFactor: 0.6       # Specifies a relative size factor for the genome browser track height
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
