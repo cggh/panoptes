@@ -2,11 +2,11 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 ﻿define([
-    "require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Popup", "DQX/Wizard", "DQX/DataFetcher/DataFetchers",
+    "require", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Popup", "DQX/Wizard", "DQX/DataFetcher/DataFetchers", "DQX/MessageBox",
     "Wizards/FindGeneControl",
     "MetaData"],
     function (
-        require, Framework, Controls, Msg, SQL, DocEl, Popup, Wizard, DataFetcher,
+        require, Framework, Controls, Msg, SQL, DocEl, Popup, Wizard, DataFetcher, MessageBox,
         FindGeneControl,
         MetaData
         ) {

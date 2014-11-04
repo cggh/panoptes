@@ -24,6 +24,7 @@ MaxCountQueryAggregated: 1000000  # Defines the maximum number of records that w
 IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 Chromosome: chromosome            # Speficies the table column ID that contains the chromosome
 Position: position                # Specifies the table column ID that contains the position on the chromosome
+BrowserTrackHeightFactor: 0.75    # Specifies a relative size factor for the genome browser track height
 GenomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
 
 

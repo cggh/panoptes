@@ -421,8 +421,12 @@ define([
                             maxVal:maxVal,
                             categoryColors: propInfo.settings.categoryColors
                         });
+                        var trackH = 120;
+                        if (tableInfo.settings.BrowserTrackHeightFactor)
+                            trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
                         densChannel
                             .setTitle(propInfo.name)
+                            .setHeight(trackH)
                             .setSubTitle(tableInfo.tableCapNamePlural);
                         that.panelBrowser.addChannel(densChannel, false);
                         that.panelBrowser.channelModifyVisibility(densChannel.getID(), channelDefaultVisible, true);
@@ -461,10 +465,13 @@ define([
                     }
 
                     //Define a custom tooltip
-                    positionChannel.setToolTipHandler(function(id, index)
+                    positionChannel.setToolTipHandler(function(id, pointIndex)
                     {
-                        var posit = dataFetcher.getPosition(index);
-                        return 'Position: '+posit+'<br>Id: '+id;
+                        var posit = dataFetcher.getPosition(pointIndex);
+                        var value = dataFetcher.getColumnPoint(pointIndex, propInfo.propid);
+                        var str = id+'<br/>Position= '+posit;
+                        str += '<br/><b>'+propInfo.name+'= '+propInfo.toDisplayString(value)+'</b>';
+                        return str;
                     })
                     //Define a function that will be called when the user clicks a snp
                     positionChannel.setClickHandler(function(id) {
@@ -542,10 +549,13 @@ define([
                         theChannel = ChannelYVals.Channel(trackid,
                             { minVal: propInfo.settings.minval, maxVal: propInfo.settings.maxval } // range
                         );
+                        var trackH = 150;
+                        if (tableInfo.settings.BrowserTrackHeightFactor)
+                            trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
                         theChannel
                             .setTitle(channelName)
                             .setSubTitle(tableInfo.tableCapNamePlural)
-                            .setHeight(150,true)
+                            .setHeight(trackH,true)
                             .setChangeYScale(true,true);
                         that.panelBrowser.addChannel(theChannel, false);
                         that.channelMap[channelId] = theChannel;
@@ -560,7 +570,7 @@ define([
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
                             var pos = dataFetcher.getPosition(pointIndex);
                             var value = dataFetcher.getColumnPoint(pointIndex, compID);
-                            return itemid+'<br/>Position= '+pos+'<br/>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+propInfo.toDisplayString(value);
+                            return itemid+'<br/>Position= '+pos+'<br/><b>'+MetaData.findProperty(propInfo.tableid,compID).name+'= '+propInfo.toDisplayString(value)+'</b>';
                         };
                         theChannel.handlePointClicked = function(compID, pointIndex) {
                             var itemid = dataFetcher.getColumnPoint(pointIndex, tableInfo.primkey);
@@ -756,7 +766,16 @@ define([
                                     states.push({id: propInfo.propid, name: propInfo.name});
                             });
 
-                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.primkey}).setClassID('region_name_'+tableInfo.id);
+                            tableInfo.genomeBrowserInfo.defaultRegionFieldName = tableInfo.primkey;
+                            if (tableInfo.settings.BrowserDefaultLabel) {
+                                if (tableInfo.settings.BrowserDefaultLabel == 'None')
+                                    tableInfo.genomeBrowserInfo.defaultRegionFieldName = '';
+                                else
+                                    tableInfo.genomeBrowserInfo.defaultRegionFieldName = tableInfo.settings.BrowserDefaultLabel;
+                            }
+
+                            tableInfo.genomeBrowserFieldChoice = Controls.Combo(null,{label:'Label: ', states: states, value:tableInfo.genomeBrowserInfo.defaultRegionFieldName})
+                                .setClassID('region_name_'+tableInfo.id);
                             tableInfo.genomeBrowserFieldChoice.setOnChanged(function() {
                                 tableInfo.genomeBrowserInfo.dataFetcher.field_name = tableInfo.genomeBrowserFieldChoice.getValue();
                                 tableInfo.genomeBrowserInfo.dataFetcher.clearData();
@@ -814,11 +833,14 @@ define([
                             regionFetcher.field_stop = tableInfo.settings.RegionStop;
                             regionFetcher.field_chrom = tableInfo.settings.Chromosome;
                             regionFetcher.field_id = tableInfo.primkey;
-                            regionFetcher.field_name = tableInfo.primkey;
+                            regionFetcher.field_name = tableInfo.genomeBrowserInfo.defaultRegionFieldName;
                             regionFetcher.fetchSubFeatures = false;
                             that.panelBrowser.addDataFetcher(regionFetcher);
                             var regionChannel = ChannelAnnotation.Channel('regions_'+tableInfo.id, regionFetcher);
-                            regionChannel.setHeight(60);
+                            var trackH = 60;
+                            if (tableInfo.settings.BrowserTrackHeightFactor)
+                                trackH = Math.round(trackH*tableInfo.settings.BrowserTrackHeightFactor);
+                            regionChannel.setHeight(trackH);
                             regionChannel.setTitle(tableInfo.tableCapNamePlural);
                             regionChannel.setMaxViewportSizeX(tableInfo.settings.GenomeMaxViewportSizeX);
                             regionChannel.setMinDrawZoomFactX(1.0/99999999);

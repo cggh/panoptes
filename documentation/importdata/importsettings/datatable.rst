@@ -68,10 +68,13 @@ QuickFindFields
   The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s).
 
 DisableSubsets
-  *Boolean.* If set, there will be no subsets options for this data set.
+  *Boolean.* If set, there will be no subsets options for this data table.
 
 DisablePlots
-  *Boolean.* If set, there will be no options to create plots for this data set.
+  *Boolean.* If set, there will be no options to create plots for this data table.
+
+DisableNotes
+  *Boolean.* If set, it will not be possible to define notes for items in this data table.
 
 PropertyGroups
   *List.*
@@ -122,6 +125,9 @@ IsRegionOnGenome
   *Boolean.* Instructs Panoptes that records in this datatable should be interpreted as genomic regions.
   In this case, the *Chromosome*, *RegionStart* and *RegionStop* keys should be defined.
 
+BrowserTrackHeightFactor
+  *Value.* Specifies a relative size factor for the genome browser track height (only applicable if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
+
 Chromosome
   *Property ID.* Specifies the table column ID that contains the chromosome
   (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
@@ -149,6 +155,10 @@ BrowserDefaultVisible
   *Boolean.* For genomic regions: specifies the default visibility status of this data table in the genome browser
   (only to be used if *IsRegionOnGenome*  is set).
   Note that, for genomic position, default visibility is specified on a per-property basis.
+
+BrowserDefaultLabel
+  *Property ID.* Specifies the default label that is used in the genome browser, used for genomic regions.
+  None indicates that no label is displayed by default.
 
 
 TableBasedSummaryValues

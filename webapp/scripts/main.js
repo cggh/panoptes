@@ -273,10 +273,17 @@ require([
                         Application.addNavigationButton('Find','fa-search', 70, function(){
                             var actions = [];
 
-                            actions.push( { content:'Find note', icon:'fa-comment', handler:function() {
-                                FindNote.execute();
-                            }
+                            var hasNotes = false;
+                            $.each(MetaData.tableCatalog, function(idx, tableInfo) {
+                                if (!tableInfo.settings.DisableNotes)
+                                    hasNotes = true;
                             });
+                            if (hasNotes) {
+                                actions.push( { content:'Find note', icon:'fa-comment', handler:function() {
+                                    FindNote.execute();
+                                }
+                                });
+                            }
 
                             if (MetaData.generalSettings.hasGenomeBrowser) {
                                 actions.push( { content:'Find gene', bitmap:'Bitmaps/GenomeBrowserSmall.png', handler:function() {
@@ -426,10 +433,12 @@ require([
                     window.open('index.html');
                 }
                 });
-                actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
+                if (MetaData.isManager) {
+                    actions.push( { content:'Open admin page', bitmap:'Bitmaps/Icons/Small/tools.png', handler:function() {
                     window.open('admin.html');
                 }
                 });
+                }
 
                 ButtonChoiceBox.create('Panoptes','', [actions]);
             }
