@@ -46,3 +46,5 @@ IntroSections:
 - Id: Sect3
   Name: Intro section 3
   Content: This is the intro text of Intro section 3
+
+GoogleAnalyticsId: UA-56388755-1

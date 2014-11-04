@@ -196,6 +196,23 @@ require([
                             }
                             MetaData.generalSettings[sett.id] = sett.content;
                         });
+
+                        //Load google analytics if we have an ID
+                        if (MetaData.generalSettings['GoogleAnalyticsId']) {
+                            (function (window, document, tag, url, obj_name, a, m) {
+                                window['GoogleAnalyticsObject'] = obj_name;
+                                window[obj_name] = window[obj_name] || function () {
+                                    (window[obj_name].q = window[obj_name].q || []).push(arguments)
+                                }, window[obj_name].l = 1 * new Date();
+                                a = document.createElement(tag),
+                                    m = document.getElementsByTagName(tag)[0];
+                                a.async = 1;
+                                a.src = url;
+                                m.parentNode.insertBefore(a, m)
+                            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+                            ga('create', MetaData.generalSettings['GoogleAnalyticsId']);
+                        }
+
                         MetaData.mapTableCatalog = {};
                         $.each(MetaData.tableCatalog, function(idx, table) {
                             Initialise.parseTableSettings(table);
