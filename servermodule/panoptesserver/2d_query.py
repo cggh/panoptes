@@ -276,7 +276,7 @@ def handler(start_response, request_data):
                     col_field=DQXDbTools.ToSafeIdentifier(col_key))
                 print sqlquery
                 cur.execute(sqlquery)
-                idx_for_col = dict((str(k), v) for k,v in cur.fetchall())
+                idx_for_col = dict((str(int(k)), v) for k,v in cur.fetchall())
                 #Sort by the order specified - reverse so last clicked is major sort
                 sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
                 #grab the data needed to sort
