@@ -136,38 +136,37 @@ a:link, a:visited
 
 .DQXWizardBoxHeader
 {
-    background-color: rgb(36, 105, 112);
     height:22px;
     padding:6px;
     color:rgb(255,255,255);
     font-size:11pt;
     font-weight:bold;
-    background-image:url(Bitmaps/misc/barback1a.png);
-    /*background-image:none*/
+    background-color: rgb(56, 135, 142);
+    background-image:none;
 }
 
 
 .DQXPopupFrameHeader
 {
-    background-color: rgb(56, 135, 142);
     padding:7px;
     padding-left:12px;
     cursor:move;
     font-size:10pt;
     font-weight:bold;
     color:rgb(255,255,255);
-    /*background-image:url(Bitmaps/misc/barback1a.png);*/
+    background-color: rgb(56, 135, 142);
     background-image:none;
+
+    background: rgb(63,151,158); /* Old browsers */
+    background: -moz-linear-gradient(top, rgb(63,151,158) 0%, rgb(56,135,142) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(63,151,158)), color-stop(100%,rgb(56,135,142))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgb(63,151,158) 0%,rgb(56,135,142) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgb(63,151,158) 0%,rgb(56,135,142) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgb(63,151,158) 0%,rgb(56,135,142) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgb(63,151,158) 0%,rgb(56,135,142) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f979e', endColorstr='#38878e',GradientType=0 ); /* IE6-9 */
     /*width:50px;*/
     /*background-image:none*/
-}
-
-.DQXPopupFrame
-{
-    border-width:4px;
-    border-style:solid;
-    border-color:rgb(80,80,80);
-    box-shadow: 4px 4px 20px 3px rgba(0,0,0,0.75);
 }
 
 .DQXPopupFrame
@@ -175,7 +174,7 @@ a:link, a:visited
     border-width:1px;
     border-style:solid;
     border-color:rgb(110,110,110);
-    box-shadow: 2px 2px 20px 7px rgba(0,0,0,0.75);
+    box-shadow: 2px 2px 20px 4px rgba(0,0,0,0.75);
 }
 
 
@@ -534,7 +533,7 @@ input.PnGenotypesPageEdit{
 
     border-width: 1px;
     border-style: solid;
-    border-color: rgb(170,170,170);
+    border-color: rgb(200,200,200);
 
     color:rgb(0,0,0);
     text-align: left;
