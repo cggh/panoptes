@@ -523,14 +523,14 @@ input.PnGenotypesPageEdit{
 
 .DQXQueryTable th
 {
-    background: rgb(240,240,240);
-    background: -moz-linear-gradient(left, rgb(240,240,240) 0%, rgb(200,200,200) 100%);
-    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(240,240,240)), color-stop(100%,rgb(200,200,200)));
-    background: -webkit-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
-    background: -o-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
-    background: -ms-linear-gradient(left, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
-    background: linear-gradient(to right, rgb(240,240,240) 0%,rgb(200,200,200) 100%);
-
+    background: rgb(244,244,244); /* Old browsers */
+    background: -moz-linear-gradient(left, rgb(244,244,244) 0%, rgb(216,216,216) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(244,244,244)), color-stop(100%,rgb(216,216,216))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, rgb(244,244,244) 0%,rgb(216,216,216) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, rgb(244,244,244) 0%,rgb(216,216,216) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, rgb(244,244,244) 0%,rgb(216,216,216) 100%); /* IE10+ */
+    background: linear-gradient(to right, rgb(244,244,244) 0%,rgb(216,216,216) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#d8d8d8',GradientType=1 ); /* IE6-9 */
     border-width: 1px;
     border-style: solid;
     border-color: rgb(200,200,200);

@@ -439,11 +439,11 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
 
                     var buttons=[];
                     if (thecol.sortOption) {
-                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow4down.png'), width:120, height:40 })
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>ascending", bitmap:DQX.BMP('arrow7down.png'), width:120, height:40 })
                             .setOnChanged(function() {
                                 that.panelTable.getTable().sortByColumn(propid,false);
                             }) );
-                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow4up.png'), width:120, height:40 })
+                        buttons.push( Controls.Button(null, { buttonClass: 'DQXToolButton2', content: "Sort<br>descending", bitmap:DQX.BMP('arrow7up.png'), width:120, height:40 })
                             .setOnChanged(function() {
                                 that.panelTable.getTable().sortByColumn(propid,true);
                             }) );

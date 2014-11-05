@@ -26,8 +26,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     if (vl > 0) vl = 0.05 + vl * 0.95;
                     vl = Math.sqrt(vl);
                     var b = 255 ;
-                    var g = 255 * (1 - 0.3*vl * vl);
-                    var r = 255 * (1 - 0.6*vl);
+                    var g = 255 * (1 - 0.15*vl * vl);
+                    var r = 255 * (1 - 0.3*vl);
                     return "rgb(" + parseInt(r) + "," + parseInt(g) + "," + parseInt(b) + ")";
                 }
             };
@@ -146,7 +146,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 col.maxColumnWidth = propInfo.settings.MaxColumnWidth;
 
             if (propInfo.isBoolean)
-                col.CellToColor = function(vl) { return vl?DQX.Color(0.75,0.85,0.75):DQX.Color(1.0,0.9,0.8); }
+                col.CellToColor = function(vl) { return vl?DQX.Color(0.88,0.97,0.88):DQX.Color(1.0,0.95,0.9); }
 
             col.checkCanSort = function() {
                 var q = tableInfo;
