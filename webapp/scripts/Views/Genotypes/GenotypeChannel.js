@@ -168,6 +168,10 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     else
                         return num;
                 });
+                model_params.on({change:'page_length'}, function() {
+                    model_params.set({'page':1});
+                });
+
                 controlsGridData.push({ label:'Page size', ctrl: page_length })
 
 
