@@ -2,6 +2,8 @@ import os
 import ImpUtils
 import SettingsLoader
 import config
+import DQXDbTools
+import simplejson
 
 class BaseImport(object):
     
@@ -66,6 +68,20 @@ class BaseImport(object):
             self._maxLineCount = 1000000
         if importSettings['ScopeStr'] == '10M':
             self._maxLineCount = 10000000
+
+    def copy (self, src):
+        
+        self._calculationObject = src._calculationObject
+        self._datasetId = src._datasetId
+        self._workspaceId = src._workspaceId
+        self._importSettings = src._importSettings
+        self._dataDir = src._dataDir
+        self._datasetFolder = src._datasetFolder
+        self._tablesToken = src._tablesToken
+        self._dataFile = src._dataFile
+        self._datatablesFolder = src._datatablesFolder
+        self._globalSettings = src._globalSettings
+        self._maxLineCount = src._maxLineCount
 
         
     def __str__(self):
@@ -181,6 +197,23 @@ class BaseImport(object):
     
     def _execSql(self, sql):
         ImpUtils.ExecuteSQL(self._calculationObject, self._datasetId, sql)
+
+    def _getTablesInfo(self, tableid = None):
+        tables = []
+        if tableid == None:
+            sql = 'SELECT id, primkey, settings FROM tablecatalog'
+        else:
+            sql = 'SELECT id, primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid)
+        with DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId) as cur:  
+            cur.execute(sql)
+            tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
+            
+            for table in tables:
+                tableSettings = SettingsLoader.SettingsLoader()
+                tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
+                table['settings'] = tableSettings
+                
+        return tables
         
     def _log(self, message):
         self._calculationObject.Log(message)

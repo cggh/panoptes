@@ -107,7 +107,7 @@ class Summariser:
             cnf["BlockSizeIncrFactor"] = self._blockSizeIncrFactor
             cnf["BlockSizeMax"] = self._blockSizeMax
             cnf["Properties"] = [
-                { "ID": propid, "Type": "Float"}
+                { "ID": propid, "Type": "Text"}
             ]
         
             cnf["Summarisers"] = [

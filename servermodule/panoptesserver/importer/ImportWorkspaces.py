@@ -46,14 +46,7 @@ class ImportWorkspaces(BaseImport):
                     self._calculationObject.LogSQLCommand(cmd)
                     cur.execute(cmd)
     
-                cur.execute('SELECT id, primkey, settings FROM tablecatalog')
-                tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
-                tableMap = {table['id']:table for table in tables}
-    
-                for table in tables:
-                    tableSettings = SettingsLoader.SettingsLoader()
-                    tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
-                    table['settings'] = tableSettings
+                tables = self._getTablesInfo()
     
                 if not self._importSettings['ConfigOnly']:
                     for table in tables:
@@ -94,7 +87,7 @@ class ImportWorkspaces(BaseImport):
             
             importCustom = ImportCustomData(self._calculationObject, self._datasetId, self._importSettings, workspaceId = workspaceid, baseFolder = self._datatablesFolder,  dataDir = 'customdata')
             
-            importCustom.importAllCustomData(tableMap)
+            importCustom.importAllCustomData()
             
             for table in tables:
                 self.CheckMaterialiseWorkspaceView(workspaceid, table['id'])
