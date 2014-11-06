@@ -3,11 +3,11 @@
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/QueryTable", "DQX/Map", "DQX/SVG",
     "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/ChannelPlot/GenomePlotter", "DQX/ChannelPlot/ChannelYVals", "DQX/ChannelPlot/ChannelPositions", "DQX/ChannelPlot/ChannelSequence","DQX/DataFetcher/DataFetchers", "DQX/DataFetcher/DataFetcherSummary",
-    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils"
+    "MetaData", "Utils/GetFullDataItemInfo", "Utils/MiscUtils", "InfoPopups/DataItemViews/ItemPropertyLine"
 ],
     function (require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, QueryTable, Map, SVG,
               Wizard, Popup, PopupFrame, GenomePlotter, ChannelYVals, ChannelPositions, ChannelSequence, DataFetchers, DataFetcherSummary,
-              MetaData, GetFullDataItemInfo, MiscUtils
+              MetaData, GetFullDataItemInfo, MiscUtils, ItemPropertyLine
         ) {
 
         var DefaultView = {};
@@ -31,14 +31,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     content += "<table>";
                     $.each(MetaData.customProperties,function(idx, propInfo) {
                         if (propInfo.tableid == tableInfo.id) {
-                            var fieldContent = levelInfo.fields[propInfo.propid];
-                            content += '<tr>';
-                            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b></td>'.DQXformat({
-                                hint: (propInfo.settings.Description)||'',
-                                name: propInfo.name
-                            });
-                            content += '<td style="padding-left:5px;word-wrap:break-word;">' + propInfo.toDisplayString(fieldContent) + "</td>";
-                            content += "</tr>";
+                            content += ItemPropertyLine.createTableLine(tableInfo, propInfo.propid, levelInfo);
                         }
                     });
                     content += "</table>";
