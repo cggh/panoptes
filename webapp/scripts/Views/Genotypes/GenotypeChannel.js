@@ -172,7 +172,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     model_params.set({'page':1});
                 });
 
-                controlsGridData.push({ label:'Page size', ctrl: page_length })
+                controlsGridData.push({ label:'Page size', ctrl: page_length });
 
 
                 var controlsGrid = Controls.CompoundGrid().setSeparation(2,4);

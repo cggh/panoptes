@@ -142,7 +142,10 @@ define([
 
         Serialise.checkLoadView = function(proceedFunction) {
             var viewid  = DQX.getUrlSearchString('view');
+            var link_load = false;
             if (viewid) {
+                ga('send', 'screenview', {screenName: 'stored_view'});
+                link_load = true;
                 DQX.customRequest(MetaData.serverUrl,PnServerModule,'view_get',
                     { id: viewid },
                     function(resp) {
@@ -160,11 +163,17 @@ define([
             var tableid  = DQX.getUrlSearchString('tableid');
             var itemid  = DQX.getUrlSearchString('itemid');
             if (tableid && itemid) {
+                ga('send', 'screenview', {screenName: 'item_url'});
+                link_load = true;
                 HistoryManager.__preventSetFragment = true;
                 Application.activateView('table_' + tableid);
                 HistoryManager.__preventSetFragment = false;
                 Msg.send({ type: 'ItemPopup' }, { tableid: tableid, itemid: itemid } );
             }
+            
+            if (!link_load)
+                ga('send', 'screenview', {screenName: 'start'});
+
 
             proceedFunction();
         };

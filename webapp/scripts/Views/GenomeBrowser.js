@@ -260,6 +260,7 @@ define([
 
 
                 that.onBecomeVisible = function() {
+                    ga('send', 'screenview', {screenName: that._myID});
                     if (that.visibilityControlsGroup)
                         that.reLoad();
                 }

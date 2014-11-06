@@ -210,7 +210,17 @@ require([
                                 a.src = url;
                                 m.parentNode.insertBefore(a, m)
                             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-                            ga('create', MetaData.generalSettings['GoogleAnalyticsId']);
+                            var vars = {};
+                            if (MetaData.userId != 'anonymous')
+                                vars.userId = MetaData.userId;
+                            ga('create', MetaData.generalSettings['GoogleAnalyticsId'],
+                                {'userId':MetaData.userId});
+                            ga('set', {
+                               'appName': MetaData.database
+                            });
+                            ga('send', 'screenview', {screenName: 'loading'});
+                        } else {
+                            window.ga = function() {};
                         }
 
                         MetaData.mapTableCatalog = {};

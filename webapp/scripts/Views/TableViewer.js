@@ -157,6 +157,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                 };
 
                 that.onBecomeVisible = function() {
+                    ga('send', 'screenview', {screenName: that.tableid});
                     if (!that.hasBecomeVisible) {
                         if (that.panelsCreated) {
                             if (that.viewIsLoaded) {

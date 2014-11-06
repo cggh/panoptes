@@ -188,6 +188,9 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
 
                 }
 
+                that.onBecomeVisible = function() {
+                    ga('send', 'screenview', {screenName: that._myID});
+                }
 
 
                 return that;
