@@ -6,13 +6,12 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
-import SettingsLoader
 import ImpUtils
 import customresponders.panoptesserver.Utils as Utils
-import simplejson
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from ProcessDatabase import ProcessDatabase
+from ProcessFilterBank import ProcessFilterBank
 from BaseImport import BaseImport
 
 class ImportCustomData(BaseImport):
@@ -23,6 +22,7 @@ class ImportCustomData(BaseImport):
         
         return settings, properties
     
+
     def ImportCustomData(self, sourceid, tableid):
         
         folder = os.path.join(self._folder,sourceid)
@@ -37,30 +37,18 @@ class ImportCustomData(BaseImport):
     
             credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'propertycatalog'))
             credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'workspaces'))
-            with DQXDbTools.DBCursor(credInfo, self._datasetId) as cur:
-                cur.execute('SELECT primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
-                row = cur.fetchone()
-                if row is None:
-                    raise Exception('Unable to find table record for table {0} in dataset {1}'.format(tableid, self._datasetId))
-                primkey = row[0]
-                tableSettingsStr = row[1]
+ 
     
             self._execSql('DELETE FROM customdatacatalog WHERE tableid="{tableid}" and sourceid="{sourceid}"'.format(
                 tableid=tableid,
                 sourceid=sourceid
             ))
     
-    
-            tableSettings = SettingsLoader.SettingsLoader()
-            tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
+            tables = self._getTablesInfo(tableid)
+            tableSettings = tables[0]["settings"]
+            primkey = tables[0]["primkey"]
     
             allowSubSampling = tableSettings['AllowSubSampling']
-    
-            isPositionOnGenome = False
-            if tableSettings.HasToken('IsPositionOnGenome') and tableSettings['IsPositionOnGenome']:
-                isPositionOnGenome = True
-                chromField = tableSettings['Chromosome']
-                posField = tableSettings['Position']
     
             settings, properties = self.getSettings(sourceid, tableid)
     
@@ -219,50 +207,12 @@ class ImportCustomData(BaseImport):
                     Utils.UpdateTableInfoView(self._workspaceId, tableid, allowSubSampling, cur)
     
                 cur.commit()
-    
-            print('Creating custom summary values')
-            for property in properties:
-                propid = property['propid']
-                settings = property['Settings']
-                if settings.HasToken('SummaryValues'):
-                    with self._logHeader('Creating summary values for custom data {0}'.format(tableid)):
-                        summSettings = settings.GetSubSettings('SummaryValues')
-                        if settings.HasToken('minval'):
-                            summSettings.AddTokenIfMissing('MinVal', settings['minval'])
-                        summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
-                        destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, propid)
-                        if not os.path.exists(destFolder):
-                            os.makedirs(destFolder)
-                        dataFileName = os.path.join(destFolder, propid)
-    
-                        if not isPositionOnGenome:
-                            raise Exception('Summary values defined for non-position table')
-    
-                        if not self._importSettings['ConfigOnly']:
-                            self._log('Extracting data to '+dataFileName)
-                            script = ImpUtils.SQLScript(self._calculationObject)
-                            script.AddCommand("SELECT {2} as chrom, {3} as pos, {0} FROM {1} ORDER BY {2},{3}".format(
-                                DBCOLESC(propid),
-                                DBTBESC(Utils.GetTableWorkspaceView(self._workspaceId, tableid)),
-                                DBCOLESC(chromField),
-                                DBCOLESC(posField)
-                            ))
-                            script.Execute(self._datasetId, dataFileName)
-                            self._calculationObject.LogFileTop(dataFileName, 5)
-    
-                        ImpUtils.CreateSummaryValues_Value(
-                            self._calculationObject,
-                            summSettings,
-                            self._datasetId,
-                            tableid,
-                            'custom',
-                            self._workspaceId,
-                            propid,
-                            settings['Name'],
-                            dataFileName,
-                            self._importSettings
-                        )
-                        
+                
+                filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, workspaceId = self._workspaceId, baseFolder = None, dataDir = 'customdata')
+                filterBanker.copy(self)
+                filterBanker.createCustomSummaryValues(sourceid, tableid)
+                
+                
  
     
     def _getDataList(self, table):
@@ -292,10 +242,14 @@ class ImportCustomData(BaseImport):
 
     
     
-    def importAllCustomData(self, tableMap):
+    def importAllCustomData(self):
     
         print('Scanning for custom data in {}'.format(self._workspaceId))
     
+        tables = self._getTablesInfo()
+            
+        tableMap = {table['id']:table for table in tables}
+                
         workspaces = self._getTables()
         print('Importing custom data')
         if len(workspaces) == 0:

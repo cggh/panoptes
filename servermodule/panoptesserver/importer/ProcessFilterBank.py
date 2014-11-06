@@ -9,6 +9,9 @@ import config
 import gzip
 import shutil
 import SettingsLoader
+from DQXDbTools import DBCOLESC
+from DQXDbTools import DBTBESC
+import customresponders.panoptesserver.Utils as Utils
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -23,6 +26,7 @@ class ProcessFilterBank(BaseImport):
             if name == 'Process':
                 ret = 'all'
         return ret
+    
     def _createSummary(self, output, chromosome, pos_str, val_str):
         pos = int(pos_str)
         val = None
@@ -60,7 +64,7 @@ class ProcessFilterBank(BaseImport):
         sourceFileName = None
         
         if len(outputs) == 0 and len(outputc) == 0:
-#            self._log('Nothing to filter bank from {}'.format(sourceFileName))
+#            self._log('Nothing to filter bank')
             return
         
         for output in outputs:
@@ -234,7 +238,6 @@ class ProcessFilterBank(BaseImport):
         self._log(("Preparing to create summary values for {} from {} using {}").format(tableid, sourceFileName, settings))
         tableSettings, properties = self._fetchSettings(tableid)
 
-        
         outputs = []
         outputc = []
         for prop in properties:
@@ -297,13 +300,13 @@ class ProcessFilterBank(BaseImport):
                             }
                     outputc.append(cval)
             
-            return outputs,outputc
+        return outputs,outputc
         
 
     def createSummaryValues(self, tableid):
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
             outputs, outputc = self._prepareSummaryValues(tableid)
-            self._extractColumnsAndProcess(outputs, outputc, True, True, True)
+            self._extractColumnsAndProcess(outputs, outputc, False, True, True)
         
     def _prepareSummaryFilterBank(self, tableid, summSettings, summaryid):
         global config
@@ -379,7 +382,65 @@ class ProcessFilterBank(BaseImport):
                                           summSettings['BlockSizeMin'])
                         self._execSql(sql)
                     self._createSummaryFilterBank(tableid, summSettings, summaryid)
-                    
+
+     
+    def createCustomSummaryValues(self, sourceid, tableid):
+    
+        settings, properties = self._fetchCustomSettings(sourceid, tableid)
+        
+        tables = self._getTablesInfo(tableid)
+        tableSettings = tables[0]["settings"]
+        
+        isPositionOnGenome = False
+        if tableSettings.HasToken('IsPositionOnGenome') and tableSettings['IsPositionOnGenome']:
+            isPositionOnGenome = True
+            chromField = tableSettings['Chromosome']
+            posField = tableSettings['Position']
+                
+        print('Creating custom summary values')
+        for prop in properties:
+            propid = prop['propid']
+            settings = prop['Settings']
+            if settings.HasToken('SummaryValues'):
+                with self._logHeader('Creating summary values for custom data {0}'.format(tableid)):
+                    summSettings = settings.GetSubSettings('SummaryValues')
+                    if settings.HasToken('minval'):
+                        summSettings.AddTokenIfMissing('MinVal', settings['minval'])
+                    summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
+                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, propid)
+                    if not os.path.exists(destFolder):
+                        os.makedirs(destFolder)
+                    dataFileName = os.path.join(destFolder, propid)
+
+                    if not isPositionOnGenome:
+                        raise Exception('Summary values defined for non-position table')
+
+                    if not self._importSettings['ConfigOnly']:
+                        self._log('Extracting data to '+dataFileName)
+                        script = ImpUtils.SQLScript(self._calculationObject)
+                        script.AddCommand("SELECT {2} as chrom, {3} as pos, {0} FROM {1} ORDER BY {2},{3}".format(
+                            DBCOLESC(propid),
+                            DBTBESC(Utils.GetTableWorkspaceView(self._workspaceId, tableid)),
+                            DBCOLESC(chromField),
+                            DBCOLESC(posField)
+                        ))
+                        script.Execute(self._datasetId, dataFileName)
+                        self._calculationObject.LogFileTop(dataFileName, 5)
+
+                    ImpUtils.CreateSummaryValues_Value(
+                        self._calculationObject,
+                        summSettings,
+                        self._datasetId,
+                        tableid,
+                        'custom',
+                        self._workspaceId,
+                        propid,
+                        settings['Name'],
+                        dataFileName,
+                        self._importSettings
+                    )
+                            
+               
                
     #Not actually used except below
     def createAllSummaryValues(self):
