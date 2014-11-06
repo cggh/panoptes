@@ -124,6 +124,15 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 })
             }
 
+            if (propInfo.settings.ExternalUrl) {
+                col.setCellClickHandler(function(fetcher,downloadrownr) {
+                    var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
+                    var url = propInfo.settings.ExternalUrl;
+                    url = url.DQXformat({value: itemid});
+                    window.open(url,'_blank');
+               }, true)
+            }
+
             col.CellToText = propInfo.toDisplayString;
             col.CellToTextInv = propInfo.fromDisplayString;
             if (propInfo.group)

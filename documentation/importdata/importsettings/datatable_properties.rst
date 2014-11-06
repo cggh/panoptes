@@ -36,6 +36,11 @@ Description
 GroupId
   *Text.* Id of the Property group this property belongs to.
 
+ExternalUrl:
+  *Text.* A url that should be opened when the user clicks on a value of this property. The url should
+  be formatted as a template, with ``{value}`` interpolated to the property value.
+  For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``.
+
 IsCategorical
   *Boolean.* Instructs Panoptes to treat the property as a categorical variable.
   For example, a combo box with the possible states is automatically shown in queries for this property.
