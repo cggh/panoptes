@@ -210,11 +210,7 @@ require([
                                 a.src = url;
                                 m.parentNode.insertBefore(a, m)
                             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-                            var vars = {};
-                            if (MetaData.userId != 'anonymous')
-                                vars.userId = MetaData.userId;
-                            ga('create', MetaData.generalSettings['GoogleAnalyticsId'],
-                                {'userId':MetaData.userId});
+                            ga('create', MetaData.generalSettings['GoogleAnalyticsId'],'auto');
                             ga('set', {
                                'appName': MetaData.database
                             });
