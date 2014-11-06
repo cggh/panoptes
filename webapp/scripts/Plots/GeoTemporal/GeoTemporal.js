@@ -220,7 +220,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                     ]).setMargin(10), {
                         title: 'Color overlay',
                         bodyStyleClass: 'ControlsSectionBody'
-                    }),
+                    })
                 ];
 
                 $.each(that.plotComponents, function(key, plotComp) {
