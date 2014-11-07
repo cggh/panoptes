@@ -32,7 +32,17 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             }
 
             if (!tableInfo.settings.DisablePlots) {
-                var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot', width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
+                var queryDefined = false;
+
+                if (tableInfo.currentQuery)
+                    if (!tableInfo.currentQuery.isTrivial)
+                        queryDefined = true;
+
+
+                var buttonName = 'Create plot';
+                if (queryDefined)
+                    buttonName += '<br>(current query)';
+                var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: buttonName, width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
                     Msg.send({type: 'CreateDefaultPropertyPlot'}, {
                         tableid: propInfo.tableid,
                         propid: propInfo.propid,
@@ -42,6 +52,20 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Popup.closeIfNeeded(popupid);
                 });
                 content += button_plot.renderHtml();
+
+                if (queryDefined) {
+                    var button_plot = Controls.Button(null, { buttonClass: 'DQXToolButton2', content: 'Create plot<br>(all data)', width:120, height:40, icon:'fa-bar-chart-o' }).setOnChanged(function() {
+                        Msg.send({type: 'CreateDefaultPropertyPlot'}, {
+                            tableid: propInfo.tableid,
+                            propid: propInfo.propid,
+                            query: SQL.WhereClause.Trivial(),
+                            dataValues: settings.dataValues
+                        });
+                        Popup.closeIfNeeded(popupid);
+                    });
+                    content += button_plot.renderHtml();
+                }
+
             }
 
 
