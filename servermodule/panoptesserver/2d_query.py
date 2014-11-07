@@ -278,7 +278,7 @@ def handler(start_response, request_data):
                 cur.execute(sqlquery)
                 idx_for_col = dict((str(int(k)), v) for k,v in cur.fetchall())
                 #Sort by the order specified - reverse so last clicked is major sort
-                sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
+                sort_col_idx = list(reversed(map(lambda key: idx_for_col[str(int(key))], row_order_columns)))
                 #grab the data needed to sort
                 sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, [row_sort_property])
                 rows = zip(row_idx, sort_data[row_sort_property])
