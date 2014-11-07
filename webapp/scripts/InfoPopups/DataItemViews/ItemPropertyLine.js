@@ -23,8 +23,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             var content = '';
             var linkAction = null;
             var linkIcon = null;
+            var propInfo = null;
+            var fieldContent = null;
             if (propid.indexOf('@')<0) {//property from this table
-                var propInfo = MetaData.findProperty(tableInfo.id, propid);
+                propInfo = MetaData.findProperty(tableInfo.id, propid);
                 fieldContent = itemData.fields[propid];
                 if (propInfo.relationParentTableId) {
                     linkAction = function() {
@@ -46,15 +48,25 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             else {//property from a parent table
                 var parenttableid = propid.split('@')[1];
                 propid = propid.split('@')[0];
-                var propInfo = MetaData.findProperty(parenttableid, propid);
+                propInfo = MetaData.findProperty(parenttableid, propid);
                 if (!parentFieldsMap[parenttableid])
                     DQX.reportError('Missing parent item data for '+parenttableid);
                 fieldContent = parentFieldsMap[parenttableid][propid];
             }
+
+            var ctrl_infobutton = Controls.ImageButton(null, {bitmap:'Bitmaps/actionbuttons/info.png', vertShift:-2}).setOnChanged(function() {
+                Msg.send({type: 'PropInfoPopup'}, {
+                    tableid: tableInfo.id,
+                    propid: propInfo.propid,
+                    dataValues: [{name: itemData.fields[tableInfo.primkey], value: fieldContent}]
+                });
+            });
+
             content += '<tr>';
-            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b></td>'.DQXformat({
+            content += '<td style="padding-bottom:3px;padding-top:3px;white-space:nowrap" title="{hint}"><b>{name}</b> {infobuttonhtml}</td>'.DQXformat({
                 hint: (propInfo.settings.Description)||'',
-                name: propInfo.name
+                name: propInfo.name,
+                infobuttonhtml: ctrl_infobutton.renderHtml()
             });
             content += '<td style="padding-left:5px;word-wrap:break-word;">';
             var displayedString = propInfo.toDisplayString(fieldContent);

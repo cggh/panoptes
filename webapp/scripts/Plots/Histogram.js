@@ -31,12 +31,18 @@ define([
             that.showRelative = false;
 
 
-
-
             that.barW = 16;
             that.scaleW = 100;
             that.textH = 130;
 
+            that.overlayValueList = [];
+            if (plotSettings) {
+                if (plotSettings.dataValues != null) {
+                    $.each(plotSettings.dataValues, function(idx, dataValue) {
+                        that.overlayValueList.push(dataValue);
+                    });
+                }
+            }
 
 
             that.createPanelPlot = function() {
@@ -239,6 +245,10 @@ define([
                 if (!that.bucketCounts)
                     return;
 
+                var propInfo = null;
+                if (that.propidValue)
+                    propInfo = MetaData.findProperty(that.tableInfo.id, that.propidValue);
+
                 var gamma = Math.pow(that.ctrl_Gamma.getValue(),2.0);
 
                 var XMin = that.bucketNrOffset*that.bucketSize;
@@ -283,9 +293,9 @@ define([
 
                 });
 
-                if (that.propidValue) {
+                if (propInfo) {
                     ctx.font="bold 12px Arial";
-                    ctx.fillText(MetaData.findProperty(that.tableInfo.id, that.propidValue).name,drawInfo.sizeX/2, drawInfo.sizeY-12);
+                    ctx.fillText(propInfo.name,drawInfo.sizeX/2, drawInfo.sizeY-12);
                 }
                 ctx.restore();
 
@@ -330,7 +340,8 @@ define([
                 }
                 ctx.restore();
 
-                ctx.fillStyle="rgb(190,190,190)";
+                ctx.fillStyle="rgb(210,210,210)";
+                ctx.strokeStyle = "rgb(100,100,100)";
                 $.each(that.bucketCounts, function(bidx, val) {
                     val = applyGammaCorr(val);
                     var x1 = (that.bucketNrOffset+bidx+0)*that.bucketSize;
@@ -349,6 +360,22 @@ define([
                     ctx.stroke();
                 });
 
+                //show overlay values
+                ctx.strokeStyle = "rgb(255,0,0)";
+                ctx.fillStyle="rgb(255,0,0)";
+                ctx.font="bold 12px Arial";
+                $.each(that.overlayValueList, function(idx, overlayValue) {
+                    var px = Math.round(overlayValue.value * scaleX + offsetX)-0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(px, 0);
+                    ctx.lineTo(px, drawInfo.sizeY-marginY);
+                    ctx.stroke();
+                    ctx.fillText(overlayValue.name, px+2, 12);
+                    if (propInfo) {
+                        var str = propInfo.toDisplayString(overlayValue.value);
+                        ctx.fillText(str, px+2, 28);
+                    }
+                });
 
                 that.plotPresent = true;
             };

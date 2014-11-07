@@ -36,7 +36,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                     Msg.send({type: 'CreateDefaultPropertyPlot'}, {
                         tableid: propInfo.tableid,
                         propid: propInfo.propid,
-                        query: settings.query
+                        query: settings.query,
+                        dataValues: settings.dataValues
                     });
                     Popup.closeIfNeeded(popupid);
                 });

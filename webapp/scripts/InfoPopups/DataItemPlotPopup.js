@@ -29,8 +29,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var propInfo = MetaData.findProperty(info.tableid, info.propid);
                 if (propInfo.isFloat) {
                     Histogram.Create(propInfo.tableid, query, {
-                        aspects: {'value':propInfo.propid }
-                    });
+                            aspects: {'value':propInfo.propid }
+                        },
+                        {
+                            dataValues: info.dataValues
+                        });
                 }
                 else {
                     BarGraph.Create(propInfo.tableid, query, {
