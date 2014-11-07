@@ -38,7 +38,7 @@ ListView: true
 
 DataItemViews: # Lists the custom views that should appear in the popup for an individual data table item
 
-- Type: Template                                       # Specifies the default view of all fields
+- Type: Template                                       # Add a template based view
   Name: Details
   Content: |
       <h4>ID: {{ID}}</h4>
