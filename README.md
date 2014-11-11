@@ -1,4 +1,4 @@
-[![logo](https://raw2.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw2.github.com/cggh/panoptes/master/webapp/Bitmaps/)
+[![logo](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/)
 
 Panoptes
 ========
