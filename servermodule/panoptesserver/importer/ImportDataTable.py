@@ -160,6 +160,8 @@ class ImportDataTable(BaseImport):
     
             filterBanker.createTableBasedSummaryValues(tableid)
                 
+            filterBanker.printLog()
+            
             self.importGraphs(tableid)
 
     def importGraphs(self, tableid):

@@ -18,6 +18,13 @@ logger = logging.getLogger(__name__)
 
 class ProcessFilterBank(BaseImport):
 
+    #Keep the log messages so that they can be output in one go so that log is less confusing
+    def _log(self, message):
+        self._logMessages.append(message)
+        
+    def printLog(self):
+        self._calculationObject.Log('\n#######'.join(self._logMessages))
+        
     def _getImportSetting(self, name):
         ret = None
         if name in self._importSettings:
@@ -152,7 +159,11 @@ class ProcessFilterBank(BaseImport):
                     line = line.rstrip('\r\n')
                     if len(line) > 0:
                         columns = line.split('\t')
-                        fields = [columns[colindex] for colindex in outputs[0]["colindices"]]
+                        fields = []
+                        if len(outputs) > 0:
+                            fields = [columns[colindex] for colindex in outputs[0]["colindices"]]
+                        else:
+                            fields = [columns[colindex] for colindex in outputc[0]["colindices"]]
                         chromosome = fields[0]
                         if chromosome != currentChromosome:
                             self._log('##### Start processing chromosome '+chromosome)
@@ -342,46 +353,53 @@ class ProcessFilterBank(BaseImport):
                     
             return outputs          
             
-    def _createSummaryFilterBank(self, tableid, summSettings, summaryid):
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-            outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
-            for output in outputs:
-                outputa = [ output ]
-                self._extractColumnsAndProcess(outputa, [], False, False, False)      
+    def _prepareTableBasedSummaryValues(self, tableid):
+    	
+    	tableSettings, properties = self._fetchSettings(tableid, includeProperties = False)
+    	
+        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
+			sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
+			self._execSql(sql)
+			
+        output = []
+        if tableSettings.HasToken('TableBasedSummaryValues'):
+			self._log('Processing table-based summary values')
+			if not type(tableSettings['TableBasedSummaryValues']) is list:
+				raise Exception('TableBasedSummaryValues token should be a list')
+			for stt in tableSettings['TableBasedSummaryValues']:
+				summSettings = SettingsLoader.SettingsLoader()
+				summSettings.LoadDict(stt)
+				summSettings.AddTokenIfMissing('MinVal', 0)
+				summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+				summSettings.DefineKnownTokens(['channelColor'])
+				summaryid = summSettings['Id']
+				with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+					extraSummSettings = summSettings.Clone()
+					extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+					if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
+						stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
+						sql = stmt.format(tableid,
+										  summaryid, 
+										  summSettings['Name'], 
+										  extraSummSettings.ToJSON(), 
+										  summSettings['MinVal'], 
+										  summSettings['MaxVal'], 
+										  summSettings['BlockSizeMin'])
+						self._execSql(sql)
+					if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+						outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
+						output = output + outputs
+						
+        return output
+
+
 
     def createTableBasedSummaryValues(self, tableid):
         
-        tableSettings, properties = self._fetchSettings(tableid, includeProperties = False)
-        
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
-            self._execSql(sql)
-            
-        if tableSettings.HasToken('TableBasedSummaryValues'):
-            self._log('Processing table-based summary values')
-            if not type(tableSettings['TableBasedSummaryValues']) is list:
-                raise Exception('TableBasedSummaryValues token should be a list')
-            for stt in tableSettings['TableBasedSummaryValues']:
-                summSettings = SettingsLoader.SettingsLoader()
-                summSettings.LoadDict(stt)
-                summSettings.AddTokenIfMissing('MinVal', 0)
-                summSettings.AddTokenIfMissing('BlockSizeMin', 1)
-                summSettings.DefineKnownTokens(['channelColor'])
-                summaryid = summSettings['Id']
-                with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
-                    extraSummSettings = summSettings.Clone()
-                    extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                    if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-                        stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
-                        sql = stmt.format(tableid,
-                                          summaryid, 
-                                          summSettings['Name'], 
-                                          extraSummSettings.ToJSON(), 
-                                          summSettings['MinVal'], 
-                                          summSettings['MaxVal'], 
-                                          summSettings['BlockSizeMin'])
-                        self._execSql(sql)
-                    self._createSummaryFilterBank(tableid, summSettings, summaryid)
+        output = self._prepareTableBasedSummaryValues(tableid)
+        for out in output:
+			outputa = [ out ]
+			self._extractColumnsAndProcess(outputa, [], False, False, False)	  
 
      
     def createCustomSummaryValues(self, sourceid, tableid):
@@ -397,7 +415,7 @@ class ProcessFilterBank(BaseImport):
             chromField = tableSettings['Chromosome']
             posField = tableSettings['Position']
                 
-        print('Creating custom summary values')
+        self._log('Creating custom summary values')
         for prop in properties:
             propid = prop['propid']
             settings = prop['Settings']
@@ -454,6 +472,103 @@ class ProcessFilterBank(BaseImport):
             self.createSummaryValues(datatable)
             self.createTableBasedSummaryValues(datatable)
 
+    def enum(self, *sequential, **named):
+        """Handy way to fake an enumerated type in Python
+        http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python
+        """
+        enums = dict(zip(sequential, range(len(sequential))), **named)
+        return type('Enum', (), enums)
+
+    #Not actually used except below
+    def createAllSummaryValuesMPI(self):
+        # Define MPI message tags
+        tags = self.enum('READY', 'DONE', 'EXIT', 'START')
+
+        # Initializations and preliminaries
+        comm = MPI.COMM_WORLD   # get MPI communicator object
+        size = comm.size        # total number of processes
+        rank = comm.rank        # rank of this process
+        status = MPI.Status()   # get MPI status object
+
+        if rank == 0:
+            # Master process executes code below
+            self._log('Creating summary values')
+        
+            datatables = self._getGlobalSettingList('DataTables')
+        
+            datatables = self._getDatasetFolders(datatables)
+            
+            tasks = []    
+            for tableid in datatables:
+                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+                    outputs, outputc = self._prepareSummaryValues(tableid)
+                    tasks = tasks + outputs + outputc
+                    outputs = self._prepareTableBasedSummaryValues(tableid)
+                    tasks = tasks + outputs
+
+            task_index = 0
+            num_workers = size - 1
+            closed_workers = 0
+            self._log("Master starting with %d workers, %d tasks" % (num_workers, len(tasks)))
+            while closed_workers < num_workers:
+                data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
+                source = status.Get_source()
+                tag = status.Get_tag()
+                if tag == tags.READY:
+                    # Worker is ready, so send it a task
+                    if task_index < len(tasks):
+                        task = tasks[task_index]
+                        comm.send(task, dest=source, tag=tags.START)
+                        self._log("Sending task %d to worker %d, %s" % (task_index, source, task))
+                        task_index += 1
+                    else:
+                        comm.send(None, dest=source, tag=tags.EXIT)
+                elif tag == tags.DONE:
+                    results = data
+                    self._log("Got data from worker %d" % source)
+                elif tag == tags.EXIT:
+                    self._log("Worker %d exited." % source)
+                    closed_workers += 1
+
+            self._log("Master finishing")
+            self.printLog()
+        else:
+            # Worker processes execute code below
+            name = MPI.Get_processor_name()
+            self._log("I am a worker with rank %d on %s." % (rank, name))
+            while True:
+                comm.send(None, dest=0, tag=tags.READY)
+                
+                task = comm.recv(tag=MPI.ANY_TAG, status=status)
+                tag = status.Get_tag()
+                
+                if tag == tags.START:
+                    taska = [ task ]
+                    result = 0
+                    ptype = ''
+                    try:
+                        if 'minval' in task:
+                            ptype = 'simple'
+                            self._extractColumnsAndProcess(taska, [], False, True, True)
+                        else:
+                            ptype = 'categorical'
+                            self._extractColumnsAndProcess([], taska, False, True, True)
+                        self._log("Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
+                    except:
+                        e = sys.exc_info()[0]
+                        self._log("Failed Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
+                        logging.exception(e)
+                        result = 1
+                    finally:
+                        comm.send(result, dest=0, tag=tags.DONE)
+                        self.printLog()
+                elif tag == tags.EXIT:
+                    break
+
+            comm.send(None, dest=0, tag=tags.EXIT)
+
+
+
 if __name__ == "__main__":
     
     import sys
@@ -465,7 +580,7 @@ if __name__ == "__main__":
     processOptions = ["all", "db", "files"]
     
     if len(sys.argv) < 4:
-        print('Arguments: ImportType processOptions DataSetId [...]')
+        print('Arguments: ImportType processOptions DataSetId [mpi]')
         print('ImportType: '+', '.join(scopeOptions))
         print('processOptions: '+', '.join(processOptions))
         sys.exit()
@@ -493,5 +608,29 @@ if __name__ == "__main__":
             }
         
     workspaceId = None
-    filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId) 
-    filterBanker.createAllSummaryValues()
+    
+    filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
+    if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
+         #Need to install openmpi in order to use this option
+         #
+         #Optional import - note not in REQUIREMENTS
+         #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/openmpi/
+         #export CC=/usr/local/bin/mpicc
+         #pip install mpi4py
+         from mpi4py import MPI
+         #Without Sun Grid Engine
+         #It's better to install from source as the packaged version is old - recommend 1.8.1 - see below
+         #mpiexec --prefix /usr/local -n 4 -host oscar,november python demo.py
+         #With Sun Grid Engine
+         #Need to install from source to get sge support
+         #wget https://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.1.tar.gz
+         #apt-get install libnuma-dev libtorque2-dev
+         #./configure --with-sge
+         #make
+         #make install
+         #qsub -cwd -S /bin/bash -pe mpi_pe 2 runq.sh
+         #You can export OPAL_PREFIX=/usr/local instead of --prefix if that suits you better
+         filterBanker.createAllSummaryValuesMPI()
+ 
+    else:
+         filterBanker.createAllSummaryValues()

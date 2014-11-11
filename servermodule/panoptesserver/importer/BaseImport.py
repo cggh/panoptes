@@ -68,6 +68,8 @@ class BaseImport(object):
             self._maxLineCount = 1000000
         if importSettings['ScopeStr'] == '10M':
             self._maxLineCount = 10000000
+            
+        self._logMessages = []
 
     def copy (self, src):
         

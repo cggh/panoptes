@@ -18,6 +18,6 @@ export PYTHONPATH
 
 cd build/DQXServer/customresponders/panoptesserver/importer
 
-python ProcessFilterBank.py all files Samples_and_Variants
+mpirun python ProcessFilterBank.py all files Samples_and_Variants 
 
 fi

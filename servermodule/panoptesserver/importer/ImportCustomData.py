@@ -211,7 +211,7 @@ class ImportCustomData(BaseImport):
                 filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, workspaceId = self._workspaceId, baseFolder = None, dataDir = 'customdata')
                 filterBanker.copy(self)
                 filterBanker.createCustomSummaryValues(sourceid, tableid)
-                
+                filterBanker.printLog()
                 
  
     
