@@ -400,20 +400,20 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
             that.download_view = function() {
               var data = '';
-              data += '#Dataset: ' + MetaData.database + '\n';
-              data += '#Workspace: ' + MetaData.workspaceid + '\n';
-              data += '#Table:' + that.table_info.tableCapNamePlural + that.view.colour_channel == 'call' ? ' Calls' : ' Allele Depths' + '\n';
-              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.col_query) + '\n';
-              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.row_query) + '\n';
-              data += '#Choromosome:' + that.model.chrom + '\n';
-              data += '#Start:' + Math.floor(that.model.col_start) + '\n';
-              data += '#End:' + Math.ceil(that.model.col_end) + '\n';
+              data += '#Dataset: ' + MetaData.database + '\r\n';
+              data += '#Workspace: ' + MetaData.workspaceid + '\r\n';
+              data += '#Table:' + that.table_info.tableCapNamePlural + that.view.colour_channel == 'call' ? ' Calls' : ' Allele Depths' + '\r\n';
+              data += '#'+ that.table_info.col_table.tableCapNamePlural + ' query: ' + that.table_info.col_table.createQueryDisplayString(that.model.col_query) + '\r\n';
+              data += '#'+ that.table_info.row_table.tableCapNamePlural + ' query: ' + that.table_info.row_table.createQueryDisplayString(that.model.row_query) + '\r\n';
+              data += '#Choromosome:' + that.model.chrom + '\r\n';
+              data += '#Start:' + Math.floor(that.model.col_start) + '\r\n';
+              data += '#End:' + Math.ceil(that.model.col_end) + '\r\n';
               Serialise.createStoredURL(function(url) {
-                data += '#URL: '+url+'\n';
+                data += '#URL: '+url+'\r\n';
                 data += 'Position\t';
                 for(var i=0; i<that.model.row_primary_key.length; i++)
                   data += that.model.row_primary_key[i] +'\t'
-                data += "\n";
+                data += "\r\n";
                 var prop = that.view.colour_channel == 'call' ? that.model.settings.Call : that.model.settings.AlleleDepth;
                 var prop_array = that.model.data[prop];
                 var arity = prop_array.shape[2] || 1;
@@ -427,7 +427,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                       }
                       data += '\t';
                     }
-                    data += '\n';
+                    data += '\r\n';
                   }
                 var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
                 FileSaver(blob, MetaData.database + '-' + that.view.colour_channel == 'call' ? ' Calls' : ' Allele Depths' + '-' + that.table_info.tableCapNamePlural + '-' + that.model.chrom + '-' + Math.floor(that.model.col_start) + '~' + Math.ceil(that.model.col_end));
