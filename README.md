@@ -12,11 +12,6 @@ data.
 For more information about the project please send an email to the public
 mailing list <panoptes-dev@googlegroups.com>.
 
-**IMPORTANT NOTE: 
-Panoptes is a new project in an early phase of development. It should currently be considered as a prototype, unfit for production deployments.**
- 
-
-
 Links:
 
 * Source code: https://github.com/cggh/panoptes
