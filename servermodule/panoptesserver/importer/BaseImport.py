@@ -70,6 +70,7 @@ class BaseImport(object):
             self._maxLineCount = 10000000
             
         self._logMessages = []
+        self._logId = ''
 
     def copy (self, src):
         
