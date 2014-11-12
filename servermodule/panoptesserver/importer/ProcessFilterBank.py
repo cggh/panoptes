@@ -23,7 +23,8 @@ class ProcessFilterBank(BaseImport):
         self._logMessages.append(message)
         
     def printLog(self):
-        self._calculationObject.Log('\n#######'.join(self._logMessages))
+        logPrefix = '\n###' + self._logId + '###'
+        self._calculationObject.Log(logPrefix.join(self._logMessages))
         
     def _getImportSetting(self, name):
         ret = None
@@ -80,7 +81,9 @@ class ProcessFilterBank(BaseImport):
             else:
                 if sourceFileName != output["inputFile"]:
                     raise ValueError("input file names do not match:", sourceFileName, " vs ", output["inputFile"])
-            if writeColumnFiles and output["outputFile"] != None:
+            if writeColumnFiles:
+                if output["outputFile"] == None:
+                    raise ValueError("No output file specified")
                 self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
                 #Changing the bufsiz seems to have little or no impact
                 output["destFile"] = open(output["outputFile"], 'w')
@@ -94,7 +97,9 @@ class ProcessFilterBank(BaseImport):
                 if sourceFileName != output["inputFile"]:
                     raise ValueError("input file names do not match:", sourceFileName, " vs ", output["inputFile"])
 
-            if writeColumnFiles and output["outputFile"] != None:
+            if writeColumnFiles:
+                if output["outputFile"] == None:
+                    raise ValueError("No output file specified")
                 self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
                 #Changing the bufsiz seems to have little or no impact
                 output["destFile"] = open(output["outputFile"], 'w')
@@ -347,6 +352,7 @@ class ProcessFilterBank(BaseImport):
                           'blockSizeIncrFactor': int(2),
                           'blockSizeStart': int(summSettings["BlockSizeMin"]),
                           'blockSizeMax': int(summSettings["BlockSizeMax"]),
+                          'readHeader': False,
                           'inputFile': fileName
                     }
                     outputs.append(values)
@@ -490,6 +496,7 @@ class ProcessFilterBank(BaseImport):
         rank = comm.rank        # rank of this process
         status = MPI.Status()   # get MPI status object
 
+        self._logId = 'PFB: '+ str(rank)
         if rank == 0:
             # Master process executes code below
             self._log('Creating summary values')
@@ -519,23 +526,26 @@ class ProcessFilterBank(BaseImport):
                     if task_index < len(tasks):
                         task = tasks[task_index]
                         comm.send(task, dest=source, tag=tags.START)
-                        self._log("Sending task %d to worker %d, %s" % (task_index, source, task))
+                        #self._log("Sending task %d to worker %d, %s" % (task_index, source, task))
                         task_index += 1
                     else:
                         comm.send(None, dest=source, tag=tags.EXIT)
                 elif tag == tags.DONE:
                     results = data
-                    self._log("Got data from worker %d" % source)
+                    #self._log("Got data from worker %d" % source)
                 elif tag == tags.EXIT:
-                    self._log("Worker %d exited." % source)
+                    #self._log("Worker %d exited." % source)
                     closed_workers += 1
 
-            self._log("Master finishing")
+            #self._log("Master finishing")
             self.printLog()
         else:
             # Worker processes execute code below
             name = MPI.Get_processor_name()
-            self._log("I am a worker with rank %d on %s." % (rank, name))
+            #self._log("I am a worker with rank %d on %s." % (rank, name))
+            writeHeader = False
+            readHeader = True
+            writeColumnFiles = False
             while True:
                 comm.send(None, dest=0, tag=tags.READY)
                 
@@ -546,14 +556,18 @@ class ProcessFilterBank(BaseImport):
                     taska = [ task ]
                     result = 0
                     ptype = ''
+                    if 'readHeader' in task:
+                        readHeader = task['readHeader']
+                    else:
+                        readHeader = True
                     try:
                         if 'minval' in task:
                             ptype = 'simple'
-                            self._extractColumnsAndProcess(taska, [], False, True, True)
+                            self._extractColumnsAndProcess(taska, [], writeHeader, readHeader, writeColumnFiles)
                         else:
                             ptype = 'categorical'
-                            self._extractColumnsAndProcess([], taska, False, True, True)
-                        self._log("Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
+                            self._extractColumnsAndProcess([], taska, writeHeader, readHeader, writeColumnFiles)
+                        #self._log("Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
                     except:
                         e = sys.exc_info()[0]
                         self._log("Failed Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
