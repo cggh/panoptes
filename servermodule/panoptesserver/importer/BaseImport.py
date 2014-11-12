@@ -4,6 +4,8 @@ import SettingsLoader
 import config
 import DQXDbTools
 import simplejson
+import logging
+import sys
 
 class BaseImport(object):
     
@@ -68,9 +70,18 @@ class BaseImport(object):
             self._maxLineCount = 1000000
         if importSettings['ScopeStr'] == '10M':
             self._maxLineCount = 10000000
-            
+
         self._logMessages = []
         self._logId = ''
+
+        #It's a bit messy but links up with python logging e.g. for using exceptions
+        if self._calculationObject.logfilename is not None:
+            logging.basicConfig(filename=self._calculationObject.logfilename)
+        else:
+            logging.basicConfig(stream=sys.stdout, level='DEBUG')
+        #This allows the use of the python logging api
+        self._logger = logging.getLogger()
+
 
     def copy (self, src):
         
@@ -217,9 +228,27 @@ class BaseImport(object):
                 table['settings'] = tableSettings
                 
         return tables
-        
+    #This is overridden by classes that operate a multi-threading model 
     def _log(self, message):
         self._calculationObject.Log(message)
         
     def _logHeader(self, message):
-        return self._calculationObject.LogHeader(message)
+        return CalcLogHeader(self, message)
+
+#        return self._calculationObject.LogHeader(message)
+
+import DQXUtils
+#This is repeated from servermodule/panoptesserver/asyncresponder.py due to the different requirements around logging
+#with the multi-threaded/MPI approach
+class CalcLogHeader:
+    def __init__(self, calcObject, title):
+        self.calcObject = calcObject
+        self.title = title
+        self.calcObject._log('==>' + self.title)
+        self.timer = DQXUtils.Timer()
+    def __enter__(self):
+        return None
+    def __exit__(self, type, value, traceback):
+        if value is None:
+            self.calcObject._log('<==Finished {0} (Elapsed: {1:.1f}s)'.format(self.title, self.timer.Elapsed()))
+

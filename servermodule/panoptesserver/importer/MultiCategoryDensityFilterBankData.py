@@ -24,7 +24,7 @@ class Summariser:
         self._blockSizeMax = blockSizeMax
         self._field = propid
         
-        print('Categories: ' + str(categories))
+        #print('Categories: ' + str(categories))
         self._categories = categories
         self._numCategories = len(categories)
         self._categorymap = {categories[i]:i for i in range(len(categories))}
