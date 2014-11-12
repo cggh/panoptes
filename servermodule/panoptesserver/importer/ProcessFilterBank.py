@@ -23,8 +23,9 @@ class ProcessFilterBank(BaseImport):
         self._logMessages.append(message)
         
     def printLog(self):
-        logPrefix = '\n###' + self._logId + '###'
-        self._calculationObject.Log(logPrefix.join(self._logMessages))
+        msg = '###' + self._logId + '###'
+        logPrefix = '\n' + msg
+        self._calculationObject.Log(msg + logPrefix.join(self._logMessages))
         
     def _getImportSetting(self, name):
         ret = None
@@ -137,6 +138,7 @@ class ProcessFilterBank(BaseImport):
                     output["currentChromosome"] = ''
                     output["colindices"] = []
                     output["summariser"] = None
+                    self._log("Categories:" + str(output["Categories"]))
                     if output["columns"] != None:
                         for col in output["columns"]:
                             try:
@@ -190,7 +192,7 @@ class ProcessFilterBank(BaseImport):
                                 output["destFile"].write(outline + '\n')
     
     
-            self._log('Finished processing {}. {} lines'.format(sourceFileName,str(linecount)))
+            #self._log('Finished processing {}. {} lines'.format(sourceFileName,str(linecount)))
             for output in outputs:
                 if output["summariser"] != None:
                     output["summariser"].Finalise()
@@ -251,7 +253,7 @@ class ProcessFilterBank(BaseImport):
         
         settings, sourceFileName = self._getDataFiles(tableid)
         
-        self._log(("Preparing to create summary values for {} from {} using {}").format(tableid, sourceFileName, settings))
+        #self._log(("Preparing to create summary values for {} from {} using {}").format(tableid, sourceFileName, settings))
         tableSettings, properties = self._fetchSettings(tableid)
 
         outputs = []
@@ -261,7 +263,7 @@ class ProcessFilterBank(BaseImport):
             settings = prop['Settings']
             if settings.HasToken('SummaryValues') and ImpUtils.IsValueDataTypeIdenfifier(prop['DataType']):
 #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
-                    self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
+                    #self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
                     summSettings = settings.GetSubSettings('SummaryValues')
                     if settings.HasToken('minval'):
                         summSettings.AddTokenIfMissing('MinVal', settings['minval'])
@@ -291,7 +293,7 @@ class ProcessFilterBank(BaseImport):
                     
             if (settings.HasToken('SummaryValues')) and (prop['DataType'] == 'Text'):
 #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
-                    self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
+                    #self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
                     summSettings = settings.GetSubSettings('SummaryValues')
                     summSettings.RequireTokens(['BlockSizeMin', 'BlockSizeMax'])
                     summSettings.AddTokenIfMissing('MaxVal', 1.0)
@@ -336,9 +338,9 @@ class ProcessFilterBank(BaseImport):
                 fileName = os.path.join(parentdir, fileid)
                 if not (os.path.isdir(fileName)):
                     itemtracknr += 1
-                    self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
+                    #self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
                     destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, 'TableTracks', tableid, summaryid, fileid)
-                    self._log('Destination: ' + destFolder)
+                    #self._log('Destination: ' + destFolder)
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
                     shutil.copyfile(fileName, os.path.join(destFolder, summaryid + '_' + fileid))
@@ -369,7 +371,7 @@ class ProcessFilterBank(BaseImport):
 			
         output = []
         if tableSettings.HasToken('TableBasedSummaryValues'):
-			self._log('Processing table-based summary values')
+			#self._log('Processing table-based summary values')
 			if not type(tableSettings['TableBasedSummaryValues']) is list:
 				raise Exception('TableBasedSummaryValues token should be a list')
 			for stt in tableSettings['TableBasedSummaryValues']:
@@ -379,22 +381,22 @@ class ProcessFilterBank(BaseImport):
 				summSettings.AddTokenIfMissing('BlockSizeMin', 1)
 				summSettings.DefineKnownTokens(['channelColor'])
 				summaryid = summSettings['Id']
-				with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
-					extraSummSettings = summSettings.Clone()
-					extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-					if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-						stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
-						sql = stmt.format(tableid,
-										  summaryid, 
-										  summSettings['Name'], 
-										  extraSummSettings.ToJSON(), 
-										  summSettings['MinVal'], 
-										  summSettings['MaxVal'], 
-										  summSettings['BlockSizeMin'])
-						self._execSql(sql)
-					if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-						outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
-						output = output + outputs
+				#with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+                                extraSummSettings = summSettings.Clone()
+                                extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+                                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
+                                    stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
+                                    sql = stmt.format(tableid,
+                                   				  summaryid, 
+                                   				  summSettings['Name'], 
+                                   				  extraSummSettings.ToJSON(), 
+                                   				  summSettings['MinVal'], 
+                                   				  summSettings['MaxVal'], 
+                                  				  summSettings['BlockSizeMin'])
+                                    self._execSql(sql)
+                                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+                                    outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
+                                    output = output + outputs
 						
         return output
 
@@ -499,46 +501,53 @@ class ProcessFilterBank(BaseImport):
         self._logId = 'PFB: '+ str(rank)
         if rank == 0:
             # Master process executes code below
-            self._log('Creating summary values')
-        
-            datatables = self._getGlobalSettingList('DataTables')
-        
-            datatables = self._getDatasetFolders(datatables)
-            
-            tasks = []    
-            for tableid in datatables:
-                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-                    outputs, outputc = self._prepareSummaryValues(tableid)
-                    tasks = tasks + outputs + outputc
-                    outputs = self._prepareTableBasedSummaryValues(tableid)
-                    tasks = tasks + outputs
-
-            task_index = 0
+            #self._log('Creating summary values')
             num_workers = size - 1
-            closed_workers = 0
-            self._log("Master starting with %d workers, %d tasks" % (num_workers, len(tasks)))
-            while closed_workers < num_workers:
-                data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
-                source = status.Get_source()
-                tag = status.Get_tag()
-                if tag == tags.READY:
-                    # Worker is ready, so send it a task
-                    if task_index < len(tasks):
-                        task = tasks[task_index]
-                        comm.send(task, dest=source, tag=tags.START)
-                        #self._log("Sending task %d to worker %d, %s" % (task_index, source, task))
-                        task_index += 1
-                    else:
-                        comm.send(None, dest=source, tag=tags.EXIT)
-                elif tag == tags.DONE:
-                    results = data
-                    #self._log("Got data from worker %d" % source)
-                elif tag == tags.EXIT:
-                    #self._log("Worker %d exited." % source)
-                    closed_workers += 1
+            try:
+                with self._logHeader("Master starting with %d workers" % (num_workers)):
+        
+                    datatables = self._getGlobalSettingList('DataTables')
+        
+                    datatables = self._getDatasetFolders(datatables)
+            
+                    tasks = []    
+                    for tableid in datatables:
+                        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+                            outputs, outputc = self._prepareSummaryValues(tableid)
+                            tasks = tasks + outputs + outputc
+                            outputs = self._prepareTableBasedSummaryValues(tableid)
+                            tasks = tasks + outputs
 
-            #self._log("Master finishing")
-            self.printLog()
+                    task_index = 0
+                    closed_workers = 0
+                    self._log("%d tasks" % (len(tasks)))
+                    while closed_workers < num_workers:
+                        data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
+                        source = status.Get_source()
+                        tag = status.Get_tag()
+                        if tag == tags.READY:
+                        # Worker is ready, so send it a task
+                            if task_index < len(tasks):
+                                task = tasks[task_index]
+                                comm.send(task, dest=source, tag=tags.START)
+                                #self._log("Sending task %d to worker %d, %s" % (task_index, source, task))
+                                task_index += 1
+                            else:
+                                comm.send(None, dest=source, tag=tags.EXIT)
+                        elif tag == tags.DONE:
+                            results = data
+                            if results != 0:
+                                self._log("Error from worker %d" % source)
+                                #Need to close workers gracefully
+                                comm.send(None, dest=source, tag=tags.EXIT)
+#                                raise Exception('Error in processing task')
+                        elif tag == tags.EXIT:
+                            #self._log("Worker %d exited." % source)
+                            closed_workers += 1
+
+            finally:
+                #self._log("Master finishing")
+                self.printLog()
         else:
             # Worker processes execute code below
             name = MPI.Get_processor_name()
@@ -571,7 +580,7 @@ class ProcessFilterBank(BaseImport):
                     except:
                         e = sys.exc_info()[0]
                         self._log("Failed Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
-                        logging.exception(e)
+                        self._logger.exception(e)
                         result = 1
                     finally:
                         comm.send(result, dest=0, tag=tags.DONE)
