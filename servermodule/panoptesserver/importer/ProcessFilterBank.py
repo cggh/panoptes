@@ -66,17 +66,19 @@ class ProcessFilterBank(BaseImport):
             output["currentChromosome"] = chromosome
         output["summariser"].Add(pos,val)        
         
+    def _isSimpleTask(self, task):
+        return 'minval' in task
         
-    def _extractColumnsAndProcess(self, outputs, outputc, writeHeader, readHeader, writeColumnFiles):
+    def _extractColumnsAndProcess(self, banks, writeHeader, readHeader, writeColumnFiles):
         
         
         sourceFileName = None
         
-        if len(outputs) == 0 and len(outputc) == 0:
+        if len(banks) == 0:
 #            self._log('Nothing to filter bank')
             return
         
-        for output in outputs:
+        for output in banks:
             if sourceFileName == None:
                 sourceFileName = output["inputFile"]
             else:
@@ -90,23 +92,7 @@ class ProcessFilterBank(BaseImport):
                 output["destFile"] = open(output["outputFile"], 'w')
                 if writeHeader:
                     output["destFile"].write('\t'.join(output["columns"]) + '\n')
-                
-        for output in outputc:
-            if sourceFileName == None:
-                sourceFileName = output["inputFile"]
-            else:
-                if sourceFileName != output["inputFile"]:
-                    raise ValueError("input file names do not match:", sourceFileName, " vs ", output["inputFile"])
-
-            if writeColumnFiles:
-                if output["outputFile"] == None:
-                    raise ValueError("No output file specified")
-                self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
-                #Changing the bufsiz seems to have little or no impact
-                output["destFile"] = open(output["outputFile"], 'w')
-                if writeHeader:
-                    output["destFile"].write('\t'.join(output["columns"]) + '\n')
-                    
+                            
         linecount = 0
         if sourceFileName.endswith('gz'):
             sourceFile = gzip.open(sourceFileName)
@@ -120,10 +106,12 @@ class ProcessFilterBank(BaseImport):
                     self._log('Original header: {0}'.format(','.join(header)))
                     header = [colname.replace(' ', '_') for colname in header]
                     self._log('Working Header : {0}'.format(','.join(header)))
-                for output in outputs:
+                for output in banks:
                     output["currentChromosome"] = ''
                     output["summariser"] = None
                     output["colindices"] = []
+                    if not self._isSimpleTask(output):
+                        self._log("Categories:" + str(output["Categories"]))
                     if output["columns"] != None:
                         for col in output["columns"]:
                             try:
@@ -133,22 +121,7 @@ class ProcessFilterBank(BaseImport):
                     else:
                         #Assume Chrom Pos Value
                         output["colindices"] = [0,1,2]
-                        
-                for output in outputc:
-                    output["currentChromosome"] = ''
-                    output["colindices"] = []
-                    output["summariser"] = None
-                    self._log("Categories:" + str(output["Categories"]))
-                    if output["columns"] != None:
-                        for col in output["columns"]:
-                            try:
-                                output["colindices"].append(header.index(col))
-                            except ValueError:
-                                raise Exception('Unable to find column {0} in file {1}'.format(col, sourceFileName))
-                    else:
-                        #Assume Chrom Pos Value
-                        output["colindices"] = [0,1,2]
-                        
+                                                
                 if self._importSettings['ConfigOnly']:
                     return
                 
@@ -166,11 +139,7 @@ class ProcessFilterBank(BaseImport):
                     line = line.rstrip('\r\n')
                     if len(line) > 0:
                         columns = line.split('\t')
-                        fields = []
-                        if len(outputs) > 0:
-                            fields = [columns[colindex] for colindex in outputs[0]["colindices"]]
-                        else:
-                            fields = [columns[colindex] for colindex in outputc[0]["colindices"]]
+                        fields = [columns[colindex] for colindex in banks[0]["colindices"]]
                         chromosome = fields[0]
                         if chromosome != currentChromosome:
                             self._log('##### Start processing chromosome '+chromosome)
@@ -178,27 +147,19 @@ class ProcessFilterBank(BaseImport):
                                 raise Exception('File should be ordered by chromosome')
                             processedChromosomes[chromosome] = True
                             currentChromosome = chromosome
-                        for output in outputs:
+                        for output in banks:
                             fields = [columns[colindex] for colindex in output["colindices"]]
-                            outline = '\t'.join(fields)
-                            self._createSummary(output, fields[0], fields[1], fields[2])
+                            if self._isSimpleTask(output):
+                                self._createSummary(output, fields[0], fields[1], fields[2])
+                            else:
+                                self._createSummaryValues_Categorical(output, fields[0], fields[1], fields[2])
                             if writeColumnFiles:
-                                output["destFile"].write(outline + '\n')
-                        for output in outputc:
-                            fields = [columns[colindex] for colindex in output["colindices"]]
-                            outline = '\t'.join(fields)
-                            self._createSummaryValues_Categorical(output, fields[0], fields[1], fields[2])
-                            if writeColumnFiles:
+                                outline = '\t'.join(fields)
                                 output["destFile"].write(outline + '\n')
     
     
             #self._log('Finished processing {}. {} lines'.format(sourceFileName,str(linecount)))
-            for output in outputs:
-                if output["summariser"] != None:
-                    output["summariser"].Finalise()
-                if writeColumnFiles:
-                    output["destFile"].close()
-            for output in outputc:
+            for output in banks:
                 if output["summariser"] != None:
                     output["summariser"].Finalise()
                 if writeColumnFiles:
@@ -324,7 +285,7 @@ class ProcessFilterBank(BaseImport):
     def createSummaryValues(self, tableid):
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
             outputs, outputc = self._prepareSummaryValues(tableid)
-            self._extractColumnsAndProcess(outputs, outputc, False, True, True)
+            self._extractColumnsAndProcess(outputs + outputc, False, True, True)
         
     def _prepareSummaryFilterBank(self, tableid, summSettings, summaryid):
         global config
@@ -362,42 +323,42 @@ class ProcessFilterBank(BaseImport):
             return outputs          
             
     def _prepareTableBasedSummaryValues(self, tableid):
-    	
-    	tableSettings, properties = self._fetchSettings(tableid, includeProperties = False)
-    	
+           
+        tableSettings, properties = self._fetchSettings(tableid, includeProperties = False)
+           
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-			sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
-			self._execSql(sql)
-			
+            sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
+            self._execSql(sql)
+            
         output = []
         if tableSettings.HasToken('TableBasedSummaryValues'):
-			#self._log('Processing table-based summary values')
-			if not type(tableSettings['TableBasedSummaryValues']) is list:
-				raise Exception('TableBasedSummaryValues token should be a list')
-			for stt in tableSettings['TableBasedSummaryValues']:
-				summSettings = SettingsLoader.SettingsLoader()
-				summSettings.LoadDict(stt)
-				summSettings.AddTokenIfMissing('MinVal', 0)
-				summSettings.AddTokenIfMissing('BlockSizeMin', 1)
-				summSettings.DefineKnownTokens(['channelColor'])
-				summaryid = summSettings['Id']
-				#with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
-                                extraSummSettings = summSettings.Clone()
-                                extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-                                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-                                    stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
-                                    sql = stmt.format(tableid,
-                                   				  summaryid, 
-                                   				  summSettings['Name'], 
-                                   				  extraSummSettings.ToJSON(), 
-                                   				  summSettings['MinVal'], 
-                                   				  summSettings['MaxVal'], 
-                                  				  summSettings['BlockSizeMin'])
-                                    self._execSql(sql)
-                                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-                                    outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
-                                    output = output + outputs
-						
+            #self._log('Processing table-based summary values')
+            if not type(tableSettings['TableBasedSummaryValues']) is list:
+                raise Exception('TableBasedSummaryValues token should be a list')
+            for stt in tableSettings['TableBasedSummaryValues']:
+                summSettings = SettingsLoader.SettingsLoader()
+                summSettings.LoadDict(stt)
+                summSettings.AddTokenIfMissing('MinVal', 0)
+                summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+                summSettings.DefineKnownTokens(['channelColor'])
+                summaryid = summSettings['Id']
+                #with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
+                extraSummSettings = summSettings.Clone()
+                extraSummSettings.DropTokens(['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
+                    stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
+                    sql = stmt.format(tableid,
+                                     summaryid, 
+                                     summSettings['Name'], 
+                                     extraSummSettings.ToJSON(), 
+                                     summSettings['MinVal'], 
+                                     summSettings['MaxVal'], 
+                                     summSettings['BlockSizeMin'])
+                    self._execSql(sql)
+                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+                    outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
+                    output = output + outputs
+                        
         return output
 
 
@@ -406,8 +367,8 @@ class ProcessFilterBank(BaseImport):
         
         output = self._prepareTableBasedSummaryValues(tableid)
         for out in output:
-			outputa = [ out ]
-			self._extractColumnsAndProcess(outputa, [], False, False, False)	  
+            outputa = [ out ]
+            self._extractColumnsAndProcess(outputa, False, False, False)      
 
      
     def createCustomSummaryValues(self, sourceid, tableid):
@@ -570,12 +531,11 @@ class ProcessFilterBank(BaseImport):
                     else:
                         readHeader = True
                     try:
-                        if 'minval' in task:
+                        if self._isSimpleTask(task):
                             ptype = 'simple'
-                            self._extractColumnsAndProcess(taska, [], writeHeader, readHeader, writeColumnFiles)
                         else:
                             ptype = 'categorical'
-                            self._extractColumnsAndProcess([], taska, writeHeader, readHeader, writeColumnFiles)
+                        self._extractColumnsAndProcess(taska, writeHeader, readHeader, writeColumnFiles)
                         #self._log("Worker with rank %d on %s %s processing %s." % (rank, name, ptype, task))
                     except:
                         e = sys.exc_info()[0]
