@@ -214,6 +214,7 @@ require([
                             ga('set', {
                                'appName': MetaData.database
                             });
+                            ga('send', 'pageview');
                             ga('send', 'screenview', {screenName: 'loading'});
                         } else {
                             window.ga = function() {};
