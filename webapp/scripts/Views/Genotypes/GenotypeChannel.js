@@ -2,10 +2,10 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/Framework", "DQX/ArrayBufferClient", "DQX/Controls", "DQX/Msg", "DQX/Utils",
-    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "Utils/Serialise", "MetaData", "Views/Genotypes/Model",
+    "DQX/ChannelPlot/ChannelCanvas", "Utils/QueryTool", "Utils/AnimatedIcon", "Utils/Serialise", "MetaData", "Views/Genotypes/Model",
      "Views/Genotypes/View"],
     function (require, _, d3, Blob, FileSaver, DQXModel, SQL, Framework, ArrayBufferClient,
-              Controls, Msg, DQX, ChannelCanvas, QueryTool, Serialise, MetaData, Model,
+              Controls, Msg, DQX, ChannelCanvas, QueryTool, AnimatedIcon, Serialise, MetaData, Model,
                View) {
 
         var GenotypeChannel = {};
@@ -16,6 +16,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
             that.init = function(table_info, controls_group, parent) {
                 that._height = 400;
+                that.loadIcon = AnimatedIcon('Bitmaps/Icons/Canvas/preloader.png', 35, 35, 12, 1000);
                 that._toolTipHandler = null;
                 that._clickHandler = null;
                 that._always_call_draw = true;
@@ -337,6 +338,24 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 that.download_button.enable(that.model.intervals_being_fetched.length == 0);
 
                 that.drawing = false;
+
+                if (that.model.intervals_being_fetched.length > 0) {
+                    if (!that.loading_id) {
+                        var draw = function (time) {
+                            if (that.model.intervals_being_fetched.length > 0) {
+                                for (var i=0; i < that.model.intervals_being_fetched.length; i++) {
+                                    var interval = that.model.intervals_being_fetched[i];
+                                    for (var pos = that.view.col_scale(interval.start); pos < that.view.col_scale(interval.end); pos += that.loadIcon.width*2) {
+                                        that.loadIcon.drawTo(draw_info.centerContext, Math.floor(pos/(that.loadIcon.width*2))*(that.loadIcon.width*2), 10, time);
+                                    }
+                                }
+
+                                window.requestAnimationFrame(draw);
+                            }
+                        };
+                        window.requestAnimationFrame(draw);
+                    }
+                }
             };
 
 
