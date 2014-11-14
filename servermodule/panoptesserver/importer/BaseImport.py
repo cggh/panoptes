@@ -71,6 +71,8 @@ class BaseImport(object):
         if importSettings['ScopeStr'] == '10M':
             self._maxLineCount = 10000000
 
+        self._isMPI = False
+
         self._logMessages = []
         self._logId = ''
 
@@ -250,6 +252,19 @@ class BaseImport(object):
         return CalcLogHeader(self, message)
 
 #        return self._calculationObject.LogHeader(message)
+    def setMPI(self, value):
+        if value:
+            if self._calculationObject.logfilename is not None:
+                from mpi4py import MPI
+                mode = MPI.MODE_WRONLY|MPI.MODE_CREATE#|MPI.MODE_APPEND 
+                fh = MPI.File.Open(comm, self._calculationObject.logfilename, mode) 
+                fh.Set_atomicity(True) 
+            else:
+                raise Exception('Must specify a logfile when using MPI')
+        self._isMPI = value
+
+    def isMPI(self):
+        return self._isMPI 
 
 import DQXUtils
 #This is repeated from servermodule/panoptesserver/asyncresponder.py due to the different requirements around logging
