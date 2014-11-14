@@ -2,11 +2,11 @@
 // This program is free software licensed under the GNU Affero General Public License. 
 // You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 define([
-    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvasXYPlot", "DQX/DataFetcher/DataFetchers",
+    "require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg", "DQX/SQL", "DQX/DocEl", "DQX/Utils", "DQX/Wizard", "DQX/Popup", "DQX/PopupFrame", "DQX/FrameCanvasXYPlot", "DQX/DataFetcher/DataFetchers", "DQX/MessageBox",
     "Wizards/EditQuery", "MetaData", "Utils/QueryTool", "Plots/GenericPlot", "Plots/StandardLayoutPlot", "Utils/ButtonChoiceBox", "Utils/MiscUtils"
 ],
     function (
-        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvasXYPlot, DataFetchers,
+        require, base64, Application, Framework, Controls, Msg, SQL, DocEl, DQX, Wizard, Popup, PopupFrame, FrameCanvasXYPlot, DataFetchers, MessageBox,
         EditQuery, MetaData, QueryTool, GenericPlot, StandardLayoutPlot, ButtonChoiceBox, MiscUtils
         ) {
 
@@ -113,16 +113,31 @@ define([
             }
 
 
+            var checkSelectingMode = function() {
+                if (that.pointSelectingMode) {
+                    MessageBox.errorBox('Error', 'Points are already being selected');
+                    return false;
+                }
+                return true;
+            }
 
             that.createPanelButtons = function() {
 
                 var cmdPointSelection = Controls.Button(null, { icon: 'fa-crosshairs', content: 'Select points...', buttonClass: 'PnButtonGrid', width:80, height:30}).setOnChanged(function () {
 
+                    if (!checkSelectingMode())
+                        return;
+
                     var actions = [];
 
                     actions.push( { content:'Rectangle selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        if (!checkSelectingMode())
+                            return;
+                        that.pointSelectingMode = true;
+                        that.setAssistText('Click two times on the plot to define the selection bounding box');
                         that.panelPlot.startRectangleSelection(function(pt1, pt2) {
-                            //var queryInfo = MiscUtils.createHalfPlaneRestrictionQuery(that.theQuery.get(),that.mapPlotAspects['xaxis'].propid, that.mapPlotAspects['yaxis'].propid, center, dir);
+                            that.pointSelectingMode = false;
+                            that.setAssistText('');
                             var rangeXMin = (Math.min(pt1.x,pt2.x)-that.offsetX)/that.scaleX;
                             var rangeXMax = (Math.max(pt1.x,pt2.x)-that.offsetX)/that.scaleX;
                             var rangeYMin = (Math.max(pt1.y,pt2.y)-that.offsetY)/that.scaleY;
@@ -162,9 +177,14 @@ define([
                     }
                     });
 
-
                     actions.push( { content:'Lasso selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        if (!checkSelectingMode())
+                            return;
+                        that.pointSelectingMode = true;
+                        that.setAssistText('Click points on the plot to select the area. Double-click to finalise the selection');
                         that.panelPlot.startLassoSelection(function(selectedPoints) {
+                            that.pointSelectingMode = false;
+                            that.setAssistText('');
 
                             function isPointInPoly(poly, pt) {
                                 for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
@@ -215,7 +235,13 @@ define([
                     });
 
                     actions.push( { content:'Half plane selection', bitmap:'Bitmaps/circle_red_small.png', handler:function() {
+                        if (!checkSelectingMode())
+                            return;
+                        that.pointSelectingMode = true;
+                        that.setAssistText('Click two times on the plot to define the boundary line for the selection');
                         that.panelPlot.startHalfPlaneSelection(function(center, dir) {
+                            that.pointSelectingMode = false;
+                            that.setAssistText('');
                             center.x = (center.x-that.offsetX)/that.scaleX;
                             center.y = (center.y-that.offsetY)/that.scaleY;
                             dir.x = dir.x/that.scaleX;
