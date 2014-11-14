@@ -403,6 +403,7 @@ define([
 
             that.drawCenter = function(drawInfo) {
                 var ctx = drawInfo.ctx;
+                ctx.globalAlpha = 1;
                 if (!that.allDataPresent())
                     return;
 
@@ -612,6 +613,8 @@ define([
 
                 var selpsX = [];
                 var selpsY = [];
+                ctx.strokeStyle = blackBranchColorString;
+                ctx.lineWidth = 1;
                 drawBranch(that.currentTree.root);
 
                 if (!that.colorNodePropId) {

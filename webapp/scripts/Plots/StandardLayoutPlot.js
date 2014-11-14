@@ -77,6 +77,15 @@ define([
                 that.panelWarning.render();
             };
 
+            that.setAssistText = function(info) {
+                var divid = that.panelPlot.getDivID();
+                $('#'+divid).find('#dqxassisttext').remove();
+                if (info) {
+                    var str = '<div id="dqxassisttext" style="position:absolute;z-index: 999;top:0;padding:1px;color:#cf0000;background-color:rgba(255,255,0,0.5);width:100%"><b>'+info+'</b></div>';
+                    $('#'+divid).append(str);
+                }
+            };
+
 
             return that;
         }
