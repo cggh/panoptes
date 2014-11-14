@@ -20,12 +20,21 @@ class ProcessFilterBank(BaseImport):
 
     #Keep the log messages so that they can be output in one go so that log is less confusing
     def _log(self, message):
-        self._logMessages.append(message)
+        if self.isMPI():
+            msg = '###' + self._logId + '###'
+            self._logFH.Write_shared(msg + message)
+        else:
+            super(ProcessFilterBank, self)._log(message)
+            #self._logMessages.append(message)
         
     def printLog(self):
-        msg = '###' + self._logId + '###'
-        logPrefix = '\n' + msg
-        self._calculationObject.Log(msg + logPrefix.join(self._logMessages))
+        if self.isMPI():
+            self._logFH.Sync()
+            self._logFH.Close()
+#        else:
+#            msg = '###' + self._logId + '###'
+#            logPrefix = '\n' + msg
+#            super(ProcessFilterBank, self)._log(msg + logPrefix.join(self._logMessages))
         
     def _getImportSetting(self, name):
         ret = None
@@ -556,7 +565,6 @@ if __name__ == "__main__":
     
     import sys
     import customresponders.panoptesserver.asyncresponder as asyncresponder
-    calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
     scopeOptions = ["all", "none", "1k", "10k", "100k"]
 
@@ -592,8 +600,10 @@ if __name__ == "__main__":
         
     workspaceId = None
     
-    filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
     if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
+         calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
+         calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
          #Need to install openmpi in order to use this option
          #
          #Optional import - note not in REQUIREMENTS
@@ -613,7 +623,10 @@ if __name__ == "__main__":
          #make install
          #qsub -cwd -S /bin/bash -pe mpi_pe 2 runq.sh
          #You can export OPAL_PREFIX=/usr/local instead of --prefix if that suits you better
+         filterBanker.setMPI(True)
          filterBanker.createAllSummaryValuesMPI()
  
     else:
+         calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
          filterBanker.createAllSummaryValues()
