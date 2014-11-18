@@ -256,9 +256,11 @@ class BaseImport(object):
         if value:
             if self._calculationObject.logfilename is not None:
                 from mpi4py import MPI
+                comm = MPI.COMM_WORLD   # get MPI communicator object
                 mode = MPI.MODE_WRONLY|MPI.MODE_CREATE#|MPI.MODE_APPEND 
-                fh = MPI.File.Open(comm, self._calculationObject.logfilename, mode) 
-                fh.Set_atomicity(True) 
+                self._logFH = MPI.File.Open(comm, self._calculationObject.logfilename, mode) 
+                self._logFH.Set_atomicity(True) 
+                self._logFH.Write_shared(str(comm.rank) + self._calculationObject.logfilename + ' file opened\n')
             else:
                 raise Exception('Must specify a logfile when using MPI')
         self._isMPI = value
