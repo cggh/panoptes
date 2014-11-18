@@ -22,15 +22,17 @@ class ProcessFilterBank(BaseImport):
     def _log(self, message):
         if self.isMPI():
             msg = '###' + self._logId + '###'
-            self._logFH.Write_shared(msg + message)
+            self._logFH.Write_shared(msg + message + '\n')
         else:
             super(ProcessFilterBank, self)._log(message)
             #self._logMessages.append(message)
         
     def printLog(self):
         if self.isMPI():
+#            self._logFH.Write_shared(self._logId + self._calculationObject.logfilename + ' file closing\n')
             self._logFH.Sync()
-            self._logFH.Close()
+#This seems to hang/or take a loooonnnnggggg time
+#            self._logFH.Close()
 #        else:
 #            msg = '###' + self._logId + '###'
 #            logPrefix = '\n' + msg
@@ -553,10 +555,10 @@ class ProcessFilterBank(BaseImport):
                         result = 1
                     finally:
                         comm.send(result, dest=0, tag=tags.DONE)
-                        self.printLog()
                 elif tag == tags.EXIT:
                     break
 
+            self._log("Finished Worker with rank %d on %s." % (rank, name))
             comm.send(None, dest=0, tag=tags.EXIT)
 
 
@@ -601,8 +603,8 @@ if __name__ == "__main__":
     workspaceId = None
     
     if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
-         calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
+         calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
          filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
          #Need to install openmpi in order to use this option
          #
