@@ -197,11 +197,12 @@ class Import2DDataTable(BaseImport):
                         sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
                                  SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
                                  UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
-                                 DROP TABLE `TempColIndex`""".format(
+                                 """.format(
                             table_settings['ColumnDataTable'],
                             table_settings['ColumnIndexField'],
                             tableid)
                         self._execSql(sql)
+                        self._dropTable('`TempColIndex`')
                         #Now check we have no NULLS
                         sql = "SELECT `{1}_column_index` from `{0}` where `{1}_column_index` IS NULL".format(
                             table_settings['ColumnDataTable'],
@@ -262,11 +263,12 @@ class Import2DDataTable(BaseImport):
                         sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
                                  SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
                                  UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
-                                 DROP TABLE `TempRowIndex`""".format(
+                                 """.format(
                             table_settings['RowDataTable'],
                             table_settings['RowIndexField'],
                             tableid)
                         self._execSql(sql)
+                        self._dropTable('`TempRowIndex`')
                         #Now check we have no NULLS
                         sql = "SELECT `{1}_row_index` from `{0}` where `{1}_row_index` IS NULL".format(
                             table_settings['RowDataTable'],

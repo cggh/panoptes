@@ -6,6 +6,7 @@ import DQXDbTools
 import simplejson
 import logging
 import sys
+import warnings
 
 class BaseImport(object):
     
@@ -227,6 +228,20 @@ class BaseImport(object):
     
     def _execSql(self, sql):
         ImpUtils.ExecuteSQL(self._calculationObject, self._datasetId, sql)
+
+    def _dropTable(self, tableName, cur = None):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            stmt = 'DROP TABLE IF EXISTS {0}'.format(tableName)
+            if cur is None:
+                self._execSql(stmt)
+            else:
+                cur.execute(stmt)
+
+    def _dropView(self, tableName):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self._execSql('DROP VIEW IF EXISTS {0}'.format(tableName))
 
     def _getTablesInfo(self, tableid = None):
         tables = []
