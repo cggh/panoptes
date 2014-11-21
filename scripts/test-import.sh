@@ -54,16 +54,12 @@ fi
 if [ ${i} == 'samples' ]
 then
 #Value2 column not loaded
-#Columns transposed
-	cat ${DB_HEAD} | awk 'BEGIN{OFS="\t";} { t = $3; $3 = $4; $4 = t; print; } ' > ${TMP}
-	rm ${DB_HEAD}
-	mv ${TMP} ${DB_HEAD}
-	cat ${CMP_DATA} | awk 'BEGIN{OFS="\t";} { t = $3; $3 = $4; $4 = t; print; } ' | cut -f -4,6- > ${TMP}
-	rm ${CMP_DATA}
-	mv ${TMP} ${CMP_DATA}
-	cat ${CMP_HEAD} | cut -f -4,6- > ${TMP}
+	cat ${CMP_HEAD} | cut -f -5,7- > ${TMP}
 	rm ${CMP_HEAD}
 	mv ${TMP} ${CMP_HEAD}
+	cat ${CMP_DATA} | cut -f -5,7- > ${TMP}
+	rm ${CMP_DATA}
+	mv ${TMP} ${CMP_DATA}
 fi
 if [ ${i} == 'variants' ]
 then

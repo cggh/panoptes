@@ -52,12 +52,6 @@ Properties:
     ForwardName: is contributed by  # Display name of the relation from child to parent
     ReverseName: contributed        # Display name of the relation from parent to child
 
-- Id: InUse
-  Name: Used
-  Description: Flag determining if sample is used for analysis
-  DataType: Boolean
-  ShowInTable: true
-
 - Id: Value1
   Name: Value 1
   Description: An example of a numerical value
@@ -65,6 +59,12 @@ Properties:
   MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
   MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   DecimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
+  ShowInTable: true
+
+- Id: InUse
+  Name: Used
+  Description: Flag determining if sample is used for analysis
+  DataType: Boolean
   ShowInTable: true
 
 - Id: SampleTypeID
