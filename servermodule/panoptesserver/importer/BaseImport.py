@@ -149,12 +149,12 @@ class BaseImport(object):
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
         if not os.path.isfile(data):
-            data = data + '.gz'
-            if os.path.isfile(data):
+            data1 = data + '.gz'
+            if os.path.isfile(data1):
                 self._dataFile = self._dataFile + '.gz'
             else:
                 self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable, self._workspaceId))
-                raise Exception("Missing data {}".format(data))
+#                raise Exception("Missing data {}".format(data))
         
         return settings, data
      
@@ -170,12 +170,12 @@ class BaseImport(object):
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
         if not os.path.isfile(data):
-            data = data + '.gz'
-            if os.path.isfile(data):
+            data1 = data + '.gz'
+            if os.path.isfile(data1):
                 self._dataFile = self._dataFile + '.gz'
             else:
                 self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable, self._workspaceId))
-                raise Exception("Missing data {}".format(data))
+#                raise Exception("Missing data {}".format(data))
         
         return settings, data
     
