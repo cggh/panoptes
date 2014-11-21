@@ -52,7 +52,7 @@ class ImportWorkspaces(BaseImport):
                     for table in tables:
                         tableid = table['id']
                         print('Re-creating custom data table for '+tableid)
-                        execSQL("DROP TABLE IF EXISTS {0}".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
+                        self._dropTable(Utils.GetTableWorkspaceProperties(workspaceid, tableid))
                         execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(
                             DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
                             DBCOLESC(table['primkey']),
@@ -114,7 +114,7 @@ class ImportWorkspaces(BaseImport):
                 print('Indexed columns: ' + str(indexedColumns))
                 tmptable = '_tmptable_'
                 wstable = '{0}CMB_{1}'.format(tableid, workspaceId)
-                self._execSql('DROP TABLE IF EXISTS {0}'.format(tmptable))
+                self._dropTable(tmptable)
                 sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
                 self._execSql(sql)
                 for indexedColumn in indexedColumns:
@@ -130,7 +130,7 @@ class ImportWorkspaces(BaseImport):
                                                                              )
                     self._execSql(sql)
 
-                self._execSql('DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
+                self._dropView(DBTBESC(wstable))
                 self._execSql('RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
     
                 if (tableSettings.HasToken('AllowSubSampling')) and (tableSettings['AllowSubSampling']):
@@ -138,13 +138,13 @@ class ImportWorkspaces(BaseImport):
                     indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
                     tmptable = '_tmptable_'
                     wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceId)
-                    self._execSql('DROP TABLE IF EXISTS {0}'.format(tmptable))
+                    self._dropTable(tmptable)
                     sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
                     self._execSql(sql)
                     for indexedColumn in indexedColumnsSubSampling:
                         sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
                         self._execSql(sql)
-                    self._execSql('DROP VIEW IF EXISTS {0}'.format(DBTBESC(wstable)))
+                    self._dropView(DBTBESC(wstable))
                     self._execSql('RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
     
     def importAllWorkspaces(self):

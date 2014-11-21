@@ -200,7 +200,7 @@ class ImportCustomData(BaseImport):
     
     
                     print('Cleaning up')
-                    cur.execute("DROP TABLE {0}".format(tmptable))
+                    self._dropTable(tmptable, cur)
     
                 if not self._importSettings['ConfigOnly']:
                     print('Updating view')
