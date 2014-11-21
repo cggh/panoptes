@@ -13,7 +13,9 @@ from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
 from DQXDbTools import DBCursor
 import logging
+import warnings
 import threading
+import MySQLdb
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -336,6 +338,8 @@ class LoadTable(threading.Thread):
         #This could be avoided but that would mean that the file has to be on the database server
         #LOCAL is also a bit slower
         #LOCAL also means warnings not errors
+#        with warnings.catch_warnings():
+        warnings.filterwarnings('error', category=MySQLdb.Warning)
         self._execSql(sql)
         
         
@@ -381,8 +385,10 @@ class LoadTable(threading.Thread):
                     self._execSql(sql)
                 
                 sortRandTable = tableid + '_SORTRAND'
-                sql = "DROP TABLE IF EXISTS {0}".format(DBTBESC(sortRandTable))
-                self._execSql(sql)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    sql = "DROP TABLE IF EXISTS {0}".format(DBTBESC(sortRandTable))
+                    self._execSql(sql)
                 sql = "CREATE TABLE {1} LIKE {0}".format(DBTBESC(tableid), DBTBESC(sortRandTable))
                 self._execSql(sql)
                 if self._autoPrimKey:
@@ -519,7 +525,9 @@ class LoadTable(threading.Thread):
         
             subsetTableName = tableid + '_subsets'
             
-            self._execSql('DROP TABLE IF EXISTS {0}'.format(DBTBESC(subsetTableName)))
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self._execSql('DROP TABLE IF EXISTS {0}'.format(DBTBESC(subsetTableName)))
             self._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
                 subsettable=DBTBESC(subsetTableName),
                 primkey=DBCOLESC(self._primkey),
