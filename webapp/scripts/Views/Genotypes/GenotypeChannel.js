@@ -493,8 +493,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     if (settObj[param])
                         that.model_params.set(param,settObj[param]);
                 });
-                that.row_query.recall(settObj['row_query']);
-                that.col_query.recall(settObj['col_query']);
+                that.row_query.recall(settObj['row_query'], true);
+                that.col_query.recall(settObj['col_query'], true);
             };
 
             that.getToolTipInfo = function (px, py) {
