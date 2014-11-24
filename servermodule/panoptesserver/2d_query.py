@@ -149,15 +149,15 @@ def extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_prope
 def summarise_call(calls):
     call = -2
     for oc in calls:
-        c = 1 if oc > 0 else oc
+        c = 2 if oc > 0 else oc #ALT
         if c == -1: #Missing
             call = -1
             break
-        if c == 0 and call == 1: #REF BUT WAS PREVIOUSLY ALT
-            call = 2 #HET
+        if c == 0 and call == 2: #REF BUT WAS PREVIOUSLY ALT
+            call = 1 #HET
             break
-        if c == 1 and call == 0: #ALT BUT WAS PREVIOUSLY REF
-            call = 2 #HET
+        if c == 2 and call == 0: #ALT BUT WAS PREVIOUSLY REF
+            call = 1 #HET
             break
         call = c
     return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
