@@ -276,8 +276,8 @@ class BaseImport(object):
                 self._logFH = MPI.File.Open(comm, self._calculationObject.logfilename, mode) 
                 self._logFH.Set_atomicity(True) 
                 self._logFH.Write_shared(str(comm.rank) + self._calculationObject.logfilename + ' file opened\n')
-            else:
-                raise Exception('Must specify a logfile when using MPI')
+#            else:
+#                raise Exception('Must specify a logfile when using MPI')
         self._isMPI = value
 
     def isMPI(self):
