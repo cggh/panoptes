@@ -21,8 +21,11 @@ class ProcessFilterBank(BaseImport):
     #Keep the log messages so that they can be output in one go so that log is less confusing
     def _log(self, message):
         if self.isMPI():
-            msg = '###' + self._logId + '###'
-            self._logFH.Write_shared(msg + message + '\n')
+            msg = '###' + self._logId + '###' + message
+            if self._calculationObject.logfilename is not None:
+                self._logFH.Write_shared(msg + '\n')
+            else:
+                super(ProcessFilterBank, self)._log(msg)
         else:
             super(ProcessFilterBank, self)._log(message)
             #self._logMessages.append(message)
@@ -30,7 +33,8 @@ class ProcessFilterBank(BaseImport):
     def printLog(self):
         if self.isMPI():
 #            self._logFH.Write_shared(self._logId + self._calculationObject.logfilename + ' file closing\n')
-            self._logFH.Sync()
+            if self._calculationObject.logfilename is not None:
+                self._logFH.Sync()
 #This seems to hang/or take a loooonnnnggggg time
 #            self._logFH.Close()
 #        else:
@@ -604,7 +608,7 @@ if __name__ == "__main__":
     
     if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
-         calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
+         #calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
          filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
          #Need to install openmpi in order to use this option
          #
