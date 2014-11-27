@@ -45,8 +45,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 var theTable = that.panelTable.getTable();
                 theTable.fetchBuffer = 300;
                 theTable.recordCountFetchType = DataFetchers.RecordCountFetchType.DELAYED;
-                var theQuery = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
-                theTable.setQuery(theQuery);
+                that.query = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
+                theTable.setQuery(that.query);
 
 
                 $.each(MetaData.customProperties, function (idx, propInfo) {
@@ -69,10 +69,9 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 that.panelButtons = Framework.Form(that.frameButtons);
                 that.button_OpenInTable = Controls.Button(null, { content: 'Show in table view', icon: 'fa-table', buttonClass: 'PnButtonGrid', width: 135, height: 35}).setOnChanged(function () {
-                    var qry = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
                     Msg.send({type: 'DataItemTablePopup'}, {
                         tableid: that.childTableInfo.id,
-                        query: qry,
+                        query: that.query,
                         title: ''//that.tableInfo.tableCapNamePlural + ' at ' + pieChartInfo.longit + ', ' + pieChartInfo.lattit
                     });
 //                        Msg.send({type: 'ShowItemsInSimpleQuery', tableid:that.childTableInfo.id},
@@ -88,7 +87,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                             Msg.send({type: 'CreateGeoMapPoint' },
                                 {
                                     tableid: that.childTableInfo.id,
-                                    startQuery: theQuery
+                                    startQuery: that.query
                                 });
                         }
                     );
@@ -102,8 +101,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             that.update = function(newItemData) {
                 that.itemData = newItemData;
                 var table = that.panelTable.getTable();
-                var theQuery = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
-                table.setQuery(theQuery);
+                that.query = SQL.WhereClause.CompareFixed(that.relationInfo.childpropid, '=', that.itemData.fields[that.tableInfo.primkey]);
+                table.setQuery(that.query);
                 table.reLoadTable();
             };
 
