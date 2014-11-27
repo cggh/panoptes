@@ -51,7 +51,6 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
 
                 var view_controls = Controls.CompoundVert([]);
                 view_controls.addControl(that.createVisibilityControl());
-                view_controls.addControl(Controls.VerticalSeparator(3));
 
                 var view_params = DQXModel({
                   samples_property:that.rowTableInfo.primkey,
@@ -184,17 +183,22 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                         controlsGrid.setItem(idx, 0, Controls.Static('<span class="DescriptionText"></span>'));
                     controlsGrid.setItem(idx, 1, item.ctrl);
                 });
-                view_controls.addControl(controlsGrid);
 
-                view_controls.addControl(show_hide_width);
+                var controls_wrapper = Controls.CompoundVert([]).setMargin(0);
+                that.controlsShowHide = Controls.ShowHide(controls_wrapper);
+                view_controls.addControl(that.controlsShowHide);
 
-                view_controls.addControl(Controls.VerticalSeparator(3));
+                controls_wrapper.addControl(Controls.VerticalSeparator(3));
+                controls_wrapper.addControl(controlsGrid);
+                controls_wrapper.addControl(show_hide_width);
+                controls_wrapper.addControl(Controls.VerticalSeparator(3));
+
                 var row_height = Controls.ValueSlider(null, {label: 'Row Height:', width:(controlWidth+75), minval:1, maxval:20, scaleDistance: 5, value:view_params.get('row_height')})
                     .bindToModel(view_params, 'row_height').setClassID(that.table_info.id + 'RowHeight');
-                view_controls.addControl(row_height);
+                controls_wrapper.addControl(row_height);
 
-                view_controls.addControl(Controls.VerticalSeparator(15));
-                view_controls.addControl(that.download_button);
+                controls_wrapper.addControl(Controls.VerticalSeparator(15));
+                controls_wrapper.addControl(that.download_button);
 
                 that.col_query = QueryTool.Create(table_info.col_table.id, {includeCurrentQuery:true});
                 that.col_query.notifyQueryUpdated = function() {
@@ -476,6 +480,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 that._myPlotter.channelModifyVisibility(that.getID(), isVisible, preventReDraw);
                 if (!preventReDraw)
                     that._myPlotter.render();
+                that.controlsShowHide.setVisible(isVisible);
             };
 
             var stored_params = ['row_order', 'row_sort_columns', 'page', 'page_length'];
