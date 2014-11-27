@@ -218,7 +218,7 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         var buttonCreatePlot = Controls.HorizontalSeparator(80);
                     }
 
-                    var ctrlQuery = that.theQuery.createQueryControl({}, []);
+                    var ctrlQuery = that.theQuery.createQueryControl({hasQueryString: true}, []);
                     var tableInfo = MetaData.getTableInfo(that.tableid);
 
 
@@ -290,16 +290,12 @@ define(["require", "DQX/Application", "DQX/Framework", "DQX/Controls", "DQX/Msg"
                         content += '<span class="DescriptionText">'+that.tableInfo.settings.Description + '</span>';
                         content += '<p>';
                     }
-                    content += '<i><b>Query: </b>';
-                    content += that.theQuery.createQueryDisplayStringHtml();
-                    content += '</i>';
-//                    content += '</div>';
                     that.introText.modifyValue(content);
                 };
 
                 //Returns a user-friendly text description of a query
                 that.getQueryDescription = function(qry) {
-                    str = '<span style=""><b>Query:</b></span> <span style="">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
+                    var str = '<span style=""><b>Query:</b></span> <span style="">'+that.tableInfo.createQueryDisplayString(qry)+'</span>';
                     return str;
                 };
 

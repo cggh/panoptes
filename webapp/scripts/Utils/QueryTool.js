@@ -93,6 +93,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.query = SQL.WhereClause.decode(settObj.query);
                 if (that.ctrlQueryString)
                     that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(that.query));
+                if (that.clearQueryShowHide)
+                    that.clearQueryShowHide.setVisible(!that.query.isTrivial);
                 if (that.hasSubSampler) {
                     that.ctrlSubSampler.modifyValue(settObj.frac);
                     if (settObj.sliceidx != null)
@@ -108,6 +110,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (that.ctrlQueryString) {
                     that.ctrlQueryString.modifyValue(that.tableInfo.tableViewer.getQueryDescription(qry));
                 }
+                if (that.clearQueryShowHide)
+                    that.clearQueryShowHide.setVisible(!that.query.isTrivial);
                 if (that.notifyQueryUpdated)
                     that.notifyQueryUpdated();
             }
@@ -220,8 +224,18 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
 
                 if (hasQueryString) {
-                    that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query));
-                    group.addControl(that.ctrlQueryString);
+                    that.clearQuery = Controls.Button(null, {
+                        hint: 'Clear Query',
+                        buttonClass: "PnClearQuery",
+                        bitmap: DQX.BMP('closeSmall.png')
+                    });
+                    that.clearQuery.setOnChanged(function() {
+                        that.modify(SQL.WhereClause.Trivial());
+                    });
+                    that.clearQueryShowHide = Controls.ShowHide(that.clearQuery);
+                    that.clearQueryShowHide.setVisible(false);
+                    that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query), 'PnQueryString');
+                    group.addControl(Controls.CompoundFloat([that.clearQueryShowHide, that.ctrlQueryString]));
                 }
 
                 if (hasDefine)
