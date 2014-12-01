@@ -193,7 +193,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
                 if (!that.tableInfo.settings.DisableSubsets) {
                     that.panelSubsets.clear();
-                    that.setContent(newItemData);
+                    that.setContentSubsets(newItemData);
                     that.panelSubsets.render();
                 }
 
