@@ -15,6 +15,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         ItemMap.create = function(viewSettings, initialItemData) {
             var that = {};
             var tableInfo = MetaData.getTableInfo(initialItemData.tableid);
+            that.initialised = false;
 
             if (!tableInfo.hasGeoCoord)
                 DQX.reportError('Table does not have geographic coordinates: '+tableInfo.id);
@@ -31,6 +32,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 that.theMap = Map.GMap(that.frameMap/*, null, null, false*/);
                 that.pointSet = Map.PointSet('points', that.theMap, 0, "", { showLabels: false, showMarkers: true });
                 that.setPoints(initialItemData);
+                that.initialised = true;
+
             };
 
 
@@ -38,7 +41,8 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             };
 
             that.update = function(newItemData) {
-                that.setPoints(newItemData);
+                if (that.initialised)
+                    that.setPoints(newItemData);
             };
 
             that.setPoints = function(itemData) {
