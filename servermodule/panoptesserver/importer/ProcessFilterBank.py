@@ -479,6 +479,7 @@ class ProcessFilterBank(BaseImport):
             # Master process executes code below
             #self._log('Creating summary values')
             num_workers = size - 1
+            closed_workers = 0
             try:
                 with self._logHeader("Master starting with %d workers" % (num_workers)):
         
@@ -495,7 +496,6 @@ class ProcessFilterBank(BaseImport):
                             tasks = tasks + outputs
 
                     task_index = 0
-                    closed_workers = 0
                     self._log("%d tasks" % (len(tasks)))
                     while closed_workers < num_workers:
                         data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
@@ -520,7 +520,19 @@ class ProcessFilterBank(BaseImport):
                         elif tag == tags.EXIT:
                             #self._log("Worker %d exited." % source)
                             closed_workers += 1
-
+            except:
+                e = sys.exc_info()[0]
+                self._log("Failed Master on %s." % (MPI.Get_processor_name()))
+                self._logger.exception(e)
+                while closed_workers < num_workers:
+                    data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
+                    source = status.Get_source()
+                    tag = status.Get_tag()
+                    if tag == tags.READY:
+                        comm.send(None, dest=source, tag=tags.EXIT)
+                    elif tag == tags.EXIT:
+                        #self._log("Worker %d exited." % source)
+                        closed_workers += 1
             finally:
                 #self._log("Master finishing")
                 self.printLog()
