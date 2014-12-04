@@ -14,7 +14,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                 // Instantiate the view object
                 var that = Application.View(
                     'start',        // View ID
-                    'Start page'    // View title
+                    'Start'    // View title
                 );
 
                 //This function is called during the initialisation. Create the frame structure of the view here
