@@ -93,7 +93,7 @@ Relation
       *Text (required).* Display name of the relation from parent to child.
 
 ReadData
-  *Boolean.* If set to false, this property will not be imported from the TAB-delimited source file. (*NOTE: under construction*).
+  *Boolean.* If set to false, this property will not be imported from the TAB-delimited source file.
 
 CanUpdate: true
   *Boolean.* If set to true, this property can be modified by the user. (*NOTE: under construction*).

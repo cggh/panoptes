@@ -78,6 +78,8 @@ def ImportDataTable(calculationObject, datasetId, tableid, folder, importSetting
         tableOrder += 1
 
         properties = ImpUtils.LoadPropertyInfo(calculationObject, tableSettings, os.path.join(folder, 'data'))
+        properties = [prop for prop in properties if prop['Settings']['ReadData']]
+
 
         sql = "DELETE FROM propertycatalog WHERE tableid='{0}'".format(tableid)
         ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
