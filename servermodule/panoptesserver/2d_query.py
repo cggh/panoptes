@@ -320,7 +320,6 @@ def handler(start_response, request_data):
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
                         ('Content-Encoding', 'gzip')]
-    import time
     start_response(status, response_headers)
     yield data
 
