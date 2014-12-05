@@ -1,4 +1,6 @@
 import os
+import glob
+import fnmatch, re
 import datetime
 import SimpleFilterBankData
 import MultiCategoryDensityFilterBankData
@@ -310,8 +312,30 @@ class ProcessFilterBank(BaseImport):
             itemtracknr = 0
             
             parentdir = os.path.join(self._datatablesFolder, tableid, summaryid)
-            for fileid in os.listdir(parentdir):
-                fileName = os.path.join(parentdir, fileid)
+            cols = None
+            files = None
+            readHeader = False
+            copyFile = True
+            reobj = None
+            if (os.path.isdir(parentdir)):
+                files = os.listdir(parentdir)
+            else:
+                readHeader = True
+                copyFile = False
+                cols = ['chrom', 'pos', summaryid]
+                pattern = os.path.join(self._datatablesFolder, tableid) + os.sep + summSettings["FilePattern"]
+                files = glob.glob(pattern)
+                #Replace the .* with (.*) so we can pick it out to use as the id
+                regex = fnmatch.translate(pattern).replace('.*','(.*)')
+                #self._log('Using {}'.format(regex))
+                reobj = re.compile(regex)
+            for fileName in files:
+                if reobj is not None:
+                    m = reobj.match(fileName)
+                    fileid = m.group(1)
+                else:
+                    fileid = fileName
+                    fileName = os.path.join(parentdir, fileid)
                 if not (os.path.isdir(fileName)):
                     itemtracknr += 1
                     #self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
@@ -319,18 +343,19 @@ class ProcessFilterBank(BaseImport):
                     #self._log('Destination: ' + destFolder)
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
-                    shutil.copyfile(fileName, os.path.join(destFolder, summaryid + '_' + fileid))
+                    if copyFile:
+                        shutil.copyfile(fileName, os.path.join(destFolder, summaryid + '_' + fileid))
                     values = { 
                           'outputDir': destFolder, 
                           'outputFile' : None, 
-                          'columns': None , 
+                          'columns': cols , 
                           'propId': summaryid + '_' + fileid,
                           'minval': float(summSettings["MinVal"]),
                           'maxval': float(summSettings["MaxVal"]),
                           'blockSizeIncrFactor': int(2),
                           'blockSizeStart': int(summSettings["BlockSizeMin"]),
                           'blockSizeMax': int(summSettings["BlockSizeMax"]),
-                          'readHeader': False,
+                          'readHeader': readHeader,
                           'inputFile': fileName
                     }
                     outputs.append(values)
@@ -490,8 +515,8 @@ class ProcessFilterBank(BaseImport):
                     tasks = []    
                     for tableid in datatables:
                         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-                            outputs, outputc = self._prepareSummaryValues(tableid)
-                            tasks = tasks + outputs + outputc
+#                            outputs, outputc = self._prepareSummaryValues(tableid)
+#                            tasks = tasks + outputs + outputc
                             outputs = self._prepareTableBasedSummaryValues(tableid)
                             tasks = tasks + outputs
 
