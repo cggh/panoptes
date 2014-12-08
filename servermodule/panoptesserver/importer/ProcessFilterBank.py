@@ -515,8 +515,8 @@ class ProcessFilterBank(BaseImport):
                     tasks = []    
                     for tableid in datatables:
                         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-#                            outputs, outputc = self._prepareSummaryValues(tableid)
-#                            tasks = tasks + outputs + outputc
+                            outputs, outputc = self._prepareSummaryValues(tableid)
+                            tasks = tasks + outputs + outputc
                             outputs = self._prepareTableBasedSummaryValues(tableid)
                             tasks = tasks + outputs
 
