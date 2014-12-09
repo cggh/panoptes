@@ -505,6 +505,7 @@ class ProcessFilterBank(BaseImport):
             #self._log('Creating summary values')
             num_workers = size - 1
             closed_workers = 0
+            errors = False
             try:
                 with self._logHeader("Master starting with %d workers" % (num_workers)):
         
@@ -539,15 +540,17 @@ class ProcessFilterBank(BaseImport):
                             results = data
                             if results != 0:
                                 self._log("Error from worker %d" % source)
+                                errors = True
                                 #Need to close workers gracefully
                                 comm.send(None, dest=source, tag=tags.EXIT)
-#                                raise Exception('Error in processing task')
+                                raise Exception('Error in processing task')
                         elif tag == tags.EXIT:
                             #self._log("Worker %d exited." % source)
                             closed_workers += 1
             except:
                 e = sys.exc_info()[0]
                 self._log("Failed Master on %s." % (MPI.Get_processor_name()))
+                errors = True
                 self._logger.exception(e)
                 while closed_workers < num_workers:
                     data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
@@ -559,12 +562,14 @@ class ProcessFilterBank(BaseImport):
                         #self._log("Worker %d exited." % source)
                         closed_workers += 1
             finally:
+                if errors:
+                    self._log("There were errors in the run - please check the log")
                 #self._log("Master finishing")
                 self.printLog()
         else:
             # Worker processes execute code below
             name = MPI.Get_processor_name()
-            #self._log("I am a worker with rank %d on %s." % (rank, name))
+            self._log("I am a worker with rank %d on %s." % (rank, name))
             writeHeader = False
             readHeader = True
             writeColumnFiles = False
