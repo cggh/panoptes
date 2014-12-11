@@ -124,7 +124,7 @@ define([
                                 }
                             });
                             if (!handled)
-                                window.location.replace(Base64.decode(introview.url));
+                                window.location.href = Base64.decode(introview.url);
                         });
                     });
                     IntroViews.storedViewsContainerLeft.modifyValue(controlsGroupLeft.renderHtml());
