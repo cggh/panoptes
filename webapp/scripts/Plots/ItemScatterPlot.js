@@ -313,6 +313,10 @@ define([
                         that.reDraw();
                 });
 
+                that.ctrl_Outline = Controls.Check(null, {label: 'Outline', value:false}).setClassID('outline')
+                  .setOnChanged(function() {
+                      that.reDraw();
+                  });
 
 
                 that.colorLegend = Controls.Html(null,'');
@@ -333,7 +337,8 @@ define([
 
                     Controls.Section(Controls.CompoundVert([
                         that.ctrl_SizeFactor,
-                        that.ctrl_Opacity
+                        that.ctrl_Opacity,
+                        that.ctrl_Outline
                     ]).setMargin(10), {
                         title: 'Layout',
                         bodyStyleClass: 'ControlsSectionBody'
@@ -704,6 +709,7 @@ define([
 
                 var sizeFactor =that.ctrl_SizeFactor.getValue();
                 var opacity = that.ctrl_Opacity.getValue();
+                var outline = that.ctrl_Outline.getValue();
 
                 if (valColorCat) {
                     //Prepare color category strings
@@ -771,13 +777,13 @@ define([
                                 ctx.beginPath();
                                 ctx.arc(px, py, pointSize, 0, 2 * Math.PI, false);
                                 ctx.closePath();
-                                ctx.fill();
+                                outline ? ctx.stroke() : ctx.fill();
                             }
                             else {
                                 var mppr = that.styleMapper[valStyle[ii]];
                                 if (mppr) {
                                     mppr.drawer(ctx, px, py, pointSize*3);
-                                    ctx.fill();
+                                    outline ? ctx.stroke() : ctx.fill();
                                 }
                             }
                         }
@@ -797,7 +803,8 @@ define([
                     ctx.beginPath();
                     ctx.arc(selpsX[i], selpsY[i], 2*sizeFactor+2, 0, 2 * Math.PI, false);
                     ctx.closePath();
-                    ctx.fill();
+                    if (!outline)
+                        ctx.fill();
                     ctx.stroke();
                 }
 
@@ -819,12 +826,14 @@ define([
                                 ctx.beginPath();
                                 ctx.arc(px, py, rd, 0, 2 * Math.PI, false);
                                 ctx.closePath();
-                                ctx.fill();
+                                if (!outline)
+                                    ctx.fill();
                                 ctx.stroke();
                             }
                             else {
                                 that.styleMapper[valStyle[ii]].drawer(ctx, px, py, rd);
-                                ctx.fill();
+                                if (!outline)
+                                    ctx.fill();
                                 ctx.stroke();
                             }
                         }
