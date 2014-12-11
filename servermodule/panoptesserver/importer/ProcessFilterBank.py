@@ -62,7 +62,7 @@ class ProcessFilterBank(BaseImport):
             pass
 #   print 'chrom %s, pos %d, val %s' % (chromosome, pos, val)
         if chromosome != output["currentChromosome"]:                        
-            summariser = SimpleFilterBankData.Summariser(chromosome, output["propId"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputDir"], output["maxval"])
+            summariser = SimpleFilterBankData.Summariser(chromosome, output["propId"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputDir"], output["maxval"], output["minval"])
             if output["summariser"] != None:
                 output["summariser"].Finalise()
             else:
@@ -105,6 +105,7 @@ class ProcessFilterBank(BaseImport):
                 if output["outputFile"] == None:
                     raise ValueError("No output file specified")
                 self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
+                self._log(output)
                 #Changing the bufsiz seems to have little or no impact
                 output["destFile"] = open(output["outputFile"], 'w')
                 if writeHeader:
