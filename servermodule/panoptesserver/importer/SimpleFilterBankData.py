@@ -18,8 +18,8 @@ class Level:
         return ("sum %d, count %d, min %d, max %d" % (int(self.sum), int(self.count), int(self.min), int(self.max)))
 
 class Summariser:
-    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal):
-        self._minval = 0
+    def __init__(self, chromosome, propid, blockSizeStart, blockSizeIncrFactor, blockSizeMax, baseDir, maxVal, minVal):
+        self._minval = minVal
         
         self._chromosome = chromosome
         self._baseDir = baseDir
@@ -165,7 +165,7 @@ class SimpleFilterBank:
     
 
     def _getNewSummarizer(self, chromosome):
-        return Summariser(self._propid, chromosome, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, self._basedir, self._maxval)
+        return Summariser(self._propid, chromosome, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, self._basedir, self._maxval, self._minval)
     
     def parse(self):
         filesize = os.path.getsize(self._processfile)
