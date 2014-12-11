@@ -319,6 +319,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                     height += that.view.row_height * that.model.row_ordinal.length;
                 else
                     height += that.view.row_height * that.model_params.get('page_length');
+                //Limit height to IE's maximum of 8,192 otherwise canvas goes blank
+                height = Math.min(height, 8192);
                 if (that._height != height) {
                     that.modifyHeight(height);
                     that._myPlotter.resizeHeight(true);
