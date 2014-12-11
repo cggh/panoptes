@@ -147,7 +147,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/DataDecoders", "DQX/Fra
                         that.reDraw();
                     });
 
-                that.ctrl_PieOffset = Controls.Check(null, {label: 'Use offset'}).setClassID('pieOffset')
+                that.ctrl_PieOffset = Controls.Check(null, {label: 'Use offset', value:true}).setClassID('pieOffset')
                     .setOnChanged(function() {
                         that.reDraw();
                     });
