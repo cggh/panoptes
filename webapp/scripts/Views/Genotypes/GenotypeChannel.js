@@ -346,7 +346,7 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 if (that.model.intervals_being_fetched.length > 0) {
                     if (!that.loading_id) {
                         var draw = function (time) {
-                            if (that.model.intervals_being_fetched.length > 0) {
+                            if (that.model.intervals_being_fetched.length > 0 && !that.draw_info.needZoomIn) {
                                 for (var i=0; i < that.model.intervals_being_fetched.length; i++) {
                                     var interval = that.model.intervals_being_fetched[i];
                                     for (var pos = that.view.col_scale(interval.start); pos < that.view.col_scale(interval.end); pos += that.loadIcon.width*2) {
