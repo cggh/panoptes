@@ -119,7 +119,9 @@ class ImportDataTable(BaseImport):
             self._execSql(sql)
             sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
             self._execSql(sql)
-    
+
+            properties = [prop for prop in properties if prop['Settings']['ReadData']]
+
             ranknr = 0
             for prop in properties:
                 propid = prop['propid']
