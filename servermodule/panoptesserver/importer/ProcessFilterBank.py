@@ -407,9 +407,14 @@ class ProcessFilterBank(BaseImport):
     def createTableBasedSummaryValues(self, tableid):
         
         output = self._prepareTableBasedSummaryValues(tableid)
+        readHeader = True
         for out in output:
+            if 'readHeader' in out:
+                readHeader = out['readHeader']
+            else:
+                readHeader = True
             outputa = [ out ]
-            self._extractColumnsAndProcess(outputa, False, False, False)      
+            self._extractColumnsAndProcess(outputa, False, readHeader, False)      
 
      
     def createCustomSummaryValues(self, sourceid, tableid):
