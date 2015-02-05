@@ -958,7 +958,7 @@ fa-link
 .PnTitleBox {
     font-weight: bold;
     color: #FFFFFF;
-    font-size: 22px;
+    font-size: 21px;
     padding-top: 0px;
     padding-left: 3px;
 }
@@ -980,6 +980,7 @@ fa-link
     top: 0px;
     border-color:rgb(210,210,210);
 }
+
 .OrgLogoBox {
     height: 20px;
     padding-top: 17px;
@@ -1022,3 +1023,4 @@ fa-link
     background-size: 6px 6px;
 }
 
+}
