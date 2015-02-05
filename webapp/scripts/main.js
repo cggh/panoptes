@@ -280,7 +280,7 @@ require([
                         Application.showViewsAsTabs();
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Find','fa-search', 70, function(){
+                        Application.addNavigationButton('','fa-search', 35, function(){
                             var actions = [];
 
                             var hasNotes = false;
@@ -340,13 +340,19 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('Get link','fa-link', 70, function(){
+                        Application.addNavigationButton('','fa-bars', 35, function(){
                             Serialise.createLink();
                         });
 
 
                         //Define the header content (visible in the top-left corner of the window)
-                        var headerContent = '<div id="PanoptesAppHeader"><img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top" style="border:0px;margin:3px"/><div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div><div class="DQXThumbNailBox"></div></div></div>'.DQXformat({
+                        var headerContent = '<div id="PanoptesAppHeader">' +
+                          ('<img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top"/>' +
+                          '<div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div>' +
+                          '' +
+                          '<div class="DQXThumbNailBox"></div></div>' +
+                          '<img class="OrgLogoBox" src="Bitmaps/malariagen_logo_bw.png" alt="MalariaGEN"/>' +
+                          '</div>').DQXformat({
                             datasetname: MetaData.generalSettings.NameBanner || MetaData.generalSettings.Name
                         });
                         Application.setHeaderHeight(48);

@@ -104,7 +104,7 @@ a:link, a:visited
 
 .PanoptesLogoBox
 {
-    opacity:0.7;
+    opacity:0.9;
     cursor:pointer;
 }
 
@@ -734,14 +734,6 @@ input.PnGenotypesPageEdit{
 }
 
 
-.PnTitleBox
-{
-    font-weight: bold;
-    color:rgb(0,120,140);
-    margin-left:6px;
-    padding-top:3px;
-}
-
 .DQXThumbNail
 {
     font-size: 9px;
@@ -762,7 +754,7 @@ input.PnGenotypesPageEdit{
     padding-top:0px;
     padding-bottom:3px;
     border: 1px solid rgb(140,195,200);
-
+fa-link
     border-radius: 3px;
     margin-top:4px;
     margin-left:6px;
@@ -945,4 +937,62 @@ input.PnGenotypesPageEdit{
 {
     position: absolute;
     bottom: 0px;
+}
+
+#PanoptesAppHeader,.DQXTabs,.DQXPopupFrameHeader{
+    background: #000000; /* Old browsers */
+    background: -moz-linear-gradient(left, #000000 0%, #757575 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#000000), color-stop(100%,#757575)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #000000 0%,#757575 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #000000 0%,#757575 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #000000 0%,#757575 100%); /* IE10+ */
+    background: linear-gradient(to right, #000000 0%,#757575 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#757575',GradientType=1 ); /* IE6-9 */
+}
+
+#PanoptesAppHeader > * {
+
+    vertical-align: middle;
+}
+
+.PnTitleBox {
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 16px;
+    padding-top: 0px;
+    padding-left: 3px;
+}
+
+.PanoptesLogoBox {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.DQXTabs {
+    padding-top: 2px;
+}
+
+.DQXPopupFrameHeader {
+}
+
+.DQXTabInactive:hover {
+    top: 0px;
+    border-color:rgb(210,210,210);
+}
+
+.OrgLogoBox {
+    height: 20px;
+    padding-top: 17px;
+    float:right;
+    padding-right: 115px;
+}
+
+.PnTopLevelNav {
+    text-align: center;
+    margin-top: 11px;
+    margin-right: 5px;
+    background: rgb(200,200,200);
+    /*color: rgb(240,240,240);*/
+    padding: 4px;
+    border-radius: 5px;
 }
