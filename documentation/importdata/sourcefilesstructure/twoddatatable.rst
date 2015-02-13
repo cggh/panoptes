@@ -37,11 +37,11 @@ Example python HDF5 creation code:
 
     import h5py
     outfile = h5py.File(filename,'w', libver='latest')
-    call = f.create_dataset("call", (1000,10,2), dtype='i8')
-    first_allele[:,:,:] = my_array_of_calls
-    allele_depth = f.create_dataset("allele_depth", (1000,10,3), dtype='i8')
+    call = outfile.create_dataset("call", (1000,10,2), dtype='i1')
+    call[:,:,:] = my_array_of_calls
+    allele_depth = outfile.create_dataset("allele_depth", (1000,10,3), dtype='i2')
     allele_depth[:,:,:] = my_array_depth
-    quality = f.create_dataset("quality", (1000,10), dtype='i8')
+    quality = outfile.create_dataset("quality", (1000,10), dtype='i4')
     quality[:,:] = my_array_of_quality
     outfile.close()
 
