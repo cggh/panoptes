@@ -168,7 +168,7 @@ fi
 
 cd $PROJECT_ROOT
 NAME=`python -c "import config;print config.NAME"`
-sed -i 's/#NOID#/'$NAME'/' webapp/index.html
+sed -i 's/#DEV#/'$NAME'/' webapp/index.html
 
 echo -e "${green}Done!${NC}"
 
