@@ -1,5 +1,8 @@
 import tempfile
 
+#Name used for reporting bugs to rollbar
+NAME = 'not set'
+
 ###########################################################################################################
 # Configuration parameters for connecting to the MySQL database
 ###########################################################################################################

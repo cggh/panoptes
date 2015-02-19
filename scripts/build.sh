@@ -166,6 +166,9 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
+cd $PROJECT_ROOT
+NAME=`python -c "import config;print config.NAME"`
+sed -i 's/#NOID#/'$NAME'/' webapp/index.html
 
 echo -e "${green}Done!${NC}"
 
