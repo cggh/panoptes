@@ -80,8 +80,9 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
         cmdArguments = {}
         try:
             if len(config.DBUSER) > 0:
-                cmd += " -u {username}"
+                cmd += " -h {host} -u {username}"
                 cmdArguments['username'] = config.DBUSER
+                cmdArguments['host'] = config.DBSRV
                 try:
                     if len(config.DBPASS) > 0:
                         cmd += " -p'{password}'"
