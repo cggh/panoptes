@@ -112,9 +112,8 @@ require([
                 return Framework.Frame(iid, 'Tab', isizeweight).setFrameClassClient('DQXForm').setMarginsIndividual(0,0,0,0);
             };
 
-
             var setup = false;
-	    var spinning = false;
+      	    var spinning = false;
             $(document).ajaxStart(
               function () {
                   if (spinning || $('.PanoptesLogoBox').length == 0)
