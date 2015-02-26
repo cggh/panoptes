@@ -996,3 +996,7 @@ fa-link
     padding: 4px;
     border-radius: 5px;
 }
+
+.DQXTabInactive:hover {
+    border-color:rgb(0,128,0);
+}

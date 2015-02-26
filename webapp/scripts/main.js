@@ -58,7 +58,7 @@ require([
     "Utils/Initialise", "Views/Intro", "Views/GenomeBrowser",  "Views/TableViewer","Views/ListViewer",
     "InfoPopups/GenePopup", "InfoPopups/ItemPopup", "InfoPopups/DataItemTablePopup", "InfoPopups/DataItemPlotPopup", "InfoPopups/PropInfoPopup",
     "Wizards/PromptWorkspace", "Wizards/PromptDataSet", "Wizards/FindGene", "Wizards/FindDataItem", "Wizards/FindNote",
-    "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter"
+    "Utils/Serialise", "Utils/ButtonChoiceBox", "Plots/PlotStarter", "DQX/DocEl", "DQX/HistoryManager"
 ],
     function (
         _, $, Application, Framework, Msg, DQX, Controls, SQL, Popup, PopupFrame, DataFetchers,
@@ -66,9 +66,53 @@ require([
         Initialise, Intro, GenomeBrowser, TableViewer, ListViewer,
         GenePopup, ItemPopup, DataItemTablePopup, DataItemPlotPopup, PropInfoPopup,
         PromptWorkspace, PromptDataSet, FindGene, FindDataItem, FindNote,
-        Serialise, ButtonChoiceBox, PlotStarter
+        Serialise, ButtonChoiceBox, PlotStarter, DocEl, HistoryManager
         ) {
         $(function () {
+
+            //Override for panoptes style
+            Application._createNavigationButton = function (id, parentDiv, bitmap, content, styleClass, width, handlerFunction) {
+                if (bitmap.indexOf('fa-') === 0)
+                    var bt = Controls.Button(id, { icon: bitmap, content: content, buttonClass: styleClass, width: width, height: 22 });
+                else
+                    var bt = Controls.Button(id, { bitmap: bitmap, content: content, buttonClass: styleClass, width: width, height: 22 });
+                bt.setOnChanged(handlerFunction);
+                parentDiv.addElem(bt.renderHtml());
+            };
+
+            Application._createNavigationSection = function () {
+                var navSectionDiv = DocEl.Div();
+                navSectionDiv.addStyle("position", "absolute");
+                navSectionDiv.addStyle("right", "0px");
+                navSectionDiv.addStyle("top", "0px");
+                navSectionDiv.addStyle("padding-top", "0px");
+                navSectionDiv.addStyle("padding-right", "0px");
+                //this._createNavigationButton("HeaderPrevious", navSectionDiv, DQX.BMP("/Icons/Small/Back.png"), "Previous<br>view", "DQXToolButton3", 100, function () { Msg.send({ type: 'Back' }) });
+                //this._createNavigationButton("HeaderHome", navSectionDiv, 'fa-home', "Start", "DQXToolButton3", 70, function () { Msg.send({ type: 'Home' }) });
+                this._createNavigationButton("HeaderHelp", navSectionDiv, 'fa-question-circle', "", "PnTopLevelNav", 22, function () { Msg.send({ type: 'Home' }) });
+
+                // Create custom navigation buttons
+                $.each(Application._customNavigationButtons, function(idx, buttonInfo) {
+                    Application._createNavigationButton("", navSectionDiv, buttonInfo.bitmap, buttonInfo.name, "PnTopLevelNav", 22/*buttonInfo.width*/, buttonInfo.handler);
+                });
+
+                $('#Div1').append(navSectionDiv.toString());
+                DQX.ExecPostCreateHtml();
+
+                Msg.listen('', { type: 'Home' }, function () {
+                    PopupFrame.minimiseAll();
+                    HistoryManager.setState(Application._views[0].getStateKeys());
+                });
+                Msg.listen('', { type: 'Back' }, function () {
+                    HistoryManager.back();
+                });
+
+            };
+            Framework.FrameGroupTab = function (iid, isizeweight) {
+                return Framework.Frame(iid, 'Tab', isizeweight).setFrameClassClient('DQXForm').setMarginsIndividual(0,0,0,0);
+            };
+
+
 
 
             $(document).ajaxStart(function () {
