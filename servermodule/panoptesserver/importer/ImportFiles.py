@@ -109,7 +109,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings WHERE id<>"DBSchemaVersion"')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog')
 
