@@ -418,8 +418,6 @@ class Numpy_to_SQL(object):
 
     #Currently assumes simple 1D
     def create_table(self, table_name, column_name, array):
-        sql = "DROP TABLE IF EXISTS `{0}`".format(table_name, )
-        yield lambda cur: cur.execute(sql)
         column_type = self.dtype_to_column_type(str(array.dtype))
         sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)

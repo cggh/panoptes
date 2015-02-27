@@ -1,7 +1,7 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-from _mysql import OperationalError
+from _mysql import OperationalError, ProgrammingError
 
 import os
 import DQXDbTools
@@ -179,6 +179,7 @@ class Import2DDataTable(BaseImport):
                                 raise Exception("Property {0} has a different column length to the column index".format(property))
                             
                         #TempColIndex should really be a TEMPORARY table
+                        self._dropTable('`TempColIndex`')
                         sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index[0:max_line_count])
                         ImpUtils.ExecuteSQLGenerator(self._calculationObject, self._datasetId, sql)
     
@@ -256,9 +257,10 @@ class Import2DDataTable(BaseImport):
                         for prop in table_settings['Properties']:
                             if len(row_index) != remote_hdf5[prop['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'row' else 1]:
                                 raise Exception("Property {0} has a different row length to the row index".format(property))
+                        self._dropTable('`TempRowIndex`')
                         sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
                         ImpUtils.ExecuteSQLGenerator(self._calculationObject, self._datasetId, sql)
-    
+
                         #We have a datatable - add an index to it then copy that index across to the data table
                         sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
                                  SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
