@@ -181,6 +181,7 @@ class CalculationThread (threading.Thread):
 
 
     def Log(self, content):
+        content = str(content)
         if self.logfilename is None:
             print(content)
         else:

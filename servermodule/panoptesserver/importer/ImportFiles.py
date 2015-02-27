@@ -14,13 +14,13 @@ import DQXUtils
 import config
 import SettingsLoader
 import ImpUtils
-import customresponders.panoptesserver.Utils as Utils
 import customresponders.panoptesserver.schemaversion as schemaversion
+import customresponders.panoptesserver.Utils as Utils
 
-import ImportDataTable
-import Import2DDataTable
+from ImportDataTable import ImportDataTable
+from Import2DDataTable import Import2DDataTable
 import ImportRefGenome
-import ImportWorkspaces
+from ImportWorkspaces import ImportWorkspaces
 import time
 import math
 from DQXDbTools import DBCOLESC
@@ -53,7 +53,6 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         shutil.copytree(sourceDocFolder, destDocFolder)
 
 
-
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
@@ -63,7 +62,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
-
 
         # Remove current reference in the index first: if import fails, nothing will show up
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
@@ -106,6 +104,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             currentVersion = GetCurrentSchemaVersion(calculationObject, datasetId)
             if currentVersion[0] < schemaversion.major:
                 raise Exception("The database schema of this dataset is outdated. Actualise it by running a full data import or or top N preview import.")
+ 
 
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
@@ -113,29 +112,13 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings WHERE id<>"DBSchemaVersion"')
         ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog')
 
-        datatables = []
+        workspaceId = None
+        
+        importer = ImportDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder = baseFolder)
+        importer.importAllDataTables()
 
-        if globalSettings.HasToken('DataTables'):
-            if not type(globalSettings['DataTables']) is list:
-                raise Exception('DataTables token should be a list')
-            datatables = globalSettings['DataTables']
-
-        for dir in os.listdir(os.path.join(datasetFolder,'datatables')):
-            if os.path.isdir(os.path.join(datasetFolder, 'datatables', dir)):
-                if dir not in datatables:
-                    datatables.append(dir)
-        print('Data tables: '+str(datatables))
-        for datatable in datatables:
-            ImportDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, 'datatables', datatable), importSettings)
-
-        try:
-            datatables_2D = globalSettings['2D_DataTables']
-        except KeyError:
-            datatables_2D = []
-        if type(datatables_2D) is not list:
-            raise TypeError('2D_DataTables token should be a list')
-        for datatable in datatables_2D:
-            Import2DDataTable.ImportDataTable(calculationObject, datasetId, datatable, os.path.join(datasetFolder, '2D_datatables', datatable), importSettings)
+        import2D = Import2DDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder, dataDir = '2D_datatables')
+        import2D.importAll2DTables()
 
 
         if os.path.exists(os.path.join(datasetFolder, 'refgenome')):
@@ -144,8 +127,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         ImportDocs(calculationObject, datasetFolder, datasetId)
 
-
-        ImportWorkspaces.ImportWorkspaces(calculationObject, datasetFolder, datasetId, importSettings)
+        importWorkspaces = ImportWorkspaces(calculationObject, datasetId, importSettings, workspaceId, dataDir = 'workspaces')
+        importWorkspaces.importAllWorkspaces()
 
         # Global settings
         with calculationObject.LogHeader('Defining global settings'):
@@ -206,10 +189,10 @@ if __name__ == "__main__":
         datatableid = sys.argv[4]
         print('Start importing datatable "{0}.{1}"...'.format(datasetid, datatableid))
         datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatableid)
-        ImportDataTable.ImportDataTable(calc, datasetid, datatableid, datatableFolder,
-            {
-                'ConfigOnly': configOnly
-            }
-        )
+ #       ImportDataTable.ImportDataTable(calc, datasetid, datatableid, datatableFolder,
+ #           {
+ #               'ConfigOnly': configOnly
+ #           }
+ #       )
         sys.exit()
 

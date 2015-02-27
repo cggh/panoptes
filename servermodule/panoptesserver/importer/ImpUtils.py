@@ -80,8 +80,9 @@ def ExecuteSQLScript(calculationObject, filename, databaseName, outputfilename=N
         cmdArguments = {}
         try:
             if len(config.DBUSER) > 0:
-                cmd += " -u {username}"
+                cmd += " -h {host} -u {username}"
                 cmdArguments['username'] = config.DBUSER
+                cmdArguments['host'] = config.DBSRV
                 try:
                     if len(config.DBPASS) > 0:
                         cmd += " -p'{password}'"
@@ -123,9 +124,9 @@ class SQLScript:
 
 
 
-def ExecuteSQL(calculationObject, database, command):
+def ExecuteSQL(calculationObject, database, command, ):
     calculationObject.LogSQLCommand(database+';'+command)
-    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database) as cur:
+    with DQXDbTools.DBCursor(calculationObject.credentialInfo, database, local_infile = 1) as cur:
         cur.db.autocommit(True)
         cur.execute(command)
 
@@ -198,8 +199,10 @@ def ImportGlobalSettings(calculationObject, datasetId, settings):
             ))
 
 
-def LoadPropertyInfo(calculationObject, impSettings, datafile):
-    calculationObject.Log('Determining properties')
+def LoadPropertyInfo(calculationObject, impSettings, datafile, log = False):
+    
+    if log:
+        calculationObject.Log('Determining properties')
     properties = []
     propidMap = {}
 
@@ -248,7 +251,8 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
 
     if (impSettings.HasToken('AutoScanProperties')) and (impSettings['AutoScanProperties']):
         try:
-            calculationObject.Log('Auto determining columns')
+            if log:
+                calculationObject.Log('Auto determining columns')
             tb = VTTable.VTTable()
             tb.allColumnsText = True
             try:
@@ -337,51 +341,15 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile):
     if len(properties) == 0:
         raise Exception('No properties defined. Use "AutoScanProperties: true" or "Properties" list to define')
 
-    calculationObject.Log('Properties found:')
-    with calculationObject.LogDataDump():
-        for property in properties:
-            calculationObject.Log(str(property)+' | '+property['Settings'].ToJSON())
-    for property in properties:
-        DQXUtils.CheckValidColumnIdentifier(property['propid'])
+    if log:
+        calculationObject.Log('Properties found:')
+    if log:
+        with calculationObject.LogDataDump():
+            for prop in properties:
+                calculationObject.Log(str(prop)+' | '+prop['Settings'].ToJSON())
+    for prop in properties:
+        DQXUtils.CheckValidColumnIdentifier(prop['propid'])
     return properties
-
-
-def ExtractColumns(calculationObject, sourceFileName, destFileName, colList, writeHeader, importSettings):
-    maxLineCount = -1
-    if importSettings['ScopeStr'] == '1k':
-        maxLineCount = 1000
-    if importSettings['ScopeStr'] == '10k':
-        maxLineCount = 10000
-    if importSettings['ScopeStr'] == '100k':
-        maxLineCount = 100000
-    if importSettings['ScopeStr'] == '1M':
-        maxLineCount = 1000000
-    if importSettings['ScopeStr'] == '10M':
-        maxLineCount = 10000000
-    calculationObject.Log('Extracting columns {0} from {1} to {2}'.format(','.join(colList), sourceFileName, destFileName))
-    lineNr = 0
-    with open(sourceFileName, 'r') as sourceFile:
-        with open(destFileName, 'w') as destFile:
-            if writeHeader:
-                destFile.write('\t'.join(colList) + '\n')
-            header = [colname.replace(' ', '_') for colname in sourceFile.readline().rstrip('\r\n').split('\t')]
-            calculationObject.Log('Original header: {0}'.format(','.join(header)))
-            colindices = []
-            for col in colList:
-                try:
-                     colindices.append(header.index(col))
-                except ValueError:
-                    raise Exception('Unable to find column {0} in file {1}'.format(col, sourceFileName))
-            for line in sourceFile:
-                line = line.rstrip('\r\n')
-                if len(line) > 0:
-                    columns = line.split('\t')
-                    destFile.write('\t'.join([columns[colindex] for colindex in colindices]) + '\n')
-                lineNr += 1
-                if (maxLineCount > 0) and (lineNr >= maxLineCount):
-                    calculationObject.Log('WARNING: limiting at line ' + str(lineNr))
-                    break
-
 
 def CreateSummaryValues_Value(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
     calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
@@ -413,35 +381,6 @@ def CreateSummaryValues_Value(calculationObject, summSettings, datasetId, tablei
     )
     ExecuteSQL(calculationObject, datasetId, sql)
 
-
-
-def CreateSummaryValues_Categorical(calculationObject, summSettings, datasetId, tableid, sourceid, workspaceid, propid, name, dataFileName, importSettings):
-    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
-    summSettings.RequireTokens(['BlockSizeMin', 'BlockSizeMax'])
-    summSettings.AddTokenIfMissing('MaxVal', 1.0)
-    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, propid)
-    if not os.path.exists(destFolder):
-        os.makedirs(destFolder)
-    if not importSettings['ConfigOnly']:
-        calculationObject.Log('Executing filter bank')
-        ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, propid, summSettings)
-    extraSummSettings = summSettings.Clone()
-    extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-    sql = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')".format(propid, tableid, sourceid, workspaceid)
-    ExecuteSQL(calculationObject, datasetId, sql)
-    sql = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})".format(
-        workspaceid,
-        sourceid,
-        propid,
-        tableid,
-        name,
-        -1,
-        extraSummSettings.ToJSON(),
-        0,
-        summSettings['MaxVal'],
-        summSettings['BlockSizeMin']
-    )
-    ExecuteSQL(calculationObject, datasetId, sql)
 
 
 class Numpy_to_SQL(object):
@@ -479,8 +418,6 @@ class Numpy_to_SQL(object):
 
     #Currently assumes simple 1D
     def create_table(self, table_name, column_name, array):
-        sql = "DROP TABLE IF EXISTS `{0}`".format(table_name, )
-        yield lambda cur: cur.execute(sql)
         column_type = self.dtype_to_column_type(str(array.dtype))
         sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)
