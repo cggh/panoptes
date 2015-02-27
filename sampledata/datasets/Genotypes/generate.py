@@ -70,8 +70,8 @@ mkdir('datatables/variants')
 sample_ids = ['SID_' + str(i).zfill(6) for i in range(NUM_SAMPLES)]
 var_ids = ['VAR_' + str(i).zfill(6) for i in range(NUM_VARIANTS)]
 
-with open('datatables/samples/data', 'w') as tabfile:
-    writer = csv.writer(tabfile, delimiter='\t')
+with open('datatables/samples/data', 'wb') as tabfile:
+    writer = csv.writer(tabfile, delimiter='\t', lineterminator='\n')
     writer.writerow(('ID', 'Name', 'Category1', 'Category2', 'Value1'))
     ctr = 0
     for id in sample_ids:
