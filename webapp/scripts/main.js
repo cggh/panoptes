@@ -113,14 +113,49 @@ require([
             };
 
 
+            var setup = false;
+	    var spinning = false;
+            $(document).ajaxStart(
+              function () {
+                  if (spinning || $('.PanoptesLogoBox').length == 0)
+                      return;
+                  spinning = true;
+                  if (!setup) {
+                      setup = true;
+                      d3.select('.PanoptesLogoBox')
+                        .attr('style', 'transform:translateX(-51px) rotate(-90deg)');
+                  }
+                  d3.select('.PanoptesLogoBox')
+                    .transition()
+                    .duration(500)
+                    .ease('easeInSine')
+                    .attr('style', 'transform:translateX(0px) rotate(0deg);')
+                    .each('end', repeat);
 
+                  function repeat() {
+                      d3.select('.PanoptesLogoBox')
+                        .attr('style', 'transform:translateX(0px) rotate(0deg);')
+                        .transition()
+                        .duration(2000)
+                        .ease('linear')
+                        .attr('style', 'transform:translateX(0px) rotate(360deg);')
+                        .each('end', repeat);
+                  }
+              }
+            );
 
-            $(document).ajaxStart(function () {
-                $('.PanoptesLogoBox').addClass('fa-spin');
-            });
-            $(document).ajaxStop(function () {
-                $('.PanoptesLogoBox').removeClass('fa-spin');
-            });
+            $(document).ajaxStop(
+              function () {
+                  spinning = false;
+                  if ($('.PanoptesLogoBox').length == 0)
+                      return;
+                  d3.select('.PanoptesLogoBox')
+                    .transition()
+                    .duration(2000)
+                      //.attr('style','transform:translateX(-51px) rotate('+ (Math.round(Math.atan2((v = $('.PanoptesLogoBox').css('transform').split('(')[1].split(')')[0].split(','))[1], v[0]) * (180/Math.PI))-90) +'deg);');
+                    .attr('style', 'transform:translateX(-51px) rotate(-90deg)');
+              }
+            );
 
             function Start_Part0() {
                 $(document).on('click', '.doclink', function() {

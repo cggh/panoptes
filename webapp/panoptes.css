@@ -966,6 +966,7 @@ fa-link
 .PanoptesLogoBox {
     margin-left: 3px;
     margin-right: 3px;
+    transform:rotate(-90deg) translateX(-51px);
 }
 
 .DQXTabs {
@@ -979,7 +980,6 @@ fa-link
     top: 0px;
     border-color:rgb(210,210,210);
 }
-
 .OrgLogoBox {
     height: 20px;
     padding-top: 17px;
