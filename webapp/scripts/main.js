@@ -418,7 +418,7 @@ require([
                         });
 
                         // Create a custom 'navigation button' that will appear in the right part of the app header
-                        Application.addNavigationButton('','fa-bars', 35, function(){
+                        Application.addNavigationButton('','fa-link', 35, function(){
                             Serialise.createLink();
                         });
 

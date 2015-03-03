@@ -754,7 +754,6 @@ input.PnGenotypesPageEdit{
     padding-top:0px;
     padding-bottom:3px;
     border: 1px solid rgb(140,195,200);
-fa-link
     border-radius: 3px;
     margin-top:4px;
     margin-left:6px;
@@ -967,6 +966,8 @@ fa-link
     margin-left: 3px;
     margin-right: 3px;
     transform:rotate(-90deg) translateX(-51px);
+    width: 48px;
+    height: 49px;
 }
 
 .DQXTabs {
@@ -1020,5 +1021,15 @@ fa-link
     background: linear-gradient(to right,  #ffffff 0%,#ffffff 35%,#0a0e0a 36%,#000000 66%,#000000 66%,#ffffff 67%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
     background-size: 6px 6px;
+}
+
+.shoutout {
+    font-size: 10px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 2px;
+    opacity: 70%;
+    background-color: #ffffff;
 }
 
