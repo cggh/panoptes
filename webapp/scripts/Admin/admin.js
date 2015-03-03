@@ -29,6 +29,9 @@ require.config({
         },
         tween: {
             exports: 'TWEEN'
+        },
+        lzstring: {
+          exports: 'LZString'
         }
     },
     waitSeconds: 15,
