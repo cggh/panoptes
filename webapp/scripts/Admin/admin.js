@@ -17,7 +17,8 @@ require.config({
         markdown: "DQX/Externals/markdown",
         DQX: "DQX",
         _:"DQX/Externals/lodash",
-        tween: "Externals/Tween"
+        tween: "Externals/Tween",
+        lzstring: "DQX/Externals/lz-string"
     },
     shim: {
         d3: {
