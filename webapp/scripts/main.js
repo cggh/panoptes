@@ -20,7 +20,8 @@ require.config({
         tween: "Externals/Tween",
         datastream: "DQX/Externals/DataStream",
         blob: "DQX/Externals/Blob",
-        filesaver: "DQX/Externals/FileSaver"
+        filesaver: "DQX/Externals/FileSaver",
+        lzstring: "DQX/Externals/lz-string"
 
     },
     shim: {
@@ -41,8 +42,10 @@ require.config({
         },
         filesaver: {
           exports: 'saveAs'
+        },
+        lzstring: {
+          exports: 'LZString'
         }
-
     },
     waitSeconds: 15,
     urlArgs: "version="+versionString
