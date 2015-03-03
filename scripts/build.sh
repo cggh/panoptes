@@ -90,7 +90,7 @@ DB=`python -c "import config;print config.DB"`
 mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
 CREATE DATABASE IF NOT EXISTS ${DB};
 EOF
-mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < scripts/datasetindex.sql
+mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
 
 BASEDIR=`python -c "import config;print config.BASEDIR"`
 echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
