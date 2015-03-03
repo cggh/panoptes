@@ -1,24 +1,21 @@
-import tempfile
-
-#Name used for reporting bugs to rollbar
-NAME = 'not set'
-
 ###########################################################################################################
 # Configuration parameters for connecting to the MySQL database
 ###########################################################################################################
 
+NAME = '<%= @name %>'
 # MySQL Hostname
-DBSRV = 'localhost'
+DBSRV = '<%= @db_server_name %>'
 
 # MySQL User
-DBUSER = 'root'
+DBUSER = '<%= @db_user %>'
 
 # MySQL Pass
 #todo: for production server data that also includes confidential information, this should be moved to a safer place outside the source code.
-DBPASS = '1234'
+DBPASS = '<%= @db_pass %>'
 
 # Name to use for the central panoptes MySQL DB
-DB='datasetindex'
+# DB='datasetindex'
+DB='<%= @db_name %>'
 
 #Timeout for db queries
 TIMEOUT = 30
@@ -27,13 +24,13 @@ TIMEOUT = 30
 # Server side file locations
 #########################################################################################################
 # Directory where disk-held data will be stored by panoptes - created if not existing
-BASEDIR = 'basedir_path'
+BASEDIR = '<%= @base_dir %>'
 
 #Dir which is scanned for data to import  - created if not existing
 #If this is empty, examples datasets will be copied to it
-SOURCEDATADIR = 'sourcedir_path'
+SOURCEDATADIR = '<%= @source_dir %>'
 
-
+#AUTHORISATIONFILE = "<%= @auth_file %>"
 
 ###########################################################################################################
 # CAS authentication
@@ -41,20 +38,14 @@ SOURCEDATADIR = 'sourcedir_path'
 
 #The URL of your CAS server - if this is set then CAS will be enabled
 # e.g. https://mydomain/cas
-CAS_SERVICE = ''
+CAS_SERVICE = '<%= @cas_service %>'
 #This is the CAS protocol version versions 2 and 3 supported (3 is only available in CAS 4)
 CAS_VERSION = 3
 #A URL to use as the link to logout
 CAS_LOGOUT_PAGE = '/logout'
 #Where to go when you've logged out - will send you to the entry page if not set
-CAS_LOGOUT_DESTINATION = ''
+CAS_LOGOUT_DESTINATION = '<%= @cas_logout %>'
 #A page to show if validation fails
 CAS_FAILURE_PAGE = None
+CAS_EFFECTIVE_URL = "<%= @cas_url %>"
 
-# Configure the SessionMiddleware (Beaker)
-# You may wish to change the data_dir but this will work
-session_opts = {
-    'session.type': 'file',
-    'session.cookie_expires': True,
-    'session.data_dir': tempfile.gettempdir() + '/panoptes'
-}
