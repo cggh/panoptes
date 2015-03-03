@@ -49,3 +49,6 @@ CAS_LOGOUT_DESTINATION = '<%= @cas_logout %>'
 CAS_FAILURE_PAGE = None
 CAS_EFFECTIVE_URL = "<%= @cas_url %>"
 
+pythoncommand = "<%= @python %>"
+mysqlcommand = "<%= @mysql %>"
+
