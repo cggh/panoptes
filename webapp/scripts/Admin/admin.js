@@ -100,10 +100,11 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                     }
 
 
-                    that.execLoadData = function(sourceFileInfo, scopeStr) {
+                    that.execLoadData = function(sourceFileInfo, scopeStr, skipTableTracks) {
                         var data={};
                         //data.ConfigOnly = (scopeStr=='none')?'1':'0';
                         data.ScopeStr = scopeStr;
+                        data.SkipTableTracks = skipTableTracks;
                         if (sourceFileInfo.sourceid) {
                             //Upload a specific custom data source
                             data.datasetid = sourceFileInfo.datasetid;
@@ -148,7 +149,7 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                                 return;
                             }
                             Popup.closeIfNeeded(popupid);
-                            that.execLoadData(sourceFileInfo, scopeStr);
+                            that.execLoadData(sourceFileInfo, scopeStr, ctrlSkipTableTracks.getValue());
                         });
                         content += bt.renderHtml() + '&nbsp;';
 
@@ -166,9 +167,17 @@ require(["_", "jquery", "DQX/Application", "DQX/Framework", "DQX/FrameList", "DQ
                             {id:'10M', name:'Top 10M preview'}
                         ]});
                         content += ctrlLoadScope.renderHtml();
+                        content += '</p><p>';
+
+                        var ctrlSkipTableTracks = Controls.Check(null, {
+                          label:'Skip filterbanking of table-row-linked tracks',
+                        });
+                        content += ctrlSkipTableTracks.renderHtml();
+                        content += '</p>';
 
 
-                        var popupid = Popup.create('Import file source data', content);
+
+                      var popupid = Popup.create('Import file source data', content);
                     }
 
                     that.createPanelSourceData = function() {

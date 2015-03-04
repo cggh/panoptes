@@ -86,7 +86,7 @@ class ProcessFilterBank(BaseImport):
     def _isSimpleTask(self, task):
         return 'minval' in task
         
-    def _extractColumnsAndProcess(self, banks, writeHeader, readHeader, writeColumnFiles):
+    def _extractColumnsAndProcess(self, banks, writeHeader, readHeader, writeColumnFiles, tableBased=False):
         
         
         sourceFileName = None
@@ -140,7 +140,8 @@ class ProcessFilterBank(BaseImport):
                         #Assume Chrom Pos Value
                         output["colindices"] = [0,1,2]
                                                 
-                if self._importSettings['ConfigOnly']:
+                if self._importSettings['ConfigOnly'] or (tableBased and self._importSettings['SkipTableTracks']=='true'):
+                    self._log('Skipping filterbank execution')
                     return
                 
                 self._log('Executing filter bank')
@@ -414,7 +415,7 @@ class ProcessFilterBank(BaseImport):
             else:
                 readHeader = True
             outputa = [ out ]
-            self._extractColumnsAndProcess(outputa, False, readHeader, False)      
+            self._extractColumnsAndProcess(outputa, False, readHeader, False, tableBased=True)
 
      
     def createCustomSummaryValues(self, sourceid, tableid):

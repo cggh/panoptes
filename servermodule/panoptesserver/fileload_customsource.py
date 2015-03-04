@@ -20,6 +20,8 @@ def ResponseExecute(data, calculationObject):
     if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
     importSettings['ScopeStr'] = data['ScopeStr']
+    importSettings['SkipTableTracks'] = data['SkipTableTracks']
+
     try:
         importer.ImportWorkspaces.ImportCustomData(
             calculationObject,

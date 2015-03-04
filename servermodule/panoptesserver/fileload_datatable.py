@@ -21,6 +21,7 @@ def ResponseExecute(data, calculationObject):
     if data['ScopeStr'] == 'none':
         importSettings['ConfigOnly'] = True
     importSettings['ScopeStr'] = data['ScopeStr']
+    importSettings['SkipTableTracks'] = data['SkipTableTracks']
 
     datasetFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid)
     if type == 'datatable':
