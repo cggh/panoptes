@@ -362,7 +362,7 @@ class ProcessFilterBank(BaseImport):
                     }
                     outputs.append(values)
                     
-            return outputs          
+        return outputs
             
     def _prepareTableBasedSummaryValues(self, tableid):
            
