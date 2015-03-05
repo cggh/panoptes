@@ -424,6 +424,10 @@ class LoadTable(threading.Thread):
                         raise Exception('Unable to write to temporary file ' + self._destFileName)
     
                     header = ifp.readline()
+                    
+                    if "\r\n" in header:
+                        self._lineSeparator = '\r\n'
+                        
                     if (self._maxLineCount > 0):
                         hfp.write(header)
                     self._parseHeader(header)
