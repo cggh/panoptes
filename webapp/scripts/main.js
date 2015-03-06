@@ -112,47 +112,21 @@ require([
                 return Framework.Frame(iid, 'Tab', isizeweight).setFrameClassClient('DQXForm').setMarginsIndividual(0,0,0,0);
             };
 
-            var setup = false;
-      	    var spinning = false;
             $(document).ajaxStart(
               function () {
-                  if (spinning || $('.PanoptesLogoBox').length == 0)
-                      return;
-                  spinning = true;
-                  if (!setup) {
-                      setup = true;
-                      d3.select('.PanoptesLogoBox')
-                        .attr('style', 'transform:translateX(-51px) rotate(-90deg)');
-                  }
                   d3.select('.PanoptesLogoBox')
                     .transition()
                     .duration(500)
-                    .ease('easeInSine')
-                    .attr('style', 'transform:translateX(0px) rotate(0deg);')
-                    .each('end', repeat);
-
-                  function repeat() {
-                      d3.select('.PanoptesLogoBox')
-                        .attr('style', 'transform:translateX(0px) rotate(0deg);')
-                        .transition()
-                        .duration(2000)
-                        .ease('linear')
-                        .attr('style', 'transform:translateX(0px) rotate(360deg);')
-                        .each('end', repeat);
-                  }
+                    .attr('style', 'opacity: 1')
               }
             );
 
             $(document).ajaxStop(
               function () {
-                  spinning = false;
-                  if ($('.PanoptesLogoBox').length == 0)
-                      return;
                   d3.select('.PanoptesLogoBox')
                     .transition()
-                    .duration(2000)
-                      //.attr('style','transform:translateX(-51px) rotate('+ (Math.round(Math.atan2((v = $('.PanoptesLogoBox').css('transform').split('(')[1].split(')')[0].split(','))[1], v[0]) * (180/Math.PI))-90) +'deg);');
-                    .attr('style', 'transform:translateX(-51px) rotate(-90deg)');
+                    .duration(500)
+                    .attr('style', 'opacity: 0')
               }
             );
 
@@ -425,7 +399,8 @@ require([
 
                         //Define the header content (visible in the top-left corner of the window)
                         var headerContent = '<div id="PanoptesAppHeader">' +
-                          ('<img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top"/>' +
+                          ('<div class="PanoptesLogoPlaceholder"></div>' +
+                            '<img class="PanoptesLogoBox" src="Bitmaps/PanoptesLogoSmall2.png" alt="Panoptes logo" align="top"/>' +
                           '<div style="display:inline-block"><div class="PnTitleBox">{datasetname}</div>' +
                           '' +
                           '<div class="DQXThumbNailBox"></div></div>' +

@@ -963,11 +963,24 @@ input.PnGenotypesPageEdit{
 }
 
 .PanoptesLogoBox {
-    margin-left: 3px;
-    margin-right: 3px;
-    transform:rotate(-90deg) translateX(-51px);
+    position: absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    left:0;
+    margin: auto;
+    opacity: 0;
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+
+}
+
+.PanoptesLogoPlaceholder {
+    display: inline-block;
     width: 48px;
     height: 49px;
+    margin-left: 3px;
+    margin-right: 3px;
 }
 
 .DQXTabs {
