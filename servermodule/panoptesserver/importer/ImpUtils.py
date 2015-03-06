@@ -330,6 +330,7 @@ def LoadPropertyInfo(calculationObject, impSettings, datafile, log = False):
             settings.ConvertToken_Boolean('ReadData')
             settings.AddTokenIfMissing('CanUpdate', False)
             settings.ConvertToken_Boolean('CanUpdate')
+            settings.AddTokenIfMissing('MaxLen', 0)
             settings.ConvertStringsToSafeSQL()
             property['DataType'] = settings['DataType']
         except Exception as e:

@@ -51,7 +51,6 @@ class LoadTable(threading.Thread):
             col['IsValue'] = ImpUtils.IsValueDataTypeIdenfifier(col['DataType'])
             col['IsDate'] = ImpUtils.IsDateDataTypeIdenfifier(col['DataType'])
             col['IsBoolean'] = (col['DataType'] == 'Boolean')
-            col['MaxLen'] = 0
             
         self._columns = columns
         
@@ -428,43 +427,54 @@ class LoadTable(threading.Thread):
                     if "\r\n" in header:
                         self._lineSeparator = '\r\n'
                         
+                    skipParse = True
+                    
+                    for col in self._columns:
+                        if col['MaxLen'] == 0:
+                            self._log('MaxLen not set for column:' + col['name'])
+                            skipParse = False
+                            
+                          
                     if (self._maxLineCount > 0):
                         hfp.write(header)
                     self._parseHeader(header)
-        
-        
-                    lineCount = 0
-                    for line in ifp:
-                        try:
-                            if (self._maxLineCount > 0):
-                                hfp.write(line)
-                                
-                            line = line.rstrip('\r\n')
-                            if len(line) > 0:
-                                #Still parse because of calculating column size
-                                writeCells = self._parseLine(line)
-                    
-                                if self._bulkLoad == False:            
-                                    self._writeInsertLine(ofp, tableid, writeCells)
-                                
-                                
-                                lineCount += 1
-                                if lineCount % 1000000 == 0:
-                                    self._log('Line '+str(lineCount))
-                                if (self._maxLineCount>0) and (lineCount >= self._maxLineCount):
-                                    self._log('WARNING:Terminating import at {0} lines'.format(lineCount))
-                                    break
-                        except Exception as e:
-                            self._log('Offending line: ' + line)
-                            raise Exception('Error while parsing line {0} of file "{1}": {2}'.format(
-                                                                                                     lineCount + 1,
-                                                                                                     sourceFileName,
-                                                                                                     str(e)))
+            
+            #If importing x lines then we need to create a temporary file
+                    #If not bulkLoading the need to create a file with SQL INSERT statements
+                    #If column lengths are not set then we need to calculate them
+                    if self._bulkLoad and self._maxLineCount <= 0 and skipParse:
+                        self._log("Skipping parse of input file")
+                    else:                
+                        lineCount = 0
+                        for line in ifp:
+                            try:
+                                if (self._maxLineCount > 0):
+                                    hfp.write(line)
+                                    
+                                line = line.rstrip('\r\n')
+                                if len(line) > 0:
+                                    #Still parse because of calculating column size
+                                    writeCells = self._parseLine(line)
+                        
+                                    if self._bulkLoad == False:            
+                                        self._writeInsertLine(ofp, tableid, writeCells)
+                                    
+                                    
+                                    lineCount += 1
+                                    if lineCount % 1000000 == 0:
+                                        self._log('Line '+str(lineCount))
+                                    if (self._maxLineCount>0) and (lineCount >= self._maxLineCount):
+                                        self._log('WARNING:Terminating import at {0} lines'.format(lineCount))
+                                        break
+                            except Exception as e:
+                                self._log('Offending line: ' + line)
+                                raise Exception('Error while parsing line {0} of file "{1}": {2}'.format(
+                                                                                                         lineCount + 1,
+                                                                                                         sourceFileName,
+                                                                                                         str(e)))
         
             if (self._maxLineCount > 0):
                 hfp.close()
-
-            self._lineCount = lineCount
                             
             if self._bulkLoad:
                 #Bulk load
