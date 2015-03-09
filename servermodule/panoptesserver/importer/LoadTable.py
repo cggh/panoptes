@@ -113,7 +113,7 @@ class LoadTable(threading.Thread):
        
     #Reimplemented here because of logging 
     def _execSql(self, sql):
-        self._log("LoadTable SQL:" + self._datasetId + ';' + sql)
+        self._log("LoadTable SQL:" + self._datasetId + ';' + repr(sql))
         start = time.time()
         with DBCursor(self._responder.credentialInfo, self._datasetId, local_infile = 1) as cur:
             cur.db.autocommit(True)
