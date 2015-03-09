@@ -116,7 +116,7 @@ require([
               function () {
                   d3.select('.PanoptesLogoBox')
                     .transition()
-                    .duration(500)
+                    .duration(1000)
                     .attr('style', 'opacity: 1')
               }
             );
@@ -125,7 +125,7 @@ require([
               function () {
                   d3.select('.PanoptesLogoBox')
                     .transition()
-                    .duration(500)
+                    .duration(1000)
                     .attr('style', 'opacity: 0')
               }
             );
