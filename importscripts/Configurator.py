@@ -197,7 +197,7 @@ if __name__ == "__main__":
     
     import config
     startDir = config.SOURCEDATADIR + '/datasets'
-    startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/samples"
+    #startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/samples"
     for dirName, subdirList, fileList in os.walk(startDir):
         
         if 'data' in fileList:
