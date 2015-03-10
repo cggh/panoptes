@@ -121,6 +121,7 @@ class Configurator(object):
                 
             header = ifp.readline()
             header = header.rstrip('\n')
+            header = header.rstrip('\r')
             config, values = self._parseHeader(header)
             
             lineCount = 1
@@ -128,6 +129,8 @@ class Configurator(object):
                 try:
                       
                     line = line.rstrip('\n')
+                    line = line.rstrip('\r')
+                    
                     if len(line) > 0:
                         self._parseLine(line, config, values)
                         
