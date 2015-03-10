@@ -114,7 +114,7 @@ class Configurator(object):
     
     def processFile(self, sourceFileName):
         
-        
+        rootProps = {}
         with open(sourceFileName, 'r') as ifp:
             if ifp is None:
                 raise Exception('Unable to read file '+sourceFileName)
@@ -147,8 +147,17 @@ class Configurator(object):
                 if 'DataType' in config[conf] and config[conf]['DataType'] == 'Value':
                     if len(values[conf]) > 0:
                         config[conf]['StringValues'] = values[conf]
+             
+            if lineCount == 1:
+                rootProps = {
+                 'Name': os.path.basename(os.path.dirname(sourceFileName)),
+                 'Format': 'newick',
+                 'Description': 'Sample Description',
+                 'CrossLink': 'unknown'
+                }
+                config = {}
                 
-            return config
+            return rootProps, config
                     
         
     
@@ -158,7 +167,7 @@ class Configurator(object):
             if len(fileList) > 0:
                 #Assume all the same so only process one
                 sourceFileName = os.path.join(dirName,fileList[0])
-                config = configurator.processFile(sourceFileName)
+                rootProps, config = configurator.processFile(sourceFileName)
                 #Two types of configuration available
                 if len(config) == 3:
                     #Old style - no header - 3 columns chrom, pos, value
@@ -188,14 +197,15 @@ if __name__ == "__main__":
     
     import config
     startDir = config.SOURCEDATADIR + '/datasets'
-    startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/variants"
+    startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/samples"
     for dirName, subdirList, fileList in os.walk(startDir):
         
         if 'data' in fileList:
             configurator = Configurator()
             config = {}
             config["Properties"] = []
-            props = configurator.processFile(os.path.join(dirName,'data'))
+            rootProps, props = configurator.processFile(os.path.join(dirName,'data'))
+            config.update(rootProps)
             for key, value in props.iteritems():
                 config["Properties"].append(value)
             if len(subdirList) > 0:
