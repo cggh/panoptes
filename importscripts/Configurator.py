@@ -51,7 +51,17 @@ class Configurator(object):
                 config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), 0)
             elif type(parsed) is bool:
                 dataType = 'Boolean'
-            elif type(parsed) is str or type(parsed) is list:
+            elif content == '':
+                #Special Case
+                #Keep the same data type as for other rows
+                if 'DataType' in config[idx]:
+                    dataType = config[idx]['DataType']
+                    #Treat '' as 0 for valued columns
+                    if dataType == 'Value':
+                        parsed = 0
+                        if not content in values[idx]:
+                            values[idx].append(content)
+            elif type(parsed) is str or type(parsed) is list or parsed is None:
                 dataType = 'Text'
                 #If you use True/False then the True doesn't appear in the output
                 cate = config[idx].get('IsCategorical','true')
@@ -64,13 +74,6 @@ class Configurator(object):
                             config[idx]['IsCategorical'] = 'false'
             elif type(parsed) is datetime.date:
                 dataType = 'Date'
-            elif content == '':
-                #Keep the same data type as for other rows
-                if 'DataType' in config[idx]:
-                    dataType = config[idx]['DataType']
-                    #Treat '' as 0 for valued columns
-                    if dataType == 'Value':
-                        parsed = 0
             else:
                 logging.error("Unrecognised type for %s:%s:%s:" % (str(name),str(type(parsed)),content))   
                 
@@ -90,15 +93,18 @@ class Configurator(object):
                 del config[idx]['DecimDigits']
                    
             if config[idx].get('DataType',dataType) != dataType:
-                logging.warn("Mixed content type for %s:%s:%s: previously %s" % (str(name),dataType,content,config[idx]['DataType']))
-                if config[idx]['DataType'] == 'Value':
-                    del config[idx]['DecimDigits']
-                    del config[idx]['MaxVal']
-                    del config[idx]['MinVal']
+                if parsed is None:
+                    dataType = config[idx]['DataType']
+                else:
+                    logging.warn("Mixed content type for %s:%s:%s: previously %s" % (str(name),dataType,content,config[idx]['DataType']))
+                    if config[idx]['DataType'] == 'Value':
+                        del config[idx]['DecimDigits']
+                        del config[idx]['MaxVal']
+                        del config[idx]['MinVal']
                     
             config[idx]['DataType'] = dataType
                 
-            if dataType == 'Value':
+            if dataType == 'Value' and not parsed is None:
                 max_val = math.ceil(float(parsed))
                 min_val = math.floor(float(parsed))
                 config[idx]['MaxVal'] = max(config[idx].get('MaxVal',0), max_val)
@@ -133,6 +139,11 @@ class Configurator(object):
                                                                                              str(e)))
                     
                 lineCount = lineCount + 1
+                
+            for conf in config:
+                if 'DataType' in config[conf] and config[conf]['DataType'] == 'Value':
+                    if len(values[conf]) > 0:
+                        config[conf]['StringValues'] = values[conf]
                 
             return config
                     
@@ -174,7 +185,7 @@ if __name__ == "__main__":
     
     import config
     startDir = config.SOURCEDATADIR + '/datasets'
-    #startDir = "/vagrant/panoptes/current/sampledata/datasets/"
+    startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/variants"
     for dirName, subdirList, fileList in os.walk(startDir):
         
         if 'data' in fileList:
