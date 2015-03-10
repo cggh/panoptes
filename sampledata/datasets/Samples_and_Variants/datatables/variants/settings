@@ -120,7 +120,7 @@ Properties:
   DataType: Text
   ShowInTable: true
   ShowInBrowser: true
-#  IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   CategoryColors:                   # Specifies display colours for the categorical states of this property
     A: rgb(255,128,60)
     B: rgb(0,180,0)
