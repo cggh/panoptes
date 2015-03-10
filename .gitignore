@@ -13,7 +13,7 @@ servermodule/panoptesserver/import/VTTable.py
 importscripts/TableUtils
 
 servermodule/panoptesserver/PanoptesAuthDb
-
+settings.gen
 
 *.py[cod]
 
