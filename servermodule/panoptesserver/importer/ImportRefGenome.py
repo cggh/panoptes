@@ -54,31 +54,64 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
             shutil.copyfile(os.path.join(folder, 'summaryvalues', summaryid, 'values'), dataFileName)
 
             settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
-            settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
-            settings.AddTokenIfMissing('MinVal', 0)
-            settings.AddTokenIfMissing('BlockSizeMin', 1)
-            settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
-            settings.AddTokenIfMissing('Order', 99999)
-            settings.DefineKnownTokens(['channelColor'])
-            settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
-            print('SETTINGS: '+settings.ToJSON())
-            if not(importSettings['ConfigOnly']):
-                print('Executing filter bank')
-                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings, maxLineCount)
+            print settings
+            if settings.HasToken('IsCategorical') and settings['IsCategorical']:
+                settings.RequireTokens(['BlockSizeMax'])
+                settings.AddTokenIfMissing('MinVal', 0)
+                settings.AddTokenIfMissing('MaxVal', 1.0)
+                settings.AddTokenIfMissing('BlockSizeMin', 1)
+                settings.AddTokenIfMissing('Order', 99999)
+                settings.DefineKnownTokens(['channelColor'])
+                settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
+                categories = []
+                if settings.HasToken('CategoryColors'):
+                    stt = settings.GetSubSettings('CategoryColors')
+                    categories = [x for x in stt.Get()]
+                    settings.AddTokenIfMissing('Categories', categories)
+                print('SETTINGS: '+settings.ToJSON())
+                if not(importSettings['ConfigOnly']):
+                    print('Executing filter bank')
+                    ImpUtils.ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, summaryid, settings, maxLineCount)
+                else:
+                    calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
+                extraSettings = settings.Clone()
+                extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'ScopeStr'])
+                sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
+                    summaryid,
+                    settings['Name'],
+                    settings['Order'],
+                    extraSettings.ToJSON(),
+                    settings['MinVal'],
+                    settings['MaxVal'],
+                    settings['BlockSizeMin']
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
             else:
-                calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
-            extraSettings = settings.Clone()
-            extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-            sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
-                summaryid,
-                settings['Name'],
-                settings['Order'],
-                extraSettings.ToJSON(),
-                settings['MinVal'],
-                settings['MaxVal'],
-                settings['BlockSizeMin']
-            )
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+                settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
+                settings.AddTokenIfMissing('MinVal', 0)
+                settings.AddTokenIfMissing('BlockSizeMin', 1)
+                settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
+                settings.AddTokenIfMissing('Order', 99999)
+                settings.DefineKnownTokens(['channelColor'])
+                settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
+                print('SETTINGS: '+settings.ToJSON())
+                if not(importSettings['ConfigOnly']):
+                    print('Executing filter bank')
+                    ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings, maxLineCount)
+                else:
+                    calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
+                extraSettings = settings.Clone()
+                extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'ScopeStr'])
+                sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
+                    summaryid,
+                    settings['Name'],
+                    settings['Order'],
+                    extraSettings.ToJSON(),
+                    settings['MinVal'],
+                    settings['MaxVal'],
+                    settings['BlockSizeMin']
+                )
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
 
 
 
