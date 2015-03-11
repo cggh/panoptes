@@ -40,15 +40,14 @@ class ProcessDatabase(BaseImport):
                         'name': prop['propid'],
                         'DataType': prop['DataType'],
                         'Index': prop['Settings']['Index'],
-                        'ReadData': prop['Settings']['ReadData']
+                        'ReadData': prop['Settings']['ReadData'],
+                        'MaxLen': prop['Settings']['MaxLen']
                     }
                     for prop in properties if (prop['propid'] != 'AutoKey')]
         
         if addPrimaryKey:
-            columns.append({'name': loadSettings['PrimKey'], 'DataType':'Text', 'Index': False, 'ReadData': True})
-            
-        
-        
+            columns.append({'name': loadSettings['PrimKey'], 'DataType':'Text', 'Index': False, 'ReadData': True, 'MaxLen': 0})
+                   
         self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, columns, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
         
         if not self._importSettings['ConfigOnly']:

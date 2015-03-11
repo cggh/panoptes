@@ -196,7 +196,7 @@ class BaseImport(object):
         
         return tableSettings, properties
     
-    def _fetchSettings(self, datatable, includeProperties = True):
+    def _fetchSettings(self, datatable, includeProperties = True, log = False):
                 
         settings, data = self._getDataFiles(datatable)
         
@@ -204,8 +204,8 @@ class BaseImport(object):
 
         properties = None
         if includeProperties:
-            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
-        
+            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data, log)
+                
         return tableSettings, properties
 
     def _getDatasetFolders(self, datatables):

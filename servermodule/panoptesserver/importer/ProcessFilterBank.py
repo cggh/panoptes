@@ -196,7 +196,7 @@ class ProcessFilterBank(BaseImport):
             sql = stmt.format(propid, tableid, sourceid, workspaceid)
             self._execSql(sql)
             stmt = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})"
-            sql = stmt.format(workspaceid,
+            sql = stmt.format(workspaceid or '',
                               sourceid,
                               propid,
                               tableid,
@@ -362,7 +362,7 @@ class ProcessFilterBank(BaseImport):
                     }
                     outputs.append(values)
                     
-            return outputs          
+        return outputs
             
     def _prepareTableBasedSummaryValues(self, tableid):
            
