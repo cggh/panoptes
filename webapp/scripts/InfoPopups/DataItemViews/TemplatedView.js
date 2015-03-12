@@ -79,12 +79,17 @@ define(["require", "handlebars", "DQX/base64", "DQX/Application", "DQX/Framework
 
             that.setContent = function (itemData) {
                 that.itemData = itemData;
+                var callback_will_fire = false;
                 _.each(that.child_fetchers, function(fetcher, childId) {
                     var query = SQL.WhereClause.CompareFixed(fetcher.relationInfo.childpropid, '=', itemData.fields[that.tableInfo.primkey]);
                     fetcher.setUserQuery1(query);
                     //We jst set the query so we no it is not ready
                     fetcher.IsDataReady(-1,1000000);
+                    callback_will_fire = true;
                 });
+                //If we have no child fetchers then we need to manually notify
+                if (!callback_will_fire)
+                    that.notifyDataReady();
             };
 
             that.createPanels = function() {
