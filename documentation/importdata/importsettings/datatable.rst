@@ -165,15 +165,34 @@ TableBasedSummaryValues
   *Block.*
   Declares that numerical genome values for are available for each item in the table.
   Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser.
-  A typical use case is if the data table contains samples that were sequenced, and there is coverage data availble
+  A typical use case is if the data table contains samples that were sequenced, and there is coverage data available
 
+  This block can contain the following keys:
+
+  *Approach 1*
+  
   There should be a subdirectory named after the identifier of this track in the data table source data folder.
   For each data item, this directory should contain a data file with the name equal to the primary key
   (see `example <https://github.com/cggh/panoptes/tree/master/sampledata/datasets/Samples_and_Variants/datatables/samples/SampleSummary1>`_).
-  This block can contain the following keys:
-
+  The input files should not contain a header row
+  
     Id
-      *Text. (required)* Identifier of this set of per-data-item genomic values.
+      *Text. (required)* Identifier of this set of per-data-item genomic values - name of subdirectory
+
+  *Approach 2*
+  
+  This approach is more like the way the table based data files are processed.
+  In this case multiple tracks can be stored in the same input file.
+  The Id corresponds to the column name instead of the directory name with the directory details given in the FilePattern expression
+  The name is the first match in the FilePattern expression
+  
+    Id
+      *Text. (required)* Identifier of this set of per-data-item genomic values - name of the column in the matching files
+    FilePattern
+    | *Text. (required)* A glob (regular expression) containing a relative path to the file
+
+  *Common keys*
+
     Name
       *Text (required).* Display name.
     MinVal
