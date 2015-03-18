@@ -25,8 +25,11 @@ class Configurator(object):
             values[conf] = []
         
         return config, values
+
+    def getColumnNames(self):
+        return self._fileColNames
         
-    def _parseLine(self, line, config, values):
+    def _parseLine(self, line, config, values, fileName):
         
         sourceCells = line.split(self._separator)
         
@@ -61,7 +64,7 @@ class Configurator(object):
                         parsed = 0
                         if not content in values[idx]:
                             values[idx].append(content)
-            elif type(parsed) is str or type(parsed) is list or parsed is None:
+            elif type(parsed) is str or type(parsed) is list or parsed is None or type(parsed) is dict:
                 dataType = 'Text'
                 #If you use True/False then the True doesn't appear in the output
                 cate = config[idx].get('IsCategorical','true')
@@ -75,7 +78,7 @@ class Configurator(object):
             elif type(parsed) is datetime.date:
                 dataType = 'Date'
             else:
-                logging.error("Unrecognised type for %s:%s:%s:" % (str(name),str(type(parsed)),content))   
+                logging.error("Unrecognised type for %s:%s:%s: in %s" % (str(name),str(type(parsed)),content, fileName))   
                 
 
             #Probably an id
@@ -132,8 +135,8 @@ class Configurator(object):
                     line = line.rstrip('\r')
                     
                     if len(line) > 0:
-                        self._parseLine(line, config, values)
-                        
+                        self._parseLine(line, config, values, sourceFileName)
+
                 except Exception as e:
                     logging.error('Offending line: ' + line)
                     raise Exception('Error while parsing line {0} of file "{1}": {2}'.format(
@@ -142,11 +145,26 @@ class Configurator(object):
                                                                                              str(e)))
                     
                 lineCount = lineCount + 1
-                
+                if lineCount > 100000:
+                    break
+                        
+               
+            rootProps = {
+             'NameSingle': os.path.basename(os.path.dirname(sourceFileName)),
+             'NamePlural': os.path.basename(os.path.dirname(sourceFileName)),
+             'Description': 'Default description',
+             'PrimKey': 'AutoKey'
+            }
             for conf in config:
                 if 'DataType' in config[conf] and config[conf]['DataType'] == 'Value':
                     if len(values[conf]) > 0:
                         config[conf]['StringValues'] = values[conf]
+                if config[conf]['Id'].lower().startswith('pos'):
+                    rootProps['Position'] = config[conf]['Id']
+                    rootProps['IsPositionOnGenome'] = 'true'
+                if config[conf]['Id'].lower().startswith('Chr'):
+                    rootProps['Chromosome'] = config[conf]['Id']
+                    rootProps['IsPositionOnGenome'] = 'true'
              
             if lineCount == 1:
                 rootProps = {
@@ -206,14 +224,17 @@ if __name__ == "__main__":
             config["Properties"] = []
             rootProps, props = configurator.processFile(os.path.join(dirName,'data'))
             config.update(rootProps)
-            for key, value in props.iteritems():
+            for key in configurator.getColumnNames():
+                value = props[key]
                 config["Properties"].append(value)
+#            for key, value in props.iteritems():
+#                config["Properties"].append(value)
             if len(subdirList) > 0:
                 for sampleDir in subdirList:
                     if sampleDir != 'graphs':
                         tbsv = configurator.processSamples(os.path.join(dirName,sampleDir))
-                        if "TableBasedSummaryValues" in config:
-                            config["TableBasedSummaryValues"].update(tbsv)
+                        if "TableBasedSummaryValues" in config and config["TableBasedSummaryValues"]:
+                            config["TableBasedSummaryValues"].append(tbsv)
                         else:
                             config["TableBasedSummaryValues"] = tbsv
             
