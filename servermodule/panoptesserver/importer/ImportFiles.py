@@ -121,8 +121,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         import2D.importAll2DTables()
 
 
-        if os.path.exists(os.path.join(datasetFolder, 'refgenome')):
-            ImportRefGenome.ImportRefGenome(calculationObject, datasetId, os.path.join(datasetFolder, 'refgenome'), importSettings)
+        if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             globalSettings.AddTokenIfMissing('hasGenomeBrowser', True)
 
         ImportDocs(calculationObject, datasetFolder, datasetId)

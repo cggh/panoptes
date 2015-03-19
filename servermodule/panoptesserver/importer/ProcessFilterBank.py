@@ -14,6 +14,7 @@ import SettingsLoader
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 import customresponders.panoptesserver.Utils as Utils
+import DQXDbTools
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -188,20 +189,25 @@ class ProcessFilterBank(BaseImport):
     def _replaceSummaryValuesDB(self, tableid, propid, name, summSettings, minVal):
         sourceid = 'fixed'
         workspaceid = self._workspaceId
+        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'summaryvalues'))
+            
         extraSummSettings = summSettings.Clone()
-        extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
+        extraSummSettings.DropTokens(['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'Order', 'Name'])
         #Don't know why here when createSummaryValues has already deleted all
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
             stmt = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')"
             sql = stmt.format(propid, tableid, sourceid, workspaceid)
             self._execSql(sql)
+            order = -1
+            if summSettings.HasToken('Order'):
+                order = summSettings['Order']
             stmt = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})"
             sql = stmt.format(workspaceid or '',
                               sourceid,
                               propid,
                               tableid,
                               name,
-                              -1,
+                              order,
                               extraSummSettings.ToJSON(),
                               minVal,
                               summSettings['MaxVal'],
@@ -474,8 +480,63 @@ class ProcessFilterBank(BaseImport):
                         self._importSettings
                     )
                             
-               
-               
+
+    def _prepareRefGenomeSummaryValues(self):
+        summaryids = []
+        outputs = []
+        
+        folder = os.path.join(self._datasetFolder, 'refgenome')
+    
+        if not os.path.exists(folder):
+            return
+
+        readHeader = False
+        
+        summaryValuesFolder = os.path.join(folder, 'summaryvalues')
+        if not os.path.exists(summaryValuesFolder):
+            return
+    
+        for dir in os.listdir(summaryValuesFolder):
+            if os.path.isdir(os.path.join(summaryValuesFolder, dir)):
+                summaryids.append(dir)
+                
+        for summaryid in summaryids:
+            with self._logHeader('Importing reference genome summary data '+summaryid):
+    
+                settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
+                settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
+                settings.AddTokenIfMissing('MinVal', 0)
+                settings.AddTokenIfMissing('BlockSizeMin', 1)
+                settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
+                settings.AddTokenIfMissing('Order', 99999)
+                settings.DefineKnownTokens(['channelColor'])
+                
+                self._replaceSummaryValuesDB('-',summaryid, settings['Name'], settings,settings["MinVal"])
+                
+                destFolder, dataFileName = self._getTrackDest(summaryid)
+                    
+                values = { 
+                      'outputDir': destFolder, 
+                      'outputFile' : dataFileName, 
+                      'columns': None , 
+                      'propId': summaryid,
+                      'minval': float(settings["MinVal"]),
+                      'maxval': float(settings["MaxVal"]),
+                      'blockSizeIncrFactor': int(2),
+                      'blockSizeStart': int(settings["BlockSizeMin"]),
+                      'blockSizeMax': int(settings["BlockSizeMax"]),
+                      'readHeader': readHeader,
+                      'inputFile': os.path.join(folder, 'summaryvalues', summaryid, 'values')
+                }
+                outputs.append(values)
+        return outputs
+         
+    def createRefGenomeSummaryValues(self):
+                
+        outputs = self._prepareRefGenomeSummaryValues()
+
+        self._extractColumnsAndProcess(outputs, False, readHeader = False, writeColumnFiles = False, tableBased=True)
+        
     #Not actually used except below
     def createAllSummaryValues(self):
         self._log('Creating summary values')
@@ -488,6 +549,8 @@ class ProcessFilterBank(BaseImport):
             self.createSummaryValues(datatable)
             self.createTableBasedSummaryValues(datatable)
 
+        self.createRefGenomeSummaryValues()
+        
     def enum(self, *sequential, **named):
         """Handy way to fake an enumerated type in Python
         http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python
@@ -528,6 +591,9 @@ class ProcessFilterBank(BaseImport):
                             outputs = self._prepareTableBasedSummaryValues(tableid)
                             tasks = tasks + outputs
 
+                    outputs = self._prepareRefGenomeSummaryValues()
+                    tasks = tasks + outputs
+                    
                     task_index = 0
                     self._log("%d tasks" % (len(tasks)))
                     while closed_workers < num_workers:

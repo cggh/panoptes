@@ -15,6 +15,7 @@ from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
 import sys
+from ProcessFilterBank import ProcessFilterBank
 
 def flattenarglist(arg):
     if isinstance(arg, list):
@@ -23,69 +24,23 @@ def flattenarglist(arg):
         return arg
 
 def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
-    if not os.path.exists(os.path.join(folder, 'summaryvalues')):
-        return
 
-    maxLineCount = -1
-    if importSettings['ScopeStr'] == '1k':
-        maxLineCount = 1000
-    if importSettings['ScopeStr'] == '10k':
-        maxLineCount = 10000
-    if importSettings['ScopeStr'] == '100k':
-        maxLineCount = 100000
-    if importSettings['ScopeStr'] == '1M':
-        maxLineCount = 1000000
-    if importSettings['ScopeStr'] == '10M':
-        maxLineCount = 10000000
+    filterBanker = ProcessFilterBank(calculationObject, datasetId, importSettings, baseFolder = folder)
 
-    calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'summaryvalues'))
-
-    summaryids = []
-    for dir in os.listdir(os.path.join(folder, 'summaryvalues')):
-        if os.path.isdir(os.path.join(folder, 'summaryvalues', dir)):
-            summaryids.append(dir)
-    for summaryid in summaryids:
-        with calculationObject.LogHeader('Importing reference genome summary data '+summaryid):
-            DQXUtils.CheckValidColumnIdentifier(summaryid)
-            destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', datasetId, summaryid)
-            if not os.path.exists(destFolder):
-                os.makedirs(destFolder)
-            dataFileName = os.path.join(destFolder, summaryid)
-            shutil.copyfile(os.path.join(folder, 'summaryvalues', summaryid, 'values'), dataFileName)
-
-            settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
-            settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
-            settings.AddTokenIfMissing('MinVal', 0)
-            settings.AddTokenIfMissing('BlockSizeMin', 1)
-            settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
-            settings.AddTokenIfMissing('Order', 99999)
-            settings.DefineKnownTokens(['channelColor'])
-            settings.AddTokenIfMissing('ScopeStr', importSettings['ScopeStr'])
-            print('SETTINGS: '+settings.ToJSON())
-            if not(importSettings['ConfigOnly']):
-                print('Executing filter bank')
-                ImpUtils.ExecuteFilterbankSummary_Value(calculationObject, destFolder, summaryid, settings, maxLineCount)
-            else:
-                calculationObject.Log('WARNING: Skipping filterbanking genome summary data')
-            extraSettings = settings.Clone()
-            extraSettings.DropTokens(['Name', 'Order', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax'])
-            sql = "INSERT INTO summaryvalues VALUES ('', 'fixed', '{0}', '-', '{1}', {2}, '{3}', {4}, {5}, {6})".format(
-                summaryid,
-                settings['Name'],
-                settings['Order'],
-                extraSettings.ToJSON(),
-                settings['MinVal'],
-                settings['MaxVal'],
-                settings['BlockSizeMin']
-            )
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, sql)
+    filterBanker.createRefGenomeSummaryValues()
 
 
 
-def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
+def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
+    
+    datasetFolder = os.path.join(baseFolder, datasetId)
+    folder = os.path.join(datasetFolder, 'refgenome')
+    if not os.path.exists(folder):
+        return False
+        
     with calculationObject.LogHeader('Importing reference genome data'):
 
-        ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings)
+        ImportRefGenomeSummaryData(calculationObject, datasetId, baseFolder, importSettings)
 
         settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
         settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])
@@ -185,3 +140,4 @@ def ImportRefGenome(calculationObject, datasetId, folder, importSettings):
                 os.remove(os.path.join(temppath, 'annotation_dump.sql'))
                 os.remove(os.path.join(temppath, 'annotation_create.sql'))
 
+    return True
