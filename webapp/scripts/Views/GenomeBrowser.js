@@ -396,7 +396,7 @@ define([
                                 if (!SummChannel) {
                                     var SummChannel = ChannelMultiCatDensity.Channel(channelid, theFetcher, colinfo, {
                                         maxVal: maxVal,
-                                        categoryColors: summaryValue.settings.CategoryColors
+                                        categoryColors: summaryValue.settings.categoryColors
                                     });
                                     SummChannel
                                       .setTitle(summaryValue.name).setHeight(120, true)
@@ -409,9 +409,9 @@ define([
                                 that.listSummaryChannels.push(channelid);
                                 
                                 var colorMapping = null;
-                                if (summaryValue.settings.CategoryColors) {
+                                if (summaryValue.settings.categoryColors) {
                                     var colorMapping = {};
-                                    $.each(summaryValue.settings.CategoryColors, function(key, val) {
+                                    $.each(summaryValue.settings.categoryColors, function(key, val) {
                                         colorMapping[key] = DQX.parseColorString(val);
                                     });
                                 }
