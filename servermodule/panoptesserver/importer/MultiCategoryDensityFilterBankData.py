@@ -47,6 +47,8 @@ class Summariser:
             blocksize *= self._blockSizeIncrFactor
 #        print(str(self.levels))
 
+    def __str__ (self):
+        return("chrom %s blkSizeStart %d blkSizeIncr %d blkSizeMax %d categories %s" % (self._chromosome, self._blockSizeStart, self._blockSizeIncrFactor, self._blockSizeMax, ';'.join(self._categories)))
 
 
 

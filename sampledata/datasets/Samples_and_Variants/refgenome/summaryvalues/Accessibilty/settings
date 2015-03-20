@@ -1,0 +1,12 @@
+Name: Accessibilty
+Order: 2
+IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+CategoryColors:                   # Specifies display colours for the categorical states of this property
+    "True": rgb(153,189,75)
+    "False": rgb(230,80,80)
+    _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+MinVal: 0
+MaxVal: 200
+BlockSizeMin: 1
+BlockSizeMax: 50000
+DefaultVisible: true

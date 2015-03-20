@@ -1,4 +1,5 @@
 #!/bin/bash -e
+INSTALL_SQL=1
 red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m' # No Color
@@ -82,15 +83,18 @@ cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
 echo mysqlcommand = \'`which mysql`\' >> config.py
 
-echo -e "${green}  Creating skeleton DB - if needed${NC}"
-DBSRV=`python -c "import config;print config.DBSRV"`
-DBUSER=`python -c "import config;print config.DBUSER"`
-DBPASS=`python -c "import config;print config.DBPASS"`
-DB=`python -c "import config;print config.DB"`
-mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
+if [ ${INSTALL_SQL} -eq 1 ]
+then
+    echo -e "${green}  Creating skeleton DB - if needed${NC}"
+    DBSRV=`python -c "import config;print config.DBSRV"`
+    DBUSER=`python -c "import config;print config.DBUSER"`
+    DBPASS=`python -c "import config;print config.DBPASS"`
+    DB=`python -c "import config;print config.DB"`
+    mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
 CREATE DATABASE IF NOT EXISTS ${DB};
 EOF
-mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+    mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+fi
 
 BASEDIR=`python -c "import config;print config.BASEDIR"`
 echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
@@ -140,7 +144,7 @@ fi
 
 cd $PROJECT_ROOT
 NAME=`python -c "import config;print config.NAME"`
-sed -i 's/#DEV#/'$NAME'/' webapp/index.html
+sed -i "s/#DEV#/$NAME/" webapp/index.html
 
 echo -e "${green}Done!${NC}"
 

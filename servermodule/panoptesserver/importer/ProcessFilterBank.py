@@ -78,14 +78,17 @@ class ProcessFilterBank(BaseImport):
         val = val_str
 #   print 'chrom %s, pos %d, val %s' % (chromosome, pos, val)
         if chromosome != output["currentChromosome"]:
+            summariser = MultiCategoryDensityFilterBankData.Summariser(chromosome, output["propId"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputDir"], output["Categories"])
             if output["summariser"] != None:
                 output["summariser"].Finalise()
-            output["summariser"] = MultiCategoryDensityFilterBankData.Summariser(chromosome, output["propId"], output["blockSizeStart"], output["blockSizeIncrFactor"], output["blockSizeMax"], output["outputDir"], output["Categories"])
+            else:
+                self._log("Categorical summarizer:" + str(summariser))
+            output["summariser"] = summariser
             output["currentChromosome"] = chromosome
         output["summariser"].Add(pos,val)        
         
     def _isSimpleTask(self, task):
-        return 'minval' in task
+        return not 'Categories' in task
         
     def _extractColumnsAndProcess(self, banks, writeHeader, readHeader, writeColumnFiles, tableBased=False):
         
@@ -106,7 +109,6 @@ class ProcessFilterBank(BaseImport):
                 if output["outputFile"] == None:
                     raise ValueError("No output file specified")
                 self._log('Extracting columns {0} from {1} to {2}'.format(','.join(output["columns"]), sourceFileName, output["outputFile"]))
-                self._log(output)
                 #Changing the bufsiz seems to have little or no impact
                 output["destFile"] = open(output["outputFile"], 'w')
                 if writeHeader:
@@ -227,6 +229,52 @@ class ProcessFilterBank(BaseImport):
         return destFolder, dataFileName
                     
 
+
+    def _defineSettings(self, tableid, settings, sourceFileName, columns, propid, summSettings):
+        summSettings.RequireTokens(['BlockSizeMax'])
+        destFolder, dataFileName = self._getTrackDest(propid)
+        values = {
+            'outputDir':destFolder, 
+            'outputFile':dataFileName, 
+            'columns': columns, 
+            'propId':propid, 
+            'blockSizeIncrFactor':int(2), 
+            'blockSizeStart':int(summSettings["BlockSizeMin"]), 
+            'blockSizeMax':int(summSettings["BlockSizeMax"]), 
+            'inputFile':sourceFileName}
+        updateDb = True
+        
+        if (settings.HasToken('IsCategorical') and settings['IsCategorical']): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
+            self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
+            summSettings.AddTokenIfMissing('MaxVal', 1.0)
+            summSettings.AddTokenIfMissing('MinVal', 0)
+            summSettings.RequireTokens(['BlockSizeMin'])
+            categories = []
+            summSettings.DefineKnownTokens(['categoryColors'])
+            if summSettings.HasToken('categoryColors'):
+                stt = settings.GetSubSettings('categoryColors')
+                categories = [x for x in stt.Get()]
+                summSettings.AddTokenIfMissing('Categories', categories)
+            values.update({'Categories':summSettings['Categories']})
+        elif ImpUtils.IsValueDataTypeIdenfifier(settings['DataType']):
+    #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
+            self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
+            if settings.HasToken('minval'):
+                summSettings.AddTokenIfMissing('MinVal', settings['minval'])
+            summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
+            summSettings.AddTokenIfMissing('MinVal', 0)
+            summSettings.AddTokenIfMissing('BlockSizeMin', 1)
+            summSettings.DefineKnownTokens(['channelColor'])
+            values.update({'minval':float(summSettings["MinVal"]), 'maxval':float(summSettings["MaxVal"])})
+        else:
+            updateDb = False
+            self._log("Not creating summary values for:" + settings["Name"])
+        
+        if updateDb:
+            self._replaceSummaryValuesDB(tableid, propid, settings['Name'], summSettings, summSettings["MinVal"])
+            return values
+        return None
+
     def _prepareSummaryValues(self, tableid):
         
         import DQXDbTools
@@ -243,74 +291,26 @@ class ProcessFilterBank(BaseImport):
         tableSettings, properties = self._fetchSettings(tableid)
 
         outputs = []
-        outputc = []
+        
         for prop in properties:
             propid = prop['propid']
             settings = prop['Settings']
-            if settings.HasToken('SummaryValues') and ImpUtils.IsValueDataTypeIdenfifier(prop['DataType']):
-#                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
-                    #self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
-                    summSettings = settings.GetSubSettings('SummaryValues')
-                    if settings.HasToken('minval'):
-                        summSettings.AddTokenIfMissing('MinVal', settings['minval'])
-                    summSettings.AddTokenIfMissing('MaxVal', settings['maxval'])
-                    summSettings.RequireTokens(['BlockSizeMax'])
-                    summSettings.AddTokenIfMissing('MinVal', 0)
-                    summSettings.AddTokenIfMissing('BlockSizeMin', 1)
-                    summSettings.DefineKnownTokens(['channelColor'])
-    
-                    self._replaceSummaryValuesDB(tableid, propid, settings['Name'], summSettings,summSettings["MinVal"])
-                    destFolder, dataFileName = self._getTrackDest(propid)
-                    
-                    values = { 
-                          'outputDir': destFolder, 
-                          'outputFile' : dataFileName, 
-                          'columns': [tableSettings['Chromosome'], tableSettings['Position'], propid] , 
-                          'propId': propid,
-                          'minval': float(summSettings["MinVal"]),
-                          'maxval': float(summSettings["MaxVal"]),
-                          'blockSizeIncrFactor': int(2),
-                          'blockSizeStart': int(summSettings["BlockSizeMin"]),
-                          'blockSizeMax': int(summSettings["BlockSizeMax"]),
-                          'inputFile': sourceFileName
-
-                          }
-                    outputs.append(values)
-                    
-            if (settings.HasToken('SummaryValues')) and (prop['DataType'] == 'Text'):
-#                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
-                    #self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
-                    summSettings = settings.GetSubSettings('SummaryValues')
-                    summSettings.RequireTokens(['BlockSizeMin', 'BlockSizeMax'])
-                    summSettings.AddTokenIfMissing('MaxVal', 1.0)
-                    
-                    destFolder, dataFileName = self._getTrackDest(propid)
-                    categories = []
-                    if settings.HasToken('categoryColors'):
-                        stt = settings.GetSubSettings('categoryColors')
-                        categories = [x for x in stt.Get()]
-                        summSettings.AddTokenIfMissing('Categories', categories)
-                    self._replaceSummaryValuesDB(tableid, propid, settings['Name'], summSettings,0)
-                    cval = {                            
-                          'outputDir': destFolder, 
-                          'outputFile' : dataFileName, 
-                          'columns': [tableSettings['Chromosome'], tableSettings['Position'], propid] , 
-                          'propId': propid,
-                          'blockSizeIncrFactor': int(2),
-                          'blockSizeStart': int(summSettings["BlockSizeMin"]),
-                          'blockSizeMax': int(summSettings["BlockSizeMax"]),
-                          'Categories': summSettings['Categories'],
-                          'inputFile': sourceFileName
-                            }
-                    outputc.append(cval)
             
-        return outputs,outputc
+            if not settings.HasToken('SummaryValues'):
+                continue
+            
+            summSettings = settings.GetSubSettings('SummaryValues')
+            values = self._defineSettings(tableid, settings, sourceFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], propid, summSettings)
+            if values != None:
+                outputs.append(values)
+                
+        return outputs
         
 
     def createSummaryValues(self, tableid):
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-            outputs, outputc = self._prepareSummaryValues(tableid)
-            self._extractColumnsAndProcess(outputs + outputc, False, True, True)
+            outputs = self._prepareSummaryValues(tableid)
+            self._extractColumnsAndProcess(outputs, False, True, True)
         
     def _prepareSummaryFilterBank(self, tableid, summSettings, summaryid):
         global config
@@ -481,61 +481,50 @@ class ProcessFilterBank(BaseImport):
                     )
                             
 
-    def _prepareRefGenomeSummaryValues(self):
+    def _getRefGenomeSummaryFolders(self):
         summaryids = []
-        outputs = []
         
         folder = os.path.join(self._datasetFolder, 'refgenome')
-    
-        if not os.path.exists(folder):
-            return
-
-        readHeader = False
-        
         summaryValuesFolder = os.path.join(folder, 'summaryvalues')
         if not os.path.exists(summaryValuesFolder):
             return
     
         for dir in os.listdir(summaryValuesFolder):
-            if os.path.isdir(os.path.join(summaryValuesFolder, dir)):
-                summaryids.append(dir)
-                
-        for summaryid in summaryids:
-            with self._logHeader('Importing reference genome summary data '+summaryid):
-    
-                settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'summaryvalues', summaryid, 'settings'))
-                settings.RequireTokens(['Name', 'MaxVal', 'MaxVal', 'BlockSizeMax'])
-                settings.AddTokenIfMissing('MinVal', 0)
-                settings.AddTokenIfMissing('BlockSizeMin', 1)
-                settings.AddTokenIfMissing('ChannelColor', 'rgb(0,0,0)')
-                settings.AddTokenIfMissing('Order', 99999)
-                settings.DefineKnownTokens(['channelColor'])
-                
-                self._replaceSummaryValuesDB('-',summaryid, settings['Name'], settings,settings["MinVal"])
-                
-                destFolder, dataFileName = self._getTrackDest(summaryid)
-                    
-                values = { 
-                      'outputDir': destFolder, 
-                      'outputFile' : dataFileName, 
-                      'columns': None , 
-                      'propId': summaryid,
-                      'minval': float(settings["MinVal"]),
-                      'maxval': float(settings["MaxVal"]),
-                      'blockSizeIncrFactor': int(2),
-                      'blockSizeStart': int(settings["BlockSizeMin"]),
-                      'blockSizeMax': int(settings["BlockSizeMax"]),
-                      'readHeader': readHeader,
-                      'inputFile': os.path.join(folder, 'summaryvalues', summaryid, 'values')
-                }
+            item = os.path.join(summaryValuesFolder, dir)
+            if os.path.isdir(item):
+                summaryids.append(item)
+
+        return summaryids
+        
+        
+    def _prepareRefGenomeSummaryValues(self, summaryFolder):
+        
+        outputs = []
+        
+        readHeader = False
+        
+        summaryid = os.path.basename(summaryFolder)
+        with self._logHeader('Importing reference genome summary data '+summaryid):
+
+            settings = SettingsLoader.SettingsLoader(os.path.join(summaryFolder, 'settings'))
+            if not (settings.HasToken('IsCategorical') and settings['IsCategorical']):
+                settings.AddTokenIfMissing('DataType', 'Value')
+                settings.DefineKnownTokens(['maxval'])
+                settings.DefineKnownTokens(['minval'])
+            sourceFileName = os.path.join(summaryFolder, 'values')
+            values = self._defineSettings('-', settings, sourceFileName, None, summaryid, settings)
+            if values != None:
                 outputs.append(values)
+
         return outputs
          
     def createRefGenomeSummaryValues(self):
-                
-        outputs = self._prepareRefGenomeSummaryValues()
 
-        self._extractColumnsAndProcess(outputs, False, readHeader = False, writeColumnFiles = False, tableBased=True)
+        summaryids = self._getRefGenomeSummaryFolders()
+                
+        for summaryid in summaryids:
+            outputs = self._prepareRefGenomeSummaryValues(summaryid)
+            self._extractColumnsAndProcess(outputs, False, readHeader = False, writeColumnFiles = False, tableBased=True)
         
     #Not actually used except below
     def createAllSummaryValues(self):
@@ -586,13 +575,16 @@ class ProcessFilterBank(BaseImport):
                     tasks = []    
                     for tableid in datatables:
                         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
-                            outputs, outputc = self._prepareSummaryValues(tableid)
-                            tasks = tasks + outputs + outputc
+                            outputs = self._prepareSummaryValues(tableid)
+                            tasks = tasks + outputs
                             outputs = self._prepareTableBasedSummaryValues(tableid)
                             tasks = tasks + outputs
 
-                    outputs = self._prepareRefGenomeSummaryValues()
-                    tasks = tasks + outputs
+                    summaryids = self._getRefGenomeSummaryFolders()
+                
+                    for summaryid in summaryids:
+                        outputs = self._prepareRefGenomeSummaryValues(summaryid)                        
+                        tasks = tasks + outputs
                     
                     task_index = 0
                     self._log("%d tasks" % (len(tasks)))

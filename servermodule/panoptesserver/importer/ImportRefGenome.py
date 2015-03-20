@@ -30,7 +30,6 @@ def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSetti
     filterBanker.createRefGenomeSummaryValues()
 
 
-
 def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     
     datasetFolder = os.path.join(baseFolder, datasetId)

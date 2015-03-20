@@ -166,14 +166,15 @@ def ExecuteFilterbankSummary_Value(calculationObject, destFolder, id, settings, 
                 ]
     )
 
-def ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, id, settings):
+def ExecuteFilterbankSummary_Categorical(calculationObject, destFolder, id, settings, maxcount=-1):
     RunConvertor(calculationObject, '_CreateMultiCategoryDensityFilterBankData', destFolder,
                  [
                      id,
                      settings['BlockSizeMin'],
                      2,
                      settings['BlockSizeMax'],
-                     ';'.join(settings['Categories'])
+                     ';'.join(settings['Categories']),
+                     maxcount
                 ]
     )
 

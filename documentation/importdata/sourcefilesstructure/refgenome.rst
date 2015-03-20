@@ -24,7 +24,8 @@ The folder name serves as the identifier of the summary value. Each summary valu
    - column 3: Value
 
 - ``settings`` (yaml formatted). Contains the displayed name of the summary value, and further guidelines on how to process the information
-  (`sample file <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/refgenome/summaryvalues/Uniqueness/settings>`_).
+  (`sample numeric file <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/refgenome/summaryvalues/Uniqueness/settings>`_).
+  (`sample categorical <https://github.com/cggh/panoptes/blob/master/sampledata/datasets/Samples_and_Variants/refgenome/summaryvalues/Accessibility/settings>`_).
 
 See also:
 
