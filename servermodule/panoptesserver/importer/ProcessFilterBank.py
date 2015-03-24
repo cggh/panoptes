@@ -272,6 +272,12 @@ class ProcessFilterBank(BaseImport):
             summSettings.AddTokenIfMissing('MinVal', 0)
             summSettings.AddTokenIfMissing('BlockSizeMin', 1)
             summSettings.DefineKnownTokens(['channelColor'])
+            if settings.HasToken('DefaultVisible'):
+                summSettings.AddTokenIfMissing('DefaultVisible', settings['DefaultVisible'])
+            if settings.HasToken('channelColor'):
+                summSettings.AddTokenIfMissing('channelColor', settings['channelColor'])
+            if settings.HasToken('DataType'):
+                summSettings.AddTokenIfMissing('DataType', settings['DataType'])
             values.update({'minval':float(summSettings["MinVal"]), 'maxval':float(summSettings["MaxVal"])})
         else:
             updateDb = False
