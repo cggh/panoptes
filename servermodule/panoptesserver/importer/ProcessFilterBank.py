@@ -142,7 +142,7 @@ class ProcessFilterBank(BaseImport):
                     else:
                         #Assume Chrom Pos Value
                         output["colindices"] = [0,1,2]
-                                                
+                    self._log("colindices:" + str(output["colindices"]))                           
                 if self._importSettings['ConfigOnly'] or (tableBased and self._importSettings['SkipTableTracks']=='true'):
                     self._log('Skipping filterbank execution')
                     return
@@ -244,17 +244,20 @@ class ProcessFilterBank(BaseImport):
             'inputFile':sourceFileName}
         updateDb = True
         
-        if (settings.HasToken('IsCategorical') and settings['IsCategorical']): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
+        settings.DefineKnownTokens(['isCategorical'])
+        
+        if (settings.HasToken('isCategorical') and settings['isCategorical']): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
             summSettings.AddTokenIfMissing('MaxVal', 1.0)
             summSettings.AddTokenIfMissing('MinVal', 0)
             summSettings.RequireTokens(['BlockSizeMin'])
             categories = []
             summSettings.DefineKnownTokens(['categoryColors'])
-            if summSettings.HasToken('categoryColors'):
+            if settings.HasToken('categoryColors'):
                 stt = settings.GetSubSettings('categoryColors')
                 categories = [x for x in stt.Get()]
                 summSettings.AddTokenIfMissing('Categories', categories)
+            self._log(summSettings)
             values.update({'Categories':summSettings['Categories']})
         elif ImpUtils.IsValueDataTypeIdenfifier(settings['DataType']):
     #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
@@ -268,13 +271,30 @@ class ProcessFilterBank(BaseImport):
             values.update({'minval':float(summSettings["MinVal"]), 'maxval':float(summSettings["MaxVal"])})
         else:
             updateDb = False
-            self._log("Not creating summary values for:" + settings["Name"])
+            self._log("Not creating summary values for:" + settings["Name"] + str(settings))
         
         if updateDb:
             self._replaceSummaryValuesDB(tableid, propid, settings['Name'], summSettings, summSettings["MinVal"])
             return values
         return None
 
+    def _preparePropertiesBasedSummaryValues(self, sourceFileName, tableid, tableSettings, properties):
+        outputs = []
+        
+        for prop in properties:
+            propid = prop['propid']
+            settings = prop['Settings']
+            
+            if not settings.HasToken('SummaryValues'):
+                continue
+            
+            summSettings = settings.GetSubSettings('SummaryValues')
+            values = self._defineSettings(tableid, settings, sourceFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], propid, summSettings)
+            if values != None:
+                outputs.append(values)
+                
+        return outputs
+    
     def _prepareSummaryValues(self, tableid):
         
         import DQXDbTools
@@ -290,20 +310,8 @@ class ProcessFilterBank(BaseImport):
         #self._log(("Preparing to create summary values for {} from {} using {}").format(tableid, sourceFileName, settings))
         tableSettings, properties = self._fetchSettings(tableid)
 
-        outputs = []
-        
-        for prop in properties:
-            propid = prop['propid']
-            settings = prop['Settings']
-            
-            if not settings.HasToken('SummaryValues'):
-                continue
-            
-            summSettings = settings.GetSubSettings('SummaryValues')
-            values = self._defineSettings(tableid, settings, sourceFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid], propid, summSettings)
-            if values != None:
-                outputs.append(values)
-                
+        outputs = self._preparePropertiesBasedSummaryValues(sourceFileName, tableid, tableSettings, properties)
+                        
         return outputs
         
 
@@ -501,30 +509,39 @@ class ProcessFilterBank(BaseImport):
         
         outputs = []
         
-        readHeader = False
-        
+        tableid = '-'
         summaryid = os.path.basename(summaryFolder)
+        propertiesBased = False
         with self._logHeader('Importing reference genome summary data '+summaryid):
 
             settings = SettingsLoader.SettingsLoader(os.path.join(summaryFolder, 'settings'))
-            if not (settings.HasToken('IsCategorical') and settings['IsCategorical']):
-                settings.AddTokenIfMissing('DataType', 'Value')
-                settings.DefineKnownTokens(['maxval'])
-                settings.DefineKnownTokens(['minval'])
+            settings.DefineKnownTokens(['isCategorical'])
             sourceFileName = os.path.join(summaryFolder, 'values')
-            values = self._defineSettings('-', settings, sourceFileName, None, summaryid, settings)
-            if values != None:
-                outputs.append(values)
+            
+            if os.path.isfile(sourceFileName):
+                if not (settings.HasToken('isCategorical') and settings['isCategorical']):
+                    settings.AddTokenIfMissing('DataType', 'Value')
+                    settings.DefineKnownTokens(['maxval'])
+                    settings.DefineKnownTokens(['minval'])
+                values = self._defineSettings(tableid, settings, sourceFileName, None, summaryid, settings)
+                if values != None:
+                    outputs.append(values)
+            else:
+                sourceFileName = os.path.join(summaryFolder, 'data')
+                propertiesBased = True
+                properties = ImpUtils.LoadPropertyInfo(self._calculationObject, settings, sourceFileName)
+                output = self._preparePropertiesBasedSummaryValues(sourceFileName, tableid, settings, properties)
+                outputs = outputs + output
 
-        return outputs
+        return outputs, propertiesBased
          
     def createRefGenomeSummaryValues(self):
 
         summaryids = self._getRefGenomeSummaryFolders()
                 
         for summaryid in summaryids:
-            outputs = self._prepareRefGenomeSummaryValues(summaryid)
-            self._extractColumnsAndProcess(outputs, False, readHeader = False, writeColumnFiles = False, tableBased=True)
+            outputs, propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
+            self._extractColumnsAndProcess(outputs, False, readHeader = propertiesBased, writeColumnFiles = False, tableBased=True)
         
     #Not actually used except below
     def createAllSummaryValues(self):

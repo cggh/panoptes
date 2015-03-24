@@ -35,6 +35,9 @@ class SettingsLoader:
         else:
             self.fileName = ''
 
+    def __str__(self):
+        return str(self.settings)
+    
     def LoadDict(self, st):
         self.settings = copy.deepcopy(st)
 
