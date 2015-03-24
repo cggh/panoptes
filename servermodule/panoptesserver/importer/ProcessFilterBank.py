@@ -248,6 +248,9 @@ class ProcessFilterBank(BaseImport):
         
         if (settings.HasToken('isCategorical') and settings['isCategorical']): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
+            summSettings.AddTokenIfMissing('isCategorical', settings['isCategorical'])
+            if settings.HasToken('DefaultVisible'):
+                summSettings.AddTokenIfMissing('DefaultVisible', settings['DefaultVisible'])
             summSettings.AddTokenIfMissing('MaxVal', 1.0)
             summSettings.AddTokenIfMissing('MinVal', 0)
             summSettings.RequireTokens(['BlockSizeMin'])
@@ -257,6 +260,7 @@ class ProcessFilterBank(BaseImport):
                 stt = settings.GetSubSettings('categoryColors')
                 categories = [x for x in stt.Get()]
                 summSettings.AddTokenIfMissing('Categories', categories)
+                summSettings.AddTokenIfMissing('categoryColors', settings['categoryColors'])
             self._log(summSettings)
             values.update({'Categories':summSettings['Categories']})
         elif ImpUtils.IsValueDataTypeIdenfifier(settings['DataType']):
