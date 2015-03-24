@@ -338,7 +338,7 @@ define([
                             var channelid=trackid;
                             var folder=that.summaryFolder+'/'+summaryValue.propid;//The server folder where to find the info, relative to the DQXServer base path
 
-                            if (!summaryValue.settings.IsCategorical) {
+                            if (!summaryValue.settings.isCategorical) {
                                 var SummChannel = that.channelMap[channelid];
                                 if (!SummChannel) {
                                     var SummChannel = ChannelYVals.Channel(channelid, {
