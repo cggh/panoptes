@@ -162,7 +162,7 @@ class Configurator(object):
                 if config[conf]['Id'].lower().startswith('pos'):
                     rootProps['Position'] = config[conf]['Id']
                     rootProps['IsPositionOnGenome'] = 'true'
-                if config[conf]['Id'].lower().startswith('Chr'):
+                if config[conf]['Id'].lower().startswith('chr'):
                     rootProps['Chromosome'] = config[conf]['Id']
                     rootProps['IsPositionOnGenome'] = 'true'
              

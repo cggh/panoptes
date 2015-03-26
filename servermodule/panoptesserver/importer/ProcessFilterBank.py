@@ -261,7 +261,7 @@ class ProcessFilterBank(BaseImport):
                 categories = [x for x in stt.Get()]
                 summSettings.AddTokenIfMissing('Categories', categories)
                 summSettings.AddTokenIfMissing('categoryColors', settings['categoryColors'])
-            self._log(summSettings)
+            self._log(str(summSettings))
             values.update({'Categories':summSettings['Categories']})
         elif ImpUtils.IsValueDataTypeIdenfifier(settings['DataType']):
     #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
@@ -610,8 +610,11 @@ class ProcessFilterBank(BaseImport):
                     summaryids = self._getRefGenomeSummaryFolders()
                 
                     for summaryid in summaryids:
-                        outputs = self._prepareRefGenomeSummaryValues(summaryid)                        
-                        tasks = tasks + outputs
+                        outputs,propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
+                        print(str(outputs))
+                        for out in outputs:
+                            out['readHeader'] = propertiesBased
+                            tasks.append(out)
                     
                     task_index = 0
                     self._log("%d tasks" % (len(tasks)))
