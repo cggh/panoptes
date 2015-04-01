@@ -57,8 +57,11 @@ RowIndexArray
   order as the ``RowDataTable`` data table, sorted by the ``RowIndexField`` property.
 
 FirstArrayDimension
-  Either 'row' or 'column' to indicate the first dimension in the HDF5 array.
+  *Text.* Either 'row' or 'column' to indicate the first dimension in the HDF5 array.
   'column' will generally perform better.
+
+SymlinkData
+  *Boolean.* Default: False. If true then the HDF5 source file will not be copied but only symlinked. Note that if your HDF5 doesn't have small enough chunking (max few MB per chunk) then performance will suffer. The default of False copies and rechunks the HDF5.
 
 ShowInGenomeBrowser
   *Block.* If this key is present, the data will be visualised as a channel in the genome browser.

@@ -64,6 +64,7 @@ class Import2DDataTable(BaseImport):
             raise ValueError('Genome browsable 2D table must have call or allele depth')
         tableSettings.AddTokenIfMissing('ColumnDataTable', '')
         tableSettings.AddTokenIfMissing('RowDataTable', '')
+        tableSettings.AddTokenIfMissing('SymlinkData', False)
             
         return tableSettings
             
@@ -296,24 +297,28 @@ class Import2DDataTable(BaseImport):
                     os.remove(path_join)
                 except OSError:
                     pass
-                local_hdf5 = h5py.File(path_join, 'w', libver='latest')
-                print "Copying HDF5 datasets"
-                for prop in table_settings['Properties']:
-                    print "..", prop
-                    prop_in = remote_hdf5[prop['Id']]
-                    #Make some choices assuming data is variants/samples
-                    if prop_in.shape[0] > prop_in.shape[1]:
-                        chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
-                    else:
-                        chunks = [min(10, prop_in.shape[0]), min(1000, prop_in.shape[1])]
-                    arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
-                    if arity > 1:
-                        chunks.append(arity)
-                    prop_out = local_hdf5.create_dataset(prop['Id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
-                    self._hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
-                    print "done"
-                print "all copies complete"
-                local_hdf5.close()
+                if table_settings['SymlinkData']:
+                    print "Symlinking datasets - will only work on unix"
+                    os.symlink(dataFile, path_join)
+                else:
+                    local_hdf5 = h5py.File(path_join, 'w', libver='latest')
+                    print "Copying HDF5 datasets"
+                    for prop in table_settings['Properties']:
+                        print "..", prop
+                        prop_in = remote_hdf5[prop['Id']]
+                        #Make some choices assuming data is variants/samples
+                        if prop_in.shape[0] > prop_in.shape[1]:
+                            chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
+                        else:
+                            chunks = [min(10, prop_in.shape[0]), min(1000, prop_in.shape[1])]
+                        arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
+                        if arity > 1:
+                            chunks.append(arity)
+                        prop_out = local_hdf5.create_dataset(prop['Id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
+                        self._hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
+                        print "done"
+                    print "all copies complete"
+                    local_hdf5.close()
                 remote_hdf5.close()
                 
     def importAll2DTables(self):

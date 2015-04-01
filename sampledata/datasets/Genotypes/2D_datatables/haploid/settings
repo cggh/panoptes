@@ -18,6 +18,8 @@ RowIndexArray: row_index             # 1D Array in HDF5 that gives the value of 
 
 FirstArrayDimension: row             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
 
+#SymlinkData: False
+
 Properties:
     -  Id: genotype                            #Name of dataset in HDF5
        Name: Call
