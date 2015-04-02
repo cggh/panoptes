@@ -10,7 +10,7 @@ cd `dirname ${SCRIPT_PATH}`
 cd ..
 PROJECT_ROOT=`pwd`;
 
-source build/virtualenv/bin/activate
+source build/panoptes_virtualenv/bin/activate
 PYTHONPATH=${PROJECT_ROOT}/build/DQXServer
 export PYTHONPATH
 

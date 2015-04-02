@@ -142,7 +142,7 @@ An example VirtualHost config would be (note that the tokens need to be replaced
             Options FollowSymLinks
             AllowOverride None
         </Directory>
-        WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/virtualenv/lib/python2.7/site-packages:[PanoptesInstallationPath]/build/DQXServer
+        WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/panoptes_virtualenv/lib/python2.7/site-packages:[PanoptesInstallationPath]/build/DQXServer
         WSGIProcessGroup Panoptes
         WSGIScriptAlias / /var/www/wsgi_server.py
     </VirtualHost>

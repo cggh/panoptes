@@ -12,12 +12,12 @@ PROJECT_ROOT=`pwd`;
 
 if [ 1 = 1 ]
 then
-source build/virtualenv/bin/activate
+source build/panoptes_virtualenv/bin/activate
 PYTHONPATH=${PROJECT_ROOT}/build/DQXServer
 export PYTHONPATH
 
 cd build/DQXServer/customresponders/panoptesserver/importer
 
-mpirun python ProcessFilterBank.py all files Samples_and_Variants 
+mpirun python ProcessFilterBank.py all files Samples_and_Variants mpi
 
 fi

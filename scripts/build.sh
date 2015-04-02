@@ -1,5 +1,5 @@
 #!/bin/bash -e
-INSTALL_SQL=1
+INSTALL_SQL=0
 red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m' # No Color
@@ -47,8 +47,8 @@ git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 
 echo -e "${green}    Python dependancies${NC}"
 cd .. 
-virtualenv virtualenv
-source virtualenv/bin/activate
+virtualenv panoptes_virtualenv
+source panoptes_virtualenv/bin/activate
 cd DQXServer
 echo -e "${green}      DQXServer requirements...${NC}"
 pip install -q -r REQUIREMENTS

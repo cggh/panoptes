@@ -12,7 +12,7 @@ PROJECT_ROOT=`pwd`;
 
 if [ 1 = 1 ]
 then
-source build/virtualenv/bin/activate
+source build/panoptes_virtualenv/bin/activate
 PYTHONPATH=${PROJECT_ROOT}/build/DQXServer
 export PYTHONPATH
 

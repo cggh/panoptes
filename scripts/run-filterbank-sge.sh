@@ -1,9 +1,10 @@
 #!/bin/bash
 #Find out the available parallel environments using the command `qconf -spl`
 QUEUE_NAME=mpi_pe
-NUMPROCS=14
+NUMPROCS=40
 SCRIPT=build/DQXServer/customresponders/panoptesserver/importer/ProcessFilterBank.py
-DATASET=Samples_and_Variants
+#DATASET=Samples_and_Variants
+DATASET=Ag1000G
 #Find out where this script is
 SCRIPT_PATH="${BASH_SOURCE[0]}";
 if ([ -h "${SCRIPT_PATH}" ]) then
@@ -15,7 +16,7 @@ cd `dirname ${SCRIPT_PATH}`
 cd ..
 PROJECT_ROOT=`pwd`;
 
-source build/virtualenv/bin/activate
+source build/panoptes_virtualenv/bin/activate
 pip install mpi4py
 PYTHONPATH=${PROJECT_ROOT}/build/DQXServer
 export PYTHONPATH
