@@ -326,7 +326,7 @@ class ProcessFilterBank(BaseImport):
         
 
     def createSummaryValues(self, tableid):
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+        if (self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files') and self._importSettings['SkipTableTracks']=='false':
             outputs = self._prepareSummaryValues(tableid)
             self._extractColumnsAndProcess(outputs, False, True, True)
         
@@ -421,7 +421,7 @@ class ProcessFilterBank(BaseImport):
                                      summSettings['MaxVal'], 
                                      summSettings['BlockSizeMin'])
                     self._execSql(sql)
-                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files':
+                if (self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'files') and self._importSettings['SkipTableTracks']=='false':
                     outputs = self._prepareSummaryFilterBank(tableid, summSettings, summaryid)
                     output = output + outputs
                         
