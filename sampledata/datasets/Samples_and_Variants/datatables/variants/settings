@@ -125,10 +125,10 @@ Properties:
     A: rgb(255,128,60)
     B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+  MaxVal: 0.2
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level 
      BlockSizeMin: 20
      BlockSizeMax: 50000
-     MaxVal: 0.2
   BrowserDefaultVisible: true
   
 - Id: NRAF_WAF, NRAF_EAF, NRAF_SAF
@@ -173,6 +173,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   - Extra_1
 
 - Type: PropertyGroup
+  Name: Allele Frequencies
   GroupId: AlleleFreq
 
 - Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map

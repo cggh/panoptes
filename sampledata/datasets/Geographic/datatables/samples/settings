@@ -68,7 +68,7 @@ Properties:
 
 - Id: Filtrd
   Name: Filtered
-  Datatype: Boolean
+  DataType: Boolean
   ReadData: false
   ShowInTable: true
   CanUpdate: true
