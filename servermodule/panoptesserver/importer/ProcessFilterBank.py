@@ -549,10 +549,11 @@ class ProcessFilterBank(BaseImport):
 
         summaryids = self._getRefGenomeSummaryFolders()
                 
-        for summaryid in summaryids:
-            outputs, propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
-            self._extractColumnsAndProcess(outputs, False, readHeader = propertiesBased, writeColumnFiles = False, tableBased=True)
-        
+        if not summaryids is None:
+            for summaryid in summaryids:
+                outputs, propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
+                self._extractColumnsAndProcess(outputs, False, readHeader = propertiesBased, writeColumnFiles = False, tableBased=True)
+            
     #Not actually used except below
     def createAllSummaryValues(self):
         self._log('Creating summary values')
