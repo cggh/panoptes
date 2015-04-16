@@ -1,27 +1,32 @@
-[![logo](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/)
+![logo](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)
 
 Panoptes
 ========
 
 Panoptes is a web application for exploration and visualisation of
-data. Many of the features, such as querying and browsing tables, are
-generic and can be used with any kind of data. However, there are
-currently also some specialised features for genomic and geospatial
-data.
+data with special focus on genomic data. It includes:
 
-For more information about the project please send an email to the public
-mailing list <panoptes-dev@googlegroups.com>.
+* Querying, sorting, plotting and templatised views of tabular data
+* Fast genome browser with tracks from the tables, including numerical, categorical and regional
+* Genotype viewer
+* Map geographic data
+* Tree viewer
 
-Links:
+All these elements are integrated to allow swift user-journeys through the data.
 
-* Source code: https://github.com/cggh/panoptes
-* Documentation: http://panoptes.readthedocs.org
-* Mailing list:	 https://groups.google.com/forum/#!forum/panoptes-dev
+Deployment and data import documentation: http://panoptes.readthedocs.org
+
+Release Notes: https://github.com/cggh/panoptes/releases
+
+Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 
 
-Release Notes
--------------
-See https://github.com/cggh/panoptes/releases
+For an example of a currently deployed Panoptes see the AG1000G instance at
+http://www.malariagen.net/apps/ag1000g/phase1-AR2/index.html
+
+![logo](https://raw.github.com/cggh/panoptes/master/documentation/screenies.png "Screenshots")
+
+
 
 
 License
