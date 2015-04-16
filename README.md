@@ -4,7 +4,7 @@ Panoptes
 ========
 
 Panoptes is a web application for exploration and visualisation of
-data with special focus on genomic data. It includes:
+data, with special focus on genomic data. It includes:
 
 * Querying, sorting, plotting and templatised views of tabular data
 * Fast genome browser with tracks from the tables, including numerical, categorical and regional
@@ -21,7 +21,7 @@ Release Notes: https://github.com/cggh/panoptes/releases
 Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 
 
-For an example of a currently deployed Panoptes see the AG1000G instance at
+For an example of a currently deployed Panoptes see the AG1000G instance at:
 http://www.malariagen.net/apps/ag1000g/phase1-AR2/index.html
 
 ![logo](https://raw.github.com/cggh/panoptes/master/documentation/screenies.png "Screenshots")
