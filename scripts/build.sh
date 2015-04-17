@@ -1,5 +1,4 @@
 #!/bin/bash -e
-INSTALL_SQL=0
 red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m' # No Color
@@ -83,17 +82,18 @@ cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
 echo mysqlcommand = \'`which mysql`\' >> config.py
 
-if [ ${INSTALL_SQL} -eq 1 ]
-then
+if [ -z ${SKIP_SQL} ]; then
     echo -e "${green}  Creating skeleton DB - if needed${NC}"
-    DBSRV=`python -c "import config;print config.DBSRV"`
-    DBUSER=`python -c "import config;print config.DBUSER"`
-    DBPASS=`python -c "import config;print config.DBPASS"`
-    DB=`python -c "import config;print config.DB"`
-    mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
+        DBSRV=`python -c "import config;print config.DBSRV"`
+        DBUSER=`python -c "import config;print config.DBUSER"`
+        DBPASS=`python -c "import config;print config.DBPASS"`
+        DB=`python -c "import config;print config.DB"`
+        mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
 CREATE DATABASE IF NOT EXISTS ${DB};
 EOF
     mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+else
+    echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
 BASEDIR=`python -c "import config;print config.BASEDIR"`
