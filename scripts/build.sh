@@ -143,9 +143,8 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
 fi
 
 cd $PROJECT_ROOT
-NAME=`python -c "import config;print config.NAME"`
-sed -i "s/#DEV#/$NAME/" webapp/index.html
 
+python scripts/_render_templates.py
 echo -e "${green}Done!${NC}"
 
 #if [ -z "$WSGI_FOLDER" ]; then
