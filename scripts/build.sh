@@ -143,8 +143,15 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
 fi
 
 cd $PROJECT_ROOT
-
-python scripts/_render_templates.py
+if [ "$1" = "DEV" ]; then
+    echo -e "${green}  Creating DEVELOPMENT html"
+    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
+else
+    echo -e "${green}  Creating PRODUCTION html"
+    VERSION=`uuidgen`
+    cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
+    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION
+fi
 echo -e "${green}Done!${NC}"
 
 #if [ -z "$WSGI_FOLDER" ]; then

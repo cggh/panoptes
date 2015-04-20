@@ -42,7 +42,7 @@ You can find a copy of this license in LICENSE in the top directory of the sourc
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=false" type="text/javascript"></script>
     <script src="scripts/Local/_SetServerUrl.js" type="text/javascript"></script>
     {% if PRODUCTION %}
-       <script data-main="scripts/main-built" src="scripts/require.js" type="text/javascript"></script>
+       <script data-main="scripts/main-built-{{VERSION}}" src="scripts/require.js" type="text/javascript"></script>
     {% else %}
         <script data-main="scripts/main" src="scripts/require.js"type="text/javascript"></script>
     {% endif %}
