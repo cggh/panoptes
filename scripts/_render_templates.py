@@ -7,6 +7,8 @@ config = dict((k,v) for k, v in config_file.__dict__.iteritems()
               if not k.startswith('_'))
 
 config['PRODUCTION'] = sys.argv[1] == 'PRODUCTION'
+if not config['PRODUCTION']:
+    config['TITLE'] += " - DEVELOPMENT MODE"
 config['VERSION'] = sys.argv[2]
 print config
 env = Environment(loader=FileSystemLoader('webapp'))
