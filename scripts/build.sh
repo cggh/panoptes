@@ -134,20 +134,20 @@ ln -s $BASEDIR/Docs Docs
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
-echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist"
+echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist${NC}"
 mkdir -p $SOURCEDATADIR
 mkdir -p $SOURCEDATADIR/datasets
 if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
-    echo -e "${green}  SourceDataDir is empty - copying sample datasets"
+    echo -e "${green}  SourceDataDir is empty - copying sample datasets${NC}"
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
 cd $PROJECT_ROOT
 if [ "$1" = "DEV" ]; then
-    echo -e "${green}  Creating DEVELOPMENT html"
+    echo -e "${green}  Creating DEVELOPMENT html${NC}"
     PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
 else
-    echo -e "${green}  Creating PRODUCTION html"
+    echo -e "${green}  Creating PRODUCTION html${NC}"
     VERSION=`uuidgen`
     cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
     PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION

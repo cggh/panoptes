@@ -78,4 +78,4 @@ ln -s /panoptes/source/build/DQXServer/wsgi_server.py /var/www/.
 
 /etc/init.d/apache2 restart
 
-echo -e "${green}Serving from [ServerName]/index.html"
+echo -e "${green}Serving from [ServerName]/index.html${NC}"

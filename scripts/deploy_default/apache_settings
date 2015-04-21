@@ -7,7 +7,7 @@
 	    AllowOverride None
 	</Directory>
 
-    WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=/panoptes/source/build/virtualenv/lib/python2.7/site-packages:/panoptes/source/build/DQXServer
+    WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=/panoptes/source/build/panoptes_virtualenv/lib/python2.7/site-packages:/panoptes/source/build/DQXServer
     WSGIProcessGroup Panoptes
     WSGIScriptAlias / /var/www/wsgi_server.py
 
