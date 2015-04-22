@@ -231,16 +231,13 @@ class ProcessFilterBank(BaseImport):
             stmt = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')"
             sql = stmt.format(propid, tableid, sourceid, workspaceid)
             self._execSql(sql)
-            order = -1
-            if 'Order' in summSettings:
-                order = summSettings['Order']
             stmt = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})"
             sql = stmt.format(workspaceid or '',
                               sourceid,
                               propid,
                               tableid,
                               name,
-                              order,
+                              tableSettings.getPropertyValue(propid,'Order'),
                               tableSettings.serializeSummaryValues(propid),
                               tableSettings.getPropertyValue(propid,'MinVal'),
                               tableSettings.getPropertyValue(propid,'MaxVal'),
