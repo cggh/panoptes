@@ -6,7 +6,7 @@ import os
 import DQXDbTools
 import DQXUtils
 import config
-import SettingsLoader
+import ImportSettings
 import ImpUtils
 import customresponders.panoptesserver.Utils as Utils
 import simplejson
@@ -22,10 +22,8 @@ class ImportWorkspaces(BaseImport):
     def getSettings(self, workspaceid):
         #Not _fetchSettings because no properties
         settingsFile, data = self._getDataFiles(workspaceid)
-        
-        settings = SettingsLoader.SettingsLoader(settingsFile)
-    
-        settings.RequireTokens(['Name'])
+         
+        settings = self._globalSettings
         
         return settings
     
@@ -34,7 +32,7 @@ class ImportWorkspaces(BaseImport):
             DQXUtils.CheckValidTableIdentifier(workspaceid)
             
             settings = self.getSettings(workspaceid)
-            print(settings.ToJSON())
+            self._log(str(settings))
             workspaceName = settings['Name']
     
             if not ImpUtils.IsDatasetPresentInServer(self._calculationObject.credentialInfo, self._datasetId):
@@ -99,12 +97,10 @@ class ImportWorkspaces(BaseImport):
     
         print('Checking for materialising of {0},{1},{2}'.format(self._datasetId, workspaceId, tableid))
         with DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId) as cur:
-            cur.execute('SELECT settings FROM tablecatalog WHERE id="{0}"'.format(tableid))
-            tableSettingsStr = cur.fetchone()[0]
-            tableSettings = SettingsLoader.SettingsLoader()
-            tableSettings.LoadDict(simplejson.loads(tableSettingsStr, strict=False))
+            tablesInfo = self._getTablesInfo(tableid)
+            tableSettings = tablesInfo[0]["settings"]
             #print('Table settings= '+tableSettings)
-            if (tableSettings.HasToken('CacheWorkspaceData')) and (tableSettings['CacheWorkspaceData']):
+            if tableSettings['CacheWorkspaceData']:
                 print('Executing materialising')
                 cur.execute('show indexes from {0}'.format(tableid))
                 indexedColumns1 = [indexRow[4] for indexRow in cur.fetchall()]
@@ -133,7 +129,7 @@ class ImportWorkspaces(BaseImport):
                 self._dropView(DBTBESC(wstable))
                 self._execSql('RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
     
-                if (tableSettings.HasToken('AllowSubSampling')) and (tableSettings['AllowSubSampling']):
+                if tableSettings['AllowSubSampling']:
                     print('Processing subsampling table')
                     indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
                     tmptable = '_tmptable_'

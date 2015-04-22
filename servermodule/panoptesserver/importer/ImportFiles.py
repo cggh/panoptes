@@ -12,7 +12,7 @@ except:
     sys.exit()
 import DQXUtils
 import config
-import SettingsLoader
+import ImportSettings
 import ImpUtils
 import customresponders.panoptesserver.schemaversion as schemaversion
 import customresponders.panoptesserver.Utils as Utils
@@ -66,11 +66,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         # Remove current reference in the index first: if import fails, nothing will show up
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
 
-        globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
-        globalSettings.RequireTokens(['Name'])
-        globalSettings.AddTokenIfMissing('Description','')
+        globalSettings = ImportSettings.ImportSettings(os.path.join(datasetFolder, 'settings'), settingsDef = ImportSettings.ImportSettings._datasetSettings)
 
-        print('Global settings: '+str(globalSettings.Get()))
+        print('Global settings: '+str(globalSettings))
 
 
         if not importSettings['ConfigOnly']:
@@ -122,8 +120,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 
         if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
-            globalSettings.AddTokenIfMissing('hasGenomeBrowser', True)
-
+            globalSettings['hasGenomeBrowser'] = True
+        
         ImportDocs(calculationObject, datasetFolder, datasetId)
 
         importWorkspaces = ImportWorkspaces(calculationObject, datasetId, importSettings, workspaceId, dataDir = 'workspaces')
@@ -131,7 +129,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Global settings
         with calculationObject.LogHeader('Defining global settings'):
-            ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
+            globalSettings.saveGlobalSettings(calculationObject, datasetId)
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):

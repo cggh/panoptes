@@ -1,10 +1,10 @@
 import os
-import SettingsLoader
 import datetime
 import SimpleFilterBankData
 import MultiCategoryDensityFilterBankData
 import ImpUtils
 import logging
+import linecache
 from BaseImport import BaseImport
 from LoadTable import LoadTable
 
@@ -23,32 +23,27 @@ class ProcessDatabase(BaseImport):
     
             if self._dbloader.status is not None:
                 self._log(str(self._dbloader.status))
-                raise Exception("Database loading failed")
+                exc_type, exc_obj, tb = self._dbloader.status
+                f = tb.tb_frame
+                lineno = tb.tb_lineno
+                filename = f.f_code.co_filename
+                linecache.checkcache(filename)
+                line = linecache.getline(filename, lineno, f.f_globals)
+                raise Exception("Database loading failed {} {} {} {}".format(filename, lineno, line.strip(), exc_obj))
 
-    def importData(self, tableid, inputFile = None, createSubsets = False, addPrimaryKey = False, loadSettings = None, properties = None):
+    def importData(self, tableid, inputFile = None, createSubsets = False, loadSettings = None):
         
         
         if loadSettings is None:
-            loadSettings, properties = self._fetchSettings(tableid)
+            loadSettings = self._fetchSettings(tableid)
             
         if inputFile is None:
             settings, data = self._getDataFiles(tableid)
         else:
             data = inputFile
             
-        columns = [ {
-                        'name': prop['propid'],
-                        'DataType': prop['DataType'],
-                        'Index': prop['Settings']['Index'],
-                        'ReadData': prop['Settings']['ReadData'],
-                        'MaxLen': prop['Settings']['MaxLen']
-                    }
-                    for prop in properties if (prop['propid'] != 'AutoKey')]
-        
-        if addPrimaryKey:
-            columns.append({'name': loadSettings['PrimKey'], 'DataType':'Text', 'Index': False, 'ReadData': True, 'MaxLen': 0})
                    
-        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, columns, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
+        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
         
         if not self._importSettings['ConfigOnly']:
             self._log(("Preparing to load {} to {}.{}").format(data, self._datasetId, tableid))

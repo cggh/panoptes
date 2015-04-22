@@ -35,7 +35,7 @@ Properties:
 - Id: EditBoolean1
   Name: Editable boolean
   GroupId: Info
-  Datatype: Boolean
+  DataType: Boolean
   ReadData: false
   ShowInTable: true
   CanUpdate: true

@@ -125,7 +125,6 @@ Properties:
     A: rgb(255,128,60)
     B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  MaxVal: 0.2
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level 
      BlockSizeMin: 20
      BlockSizeMax: 50000
@@ -180,7 +179,6 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   Name: Map                                            # Name of the view
   PieChartSize: 1000                                   # Size of the largest pie chart
   MapCenter: { Longitude: 10, Lattitude: 0 }           # Start location of the map
-  MapZoom: 2                                           # Start zoom factor of the map
   DataType: Fraction                                   # Type of values used to create the pie chart
   PositionOffsetFraction: 0.5                          # An offset between the pie chart location and the actual chart, used to achieve a nice (nonoverlapping) view
   LocationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)

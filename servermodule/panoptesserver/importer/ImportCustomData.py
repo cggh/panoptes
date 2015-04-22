@@ -13,14 +13,15 @@ from DQXDbTools import DBTBESC
 from ProcessDatabase import ProcessDatabase
 from ProcessFilterBank import ProcessFilterBank
 from BaseImport import BaseImport
+from ImportSettings import ImportSettings
 
 class ImportCustomData(BaseImport):
     
         #Retrieve and validate settings
     def getSettings(self, source, workspaceid):
-        settings, properties = self._fetchCustomSettings(source, workspaceid)    
+        settings = self._fetchCustomSettings(source, workspaceid)    
         
-        return settings, properties
+        return settings
     
 
     def ImportCustomData(self, sourceid, tableid):
@@ -50,17 +51,14 @@ class ImportCustomData(BaseImport):
     
             allowSubSampling = tableSettings['AllowSubSampling']
     
-            settings, properties = self.getSettings(sourceid, tableid)
+            settings = self.getSettings(sourceid, tableid)
     
             self._execSql("INSERT INTO customdatacatalog VALUES ('{tableid}', '{sourceid}', '{settings}')".format(
                 tableid=tableid,
                 sourceid=sourceid,
-                settings=settings.ToJSON()
+                settings=settings.serializeCustomData()
             ))
-    
-            # remove primary key, just in case
-            properties = [prop for prop in properties if prop['propid'] != primkey ]
-    
+            
             sourcetable=Utils.GetTableWorkspaceProperties(self._workspaceId, tableid)
             print('Source table: '+sourcetable)
     
@@ -70,11 +68,11 @@ class ImportCustomData(BaseImport):
                 existingProperties = [row[0] for row in cur.fetchall()]
                 print('Existing properties: '+str(existingProperties))
     
-            propidList = []
-            for property in properties:
-                DQXUtils.CheckValidColumnIdentifier(property['propid'])
-                propidList.append(property['propid'])
-    
+            # remove primary key, just in case
+            propidList = settings.getPropertyNames()
+            if primkey in propidList:
+                del propidList[primkey]
+                
             with DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId) as cur:
                 if not self._importSettings['ConfigOnly']:
                     # Dropping columns that will be replaced
@@ -99,58 +97,37 @@ class ImportCustomData(BaseImport):
     
     
                 ranknr = 0
-                for property in properties:
-                    propid = property['propid']
-                    settings = property['Settings']
-                    extraSettings = settings.Clone()
-                    extraSettings.DropTokens(['Name', 'DataType', 'Order','SummaryValues'])
+                for propid in settings.getPropertyNames():
+                    
                     print('Create property catalog entry for {0} {1} {2}'.format(self._workspaceId, tableid, propid))
                     sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(self._workspaceId, propid, tableid)
                     self._execSql(sql)
                     sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
                         self._workspaceId,
-                        settings['DataType'],
+                        settings.getPropertyValue(propid,'DataType'),
                         propid,
                         tableid,
-                        settings['Name'],
+                        settings.getPropertyValue(propid,'Name'),
                         0,
-                        extraSettings.ToJSON()
+                        settings.serializePropertySummary(propid)
                     )
                     self._execSql(sql)
                     ranknr += 1
-    
-                propDict = {}
-                for property in properties:
-                    propDict[property['propid']] = property
-    
+        
                 if not self._importSettings['ConfigOnly']:
                     tmptable = Utils.GetTempID()
-                    columns = [ {
-                                    'name': prop['propid'],
-                                    'DataType': prop['DataType'],
-                                    'Index': prop['Settings']['Index'],
-                                    'ReadData': prop['Settings']['ReadData']
-                                } for prop in properties]
-                    columns.append({'name':primkey, 'DataType':'Text', 'Index': False, 'ReadData': True})
-          
-    #                LoadTable.LoadTable(
-    #                    calculationObject,
-    #                    os.path.join(folder, 'data'),
-    #                    datasetId,
-    #                    tmptable,
-    #                    columns,
-    #                    {'PrimKey': primkey},
-    #                    importSettings,
-    #                    False
-    #                )
-                    
+                              
                     print('Importing custom data into {0}, {1}, {2} FROM {3}'.format(self._datasetId, self._workspaceId, tableid, folder))
-#                    importer = ImportDataset(self._calculationObject, self._datasetId, self._importSettings)
+
                     importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, workspaceId = self._workspaceId, baseFolder = folder, dataDir = 'customdata')
                     importer._sourceId = self._sourceId
             
-                    tableSettings = {'PrimKey': primkey}
-                    importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), properties = properties, loadSettings = tableSettings, addPrimaryKey = True)
+                    tableSettings = ImportSettings()
+                    props = settings['Properties']
+                    if primkey not in settings.getPropertyNames():
+                        props.append({ 'Id': primkey, 'Name': primkey, 'DataType':'Text', 'Index': False, 'ReadData': True, 'MaxLen': 0})
+                    tableSettings.loadProps({'PrimKey': primkey, 'Properties' : props}, False)
+                    importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), loadSettings = tableSettings)
                     
                     importer.cleanUp()
                     
@@ -164,8 +141,7 @@ class ImportCustomData(BaseImport):
                     for row in cur.fetchall():
                         existingcols.append(row[0])
                     print('Existing columns: '+str(existingcols))
-                    for prop in properties:
-                        propid = prop['propid']
+                    for propid in propidList:
                         if propid in existingcols:
                             raise Exception('Property "{0}" from custom data source "{1}" is already present'.format(propid, sourceid))
 
@@ -174,11 +150,10 @@ class ImportCustomData(BaseImport):
                     self._log('WARNING: better mechanism to determine column types needed here')#TODO: implement
                     frst = True
                     sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
-                    for property in properties:
-                        propid = property['propid']
+                    for propid in propidList:
                         if not frst:
                             sql += " ,"
-                        sqldatatype = ImpUtils.GetSQLDataType(property['DataType'])
+                        sqldatatype = ImpUtils.GetSQLDataType(settings.getPropertyValue(propid,'DataType'))
                         sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
                         frst = False
                         self._calculationObject.LogSQLCommand(sql)
@@ -189,8 +164,7 @@ class ImportCustomData(BaseImport):
                     frst = True
                     credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, sourcetable))
                     sql = "update {0} left join {1} on {0}.{2}={1}.{2} set ".format(DBTBESC(sourcetable), tmptable, DBCOLESC(primkey))
-                    for property in properties:
-                        propid = property['propid']
+                    for propid in propidList:
                         if not frst:
                             sql += ", "
                         sql += "{0}.{2}={1}.{2}".format(DBTBESC(sourcetable), tmptable, DBCOLESC(propid))
@@ -219,13 +193,11 @@ class ImportCustomData(BaseImport):
 
         name = 'CustomData'
         
-        settings, props = self._fetchCustomSettings(None, table, False)
-        
+        settings = self._fetchCustomSettings(None, table)
+         
         customdatalist = None
         
-        if settings is not None and settings.HasToken(name):
-            if not type(settings[name]) is list:
-                raise Exception(name + ' token should be a list')
+        if not settings is None:       
             customdatalist = settings[name]
             
         if customdatalist is None:# Alternatively, just use list of folders

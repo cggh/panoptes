@@ -1,6 +1,9 @@
 IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 Chromosome: Chrom            # Speficies the table column ID that contains the chromosome
 Position: Pos        
+NameSingle: combined
+NamePlural: combined
+PrimKey: AutoKey
 
 Properties:
 - Id: Chrom
@@ -18,8 +21,6 @@ Properties:
     "False": rgb(230,80,80)
     "True": rgb(153,189,75)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  MinVal: 0
-  MaxVal: 200
   SummaryValues:
     BlockSizeMin: 1
     BlockSizeMax: 50000

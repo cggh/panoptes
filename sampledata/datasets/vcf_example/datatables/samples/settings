@@ -2,4 +2,10 @@ NameSingle: Sample
 NamePlural: Samples
 
 PrimKey: sample_id
-AutoScanProperties: True
+
+
+Properties:
+- DataType: Text
+  Id: sample_id
+  MaxLen: 7
+  Name: sample_id

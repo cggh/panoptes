@@ -5,8 +5,6 @@ CategoryColors:                   # Specifies display colours for the categorica
     "True": rgb(153,189,75)
     "False": rgb(230,80,80)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-MinVal: 0
-MaxVal: 200
 BlockSizeMin: 1
 BlockSizeMax: 50000
 DefaultVisible: true

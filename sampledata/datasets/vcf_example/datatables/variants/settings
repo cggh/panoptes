@@ -2,8 +2,52 @@ NameSingle: Variant
 NamePlural: Variants
 
 PrimKey: AutoKey
-AutoScanProperties: True
 
 IsPositionOnGenome: true      
 Chromosome: CHROM
 Position: POS
+
+Properties:
+- DataType: Text
+  Id: CHROM
+  Name: CHROM
+- DataType: Value
+  DecimDigits: 0
+  Id: POS
+  Name: POS
+- DataType: Text
+  Id: ID
+  Name: ID
+- DataType: Text
+  Id: REF
+  Name: REF
+- DataType: Text
+  Id: ALT
+  Name: ALT
+- DataType: Value
+  Id: QUAL
+  Name: QUAL
+- DataType: Boolean
+  Id: FILTER_PASS
+  Name: FILTER_PASS
+- DataType: Value
+  Id: num_alleles
+  Name: num_alleles
+- DataType: Boolean
+  Id: is_snp
+  Name: is_snp
+- DataType: Text
+  Id: svlen
+  Name: svlen
+- DataType: Text
+  Id: AA
+  Name: AA
+- DataType: Value
+  Id: DP
+  Name: DP
+- DataType: Boolean
+  Id: HM2
+  Name: HM2
+- DataType: Boolean
+  Id: HM3
+  Name: HM3

@@ -7,7 +7,7 @@ import DQXDbTools
 import DQXUtils
 import config
 from DQXTableUtils import VTTable
-import SettingsLoader
+from ImportSettings import ImportSettings
 import ImpUtils
 import shutil
 import customresponders.panoptesserver.Utils as Utils
@@ -41,10 +41,11 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
 
         ImportRefGenomeSummaryData(calculationObject, datasetId, baseFolder, importSettings)
 
-        settings = SettingsLoader.SettingsLoader(os.path.join(folder, 'settings'))
-        settings.DefineKnownTokens(['AnnotMaxViewportSize', 'RefSequenceSumm'])
-        print('Settings: '+str(settings.Get()))
-        ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
+        settings = ImportSettings(os.path.join(folder, 'settings'), settingsDef = ImportSettings._refGenomeSettings)
+        print('Settings: '+str(settings))
+        #Do we really need to do this?
+        #TODO
+        #ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
         # Import reference genome
         if not(importSettings['ConfigOnly']):
@@ -101,22 +102,20 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                 attrib_genename = 'Name'
                 attrib_genenames = 'Name,Alias,previous_systematic_id'
                 attrib_descr = 'descr'
-                if settings.HasToken('Annotation'):
-                    annotationsettings = settings.GetSubSettings('Annotation')
-                    print('Annotation settings: '+str(annotationsettings.Get()))
-                    if annotationsettings.HasToken('Format'):
+                if settings['Annotation']:
+                    annotationsettings = settings['Annotation']
+                    print('Annotation settings: '+str(annotationsettings))
+                    if 'Format' in annotationsettings:
                         formatid = annotationsettings['Format']
-                        if formatid not in ['GFF', 'GTF']:
-                            raise Exception('Invalid annotation format (should be GTF or GFF')
-                    if annotationsettings.HasToken('GeneFeature'):
+                    if 'GeneFeature' in annotationsettings:
                         geneidlist = flattenarglist(annotationsettings['GeneFeature'])
-                    if annotationsettings.HasToken('ExonFeature'):
+                    if 'ExonFeature' in annotationsettings:
                         exonid = annotationsettings['ExonFeature']
-                    if annotationsettings.HasToken('GeneNameAttribute'):
+                    if 'GeneNameAttribute' in annotationsettings:
                         attrib_genename = flattenarglist(annotationsettings['GeneNameAttribute'])
-                    if annotationsettings.HasToken('GeneNameSetAttribute'):
+                    if 'GeneNameSetAttribute' in annotationsettings:
                         attrib_genenames = flattenarglist(annotationsettings['GeneNameSetAttribute'])
-                    if annotationsettings.HasToken('GeneDescriptionAttribute'):
+                    if 'GeneDescriptionAttribute' in annotationsettings:
                         attrib_descr = flattenarglist(annotationsettings['GeneDescriptionAttribute'])
 
                 tempgfffile = ImpUtils.GetTempFileName()

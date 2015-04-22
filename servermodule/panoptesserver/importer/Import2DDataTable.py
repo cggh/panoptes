@@ -9,13 +9,12 @@ import DQXUtils
 import h5py
 import simplejson
 import config
-import SettingsLoader
 import ImpUtils
 import copy
 import arraybuffer
 import customresponders.panoptesserver.Utils as Utils
 from BaseImport import BaseImport
-
+from ImportSettings import ImportSettings
 
 class Import2DDataTable(BaseImport):
 
@@ -56,15 +55,12 @@ class Import2DDataTable(BaseImport):
                         
     #Retrieve and validate settings
     def getSettings(self, tableid):
-        tableSettings, properties = self._fetchSettings(tableid, False)
+        tableSettings = self._fetchSettings(tableid, settingsDef = ImportSettings._2DtableSettings)
         
-        tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'FirstArrayDimension'])
-        tableSettings.AddTokenIfMissing('ShowInGenomeBrowser', False)
-        if tableSettings['ShowInGenomeBrowser'] and not (tableSettings.GetSubSettings('ShowInGenomeBrowser').HasToken('Call') or tableSettings.GetSubSettings('ShowInGenomeBrowser').HasToken('AlleleDepth')):
-            raise ValueError('Genome browsable 2D table must have call or allele depth')
-        tableSettings.AddTokenIfMissing('ColumnDataTable', '')
-        tableSettings.AddTokenIfMissing('RowDataTable', '')
-        tableSettings.AddTokenIfMissing('SymlinkData', False)
+        if tableSettings['ShowInGenomeBrowser']:
+            sigb = tableSettings['ShowInGenomeBrowser']
+            if not ('Call' in sigb or 'AlleleDepth' in sigb):
+                raise ValueError('Genome browsable 2D table must have call or allele depth')
             
         return tableSettings
             
@@ -82,23 +78,14 @@ class Import2DDataTable(BaseImport):
                 
             table_settings = self.getSettings(tableid)
  
-            extra_settings = table_settings.Clone()
-            extra_settings.DropTokens(['ColumnDataTable',
-                                      'ColumnIndexField',
-                                      'RowDataTable',
-                                      'RowIndexField',
-                                      'Properties'])
+            
     
             settingsFile, dataFile = self._getDataFiles(tableid)
             remote_hdf5 = h5py.File(dataFile, 'r')
             #Check that the referenced tables exist and have the primary key specified.
             if table_settings['ColumnDataTable']:
-                sql = "SELECT id FROM tablecatalog WHERE id = '{0}'".format(table_settings['ColumnDataTable'])
-                cat_id = self._execSqlQuery(sql)
-                try:
-                    cat_id = cat_id[0][0]
-                except IndexError:
-                    raise Exception("Index Table " + table_settings['ColumnDataTable'] + " doesn't exist")
+                tables = self._getTablesInfo(table_settings['ColumnDataTable'])
+                cat_id = tables[0]["id"]
                 sql = "SELECT {0} FROM {1} LIMIT 1".format(table_settings['ColumnIndexField'],
                                                            table_settings['ColumnDataTable'])
                 try:
@@ -106,12 +93,9 @@ class Import2DDataTable(BaseImport):
                 except:
                     raise Exception(table_settings['ColumnIndexField'] + " column index field doesn't exist in table " + table_settings['ColumnDataTable'])
             if table_settings['RowDataTable']:
-                sql = "SELECT id FROM tablecatalog WHERE id = '{0}'".format(table_settings['RowDataTable'])
-                cat_id = self._execSqlQuery(sql)
-                try:
-                    cat_id = cat_id[0][0]
-                except IndexError:
-                    raise Exception("Index Table " + table_settings['RowDataTable'] + " doesn't exist")
+                tables = self._getTablesInfo(table_settings['RowDataTable'])
+                cat_id = tables[0]["id"]
+
                 sql = "SELECT {0} FROM {1} LIMIT 1".format(table_settings['RowIndexField'],
                                                            table_settings['RowDataTable'])
                 try:
@@ -128,34 +112,31 @@ class Import2DDataTable(BaseImport):
                 raise Exception("FirstArrayDimension must be column or row")
     
             # Add to tablecatalog
-            extra_settings.ConvertStringsToSafeSQL()
             sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', {6})".format(
                 tableid,
                 table_settings['NamePlural'],
                 table_settings['ColumnDataTable'],
                 table_settings['RowDataTable'],
                 table_settings['FirstArrayDimension'],
-                extra_settings.ToJSON(),
+                table_settings.serialize2DdataTable(),
                 self.tableOrder
             )
             self._execSql(sql)
             self.tableOrder += 1
     
-            for prop in table_settings['Properties']:
-                extra_settings = copy.deepcopy(prop)
-                dtype = arraybuffer._strict_dtype_string(remote_hdf5[prop['Id']].dtype)
-                arity = 1 if len(remote_hdf5[prop['Id']].shape) == 2 else remote_hdf5[prop['Id']].shape[2]
-                del extra_settings['Id']
-                del extra_settings['Name']
+            for propname in table_settings.getPropertyNames():
+                propid = table_settings.getPropertyValue(propname,'Id')
+                dtype = arraybuffer._strict_dtype_string(remote_hdf5[propid].dtype)
+                arity = 1 if len(remote_hdf5[propid].shape) == 2 else remote_hdf5[propid].shape[2]
                 sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}', {8})".format(
-                    prop['Id'],
+                    propid,
                     tableid,
                     table_settings['ColumnDataTable'],
                     table_settings['RowDataTable'],
-                    prop['Name'],
+                    table_settings.getPropertyValue(propname,'Name'),
                     self.property_order,
                     dtype,
-                    simplejson.dumps(extra_settings),
+                    table_settings.serializePropertyValues(propname),
                     arity
                 )
                 self._execSql(sql)
@@ -168,7 +149,7 @@ class Import2DDataTable(BaseImport):
                     # We could just run the command and ignore the error raised if it already exists
                     # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['ColumnDataTable'], tableid)
                     # self._execSql(sql)
-                    if table_settings.HasToken('ColumnIndexArray'):
+                    if table_settings['ColumnIndexArray']:
                         #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
                         #Firstly create a temporary table with the index array
                         try:
@@ -248,7 +229,7 @@ class Import2DDataTable(BaseImport):
                         if e[0] != 1060:
                             raise e
                                                 
-                    if table_settings.HasToken('RowIndexArray'):
+                    if table_settings['RowIndexArray']:
                         #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
                         #Firstly create a temporay table with the index array
                         try:
