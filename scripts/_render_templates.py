@@ -10,7 +10,7 @@ config['PRODUCTION'] = sys.argv[1] == 'PRODUCTION'
 if not config['PRODUCTION']:
     config['TITLE'] += " - DEVELOPMENT MODE"
 config['VERSION'] = sys.argv[2]
-env = Environment(loader=FileSystemLoader('webapp'))
+env = Environment('<%', '%>', '<%=', '%>', '<%#', '%>', loader=FileSystemLoader('webapp'))
 template = env.get_template('index.html.template')
 output_from_parsed_template = template.render(**config)
 
