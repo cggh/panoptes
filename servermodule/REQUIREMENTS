@@ -5,3 +5,4 @@ PyYAML==3.10
 python-dateutil==2.2
 six==1.5.2
 Unidecode==0.04.16
+Jinja2==2.7.3

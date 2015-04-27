@@ -75,12 +75,21 @@ Edit the file and specify the following components:
 - A directory Panoptes can use for storing files (BASEDIR, see further).
 - A directory that will contain the source data files (SOURCEDATADIR, see further)
 
+- Title of the deployment (TITLE)
+- Extra JS for utilities and tracking such as rollbar etc. Note that google analytics can be set on a dataset level. (EXTRA_HEAD_JS, EXTRA_TAIL_JS)
+
 .. note::
-  Changes in 'config.py' are used on build, so you will need to rebuild if they change.
+  Changes in 'config.py' are fixed on build, so you will need to rebuild if they change.
+
 
 To build run::
 
 	./scripts/build.sh
+
+To build for development::
+
+	./scripts/build.sh DEV
+
 
 to create a panoptes installation in 'build'. Note that this deletes any existing build.
 This build copies the different components of the application, and merges them into a single file structure.

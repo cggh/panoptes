@@ -1,5 +1,6 @@
 //sudo apt-get install nodejs nodejs-legacy npm
 //sudo npm install -g requirejs
+//export NODE_PATH=/usr/local/lib/node_modules
 //node scripts/dist.js
 
 var requirejs = require('requirejs');
@@ -16,8 +17,8 @@ var config = {
         tween: "Externals/Tween",
         datastream: "DQX/Externals/DataStream",
         blob: "DQX/Externals/Blob",
-        filesaver: "DQX/Externals/FileSaver"
-
+        filesaver: "DQX/Externals/FileSaver",
+        lzstring: "DQX/Externals/lz-string"
     },
     shim: {
         d3: {
@@ -37,6 +38,9 @@ var config = {
         },
         filesaver: {
           exports: 'saveAs'
+        },
+        lzstring: {
+          exports: 'LZString'
         }
 
     },
