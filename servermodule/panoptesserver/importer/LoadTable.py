@@ -137,7 +137,7 @@ class LoadTable(threading.Thread):
                 content = '\'' + content + '\''
 
         if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
-            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-'):
+            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-' or content == 'nan'):
                 content = 'NULL'
 
         if ImpUtils.IsDateDataTypeIdenfifier(col['DataType']):
@@ -278,13 +278,8 @@ class LoadTable(threading.Thread):
                     colTokens.append(var)
                     ts = DBCOLESC(col) + " = CASE " + var
                     #This could be made a bit less painful by looking at the values when parsing
-                    ts += " WHEN 'NA' THEN NULL"
-                    ts += " WHEN '' THEN NULL"
-                    ts += " WHEN 'None' THEN NULL"
-                    ts += " WHEN 'NULL' THEN NULL"
-                    ts += " WHEN 'null' THEN NULL"
-                    ts += " WHEN 'inf' THEN NULL"
-                    ts += " WHEN '-' THEN NULL"
+                    for nullval in [ 'NA', '', 'None', 'NULL', 'null', 'inf', '-', 'nan' ]:
+                        ts += " WHEN '" + nullval + "' THEN NULL"
                     ts += " ELSE " + var
                     ts += " END"
                     transform.append(ts)
