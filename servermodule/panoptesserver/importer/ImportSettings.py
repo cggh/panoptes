@@ -1430,18 +1430,29 @@ containing the relative size of that specific pie'''
         for val in ['Name', 'DataType', 'Order','SummaryValues']:
             if val in saved:
                 del saved[val]
+
+        for val in saved:
+            if val in self._propertiesDefault and 'propName' in self._propertiesDefault[val]:
+                name =  self._propertiesDefault[val]['propName']
+                saved[name] = saved[val]
+                del saved[val] 
         
         return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
         
     #For insertion into propertycatalog              
     def serializePropertySummary(self, key):
         saved = copy.deepcopy(self.getProperty(key))
-        if 'Name' in saved:
-            del saved['Name']
-        del saved['DataType']
-        if 'Order' in saved:
-            del saved['Order']
+
+        for val in ['Name', 'Order']:
+            if val in saved:
+                del saved[val]
         
+        for val in saved:
+            if val in self._propertiesDefault and 'propName' in self._propertiesDefault[val]:
+                name =  self._propertiesDefault[val]['propName']
+                saved[name] = saved[val]
+                del saved[val] 
+                
         return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
 
     
