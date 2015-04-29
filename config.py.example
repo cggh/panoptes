@@ -1,7 +1,5 @@
-import tempfile
-
-#Name used for reporting bugs to rollbar
-NAME = 'not set'
+#Title bar text
+TITLE = 'Panoptes'
 
 ###########################################################################################################
 # Configuration parameters for connecting to the MySQL database
@@ -33,8 +31,6 @@ BASEDIR = 'basedir_path'
 #If this is empty, examples datasets will be copied to it
 SOURCEDATADIR = 'sourcedir_path'
 
-
-
 ###########################################################################################################
 # CAS authentication
 #########################################################################################################
@@ -50,11 +46,3 @@ CAS_LOGOUT_PAGE = '/logout'
 CAS_LOGOUT_DESTINATION = ''
 #A page to show if validation fails
 CAS_FAILURE_PAGE = None
-
-# Configure the SessionMiddleware (Beaker)
-# You may wish to change the data_dir but this will work
-session_opts = {
-    'session.type': 'file',
-    'session.cookie_expires': True,
-    'session.data_dir': tempfile.gettempdir() + '/panoptes'
-}
