@@ -29,7 +29,7 @@ Short debain/ubuntu guide for the temporarly challenged
 ::
 
     sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
-    wget https://github.com/cggh/panoptes/archive/master.zip
+    wget https://github.com/cggh/panoptes/archive/1.6.1.zip
     unzip master.zip
     cd panoptes-master
     cp config.py.example config.py
