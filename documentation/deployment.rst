@@ -30,8 +30,8 @@ Short debain/ubuntu guide for the temporarly challenged
 
     sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
     wget https://github.com/cggh/panoptes/archive/1.6.1.zip
-    unzip master.zip
-    cd panoptes-master
+    unzip 1.6.1.zip
+    cd panoptes-1.6.1
     cp config.py.example config.py
     nano config.py #EDIT DB CREDENTIALS AND FILE PATHS
     ./scripts/build.sh
@@ -44,9 +44,9 @@ Download & dependencies
 .......................
 Download the code from the GitHub repository::
 
-    wget https://github.com/cggh/panoptes/archive/master.zip
-    unzip master.zip
-    cd panoptes-master
+    wget https://github.com/cggh/panoptes/archive/1.6.1.zip
+    unzip 1.6.1.zip
+    cd panoptes-1.6.1
 
 Panoptes needs a running MySQL version **5.6 or later** with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
 
@@ -97,7 +97,7 @@ This will attempt to install the needed python packages and link Panoptes into t
 Server data file structure
 ..........................
 Panoptes uses two file directories, and the location of both has to be specified in config.py
-(example: `config.py.sample <https://github.com/cggh/DQXServer/blob/master/config.py.sample#L38>`_).
+(example: `config.py.example <https://github.com/cggh/panoptes/blob/master/config.py.sample#L38>`_).
 
 BASEDIR:
 This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks", "Uploads" and "temp".
