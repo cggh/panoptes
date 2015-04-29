@@ -4,8 +4,7 @@ red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m'
 
-#release='Pn1.2'
-release='master'
+release='Pn1.6.1'
 
 
 # target: Ubuntu 14.04.1 LTS
