@@ -429,6 +429,7 @@ define([
                                         SummChannel.scrollInView();
 
                                 });
+                                that.panelBrowser.channelModifyVisibility(SummChannel.getID(), ctrl_onoff.getValue());
                                 controlsList.push(ctrl_onoff);
 
                                 if (colorMapping) {

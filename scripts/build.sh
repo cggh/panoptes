@@ -1,5 +1,4 @@
 #!/bin/bash -e
-INSTALL_SQL=0
 red='\e[0;31m'
 green='\e[0;32m'
 NC='\e[0m' # No Color
@@ -83,17 +82,18 @@ cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
 echo mysqlcommand = \'`which mysql`\' >> config.py
 
-if [ ${INSTALL_SQL} -eq 1 ]
-then
+if [ -z ${SKIP_SQL} ]; then
     echo -e "${green}  Creating skeleton DB - if needed${NC}"
-    DBSRV=`python -c "import config;print config.DBSRV"`
-    DBUSER=`python -c "import config;print config.DBUSER"`
-    DBPASS=`python -c "import config;print config.DBPASS"`
-    DB=`python -c "import config;print config.DB"`
-    mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
+        DBSRV=`python -c "import config;print config.DBSRV"`
+        DBUSER=`python -c "import config;print config.DBUSER"`
+        DBPASS=`python -c "import config;print config.DBPASS"`
+        DB=`python -c "import config;print config.DB"`
+        mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
 CREATE DATABASE IF NOT EXISTS ${DB};
 EOF
     mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+else
+    echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
 BASEDIR=`python -c "import config;print config.BASEDIR"`
@@ -134,18 +134,24 @@ ln -s $BASEDIR/Docs Docs
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
-echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist"
+echo -e "${green}  SourceDataDir is ${SOURCEDATADIR} - making if it doesn't exist${NC}"
 mkdir -p $SOURCEDATADIR
 mkdir -p $SOURCEDATADIR/datasets
 if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
-    echo -e "${green}  SourceDataDir is empty - copying sample datasets"
+    echo -e "${green}  SourceDataDir is empty - copying sample datasets${NC}"
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
 cd $PROJECT_ROOT
-NAME=`python -c "import config;print config.NAME"`
-sed -i "s/#DEV#/$NAME/" webapp/index.html
-
+if [ "$1" = "DEV" ]; then
+    echo -e "${green}  Creating DEVELOPMENT html${NC}"
+    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
+else
+    echo -e "${green}  Creating PRODUCTION html${NC}"
+    VERSION=`uuidgen`
+    cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
+    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION
+fi
 echo -e "${green}Done!${NC}"
 
 #if [ -z "$WSGI_FOLDER" ]; then

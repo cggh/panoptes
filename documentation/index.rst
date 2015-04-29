@@ -33,6 +33,8 @@ Contents
    introduction
    deployment
    importdata/_intro
+   importdata/sourcefilesstructure/_intro
+   importdata/importsettings/_intro
 
 License
 -------

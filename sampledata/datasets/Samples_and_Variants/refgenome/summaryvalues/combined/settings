@@ -24,7 +24,7 @@ Properties:
   SummaryValues:
     BlockSizeMin: 1
     BlockSizeMax: 50000
-  DefaultVisible: true
+  DefaultVisible: false
 
 - Id: Unique
   Name: Unique
