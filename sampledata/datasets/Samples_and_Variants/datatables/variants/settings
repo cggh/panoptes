@@ -128,6 +128,7 @@ Properties:
   SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level 
      BlockSizeMin: 20
      BlockSizeMax: 50000
+     MaxDensity: 0.2
   BrowserDefaultVisible: true
   
 - Id: NRAF_WAF, NRAF_EAF, NRAF_SAF

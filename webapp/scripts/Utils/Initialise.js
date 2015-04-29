@@ -365,7 +365,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 if (prop.settings) {
                     try {
                         var settingsObj = JSON.parse(prop.settings);
-                        if ('maxval' in settingsObj)
+                        if ('MaxVal' in settingsObj)
                             settingsObj.hasValueRange = true;
                     }
                     catch(e) {
