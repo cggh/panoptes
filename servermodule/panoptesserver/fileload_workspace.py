@@ -21,13 +21,14 @@ def ResponseExecute(data, calculationObject):
 
 
     try:
-        importer.ImportWorkspaces.ImportWorkspace(
+        wsimport = importer.ImportWorkspaces.ImportWorkspaces(
             calculationObject,
             datasetid,
+            importSettings,
             workspaceid,
-            config.SOURCEDATADIR + '/datasets/' + datasetid + '/workspaces/' + workspaceid,
-            importSettings
+            dataDir='workspaces'
         )
+        wsimport.ImportWorkspace(workspaceid)
     except importer.ImportError.ImportException as e:
         calculationObject.fail(str(e))
 

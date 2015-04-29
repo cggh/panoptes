@@ -111,7 +111,7 @@ class LoadTable(threading.Thread):
         for col in self._loadSettings.getPropertyNames():
             # if 'ReadData' not in col:
             #     print('==========' + str(col))
-            colname = self._loadSettings.getPropertyValue(col,"propid")
+            colname = self._loadSettings.getPropertyValue(col,"Id")
             if (self._loadSettings.getPropertyValue(col,'ReadData') and (colname not in self._fileColIndex)):
                 raise Exception('File is missing column '+colname)
     
@@ -137,7 +137,7 @@ class LoadTable(threading.Thread):
                 content = '\'' + content + '\''
 
         if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
-            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-'):
+            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-' or content == 'nan'):
                 content = 'NULL'
 
         if ImpUtils.IsDateDataTypeIdenfifier(col['DataType']):
@@ -172,7 +172,7 @@ class LoadTable(threading.Thread):
         for col in self._loadSettings.getPropertyNames():
 
             content = 'NULL'
-            name = self._loadSettings.getPropertyValue(col,'propid') 
+            name = self._loadSettings.getPropertyValue(col,'Id') 
             if name in self._fileColIndex:
                 content = sourceCells[self._fileColIndex[name]]
 #                content = self._encodeCell(content, col)
@@ -222,7 +222,7 @@ class LoadTable(threading.Thread):
             colTokens.append("`{}_row_index` INT  ".format(self._rowIndexField))
             
         for col in self._loadSettings.getPropertyNames():
-            name = self._loadSettings.getPropertyValue(col,'propid')
+            name = self._loadSettings.getPropertyValue(col,'Id')
             typedefn = self._loadSettings.getPropertyValue(col,'DataType')
             maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
             st = DBCOLESC(name)
@@ -278,13 +278,8 @@ class LoadTable(threading.Thread):
                     colTokens.append(var)
                     ts = DBCOLESC(col) + " = CASE " + var
                     #This could be made a bit less painful by looking at the values when parsing
-                    ts += " WHEN 'NA' THEN NULL"
-                    ts += " WHEN '' THEN NULL"
-                    ts += " WHEN 'None' THEN NULL"
-                    ts += " WHEN 'NULL' THEN NULL"
-                    ts += " WHEN 'null' THEN NULL"
-                    ts += " WHEN 'inf' THEN NULL"
-                    ts += " WHEN '-' THEN NULL"
+                    for nullval in [ 'NA', '', 'None', 'NULL', 'null', 'inf', '-', 'nan' ]:
+                        ts += " WHEN '" + nullval + "' THEN NULL"
                     ts += " ELSE " + var
                     ts += " END"
                     transform.append(ts)
@@ -337,7 +332,7 @@ class LoadTable(threading.Thread):
                 e = sys.exc_info()
                 self._log("Failed to create unique index: %s " % str(e))
         for col in self._loadSettings.getPropertyNames():
-            name = self._loadSettings.getPropertyValue(col, 'propid')
+            name = self._loadSettings.getPropertyValue(col, 'Id')
             if self._loadSettings.getPropertyValue(col, 'Index') and col != self._loadSettings["PrimKey"]:
                 self._execSql('create index {2} ON {0}({1})'.format(DBTBESC(tableid), DBCOLESC(name), DBCOLESC(tableid + '_' + name)))
                 

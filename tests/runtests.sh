@@ -16,4 +16,4 @@ export PYTHONPATH
 
 #pip install nose
 #nosetests
-python ${PROJECT_ROOT}/servermodule/panoptesserver/importer/test/SettingsTest.py
+python ${PROJECT_ROOT}/servermodule/panoptesserver/importer/test/ImportSettingsTest.py

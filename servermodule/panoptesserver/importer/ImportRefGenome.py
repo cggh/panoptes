@@ -139,3 +139,20 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                 os.remove(os.path.join(temppath, 'annotation_create.sql'))
 
     return True
+
+if __name__ == "__main__":
+
+
+    import sys
+    import customresponders.panoptesserver.asyncresponder as asyncresponder
+
+    datasetId = sys.argv[1]
+    importSettings = {
+                'ConfigOnly': False,
+                'ScopeStr': 'all',
+                'SkipTableTracks': 'true'
+            }
+    calculationObject = asyncresponder.CalculationThread('', None, {'isRunningLocal': True}, '')
+    DQXDbTools.DbCredentialVerifier = None
+    baseFolder = os.path.join(config.SOURCEDATADIR, 'datasets')
+    ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings)

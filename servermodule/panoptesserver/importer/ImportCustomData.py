@@ -56,7 +56,7 @@ class ImportCustomData(BaseImport):
             self._execSql("INSERT INTO customdatacatalog VALUES ('{tableid}', '{sourceid}', '{settings}')".format(
                 tableid=tableid,
                 sourceid=sourceid,
-                settings=settings.serializeCustomData()
+                settings=settings.serialize()
             ))
             
             sourcetable=Utils.GetTableWorkspaceProperties(self._workspaceId, tableid)
@@ -109,7 +109,7 @@ class ImportCustomData(BaseImport):
                         tableid,
                         settings.getPropertyValue(propid,'Name'),
                         0,
-                        settings.serializePropertySummary(propid)
+                        settings.serializeProperty(propid)
                     )
                     self._execSql(sql)
                     ranknr += 1

@@ -26,7 +26,7 @@ import math
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
-
+import sqlparse
 
 def GetCurrentSchemaVersion(calculationObject, datasetId):
     with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
@@ -85,7 +85,13 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             scriptPath = os.path.dirname(os.path.realpath(__file__))
             calculationObject.SetInfo('Creating database')
             print('Creating new database')
-            ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
+            #Can't use source as it's part of the mysql client not the API
+            sql = open(scriptPath + "/createdataset.sql").read()
+            sql_parts = sqlparse.split( sql )
+            for sql_part in sql_parts:
+                if sql_part.strip() ==  '':
+                    continue 
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql_part)
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
                 schemaversion.major,
                 schemaversion.minor

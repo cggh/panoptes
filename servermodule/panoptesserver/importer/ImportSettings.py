@@ -32,11 +32,13 @@ class ImportSettings:
                         ('ColumnDataTable', {
                              'type': 'Text',
                              'required': True,
+                             'serializable': False,
                              'description': 'Identifier of the (1D) data table defining the columns of the matrix\n  (In case of genotype data: the variants). This links the 2D data table to the 1D data table containing the column information'
                              }),
                         ('ColumnIndexField', {
                              'type': 'Text',
                              'required': True,
+                             'serializable': False,
                              'description': 'The property ID in the ``ColumnDataTable`` data table that maps into the ``ColumnIndexArray``\n  array in the HDF5 source file. ``ColumnIndexField`` and ``ColumnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.\n  Alternatively ``ColumnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``ColumnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                              }),
                         ('ColumnIndexArray', {
@@ -47,11 +49,13 @@ class ImportSettings:
                         ('RowDataTable', {
                              'type': 'Text',
                              'required': True,
+                             'serializable': False,
                              'description': 'Identifier of the (1D) data table defining the rows of the matrix\n  (in case of genotype data: the samples). This links the 2D data table to the 1D data table containing the row information'
                              }),
                         ('RowIndexField', {
                              'type': 'Text',
                              'required': True,
+                             'serializable': False,
                              'description': 'The property ID in the ``RowDataTable`` data table that maps into ``RowIndexArray``\n  array in the HDF5 source file. ``RowIndexField`` and ``RowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.\n  Alternatively ``RowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``RowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                              }),
                         ('RowIndexArray', {
@@ -108,16 +112,19 @@ class ImportSettings:
                         ('Properties', {
                              'type': 'List',
                              'required': True,
+                             'serializable': False,
                              'description': 'Contains a list of all properties defined for each cell of the 2D data table',
                              'children': OrderedDict((
                                           ('Id', {
                                                  'type': 'Text',
                                                  'required': True,
+                                                 'serializable': False,
                                                  'description': 'Identifier of the property, and name of the dataset in the HDF5 source file'
                                                  }),
                                           ('Name', {
                                                     'type': 'Text',
                                                     'required': False,
+                                                    'serializable': False,
                                                     'description': 'Display name of the property'
                                                     }),
                                           ('Description', {
@@ -243,6 +250,7 @@ class ImportSettings:
                          ('PrimKey', {
                                    'type': 'PropertyID',
                                    'required': True,
+                                   'serializable': False,
                                    'description': "The primary key *property ID* for this table.\n  A data item *property* is a column in the TAB-delimited source file ``data``, and the *ID* corresponds to the column header.\n  The primary key should refer to a column containing a unique value for each record in the table.\n  Optionally, this parameter can be set to '``AutoKey``' to instruct the software to automatically generate a primary key"
                                 }),
                          ('ItemTitle', {
@@ -325,6 +333,7 @@ class ImportSettings:
                          ('Properties', {
                                    'type': 'List',
                                    'required': True,
+                                   'serializable': False,
                                    'description': 'Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.\n  See :ref:`def-settings-datatable-properties` settings for an overview of the keys that can be used for each property in this list',
                                    'children': {} #Is self._propertiesDefault - set in constructor
                                 }),
@@ -638,6 +647,7 @@ containing the relative size of that specific pie'''
                                                 ('Id', {
                                                        'type': 'Text',
                                                        'required': True,
+                                                       'serializable': False,
                                                        'description': 'Identifier of this set of per-data-item genomic values - name of subdirectory or Identifier of this set of per-data-item genomic values - name of the column in the matching files'
                                                        }),
                                                 ('FilePattern', {
@@ -648,28 +658,33 @@ containing the relative size of that specific pie'''
                                                 ('Name', {
                                                          'type': 'Text',
                                                          'required': True,
+                                                         'serializable': False,
                                                          'description': 'Display name of the property'
                                                          }),
                                                 ('MinVal', {
                                                            'type': 'Value',
                                                            'required': True,
+                                                           'serializable': False,
                                                            'default': 0,
                                                            'description': 'Minimum this value can reach'
                                                            }),
                                                 ('MaxVal', {
                                                            'type': 'Value',
                                                            'required': True,
+                                                           'serializable': False,
                                                            'description': 'Maximum this value can reach'
                                                            }),
                                                 ('BlockSizeMin', {
                                                              'type': 'Value',
                                                              'required': True,
+                                                             'serializable': False,
                                                              'default': 1,
                                                              'description': 'Minimum block size used by the multiresolution summariser (in bp)'
                                                              }),
                                                 ('BlockSizeMax', {
                                                                 'type': 'Value',
                                                                 'required': True,
+                                                                'serializable': False,
                                                                 'description': 'Maximum block size used by the multiresolution summariser (in bp)'
                                                                 }),
                                                 ('ChannelColor', {
@@ -693,6 +708,7 @@ containing the relative size of that specific pie'''
                             ('DataType', {
                                    'type': 'Text',
                                    'required': True,
+                                   'serializable': False,
                                    'description': 'Data type of the values in the property',
                                    'values':  OrderedDict(( ('Text', {
                                                      'description': 'text strings'
@@ -720,6 +736,7 @@ containing the relative size of that specific pie'''
                             ('Name', {
                                    'type': 'Text',
                                    'required': True,
+                                   'serializable': False,
                                    'description': 'Display name of the property'
                                    }),
                             ('Description', {
@@ -781,6 +798,7 @@ containing the relative size of that specific pie'''
                             ('MaxLen', {
                                    'type': 'Value',
                                    'required': False,
+                                   'serializable': False,
                                    'default': 0,
                                    'description': 'If present used to specify the maximum size of the database column - otherwise it is calculated'
                                    }),
@@ -906,12 +924,14 @@ containing the relative size of that specific pie'''
                             ('Order', {
                                        'type': 'Value',
                                        'required': False,
+                                       'serializable': False,
                                        'default': -1,
                                        'description': 'Only used for reference genome tracks'
                                        }),
                             ('SummaryValues', {
                                    'type': 'Block',
                                    'required': False,
+                                   'serializable': False,
                                    'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True},
                                    
@@ -1186,6 +1206,24 @@ containing the relative size of that specific pie'''
             if not pkey in testDict:
                 self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
         
+
+    def _hasOptionalSibling(self, testDict, pkey, pdef):
+        ret = False
+        
+        sibName = pdef['siblingOptional']['name']
+        sibValue = pdef['siblingOptional']['value']
+        for valkey in testDict:
+            val = testDict[valkey]
+            if valkey == sibName:
+                ret = True
+                if type(sibValue) == str and val != sibValue:
+                    ret = False
+                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
+                if type(sibValue) == list and val not in sibValue:
+                    ret = False
+                    self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
+        return ret
+
     def _checkProperty(self, testDict, pkey, pdef, siblings = None):
         
         #print("Checking {} {}".format(str(testDict), str(pdef)))        
@@ -1259,15 +1297,7 @@ containing the relative size of that specific pie'''
 
         if 'siblingOptional' in pdef:
             if siblings and pkey in testDict:
-                sibName = pdef['siblingOptional']['name']
-                sibValue = pdef['siblingOptional']['value']
-                for valkey in testDict:
-                    val = testDict[valkey]
-                    if valkey == sibName:
-                        if type(sibValue) == str and val != sibValue:
-                            self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
-                        if type(sibValue) == list and val not in sibValue:
-                            self._errors.append("Wrong sibling value for {} ({})\n (expected {} {}, got {} {}) for {}".format(sibName, pkey, sibValue, type(sibValue), val, type(val), str(testDict)))
+                self._hasOptionalSibling(testDict, pkey, pdef)
                 
         if 'siblingRequired' in pdef:
             if type(pdef['siblingRequired']) == list:
@@ -1337,22 +1367,20 @@ containing the relative size of that specific pie'''
                     propid = propid.strip()
                     try:
                         if not propid in self._propidMap:
-                            properties = {'propid':propid}
+                            properties = {}
                             self._propidMap[propid] = properties
                         self._propidMap[propid].update(copy.deepcopy(propSource))
-                        #Really using 'propid' instead of 'Id' but to be tidy
                         self._propidMap[propid]['Id'] = propid
                     except Exception as e:
                         raise Exception('Invalid property "{0}": {1}'.format(propid, str(e)))
             
             #Now we need to update the original so it can be validated
             propsList = copy.deepcopy(self._settings["Properties"])
-                        #Do it backwards so can deleted without changing the index
+            #Do it backwards so can deleted without changing the index
             for i, propDetails in reversed(list(enumerate(propsList))):
                 propid = propDetails['Id']
                 if propid in self._propidMap:
                     self._settings['Properties'][i] = copy.deepcopy(self._propidMap[propid])
-                    del self._settings['Properties'][i]['propid']
                 else:
                     del self._settings['Properties'][i]
 
@@ -1404,16 +1432,40 @@ containing the relative size of that specific pie'''
                 settings[key] = val.replace('"', '`').replace("'", '`')
         return settings
 
+    def _prepareSerialization(self, settings, defn):
+        
+        tosave = copy.deepcopy(settings)
+        for key in defn:
+            if not defn[key].get('serializable', True):
+                if key in tosave:
+                    del tosave[key]
+            else:
+                if 'propName' in defn[key]:
+                    propName = defn[key]['propName']
+                    if key in settings:
+                        tosave[propName] = settings[key]
+                        del tosave[key]
+                else:
+                    propName = key
+                if 'default' in defn[key]:
+                    includeDefault = True
+                    
+                    if 'siblingOptional' in defn[key]:
+                        if not self._hasOptionalSibling(settings, key, defn[key]):
+                            includeDefault = False
+                    
+                    if includeDefault:
+                        tosave[propName] = settings.get(key, defn[key]['default'])
+
+                
+        return simplejson.dumps(self.ConvertStringsToSafeSQL(tosave))
+        
     #For insertion into tablecatalog, graphs
     def serialize(self):
         
-        saved = copy.deepcopy(self._settings)
-        for val in ['PrimKey', 'Properties']:
-            if val in saved:
-                del saved[val]
-        
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
+        return self._prepareSerialization(self._settings, self._settingsDef)
     
+    #Used to pick up table settings from the db
     def deserialize(self, settings):
         
         parsed = simplejson.loads(settings, strict=False)
@@ -1425,35 +1477,10 @@ containing the relative size of that specific pie'''
         return self._propidMap.keys()
        
     #For insertion into propertycatalog              
-    def serializeProperty(self, key):
-        saved = copy.deepcopy(self.getProperty(key))
-        for val in ['Name', 'DataType', 'Order','SummaryValues']:
-            if val in saved:
-                del saved[val]
-        
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
-        
-    #For insertion into propertycatalog              
-    def serializePropertySummary(self, key):
-        saved = copy.deepcopy(self.getProperty(key))
-        if 'Name' in saved:
-            del saved['Name']
-        del saved['DataType']
-        if 'Order' in saved:
-            del saved['Order']
-        
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
+    def serializeProperty(self, key):    
+        return self._prepareSerialization(self.getProperty(key), self._settingsDef["Properties"]["children"])
 
     
-    def serializePropertyValue(self, key, subkey):
-        saved = copy.deepcopy(self.getProperty(key)[subkey])
-        
-        for val in ['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'Order', 'Name']:
-            if val in saved:
-                del saved[val]
-                
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
-
     def serializeSummaryValues(self, key):
         props = self.getProperty(key)
         saved = copy.deepcopy(props['SummaryValues'])
@@ -1482,49 +1509,8 @@ containing the relative size of that specific pie'''
 
     #For insertion into tablebasedsummaryvalues
     def serializeTableBasedValue(self, key):
+        return self._prepareSerialization(self.getTableBasedSummaryValue(key), self._dataTableSettings['TableBasedSummaryValues']['children'])
         
-        saved = copy.deepcopy(self.getTableBasedSummaryValue(key))
-                
-        for val in self.getTableBasedSummaryValue(key):
-            defn = self._dataTableSettings['TableBasedSummaryValues']['children']
-            if val in defn and 'propName' in defn[val]:
-                name =  defn[val]['propName']
-                saved[name] = saved[val]
-                del saved[val] 
-                
-        for val in ['Id', 'Name', 'MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax']:
-            if val in saved:
-                del saved[val]
-                
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
-    
-    def serializeCustomData(self):
-        
-        saved = copy.deepcopy(self._settings)
-        
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
-    
-    def serialize2DdataTable(self):
-        saved = copy.deepcopy(self._settings)
-
-        for val in ['ColumnDataTable',
-                                      'ColumnIndexField',
-                                      'RowDataTable',
-                                      'RowIndexField',
-                                      'Properties']:
-            if val in saved:
-                del saved[val]
-            
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
-    
-    def serializePropertyValues(self, propid):
-        saved = copy.deepcopy(self.getProperty(propid))
-
-        for val in [ 'Id', 'Name', 'propid']:
-            if val in saved:
-                del saved[val]
-            
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
             
     def saveGlobalSettings(self, calculationObject, datasetId):
         calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId, 'settings'))

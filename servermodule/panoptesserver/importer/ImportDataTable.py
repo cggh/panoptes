@@ -82,7 +82,7 @@ class ImportDataTable(BaseImport):
                 
                 if 'Relation' in tableSettings.getProperty(propid):
                     relationSettings = tableSettings.getPropertyValue(propid, 'Relation')
-                    self._log('Creating relation: '+ tableSettings.serializePropertyValue(propid, 'Relation'))
+                    self._log('Creating relation: {} {} {}'.format(relationSettings['TableId'],relationSettings['ForwardName'],relationSettings['ReverseName']))
                     sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                         tableid,
                         propid,

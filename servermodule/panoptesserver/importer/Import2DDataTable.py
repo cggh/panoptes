@@ -118,7 +118,7 @@ class Import2DDataTable(BaseImport):
                 table_settings['ColumnDataTable'],
                 table_settings['RowDataTable'],
                 table_settings['FirstArrayDimension'],
-                table_settings.serialize2DdataTable(),
+                table_settings.serialize(),
                 self.tableOrder
             )
             self._execSql(sql)
@@ -136,7 +136,7 @@ class Import2DDataTable(BaseImport):
                     table_settings.getPropertyValue(propname,'Name'),
                     self.property_order,
                     dtype,
-                    table_settings.serializePropertyValues(propname),
+                    table_settings.serializeProperty(propname),
                     arity
                 )
                 self._execSql(sql)
