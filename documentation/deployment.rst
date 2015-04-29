@@ -1,19 +1,10 @@
 Installation and deployment guide
 =================================
 
-.. note::
-  Successfully deploying and administering Panoptes requires familiarity with the following technologies:
-  - MySQL
-  - Python
-  - WSGI
-  - Web servers (e.g. Apache2)
-  - Unix system administration
-
-
-Automatic deployment on a new Ubuntu EC2 image
+Deployment on a new Ubuntu image
 ----------------------------------------------
 
-For testing purposes, the simplest way to obtain a running instance of Panoptes is to do a full deployment on a fresh a fresh Ubuntu 14.04.1 LTS image,
+For testing purposes, a slightly easier way to obtain a running instance of Panoptes is to do a full deployment on a fresh a fresh Ubuntu 14.04.1 LTS image,
 e.g. on an EC2 virtual machine.
 A script is provided that performs a fully automatic installation, including
 
@@ -24,16 +15,29 @@ A script is provided that performs a fully automatic installation, including
 .. caution::
   This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
 
-The following steps will create a fully working Panoptes instance on a Amazon EC2 Ubuntu 14.04.1 LTS image::
+The following steps will create a fully working Panoptes instance on an Ubuntu 14.04.1 LTS image::
 
   cd /
   sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
   sudo chmod +x deployfull.sh
   sudo ./deployfull.sh
 
-The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerName]/index.html`.
+The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerAddress]/index.html`.
 
-Manual installation
+Short debain/ubuntu guide for the temporarly challenged
+-----------------------------------
+::
+
+    sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
+    wget https://github.com/cggh/panoptes/archive/master.zip
+    unzip master.zip
+    cd panoptes-master
+    cp config.py.example config.py
+    nano config.py #EDIT DB CREDENTIALS AND FILE PATHS
+    ./scripts/build.sh
+    ./scripts/run.sh
+
+Basic installation
 -------------------
 
 Download & dependencies
@@ -54,13 +58,8 @@ Panoptes needs a running MySQL version **5.6 or later** with permission to creat
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
-	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev
+	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
 
-You will also need libhdf5-dev. This is a virtual package satisfied by the several different install types of HDF5. The simplest solution is to::
-
-    sudo apt-get install libhdf5-serial-dev
-
-unless you want a specific HDF5 setup.
 
 Build
 .....
@@ -68,16 +67,13 @@ In the directory where the code was unzipped, copy 'config.py.example' to 'confi
 Edit the file and specify the following components:
 
 - MySQL setup (DBSRV, DBUSER, DBPASS).
-
-.. note::
-  The login credentials used need to have sufficient privileges to perform alterations such as database creation.
-
 - A directory Panoptes can use for storing files (BASEDIR, see further).
 - A directory that will contain the source data files (SOURCEDATADIR, see further)
-
 - Title of the deployment (TITLE)
 - Extra JS for utilities and tracking such as rollbar etc. Note that google analytics can be set on a dataset level. (EXTRA_HEAD_JS, EXTRA_TAIL_JS)
 
+.. note::
+The login credentials used need to have sufficient privileges to perform alterations such as database creation.
 .. note::
   Changes in 'config.py' are fixed on build, so you will need to rebuild if they change.
 
@@ -128,8 +124,8 @@ To run on your external network interface use (with the port you desire)::
 
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
 
-Deployment on Apache2
-.....................
+Deployment on Apache2 (OPTIONAL)
+................................
 
 .. note::
   This section describes a deployment strategy where the static files (html, css, js)
