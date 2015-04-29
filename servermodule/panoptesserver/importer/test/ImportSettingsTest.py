@@ -1,6 +1,7 @@
 import unittest
 import os
 import ImportSettings
+import simplejson
 
 ''' Not doing it anymore....
 	def testConvertBoolean(self):
@@ -222,6 +223,27 @@ class ImportSettingsTest(unittest.TestCase):
 		testProps['Position'] = 'Test'
 		settingsLoaded.loadProps(testProps)
 	
-	
+	def testSerialize(self):
+
+		settingsLoaded = ImportSettings.ImportSettings()
+		testProps = self._testProps
+		testProps['Properties'].append({ "Id": "Test1",
+									"Name": "Test1",
+									"DataType": "Value"})
+		testProps['Properties'].append({ "Id": "Test2",
+									"Name": "Test2",
+									"DataType": "Text",
+									"IsCategorical": True})
+		settingsLoaded.loadProps(testProps)
+		prop = settingsLoaded.serializeProperty("Test1")
+		propDict = simplejson.loads(prop, strict=False)
+		self.assertIn('maxval', propDict, 'maxval default value should be set')
+		self.assertNotIn('Name', propDict, 'Name should not be serialized')
+		prop = settingsLoaded.serializeProperty("Test2")
+		propDict = simplejson.loads(prop, strict=False)
+		self.assertNotIn('maxval', propDict, 'maxval default value should not be set')
+		self.assertNotIn('IsCategorical', propDict, 'propName not working - old value present')
+		self.assertIn('isCategorical', propDict, 'propName not working - new value not present')
+		
 if __name__ == '__main__':
 	unittest.main()
