@@ -666,13 +666,13 @@ containing the relative size of that specific pie'''
                                                            'required': True,
                                                            'serializable': False,
                                                            'default': 0,
-                                                           'description': 'Minimum this value can reach'
+                                                           'description': 'Value used for lower extent of scales'
                                                            }),
                                                 ('MaxVal', {
                                                            'type': 'Value',
                                                            'required': True,
                                                            'serializable': False,
-                                                           'description': 'Maximum this value can reach'
+                                                           'description': 'Value used for upper extent of scales'
                                                            }),
                                                 ('BlockSizeMin', {
                                                              'type': 'Value',
@@ -782,17 +782,15 @@ containing the relative size of that specific pie'''
                             ('MinVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'propName': 'minval',
                                    'default': 0,
-                                   'description': 'For *Value* types, specifies the minimum value that can be reached',
+                                   'description': 'For *Value* types, upper extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MaxVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'propName': 'maxval',
                                    'default': 1.0,
-                                   'description': 'For *Value* types, specifies the maximum value that can be reached',
+                                   'description': 'For *Value* types, lower extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MaxLen', {
@@ -931,7 +929,7 @@ containing the relative size of that specific pie'''
                             ('SummaryValues', {
                                    'type': 'Block',
                                    'required': False,
-                                   'serializable': False,
+                                   'serializable': True,
                                    'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True},
                                    
@@ -951,10 +949,15 @@ containing the relative size of that specific pie'''
                                                                 'type': 'Text',
                                                                 'required': False,
                                                                 'propName': 'channelColor',
-                                                                'description': 'Colour of the channel. Formatted as ``"rgb(r,g,b)"``'
+                                                                'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
+                                                                }),
+                                                ('MaxDensity', {
+                                                                'type': 'Value',
+                                                                'required': False,
+                                                                'description': 'For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp'
                                                                 })
-                                                            ))
-                                               })
+                                            ))
+                                   })
                           ))
                                                     
     _datasetSettings = OrderedDict((
@@ -1500,11 +1503,11 @@ containing the relative size of that specific pie'''
                 else:
                     name = val
                 saved[name] = props[val]
-                
+
         for val in ['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'Order', 'Name']:
-            if val in saved:                
+            if val in saved:
                 del saved[val]
-                
+
         return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
 
     #For insertion into tablebasedsummaryvalues
