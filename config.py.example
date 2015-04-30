@@ -25,11 +25,11 @@ TIMEOUT = 30
 # Server side file locations
 #########################################################################################################
 # Directory where disk-held data will be stored by panoptes - created if not existing
-BASEDIR = 'basedir_path'
+BASEDIR = 'EDITME_PATH_TO_BASEDIR'
 
 #Dir which is scanned for data to import  - created if not existing
 #If this is empty, examples datasets will be copied to it
-SOURCEDATADIR = 'sourcedir_path'
+SOURCEDATADIR = 'EDITME_PATH_TO_SOURCEDIR'
 
 ###########################################################################################################
 # CAS authentication
