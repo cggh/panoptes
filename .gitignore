@@ -15,6 +15,7 @@ importscripts/TableUtils
 servermodule/panoptesserver/PanoptesAuthDb
 settings.gen
 chef-install
+panoptes-boxes-master
 *.py[cod]
 
 # C extensions
