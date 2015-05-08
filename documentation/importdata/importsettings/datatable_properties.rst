@@ -38,7 +38,7 @@ GroupId
 
 ExternalUrl:
   *Text.* A url that should be opened when the user clicks on a value of this property. The url should
-  be formatted as a template, with ``{value}`` interpolated to the property value.
+  be formatted as a template, with ``{value}`` interpolated to the property value. Multiple links can be specified by separating the values with semi-colons.
   For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``.
 
 IsCategorical

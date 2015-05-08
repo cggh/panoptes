@@ -127,9 +127,13 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (propInfo.settings.ExternalUrl) {
                 col.setCellClickHandler(function(fetcher,downloadrownr) {
                     var itemid=theTable.getCellValue(downloadrownr,propInfo.propid);
-                    var url = propInfo.settings.ExternalUrl;
-                    url = url.DQXformat({value: itemid});
-                    window.open(url,'_blank');
+                    var urltemplate = propInfo.settings.ExternalUrl;
+                    var itemids = itemid.split(";");
+                    itemids.forEach(function(itemid) {
+                        var url = urltemplate.DQXformat({value: itemid});
+                        window.open(url,'_blank');
+                    });
+
                }, true)
             }
 
