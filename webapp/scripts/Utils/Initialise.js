@@ -464,7 +464,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.mapSingleColor = function(value) {
                     if (prop.settings.categoryColors) {
                         var cl = prop.settings.categoryColors[value];
-                        if (cl) return cl;
+                        if (cl) return DQX.colourFromString(cl);
                         return DQX.Color(0.5,0.5,0.5);
                     }
                     if (prop.isBoolean) {

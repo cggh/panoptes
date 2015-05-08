@@ -158,8 +158,16 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
             if (propInfo.settings.MaxColumnWidth)
                 col.maxColumnWidth = propInfo.settings.MaxColumnWidth;
 
-            if (propInfo.isBoolean)
-                col.CellToColor = function(vl) { return vl?DQX.Color(0.88,0.97,0.88):DQX.Color(1.0,0.95,0.9); }
+            if (propInfo.settings.categoryColors) {
+                col.CellToColor = function(val) {
+                    console.log(val, propInfo.mapSingleColor(val).toString());
+                    return propInfo.mapSingleColor(val).lighten(0.5);
+                }
+            } else if (propInfo.isBoolean) {
+                col.CellToColor = function (vl) {
+                    return vl ? DQX.Color(0.88, 0.97, 0.88) : DQX.Color(1.0, 0.95, 0.9);
+                }
+            }
 
             col.checkCanSort = function() {
                 var q = tableInfo;
