@@ -180,7 +180,7 @@ require([
             function Start_Part3() {
 
                 var getter = DataFetchers.ServerDataGetter();
-                getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'settings'],'ordr');
+                getter.addTable('tablecatalog',['id','name','primkey', 'IsPositionOnGenome', 'defaultQuery', 'settings'],'ordr');
                 getter.addTable('customdatacatalog',['tableid','sourceid', 'settings'],'tableid');
                 getter.addTable('2D_tablecatalog',['id','name','col_table', 'row_table', 'first_dimension', 'settings'],'ordr');
                 getter.addTable('settings',['id','content'],'id');

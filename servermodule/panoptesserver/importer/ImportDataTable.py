@@ -102,12 +102,13 @@ class ImportDataTable(BaseImport):
     
             # Add to tablecatalog
             extraSettings.ConvertStringsToSafeSQL()
-            sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', {5})".format(
+            sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
                 tableid,
                 tableSettings['NamePlural'],
                 tableSettings['PrimKey'],
                 tableSettings['IsPositionOnGenome'],
                 extraSettings.ToJSON(),
+                "", #defaultQuery
                 self.tableOrder
             )
             self._execSql(sql)
