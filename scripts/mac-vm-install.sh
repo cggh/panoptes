@@ -1,12 +1,12 @@
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-#brew tap phinze/homebrew-cask && brew install brew-cask
+brew tap phinze/homebrew-cask && brew install brew-cask
 brew cask install virtualbox
 brew cask install vagrant
 brew cask install vagrant-manager
 vagrant box add ubuntu/trusty64
-brew install wget
+brew cask install chefdk
 wget https://github.com/cggh/panoptes-boxes/archive/master.zip 
-unzip -f master.zip
+unzip -o master.zip
 rm master.zip
 cd panoptes-boxes-master
 cd common
