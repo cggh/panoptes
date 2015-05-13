@@ -143,7 +143,7 @@ define([
                                 chromosomeField = tableInfo.ChromosomeField;
                             else {
                                 if (chromosomeField != tableInfo.ChromosomeField)
-                                    DQX.reportError('Inconsistent chromosome field column over different datasets: ' + chromosomeField + ', ' + tableInfo.ChromosomeField);
+                                    DQX.reportError('Inconsistent chromosome field column over different datatables: ' + chromosomeField + ', ' + tableInfo.ChromosomeField);
                             }
                         }
                     });
