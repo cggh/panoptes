@@ -233,7 +233,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.modify(SQL.WhereClause.Trivial());
                     });
                     that.clearQueryShowHide = Controls.ShowHide(that.clearQuery);
-                    that.clearQueryShowHide.setVisible(false);
+                    that.clearQueryShowHide.setVisible(!that.query.isTrivial);
                     that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query), 'PnQueryString');
                     group.addControl(Controls.CompoundFloat([that.clearQueryShowHide, that.ctrlQueryString]));
                 }

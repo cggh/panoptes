@@ -110,6 +110,7 @@ CREATE TABLE `tablecatalog` (
   `primkey` varchar(255),
   `IsPositionOnGenome` int,
   `settings` text,
+  `defaultQuery` text,
   `ordr` int
 );
 

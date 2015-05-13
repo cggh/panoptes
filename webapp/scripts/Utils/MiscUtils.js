@@ -160,7 +160,6 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
 
             if (propInfo.settings.categoryColors) {
                 col.CellToColor = function(val) {
-                    console.log(val, propInfo.mapSingleColor(val).toString());
                     return propInfo.mapSingleColor(val).lighten(0.5);
                 }
             } else if (propInfo.isBoolean) {
