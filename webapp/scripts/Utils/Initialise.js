@@ -77,10 +77,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         Initialise.augmentTableInfo = function(table) {
 
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
+
             if (table.defaultQuery != '')
-                table.currentQuery = SQL.WhereClause.decode(table.defaultQuery);
+                table.defaultQuery = SQL.WhereClause.decode(table.defaultQuery);
             else
-                table.currentQuery = SQL.WhereClause.Trivial();
+                table.defaultQuery = SQL.WhereClause.Trivial();
+            table.currentQuery = table.defaultQuery;
             table.currentSelection = {};
 
             table.tableNameSingle = table.name;
