@@ -51,8 +51,11 @@ cd DQXServer
 git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 
 echo -e "${green}    Python dependancies${NC}"
-cd .. 
-virtualenv panoptes_virtualenv
+cd ..
+if [ ! -d panoptes_virtualenv ]
+then 
+  virtualenv panoptes_virtualenv
+fi
 source panoptes_virtualenv/bin/activate
 cd DQXServer
 echo -e "${green}      DQXServer requirements...${NC}"
