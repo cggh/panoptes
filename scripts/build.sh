@@ -13,6 +13,12 @@ cd `dirname ${SCRIPT_PATH}` > /dev/null
 cd ..
 PROJECT_ROOT=`pwd`;
 
+if [ ! -f config.py ]
+then
+  echo "You must have a config.py"
+  exit 1
+fi
+
 echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
 mkdir -p webapp/scripts/Local
