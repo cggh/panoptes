@@ -11,16 +11,3 @@ chefdk-0.5.1-1.msi
 VirtualBox-4.3.28-100309-Win.exe
 Git-1.9.5-preview20150319.exe
 powershell -Command "(new-object -com shell.application).namespace((Get-Location).Path).CopyHere((new-object -com shell.application).namespace((Get-Location).Path + '\master.zip').Items(),16)"
-cd panoptes-boxes-master
-cd common
-rem Depending on where git has been installed
-set GITHOME=%LOCALAPPDATA%\Programs
-rem GITHOME=%SYSTEMDRIVE%\Program Files (x86)
-"%GITHOME%\Git\bin\sh.exe" create-vendor-cookbooks.sh
-vagrant plugin install vagrant-omnibus
-vagrant plugin install vagrant-vbguest
-vagrant plugin install vagrant-hosts
-cd ..
-cd vagrant
-vagrant up
-
