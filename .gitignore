@@ -4,10 +4,10 @@
 *.py~
 .idea
 .DS_Store
-webapp/scripts/DQX
-webapp/scripts/Local
-webapp/Doc
-webapp/Docs
+webapp/bower_components/
+webapp/dist/
+webapp/node_modules/
+
 servermodule/panoptesserver/VTTable.py
 servermodule/panoptesserver/import/VTTable.py
 importscripts/TableUtils

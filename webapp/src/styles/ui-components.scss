@@ -1,0 +1,127 @@
+.tab-content {
+  .tab-pane {
+    display: none;
+    clear: both;
+    //z-index:1; Not sure why this was here
+    padding: 10px 5px;
+  }
+  .tab-pane.active {
+    display: block;
+  }
+}
+
+.tabs {
+  white-space: nowrap;
+  //overflow: hidden; Comment out for now as although ugly it at least lets you select the tab
+  .tab {
+    display: inline-block;
+    position: relative;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: 3px;
+    padding: 3px 10px 7px;
+    cursor: pointer;
+    //z-index:2; Not sure why this was here...
+    top: 1px;
+    background-color: rgb(240, 240, 240);
+    border: 1px solid rgb(160, 160, 160);
+    border-bottom-width: 0;
+    color: rgb(80, 80, 80);
+    font-weight: bold;
+    opacity: 0.5;
+  }
+  .tab.active {
+    top: 0;
+    color: rgb(0, 0, 0);
+    opacity: inherit;
+  }
+  .tab.inactive:hover {
+    opacity: 0.8;
+  }
+}
+
+.popup {
+  position: absolute;
+  border: 1px solid rgb(110, 110, 110);
+  box-shadow: 2px 2px 20px 4px rgba(0, 0, 0, 0.75);
+  background: white;
+
+  .header {
+    height: 16px;
+    padding: 7px;
+    padding-left: 12px;
+    cursor: move;
+    font-size: 10pt;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-image: none;
+    background: rgb(63, 151, 158); /* Old browsers */
+    background: -moz-linear-gradient(top, rgb(63, 151, 158) 0%, rgb(56, 135, 142) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(63, 151, 158)), color-stop(100%, rgb(56, 135, 142))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgb(63, 151, 158) 0%, rgb(56, 135, 142) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgb(63, 151, 158) 0%, rgb(56, 135, 142) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgb(63, 151, 158) 0%, rgb(56, 135, 142) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgb(63, 151, 158) 0%, rgb(56, 135, 142) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3f979e', endColorstr='#38878e', GradientType=0); /* IE6-9 */
+
+    .icon {
+      position: relative;
+      left: -5px;
+      top: -4px;
+      vertical-align: text-top;
+      font-size: 24px;
+    }
+  }
+}
+
+.modal {
+  display: none;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  -webkit-overflow-scrolling: touch;
+
+  // Prevent Chrome on Windows from adding a focus outline. For details, see
+  // https://github.com/twbs/bootstrap/pull/10951.
+  outline: 0;
+  background: rgba(0,0,0,0.7);
+  .popup {
+    position: static;
+  }
+}
+.modal.visible {
+  display: flex;
+}
+
+//@import "../../node_modules/react-resizable/css/styles.css";
+.react-resizable {
+  position: relative;
+}
+
+.react-resizable-handle.react-draggable {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pg08IS0tIEdlbmVyYXRvcjogQWRvYmUgRmlyZXdvcmtzIENTNiwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0+DTwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DTxzdmcgaWQ9IlVudGl0bGVkLVBhZ2UlMjAxIiB2aWV3Qm94PSIwIDAgNiA2IiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojZmZmZmZmMDAiIHZlcnNpb249IjEuMSINCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQl4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjZweCIgaGVpZ2h0PSI2cHgiDT4NCTxnIG9wYWNpdHk9IjAuMzAyIj4NCQk8cGF0aCBkPSJNIDYgNiBMIDAgNiBMIDAgNC4yIEwgNCA0LjIgTCA0LjIgNC4yIEwgNC4yIDAgTCA2IDAgTCA2IDYgTCA2IDYgWiIgZmlsbD0iIzAwMDAwMCIvPg0JPC9nPg08L3N2Zz4=');
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  cursor: se-resize;
+  /* Since this handle is absolutely positioned, we don't want the
+     draggable transforms to actually move it */
+  transform: none !important;
+  -webkit-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+  -moz-transform: none !important;
+}
