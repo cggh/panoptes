@@ -58,16 +58,12 @@ var LayoutStore = Fluxxor.createStore({
         components: ['P1', 'P2']
 
       },
-      modal: {
-        component: 'ui/HelloWorld',
-        props: {
-          msg: 'MODAL IN YOUR FACE!'
-        }
-      }
+      modal: {}
     });
 
     this.bindActions(
       LAYOUT.MODAL_CLOSE, this.modalClose,
+      LAYOUT.MODAL_OPEN, this.modalOpen,
       LAYOUT.NOTIFY, this.notify,
       LAYOUT.POPUP_MOVE, this.popupMove,
       LAYOUT.POPUP_RESIZE, this.popupResize,
@@ -75,8 +71,14 @@ var LayoutStore = Fluxxor.createStore({
     );
   },
 
+
   modalClose() {
     this.state = this.state.set('modal', Immutable.Map());
+    this.emit('change');
+  },
+
+  modalOpen(payload) {
+    this.state = this.state.set('modal', Immutable.fromJS(payload));
     this.emit('change');
   },
 

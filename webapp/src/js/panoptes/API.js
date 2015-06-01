@@ -6,7 +6,7 @@ const {assertRequired} = require('util/Assert');
 const SQL = require('panoptes/SQL');
 const DataDecoders = require('panoptes/DataDecoders');
 
-const serverURL = "http://www.malariagen.net/apps/ag1000g/phase1-AR2/api";
+const serverURL = initialConfig.serverURL;
 
 //TODO: Refactor server errors to closer to HTTP standard
 function filterError(json) {
@@ -66,20 +66,29 @@ function pageQuery(options) {
     if (collist.length > 0) collist += "~";
     collist += encoding + id;
   });
+
   return getRequestJSON({
     datatype: 'pageqry',
     database: database,
     tbname: table,
     qry: SQL.WhereClause.encode(query),
-//    collist: LZString.compressToEncodedURIComponent(collist),
-    collist: collist,
+    collist: LZString.compressToEncodedURIComponent(collist),
     order: order,
     sortreverse: sortReverse ? '1' : '0',
     needtotalcount: count ? '1' : '0',
     limit: '0~' + limit,
     distinct: distinct ? '1' : '0'
   })
-    .then(decodeValList(columns));
+    .then(decodeValList(columns))
+    .then((columns) => {
+      let rows = [];
+      for (let i=0;i < columns[_.keys(columns)[0]].length; i++) {
+        let row = {}
+        _.each(columns, (array, id) => row[id] = array[i]);
+        rows.push(row);
+      }
+      return rows;
+    });
 }
 
 module.exports = {

@@ -9,13 +9,25 @@ function nameSpace(namespace, obj) {
 
 let layout = keyMirror({
   MODAL_CLOSE: null,
+  MODAL_OPEN: null,
   NOTIFY: null,
   POPUP_MOVE: null,
   POPUP_RESIZE: null,
   TAB_SWITCH: null
 });
 
+let panoptes = keyMirror({
+});
+
+let api = keyMirror({
+  FETCH_USER: null,
+  FETCH_USER_FAIL: null,
+  FETCH_USER_SUCCESS: null
+});
+
 
 module.exports = {
-  LAYOUT:nameSpace('LAYOUT', layout)
+  LAYOUT: nameSpace('LAYOUT', layout),
+  PANOPTES: nameSpace('PANOPTES', panoptes),
+  API: nameSpace('API', api)
 };

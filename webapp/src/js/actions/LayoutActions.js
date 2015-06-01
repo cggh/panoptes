@@ -21,7 +21,6 @@ let LayoutActions = {
     });
   },
   tabSwitch(compId) {
-    debugger;
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId
     });

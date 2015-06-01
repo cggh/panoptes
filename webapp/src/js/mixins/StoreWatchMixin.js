@@ -19,7 +19,7 @@ var StoreWatchMixin = function() {
 
     _setStateFromFlux: function() {
       if(this.isMounted()) {
-        this.replaceState(this.getStateFromFlux());
+        this.setState(this.getStateFromFlux());
       }
     },
 

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Base64 = require('panoptes/Base64');
 
 var SQL = {};

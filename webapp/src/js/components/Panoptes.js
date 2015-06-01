@@ -13,22 +13,26 @@ const Modal = require('ui/Modal');
 const HelloWorld = require('ui/HelloWorld');
 
 let Panoptes = React.createClass({
-  mixins: [ FluxMixin, StoreWatchMixin('LayoutStore')],
+  mixins: [ FluxMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
 
   componentDidMount() {
     let store = this.getFlux().store('LayoutStore');
     store.on("notify",
       () => this.refs.notificationSystem.addNotification(store.getLastNotification()));
-  },
+    this.getFlux().actions.api.fetchUser();
+    },
 
   getStateFromFlux() {
-    return this.getFlux().store('LayoutStore').getState();
+    return {
+      layout: this.getFlux().store('LayoutStore').getState(),
+      panoptes: this.getFlux().store('PanoptesStore').getState()
+    }
   },
 
   render() {
     let actions = this.getFlux().actions.layout;
-    let state = this.state;
-    let modal = this.state.get('modal').toObject();
+    let state = this.state.layout;
+    let modal = state.get('modal').toObject();
     return (
       <div>
         <TabbedArea activeTab={state.getIn(['tabs','selectedTab'])}
@@ -66,7 +70,6 @@ let Panoptes = React.createClass({
       </div>
     );
   }
-
 });
 
 module.exports = Panoptes;
