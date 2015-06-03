@@ -1,18 +1,50 @@
-
 @import "./normalize.css";
+@import "./bootstrap.css";
 @import "./ui-components.scss";
 @import "./font-awesome.css";
 
-//$primary-color: green;
-//
-//h1 {
-//  color: $primary-color;
-//}
-//
-//li.task {
-//  list-style-type: none;
-//
-//  label {
-//    padding: 0 10px;
-//  }
-//}
+
+.main {
+  height: 100vh;
+  width: 100vw;
+
+  .page {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      background: linear-gradient(to right, #000000 0%, #757575 100%);
+
+      .title {
+        flex: 1;
+        margin: 25px;
+        color: white;
+        font-weight: bold;
+        font-size: large;
+      }
+
+      .logo {
+        margin: 25px;
+      }
+
+      .btn-toolbar {
+        .btn {
+          font-size: 22px;
+          padding: 0px 6px;
+        }
+        margin: 7px;
+      }
+
+    }
+
+    .body {
+      flex: 1;
+    }
+  }
+}

@@ -63,7 +63,7 @@ let Popup = React.createClass({
   render() {
     let { initPosition, initSize, title, faIcon, children, ...other } = this.props;
     return (
-      <Draggable handle='.header'
+      <Draggable handle='.popup-header'
                  start={initPosition.toObject()}
                  moveOnStartChange={true}
                  onStop={this.handleMoveStop}>
@@ -75,11 +75,11 @@ let Popup = React.createClass({
           <div className="popup"
                style={this.state.size.toObject()}
                {...other}>
-            <div className="header">
+            <div className="popup-header">
               {faIcon ? <Icon className='icon' name={faIcon}/> : null}
               {title}
             </div>
-            <div className="body">
+            <div className="popup-body">
               {children}
             </div>
           </div>
