@@ -86,6 +86,6 @@ You can find a copy of this license in LICENSE in the top directory of the sourc
 
 </div>
 
-<%=@EXTRA_TAIL_JS%>
+<%=@EXTRA_TAIL%>
 
 </body>
