@@ -70,7 +70,7 @@ Edit the file and specify the following components:
 - A directory Panoptes can use for storing files (BASEDIR, see further).
 - A directory that will contain the source data files (SOURCEDATADIR, see further)
 - Title of the deployment (TITLE)
-- Extra JS for utilities and tracking such as rollbar etc. Note that google analytics can be set on a dataset level. (EXTRA_HEAD_JS, EXTRA_TAIL_JS)
+- Extra JS for utilities and tracking such as rollbar etc. Note that google analytics can be set on a dataset level. (EXTRA_HEAD, EXTRA_TAIL)
 
 .. note::
 The login credentials used need to have sufficient privileges to perform alterations such as database creation.
