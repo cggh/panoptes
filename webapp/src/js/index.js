@@ -10,15 +10,15 @@ const LayoutActions = require('actions/LayoutActions');
 const PanoptesActions = require('actions/PanoptesActions');
 const APIActions = require('actions/APIActions');
 
-const InitialConfig = require('panoptes/InitialConfig')
+const InitialConfig = require('panoptes/InitialConfig');
 
 
 
 InitialConfig()
-  .then(() => {
+  .then((config) => {
     let stores = {
       LayoutStore: new LayoutStore(),
-      PanoptesStore: new PanoptesStore(initialConfig)
+      PanoptesStore: new PanoptesStore(config)
     };
 
     let actions = {

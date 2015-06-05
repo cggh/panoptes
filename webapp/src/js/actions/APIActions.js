@@ -3,23 +3,30 @@ const APICONST = Constants.API;
 const LAYOUT = Constants.LAYOUT;
 const API = require('panoptes/API');
 
-function errorNotify(errText, retryFunc) {
+function errorNotify(err, retryFunc) {
   let note = {
     title: "Error",
     level: 'error',
-    message: errText
+    message: err.message,
+    autoDismiss: 0,
+    action: {
+          label: 'Retry',
+          callback: retryFunc
+        }
   };
-  if (retry) {
+  if (retryFunc) {
     note.action = {
       label: 'Retry',
       callback: retryFunc
     }
   }
-  this.dispatch(LAYOUT.NOTIFY, note);
+  this.flux.actions.layout.notify(note);
 }
 
 let APIActions = {
-  fetchUser() {
+  fetchUser(dataset) {
+    console.log('fetch');
+    let userID = null;
     this.dispatch(APICONST.FETCH_USER);
     API.getRequestJSON({
       datatype: 'custom',
@@ -29,13 +36,47 @@ let APIActions = {
       .then(status => {
         if ('issue' in status)
           throw Error(status.issue);
-        return status.userid;
+        userID = status.userid;
       })
-      .then(userID => this.dispatch(APICONST.FETCH_USER_SUCCESS, userID))
-      .catch(error => {
-        this.dispatch(APICONST.FETCH_USER_FAIL);
-        errorNotify(error, APIActions.fetchUser);
-      });
+      .then(API.getRequestJSON({
+        datatype: 'custom',
+        respmodule: 'panoptesserver',
+        respid: 'datasetinfo',
+        database: dataset
+      })
+        .then((resp) => {
+          let note = {
+            title: "Schema Outdated",
+            level: 'error',
+            autoDismiss: 0,
+            action: {
+              label: 'Open admin',
+              callback: function () {
+                window.open('admin.html', '_blank');
+              }
+            }
+          };
+          if (resp.needfullreload) {
+            note.message = 'A full reload is needed';
+            this.flux.actions.layout.notify(note);
+          }
+          if (resp.needconfigreload) {
+            note.message = 'A config update is needed';
+            this.flux.actions.layout.notify(note);
+          }
+          this.dispatch(APICONST.FETCH_USER_SUCCESS, {
+            id: userID,
+            isManager: resp.manager
+          })
+        })
+        .catch(error => {
+          this.dispatch(APICONST.FETCH_USER_FAIL);
+          errorNotify.call(this, error, () => this.flux.actions.api.fetchUser(dataset));
+        }))
+    .catch(error => {
+      this.dispatch(APICONST.FETCH_USER_FAIL);
+      errorNotify.call(this, error, () => this.flux.actions.api.fetchUser(dataset));
+    });
   }
 };
 

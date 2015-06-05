@@ -4,11 +4,24 @@ const Immutable = require('immutable');
 const Constants = require('../constants/Constants');
 const LAYOUT = Constants.LAYOUT;
 
+//For mock data:
+const SQL = require('panoptes/SQL');
+
+
 var LayoutStore = Fluxxor.createStore({
 
   initialize() {
     this.state = Immutable.fromJS({
       components: {
+        'Table': {
+          component: 'containers/DataTable',
+          title: 'Variants',
+          faIcon: 'bookmark',
+          props: {
+            table: 'variants',
+            query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+          }
+        },
         'T1': {
           component: 'ui/HelloWorld',
           title: 'WTF TAB',
@@ -51,8 +64,8 @@ var LayoutStore = Fluxxor.createStore({
         }
       },
       tabs: {
-        selectedTab: 'T1',
-        components: ['T1', 'T2']
+        selectedTab: 'Table',
+        components: ['Table', 'T1', 'T2']
       },
       popups: {
         components: ['P1', 'P2']

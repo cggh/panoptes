@@ -33,7 +33,10 @@ function getRequestJSON(params = {}) {
   return Qajax({url: url, method: "GET"})
     .then(Qajax.filterSuccess)
     .then(Qajax.toJSON)
-    .then(filterError);
+    .then(filterError)
+    .catch(err => {
+    throw Error(`There was a problem with a request to the server: ${err.statusText}`)
+  })
 }
 
 

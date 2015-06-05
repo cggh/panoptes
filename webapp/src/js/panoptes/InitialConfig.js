@@ -51,10 +51,6 @@ let mapExtraTableSettings = function (tableInfo, customDataCatalog) {
 
 let augmentTableInfo = function (table) {
   table.hasGenomePositions = table.IsPositionOnGenome == '1';
-  if (table.defaultQuery != '')
-    table.defaultQuery = SQL.WhereClause.decode(table.defaultQuery);
-  else
-    table.defaultQuery = SQL.WhereClause.Trivial();
   table.tableNameSingle = table.name;
   table.tableNamePlural = table.name;
   if (table.settings.NameSingle)
@@ -73,13 +69,11 @@ let augmentTableInfo = function (table) {
   if ('QuickFindFields' in table.settings)
     table.quickFindFields = table.settings.QuickFindFields.split(',');
   table.icon = table.settings.Icon;
-  table.propertyGroups = [];
-  table.propertyGroupMap = {};
+  table.propertyGroups = {};
   if (table.settings.PropertyGroups) {
     _.each(table.settings.PropertyGroups, function (groupInfo) {
       groupInfo.properties = [];
-      table.propertyGroups.push(groupInfo);
-      table.propertyGroupMap[groupInfo.Id] = groupInfo;
+      table.propertyGroups[groupInfo.Id] = groupInfo;
     });
   }
 }
@@ -194,19 +188,18 @@ let parseCustomProperties = function () {
     //Assign property group
     prop.group = null;
     if (prop.settings.GroupId)
-      if (tableInfo.propertyGroupMap[prop.settings.GroupId]) {
-        prop.group = tableInfo.propertyGroupMap[prop.settings.GroupId];
-        tableInfo.propertyGroupMap[prop.settings.GroupId].properties.push(prop);
+      if (tableInfo.propertyGroups[prop.settings.GroupId]) {
+        tableInfo.propertyGroups[prop.settings.GroupId].properties.push(prop.propid);
       }
-    if (!prop.group) {
-      if (!tableInfo.propertyGroupMap['']) {
-        var grp = {Id: '', Name: 'Properties', properties: []};
-        tableInfo.propertyGroupMap[''] = grp;
-        tableInfo.propertyGroups.push(grp);
-      }
-      prop.group = tableInfo.propertyGroupMap[''];
-      tableInfo.propertyGroupMap[''].properties.push(prop);
-    }
+    //if (!prop.group) {
+    //  if (!tableInfo.propertyGroupMap['']) {
+    //    var grp = {Id: '', Name: 'Properties', properties: []};
+    //    tableInfo.propertyGroupMap[''] = grp;
+    //    tableInfo.propertyGroups.push(grp);
+    //  }
+    //  prop.group = tableInfo.propertyGroupMap[''];
+    //  tableInfo.propertyGroupMap[''].properties.push(prop);
+    //}
 
     // Determine table name where the column is originally defined
     if (prop.source == 'fixed') {
@@ -414,6 +407,18 @@ let fetchInitialConfig = function () {
       //parseRelations();
       //parseStoredSubsets();
     //});
+  .then(() => {
+      return _.extend(initialConfig, {
+        user: {
+          id: initialConfig.userID,
+          isManager: initialConfig.isManager
+        },
+
+        chromosomes: fetchedConfig.chromosomes,
+        tables: fetchedConfig.mapTableCatalog,
+        settings: fetchedConfig.generalSettings
+      })
+    });
 };
 
 module.exports = fetchInitialConfig;

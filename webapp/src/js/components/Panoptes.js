@@ -12,6 +12,7 @@ const Popup = require('ui/Popup');
 const Modal = require('ui/Modal');
 const {Button, ButtonToolbar} = require('react-bootstrap');
 const HelloWorld = require('ui/HelloWorld');
+const DataTable = require('containers/DataTable');
 const Icon = require('ui/Icon');
 
 
@@ -21,8 +22,10 @@ let Panoptes = React.createClass({
   componentDidMount() {
     let store = this.getFlux().store('LayoutStore');
     store.on("notify",
-      () => this.refs.notificationSystem.addNotification(store.getLastNotification()));
-    this.getFlux().actions.api.fetchUser();
+      () => this.refs.notificationSystem.addNotification(
+        _.extend(store.getLastNotification(), {position:'tc'})));
+    //We don't need this as it will come to us in page load json
+    //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
   },
 
   getStateFromFlux() {
@@ -34,13 +37,15 @@ let Panoptes = React.createClass({
 
   render() {
     let actions = this.getFlux().actions.layout;
-    let state = this.state.layout;
-    let modal = state.get('modal').toObject();
+    let l_state = this.state.layout.toObject();
+    let p_state = this.state.panoptes.toObject();
+    let modal = l_state.modal.toObject();
     return (
       <div className="page">
         <div className="header">
-          <div className="title">Name of dataset</div>
-          <img className="logo" src="http://www.placecage.com/145/20"/>
+          <div className="title">{p_state.settings.get('Name')}</div>
+          <div className="username">{p_state.userID}</div>
+          <img className="logo" src={p_state.logo}/>
           <ButtonToolbar>
             <Button><Icon className='icon' name="question-circle"/></Button>
             <Button><Icon className='icon' name="search"/></Button>
@@ -48,10 +53,10 @@ let Panoptes = React.createClass({
           </ButtonToolbar>
         </div>
         <div className="body">
-          <TabbedArea activeTab={state.getIn(['tabs','selectedTab'])}
+          <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
                       onSelect={actions.tabSwitch}>
-            {state.getIn(['tabs', 'components']).map(tabId => {
-              let tab = state.getIn(['components', tabId]).toObject();
+            {l_state.tabs.get('components').map(tabId => {
+              let tab = l_state.components.get(tabId).toObject();
               return (
                 <TabPane
                   compId={tabId}
@@ -63,8 +68,8 @@ let Panoptes = React.createClass({
             })}
           </TabbedArea>
           <Popups>
-            {state.getIn(['popups', 'components']).map(popupId => {
-              let popup = state.getIn(['components', popupId]).toObject();
+            {l_state.popups.get('components').map(popupId => {
+              let popup = l_state.components.get(popupId).toObject();
               return (
                 <Popup
                   {...popup}
@@ -81,7 +86,7 @@ let Panoptes = React.createClass({
                  onClose={actions.modalClose}>
             {modal.component ? React.createElement(require(modal.component), modal.props.toObject()) : null}
           </Modal>
-          <NotificationSystem ref="notificationSystem"/>
+          <NotificationSystem ref="notificationSystem" />
         </div>
       </div>
     );
