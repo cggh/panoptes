@@ -14,10 +14,11 @@ var LayoutStore = Fluxxor.createStore({
     this.state = Immutable.fromJS({
       components: {
         'Table': {
-          component: 'containers/DataTable',
+          component: 'containers/DataTableView',
           title: 'Variants',
           faIcon: 'bookmark',
           props: {
+            compId: 'Table',
             table: 'variants',
             query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
           }
@@ -27,6 +28,7 @@ var LayoutStore = Fluxxor.createStore({
           title: 'WTF TAB',
           faIcon: 'bookmark',
           props: {
+            compId: 'T2',
             msg: 'WTF'
           }
         },
@@ -35,6 +37,7 @@ var LayoutStore = Fluxxor.createStore({
           title: 'OMG TAB',
           faIcon: 'bookmark',
           props: {
+            compId: 'T2',
             msg: 'OMG'
           }
         },
@@ -43,6 +46,7 @@ var LayoutStore = Fluxxor.createStore({
           title: 'WTF POP',
           faIcon: 'bookmark',
           props: {
+            compId: 'P1',
             msg: 'WTF'
           }
         },
@@ -59,6 +63,7 @@ var LayoutStore = Fluxxor.createStore({
             height: 200
           },
           props: {
+            compId: 'P2',
             msg: 'OMG'
           }
         }

@@ -77,7 +77,21 @@ let APIActions = {
       this.dispatch(APICONST.FETCH_USER_FAIL);
       errorNotify.call(this, error, () => this.flux.actions.api.fetchUser(dataset));
     });
+  },
+
+  fetchTableData(compId, query) {
+    this.dispatch(APICONST.FETCH_TABLE_DATA, {
+      compId: compId,
+      query: query
+    });
+    this.dispatch(APICONST.FETCH_TABLE_DATA_SUCCESS, {
+      compId: compId,
+      query: query,
+      rows: [[7,8,9], [20,45,23]]
+    });
   }
+
+
 };
 
 module.exports = APIActions;

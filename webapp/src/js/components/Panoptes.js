@@ -1,4 +1,5 @@
 const React = require('react');
+const PureRenderMixin = require('mixins/PureRenderMixin');
 const _ = require('lodash');
 const NotificationSystem = require('react-notification-system');
 
@@ -11,13 +12,12 @@ const Popups = require('ui/Popups');
 const Popup = require('ui/Popup');
 const Modal = require('ui/Modal');
 const {Button, ButtonToolbar} = require('react-bootstrap');
-const HelloWorld = require('ui/HelloWorld');
-const DataTable = require('containers/DataTable');
 const Icon = require('ui/Icon');
-
+const HelloWorld = require('ui/HelloWorld');
+const DataTable = require('containers/DataTableView');
 
 let Panoptes = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
+  mixins: [FluxMixin, PureRenderMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
 
   componentDidMount() {
     let store = this.getFlux().store('LayoutStore');

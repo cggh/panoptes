@@ -5,6 +5,7 @@ const Panoptes = require('components/Panoptes.js');
 
 const LayoutStore = require('stores/LayoutStore');
 const PanoptesStore = require('stores/PanoptesStore');
+const DataTableViewStore = require('stores/DataTableViewStore');
 
 const LayoutActions = require('actions/LayoutActions');
 const PanoptesActions = require('actions/PanoptesActions');
@@ -17,8 +18,9 @@ const InitialConfig = require('panoptes/InitialConfig');
 InitialConfig()
   .then((config) => {
     let stores = {
+      PanoptesStore: new PanoptesStore(config),
       LayoutStore: new LayoutStore(),
-      PanoptesStore: new PanoptesStore(config)
+      DataTableViewStore: new DataTableViewStore()
     };
 
     let actions = {

@@ -19,7 +19,6 @@ var PanoptesStore = Fluxxor.createStore({
   },
 
   fetchUserSuccess(payload) {
-    console.log(payload);
     this.state = this.state.set('user', payload);
   },
 
