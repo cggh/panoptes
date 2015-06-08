@@ -2,30 +2,12 @@ const Constants = require('../constants/Constants');
 const APICONST = Constants.API;
 const LAYOUT = Constants.LAYOUT;
 const API = require('panoptes/API');
+const Immutable = require('immutable');
 
-function errorNotify(err, retryFunc) {
-  let note = {
-    title: "Error",
-    level: 'error',
-    message: err.message,
-    autoDismiss: 0,
-    action: {
-          label: 'Retry',
-          callback: retryFunc
-        }
-  };
-  if (retryFunc) {
-    note.action = {
-      label: 'Retry',
-      callback: retryFunc
-    }
-  }
-  this.flux.actions.layout.notify(note);
-}
+const ErrorReport = require('panoptes/ErrorReporter.js');
 
 let APIActions = {
   fetchUser(dataset) {
-    console.log('fetch');
     let userID = null;
     this.dispatch(APICONST.FETCH_USER);
     API.getRequestJSON({
@@ -71,27 +53,13 @@ let APIActions = {
         })
         .catch(error => {
           this.dispatch(APICONST.FETCH_USER_FAIL);
-          errorNotify.call(this, error, () => this.flux.actions.api.fetchUser(dataset));
+          ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
         }))
     .catch(error => {
       this.dispatch(APICONST.FETCH_USER_FAIL);
-      errorNotify.call(this, error, () => this.flux.actions.api.fetchUser(dataset));
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
     });
   },
-
-  fetchTableData(compId, query) {
-    this.dispatch(APICONST.FETCH_TABLE_DATA, {
-      compId: compId,
-      query: query
-    });
-    this.dispatch(APICONST.FETCH_TABLE_DATA_SUCCESS, {
-      compId: compId,
-      query: query,
-      rows: [[7,8,9], [20,45,23]]
-    });
-  }
-
-
 };
 
 module.exports = APIActions;

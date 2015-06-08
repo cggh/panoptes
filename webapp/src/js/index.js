@@ -5,22 +5,20 @@ const Panoptes = require('components/Panoptes.js');
 
 const LayoutStore = require('stores/LayoutStore');
 const PanoptesStore = require('stores/PanoptesStore');
-const DataTableViewStore = require('stores/DataTableViewStore');
 
 const LayoutActions = require('actions/LayoutActions');
 const PanoptesActions = require('actions/PanoptesActions');
 const APIActions = require('actions/APIActions');
 
 const InitialConfig = require('panoptes/InitialConfig');
-
+const ErrorReport = require('panoptes/ErrorReporter.js');
 
 
 InitialConfig()
   .then((config) => {
     let stores = {
       PanoptesStore: new PanoptesStore(config),
-      LayoutStore: new LayoutStore(),
-      DataTableViewStore: new DataTableViewStore()
+      LayoutStore: new LayoutStore()
     };
 
     let actions = {

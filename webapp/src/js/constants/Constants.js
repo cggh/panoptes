@@ -23,9 +23,6 @@ let api = keyMirror({
   FETCH_USER: null,
   FETCH_USER_FAIL: null,
   FETCH_USER_SUCCESS: null,
-  FETCH_TABLE_DATA: null,
-  FETCH_TABLE_DATA_SUCCESS: null,
-  FETCH_TABLE_DATA_FAIL: null
 });
 
 

@@ -1,42 +1,89 @@
 const React = require('react');
+const ImmutablePropTypes = require('react-immutable-proptypes');
 const PureRenderMixin = require('mixins/PureRenderMixin');
-
 const FluxMixin = require('mixins/FluxMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
+const API = require('panoptes/API');
+const ErrorReport = require('panoptes/ErrorReporter');
+
+const {Table, Column} = require('fixed-data-table');
+const Loading = require('ui/Loading');
+const ResizeDetect = require('utils/ResizeDetector');
 
 let DataTableView = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, StoreWatchMixin('DataTableViewStore')],
+  mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
     compId: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired
+    dataset: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string.isRequired,
+    order: React.PropTypes.string
   },
 
-  getStateFromFlux() {
-    return this.getFlux().store('DataTableViewStore').getStateFor(this.props.compId).toObject()
+  getInitialState: function () {
+    return {
+      rows: [],
+      loadStatus: 'loaded',
+      size: {
+        width: 0,
+        height: 0
+      }
+    };
   },
 
-  componentDidMount: function() {
-    this.getRowDataIfNeeded(this.props);
+  componentDidMount() {
+    this.getDataIfNeeded(this.props);
   },
-  componentWillReceiveProps: function(nextProps) {
-    this.getRowDataIfNeeded(nextProps);
+  componentWillReceiveProps(nextProps) {
+    this.getDataIfNeeded(nextProps);
   },
-  getRowDataIfNeeded: function(props) {
-    if(props.query !== this.state.query) {
-      this.getFlux().actions.api.fetchTableData(props.compId, props.query);
-    }
+  getDataIfNeeded(nextProps) {
+    if (nextProps.query !== this.state.query ||
+      nextProps.order !== this.state.order)
+      this.fetchData(nextProps);
+  },
+
+  fetchData(props) {
+    this.setState({loadStatus: 'loading'});
+    setTimeout(() => {
+      API.pageQuery({
+        database: props.dataset,
+        table: props.table,
+        columns: {SnpName: 'ST'}
+      })
+        .then((data) => {
+          this.setState({loadStatus: 'loaded'});
+          this.setState({rows: data});
+        })
+        .catch((error) => {
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          this.setState({loadStatus: 'error'});
+        });
+
+    }, 2000);
   },
 
   render() {
     let { query, ...other } = this.props;
-    let rows = this.state.rows;
+    let { loadStatus, rows, size } = this.state;
     return (
-      <div {...other}>
-        Hello World! {query}
-        {rows}
-      </div>
+        <ResizeDetect className="datatable" onResize={(size) => this.setState({size:size})}>
+            <Table
+              rowHeight={50}
+              rowGetter={(index) => rows[index]}
+              rowsCount={rows.length}
+              width={size.width}
+              height={size.height}
+              headerHeight={50}>
+              <Column
+                label="SnpName"
+                width={100}
+                dataKey="SnpName"
+                />
+            </Table>
+            <Loading status={loadStatus}/>
+        </ResizeDetect>
     );
   }
 

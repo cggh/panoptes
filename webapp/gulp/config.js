@@ -38,6 +38,10 @@ module.exports = {
     src: 'src/fonts/**/*.{ttf,woff,woff2,eof,svg}',
     dest: dest+'/fonts'
   },
+  images: {
+    src: 'src/images/**/*.{png,jpg,svg}',
+    dest: dest+'/images'
+  },
   watch: {
     src: 'src/**/*.*',
     tasks: ['build']

@@ -19,8 +19,12 @@ var LayoutStore = Fluxxor.createStore({
           faIcon: 'bookmark',
           props: {
             compId: 'Table',
+            dataset: initialConfig.dataset,
             table: 'variants',
-            query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+            query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+            order: null
+            //columns etc.
+
           }
         },
         'T1': {

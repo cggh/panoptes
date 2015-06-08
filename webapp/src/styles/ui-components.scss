@@ -1,41 +1,52 @@
-.tab-content {
-  .tab-pane {
-    display: none;
-    clear: both;
-    //z-index:1; Not sure why this was here
-    padding: 10px 5px;
+.tabbed-area {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  .tab-content {
+    width: 100%;
+    height: calc(100% - 30px);
+    .tab-pane {
+      display: none;
+      clear: both;
+      //z-index:1; Not sure why this was here
+      padding: 10px 5px;
+      width: 100%;
+      height: 100%;
+    }
+    .tab-pane.active {
+      display: block;
+      position: relative;
+    }
   }
-  .tab-pane.active {
-    display: block;
-  }
-}
-
-.tabs {
-  display: flex;
+  .tabs {
+    display: flex;
+    height: 30px;
   background: linear-gradient(to right, #000000 0%, #757575 100%);
-  .tab {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    margin-right: 2px;
-    margin-left: 2px;
-    padding: 3px 10px 7px;
-    cursor: pointer;
-    top: 1px;
-    font-weight: bold;
-    opacity: 0.7;
-    overflow: hidden;
-    white-space: nowrap;
-    color: rgb(255, 255, 255);
-    background: rgb(56, 135, 142);
+    .tab {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      margin-right: 2px;
+      margin-left: 2px;
+      padding: 3px 10px 7px;
+      cursor: pointer;
+      top: 1px;
+      font-weight: bold;
+      opacity: 0.7;
+      overflow: hidden;
+      white-space: nowrap;
+      color: rgb(255, 255, 255);
+      background: rgb(56, 135, 142);
+    }
+    .tab.active {
+      top: 0;
+      //color: rgb(0, 0, 0);
+      opacity: inherit;
+    }
+    .tab.inactive:hover {
+      opacity: 0.9;
+    }
   }
-  .tab.active {
-    top: 0;
-    //color: rgb(0, 0, 0);
-    opacity: inherit;
-  }
-  .tab.inactive:hover {
-    opacity: 0.9;
-  }
+
 }
 
 .popups {
@@ -69,6 +80,7 @@
     }
 
     .popup-body {
+      position: relative;
       flex: 1;
     }
 
@@ -90,11 +102,12 @@
   // Prevent Chrome on Windows from adding a focus outline. For details, see
   // https://github.com/twbs/bootstrap/pull/10951.
   outline: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   .popup {
     position: static;
   }
 }
+
 .modal.visible {
   display: flex;
 }
@@ -124,4 +137,69 @@
   -ms-transform: none !important;
   -o-transform: none !important;
   -moz-transform: none !important;
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  99% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+    visibility: visible;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-container {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.6);
+  animation: fadein 1s linear;
+  div {
+    opacity: 0.5;
+    height: 50%;
+    width: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .spinner {
+    background-image: url(../images/panoptes-logo.png);
+    animation: fa-spin 2s infinite linear;
+  }
+  .error {
+    background-image: url(../images/error.svg);
+  }
+
+
+}
+
+.loading-container.loaded {
+  animation: fadeout 1s linear;
+  visibility: hidden;
+}
+
+.datatable {
+  width: 100%;
+  height: 100%;
 }

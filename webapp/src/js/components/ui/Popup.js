@@ -76,7 +76,7 @@ let Popup = React.createClass({
                style={this.state.size.toObject()}
                {...other}>
             <div className="popup-header">
-              {faIcon ? <Icon className='icon' name={faIcon}/> : null}
+              {faIcon ? <Icon name={faIcon}/> : null}
               {title}
             </div>
             <div className="popup-body">

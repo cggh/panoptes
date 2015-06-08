@@ -23,9 +23,9 @@ let Panoptes = React.createClass({
     let store = this.getFlux().store('LayoutStore');
     store.on("notify",
       () => this.refs.notificationSystem.addNotification(
-        _.extend(store.getLastNotification(), {position:'tc'})));
+        _.extend(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
-    //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
+    this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
   },
 
   getStateFromFlux() {
@@ -41,53 +41,56 @@ let Panoptes = React.createClass({
     let p_state = this.state.panoptes.toObject();
     let modal = l_state.modal.toObject();
     return (
-      <div className="page">
-        <div className="header">
-          <div className="title">{p_state.settings.get('Name')}</div>
-          <div className="username">{p_state.userID}</div>
-          <img className="logo" src={p_state.logo}/>
-          <ButtonToolbar>
-            <Button><Icon className='icon' name="question-circle"/></Button>
-            <Button><Icon className='icon' name="search"/></Button>
-            <Button><Icon className='icon' name="link"/></Button>
-          </ButtonToolbar>
+      <div>
+        <div className="page">
+          <div className="header">
+            <div className="title">{p_state.settings.get('Name')}</div>
+            <div className="username">{p_state.userID}</div>
+            <img className="logo" src={p_state.logo}/>
+            <ButtonToolbar>
+              <Button><Icon className='icon' name="question-circle"/></Button>
+              <Button><Icon className='icon' name="search"/></Button>
+              <Button><Icon className='icon' name="link"/></Button>
+            </ButtonToolbar>
+          </div>
+          <div className="body">
+            <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
+                        onSelect={actions.tabSwitch}>
+              {l_state.tabs.get('components').map(tabId => {
+                let tab = l_state.components.get(tabId).toObject();
+                return (
+                  <TabPane
+                    compId={tabId}
+                    key={tabId}
+                    title={tab.title}>
+                    {React.createElement(require(tab.component), tab.props.toObject())}
+                  </TabPane>
+                )
+              })}
+            </TabbedArea>
+          </div>
         </div>
-        <div className="body">
-          <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
-                      onSelect={actions.tabSwitch}>
-            {l_state.tabs.get('components').map(tabId => {
-              let tab = l_state.components.get(tabId).toObject();
-              return (
-                <TabPane
-                  compId={tabId}
-                  key={tabId}
-                  title={tab.title}>
-                  {React.createElement(require(tab.component), tab.props.toObject())}
-                </TabPane>
-              )
-            })}
-          </TabbedArea>
-          <Popups>
-            {l_state.popups.get('components').map(popupId => {
-              let popup = l_state.components.get(popupId).toObject();
-              return (
-                <Popup
-                  {...popup}
-                  compId={popupId}
-                  key={popupId}
-                  onMoveStop={actions.popupMove.bind(this, popupId)}
-                  onResizeStop={actions.popupResize.bind(this, popupId)}>
-                  {React.createElement(require(popup.component), popup.props.toObject())}
-                </Popup>
-              )
-            })}
-          </Popups>
-          <Modal visible={modal.component ? true : false}
-                 onClose={actions.modalClose}>
-            {modal.component ? React.createElement(require(modal.component), modal.props.toObject()) : null}
-          </Modal>
-          <NotificationSystem ref="notificationSystem" />
-        </div>
+        <Popups>
+          {l_state.popups.get('components').map(popupId => {
+            let popup = l_state.components.get(popupId).toObject();
+            return (
+              <Popup
+                {...popup}
+                compId={popupId}
+                key={popupId}
+                onMoveStop={actions.popupMove.bind(this, popupId)}
+                onResizeStop={actions.popupResize.bind(this, popupId)}>
+                {React.createElement(require(popup.component), popup.props.toObject())}
+              </Popup>
+            )
+          })}
+        </Popups>
+        <Modal visible={modal.component ? true : false}
+               onClose={actions.modalClose}>
+          {modal.component ? React.createElement(require(modal.component), modal.props.toObject()) : null}
+        </Modal>
+        <NotificationSystem ref="notificationSystem"/>
+
       </div>
     );
   }
