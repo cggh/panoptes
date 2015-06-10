@@ -271,6 +271,7 @@ class LoadTable(threading.Thread):
                     ts += " WHEN 'True' THEN 1 WHEN 'False' THEN 0 "
                     ts += " WHEN 'true' THEN 1 WHEN 'false' THEN 0 "
                     ts += " WHEN 'TRUE' THEN 1 WHEN 'FALSE' THEN 0 "
+                    ts += " WHEN '1' THEN 1 WHEN '0' THEN 0 "
                     ts += " END"
                     transform.append(ts)
                 elif dt == 'Value' or dt == 'HighPrecisionValue' or dt == 'GeoLongitude' or dt == 'GeoLattitude':
