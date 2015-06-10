@@ -289,6 +289,7 @@ class LoadTable(threading.Thread):
                     ts += " WHEN 'True' THEN 1 WHEN 'False' THEN 0 "
                     ts += " WHEN 'true' THEN 1 WHEN 'false' THEN 0 "
                     ts += " WHEN 'TRUE' THEN 1 WHEN 'FALSE' THEN 0 "
+                    ts += " WHEN '1' THEN 1 WHEN '0' THEN 0 "
                     ts += " END"
                     transform.append(ts)
                 elif dt == 'Value' or dt == 'HighPrecisionValue' or dt == 'GeoLongitude' or dt == 'GeoLattitude':
@@ -296,13 +297,8 @@ class LoadTable(threading.Thread):
                     colTokens.append(var)
                     ts = DBCOLESC(col) + " = CASE " + var
                     #This could be made a bit less painful by looking at the values when parsing
-                    ts += " WHEN 'NA' THEN NULL"
-                    ts += " WHEN '' THEN NULL"
-                    ts += " WHEN 'None' THEN NULL"
-                    ts += " WHEN 'NULL' THEN NULL"
-                    ts += " WHEN 'null' THEN NULL"
-                    ts += " WHEN 'inf' THEN NULL"
-                    ts += " WHEN '-' THEN NULL"
+                    for nullval in [ 'NA', '', 'None', 'NULL', 'null', 'inf', '-', 'nan' ]:
+                        ts += " WHEN '" + nullval + "' THEN NULL"
                     ts += " ELSE " + var
                     ts += " END"
                     transform.append(ts)
