@@ -56,7 +56,8 @@ let Panoptes = React.createClass({
           </div>
           <div className="body">
             <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
-                        onSelect={actions.tabSwitch}>
+                        onSelect={actions.tabSwitch}
+                        onClose={actions.tabClose}>
               {l_state.tabs.get('components').map(tabId => {
                 let tab = l_state.components.get(tabId).toObject();
                 let props = tab.props.toObject();

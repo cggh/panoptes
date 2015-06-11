@@ -2,13 +2,15 @@ const React = require('react');
 const ValidComponentChildren = require('../utils/ValidComponentChildren');
 const classNames = require('classnames');
 const PureRenderMixin = require('mixins/PureRenderMixin');
+const Icon = require('ui/Icon');
 
 let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
     activeTab: React.PropTypes.string,
-    onSelect: React.PropTypes.func
+    onSelect: React.PropTypes.func,
+    onClose: React.PropTypes.func
   },
 
   handleClick(tabId, e) {
@@ -17,7 +19,14 @@ let TabbedArea = React.createClass({
       this.props.onSelect(tabId);
     }
   },
-
+  handleClose(tabId, event) {
+    if (this.props.onClose) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.onClose(tabId);
+    }
+  },
+  
   renderTab(tab) {
     let id = tab.props.compId;
     let classes = {
@@ -29,7 +38,8 @@ let TabbedArea = React.createClass({
       <div className={classNames(classes)}
            key = {id}
            onClick={this.handleClick.bind(this, id)}>
-        {tab.props.title}
+        <div className="title">{tab.props.title}</div>
+        <Icon className="close" name="close" onClick={this.handleClose.bind(this, id)}/>
       </div>
     )
   },

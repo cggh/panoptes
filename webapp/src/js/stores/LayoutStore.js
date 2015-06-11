@@ -90,6 +90,7 @@ var LayoutStore = Fluxxor.createStore({
       LAYOUT.POPUP_CLOSE, this.popupClose,
       LAYOUT.POPUP_MOVE, this.popupMove,
       LAYOUT.POPUP_RESIZE, this.popupResize,
+      LAYOUT.TAB_CLOSE, this.tabClose,
       LAYOUT.TAB_SWITCH, this.tabSwitch
     );
   },
@@ -130,6 +131,21 @@ var LayoutStore = Fluxxor.createStore({
   popupResize(payload) {
     let {compId, size} = payload;
     this.state = this.state.mergeIn(['components', compId, 'initSize'], size);
+    this.emit('change');
+  },
+
+  tabClose(payload) {
+    let {compId} = payload;
+    let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
+    if (pos === -1)
+      throw Error("Closed non-existant tab");
+    let new_tabs = this.state.getIn(['tabs', 'components']).delete(pos);
+    this.state = this.state.setIn(['tabs', 'components'], new_tabs);
+    if (compId === this.state.getIn(['tabs', 'selectedTab']))
+      if (pos < new_tabs.size)
+        this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.get(pos));
+      else
+        this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
     this.emit('change');
   },
 

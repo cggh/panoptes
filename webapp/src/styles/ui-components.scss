@@ -26,14 +26,15 @@
   }
   .tabs {
     display: flex;
-    height: 30px;
+    height: 33px;
   background: linear-gradient(to right, #000000 0%, #757575 100%);
     .tab {
+      display: flex;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       margin-right: 2px;
       margin-left: 2px;
-      padding: 3px 10px 7px;
+      padding: 7px 5px 0px 9px;
       cursor: pointer;
       top: 1px;
       font-weight: bold;
@@ -42,6 +43,17 @@
       white-space: nowrap;
       color: rgb(255, 255, 255);
       background: $primary-color;
+      .icon {
+        position: relative;
+        left: -2px;
+        top: -3px;
+        vertical-align: text-top;
+        font-size: 24px;
+        margin-left: 10px;
+      }
+      .title {
+        flex: 1;
+      }
     }
     .tab.active {
       top: 0;

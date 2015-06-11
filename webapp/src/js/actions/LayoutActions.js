@@ -31,6 +31,11 @@ let LayoutActions = {
       size: size
     });
   },
+  tabClose(compId) {
+    this.dispatch(LAYOUT.TAB_CLOSE, {
+      compId: compId
+    });
+  },
   tabSwitch(compId) {
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId

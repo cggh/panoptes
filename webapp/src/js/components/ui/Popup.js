@@ -24,7 +24,8 @@ let Popup = React.createClass({
       h: React.PropTypes.number
     }),
     onMoveStop: React.PropTypes.func,
-    onResizeStop: React.PropTypes.func
+    onResizeStop: React.PropTypes.func,
+    onClose: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -60,8 +61,11 @@ let Popup = React.createClass({
       this.props.onMoveStop({x:left, y:top});
   },
   handleClose(event) {
-    if (this.props.onClose)
+    if (this.props.onClose) {
+      event.preventDefault();
+      event.stopPropagation();
       this.props.onClose();
+    }
   },
 
   render() {
