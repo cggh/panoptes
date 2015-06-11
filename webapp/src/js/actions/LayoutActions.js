@@ -2,6 +2,12 @@ const Constants = require('../constants/Constants');
 const LAYOUT = Constants.LAYOUT;
 
 let LayoutActions = {
+  componentUpdate(compId, newProps) {
+    this.dispatch(LAYOUT.COMPONENT_UPDATE, {
+      compId: compId,
+      newProps: newProps
+    });
+  },
   modalClose() {
     this.dispatch(LAYOUT.MODAL_CLOSE);
   },
@@ -24,7 +30,7 @@ let LayoutActions = {
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId
     });
-  }
+  },
 };
 
 module.exports = LayoutActions;

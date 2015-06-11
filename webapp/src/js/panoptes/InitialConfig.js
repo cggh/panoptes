@@ -53,6 +53,8 @@ let augmentTableInfo = function (table) {
   table.hasGenomePositions = table.IsPositionOnGenome == '1';
   table.tableNameSingle = table.name;
   table.tableNamePlural = table.name;
+  if (table.settings.Description)
+    table.description = table.settings.Description;
   if (table.settings.NameSingle)
     table.tableNameSingle = table.settings.NameSingle;
   if (table.settings.NamePlural)
@@ -68,7 +70,8 @@ let augmentTableInfo = function (table) {
   table.quickFindFields = [table.primkey];
   if ('QuickFindFields' in table.settings)
     table.quickFindFields = table.settings.QuickFindFields.split(',');
-  table.icon = table.settings.Icon;
+  //TODO Remove the fa here for now - sholuld be in settings
+  table.icon = table.settings.Icon.substring(3);
   table.propertyGroups = {};
   if (table.settings.PropertyGroups) {
     _.each(table.settings.PropertyGroups, function (groupInfo) {

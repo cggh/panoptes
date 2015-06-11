@@ -14,7 +14,7 @@ var LayoutStore = Fluxxor.createStore({
     this.state = Immutable.fromJS({
       components: {
         'Table': {
-          component: 'containers/DataTableView',
+          component: 'containers/DataTableWithQuery',
           title: 'Variants',
           faIcon: 'bookmark',
           props: {
@@ -77,13 +77,13 @@ var LayoutStore = Fluxxor.createStore({
         components: ['Table', 'T1', 'T2']
       },
       popups: {
-        components: ['P1', 'P2']
-
+        components: []//'P1', 'P2']
       },
       modal: {}
     });
 
     this.bindActions(
+      LAYOUT.COMPONENT_UPDATE, this.componentUpdate,
       LAYOUT.MODAL_CLOSE, this.modalClose,
       LAYOUT.MODAL_OPEN, this.modalOpen,
       LAYOUT.NOTIFY, this.notify,
@@ -93,7 +93,11 @@ var LayoutStore = Fluxxor.createStore({
     );
   },
 
-
+  componentUpdate(payload) {
+    let {compId, newProps} = payload;
+    this.state = this.state.mergeIn(['components', compId, 'props'], newProps)
+    this.emit('change');
+  },
   modalClose() {
     this.state = this.state.set('modal', Immutable.Map());
     this.emit('change');

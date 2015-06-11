@@ -8,6 +8,7 @@ function nameSpace(namespace, obj) {
 }
 
 let layout = keyMirror({
+  COMPONENT_UPDATE: null,
   MODAL_CLOSE: null,
   MODAL_OPEN: null,
   NOTIFY: null,
@@ -22,7 +23,7 @@ let panoptes = keyMirror({
 let api = keyMirror({
   FETCH_USER: null,
   FETCH_USER_FAIL: null,
-  FETCH_USER_SUCCESS: null,
+  FETCH_USER_SUCCESS: null
 });
 
 

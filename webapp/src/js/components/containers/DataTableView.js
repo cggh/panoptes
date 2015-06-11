@@ -1,5 +1,8 @@
 const React = require('react');
+const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const shallowEquals = require('shallow-equals');
+const classNames = require('classnames');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
@@ -14,14 +17,26 @@ let DataTableView = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    compId: React.PropTypes.string.isRequired,
     dataset: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
-    order: React.PropTypes.string
+    order: React.PropTypes.string,
+    start: React.PropTypes.number,
+    columns: ImmutablePropTypes.orderedMap.isRequired
   },
 
-  getInitialState: function () {
+  getDefaultProps() {
+    return {
+      dataset: null,
+      table: null,
+      query: null,
+      order: null,
+      start: 0,
+      columns: Immutable.OrderedMap()
+    };
+  },
+
+  getInitialState() {
     return {
       rows: [],
       loadStatus: 'loaded',
@@ -33,14 +48,13 @@ let DataTableView = React.createClass({
   },
 
   componentDidMount() {
-    this.getDataIfNeeded(this.props);
+    this.getDataIfNeeded({}, this.props);
   },
   componentWillReceiveProps(nextProps) {
-    this.getDataIfNeeded(nextProps);
+    this.getDataIfNeeded(this.props, nextProps);
   },
-  getDataIfNeeded(nextProps) {
-    if (nextProps.query !== this.state.query ||
-      nextProps.order !== this.state.order)
+  getDataIfNeeded(lastProps, nextProps) {
+    if (!shallowEquals(lastProps, nextProps))
       this.fetchData(nextProps);
   },
 
@@ -65,10 +79,10 @@ let DataTableView = React.createClass({
   },
 
   render() {
-    let { query, ...other } = this.props;
+    let { query, className } = this.props;
     let { loadStatus, rows, size } = this.state;
     return (
-        <ResizeDetect className="datatable" onResize={(size) => this.setState({size:size})}>
+        <ResizeDetect className={classNames("datatable", className)} onResize={(size) => this.setState({size:size})}>
             <Table
               rowHeight={50}
               rowGetter={(index) => rows[index]}

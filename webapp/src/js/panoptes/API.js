@@ -58,11 +58,12 @@ function pageQuery(options) {
     order: null,
     sortReverse: false,
     count: false,
-    limit: 1000000,
+    start: 0,
+    stop: 1000000,
     distinct: false
   };
   let {database, table, columns, query, order,
-    sortReverse, count, limit, distinct} = _.extend(defaults, options);
+    sortReverse, count, start, stop, distinct} = _.extend(defaults, options);
 
   let collist = "";
   _.each(columns, (encoding, id) => {
@@ -79,14 +80,14 @@ function pageQuery(options) {
     order: order,
     sortreverse: sortReverse ? '1' : '0',
     needtotalcount: count ? '1' : '0',
-    limit: '0~' + limit,
+    limit: `${start}~${stop}`,
     distinct: distinct ? '1' : '0'
   })
     .then(decodeValList(columns))
     .then((columns) => {
       let rows = [];
       for (let i=0;i < columns[_.keys(columns)[0]].length; i++) {
-        let row = {}
+        let row = {};
         _.each(columns, (array, id) => row[id] = array[i]);
         rows.push(row);
       }

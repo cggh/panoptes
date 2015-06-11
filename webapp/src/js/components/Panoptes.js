@@ -13,8 +13,9 @@ const Popup = require('ui/Popup');
 const Modal = require('ui/Modal');
 const {Button, ButtonToolbar} = require('react-bootstrap');
 const Icon = require('ui/Icon');
+
 const HelloWorld = require('ui/HelloWorld');
-const DataTable = require('containers/DataTableView');
+const DataTable = require('containers/DataTableWithQuery');
 
 let Panoptes = React.createClass({
   mixins: [FluxMixin, PureRenderMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
@@ -25,7 +26,7 @@ let Panoptes = React.createClass({
       () => this.refs.notificationSystem.addNotification(
         _.extend(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
-    this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
+    //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
   },
 
   getStateFromFlux() {
@@ -58,12 +59,14 @@ let Panoptes = React.createClass({
                         onSelect={actions.tabSwitch}>
               {l_state.tabs.get('components').map(tabId => {
                 let tab = l_state.components.get(tabId).toObject();
+                let props = tab.props.toObject();
+                props.componentUpdate = (newProps) => actions.componentUpdate(tabId, newProps);
                 return (
                   <TabPane
                     compId={tabId}
                     key={tabId}
                     title={tab.title}>
-                    {React.createElement(require(tab.component), tab.props.toObject())}
+                    {React.createElement(require(tab.component), props)}
                   </TabPane>
                 )
               })}

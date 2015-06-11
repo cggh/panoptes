@@ -4055,12 +4055,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     border-bottom-color: #fff;
   }
 }
-.tab-content > .tab-pane {
-  display: none;
-}
-.tab-content > .active {
-  display: block;
-}
+/*.tab-content > .tab-pane {*/
+  /*display: none;*/
+/*}*/
+/*.tab-content > .active {*/
+  /*display: block;*/
+/*}*/
 .nav-tabs .dropdown-menu {
   margin-top: -1px;
   border-top-left-radius: 0;

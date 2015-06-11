@@ -20,10 +20,15 @@ var PanoptesStore = Fluxxor.createStore({
 
   fetchUserSuccess(payload) {
     this.state = this.state.set('user', payload);
+    this.emit('change');
   },
 
   getState() {
     return this.state;
+  },
+
+  getTable(table) {
+    return this.state.getIn(['tables', table]);
   }
 
 });
