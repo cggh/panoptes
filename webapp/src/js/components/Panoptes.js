@@ -76,13 +76,16 @@ let Panoptes = React.createClass({
         <Popups>
           {l_state.popups.get('components').map(popupId => {
             let popup = l_state.components.get(popupId).toObject();
+            let props = popup.props.toObject();
+            props.componentUpdate = (newProps) => actions.componentUpdate(popupId, newProps);
             return (
               <Popup
                 {...popup}
                 compId={popupId}
                 key={popupId}
                 onMoveStop={actions.popupMove.bind(this, popupId)}
-                onResizeStop={actions.popupResize.bind(this, popupId)}>
+                onResizeStop={actions.popupResize.bind(this, popupId)}
+                onClose={actions.popupClose.bind(this, popupId)}>
                 {React.createElement(require(popup.component), popup.props.toObject())}
               </Popup>
             )

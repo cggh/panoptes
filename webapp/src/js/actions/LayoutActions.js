@@ -14,6 +14,11 @@ let LayoutActions = {
   notify(notification) {
     this.dispatch(LAYOUT.NOTIFY, notification);
   },
+  popupClose(compId) {
+    this.dispatch(LAYOUT.POPUP_CLOSE, {
+      compId: compId
+    });
+  },
   popupMove(compId, pos) {
     this.dispatch(LAYOUT.POPUP_MOVE, {
       compId: compId,

@@ -72,13 +72,14 @@
     .popup-header {
       overflow: hidden;
       white-space: nowrap;
-      height: 31px;
+      height: 33px;
       padding: 7px 7px 7px 12px;
       cursor: move;
       font-size: 10pt;
       font-weight: bold;
       color: rgb(255, 255, 255);
       background: $primary-color;
+      display: flex;
 
       .icon {
         position: relative;
@@ -86,6 +87,9 @@
         top: -4px;
         vertical-align: text-top;
         font-size: 24px;
+      }
+      .title {
+        flex: 1;
       }
     }
 

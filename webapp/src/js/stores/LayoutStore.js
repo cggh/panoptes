@@ -77,7 +77,7 @@ var LayoutStore = Fluxxor.createStore({
         components: ['Table', 'T1', 'T2']
       },
       popups: {
-        components: []//'P1', 'P2']
+        components: ['P1', 'P2']
       },
       modal: {}
     });
@@ -87,6 +87,7 @@ var LayoutStore = Fluxxor.createStore({
       LAYOUT.MODAL_CLOSE, this.modalClose,
       LAYOUT.MODAL_OPEN, this.modalOpen,
       LAYOUT.NOTIFY, this.notify,
+      LAYOUT.POPUP_CLOSE, this.popupClose,
       LAYOUT.POPUP_MOVE, this.popupMove,
       LAYOUT.POPUP_RESIZE, this.popupResize,
       LAYOUT.TAB_SWITCH, this.tabSwitch
@@ -111,6 +112,13 @@ var LayoutStore = Fluxxor.createStore({
   notify(payload) {
     this.lastNotification = payload;
     this.emit('notify');
+  },
+
+  popupClose(payload) {
+    let {compId} = payload;
+    let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
+    this.state = this.state.setIn(['popups', 'components'], list);
+    this.emit('change');
   },
 
   popupMove(payload) {

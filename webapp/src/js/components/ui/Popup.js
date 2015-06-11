@@ -57,13 +57,17 @@ let Popup = React.createClass({
   handleMoveStop(event, ui) {
     let {left, top} = ui.position;
     if (this.props.onMoveStop)
-      this.props.onMoveStop({x:left, y:top})
+      this.props.onMoveStop({x:left, y:top});
+  },
+  handleClose(event) {
+    if (this.props.onClose)
+      this.props.onClose();
   },
 
   render() {
     let { initPosition, initSize, title, faIcon, children, ...other } = this.props;
     return (
-      <Draggable handle='.popup-header'
+      <Draggable handle='.popup-header *'
                  start={initPosition.toObject()}
                  moveOnStartChange={true}
                  onStop={this.handleMoveStop}>
@@ -77,7 +81,8 @@ let Popup = React.createClass({
                {...other}>
             <div className="popup-header">
               {faIcon ? <Icon name={faIcon}/> : null}
-              {title}
+              <div className="title">{title}</div>
+              <Icon className="close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
               {children}
