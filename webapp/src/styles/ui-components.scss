@@ -81,6 +81,15 @@
     background: white;
     z-index: 2;
 
+    .popup-drag {
+      position: absolute;
+      height: 33px;
+      width: calc(100% - 30px);
+      top:0;
+      left:0;
+      cursor: move;
+    }
+
     .popup-header {
       overflow: hidden;
       white-space: nowrap;
@@ -94,6 +103,7 @@
       display: flex;
 
       .icon {
+        color: white;
         position: relative;
         left: -5px;
         top: -4px;

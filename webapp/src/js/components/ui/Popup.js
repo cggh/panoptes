@@ -71,7 +71,7 @@ let Popup = React.createClass({
   render() {
     let { initPosition, initSize, title, faIcon, children, ...other } = this.props;
     return (
-      <Draggable handle='.popup-header *'
+      <Draggable handle='.popup-drag'
                  start={initPosition.toObject()}
                  moveOnStartChange={true}
                  onStop={this.handleMoveStop}>
@@ -91,6 +91,7 @@ let Popup = React.createClass({
             <div className="popup-body">
               {children}
             </div>
+            <div className="popup-drag"></div>
           </div>
         </Resizable>
       </Draggable>
