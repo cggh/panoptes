@@ -209,6 +209,10 @@ class BaseImport(object):
     def _getDatasetFolders(self, datatables):
         
         subDir = 'datatables'
+        
+        if datatables == None:
+            datatables = []
+            
         for directory in os.listdir(os.path.join(self._datasetFolder, subDir)):
             if os.path.isdir(os.path.join(self._datasetFolder, subDir, directory)):
                 if directory not in datatables:
