@@ -15,35 +15,36 @@ let Popup = React.createClass({
   propTypes: {
     title: React.PropTypes.string, //Used in title bar
     faIcon: React.PropTypes.string,
-    initPosition: ImmutablePropTypes.shape({
+    position: ImmutablePropTypes.shape({
       x: React.PropTypes.number,
       y: React.PropTypes.number
     }),
-    initSize: ImmutablePropTypes.shape({
+    size: ImmutablePropTypes.shape({
       w: React.PropTypes.number,
       h: React.PropTypes.number
     }),
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    onClick: React.PropTypes.func
   },
 
   getDefaultProps() {
     return {
       title: 'Popup',
-      initPosition: Immutable.Map({
+      position: Immutable.Map({
         x: 100,
         y: 100
       }),
-      initSize: Immutable.Map({
-        width: 300,
-        height: 200
+      size: Immutable.Map({
+        width: 500,
+        height: 400
       })
     };
   },
 
   getInitialState() {
-    return {size: this.props.initSize};
+    return {size: this.props.size};
   },
 
   handleResize(event, {element, size}) {
@@ -67,17 +68,22 @@ let Popup = React.createClass({
       this.props.onClose();
     }
   },
+  handleClick(event) {
+    if (this.props.onClick)
+      this.props.onClick(event);
+  },
 
   render() {
-    let { initPosition, initSize, title, faIcon, children, ...other } = this.props;
+    let { position, size, title, faIcon, children, ...other } = this.props;
     return (
       <Draggable handle='.popup-drag'
-                 start={initPosition.toObject()}
+                 start={position.toObject()}
                  moveOnStartChange={true}
+                 onStart={this.handleClick}
                  onStop={this.handleMoveStop}>
-        <Resizable width={initSize.get('width')} height={initSize.get('height')}
-                   minConstraints={[150, 150]}
-                   maxConstraints={[500, 300]}
+        <Resizable width={size.get('width')} height={size.get('height')}
+                   minConstraints={[50, 50]}
+                   handleSize={[20,20]}
                    onResize={this.handleResize}
                    onResizeStop={this.handleResizeStop}>
           <div className="popup"

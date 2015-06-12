@@ -7,7 +7,7 @@
   .tab-content {
     position: relative;
     width: 100%;
-    height: calc(100% - 30px);
+    height: calc(100% - #{$topbar-height});
     .tab-pane {
       display: block;
       position: absolute;
@@ -26,8 +26,8 @@
   }
   .tabs {
     display: flex;
-    height: 33px;
-  background: linear-gradient(to right, #000000 0%, #757575 100%);
+    height: $topbar-height;
+    background: linear-gradient(to right, #000000 0%, #757575 100%);
     .tab {
       display: flex;
       border-top-left-radius: 8px;
@@ -77,23 +77,24 @@
     flex-direction: column;
     position: fixed;
     border: 1px solid rgb(110, 110, 110);
-    box-shadow: 4px 4px 20px 2px rgba(0, 0, 0, 0.75);
+    box-shadow: 4px 4px 20px 2px rgba(0, 0, 0, 0.25);
     background: white;
     z-index: 2;
 
     .popup-drag {
       position: absolute;
-      height: 33px;
+      height: $topbar-height;
       width: calc(100% - 30px);
-      top:0;
-      left:0;
+      top: 0;
+      left: 0;
       cursor: move;
+      z-index: 3;
     }
 
     .popup-header {
       overflow: hidden;
       white-space: nowrap;
-      height: 33px;
+      height: $topbar-height;
       padding: 7px 7px 7px 12px;
       cursor: move;
       font-size: 10pt;
@@ -101,6 +102,10 @@
       color: rgb(255, 255, 255);
       background: $primary-color;
       display: flex;
+      //MD like shadow needs relative and z-index
+      box-shadow: $z-1-shadow;
+      position: relative;
+      z-index: 3;
 
       .icon {
         color: white;
@@ -149,6 +154,7 @@
 }
 
 //@import "../../node_modules/react-resizable/css/styles.css";
+//Had to inline as npm dir not accesible on build.
 .react-resizable {
   position: relative;
 }
@@ -228,7 +234,6 @@
     background-image: url(../images/error.svg);
   }
 
-
 }
 
 .loading-container.loaded {
@@ -237,13 +242,17 @@
 }
 
 .top-bar {
-    height: 33px;
-    background: $primary-color;
-    .btn {
-      border: none;
-      background: transparent;
-      color: white;
-    }
+  height: $topbar-height;
+  background: $primary-color;
+  box-shadow: $z-1-shadow;
+  position: relative;
+  z-index: 2;
+
+  .btn {
+    border: none;
+    background: transparent;
+    color: white;
+  }
 }
 
 .datatable {
@@ -262,7 +271,7 @@
   line-height: normal;
   div.icon {
     border-radius: 9px;
-    border: 2px solid rgb(99,201,205);
+    border: 2px solid rgb(99, 201, 205);
     padding: 5px 12px;
     margin-right: 10px;
     margin-bottom: 10px;

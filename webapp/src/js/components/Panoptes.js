@@ -1,4 +1,5 @@
 const React = require('react');
+const Immutable = require('immutable');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const _ = require('lodash');
 const NotificationSystem = require('react-notification-system');
@@ -58,14 +59,14 @@ let Panoptes = React.createClass({
             <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
                         onSelect={actions.tabSwitch}
                         onClose={actions.tabClose}>
-              {l_state.tabs.get('components').map(tabId => {
-                let tab = l_state.components.get(tabId).toObject();
+              {l_state.tabs.get('components').map(compId => {
+                let tab = l_state.components.get(compId).toObject();
                 let props = tab.props.toObject();
-                props.componentUpdate = (newProps) => actions.componentUpdate(tabId, newProps);
+                props.componentUpdate = actions.componentUpdateFor(compId);
                 return (
                   <TabPane
-                    compId={tabId}
-                    key={tabId}
+                    compId={compId}
+                    key={compId}
                     title={tab.title}>
                     {React.createElement(require(tab.component), props)}
                   </TabPane>
@@ -75,19 +76,23 @@ let Panoptes = React.createClass({
           </div>
         </div>
         <Popups>
-          {l_state.popups.get('components').map(popupId => {
-            let popup = l_state.components.get(popupId).toObject();
+          {l_state.popups.get('components').map(compId => {
+            let popup = l_state.components.get(compId).toObject();
             let props = popup.props.toObject();
-            props.componentUpdate = (newProps) => actions.componentUpdate(popupId, newProps);
+            props.componentUpdate = actions.componentUpdateFor(compId);
+            let state = l_state.popups.getIn(['state',compId]) || Immutable.Map();
             return (
               <Popup
-                {...popup}
-                compId={popupId}
-                key={popupId}
-                onMoveStop={actions.popupMove.bind(this, popupId)}
-                onResizeStop={actions.popupResize.bind(this, popupId)}
-                onClose={actions.popupClose.bind(this, popupId)}>
-                {React.createElement(require(popup.component), popup.props.toObject())}
+                {...state.toObject()}
+                compId={compId}
+                key={compId}
+                faIcon={popup.faIcon}
+                title={popup.title}
+                onMoveStop={actions.popupMove.bind(this, compId)}
+                onResizeStop={actions.popupResize.bind(this, compId)}
+                onClose={actions.popupClose.bind(this, compId)}
+                onClick={actions.popupFocus.bind(this, compId)}>
+                {React.createElement(require(popup.component), props)}
               </Popup>
             )
           })}

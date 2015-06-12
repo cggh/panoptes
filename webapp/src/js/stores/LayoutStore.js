@@ -58,14 +58,6 @@ var LayoutStore = Fluxxor.createStore({
           component: 'ui/HelloWorld',
           title: 'OMG POP',
           faIcon: 'bookmark',
-          initPosition: {
-            x: 500,
-            y: 100
-          },
-          initSize: {
-            width: 300,
-            height: 200
-          },
           props: {
             compId: 'P2',
             msg: 'OMG'
@@ -77,7 +69,19 @@ var LayoutStore = Fluxxor.createStore({
         components: ['Table', 'T1', 'T2']
       },
       popups: {
-        components: ['P1', 'P2']
+        components: ['Table', 'P2'],
+        state: {
+          'P2': {
+            position: {
+              x: 500,
+              y: 100
+            },
+            size: {
+              width: 300,
+              height: 200
+            }
+          }
+        }
       },
       modal: {}
     });
@@ -88,6 +92,7 @@ var LayoutStore = Fluxxor.createStore({
       LAYOUT.MODAL_OPEN, this.modalOpen,
       LAYOUT.NOTIFY, this.notify,
       LAYOUT.POPUP_CLOSE, this.popupClose,
+      LAYOUT.POPUP_FOCUS, this.popupFocus,
       LAYOUT.POPUP_MOVE, this.popupMove,
       LAYOUT.POPUP_RESIZE, this.popupResize,
       LAYOUT.TAB_CLOSE, this.tabClose,
@@ -122,15 +127,23 @@ var LayoutStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  popupFocus(payload) {
+    let {compId} = payload;
+    let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
+    list = list.push(compId);
+    this.state = this.state.setIn(['popups', 'components'], list);
+    this.emit('change');
+  },
+
   popupMove(payload) {
     let {compId, pos} = payload;
-    this.state = this.state.mergeIn(['components', compId, 'initPosition'], pos);
+    this.state = this.state.mergeIn(['popups', 'state', compId, 'position'], pos);
     this.emit('change');
   },
 
   popupResize(payload) {
     let {compId, size} = payload;
-    this.state = this.state.mergeIn(['components', compId, 'initSize'], size);
+    this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], size);
     this.emit('change');
   },
 

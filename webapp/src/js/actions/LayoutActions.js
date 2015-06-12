@@ -1,6 +1,18 @@
 const Constants = require('../constants/Constants');
 const LAYOUT = Constants.LAYOUT;
 
+function memoize(fn) {
+  let cache = {};
+  return function (arg) {
+    if (cache[arg] !== undefined) {
+      return cache[arg];
+    }
+    var result = fn(arg).bind(this);
+    cache[arg] = result;
+    return result;
+  };
+}
+
 let LayoutActions = {
   componentUpdate(compId, newProps) {
     this.dispatch(LAYOUT.COMPONENT_UPDATE, {
@@ -8,6 +20,14 @@ let LayoutActions = {
       newProps: newProps
     });
   },
+  componentUpdateFor: memoize((compId) => {
+    return function (newProps) {
+      this.dispatch(LAYOUT.COMPONENT_UPDATE, {
+        compId: compId,
+        newProps: newProps
+      });
+    }
+  }),
   modalClose() {
     this.dispatch(LAYOUT.MODAL_CLOSE);
   },
@@ -16,6 +36,11 @@ let LayoutActions = {
   },
   popupClose(compId) {
     this.dispatch(LAYOUT.POPUP_CLOSE, {
+      compId: compId
+    });
+  },
+  popupFocus(compId) {
+    this.dispatch(LAYOUT.POPUP_FOCUS, {
       compId: compId
     });
   },
