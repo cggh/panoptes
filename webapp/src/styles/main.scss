@@ -4,6 +4,9 @@
 @import "./fixed-data-table.css";
 @import "./ui-components.scss";
 
+body {
+  font-family: 'Roboto', sans-serif;
+}
 
 .main {
   .page {
@@ -49,7 +52,7 @@
 
     .body {
       flex: 1;
-      position:relative;
+      position: relative;
     }
   }
 }
