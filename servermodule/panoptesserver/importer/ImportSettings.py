@@ -1071,7 +1071,7 @@ containing the relative size of that specific pie'''
                                                       'description': 'Optionally, an explicit list of custom data can be specified to control the order of import'
                                                       })))
     
-    def __init__(self, fileName = None, log = True, settingsDef = None):
+    def __init__(self, fileName = None, log = True, settingsDef = None, validate = True):
         self._logLevel = log
         self._settingsDef = settingsDef
         self._propidMap = OrderedDict()
@@ -1085,7 +1085,7 @@ containing the relative size of that specific pie'''
         #Is a list of property Ids in the parent table but since we don't have this info
         self._customDataSettings["DataItemViews"]["children"]["Fields"]["type"] = 'List'
         
-        self.loadFile(fileName)
+        self.loadFile(fileName, validate)
     
     def __str__(self):
         return str(self._propidMap)
@@ -1094,7 +1094,7 @@ containing the relative size of that specific pie'''
         if (self._logLevel):
             print(message)
                 
-    def loadFile(self, fileName):
+    def loadFile(self, fileName, validate = True):
         if fileName is not None:
             self.fileName = fileName
             if self._logLevel:
@@ -1107,7 +1107,7 @@ containing the relative size of that specific pie'''
                     print('ERROR: yaml parsing error: ' + str(e))
                     raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
                 
-            self._load()
+            self._load(validate)
             if self._logLevel:
                 self._log('Settings: '+str(self._settings))
         else:

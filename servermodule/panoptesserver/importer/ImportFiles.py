@@ -27,6 +27,7 @@ from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
 import sqlparse
+from PluginLoader import PluginLoader
 
 def GetCurrentSchemaVersion(calculationObject, datasetId):
     with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
@@ -118,6 +119,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         workspaceId = None
         
+        modules = PluginLoader(calculationObject, datasetId, importSettings, workspaceId)
+        modules.importAll('pre')
+        
         importer = ImportDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder = baseFolder)
         importer.importAllDataTables()
 
@@ -148,6 +152,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
                 globalSettings['Name'],
                 str(math.ceil(importtime))
             ))
+            
+        modules.importAll('post')
 
 
 if __name__ == "__main__":
