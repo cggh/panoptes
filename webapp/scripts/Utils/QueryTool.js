@@ -19,7 +19,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         QueryTool.Create = function(tableid, settings) {
             var that={};
             that.tableInfo = MetaData.getTableInfo(tableid);
-            that.query = SQL.WhereClause.Trivial();
+            that.query = SQL.WhereClause.decode(SQL.WhereClause.encode(that.tableInfo.defaultQuery));
             that.hasSubSampler = false;
             if (that.tableInfo.currentQuery)
                 that.query = SQL.WhereClause.decode(SQL.WhereClause.encode(that.tableInfo.currentQuery));
@@ -233,7 +233,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         that.modify(SQL.WhereClause.Trivial());
                     });
                     that.clearQueryShowHide = Controls.ShowHide(that.clearQuery);
-                    that.clearQueryShowHide.setVisible(false);
+                    that.clearQueryShowHide.setVisible(!that.query.isTrivial);
                     that.ctrlQueryString = Controls.Html(null,that.tableInfo.tableViewer.getQueryDescription(that.query), 'PnQueryString');
                     group.addControl(Controls.CompoundFloat([that.clearQueryShowHide, that.ctrlQueryString]));
                 }

@@ -17,6 +17,8 @@ define(["_", "tween", "DQX/Utils"], function (_, tween, DQX) {
              that.last_clip = clip;
              var x_scale = view.col_scale;
              var snp_width = x_scale(model.col_width) - x_scale(0);
+             //Restrict snp_width such that a single snp isn't full width
+             snp_width = Math.min(snp_width, 150);
              var row_height = Math.ceil(view.row_height);
              var pos = model.col_positions;
              var col_len = DQX.niceColours.length;

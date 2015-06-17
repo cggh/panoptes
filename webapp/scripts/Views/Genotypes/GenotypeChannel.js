@@ -204,6 +204,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                 that.col_query.notifyQueryUpdated = function() {
                   model_params.set('col_query', that.col_query.get());
                 };
+                model_params.set('col_query', that.col_query.get());
+
                 var col_query_tool = that.col_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(col_query_tool);
                 that.row_query = QueryTool.Create(table_info.row_table.id, {includeCurrentQuery:true});
@@ -211,6 +213,8 @@ define(["require", "_", "d3", "blob", "filesaver", "DQX/Model", "DQX/SQL", "DQX/
                   model_params.set('row_query', that.row_query.get());
                   model_params.set('page', 1);
                 };
+                model_params.set('row_query', that.row_query.get());
+
                 var row_query_tool = that.row_query.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
                 controls_group.addControl(row_query_tool);
 
