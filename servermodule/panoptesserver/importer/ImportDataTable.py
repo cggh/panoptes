@@ -46,7 +46,7 @@ class ImportDataTable(BaseImport):
             self._execSql(sql)
 
             # Add to tablecatalog
-            sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
+            sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
                 tableid,
                 tableSettings['NamePlural'],
                 tableSettings['PrimKey'],
@@ -71,7 +71,7 @@ class ImportDataTable(BaseImport):
                 if not tableSettings.getPropertyValue(propid,'ReadData'):
                     continue
                 
-                sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
+                sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
                     tableSettings.getPropertyValue(propid, 'DataType'),
                     propid,
                     tableid,
@@ -84,7 +84,7 @@ class ImportDataTable(BaseImport):
                 if 'Relation' in tableSettings.getProperty(propid):
                     relationSettings = tableSettings.getPropertyValue(propid, 'Relation')
                     self._log('Creating relation: {} {} {}'.format(relationSettings['TableId'],relationSettings['ForwardName'],relationSettings['ReverseName']))
-                    sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
+                    sql = "INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                         tableid,
                         propid,
                         relationSettings['TableId'],
@@ -125,7 +125,7 @@ class ImportDataTable(BaseImport):
                         graphSettings = ImportSettings(os.path.join(graphfolder, 'settings'), settingsDef = ImportSettings._graphSettings)
                        
                         crosslink = graphSettings['CrossLink']
-                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
+                        sql = "INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
                             graphid,
                             tableid,
                             'tree',
