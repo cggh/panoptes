@@ -83,6 +83,14 @@ Properties:
   ShowInTable: true
   MaxColumnWidth: 120               # Specifies the maximum pixel width used for the column representing this property in a table
   Search: Pattern
+
+- Id: ExternalRef
+  Name: External Reference
+  Description: Reference on some other site with a link
+  DataType: Text
+  ShowInTable: true
+  ExternalUrl: http://en.wikipedia.org/wiki/{value}
+
   
 # The following block declares that this data table contains genome values for each item in the table
 # Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser

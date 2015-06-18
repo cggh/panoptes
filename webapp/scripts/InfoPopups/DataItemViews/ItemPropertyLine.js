@@ -39,8 +39,11 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 }
                 if (propInfo.settings.ExternalUrl) {
                     linkAction = function() {
-                        var url = propInfo.settings.ExternalUrl.DQXformat({value: propInfo.toDisplayString(itemData.fields[propid])});
-                        window.open(url,'_blank');
+                        var itemids = propInfo.toDisplayString(itemData.fields[propid]).split(";");
+                        itemids.forEach(function(itemid) {
+                            var url = propInfo.settings.ExternalUrl.DQXformat({value: itemid});
+                            window.open(url,'_blank');
+                        });
                     };
                     linkIcon = "fa fa-external-link";
                 }

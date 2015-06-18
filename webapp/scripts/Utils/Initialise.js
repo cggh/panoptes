@@ -77,7 +77,12 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
         Initialise.augmentTableInfo = function(table) {
 
             table.hasGenomePositions = table.IsPositionOnGenome=='1';
-            table.currentQuery = SQL.WhereClause.Trivial();
+
+            if (table.defaultQuery != '')
+                table.defaultQuery = SQL.WhereClause.decode(table.defaultQuery);
+            else
+                table.defaultQuery = SQL.WhereClause.Trivial();
+            table.currentQuery = table.defaultQuery;
             table.currentSelection = {};
 
             table.tableNameSingle = table.name;
@@ -464,7 +469,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 prop.mapSingleColor = function(value) {
                     if (prop.settings.categoryColors) {
                         var cl = prop.settings.categoryColors[value];
-                        if (cl) return cl;
+                        if (cl) return DQX.colourFromString(cl);
                         return DQX.Color(0.5,0.5,0.5);
                     }
                     if (prop.isBoolean) {

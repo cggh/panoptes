@@ -1,15 +1,17 @@
-import logging;
+import logging
 import datetime
 import yaml
 import decimal
 import math
 import os
 from distutils.command.config import config
+from collections import OrderedDict
 
 class Configurator(object):
     
     def __init__(self):
         self._separator = '\t'
+        self._definitions = {}
     
     def _parseHeader(self, header):
         self._fileColNames = [colname.replace(' ', '_') for colname in header.rstrip('\n').split(self._separator)]
@@ -17,7 +19,14 @@ class Configurator(object):
         
         config = {}
         values = {}
-        
+       
+        #Need to ignore trees
+        if len(self._fileColNames) == 1 and '(' in header:
+            print 'Probably not a data table file. Header is:' + header
+            self._fileColNames = []
+            self._fileColIndex = {}
+            return config, values
+ 
         for conf in self._fileColNames:
             config[conf] = {}
             config[conf]['Id'] = conf
@@ -29,7 +38,7 @@ class Configurator(object):
     def getColumnNames(self):
         return self._fileColNames
         
-    def _parseLine(self, line, config, values, fileName):
+    def _parseLine(self, line, config, values, fileName, lineCount):
         
         sourceCells = line.split(self._separator)
         
@@ -37,10 +46,22 @@ class Configurator(object):
         for content in sourceCells:
 
             name = self._fileColNames[i]
+            i = i + 1
             idx = name
             
             config[idx]['MaxLen'] = max(config[idx].get('MaxLen', 0), len(content))
 
+            #It's just too slow....
+            if lineCount > 10000 and 'DataType' in config[idx]:
+                if config[idx]['DataType'] == 'Value' and config[idx]['DecimDigits'] > 0 and '.' in content:
+                    config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), abs(decimal.Decimal(content).as_tuple().exponent))
+                continue
+
+            if content == '':
+                #Special Case
+                #Keep the same data type as for other rows
+                continue
+            
             #This isn't the quickest but is convenient and sometimes can't tell whether int or str (00000007 and 00000008) 
             #http://pythonhosted.org//fastnumbers/fast.html#fast-real for speed
             parsed = yaml.load(content)
@@ -54,16 +75,6 @@ class Configurator(object):
                 config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), 0)
             elif type(parsed) is bool:
                 dataType = 'Boolean'
-            elif content == '':
-                #Special Case
-                #Keep the same data type as for other rows
-                if 'DataType' in config[idx]:
-                    dataType = config[idx]['DataType']
-                    #Treat '' as 0 for valued columns
-                    if dataType == 'Value':
-                        parsed = 0
-                        if not content in values[idx]:
-                            values[idx].append(content)
             elif type(parsed) is str or type(parsed) is list or parsed is None or type(parsed) is dict:
                 dataType = 'Text'
                 #If you use True/False then the True doesn't appear in the output
@@ -96,10 +107,11 @@ class Configurator(object):
                 del config[idx]['DecimDigits']
                    
             if config[idx].get('DataType',dataType) != dataType:
-                if parsed is None:
-                    dataType = config[idx]['DataType']
-                else:
-                    logging.warn("Mixed content type for %s:%s:%s: previously %s" % (str(name),dataType,content,config[idx]['DataType']))
+#                if parsed is None:
+#                    dataType = config[idx]['DataType']
+#                else:
+                    logging.warn("Mixed content type for %s:%s:%s(%s): previously %s from %s" % (str(name),dataType,content,str(type(parsed)),config[idx]['DataType'], self._definitions.get(idx,'')))
+        	    self._definitions[idx] = content
                     if config[idx]['DataType'] == 'Value':
                         del config[idx]['DecimDigits']
                         del config[idx]['MaxVal']
@@ -113,11 +125,11 @@ class Configurator(object):
                 config[idx]['MaxVal'] = max(config[idx].get('MaxVal',0), max_val)
                 config[idx]['MinVal'] = min(config[idx].get('MinVal',0), min_val)
       
-            i = i + 1
     
     def processFile(self, sourceFileName):
         
         rootProps = {}
+        logging.warn("Parsing %s" % (sourceFileName))
         with open(sourceFileName, 'r') as ifp:
             if ifp is None:
                 raise Exception('Unable to read file '+sourceFileName)
@@ -135,7 +147,7 @@ class Configurator(object):
                     line = line.rstrip('\r')
                     
                     if len(line) > 0:
-                        self._parseLine(line, config, values, sourceFileName)
+                        self._parseLine(line, config, values, sourceFileName, lineCount)
 
                 except Exception as e:
                     logging.error('Offending line: ' + line)
@@ -145,16 +157,17 @@ class Configurator(object):
                                                                                              str(e)))
                     
                 lineCount = lineCount + 1
-                if lineCount > 100000:
-                    break
+
+                if lineCount % 1000000 == 0:
+                    print "Processed {} lines".format(lineCount)
                         
                
-            rootProps = {
-             'NameSingle': os.path.basename(os.path.dirname(sourceFileName)),
-             'NamePlural': os.path.basename(os.path.dirname(sourceFileName)),
-             'Description': 'Default description',
-             'PrimKey': 'AutoKey'
-            }
+            rootProps = OrderedDict((
+             ('NameSingle', os.path.basename(os.path.dirname(sourceFileName))),
+             ('NamePlural', os.path.basename(os.path.dirname(sourceFileName))),
+             ('Description', 'Default description'),
+             ('PrimKey', 'AutoKey')
+            ))
             for conf in config:
                 if 'DataType' in config[conf] and config[conf]['DataType'] == 'Value':
                     if len(values[conf]) > 0:
@@ -175,7 +188,7 @@ class Configurator(object):
                 }
                 config = {}
                 
-            return rootProps, config
+            return rootProps, config, values
                     
         
     
@@ -185,7 +198,7 @@ class Configurator(object):
             if len(fileList) > 0:
                 #Assume all the same so only process one
                 sourceFileName = os.path.join(dirName,fileList[0])
-                rootProps, config = configurator.processFile(sourceFileName)
+                rootProps, config, values = configurator.processFile(sourceFileName)
                 #Two types of configuration available
                 if len(config) == 3:
                     #Old style - no header - 3 columns chrom, pos, value
@@ -208,6 +221,7 @@ class Configurator(object):
         
     def output(self, outfile, config):
         with open(outfile, 'w') as of:
+            print >>of, "#Warning for large data files MaxVal, MinVal and Categories may not be correct"
             yaml.dump(config, of, default_flow_style=False)
         #print yaml.dump(config, default_flow_style=False)
                                 
@@ -222,10 +236,12 @@ if __name__ == "__main__":
             configurator = Configurator()
             config = {}
             config["Properties"] = []
-            rootProps, props = configurator.processFile(os.path.join(dirName,'data'))
+            rootProps, props, values = configurator.processFile(os.path.join(dirName,'data'))
             config.update(rootProps)
             for key in configurator.getColumnNames():
                 value = props[key]
+                if 'IsCategorical' in value and value['IsCategorical'] == 'true':
+                    value['Categories'] = values[key]
                 config["Properties"].append(value)
 #            for key, value in props.iteritems():
 #                config["Properties"].append(value)

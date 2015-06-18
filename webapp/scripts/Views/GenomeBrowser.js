@@ -143,7 +143,7 @@ define([
                                 chromosomeField = tableInfo.ChromosomeField;
                             else {
                                 if (chromosomeField != tableInfo.ChromosomeField)
-                                    DQX.reportError('Inconsistent chromosome field column over different datasets: ' + chromosomeField + ', ' + tableInfo.ChromosomeField);
+                                    DQX.reportError('Inconsistent chromosome field column over different datatables: ' + chromosomeField + ', ' + tableInfo.ChromosomeField);
                             }
                         }
                     });
@@ -767,11 +767,17 @@ define([
 
                             tableInfo.genomeBrowserInfo.theQuery = QueryTool.Create(tableInfo.id, {includeCurrentQuery:true});
                             tableInfo.genomeBrowserInfo.theQuery.notifyQueryUpdated = function() {
-                                tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+
+                                //REMOVE QUERY #308
+                                //tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+                                tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(SQL.WhereClause.Trivial());
+
                                 that.panelBrowser.render();
                             };
                             var ctrlQuery = tableInfo.genomeBrowserInfo.theQuery.createQueryControl({hasSection: true, hasQueryString: true, defaultHidden: true});
-                            controlsGroup.addControl(ctrlQuery);
+
+                            //REMOVE QUERY #308
+                            //controlsGroup.addControl(ctrlQuery);
 
                             var channelControlsGroup = Controls.CompoundVert([]).setMargin(0);
                             controlsGroup.addControl(channelControlsGroup);
@@ -789,7 +795,9 @@ define([
                             tableInfo.genomeBrowserInfo.dataFetcher = dataFetcher;
                             dataFetcher.addFetchColumnActive(tableInfo.primkey, "String");//add id column to the datafetcher, not plotted but needed for the tooltip & click actions
 
-                            dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+                            //REMOVE QUERY #308
+                            //dataFetcher.setUserQuery2(tableInfo.genomeBrowserInfo.theQuery.get());
+                            tableInfo.genomeBrowserInfo.dataFetcher.setUserQuery2(SQL.WhereClause.Trivial());
 
                             //Loop over all datatable properties, and add those that are declared to be displayed in the genome browser
                             tableInfo.genomeBrowserInfo.currentCustomProperties = [];

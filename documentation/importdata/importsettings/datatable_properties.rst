@@ -38,7 +38,7 @@ GroupId
 
 ExternalUrl:
   *Text.* A url that should be opened when the user clicks on a value of this property. The url should
-  be formatted as a template, with ``{value}`` interpolated to the property value.
+  be formatted as a template, with ``{value}`` interpolated to the property value. Multiple links can be specified by separating the values with semi-colons.
   For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``.
 
 IsCategorical
@@ -49,7 +49,7 @@ IsCategorical
 CategoryColors
   *Block.* Specifies display colours for the categorical states of this property.
   Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).
-  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
+  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly. A faded version of this colour will be used for column background. The colour will be used for genome browser tracks and plots.
 
 MaxColumnWidth
   *Value.* Specifies the maximum width (in pixels) used for the column representing this property in a table view.
