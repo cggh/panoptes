@@ -12,7 +12,7 @@ except:
     sys.exit()
 import DQXUtils
 import config
-import SettingsLoader
+import ImportSettings
 import ImpUtils
 import customresponders.panoptesserver.schemaversion as schemaversion
 import customresponders.panoptesserver.Utils as Utils
@@ -26,7 +26,8 @@ import math
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
 from DQXDbTools import DBDBESC
-
+import sqlparse
+from PluginLoader import PluginLoader
 
 def GetCurrentSchemaVersion(calculationObject, datasetId):
     with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
@@ -66,11 +67,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         # Remove current reference in the index first: if import fails, nothing will show up
         ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
 
-        globalSettings = SettingsLoader.SettingsLoader(os.path.join(datasetFolder, 'settings'))
-        globalSettings.RequireTokens(['Name'])
-        globalSettings.AddTokenIfMissing('Description','')
+        globalSettings = ImportSettings.ImportSettings(os.path.join(datasetFolder, 'settings'), settingsDef = ImportSettings.ImportSettings._datasetSettings)
 
-        print('Global settings: '+str(globalSettings.Get()))
+        print('Global settings: '+str(globalSettings))
 
 
         if not importSettings['ConfigOnly']:
@@ -87,7 +86,13 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             scriptPath = os.path.dirname(os.path.realpath(__file__))
             calculationObject.SetInfo('Creating database')
             print('Creating new database')
-            ImpUtils.ExecuteSQLScript(calculationObject, scriptPath + '/createdataset.sql', datasetId)
+            #Can't use source as it's part of the mysql client not the API
+            sql = open(scriptPath + "/createdataset.sql").read()
+            sql_parts = sqlparse.split( sql )
+            for sql_part in sql_parts:
+                if sql_part.strip() ==  '':
+                    continue 
+                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql_part)
             ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
                 schemaversion.major,
                 schemaversion.minor
@@ -114,6 +119,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         workspaceId = None
         
+        modules = PluginLoader(calculationObject, datasetId, importSettings, workspaceId)
+        modules.importAll('pre')
+        
         importer = ImportDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder = baseFolder)
         importer.importAllDataTables()
 
@@ -122,8 +130,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 
         if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
-            globalSettings.AddTokenIfMissing('hasGenomeBrowser', True)
-
+            globalSettings['hasGenomeBrowser'] = True
+        
         ImportDocs(calculationObject, datasetFolder, datasetId)
 
         importWorkspaces = ImportWorkspaces(calculationObject, datasetId, importSettings, workspaceId, dataDir = 'workspaces')
@@ -131,7 +139,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Global settings
         with calculationObject.LogHeader('Defining global settings'):
-            ImpUtils.ImportGlobalSettings(calculationObject, datasetId, globalSettings)
+            globalSettings.saveGlobalSettings(calculationObject, datasetId)
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
@@ -144,6 +152,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
                 globalSettings['Name'],
                 str(math.ceil(importtime))
             ))
+            
+        modules.importAll('post')
 
 
 if __name__ == "__main__":

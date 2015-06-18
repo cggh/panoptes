@@ -495,8 +495,8 @@ define([
                         theFetcher.activateFetchColumn(colinfo.myID);
                         var denstrackid =tableInfo.id+'_'+propInfo.propid+'_dens';
                         var maxVal = 1.0;
-                        if (propInfo.settings.SummaryValues.MaxVal)
-                            maxVal = propInfo.settings.SummaryValues.MaxVal;
+                        if (propInfo.settings.SummaryValues.MaxDensity)
+                            maxVal = propInfo.settings.SummaryValues.MaxDensity;
                         var densChannel = ChannelMultiCatDensity.Channel(denstrackid, theFetcher, colinfo, {
                             maxVal:maxVal,
                             categoryColors: propInfo.settings.categoryColors
@@ -627,7 +627,7 @@ define([
                     var theChannel = that.channelMap[channelId];
                     if (!theChannel) { // Channel does not yet exist -> create
                         theChannel = ChannelYVals.Channel(trackid,
-                            { minVal: propInfo.settings.minval, maxVal: propInfo.settings.maxval } // range
+                            { minVal: propInfo.settings.MinVal, maxVal: propInfo.settings.MaxVal } // range
                         );
                         var trackH = 150;
                         if (tableInfo.settings.BrowserTrackHeightFactor)

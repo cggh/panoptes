@@ -7,76 +7,23 @@ import DQXDbTools
 import DQXUtils
 import config
 import shutil
-import SettingsLoader
 from ProcessDatabase import ProcessDatabase
 from ProcessFilterBank import ProcessFilterBank
 
 from BaseImport import BaseImport
-
+from ImportSettings import ImportSettings
 
 class ImportDataTable(BaseImport):
     tableOrder = 0
       
     #Retrieve and validate settings
     def getSettings(self, tableid):
-        tableSettings, properties = self._fetchSettings(tableid)    
+        tableSettings = self._fetchSettings(tableid)    
         
-        tableSettings.RequireTokens(['NameSingle', 'NamePlural', 'PrimKey'])
-        tableSettings.AddTokenIfMissing('IsPositionOnGenome', False)
-        tableSettings.AddTokenIfMissing('IsRegionOnGenome', False)
-        tableSettings.AddTokenIfMissing('MaxTableSize', None)
-        tableSettings.AddTokenIfMissing('MaxCountQueryRecords', 200000)
-        tableSettings.AddTokenIfMissing('MaxCountQueryAggregated', 1000000)
-        tableSettings.AddTokenIfMissing('AllowSubSampling', False)
-
         if tableSettings['MaxTableSize'] is not None:
             self._log('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
-
-        propDict = {}
-        for prop in properties:
-            propDict[prop['propid']] = prop
-            
-
-        if tableSettings['IsPositionOnGenome']:
-            if tableSettings['Chromosome'] not in propDict:
-                raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
-            if tableSettings['Position'] not in propDict:
-                raise Exception('Genome position datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Position']))
-
-        if tableSettings['IsRegionOnGenome']:
-            if not tableSettings.HasToken('Chromosome'):
-                raise Exception('Missing setting "Chromosome" in genome region datatable {0}'.format(tableid))
-            if not tableSettings.HasToken('RegionStart'):
-                raise Exception('Missing setting "RegionStart" in genome region datatable {0}'.format(tableid))
-            if not tableSettings.HasToken('RegionStop'):
-                raise Exception('Missing setting "RegionStop" in genome region datatable {0}'.format(tableid))
-            if tableSettings['Chromosome'] not in propDict:
-                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['Chromosome']))
-            if tableSettings['RegionStart'] not in propDict:
-                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStart']))
-            if tableSettings['RegionStop'] not in propDict:
-                raise Exception('Genome region datatable {0} is missing property "{1}"'.format(tableid, tableSettings['RegionStop']))
-
-        if tableSettings.HasToken('TableBasedSummaryValues'):
-            if not type(tableSettings['TableBasedSummaryValues']) is list:
-                raise Exception('TableBasedSummaryValues token should be a list')
-            for stt in tableSettings['TableBasedSummaryValues']:
-                summSettings = SettingsLoader.SettingsLoader()
-                summSettings.LoadDict(stt)
-                summSettings.RequireTokens(['Id', 'Name', 'MaxVal', 'BlockSizeMax'])
-             
-        for prop in properties:
-                settings = prop['Settings']
-                if settings.HasToken('Relation'):
-                    relationSettings = settings.GetSubSettings('Relation')
-                    relationSettings.RequireTokens(['TableId'])
-                    relationSettings.AddTokenIfMissing('ForwardName', 'belongs to')
-                    relationSettings.AddTokenIfMissing('ReverseName', 'has')
-
-        if tableSettings.HasToken('Description'):
-            tableSettings.SetToken('Description', tableSettings['Description'].replace('\n', ' ').replace('\r', ' '))
                    
-        return tableSettings, properties
+        return tableSettings
                 
 
 
@@ -92,22 +39,19 @@ class ImportDataTable(BaseImport):
             self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'relations'))
             self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablebasedsummaryvalues'))
     
-            tableSettings, properties = self.getSettings(tableid)
-            extraSettings = tableSettings.Clone()
-            extraSettings.DropTokens(['PrimKey', 'Properties'])
+            tableSettings = self.getSettings(tableid)
     
             # Drop existing tablecatalog record
             sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)
             self._execSql(sql)
-    
+
             # Add to tablecatalog
-            extraSettings.ConvertStringsToSafeSQL()
-            sql = "INSERT INTO tablecatalog VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
+            sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
                 tableid,
                 tableSettings['NamePlural'],
                 tableSettings['PrimKey'],
                 tableSettings['IsPositionOnGenome'],
-                extraSettings.ToJSON(),
+                tableSettings.serialize(),
                 "", #defaultQuery
                 self.tableOrder
             )
@@ -121,27 +65,26 @@ class ImportDataTable(BaseImport):
             sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
             self._execSql(sql)
 
-            properties = [prop for prop in properties if prop['Settings']['ReadData']]
-
             ranknr = 0
-            for prop in properties:
-                propid = prop['propid']
-                settings = prop['Settings']
-                extraSettings = settings.Clone()
-                extraSettings.DropTokens(['Name', 'DataType', 'Order'])
-                sql = "INSERT INTO propertycatalog VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
-                    settings['DataType'],
+            for propid in tableSettings.getPropertyNames():
+                
+                if not tableSettings.getPropertyValue(propid,'ReadData'):
+                    continue
+                
+                sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
+                    tableSettings.getPropertyValue(propid, 'DataType'),
                     propid,
                     tableid,
-                    settings['Name'],
+                    tableSettings.getPropertyValue(propid, 'Name'),
                     0,
-                    extraSettings.ToJSON()
+                    tableSettings.serializeProperty(propid)
                 )
                 self._execSql(sql)
-                if settings.HasToken('Relation'):
-                    relationSettings = settings.GetSubSettings('Relation')
-                    self._log('Creating relation: '+relationSettings.ToJSON())
-                    sql = "INSERT INTO relations VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
+                
+                if 'Relation' in tableSettings.getProperty(propid):
+                    relationSettings = tableSettings.getPropertyValue(propid, 'Relation')
+                    self._log('Creating relation: {} {} {}'.format(relationSettings['TableId'],relationSettings['ForwardName'],relationSettings['ReverseName']))
+                    sql = "INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                         tableid,
                         propid,
                         relationSettings['TableId'],
@@ -178,16 +121,16 @@ class ImportDataTable(BaseImport):
                     if os.path.isdir(os.path.join(graphsfolder, graphid)):
                         print('Importing graph ' + graphid)
                         graphfolder = os.path.join(graphsfolder, graphid)
-                        graphSettings = SettingsLoader.SettingsLoader(os.path.join(graphfolder, 'settings'))
-                        crosslink = ''
-                        if graphSettings.HasToken('CrossLink'):
-                            crosslink = graphSettings['CrossLink']
-                        sql = "INSERT INTO graphs VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
+                        
+                        graphSettings = ImportSettings(os.path.join(graphfolder, 'settings'), settingsDef = ImportSettings._graphSettings)
+                       
+                        crosslink = graphSettings['CrossLink']
+                        sql = "INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
                             graphid,
                             tableid,
                             'tree',
                             graphSettings['Name'],
-                            graphSettings.ToJSON(),
+                            graphSettings.serialize(),
                             crosslink
                         )
                         self._execSql(sql)

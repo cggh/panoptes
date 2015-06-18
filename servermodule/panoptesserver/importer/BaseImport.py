@@ -1,6 +1,6 @@
 import os
 import ImpUtils
-import SettingsLoader
+import ImportSettings
 import config
 import DQXDbTools
 import simplejson
@@ -38,6 +38,8 @@ class BaseImport(object):
       
         self._dataFile = 'data'
         
+        settingsDef = None
+        
         if dataDir == 'datatables' or dataDir == 'workspaces':  
             datasetFolder = os.path.join(baseFolder, datasetId)
         
@@ -45,6 +47,7 @@ class BaseImport(object):
         elif dataDir == 'workspaces':
             datasetFolder = os.path.join(baseFolder,datasetId, self._workspaceId)
             self._datatablesFolder = os.path.join(datasetFolder, dataDir)
+            settingsDef = ImportSettings.ImportSettings._workspaceSettings
         elif dataDir == '2D_datatables':
             datasetFolder = os.path.join(baseFolder, datasetId)
         
@@ -53,10 +56,11 @@ class BaseImport(object):
         elif dataDir == 'customdata':
             self._datatablesFolder = os.path.join(baseFolder, self._workspaceId)           
             self._datasetFolder = self._datatablesFolder
+            settingsDef = ImportSettings.ImportSettings._workspaceSettings
             
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = SettingsLoader.SettingsLoader(settingsFile, False)
+            self._globalSettings = ImportSettings.ImportSettings(settingsFile, False, settingsDef = settingsDef)
         else:
             self._globalSettings = None
             
@@ -116,7 +120,7 @@ class BaseImport(object):
         ret = []
         
         self._log(str(self))
-        if self._globalSettings and self._globalSettings.HasToken(self._tablesToken):
+        if self._globalSettings[self._tablesToken]:
             ret = self._getGlobalSettingList(self._tablesToken)
         else:
             if not os.path.exists(os.path.join(self._datasetFolder, self._dataDir)):
@@ -129,7 +133,7 @@ class BaseImport(object):
     
     def _getGlobalSettingList(self, name):
         retval = None
-        if self._globalSettings is not None and self._globalSettings.HasToken(name):
+        if self._globalSettings is not None and self._globalSettings[name]:
             if not type(self._globalSettings[name]) is list:
                 raise Exception(name + ' token should be a list')
             retval = self._globalSettings[name]
@@ -180,7 +184,7 @@ class BaseImport(object):
         
         return settings, data
     
-    def _fetchCustomSettings(self, source, datatable, includeProperties = True):
+    def _fetchCustomSettings(self, source, datatable):
                 
         settings, data = self._getCustomSettings(source, datatable)
         
@@ -188,29 +192,27 @@ class BaseImport(object):
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
         else:
-            tableSettings = SettingsLoader.SettingsLoader(settings, False)
-
-        properties = None
-        if includeProperties:
-            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data)
+            tableSettings = ImportSettings.ImportSettings(settings, settingsDef = ImportSettings.ImportSettings._customDataSettings)
         
-        return tableSettings, properties
+        return tableSettings
     
-    def _fetchSettings(self, datatable, includeProperties = True, log = False):
+    def _fetchSettings(self, datatable, settingsDef = None):
                 
         settings, data = self._getDataFiles(datatable)
         
-        tableSettings = SettingsLoader.SettingsLoader(settings, False)
-
-        properties = None
-        if includeProperties:
-            properties = ImpUtils.LoadPropertyInfo(self._calculationObject, tableSettings, data, log)
+        tableSettings = ImportSettings.ImportSettings(settings, settingsDef = settingsDef)
+        #self._log("Loaded importsettings")
+        #tableSettings = SettingsLoader.SettingsLoader(settings, False)
                 
-        return tableSettings, properties
+        return tableSettings
 
     def _getDatasetFolders(self, datatables):
         
         subDir = 'datatables'
+        
+        if datatables == None:
+            datatables = []
+            
         for directory in os.listdir(os.path.join(self._datasetFolder, subDir)):
             if os.path.isdir(os.path.join(self._datasetFolder, subDir, directory)):
                 if directory not in datatables:
@@ -253,9 +255,12 @@ class BaseImport(object):
             cur.execute(sql)
             tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
             
+            if not tableid is None and len(tables) != 1:
+                raise Exception("Index Table " + tableid + " doesn't exist")
+                
             for table in tables:
-                tableSettings = SettingsLoader.SettingsLoader()
-                tableSettings.LoadDict(simplejson.loads(table['settingsStr'], strict=False))
+                tableSettings = ImportSettings.ImportSettings(settingsDef = ImportSettings.ImportSettings._dataTableSettings)
+                tableSettings.deserialize(table['settingsStr'])
                 table['settings'] = tableSettings
                 
         return tables
