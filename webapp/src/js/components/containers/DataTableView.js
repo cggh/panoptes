@@ -5,16 +5,17 @@ const shallowEquals = require('shallow-equals');
 const classNames = require('classnames');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
+const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
 
 const {Table, Column} = require('fixed-data-table');
 const Loading = require('ui/Loading');
-const ResizeDetect = require('utils/ResizeDetector');
+
 
 let DataTableView = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin],
+  mixins: [PureRenderMixin, FluxMixin, SetSizeToParent],
 
   propTypes: {
     dataset: React.PropTypes.string.isRequired,
@@ -80,15 +81,15 @@ let DataTableView = React.createClass({
 
   render() {
     let { query, className } = this.props;
-    let { loadStatus, rows, size } = this.state;
+    let { loadStatus, rows, width, height } = this.state;
     return (
-        <ResizeDetect className={classNames("datatable", className)} onResize={(size) => this.setState({size:size})}>
+        <div className={classNames("datatable", className)}>
             <Table
               rowHeight={50}
               rowGetter={(index) => rows[index]}
               rowsCount={rows.length}
-              width={size.width}
-              height={size.height}
+              width={width}
+              height={height}
               headerHeight={50}>
               <Column
                 label="SnpName"
@@ -97,7 +98,7 @@ let DataTableView = React.createClass({
                 />
             </Table>
             <Loading status={loadStatus}/>
-        </ResizeDetect>
+        </div>
     );
   }
 
