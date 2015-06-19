@@ -230,6 +230,8 @@ let parseCustomProperties = function () {
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);
+    tableInfo.propertiesMap = tableInfo.propertiesMap || {};
+    tableInfo.propertiesMap[prop.propid] = prop;
   });
 
   var promises = [];

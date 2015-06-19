@@ -31,6 +31,13 @@ let LayoutActions = {
   modalClose() {
     this.dispatch(LAYOUT.MODAL_CLOSE);
   },
+  modalOpen(component, props) {
+    this.dispatch(LAYOUT.MODAL_OPEN,
+      {
+        component: component,
+        props: props
+      });
+  },
   notify(notification) {
     this.dispatch(LAYOUT.NOTIFY, notification);
   },

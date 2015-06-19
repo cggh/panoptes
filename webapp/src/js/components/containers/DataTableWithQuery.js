@@ -10,9 +10,10 @@ const Sidebar = require('react-sidebar');
 const DataTableView = require('containers/DataTableView');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
+const QueryString = require('ui/QueryString');
 
 const mui = require('material-ui');
-const {Toolbar, IconButton} = mui;
+const {FlatButton} = mui;
 
 //For mock data:
 const SQL = require('panoptes/SQL');
@@ -54,12 +55,22 @@ let DataTableWithQuery = React.createClass({
   },
 
   render() {
+    let actions = this.getFlux().actions;
     let {table, query, sidebar, componentUpdate} = this.props;
-    console.log(this.state.table_config.toJS());
+    let {table_config} = this.state;
     let {icon, description} = this.state.table_config.toObject();
+
     let sidebar_content = (
       <div className="sidebar">
         <SidebarHeader icon={icon} description={description}/>
+        <QueryString table={table_config} query={query}/>
+        <FlatButton label="Change Query"
+                    primary={true}
+                    onClick={() => actions.layout.modalOpen('ui/QueryPicker',
+                      {
+                        tableConfig: table_config,
+                        msg: "Oh yeah!"
+                      })}/>
       </div>
     );
 //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37

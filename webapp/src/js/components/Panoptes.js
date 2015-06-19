@@ -16,9 +16,13 @@ const mui = require('material-ui');
 const {IconButton} = mui;
 const ThemeManager = new mui.Styles.ThemeManager();
 const Icon = require('ui/Icon');
+const Colors = require('material-ui/src/styles/colors');
+const ColorManipulator = require('material-ui/src/utils/color-manipulator');
 
 const HelloWorld = require('ui/HelloWorld');
 const DataTable = require('containers/DataTableWithQuery');
+const QueryPicker = require('ui/QueryPicker');
+
 
 let Panoptes = React.createClass({
   mixins: [FluxMixin, PureRenderMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
@@ -44,6 +48,22 @@ let Panoptes = React.createClass({
   },
 
   getChildContext() {
+    //ThemeManager.setTheme({
+    //  getPalette: function() {
+    //    return {
+    //      primary1Color: Colors.cyan500,
+    //      primary2Color: Colors.cyan700,
+    //      primary3Color: Colors.cyan100,
+    //      accent1Color: Colors.redA200,
+    //      accent2Color: Colors.redA400,
+    //      accent3Color: Colors.redA100,
+    //      textColor: Colors.darkBlack,
+    //      canvasColor: Colors.white,
+    //      borderColor: Colors.grey300,
+    //      disabledColor: ColorManipulator.fade(Colors.darkBlack, 0.3)        };
+    //  },
+    //  getComponentThemes: function() {}
+    //});
     return {
       muiTheme: ThemeManager.getCurrentTheme()
     };

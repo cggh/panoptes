@@ -20,7 +20,10 @@ let SidebarHeader = React.createClass({
         <span className="description">
            {description}
         </span>
-       </div>
+        <div style={ {clear: 'both'} }/>
+      </div>
+
+
     );
   }
 });
