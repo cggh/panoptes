@@ -12,20 +12,20 @@ let Loading = React.createClass({
     let { status, ...other } = this.props;
     if (status == 'loading')
       return (
-        <div className="loading-container">
+        <div className="loading-container show">
           <div className="spinner" />
         </div>
       );
 
     if (status == 'error')
       return (
-        <div className="loading-container">
+        <div className="loading-container show">
           <div className="error" />
         </div>
       );
 
     return (
-      <div className="loading-container loaded">
+      <div className="loading-container">
         <div className="spinner" />
       </div>
     );

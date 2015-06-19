@@ -181,29 +181,6 @@
   -moz-transform: none !important;
 }
 
-@keyframes fadeout {
-  0% {
-    opacity: 1;
-    visibility: visible;
-  }
-  99% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-@keyframes fadein {
-  0% {
-    opacity: 0;
-    visibility: visible;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 
 .loading-container {
   position: absolute;
@@ -217,7 +194,9 @@
   height: 100%;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.6);
-  animation: fadein 1s linear;
+  visibility: hidden;
+  opacity:0;
+  transition:visibility 0s linear 0.5s,opacity 0.5s linear;
   div {
     opacity: 0.5;
     height: 50%;
@@ -236,9 +215,10 @@
 
 }
 
-.loading-container.loaded {
-  animation: fadeout 1s linear;
-  visibility: hidden;
+.loading-container.show {
+  visibility:visible;
+  opacity:1;
+  transition-delay:0s;
 }
 
 .top-bar {
