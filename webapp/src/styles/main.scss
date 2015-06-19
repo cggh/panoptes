@@ -1,11 +1,24 @@
 @import "./normalize.css";
-@import "./bootstrap.css";
 @import "./font-awesome.css";
 @import "./fixed-data-table.css";
 @import "./ui-components.scss";
 
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Roboto', sans-serif;
+  font-size: 14px;
 }
 
 .main {
@@ -19,6 +32,8 @@ body {
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: visible;
+      z-index: 1;
       height: 50px;
       background: linear-gradient(to right, #000000 0%, #757575 100%);
 
@@ -39,15 +54,6 @@ body {
         color: white;
         font-weight: bold;
       }
-
-      .btn-toolbar {
-        .btn {
-          font-size: 22px;
-          padding: 0px 6px;
-        }
-        margin: 7px;
-      }
-
     }
 
     .body {

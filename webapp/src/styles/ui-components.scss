@@ -34,7 +34,7 @@
       border-top-right-radius: 8px;
       margin-right: 2px;
       margin-left: 2px;
-      padding: 7px 5px 0px 9px;
+      padding: 0 7px 0px 7px;
       cursor: pointer;
       top: 1px;
       font-weight: bold;
@@ -43,16 +43,10 @@
       white-space: nowrap;
       color: rgb(255, 255, 255);
       background: $primary-color;
-      .icon {
-        position: relative;
-        left: -2px;
-        top: -3px;
-        vertical-align: text-top;
-        font-size: 24px;
-        margin-left: 10px;
-      }
       .title {
         flex: 1;
+        vertical-align: middle;
+        line-height: $topbar-height;
       }
     }
     .tab.active {
@@ -63,15 +57,32 @@
     .tab.inactive:hover {
       opacity: 0.9;
     }
+    .tab.inactive .action {
+      display: none;
+    }
   }
 
 }
+
+.icon {
+  position: relative;
+  vertical-align: middle;
+  font-size: 22px;
+  margin: 5px;
+  color: white;
+}
+
+.icon.close {
+  opacity: .3;
+}
+
 
 .popups {
   overflow: hidden;
   position: absolute;
   top: 0;
   left: 0;
+  //z-index: 10;
   .popup {
     display: flex;
     flex-direction: column;
@@ -95,28 +106,22 @@
       overflow: hidden;
       white-space: nowrap;
       height: $topbar-height;
-      padding: 7px 7px 7px 12px;
+      //padding: 7px 7px 7px 12px;
       cursor: move;
       font-size: 10pt;
       font-weight: bold;
       color: rgb(255, 255, 255);
-      background: $primary-color;
-      display: flex;
+      //background: $primary-color;
+      background: linear-gradient(to right, #000000 0%, #757575 100%);display: flex;
       //MD like shadow needs relative and z-index
       box-shadow: $z-1-shadow;
       position: relative;
       z-index: 3;
 
-      .icon {
-        color: white;
-        position: relative;
-        left: -5px;
-        top: -4px;
-        vertical-align: text-top;
-        font-size: 24px;
-      }
       .title {
         flex: 1;
+        vertical-align: middle;
+        line-height: $topbar-height;
       }
     }
 
@@ -249,16 +254,18 @@
 
 .sidebar-header {
   line-height: normal;
-  div.icon {
+  .icon-holder {
     border-radius: 9px;
     border: 2px solid rgb(99, 201, 205);
     padding: 5px 12px;
     margin-right: 10px;
     margin-bottom: 10px;
     float: left;
-    font-size: 30px;
-    color: $primary-color;
     background-color: $light-primary-color;
+    .icon {
+      font-size: 30px;
+      color: $primary-color;
+    }
   }
 }
 
@@ -270,4 +277,8 @@
   div.grow {
     flex: 1;
   }
+}
+
+.pointer {
+  cursor: pointer;
 }

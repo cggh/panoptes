@@ -7,10 +7,12 @@ const FluxMixin = require('mixins/FluxMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar');
-const {Button, ButtonToolbar} = require('react-bootstrap');
 const DataTableView = require('containers/DataTableView');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
+
+const mui = require('material-ui');
+const {Toolbar, IconButton} = mui;
 
 //For mock data:
 const SQL = require('panoptes/SQL');
@@ -67,12 +69,11 @@ let DataTableWithQuery = React.createClass({
         docked={sidebar}
         sidebar={sidebar_content}>
         <div className="vertical-stack">
-          <ButtonToolbar className="top-bar">
-            <Button onClick={() => componentUpdate({sidebar: !sidebar})}>
-              <Icon className='icon' name={sidebar ? 'arrow-left' : 'bars'}/>
-            </Button>
-          </ButtonToolbar>
-
+          <div className="top-bar">
+            <Icon className='pointer icon'
+                  name={sidebar ? 'arrow-left' : 'bars'}
+                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+          </div>
           <DataTableView className='grow'
             dataset={initialConfig.dataset}
             table={table}
@@ -84,3 +85,10 @@ let DataTableWithQuery = React.createClass({
 });
 
 module.exports = DataTableWithQuery;
+
+
+//<ButtonToolbar className="top-bar">
+//  <Button onClick={() => componentUpdate({sidebar: !sidebar})}>
+//    <Icon className='icon' name={sidebar ? 'arrow-left' : 'bars'}/>
+//  </Button>
+//</ButtonToolbar>

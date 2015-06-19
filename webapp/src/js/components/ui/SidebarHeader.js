@@ -14,7 +14,7 @@ let SidebarHeader = React.createClass({
     let { icon, description } = this.props;
     return (
       <div className="sidebar-header">
-        <div className="icon">
+        <div className="icon-holder">
           <Icon name={icon}/>
         </div>
         <span className="description">

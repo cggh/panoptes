@@ -92,7 +92,7 @@ let Popup = React.createClass({
             <div className="popup-header">
               {faIcon ? <Icon name={faIcon}/> : null}
               <div className="title">{title}</div>
-              <Icon className="close" name="close" onClick={this.handleClose}/>
+              <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
               {children}

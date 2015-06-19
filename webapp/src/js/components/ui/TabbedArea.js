@@ -26,7 +26,7 @@ let TabbedArea = React.createClass({
       this.props.onClose(tabId);
     }
   },
-  
+
   renderTab(tab) {
     let id = tab.props.compId;
     let classes = {
@@ -39,7 +39,7 @@ let TabbedArea = React.createClass({
            key = {id}
            onClick={this.handleClick.bind(this, id)}>
         <div className="title">{tab.props.title}</div>
-        <Icon className="close" name="close" onClick={this.handleClose.bind(this, id)}/>
+        <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
       </div>
     )
   },

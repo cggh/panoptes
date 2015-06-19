@@ -15,7 +15,7 @@ var LayoutStore = Fluxxor.createStore({
       components: {
         'Table': {
           component: 'containers/DataTableWithQuery',
-          title: 'Variants',
+          title: 'Variants - filtered',
           faIcon: 'bookmark',
           props: {
             compId: 'Table',

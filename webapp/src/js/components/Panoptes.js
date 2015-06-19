@@ -12,7 +12,9 @@ const TabPane = require('ui/TabPane');
 const Popups = require('ui/Popups');
 const Popup = require('ui/Popup');
 const Modal = require('ui/Modal');
-const {Button, ButtonToolbar} = require('react-bootstrap');
+const mui = require('material-ui');
+const {IconButton} = mui;
+const ThemeManager = new mui.Styles.ThemeManager();
 const Icon = require('ui/Icon');
 
 const HelloWorld = require('ui/HelloWorld');
@@ -37,11 +39,22 @@ let Panoptes = React.createClass({
     }
   },
 
+  childContextTypes: {
+    muiTheme: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      muiTheme: ThemeManager.getCurrentTheme()
+    };
+  },
+
   render() {
     let actions = this.getFlux().actions.layout;
     let l_state = this.state.layout.toObject();
     let p_state = this.state.panoptes.toObject();
     let modal = l_state.modal.toObject();
+    let iconStyle = {color:'white'};
     return (
       <div>
         <div className="page">
@@ -49,11 +62,9 @@ let Panoptes = React.createClass({
             <div className="title">{p_state.settings.get('Name')}</div>
             <div className="username">{p_state.userID}</div>
             <img className="logo" src={p_state.logo}/>
-            <ButtonToolbar>
-              <Button><Icon className='icon' name="question-circle"/></Button>
-              <Button><Icon className='icon' name="search"/></Button>
-              <Button><Icon className='icon' name="link"/></Button>
-            </ButtonToolbar>
+            <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
+            <IconButton tooltip="Find" iconClassName="fa fa-search"/>
+            <IconButton tooltip="Link" iconClassName="fa fa-link"/>
           </div>
           <div className="body">
             <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
