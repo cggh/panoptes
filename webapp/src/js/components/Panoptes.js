@@ -74,7 +74,6 @@ let Panoptes = React.createClass({
     let l_state = this.state.layout.toObject();
     let p_state = this.state.panoptes.toObject();
     let modal = l_state.modal.toObject();
-    let iconStyle = {color:'white'};
     return (
       <div>
         <div className="page">
@@ -97,8 +96,7 @@ let Panoptes = React.createClass({
                 return (
                   <TabPane
                     compId={compId}
-                    key={compId}
-                    title={tab.title}>
+                    key={compId}>
                     {React.createElement(require(tab.component), props)}
                   </TabPane>
                 )
@@ -117,8 +115,6 @@ let Panoptes = React.createClass({
                 {...state.toObject()}
                 compId={compId}
                 key={compId}
-                faIcon={popup.faIcon}
-                title={popup.title}
                 onMoveStop={actions.popupMove.bind(this, compId)}
                 onResizeStop={actions.popupResize.bind(this, compId)}
                 onClose={actions.popupClose.bind(this, compId)}

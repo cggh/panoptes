@@ -7,7 +7,15 @@ let TabPane = React.createClass({
 
   propTypes: {
     title: React.PropTypes.string,
-    active: React.PropTypes.bool //Usually set by TabbedArea
+    active: React.PropTypes.bool, //Usually set by TabbedArea
+    children: React.PropTypes.element
+  },
+
+  icon() {
+    return this.refs.child.icon ? this.refs.child.icon() : null;
+  },
+  title() {
+    return this.refs.child.title ? this.refs.child.title() : null;
   },
 
   render() {
@@ -18,7 +26,7 @@ let TabPane = React.createClass({
 
     return (
       <div {...this.props} className={classNames(this.props.className, classes)}>
-        {this.props.children}
+        {React.addons.cloneWithProps(this.props.children, {ref: 'child' })}
       </div>
     );
   }

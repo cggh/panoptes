@@ -8,6 +8,13 @@ let QueryPicker = React.createClass({
     msg: React.PropTypes.string.isRequired
   },
 
+  icon() {
+    return 'filter';
+  },
+  title() {
+    return 'Pick Query';
+  },
+
   render() {
     let { msg, ...other } = this.props;
     return (

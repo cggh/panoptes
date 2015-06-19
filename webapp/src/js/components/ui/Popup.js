@@ -13,8 +13,6 @@ let Popup = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    title: React.PropTypes.string, //Used in title bar
-    faIcon: React.PropTypes.string,
     position: ImmutablePropTypes.shape({
       x: React.PropTypes.number,
       y: React.PropTypes.number
@@ -26,12 +24,12 @@ let Popup = React.createClass({
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
     onClose: React.PropTypes.func,
-    onClick: React.PropTypes.func
+    onClick: React.PropTypes.func,
+    children: React.PropTypes.element
   },
 
   getDefaultProps() {
     return {
-      title: 'Popup',
       position: Immutable.Map({
         x: 100,
         y: 100
@@ -44,7 +42,23 @@ let Popup = React.createClass({
   },
 
   getInitialState() {
-    return {size: this.props.size};
+    return {
+      size: this.props.size,
+      icon: null,
+      title: null
+    };
+  },
+
+  componentDidMount() {
+    this.componentDidUpdate();
+  },
+
+  componentDidUpdate() {
+    let {child} = this.refs;
+    if (child) {
+      child.icon ? this.setState({icon:child.icon()}) : null;
+      child.title ? this.setState({title:child.title()}) : null;
+    }
   },
 
   handleResize(event, {element, size}) {
@@ -74,7 +88,10 @@ let Popup = React.createClass({
   },
 
   render() {
-    let { position, size, title, faIcon, children, ...other } = this.props;
+    let { position, size, children, ...other } = this.props;
+    let { icon, title } = this.state;
+    if (!children)
+      return null;
     return (
       <Draggable handle='.popup-drag'
                  start={position.toObject()}
@@ -90,12 +107,12 @@ let Popup = React.createClass({
                style={this.state.size.toObject()}
                {...other}>
             <div className="popup-header">
-              {faIcon ? <Icon name={faIcon}/> : null}
+              {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>
               <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
-              {children}
+              {React.addons.cloneWithProps(children, {ref: 'child' })}
             </div>
             <div className="popup-drag"></div>
           </div>

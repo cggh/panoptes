@@ -7,7 +7,7 @@ const FluxMixin = require('mixins/FluxMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar');
-const DataTableView = require('containers/DataTableView');
+const DataTableView = require('ui/DataTableView');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
 const QueryString = require('ui/QueryString');
@@ -24,10 +24,12 @@ let DataTableWithQuery = React.createClass({
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
+    title: React.PropTypes.string,
     dataset: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     order: React.PropTypes.string,
+    ascending: React.PropTypes.bool,
     columns: ImmutablePropTypes.listOf(
       React.PropTypes.string
     ),
@@ -54,17 +56,25 @@ let DataTableWithQuery = React.createClass({
     }
   },
 
+  icon() {
+    return this.state.table_config.get('icon');
+  },
+
+  title() {
+    //console.log(this.state.table_config.toJS());
+    return this.props.title || this.state.table_config.get('tableCapNamePlural');
+  },
+
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, sidebar, componentUpdate} = this.props;
+    let {table, query, order, sidebar, componentUpdate} = this.props;
     let {table_config} = this.state;
     let {icon, description} = this.state.table_config.toObject();
 
     let sidebar_content = (
       <div className="sidebar">
         <SidebarHeader icon={icon} description={description}/>
-        <QueryString table={table_config} query={query}/>
-        <FlatButton label="Change Query"
+        <FlatButton label="Change Filter"
                     primary={true}
                     onClick={() => actions.layout.modalOpen('ui/QueryPicker',
                       {
@@ -84,6 +94,8 @@ let DataTableWithQuery = React.createClass({
             <Icon className='pointer icon'
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
+            <QueryString className='text' prepend='Filter:' table={table_config} query={query}/>
+
           </div>
           <DataTableView className='grow'
             dataset={initialConfig.dataset}
@@ -96,10 +108,3 @@ let DataTableWithQuery = React.createClass({
 });
 
 module.exports = DataTableWithQuery;
-
-
-//<ButtonToolbar className="top-bar">
-//  <Button onClick={() => componentUpdate({sidebar: !sidebar})}>
-//    <Icon className='icon' name={sidebar ? 'arrow-left' : 'bars'}/>
-//  </Button>
-//</ButtonToolbar>

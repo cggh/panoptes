@@ -1,6 +1,7 @@
 const React = require('react');
 const ValidComponentChildren = require('../utils/ValidComponentChildren');
 const classNames = require('classnames');
+const _ = require('lodash');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const Icon = require('ui/Icon');
 
@@ -27,7 +28,34 @@ let TabbedArea = React.createClass({
     }
   },
 
+  getInitialState() {
+    return {
+      icons: {},
+      titles: {}
+    };
+  },
+
+
+  componentDidMount() {
+    this.componentDidUpdate();
+  },
+
+  componentDidUpdate() {
+    let icons = {};
+    let titles = {};
+    _.each(this.refs, (child, id) => {
+      child.icon ? icons[id] = child.icon() : null;
+      child.title ? titles[id] = child.title() : null;
+    });
+    if (!(_.isEqual(this.state.icons, icons) && _.isEqual(this.state.titles, titles)))
+      this.setState({
+        icons: icons,
+        titles: titles
+      });
+  },
+
   renderTab(tab) {
+    let {icons, titles} = this.state;
     let id = tab.props.compId;
     let classes = {
       tab: true,
@@ -38,7 +66,8 @@ let TabbedArea = React.createClass({
       <div className={classNames(classes)}
            key = {id}
            onClick={this.handleClick.bind(this, id)}>
-        <div className="title">{tab.props.title}</div>
+        {icons[id] ? <Icon name={icons[id]}/> : null}
+        <div className="title">{titles[id]}</div>
         <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
       </div>
     )
@@ -49,7 +78,8 @@ let TabbedArea = React.createClass({
       tab,
       {
         active: (tab.props.compId === this.props.activeTab),
-        key: tab.props.compId
+        key: tab.props.compId,
+        ref: tab.props.compId
       })
   },
 

@@ -8,12 +8,12 @@ let QueryString = React.createClass({
   mixins: [PureRenderMixin],
 
   render() {
-    let {query, table_config, ...other} = this.props;
+    let {query, table_config, prepend, ...other} = this.props;
     let qry = SQL.WhereClause.decode(query);
 
     if ((!qry) || (qry.isTrivial))
       return <span {...other}>
-        All
+        {`${prepend} All`}
       </span>;
 
     var nameMap = {};

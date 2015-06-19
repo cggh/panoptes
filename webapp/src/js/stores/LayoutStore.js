@@ -15,8 +15,6 @@ var LayoutStore = Fluxxor.createStore({
       components: {
         'Table': {
           component: 'containers/DataTableWithQuery',
-          title: 'Variants - filtered',
-          faIcon: 'bookmark',
           props: {
             compId: 'Table',
             dataset: initialConfig.dataset,
@@ -29,8 +27,6 @@ var LayoutStore = Fluxxor.createStore({
         },
         'T1': {
           component: 'ui/HelloWorld',
-          title: 'WTF TAB',
-          faIcon: 'bookmark',
           props: {
             compId: 'T2',
             msg: 'WTF'
@@ -47,8 +43,6 @@ var LayoutStore = Fluxxor.createStore({
         },
         'P1': {
           component: 'ui/HelloWorld',
-          title: 'WTF POP',
-          faIcon: 'bookmark',
           props: {
             compId: 'P1',
             msg: 'WTF'
@@ -56,8 +50,6 @@ var LayoutStore = Fluxxor.createStore({
         },
         'P2': {
           component: 'ui/HelloWorld',
-          title: 'OMG POP',
-          faIcon: 'bookmark',
           props: {
             compId: 'P2',
             msg: 'OMG'
