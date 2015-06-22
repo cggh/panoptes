@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
@@ -16,6 +17,7 @@ let QueryString = React.createClass({
         {`${prepend} All`}
       </span>;
 
+    return (<div>{query}</div>);
     var nameMap = {};
     _.each(MetaData.customProperties,function(propInfo) {
       if (propInfo.tableid == table.id)

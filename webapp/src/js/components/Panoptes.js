@@ -1,10 +1,11 @@
 const React = require('react');
 const Immutable = require('immutable');
-const PureRenderMixin = require('mixins/PureRenderMixin');
 const _ = require('lodash');
 const NotificationSystem = require('react-notification-system');
 
 const FluxMixin = require('mixins/FluxMixin');
+const ConfigMixin = require('mixins/ConfigMixin');
+const PureRenderMixin = require('mixins/PureRenderMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const TabbedArea = require('ui/TabbedArea');
@@ -25,7 +26,11 @@ const QueryPicker = require('containers/QueryPicker');
 
 
 let Panoptes = React.createClass({
-  mixins: [FluxMixin, PureRenderMixin, StoreWatchMixin('LayoutStore', 'PanoptesStore')],
+  mixins: [
+    FluxMixin,
+    ConfigMixin,
+    PureRenderMixin,
+    StoreWatchMixin('LayoutStore', 'PanoptesStore')],
 
   componentDidMount() {
     let store = this.getFlux().store('LayoutStore');
@@ -72,15 +77,16 @@ let Panoptes = React.createClass({
   render() {
     let actions = this.getFlux().actions.layout;
     let l_state = this.state.layout.toObject();
-    let p_state = this.state.panoptes.toObject();
+    let userID = this.state.panoptes.getIn(['user', 'id']);
+    let config = this.getConfig();
     let modal = l_state.modal.toObject();
     return (
       <div>
         <div className="page">
           <div className="header">
-            <div className="title">{p_state.settings.get('Name')}</div>
-            <div className="username">{p_state.userID}</div>
-            <img className="logo" src={p_state.logo}/>
+            <div className="title">{config.settings.Name}</div>
+            <div className="username">{userID}</div>
+            <img className="logo" src={config.logo}/>
             <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
             <IconButton tooltip="Find" iconClassName="fa fa-search"/>
             <IconButton tooltip="Link" iconClassName="fa fa-link"/>

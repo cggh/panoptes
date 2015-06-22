@@ -8,9 +8,9 @@ const API = Constants.API;
 
 var PanoptesStore = Fluxxor.createStore({
 
-  initialize(config) {
+  initialize(init) {
     this.state = Immutable.fromJS(
-      config
+      init
     );
 
     this.bindActions(
@@ -25,12 +25,7 @@ var PanoptesStore = Fluxxor.createStore({
 
   getState() {
     return this.state;
-  },
-
-  getTable(table) {
-    return this.state.getIn(['tables', table]);
   }
-
 });
 
 module.exports = PanoptesStore;

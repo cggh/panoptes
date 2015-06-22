@@ -3,8 +3,10 @@ const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const shallowEquals = require('shallow-equals');
 const classNames = require('classnames');
+
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
+const ConfigMixin = require('mixins/ConfigMixin');
 const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const API = require('panoptes/API');
@@ -15,10 +17,14 @@ const Loading = require('ui/Loading');
 
 
 let DataTableView = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, SetSizeToParent],
+  mixins: [
+    PureRenderMixin,
+    FluxMixin,
+    ConfigMixin,
+    SetSizeToParent
+  ],
 
   propTypes: {
-    dataset: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
@@ -28,7 +34,6 @@ let DataTableView = React.createClass({
 
   getDefaultProps() {
     return {
-      dataset: null,
       table: null,
       query: null,
       order: null,
@@ -63,7 +68,7 @@ let DataTableView = React.createClass({
     this.setState({loadStatus: 'loading'});
     setTimeout(() => {
       API.pageQuery({
-        database: props.dataset,
+        database: this.config.dataset,
         table: props.table,
         columns: {SnpName: 'ST'}
       })

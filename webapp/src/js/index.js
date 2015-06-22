@@ -24,7 +24,7 @@ injectTapEventPlugin();
 InitialConfig()
   .then((config) => {
     let stores = {
-      PanoptesStore: new PanoptesStore(config),
+      PanoptesStore: new PanoptesStore({user:config.user}),
       LayoutStore: new LayoutStore()
     };
 
@@ -35,7 +35,7 @@ InitialConfig()
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
-    React.render(<Panoptes flux={flux}/>, document.getElementById('main'));
+    React.render(<Panoptes flux={flux} config={config}/>, document.getElementById('main'));
   }).done();
 
 

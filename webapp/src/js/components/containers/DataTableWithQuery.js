@@ -4,6 +4,7 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
 const FluxMixin = require('mixins/FluxMixin');
+const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar');
@@ -20,12 +21,11 @@ const SQL = require('panoptes/SQL');
 const shallowEqual = require('shallow-equals');
 
 let DataTableWithQuery = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, StoreWatchMixin('PanoptesStore')],
+  mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
-    dataset: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     order: React.PropTypes.string,
@@ -40,7 +40,6 @@ let DataTableWithQuery = React.createClass({
   getDefaultProps() {
     return {
       componentUpdate: null,
-      dataset: null,
       table: null,
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
@@ -50,18 +49,16 @@ let DataTableWithQuery = React.createClass({
     };
   },
 
-  getStateFromFlux() {
-    return {
-      table_config: this.getFlux().store('PanoptesStore').getTable(this.props.table)
-    }
+  componentWillMount() {
+    this.config = this.config.tables[this.props.table];
   },
 
   icon() {
-    return this.state.table_config.get('icon');
+    return this.config.icon;
   },
 
   title() {
-    return this.props.title || this.state.table_config.get('tableCapNamePlural');
+    return this.props.title || this.config.tableCapNamePlural;
   },
 
   handlePick(query) {
@@ -73,8 +70,7 @@ let DataTableWithQuery = React.createClass({
   render() {
     let actions = this.getFlux().actions;
     let {table, query, order, sidebar, componentUpdate} = this.props;
-    let {table_config} = this.state;
-    let {icon, description} = this.state.table_config.toObject();
+    let {icon, description} = this.config;
 
     let sidebar_content = (
       <div className="sidebar">
@@ -100,11 +96,10 @@ let DataTableWithQuery = React.createClass({
             <Icon className='pointer icon'
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <QueryString className='text' prepend='Filter:' table={table_config} query={query}/>
+            <QueryString className='text' prepend='Filter:' table={table} query={query}/>
 
           </div>
           <DataTableView className='grow'
-            dataset={initialConfig.dataset}
             table={table}
             query={query}/>
         </div>

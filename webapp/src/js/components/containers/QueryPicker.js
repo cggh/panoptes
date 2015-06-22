@@ -1,6 +1,7 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
+const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const SQL = require('panoptes/SQL');
@@ -9,7 +10,11 @@ const {RaisedButton} = require('material-ui');
 const QueryString = require('ui/QueryString');
 
 let QueryPicker = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, StoreWatchMixin('PanoptesStore')],
+  mixins: [
+    PureRenderMixin,
+    FluxMixin,
+    ConfigMixin,
+    StoreWatchMixin('PanoptesStore')],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
@@ -19,7 +24,6 @@ let QueryPicker = React.createClass({
 
   getStateFromFlux() {
     return {
-      table_config: this.getFlux().store('PanoptesStore').getTable(this.props.table)
     }
   },
 
@@ -29,11 +33,15 @@ let QueryPicker = React.createClass({
     }
   },
 
+  componentWillMount() {
+    this.config = this.config.tables[this.props.table];
+  },
+
   componentDidMount() {
     if (this.props.initialQuery)
       this.setState({query: this.props.initialQuery});
     else {
-      let defaultQuery = this.state.table_config.get('defaultQuery');
+      let defaultQuery = this.config.defaultQuery;
       if (defaultQuery && defaultQuery != '') {
         this.setState({query: defaultQuery});
       }
@@ -44,7 +52,7 @@ let QueryPicker = React.createClass({
     return 'filter';
   },
   title() {
-    return `Pick Filter for ${this.state.table_config.get('tableNamePlural')}`;
+    return `Pick Filter for ${this.config.tableNamePlural}`;
   },
 
   handlePick() {
@@ -52,14 +60,15 @@ let QueryPicker = React.createClass({
   },
 
   render() {
-    let {query, table_config} = this.state;
+    let {query} = this.state;
+    let {table} = this.props;
     return (
       <div className='large-modal'>
         <div className='hoizontal stack'>
           <div className='vertical stack'>
             <div className='red grow'>LIST</div>
             <div className='centering-container'>
-              <QueryString className='text' prepend='' table={table_config} query={query}/>
+              <QueryString className='text' prepend='' table={table} query={query}/>
             </div>
           </div>
           <div className='vertical stack'>
