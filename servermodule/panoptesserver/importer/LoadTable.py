@@ -180,7 +180,7 @@ class LoadTable(threading.Thread):
             
             if self._loadSettings.getPropertyValue(col,'DataType') == 'Text':
                 maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
-                self._log("{} {}".format(content, len(content)))
+                #self._log("{} {}".format(content, len(content)))
                 self._loadSettings.setPropertyValue(col,'MaxLen',max(maxlen, len(content)))
                 
             writeCells.append(content)
