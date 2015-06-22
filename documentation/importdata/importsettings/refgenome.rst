@@ -15,6 +15,7 @@ This YAML_ file contains settings for the :ref:`reference genome<dataconcept_ref
 Possible keys
 .............
 
+
 GenomeBrowserDescr
   *Text.* Descriptive text that will be displayed in the genome browser section of the main page.
 
@@ -26,38 +27,42 @@ RefSequenceSumm
 
 Annotation
   *Block.* Directives for parsing the annotation file (annotation.gff).
-  Possible member keys:
+  The block can contain the following keys:
+    Format
+      *Text.* File format. Possible values
+        GFF = Version 3 GFF file
+        GTF = Version 2 GTF file
 
-  Format
-    *Text.* File format. Possible values
-     - ``GFF`` = Version 3 GFF file
-     - ``GTF`` = Version 2 GTF file
+.
 
-  GeneFeature
-    *Text or List.* Feature id(s) used to identify genes.
-    Example: ``[gene, pseudogene]``.
+    GeneFeature
+      *Text or List.* Feature id(s) used to identify genes.
+  Example: [gene, pseudogene].
 
-  ExonFeature
-    *Text or List.* Feature id(s) used to identify exons.
+    ExonFeature
+      *Text or List.* Feature id(s) used to identify exons.
 
-  GeneNameAttribute:
-    *Text.* Attribute id used to identify gene names.
+    GeneNameAttribute
+      *Text.* Attribute id used to identify gene names.
 
-  GeneNameSetAttribute:
-    *Text or List.* Attribute id(s) used to identify gene name sets.
-    Example: ``[Name,Alias]``.
+    GeneNameSetAttribute
+      *Text or List.* Attribute id(s) used to identify gene name sets.
+  Example: [Name,Alias].
 
-  GeneDescriptionAttribute
-    *Text or List.*  Attribute id(s) used to identify gene descriptions.
+    GeneDescriptionAttribute
+      *Text or List.* Attribute id(s) used to identify gene descriptions.
 
-ExternalGeneLinks:
+
+ExternalGeneLinks
   *List.* Each item in the list specifies a link for a gene to an external url.
   These links will show up as buttons in the gene popup window.
-  An item in this list should contain the following keys:
-
+  The block can contain the following keys:
     Url
-      *Text (required).*: Url for this link.
+      *Text (required).* Url for this link.
       This may include a token ``{Id}`` to refer to the unique gene identifier.
       Example: ``https://www.google.co.uk/search?q={Id}``.
-    Name:
+
+    Name
       *Text (required).* Display name for this external link.
+
+
