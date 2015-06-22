@@ -52,6 +52,9 @@ Properties:
     ForwardName: is contributed by  # Display name of the relation from child to parent
     ReverseName: contributed        # Display name of the relation from parent to child
 
+- Id: SampleDate
+  DataType: Date
+
 - Id: Value1
   Name: Value 1
   Description: An example of a numerical value
