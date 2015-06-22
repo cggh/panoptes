@@ -61,8 +61,13 @@ let DataTableWithQuery = React.createClass({
   },
 
   title() {
-    //console.log(this.state.table_config.toJS());
     return this.props.title || this.state.table_config.get('tableCapNamePlural');
+  },
+
+  handlePick(query) {
+    let flux = this.getFlux();
+    flux.actions.layout.modalClose();
+    this.props.componentUpdate({query: query});
   },
 
   render() {
@@ -76,10 +81,11 @@ let DataTableWithQuery = React.createClass({
         <SidebarHeader icon={icon} description={description}/>
         <FlatButton label="Change Filter"
                     primary={true}
-                    onClick={() => actions.layout.modalOpen('ui/QueryPicker',
+                    onClick={() => actions.layout.modalOpen('containers/QueryPicker',
                       {
-                        tableConfig: table_config,
-                        msg: "Oh yeah!"
+                        table: table,
+                        initialQuery: query,
+                        onPick: this.handlePick
                       })}/>
       </div>
     );
@@ -89,7 +95,7 @@ let DataTableWithQuery = React.createClass({
       <Sidebar
         docked={sidebar}
         sidebar={sidebar_content}>
-        <div className="vertical-stack">
+        <div className="vertical stack">
           <div className="top-bar">
             <Icon className='pointer icon'
                   name={sidebar ? 'arrow-left' : 'bars'}

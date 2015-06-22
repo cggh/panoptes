@@ -75,7 +75,12 @@ var LayoutStore = Fluxxor.createStore({
           }
         }
       },
-      modal: {}
+      modal: {
+        //component:'containers/QueryPicker',
+        //props: {
+        //  table: 'variants'
+        //}
+      }
     });
 
     this.bindActions(

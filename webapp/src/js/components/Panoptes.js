@@ -21,7 +21,7 @@ const ColorManipulator = require('material-ui/src/utils/color-manipulator');
 
 const HelloWorld = require('ui/HelloWorld');
 const DataTable = require('containers/DataTableWithQuery');
-const QueryPicker = require('ui/QueryPicker');
+const QueryPicker = require('containers/QueryPicker');
 
 
 let Panoptes = React.createClass({

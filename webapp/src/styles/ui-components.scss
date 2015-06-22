@@ -154,7 +154,11 @@
     position: static;
     transition: none;
     visibility: hidden;
+    .popup-header {
+      cursor: inherit;
+    }
   }
+
 }
 
 .modal.visible {
@@ -289,9 +293,8 @@
   }
 }
 
-.vertical-stack {
+.stack {
   display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
   div.grow {
@@ -299,6 +302,31 @@
   }
 }
 
+.stack.vertical {
+  flex-direction: column;
+}
+
+.stack.horizontal {
+  flex-direction: row;
+}
+
 .pointer {
   cursor: pointer;
+}
+
+
+.large-modal {
+  height: calc(100vh - 200px);
+  width: calc(100vw - 200px);
+}
+
+.centering-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.button {
+  margin: 20px;
 }
