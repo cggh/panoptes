@@ -76,10 +76,10 @@ let Panoptes = React.createClass({
 
   render() {
     let actions = this.getFlux().actions.layout;
-    let l_state = this.state.layout.toObject();
+    let {tabs, popups, modal, components} = this.state.layout.toObject();
+    modal = modal.toObject();
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.getConfig();
-    let modal = l_state.modal.toObject();
     return (
       <div>
         <div className="page">
@@ -92,11 +92,11 @@ let Panoptes = React.createClass({
             <IconButton tooltip="Link" iconClassName="fa fa-link"/>
           </div>
           <div className="body">
-            <TabbedArea activeTab={l_state.tabs.get('selectedTab')}
+            <TabbedArea activeTab={tabs.get('selectedTab')}
                         onSelect={actions.tabSwitch}
                         onClose={actions.tabClose}>
-              {l_state.tabs.get('components').map(compId => {
-                let tab = l_state.components.get(compId).toObject();
+              {tabs.get('components').map(compId => {
+                let tab = components.get(compId).toObject();
                 let props = tab.props.toObject();
                 props.componentUpdate = actions.componentUpdateFor(compId);
                 return (
@@ -111,11 +111,11 @@ let Panoptes = React.createClass({
           </div>
         </div>
         <Popups>
-          {l_state.popups.get('components').map(compId => {
-            let popup = l_state.components.get(compId).toObject();
+          {popups.get('components').map(compId => {
+            let popup = components.get(compId).toObject();
             let props = popup.props.toObject();
             props.componentUpdate = actions.componentUpdateFor(compId);
-            let state = l_state.popups.getIn(['state',compId]) || Immutable.Map();
+            let state = popups.getIn(['state',compId]) || Immutable.Map();
             return (
               <Popup
                 {...state.toObject()}
