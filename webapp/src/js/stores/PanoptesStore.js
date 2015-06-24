@@ -23,6 +23,11 @@ var PanoptesStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  getStoredSubsetsFor(table) {
+    let subsets = this.state.getIn(['storedSubsets', table]);
+    return subsets || {};
+  },
+
   getState() {
     return this.state;
   }

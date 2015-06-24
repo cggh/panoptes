@@ -540,8 +540,9 @@ SQL.WhereClause.Compound = function (icompoundtype, components) {
       compstrs.push(comp.toQueryDisplayString(queryData, level + 1));
     });
     var joinstr = ' ' + that.Tpe + ' ';
-    if (level == 0)
-      joinstr = ' <b>' + that.Tpe + '</b> ';
+    //Taken out as we don't put HTML in query strings anymore with React
+    //if (level == 0)
+    //  joinstr = ' <b>' + that.Tpe + '</b> ';
     var str = compstrs.join(joinstr);
     if (level == 1) str = '[' + str + ']';
     if (level > 1) str = '(' + str + ')';

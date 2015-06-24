@@ -24,7 +24,12 @@ injectTapEventPlugin();
 InitialConfig()
   .then((config) => {
     let stores = {
-      PanoptesStore: new PanoptesStore({user:config.user}),
+      PanoptesStore: new PanoptesStore({
+        user:config.user,
+        storedSubsets: {
+
+        }
+      }),
       LayoutStore: new LayoutStore()
     };
 

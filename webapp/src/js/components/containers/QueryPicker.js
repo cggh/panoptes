@@ -35,9 +35,6 @@ let QueryPicker = React.createClass({
 
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
-  },
-
-  componentDidMount() {
     if (this.props.initialQuery)
       this.setState({query: this.props.initialQuery});
     else {

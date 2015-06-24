@@ -76,10 +76,10 @@ var LayoutStore = Fluxxor.createStore({
         }
       },
       modal: {
-        //component:'containers/QueryPicker',
-        //props: {
-        //  table: 'variants'
-        //}
+        component:'containers/QueryPicker',
+        props: {
+          table: 'variants'
+        }
       }
     });
 

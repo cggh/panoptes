@@ -16,6 +16,19 @@ function columnSpec(list) {
   return ret;
 }
 
+function caseChange(config) {
+  let out = {};
+  _.each(_.keys(config), (key) => {
+    let destKey = key[0].toLowerCase() + key.slice(1);
+    let value = config[key];
+    if (typeof value === "object") {
+      value = caseChange(value);
+    }
+    out[destKey] = value;
+  });
+  return out;
+}
+
 let parseTableSettings = function (table) {
   //TODO Default should be at import level
   let settings = {GenomeMaxViewportSizeX: 50000};
@@ -413,7 +426,7 @@ let fetchInitialConfig = function () {
       //parseStoredSubsets();
     //});
   .then(() => {
-      return _.extend(initialConfig, {
+      return caseChange(_.extend(initialConfig, {
         user: {
           id: initialConfig.userID,
           isManager: initialConfig.isManager
@@ -422,7 +435,7 @@ let fetchInitialConfig = function () {
         chromosomes: fetchedConfig.chromosomes,
         tables: fetchedConfig.mapTableCatalog,
         settings: fetchedConfig.generalSettings
-      })
+      }))
     });
 };
 

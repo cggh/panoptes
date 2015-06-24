@@ -1,17 +1,16 @@
-JD2DateTime = function(JD) {
+let JD2DateTime = function(JD) {
   return new Date((JD-2440587.5)*24*60*60*1000);
 };
 
 /**
  * @return {number}
  */
-DateTime2JD = function(date) {
+let DateTime2JD = function(date) {
   return date.getTime()/(24.0*60*60*1000) + 2440587.5;
 };
 
 
-module.exports = {
-  formatValue(property, value) {
+module.exports = function(property, value) {
     if (property.isBoolean) {
       if (value == 'Yes') return vl;
       return parseInt(vl) ? 'Yes' : 'No';
@@ -39,9 +38,8 @@ module.exports = {
         if (isNaN(value))
           return '';
         else
-          return value.toFixed(digits);
+          return value.toFixed(property.settings.decimDigits);
       }
     }
     return value;
-  }
 };
