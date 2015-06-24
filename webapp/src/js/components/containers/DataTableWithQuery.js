@@ -8,10 +8,10 @@ const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar');
-const DataTableView = require('ui/DataTableView');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
-const QueryString = require('ui/QueryString');
+const DataTableView = require('panoptes/DataTableView');
+const QueryString = require('panoptes/QueryString');
 
 const mui = require('material-ui');
 const {FlatButton} = mui;

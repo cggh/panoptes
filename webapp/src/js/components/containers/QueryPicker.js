@@ -7,7 +7,8 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const SQL = require('panoptes/SQL');
 
 const {RaisedButton} = require('material-ui');
-const QueryString = require('ui/QueryString');
+const QueryString = require('panoptes/QueryString');
+const QueryEditor = require('panoptes/QueryEditor');
 
 let QueryPicker = React.createClass({
   mixins: [
@@ -56,20 +57,29 @@ let QueryPicker = React.createClass({
     this.props.onPick(this.state.query);
   },
 
+  handleQueryChange(newQuery) {
+    this.setState({
+      query: newQuery
+    });
+  },
+
   render() {
     let {query} = this.state;
     let {table} = this.props;
     return (
       <div className='large-modal'>
-        <div className='hoizontal stack'>
+        <div className='horizontal stack'>
           <div className='vertical stack'>
             <div className='red grow'>LIST</div>
+
+          </div>
+          <div className='vertical stack'>
+            <div className='grow scroll-within query-editor-container'>
+              <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
+            </div>
             <div className='centering-container'>
               <QueryString className='text' prepend='' table={table} query={query}/>
             </div>
-          </div>
-          <div className='vertical stack'>
-            <div className='green grow'>GRAPHICAL</div>
             <div className='centering-container'>
               <RaisedButton label="Use"
                           primary={true}

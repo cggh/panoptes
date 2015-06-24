@@ -21,7 +21,7 @@ function caseChange(config) {
   _.each(_.keys(config), (key) => {
     let destKey = key[0].toLowerCase() + key.slice(1);
     let value = config[key];
-    if (typeof value === "object") {
+    if (typeof value === "object" && key !== 'propertiesMap') {
       value = caseChange(value);
     }
     out[destKey] = value;
@@ -205,7 +205,7 @@ let parseCustomProperties = function () {
     prop.group = null;
     if (prop.settings.GroupId)
       if (tableInfo.propertyGroups[prop.settings.GroupId]) {
-        tableInfo.propertyGroups[prop.settings.GroupId].properties.push(prop.propid);
+        tableInfo.propertyGroups[prop.settings.GroupId].properties.push(prop);
       }
     //if (!prop.group) {
     //  if (!tableInfo.propertyGroupMap['']) {
@@ -240,6 +240,40 @@ let parseCustomProperties = function () {
       if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
         tableInfo.hasGeoCoord = true;
     });
+    
+    //Set a recommended encoder
+    var encoding  = 'String';
+    if (prop.datatype=='Value') {
+      encoding  = 'Float3';
+      if ((prop.settings.decimDigits ==0 ) || (prop.isPrimKey))
+        encoding  = 'Int';
+    }
+    if (prop.datatype=='HighPrecisionValue') {
+      encoding  = 'FloatH';
+    }
+    if ((prop.datatype=='Value') && (prop.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
+      encoding  = 'Int';
+    if (prop.datatype=='Boolean')
+      encoding  = 'Int';
+    if ( (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') )
+      encoding  = 'Float4';
+    if ( (prop.datatype=='Date') )
+      encoding  = 'Float4';
+    prop.encoding = encoding;
+
+    let encodingTypes = {
+      "Generic": "String",     //returns string data, also works for other data
+      "String": "String",      //returns string data
+      "Float2": "Float",       //returns floats in 2 base64 bytes
+      "Float3": "Float",       //returns floats in 3 base64 bytes
+      "Float4": "Float",       //returns floats in 4 base64 bytes
+      "FloatH": "Float",       //returns floats as string
+      "Int": "Integer",        //returns exact integers
+      "IntB64": "Integer",     //returns exact integers, base64 encoded
+      "IntDiff": "Integer"     //returns exact integers as differences with previous values
+    };
+    prop.encodingType = encodingTypes[prop.encoding];
+
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);

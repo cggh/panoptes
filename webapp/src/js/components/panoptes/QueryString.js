@@ -18,6 +18,12 @@ let QueryString = React.createClass({
     StoreWatchMixin('PanoptesStore')
   ],
 
+  propTypes: {
+    table: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string.isRequired,
+    prepend: React.PropTypes.string.isRequired
+  },
+
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
   },
@@ -29,7 +35,7 @@ let QueryString = React.createClass({
   },
 
   render() {
-    let {query, table, prepend, ...other} = this.props;
+    let {query, prepend, ...other} = this.props;
     let qry = SQL.WhereClause.decode(query);
 
     if ((!qry) || (qry.isTrivial))
@@ -46,7 +52,7 @@ let QueryString = React.createClass({
     });
 
     var subsetMap = {};
-    _.each(this.state.subsets, function(subset) {
+    this.state.subsets.map((subset) => {
       subsetMap[subset.id] = {
         name: subset.name
       };

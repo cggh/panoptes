@@ -49,7 +49,7 @@ var Icon = React.createClass({
     if (className) {
       classNames += ` ${className}`;
     }
-    return <span {...props} className={classNames} />;
+    return <span {...props} className={classNames}> { this.props.children} </span>;
   }
 });
 

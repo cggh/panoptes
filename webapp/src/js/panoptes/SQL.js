@@ -52,147 +52,168 @@ SQL.WhereClause.whcClassGenerator = {};
 //A list of all comparison operators that act on a field
 SQL.WhereClause._fieldComparisonOperators = [
   {
-    ID: '=', name: 'Equals',
+    ID: '=', name: '=',
     String: true, Float: true, Integer: true, MultiChoiceInt: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '=', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
-    ID: '<>', name: 'Differs from',
+    ID: '<>', name: 'not =',
     String: true, Float: true, Integer: true, MultiChoiceInt: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '<>', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: '<', name: '<',
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '<', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: '>', name: '>',
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '>', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: '<=', name: '<=',
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '<=', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: '>=', name: '>=',
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', '>=', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: 'between', name: 'Between',
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareBetween('', '', '')
-    }
+    },
+    fieldType: 'minMax'
   },
   {
     ID: 'CONTAINS', name: 'Contains',
     String: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', 'CONTAINS', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: 'NOTCONTAINS', name: 'Does not contain',
     String: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', 'NOTCONTAINS', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: 'STARTSWITH', name: 'Starts with',
     String: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', 'STARTSWITH', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: 'LIKE', name: 'Like',
     String: true,
     Create: function () {
       return SQL.WhereClause.CompareFixed('', 'LIKE', '')
-    }
+    },
+    fieldType: 'value'
   },
   {
     ID: 'ISPRESENT', name: 'Is present', MultiChoiceInt: true,
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.IsPresent()
-    }
+    },
+    fieldType: 'none'
   },
   {
     ID: 'ISABSENT', name: 'Is absent', MultiChoiceInt: true,
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.IsAbsent()
-    }
+    },
+    fieldType: 'none'
   },
   {
     ID: 'ISNOTEMPTYSTR', name: 'Is present', String: true,
     Create: function () {
       return SQL.WhereClause.IsNotEmptyStr()
-    }
+    },
+    fieldType: 'none'
   },
   {
     ID: 'ISEMPTYSTR', name: 'Is absent', String: true,
     Create: function () {
       return SQL.WhereClause.IsEmptyStr()
-    }
+    },
+    fieldType: 'none'
   },
   {
-    ID: '=FIELD', name: 'Equals field', MultiChoiceInt: true, //test the equality with another database field
+    ID: '=FIELD', name: 'Equals column', MultiChoiceInt: true, //test the equality with another database field
     String: true, Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.EqualsField()
-    }
+    },
+    fieldType: 'otherColumn'
   },
   {
-    ID: '<>FIELD', name: 'Differs from field', MultiChoiceInt: true, //test the difference with another database field
+    ID: '<>FIELD', name: 'Differs from column', MultiChoiceInt: true, //test the difference with another database field
     String: true, Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.DiffersField()
-    }
+    },
+    fieldType: 'otherColumn'
   },
   {
-    ID: '<FIELD', name: '< Field', //Performs a < operation with a linear function of another field
+    ID: '<FIELD', name: '< Column', //Performs a < operation with a linear function of another field
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareField('<FIELD')
-    }
+    },
+    fieldType: 'otherColumnWithScaleAndOffset'
   },
   {
-    ID: '>FIELD', name: '> Field', //Performs a > operation with a linear function of another field
+    ID: '>FIELD', name: '> Column', //Performs a > operation with a linear function of another field
     Float: true, Integer: true,
     Create: function () {
       return SQL.WhereClause.CompareField('>FIELD')
-    }
+    },
+    fieldType: 'otherColumnWithScaleAndOffset'
   },
   {
     ID: '_subset_', name: 'in subset',
     Create: function () {
       return SQL.WhereClause.InSubset()
-    }
+    },
+    fieldType: 'subset'
   },
   {
     ID: '_note_', name: 'has note containing',
     Create: function () {
       return SQL.WhereClause.NoteContains()
-    }
+    },
+    fieldType: 'note'
   }
 ];
 
@@ -219,7 +240,7 @@ SQL.WhereClause.getCompatibleFieldComparisonOperators = function (datatype) {
 
 //A class that encapsulates the comparison of a field to a fixed value
 SQL.WhereClause.whcClassGenerator['comparefixed'] = function (args) {
-  return SQL.WhereClause.CompareFixed(args.ColName, args.Tpe, args.CompValue);
+  return SQL.WhereClause.CompareFixed(args.ColName, args.type, args.CompValue);
 };
 SQL.WhereClause.CompareFixed = function (icolname, icomptype, ivalue) {
   var that = {};
@@ -232,11 +253,11 @@ SQL.WhereClause.CompareFixed = function (icolname, icomptype, ivalue) {
   that.whcClass = 'comparefixed';
   that.isCompound = false;
   that.ColName = icolname;
-  that.Tpe = icomptype;
+  that.type = icomptype;
   that.CompValue = ivalue;
 
   that.toQueryDisplayString = function (queryData, level) {
-    return queryData.fieldInfoMap[that.ColName].name + ' ' + that.Tpe + ' ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValue);
+    return queryData.fieldInfoMap[that.ColName].name + ' ' + that.type + ' ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValue);
   };
 
   return that;
@@ -253,7 +274,7 @@ SQL.WhereClause.CompareBetween = function (icolname, ivalueMin, ivalueMax) {
   that.ColName = icolname;
   that.CompValueMin = ivalueMin;
   that.CompValueMax = ivalueMax;
-  that.Tpe = "between";
+  that.type = "between";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' between ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMin) + ' and ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValueMax);
@@ -267,7 +288,7 @@ SQL.WhereClause.whcClassGenerator['equalsfield'] = function (args) {
   var whc = SQL.WhereClause.EqualsField();
   whc.ColName = args.ColName;
   whc.ColName2 = args.ColName2;
-  return whc;
+  return whc
 };
 SQL.WhereClause.EqualsField = function () {
   var that = {};
@@ -275,7 +296,7 @@ SQL.WhereClause.EqualsField = function () {
   that.isCompound = false;
   that.ColName = "";
   that.ColName2 = "";
-  that.Tpe = "=FIELD";
+  that.type = "=FIELD";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' = ' + queryData.fieldInfoMap[that.ColName2].name;
@@ -286,7 +307,7 @@ SQL.WhereClause.EqualsField = function () {
 
 //A class that Encapsulates the differential comparison of a field to another field
 SQL.WhereClause.whcClassGenerator['differsfield'] = function (args) {
-  var whc = SQL.WhereClause.EqualsField();
+  var whc = SQL.WhereClause.DiffersField();
   whc.ColName = args.ColName;
   whc.ColName2 = args.ColName2;
   return whc;
@@ -297,7 +318,7 @@ SQL.WhereClause.DiffersField = function () {
   that.isCompound = false;
   that.ColName = "";
   that.ColName2 = "";
-  that.Tpe = "<>FIELD";
+  that.type = "<>FIELD";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' <> ' + queryData.fieldInfoMap[that.ColName2].name;
@@ -309,7 +330,7 @@ SQL.WhereClause.DiffersField = function () {
 
 //A class that Encapsulates the numerical comparison of a field to another field
 SQL.WhereClause.whcClassGenerator['comparefield'] = function (args) {
-  var whc = SQL.WhereClause.CompareField(args.Tpe);
+  var whc = SQL.WhereClause.CompareField(args.type);
   whc.ColName = args.ColName;
   whc.ColName2 = args.ColName2;
   whc.Factor = args.Factor;
@@ -322,12 +343,12 @@ SQL.WhereClause.CompareField = function (icomptype) {
   that.isCompound = false;
   that.ColName = "";
   that.ColName2 = "";
-  that.Tpe = icomptype;
+  that.type = icomptype;
   that.Factor = 1.0;
   that.Offset = 0.0;
 
   that.toQueryDisplayString = function (queryData, level) {
-    var str = queryData.fieldInfoMap[that.ColName].name + ' ' + that.Tpe[0] + ' ';
+    var str = queryData.fieldInfoMap[that.ColName].name + ' ' + that.type[0] + ' ';
     if (Math.abs(that.Factor - 1) > 1.0e-9) {
       var factorStr;
       if (that.Factor == 0)
@@ -362,7 +383,7 @@ SQL.WhereClause.IsPresent = function () {
   var that = {};
   that.whcClass = 'ispresent';
   that.isCompound = false;
-  that.Tpe = "ISPRESENT";
+  that.type = "ISPRESENT";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' is present';
@@ -381,7 +402,7 @@ SQL.WhereClause.IsAbsent = function () {
   var that = {};
   that.whcClass = 'isabsent';
   that.isCompound = false;
-  that.Tpe = "ISABSENT";
+  that.type = "ISABSENT";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' is absent';
@@ -400,7 +421,7 @@ SQL.WhereClause.IsNotEmptyStr = function () {
   var that = {};
   that.whcClass = 'isstringnonempty';
   that.isCompound = false;
-  that.Tpe = "ISNOTEMPTYSTR";
+  that.type = "ISNOTEMPTYSTR";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' is present';
@@ -419,7 +440,7 @@ SQL.WhereClause.IsEmptyStr = function () {
   var that = {};
   that.whcClass = 'isstringempty';
   that.isCompound = false;
-  that.Tpe = "ISEMPTYSTR";
+  that.type = "ISEMPTYSTR";
 
   that.toQueryDisplayString = function (queryData, level) {
     return queryData.fieldInfoMap[that.ColName].name + ' is absent';
@@ -440,7 +461,7 @@ SQL.WhereClause.InSubset = function () {
   var that = {};
   that.whcClass = '_subset_';
   that.isCompound = false;
-  that.Tpe = "_subset_";
+  that.type = "_subset_";
   that.ColName = '_subset_';
 
   that.toQueryDisplayString = function (queryData, level) {
@@ -465,7 +486,7 @@ SQL.WhereClause.NoteContains = function () {
   var that = {};
   that.whcClass = '_note_';
   that.isCompound = false;
-  that.Tpe = "_note_";
+  that.type = "_note_";
   that.ColName = '_note_';
   that.NoteText = '';
 
@@ -484,7 +505,7 @@ SQL.WhereClause.Trivial = function () {
   var that = {};
   that.whcClass = 'trivial';
   that.isCompound = false;
-  that.Tpe = "";
+  that.type = "";
   that.isTrivial = true;
   that.toQueryDisplayString = function (queryData, level) {
     return 'All';
@@ -500,7 +521,7 @@ SQL.WhereClause.None = function () {
   var that = {};
   that.whcClass = 'none';
   that.isCompound = false;
-  that.Tpe = "None";
+  that.type = "None";
   that.isNone = true;
   that.toQueryDisplayString = function (queryData, level) {
     return 'None';
@@ -511,8 +532,8 @@ SQL.WhereClause.None = function () {
 
 //A class that Encapsulates a compound statement
 SQL.WhereClause.whcClassGenerator['compound'] = function (args) {
-  var whc = SQL.WhereClause.Compound(args.Tpe, []);
-  _.each(args.Components, function (comp, idx) {
+  var whc = SQL.WhereClause.Compound(args.type, []);
+  _.each(args.components, function (comp, idx) {
     whc.addComponent(SQL.WhereClause.whcClassGenerator[comp.whcClass](comp));
   });
   return whc;
@@ -523,26 +544,42 @@ SQL.WhereClause.Compound = function (icompoundtype, components) {
   var that = {};
   that.whcClass = 'compound';
   that.isCompound = true;
-  that.Tpe = icompoundtype;
-  that.Components = components;
-  if (that.Components == null) that.Components = [];
+  that.type = icompoundtype;
+  that.components = components;
+  if (that.components == null) that.components = [];
   that.addComponent = function (icomp) {
-    this.Components.push(icomp);
+    icomp.parent = that;
+    this.components.push(icomp);
   };
   that.getComponentCount = function () {
-    return this.Components.length;
+    return this.components.length;
+  };
+  that.inlineIfOneChild = function () {
+    if (that.getComponentCount() === 1) {
+      let parent = that.parent;
+      let isRoot = that.isRoot;
+      _.assign(that, that.components[0]);
+      that.parent = parent;
+      that.isRoot = isRoot;
+    }
+  };
+  that.removeChild = function(child) {
+    _.remove(that.components, (myChild) => {
+      return myChild === child;
+    });
+    that.inlineIfOneChild();
   };
 
   that.toQueryDisplayString = function (queryData, level) {
     if (!level) level = 0;
     var compstrs = [];
-    _.each(that.Components, function (comp, idx) {
+    _.each(that.components, function (comp, idx) {
       compstrs.push(comp.toQueryDisplayString(queryData, level + 1));
     });
-    var joinstr = ' ' + that.Tpe + ' ';
+    var joinstr = ' ' + that.type + ' ';
     //Taken out as we don't put HTML in query strings anymore with React
     //if (level == 0)
-    //  joinstr = ' <b>' + that.Tpe + '</b> ';
+    //  joinstr = ' <b>' + that.type + '</b> ';
     var str = compstrs.join(joinstr);
     if (level == 1) str = '[' + str + ']';
     if (level > 1) str = '(' + str + ')';
@@ -565,6 +602,17 @@ SQL.WhereClause.OR = function (components) {
 
 //Encodes a whereclause object to an url-friendly string
 SQL.WhereClause.encode = function (whc) {
+  whc = _.cloneDeep(whc);
+  //Remove to stop cycles before JSONify
+  function removeParents(component) {
+    delete component.parent;
+    //Need to keep compatibility... rename a few things for sanity
+    component.Components = (component.components === undefined) ? component.Components : component.components;
+    component.Tpe = (component.type === undefined) ? component.Tpe : component.type;
+    if (component.components)
+      _.each(component.components, removeParents);
+  }
+  removeParents(whc);
   var jsonstring = JSON.stringify(whc);
   var st = Base64.encode(jsonstring);
   st = st.replace(/\+/g, "-");
@@ -581,7 +629,32 @@ SQL.WhereClause.encode = function (whc) {
 SQL.WhereClause.decode = function (st) {
   st = Base64.decode(st);
   var tree = JSON.parse(st);
-  return SQL.WhereClause.whcClassGenerator[tree.whcClass](tree);
+  function makeCompatible(parent, component) {
+    //Need to keep compatibility... rename a few things for sanity
+    component.components = (component.Components === undefined) ? component.components : component.Components;
+    component.type = (component.Tpe === undefined) ? component.type : component.Tpe;
+    delete component.Tpe;
+    delete component.Components;
+    if (component.components)
+      _.each(component.components, makeCompatible.bind(this, component));
+  }
+  makeCompatible(null, tree);
+  let query = SQL.WhereClause.whcClassGenerator[tree.whcClass](tree);
+  function assignParents(parent, component) {
+    component.parent = parent;
+    if (component.components)
+      _.each(component.components, assignParents.bind(this, component));
+  }
+  assignParents(null, query);
+  function cleanUp(parent, component) {
+    if (component.isCompound)
+      component.inlineIfOneChild();
+    if (component.components)
+      _.each(component.components, cleanUp.bind(this, component));
+  }
+  cleanUp(null, query);
+  query.isRoot = true;
+  return query;
 };
 
 
@@ -596,7 +669,7 @@ SQL.WhereClause.createRestriction = function (origQuery0, newStatement) {
     return newStatement;
   }
   //Add the statement
-  if ((origQuery.isCompound) && (origQuery.Tpe == 'AND')) {
+  if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
     origQuery.addComponent(newStatement);
     return origQuery;
   }
@@ -617,13 +690,13 @@ SQL.WhereClause.createValueRestriction = function (origQuery0, fieldName, value,
   }
   //try to find a matching fixed comparison statement
   var compStatement = null;
-  if (origQuery.Tpe == comparisonType)
+  if (origQuery.type == comparisonType)
     if (origQuery.ColName == fieldName)
       compStatement = origQuery;
 
-  if ((origQuery.isCompound) && (origQuery.Tpe == 'AND')) {
-    _.each(origQuery.Components, function (comp, idx) {
-      if (comp.Tpe == comparisonType)
+  if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
+    _.each(origQuery.components, function (comp, idx) {
+      if (comp.type == comparisonType)
         if (comp.ColName == fieldName)
           compStatement = comp;
     });
@@ -640,7 +713,7 @@ SQL.WhereClause.createValueRestriction = function (origQuery0, fieldName, value,
     return origQuery;
   }
   //Add the statement
-  if ((origQuery.isCompound) && (origQuery.Tpe == 'AND')) {
+  if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
     origQuery.addComponent(newStatement);
     return origQuery;
   }
@@ -660,13 +733,13 @@ SQL.WhereClause.createRangeRestriction = function (origQuery0, fieldName, minVal
   //try to find a matching between statement
   var betweenStatement = null;
 
-  if (origQuery.Tpe == 'between')
+  if (origQuery.type == 'between')
     if (origQuery.ColName == fieldName)
       betweenStatement = origQuery;
 
-  if ((origQuery.isCompound) && (origQuery.Tpe == 'AND')) {
-    _.each(origQuery.Components, function (comp, idx) {
-      if (comp.Tpe == 'between')
+  if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
+    _.each(origQuery.components, function (comp, idx) {
+      if (comp.type == 'between')
         if (comp.ColName == fieldName)
           betweenStatement = comp;
     });
@@ -683,7 +756,7 @@ SQL.WhereClause.createRangeRestriction = function (origQuery0, fieldName, minVal
     return origQuery;
   }
   //Add the between statement
-  if ((origQuery.isCompound) && (origQuery.Tpe == 'AND')) {
+  if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
     origQuery.addComponent(newStatement);
     return origQuery;
   }
@@ -709,6 +782,5 @@ SQL.TableSort = function (icollist) {
   };
   return that;
 };
-
 
 module.exports = SQL;
