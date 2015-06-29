@@ -291,7 +291,8 @@ class LoadTable(threading.Thread):
                     #The date format is interpreted as being in the current time zone e.g. 2007-11-30
                     #For other formats - see http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_str-to-date
                     #"DATE_FORMAT(STR_TO_DATE(" + var + ", ''), '%Y-%m-%d')" 
-                    ts = DBCOLESC(col) + " = UNIX_TIMESTAMP(CONCAT(" + var + ",' 12:00:00')) " 
+                    # The date is stored as Julian Days
+                    ts = DBCOLESC(col) + " = ((UNIX_TIMESTAMP(CONCAT(" + var + ",' 12:00:00')) / 86400) + 2440587) "
                     transform.append(ts)
                 else:
                     self._log('Defaulting to text type for column: ' + col)
