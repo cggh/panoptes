@@ -5,7 +5,6 @@
 import os
 import DQXDbTools
 import DQXUtils
-import config
 import ImportSettings
 import ImpUtils
 import customresponders.panoptesserver.Utils as Utils
@@ -44,13 +43,13 @@ class ImportWorkspaces(BaseImport):
                     self._calculationObject.LogSQLCommand(cmd)
                     cur.execute(cmd)
     
-                tables = self._getTablesInfo()
+                tables = self._dao.getTablesInfo()
     
                 if not self._importSettings['ConfigOnly']:
                     for table in tables:
                         tableid = table['id']
                         print('Re-creating custom data table for '+tableid)
-                        self._dropTable(Utils.GetTableWorkspaceProperties(workspaceid, tableid))
+                        self._dao.dropTable(Utils.GetTableWorkspaceProperties(workspaceid, tableid))
                         execSQL("CREATE TABLE {0} (StoredSelection TINYINT DEFAULT 0) AS SELECT {1} FROM {2}".format(
                             DBTBESC(Utils.GetTableWorkspaceProperties(workspaceid, tableid)),
                             DBCOLESC(table['primkey']),
@@ -90,6 +89,10 @@ class ImportWorkspaces(BaseImport):
             for table in tables:
                 self.CheckMaterialiseWorkspaceView(workspaceid, table['id'])
     
+
+
+        
+
     def CheckMaterialiseWorkspaceView(self, workspaceId, tableid):
     
         if self._importSettings['ConfigOnly']:
@@ -97,7 +100,7 @@ class ImportWorkspaces(BaseImport):
     
         print('Checking for materialising of {0},{1},{2}'.format(self._datasetId, workspaceId, tableid))
         with DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId) as cur:
-            tablesInfo = self._getTablesInfo(tableid)
+            tablesInfo = self._dao.getTablesInfo(tableid)
             tableSettings = tablesInfo[0]["settings"]
             #print('Table settings= '+tableSettings)
             if tableSettings['CacheWorkspaceData']:
@@ -108,40 +111,16 @@ class ImportWorkspaces(BaseImport):
                 indexedColumns2 = [indexRow[4] for indexRow in cur.fetchall()]
                 indexedColumns = set(indexedColumns1+indexedColumns2)
                 print('Indexed columns: ' + str(indexedColumns))
-                tmptable = '_tmptable_'
                 wstable = '{0}CMB_{1}'.format(tableid, workspaceId)
-                self._dropTable(tmptable)
-                sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
-                self._execSql(sql)
-                for indexedColumn in indexedColumns:
-                    sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
-                    self._execSql(sql)
-
-                if tableSettings['IsPositionOnGenome']:
-                    self._log('Indexing chromosome,position on materialised view')
-                    sql = 'create index mt1_chrompos ON {0}({1},{2})'.format(
-                                                                             DBTBESC(tmptable),
-                                                                             DBCOLESC(tableSettings['Chromosome']),
-                                                                             DBCOLESC(tableSettings['Position'])
-                                                                             )
-                    self._execSql(sql)
-
-                self._dropView(DBTBESC(wstable))
-                self._execSql('RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
+                
+                self._dao.materializeView(tableSettings, indexedColumns, wstable)
     
                 if tableSettings['AllowSubSampling']:
                     print('Processing subsampling table')
                     indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
-                    tmptable = '_tmptable_'
                     wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceId)
-                    self._dropTable(tmptable)
-                    sql = 'CREATE TABLE {0} as SELECT * FROM {1}'.format(tmptable, DBTBESC(wstable))
-                    self._execSql(sql)
-                    for indexedColumn in indexedColumnsSubSampling:
-                        sql = 'CREATE INDEX {0} ON {1}({0})'.format(DBCOLESC(indexedColumn), DBTBESC(tmptable))
-                        self._execSql(sql)
-                    self._dropView(DBTBESC(wstable))
-                    self._execSql('RENAME TABLE {0} TO {1}'.format(tmptable, DBTBESC(wstable)))
+                    self._dao.materializeView(tableSettings, indexedColumnsSubSampling, wstable)
+                    
     
     def importAllWorkspaces(self):
     

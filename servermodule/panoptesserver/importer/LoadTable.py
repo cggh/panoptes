@@ -16,6 +16,7 @@ import logging
 import warnings
 import threading
 import MySQLdb
+from SettingsDAO import SettingsDAO
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -80,6 +81,8 @@ class LoadTable(threading.Thread):
         self._columnIndexField = loadSettings['ColumnIndexField'] 
             
         self._rowIndexField = loadSettings['RowIndexField']
+        
+        self._dao = SettingsDAO(responder, self._datasetId, None, logCache = self._logMessages)
             
 
     #Keep the log messages so that they can be output in one go so that log is less confusing
@@ -88,15 +91,6 @@ class LoadTable(threading.Thread):
         
     def printLog(self):
         self._responder.Log('\n#######'.join(self._logMessages))
-       
-    #Reimplemented here because of logging 
-    def _execSql(self, sql):
-        self._log("LoadTable SQL:" + self._datasetId + ';' + repr(sql))
-        start = time.time()
-        with DBCursor(self._responder.credentialInfo, self._datasetId, local_infile = 1) as cur:
-            cur.db.autocommit(True)
-            cur.execute(sql)
-        self._log('<---Finished (Elapsed: {0:.1f}s)'.format(time.time() - start))   
         
     # Columns: list of dict
     #       name
@@ -319,7 +313,7 @@ class LoadTable(threading.Thread):
         #LOCAL also means warnings not errors
 #        with warnings.catch_warnings():
         warnings.filterwarnings('error', category=MySQLdb.Warning)
-        self._execSql(sql)
+        self._dao._execSqlLoad(sql)
         
         
 
@@ -329,28 +323,24 @@ class LoadTable(threading.Thread):
         
         
         if not (self._loadSettings["AutoKey"] == self._loadSettings["PrimKey"]):
-            try:
-                self._execSql('create unique index {2} ON {0}({1})'.format(DBTBESC(tableid), DBCOLESC(self._loadSettings["PrimKey"]), DBCOLESC(tableid + '_' + self._loadSettings["PrimKey"])))
-            except:
-                e = sys.exc_info()
-                self._log("Failed to create unique index: %s " % str(e))
+            self._dao.createIndex(tableid + '_' + self._loadSettings["PrimKey"], tableid, self._loadSettings["PrimKey"], unique = True)
+            
         for col in self._loadSettings.getPropertyNames():
             name = self._loadSettings.getPropertyValue(col, 'Id')
             if self._loadSettings.getPropertyValue(col, 'Index') and col != self._loadSettings["PrimKey"]:
-                self._execSql('create index {2} ON {0}({1})'.format(DBTBESC(tableid), DBCOLESC(name), DBCOLESC(tableid + '_' + name)))
+                self._dao.createIndex(tableid + '_' + name, tableid, name)
                 
         if self._isPositionOnGenome:
             self._log('Indexing chromosome')
+            self._dao.createIndex(tableid + '_chrompos', tableid, self._chrom + "," + self._pos)
             
-            self._execSql('create index {0}_chrompos ON {0}({1},{2})'.format(
-                tableid,
-                self._chrom,
-                self._pos
-            ))
             
         if self._allowSubSampling:
-            sql = "CREATE INDEX {1} ON {0}(_randomval_)".format(DBTBESC(tableid), DBCOLESC(tableid + '_randomindex'))
-            self._execSql(sql)
+            self._dao.createIndex(tableid + '_randomindex', tableid, '_randomval_')
+            
+
+
+
 
     def _createSubSampleTables(self):
         
@@ -359,35 +349,8 @@ class LoadTable(threading.Thread):
         
         if self._allowSubSampling:
             with self._responder.LogHeader('Create subsampling table'):
-                self._log('Creating random data column')
-                if self._bulkLoad == False:
-                    sql = "UPDATE {0} SET _randomval_=RAND()".format(DBTBESC(tableid))
-                    self._execSql(sql)
-                
-                sortRandTable = tableid + '_SORTRAND'
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    sql = "DROP TABLE IF EXISTS {0}".format(DBTBESC(sortRandTable))
-                    self._execSql(sql)
-                sql = "CREATE TABLE {1} LIKE {0}".format(DBTBESC(tableid), DBTBESC(sortRandTable))
-                self._execSql(sql)
-                if self._loadSettings["PrimKey"] == "AutoKey":
-                    self._log('Restructuring AutoKey')
-                    sql = "alter table {0} drop column AutoKey".format(DBTBESC(sortRandTable))
-                    self._execSql(sql)
-                    sql = "alter table {0} add column AutoKey int FIRST".format(DBTBESC(sortRandTable))
-                    self._execSql(sql)
-                    sql = "create index idx_autokey on {0}(AutoKey)".format(DBTBESC(sortRandTable))
-                    self._execSql(sql)
-                sql = "alter table {0} add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(DBTBESC(sortRandTable))
-                self._execSql(sql)
-                sql = "insert into {1} select *,0 from {0} order by _randomval_".format(DBTBESC(tableid), DBTBESC(sortRandTable))
-                sql += ' LIMIT 5000000' # NOTE: there is little point in importing more than that!
-                self._execSql(sql)
+                self._dao.createSubSampleTable(tableid, self._loadSettings["PrimKey"], self._bulkLoad)
 
-
-    def _dropTable(self, tableid):
-        return 'drop table if exists {0};'.format(DBTBESC(tableid))
 
     def _preprocessFile(self, sourceFileName, tableid):
         
@@ -489,10 +452,10 @@ class LoadTable(threading.Thread):
         
             self._log('Creating schema')
             try:
-                self._execSql(self._dropTable(tableid))
+                self._dao.dropTable(tableid)
             except:
                 self._log("{} doesn't exist".format(tableid))
-            self._execSql(self._createTable(tableid))
+            self._dao._execSql(self._createTable(tableid))
             
             self._log('Importing data')
             
@@ -528,15 +491,15 @@ class LoadTable(threading.Thread):
         
             subsetTableName = tableid + '_subsets'
             
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                self._execSql('DROP TABLE IF EXISTS {0}'.format(DBTBESC(subsetTableName)))
-            self._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
+            self._dao.dropTable(subsetTableName)
+            
+            self._dao._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
                 subsettable=DBTBESC(subsetTableName),
                 primkey=DBCOLESC(self._loadSettings["PrimKey"]),
                 table=DBTBESC(tableid)
             ))
-            self._execSql('ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
-            self._execSql('CREATE INDEX primkey ON {0}({1})'.format(DBTBESC(subsetTableName), DBCOLESC(self._loadSettings["PrimKey"])))
-            self._execSql('CREATE INDEX subsetid ON {0}(subsetid)'.format(DBTBESC(subsetTableName)))
+            self._dao._execSql('ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
+            self._dao.createIndex('primkey',subsetTableName, self._loadSettings["PrimKey"])
+            self._dao.createIndex('subsetid',subsetTableName, 'subsetid')
+            
 

@@ -7,7 +7,7 @@ class SQLloader(BasePlugin):
     
 
         
-    def _getSettingsDef(self):
+    def getSettings(self):
         settingsDef = OrderedDict((('plugin', {
                                                'type': 'Text',
                                                'required': True,
