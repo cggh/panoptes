@@ -177,7 +177,7 @@ class SettingsDAO(object):
         db = self._datasetId
         self._datasetId = indexDb
     # Remove current reference in the index first: if import fails, nothing will show up
-        self._execSql('DELETE FROM datasetindex WHERE id="{0}"'.format(self._datasetId))
+        self._execSql('DELETE FROM datasetindex WHERE id="{0}"'.format(db))
         self._datasetId = db
     
     
