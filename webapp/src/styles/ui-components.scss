@@ -369,7 +369,6 @@
     margin: 10px;
   }
   .or {
-    //border: solid 2px red;
     margin: 5px;
 
     .startline {
@@ -469,4 +468,10 @@ select {
 input {
   border: none;
   border-bottom: solid 1px #e0e0e0;
+}
+
+.query-picker {
+  .list-string {
+    width: 250px;
+  }
 }

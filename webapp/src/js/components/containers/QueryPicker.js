@@ -6,9 +6,11 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const SQL = require('panoptes/SQL');
 
-const {RaisedButton} = require('material-ui');
+const {RaisedButton, IconButton, List, ListItem, Paper, ListDivider} = require('material-ui');
 const QueryString = require('panoptes/QueryString');
 const QueryEditor = require('panoptes/QueryEditor');
+const Sidebar = require('react-sidebar');
+
 
 let QueryPicker = React.createClass({
   mixins: [
@@ -24,8 +26,7 @@ let QueryPicker = React.createClass({
   },
 
   getStateFromFlux() {
-    return {
-    }
+    return {}
   },
 
   getInitialState() {
@@ -67,26 +68,61 @@ let QueryPicker = React.createClass({
     let {query} = this.state;
     let {table} = this.props;
     return (
-      <div className='large-modal'>
-        <div className='horizontal stack'>
-          <div className='vertical stack'>
-            <div className='red grow'>LIST</div>
+      <div className='large-modal query-picker'>
+        <Sidebar
+          docked={true}
+          sidebar={(
+          <div>
+            <List>
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryTextLines={2}
+                       >
+                Default
+              </ListItem>
+              <ListDivider />
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryTextLines={2}
+                       >
+                Previous
+              </ListItem>
+              <ListDivider />
+
+            </List>
+            <List  subheader="Stored Filters">
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryTextLines={2}
+                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        >
+                Blue widgets
+              </ListItem>
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryTextLines={2}
+                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        >
+                Yellow birds
+              </ListItem>
+            </List>
 
           </div>
-          <div className='vertical stack'>
-            <div className='grow scroll-within query-editor-container'>
-              <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
-            </div>
-            <div className='centering-container'>
-              <QueryString className='text' prepend='' table={table} query={query}/>
-            </div>
-            <div className='centering-container'>
-              <RaisedButton label="Use"
+        )}>
+        <div className='vertical stack'>
+          <div className='grow scroll-within query-editor-container'>
+            <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
+          </div>
+          <div className='centering-container'>
+            <QueryString className='text' prepend='' table={table} query={query}/>
+          </div>
+          <div className='centering-container'>
+            <RaisedButton label="Set as Default"
+                          onClick={this.handlePick}/>
+            <RaisedButton label="Store"
+                          onClick={this.handlePick}/>
+            <RaisedButton label="Use"
                           primary={true}
                           onClick={this.handlePick}/>
-            </div>
+
           </div>
         </div>
+        </Sidebar>
+
       </div>
     );
   }
@@ -94,3 +130,5 @@ let QueryPicker = React.createClass({
 });
 
 module.exports = QueryPicker;
+
+
