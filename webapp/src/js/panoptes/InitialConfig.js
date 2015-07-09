@@ -240,7 +240,7 @@ let parseCustomProperties = function () {
       if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
         tableInfo.hasGeoCoord = true;
     });
-    
+
     //Set a recommended encoder
     var encoding  = 'String';
     if (prop.datatype=='Value') {
@@ -460,6 +460,15 @@ let fetchInitialConfig = function () {
       //parseStoredSubsets();
     //});
   .then(() => {
+      let defaultQueries = {};
+      let subsets = {};
+            _.each(fetchedConfig.tableCatalog, (table) => {
+        if (table.defaultQuery != '')
+          defaultQueries[table.id] = table.defaultQuery;
+        else
+          defaultQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+        subsets[table.id] = [];
+      });
       return caseChange(_.extend(initialConfig, {
         user: {
           id: initialConfig.userID,
@@ -468,7 +477,9 @@ let fetchInitialConfig = function () {
 
         chromosomes: fetchedConfig.chromosomes,
         tables: fetchedConfig.mapTableCatalog,
-        settings: fetchedConfig.generalSettings
+        settings: fetchedConfig.generalSettings,
+        defaultQueries: defaultQueries,
+        subsets: subsets
       }))
     });
 };

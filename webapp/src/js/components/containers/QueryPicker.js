@@ -26,7 +26,10 @@ let QueryPicker = React.createClass({
   },
 
   getStateFromFlux() {
-    return {}
+    return {
+      defaultQuery: this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table),
+      lastQuery: this.getFlux().store('PanoptesStore').getLastQueryFor(this.props.table)
+    }
   },
 
   getInitialState() {
@@ -57,7 +60,6 @@ let QueryPicker = React.createClass({
   handlePick() {
     this.props.onPick(this.state.query);
   },
-
   handleQueryChange(newQuery) {
     this.setState({
       query: newQuery
@@ -65,7 +67,7 @@ let QueryPicker = React.createClass({
   },
 
   render() {
-    let {query} = this.state;
+    let {query, lastQuery, defaultQuery} = this.state;
     let {table} = this.props;
     return (
       <div className='large-modal query-picker'>
@@ -74,15 +76,25 @@ let QueryPicker = React.createClass({
           sidebar={(
           <div>
             <List>
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={defaultQuery}/></p>}
                         secondaryTextLines={2}
-                       >
+                        onClick={() => this.handleQueryChange(defaultQuery)}
+                        onDoubleClick={() => {
+                          this.handleQueryChange(defaultQuery);
+                          this.handlePick();
+                          }
+                        }>
                 Default
               </ListItem>
               <ListDivider />
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={lastQuery}/></p>}
                         secondaryTextLines={2}
-                       >
+                        onClick={() => this.handleQueryChange(lastQuery)}
+                        onDoubleClick={() => {
+                          this.handleQueryChange(lastQuery);
+                          this.handlePick();
+                          }
+                        }>
                 Previous
               </ListItem>
               <ListDivider />

@@ -1,6 +1,8 @@
 const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');
 
+const SQL = require('panoptes/SQL');
+
 const Constants = require('../constants/Constants');
 const LAYOUT = Constants.LAYOUT;
 const API = Constants.API;
@@ -24,8 +26,17 @@ var PanoptesStore = Fluxxor.createStore({
   },
 
   getStoredSubsetsFor(table) {
-    let subsets = this.state.getIn(['storedSubsets', table]);
-    return subsets || Immutable.Map();
+    return this.state.getIn(['storedSubsets', table]);
+  },
+  getDefaultQueryFor(table) {
+    return this.state.getIn(['defaultQueries', table]);
+  },
+  getLastQueryFor(table) {
+    let last = this.state.getIn(['lastQuery', table]);
+    return last || SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+  },
+  getStoredQueriesFor(table) {
+    return this.state.getIn(['storedQueries', table]);
   },
 
   getState() {

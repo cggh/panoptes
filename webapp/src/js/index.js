@@ -26,9 +26,9 @@ InitialConfig()
     let stores = {
       PanoptesStore: new PanoptesStore({
         user:config.user,
-        storedSubsets: {
-
-        }
+        storedSubsets: config.subsets,
+        defaultQueries: config.defaultQueries,
+        storedQueries: config.storedQueries,
       }),
       LayoutStore: new LayoutStore()
     };
