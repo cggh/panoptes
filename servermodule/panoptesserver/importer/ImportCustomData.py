@@ -193,11 +193,11 @@ class ImportCustomData(BaseImport):
 
     
     
-    def importAllCustomData(self):
+    def importAllCustomData(self, importTable = None):
     
         print('Scanning for custom data in {}'.format(self._workspaceId))
     
-        tables = self._dao.getTablesInfo()
+        tables = self._dao.getTablesInfo(importTable)
             
         tableMap = {table['id']:table for table in tables}
                 
@@ -210,7 +210,11 @@ class ImportCustomData(BaseImport):
         for table in workspaces:
             #Only use of table map
             if not table in tableMap:
-                raise Exception('Invalid table id '+table)
+                if importTable == None:
+                    raise Exception('Invalid table id {}'.format(table) )
+                else:
+                    self._log("Ignoring table:" + table)
+                    continue
                         
             self._folder = os.path.join(self._datatablesFolder,self._dataDir,table)
                         

@@ -7,7 +7,6 @@ import sys
 import shutil
 from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
-from GlobalSettings import GlobalSettings
 import customresponders.panoptesserver.schemaversion as schemaversion
 
 from ImportDataTable import ImportDataTable
@@ -46,11 +45,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         dao = SettingsDAO(calculationObject, datasetId, None)
         dao.removeDatasetMasterRef()
 
-        globalSettings = GlobalSettings(os.path.join(datasetFolder, 'settings'))
-
-        print('Global settings: '+str(globalSettings))
-
-
         if not importSettings['ConfigOnly']:
             # Dropping existing database
             dao = SettingsDAO(calculationObject, datasetId, None)
@@ -85,7 +79,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         import2D = Import2DDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder, dataDir = '2D_datatables')
         import2D.importAll2DTables()
 
-
+        globalSettings = importer._globalSettings
+        
         if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             globalSettings['hasGenomeBrowser'] = True
         

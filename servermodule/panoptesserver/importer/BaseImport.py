@@ -95,7 +95,14 @@ class BaseImport(object):
         
         self._dao = SettingsDAO(self._calculationObject, self._datasetId, self._workspaceId)
 
+    def setWorkspaceId(self, workspaceId):
+        self._workspaceId = workspaceId
+        self._dao._workspaceId = workspaceId
 
+    #This changes the message displayed in the Server calcuations section on the web page
+    def setInfo(self, message):
+        self._calculationObject.SetInfo(message)
+        
     def copy (self, src):
         
         self._calculationObject = src._calculationObject
@@ -202,7 +209,7 @@ class BaseImport(object):
         
         return tableSettings
     
-    def _fetchSettings(self, datatable, settingsDef = None):
+    def _fetchSettings(self, datatable):
                 
         settings, data = self._getDataFiles(datatable)
         
@@ -237,6 +244,7 @@ class BaseImport(object):
         self._calculationObject.Log(message)
         
     def _logHeader(self, message):
+        self.setInfo(message)
         return CalcLogHeader(self, message)
 
 #        return self._calculationObject.LogHeader(message)

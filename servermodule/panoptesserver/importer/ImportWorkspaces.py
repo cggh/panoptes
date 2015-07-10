@@ -19,17 +19,16 @@ class ImportWorkspaces(BaseImport):
     
     #Retrieve and validate settings
     def getSettings(self, workspaceid):
-        #Not _fetchSettings because no properties
-        settingsFile, data = self._getDataFiles(workspaceid)
-         
-        settings = self._globalSettings
+        
+        settings = self._fetchSettings(workspaceid)
         
         return settings
     
-    def ImportWorkspace(self, workspaceid):
+    def ImportWorkspace(self, workspaceid, tableid):
         with self._logHeader('Importing workspace {0}.{1}'.format(self._datasetId, workspaceid)):
             DQXUtils.CheckValidTableIdentifier(workspaceid)
             
+            self.setWorkspaceId(workspaceid)
             settings = self.getSettings(workspaceid)
             self._log(str(settings))
             workspaceName = settings['Name']
@@ -43,7 +42,7 @@ class ImportWorkspaces(BaseImport):
                     self._calculationObject.LogSQLCommand(cmd)
                     cur.execute(cmd)
     
-                tables = self._dao.getTablesInfo()
+                tables = self._dao.getTablesInfo(tableid)
     
                 if not self._importSettings['ConfigOnly']:
                     for table in tables:
@@ -61,14 +60,16 @@ class ImportWorkspaces(BaseImport):
                         )
                         execSQL("create index idx_StoredSelection on {0}(StoredSelection)".format(Utils.GetTableWorkspaceProperties(workspaceid, tableid)) )
     
-                print('Removing existing workspace properties')
-                execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}'".format(workspaceid) )
     
                 self._log('Creating StoredSelection columns')
                 for table in tables:
-                    tableid = table['id']
+                    tabid = table['id']
+                    
+                    print('Removing existing workspace properties')
+                    execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}' and tableid='{1}'".format(workspaceid, tabid) )
+
                     sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
-                    cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tableid, sett)
+                    cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tabid, sett)
                     execSQL(cmd)
     
                 print('Re-creating workspaces record')
@@ -77,6 +78,9 @@ class ImportWorkspaces(BaseImport):
                 if not self._importSettings['ConfigOnly']:
                     print('Updating views')
                     for table in tables:
+                        #If a view has been materialized then it's necessary to get rid of it
+                        viewName = Utils.GetTableWorkspaceView(workspaceid, table['id'])
+                        self._dao.dropTable(viewName, cur)
                         Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
     
                 cur.commit()
@@ -84,7 +88,7 @@ class ImportWorkspaces(BaseImport):
             
             importCustom = ImportCustomData(self._calculationObject, self._datasetId, self._importSettings, workspaceId = workspaceid, baseFolder = self._datatablesFolder,  dataDir = 'customdata')
             
-            importCustom.importAllCustomData()
+            importCustom.importAllCustomData(tableid)
             
             for table in tables:
                 self.CheckMaterialiseWorkspaceView(workspaceid, table['id'])
@@ -122,7 +126,7 @@ class ImportWorkspaces(BaseImport):
                     self._dao.materializeView(tableSettings, indexedColumnsSubSampling, wstable)
                     
     
-    def importAllWorkspaces(self):
+    def importAllWorkspaces(self, tableid = None):
     
     
         workspaces = self._getTables()
@@ -132,5 +136,5 @@ class ImportWorkspaces(BaseImport):
             return
         
         for workspace in workspaces:
-            self.ImportWorkspace(workspace)
+            self.ImportWorkspace(workspace, tableid)
             

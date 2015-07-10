@@ -35,7 +35,8 @@ class SettingsDAO(object):
         if self._logCache:
             self._logCache.append(message)
         else:
-            self._calculationObject.Log(message)
+            #self._calculationObject.Log(message)
+            self._calculationObject.LogSQLCommand(message)
                 
     def __updateConnectionSettings(self, dbCursor, local_file = 0, db = None):
         dbCursor.db_args = self._config.getImportConnectionSettings(db)
@@ -149,6 +150,7 @@ class SettingsDAO(object):
             if cur is None:
                 self._execSql(stmt)
             else:
+                self._log('DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid)))
                 cur.execute(stmt)
 
     def dropView(self, tableid):
@@ -299,15 +301,27 @@ class SettingsDAO(object):
         self._execSql("INSERT INTO customdatacatalog VALUES (%s, %s, %s)",tableid, sourceid, settings.serialize())
 
 
-    def deleteFromWorkspacePropertyCatalog(self, tableid, prop):
+    def dropColumns(self, table, columns):
+        sql = "ALTER TABLE {0} ".format(DBTBESC(table))
+        for prop in columns:
+            if prop != columns[0]:
+                sql += ", "
+            sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
+        
+        self._execSql(sql)
+    
+    
+    def deleteFromWorkspacePropertyCatalog(self, tableid, prop = None):
         self._checkPermissions('propertycatalog', tableid)
         print 'Removing outdated information: {0} {1} {2}'.format(self._workspaceId, prop, tableid)
-
-        self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (propid=%s) and (tableid=%s)',self._workspaceId, prop, tableid)
-
+        if prop != None:
+            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (propid=%s) and (tableid=%s)',self._workspaceId, prop, tableid)
+        else:
+            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (tableid=%s)',self._workspaceId, tableid)
 
     def insertIntoWorkspacePropertyCatalog(self, tableid, propid, settings):
         self._checkPermissions('propertycatalog', tableid)
+        
         self._execSql("INSERT INTO propertycatalog VALUES (%s, 'custom', %s, %s, %s, %s, %s, %s)",self._workspaceId, 
             settings.getPropertyValue(propid, 'DataType'), 
             propid, 
@@ -315,6 +329,7 @@ class SettingsDAO(object):
             settings.getPropertyValue(propid, 'Name'), 
             0, 
             settings.serializeProperty(propid))
+
     
     def deleteSummaryValuesForTable(self, tableid):
         self._checkPermissions('summaryvalues', tableid)
