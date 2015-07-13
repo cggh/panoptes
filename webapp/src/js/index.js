@@ -10,6 +10,8 @@ const LayoutActions = require('actions/LayoutActions');
 const PanoptesActions = require('actions/PanoptesActions');
 const APIActions = require('actions/APIActions');
 
+const API = require('panoptes/API');
+
 const InitialConfig = require('panoptes/InitialConfig');
 const ErrorReport = require('panoptes/ErrorReporter.js');
 const injectTapEventPlugin = require("react-tap-event-plugin");
@@ -28,10 +30,22 @@ InitialConfig()
         user:config.user,
         storedSubsets: config.subsets,
         defaultQueries: config.defaultQueries,
-        storedQueries: config.storedQueries,
+        storedQueries: config.storedQueries
       }),
-      LayoutStore: new LayoutStore()
+      LayoutStore: new LayoutStore() //Can grab link state before this and initalise store with it.
     };
+
+    //Listen to the layout store and update the URL when it changes.
+    let last_state = stores.LayoutStore.getState().delete('modal');
+    stores.LayoutStore.on('change', () => {
+      let new_state = stores.LayoutStore.getState().delete('modal');
+      if (!last_state.equals(new_state)) {
+        last_state = new_state;
+        API.storeData(new_state.toJS()).then((resp) => {
+          console.log(resp);
+        });
+      }
+    });
 
     let actions = {
       layout: LayoutActions,

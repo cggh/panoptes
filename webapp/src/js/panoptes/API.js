@@ -5,6 +5,7 @@ const LZString = require('lz-string');
 const {assertRequired} = require('util/Assert');
 const SQL = require('panoptes/SQL');
 const DataDecoders = require('panoptes/DataDecoders');
+const Base64 = require('panoptes/Base64');
 
 const serverURL = initialConfig.serverURL;
 
@@ -25,18 +26,25 @@ function filterError(json) {
   return Promise.resolve(json);
 }
 
-function getRequestJSON(params = {}) {
+function requestJSON(method, params = {}, data = null) {
   let url = `${serverURL}?`;
   _.forOwn(params, function (val, id) {
     url += `&${id}=${val}`;
   });
-  return Qajax({url: url, method: "GET"})
+  return Qajax({url: url, method: method, data:data})
     .then(Qajax.filterSuccess)
     .then(Qajax.toJSON)
     .then(filterError)
     .catch(err => {
     throw Error(`There was a problem with a request to the server: ${err.statusText}`)
   })
+}
+
+function getRequestJSON(params = {}) {
+  return requestJSON("GET", params);
+}
+function postRequestJSON(params = {}, data = null) {
+  return requestJSON("POST", params, data);
 }
 
 
@@ -95,8 +103,14 @@ function pageQuery(options) {
     });
 }
 
+function storeData(data) {
+  data = Base64.encode(JSON.stringify(data));
+  return postRequestJSON({datatype: 'storedata'}, data).then((resp) => resp.id);
+}
+
 module.exports = {
   serverURL: serverURL,
   getRequestJSON: getRequestJSON,
-  pageQuery: pageQuery
+  pageQuery: pageQuery,
+  storeData: storeData
 };

@@ -172,7 +172,6 @@ var LayoutStore = Fluxxor.createStore({
     return this.lastNotification;
   }
 
-
 });
 
 module.exports = LayoutStore;
