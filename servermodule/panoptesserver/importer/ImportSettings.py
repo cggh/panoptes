@@ -119,6 +119,12 @@ class ImportSettings:
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
+                            ('MaxDecimDigits', {
+                                   'type': 'Value',
+                                   'required': False,
+                                   'description': '(Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database',
+                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   }),
                             ('Index', {
                                    'type': 'Boolean',
                                    'required': False,
@@ -349,16 +355,19 @@ class ImportSettings:
 
     def _checkSiblingRequired(self, testDict, pkey, srdef, siblings):
 
+        message = None
+        
         siblingValue = srdef['value']
         siblingName = srdef['name']
-       
-        
+               
         if testDict[siblingName] != siblingValue:
             if pkey in testDict:
-                self._errors.append("{} Wrong value for {} (expected {} got {}) for {}".format(pkey, siblingName, siblingValue, testDict[siblingName], str(testDict)))
+                message = "{} Wrong value for {} (expected {} got {}) for {}".format(pkey, siblingName, siblingValue, testDict[siblingName], str(testDict))
         else:
             if testDict[siblingName] == siblingValue and not pkey in testDict:
-                self._errors.append("Missing required value {} for {} because {} == {}".format(pkey, str(testDict), siblingName, siblingValue))
+                message = "Missing required value {} for {} because {} == {}".format(pkey, str(testDict), siblingName, siblingValue)
+                
+        return message
                     
     def _checkSettingRequired(self, testDict, pkey, srdef):
         settingValue = srdef['value']
@@ -423,7 +432,7 @@ class ImportSettings:
         #Make sure Booleans are bool
             if pdef['type'] == 'Boolean':
                 if not type(value) is bool:
-                    self._errors.append("{} must be a boolean is {}".format(pkey,value))
+                    self._errors.append("{} must be a boolean is {} ({})".format(pkey,type(value),value))
             elif pdef['type'] == 'Block':
                 if not type(value) is dict:
                     self._errors.append("{} must be a block is {}".format(pkey, value))
@@ -463,10 +472,22 @@ class ImportSettings:
                 
         if 'siblingRequired' in pdef:
             if type(pdef['siblingRequired']) == list:
+                valid = False
+                options = []
+                #List is OR
                 for srdef in pdef['siblingRequired']: 
-                    self._checkSiblingRequired(testDict, pkey, srdef, siblings)
+                    msg = self._checkSiblingRequired(testDict, pkey, srdef, siblings)
+                    if msg == None:
+                        valid = True
+                    else:
+                        options.append(msg)
+                if not valid:
+                    self._errors.append("When " + pkey + " one of following must be set " + ",".join(map(lambda x: x['name'] + "=" + x['value'], pdef['siblingRequired'])) + " for " + str(testDict))
+                    
             else:
-                self._checkSiblingRequired(testDict, pkey, pdef['siblingRequired'], siblings)
+                msg = self._checkSiblingRequired(testDict, pkey, pdef['siblingRequired'], siblings)
+                if msg:
+                    self._errors.append(msg)
             
         if 'settingRequired' in pdef:
             if type(pdef['settingRequired']) == list:
@@ -743,7 +764,14 @@ class ImportSettings:
         if 'siblingOptional' in detail:
             line = line + "(only applies if *" + detail['siblingOptional']['name'] + "* is " + str(detail['siblingOptional']['value']) + ")"
         if 'siblingRequired' in detail:
-            line = line + "(only applies if *" + detail['siblingRequired']['name'] + "* is " + str(detail['siblingRequired']['value']) + ")"
+            if type(detail['siblingRequired']) == list:
+                line = line + "(only applies if one of the following is true:"
+                for sr in detail['siblingRequired']:
+                    line = line + "(*" + sr['name'] + "* is " + str(sr['value']) + ")" 
+                line = line + ")"
+                    
+            else:
+                line = line + "(only applies if *" + detail['siblingRequired']['name'] + "* is " + str(detail['siblingRequired']['value']) + ")"
         print(line + ".", file = f)
         if 'values' in detail:
             print(indent + "  Possible values:", file = f)

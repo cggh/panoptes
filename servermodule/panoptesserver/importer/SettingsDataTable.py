@@ -78,6 +78,11 @@ class SettingsDataTable(ImportSettings):
                                    'required': False,
                                    'description': 'The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s)'
                                 }),
+                         ('ColumnIndexField', {
+                                   'type': 'Text',
+                                   'required': False,
+                                   'description': 'When this table is linked to a 2D data table setting this value to the same as that in the 2D settings provides a performance improvement for large data sets'
+                                }),                                         
                          ('DisableSubsets', {
                                    'type': 'Boolean',
                                    'required': False,
@@ -212,7 +217,7 @@ Requires the presence of properties with data type ``GeoLongitude`` and ``GeoLat
                                                                 }),
                                                 ('MapZoom', {
                                                             'type': 'Value',
-                                                            'siblingRequired': { 'name': 'Type', 'value': 'ItemMap'},
+                                                            'siblingRequired': [{ 'name': 'Type', 'value': 'ItemMap'},{ 'name': 'Type', 'value': 'PieChartMap'}],
                                                             'description': 'Start zoom factor of the map (integer, minimum value of 0)'
                                                             }),
                                                 ('Docs5', { 'type': 'documentation',
@@ -252,7 +257,7 @@ containing the relative size of that specific pie'''
                                                             }),
                                                 ('MapZoom', {
                                                             'type': 'Value',
-                                                            'siblingRequired': { 'name': 'Type', 'value': 'ItemMap'},
+                                                            'siblingRequired': [{ 'name': 'Type', 'value': 'ItemMap'},{ 'name': 'Type', 'value': 'PieChartMap'}],
                                                             'description': 'Start zoom factor of the map (integer, minimum value of 0)'
                                                             }),
                                                 ('DataType', {
