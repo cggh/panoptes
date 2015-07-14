@@ -17,6 +17,7 @@ let layout = keyMirror({
   POPUP_FOCUS: null,
   POPUP_RESIZE: null,
   TAB_CLOSE: null,
+  TAB_OPEN: null,
   TAB_SWITCH: null
 });
 

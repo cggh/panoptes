@@ -68,6 +68,12 @@ let LayoutActions = {
       compId: compId
     });
   },
+  tabOpen(component, props) {
+    this.dispatch(LAYOUT.TAB_OPEN, {
+      component: component,
+      props: props
+    });
+  },
   tabSwitch(compId) {
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId

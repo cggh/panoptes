@@ -23,7 +23,7 @@ const ColorManipulator = require('material-ui/src/utils/color-manipulator');
 const HelloWorld = require('ui/HelloWorld');
 const DataTable = require('containers/DataTableWithQuery');
 const QueryPicker = require('containers/QueryPicker');
-
+const NewTab = require('panoptes/EmptyTab');
 
 window.Perf = React.addons.Perf;
 
@@ -109,7 +109,7 @@ let Panoptes = React.createClass({
                         onClose={actions.tabClose}>
               {tabs.get('components').map(compId => {
                 let tab = components.get(compId).toObject();
-                let props = tab.props.toObject();
+                let props = tab.props ? tab.props.toObject() : {};
                 props.componentUpdate = actions.componentUpdateFor(compId);
                 return (
                   <TabPane
@@ -125,7 +125,7 @@ let Panoptes = React.createClass({
         <Popups>
           {popups.get('components').map(compId => {
             let popup = components.get(compId).toObject();
-            let props = popup.props.toObject();
+            let props = popup.props ? popup.props.toObject() : {};
             props.componentUpdate = actions.componentUpdateFor(compId);
             let state = popups.getIn(['state',compId]) || Immutable.Map();
             return (

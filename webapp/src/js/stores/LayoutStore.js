@@ -1,6 +1,6 @@
 const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');
-
+const uid = require('uid');
 const Constants = require('../constants/Constants');
 const LAYOUT = Constants.LAYOUT;
 
@@ -25,43 +25,17 @@ var LayoutStore = Fluxxor.createStore({
 
           }
         },
-        'T1': {
-          component: 'ui/HelloWorld',
-          props: {
-            compId: 'T2',
-            msg: 'WTF'
-          }
+        'EmptyTab': {
+          component: 'panoptes/EmptyTab'
         },
-        'T2': {
-          component: 'ui/HelloWorld',
-          title: 'OMG TAB',
-          faIcon: 'bookmark',
-          props: {
-            compId: 'T2',
-            msg: 'OMG'
-          }
-        },
-        'P1': {
-          component: 'ui/HelloWorld',
-          props: {
-            compId: 'P1',
-            msg: 'WTF'
-          }
-        },
-        'P2': {
-          component: 'ui/HelloWorld',
-          props: {
-            compId: 'P2',
-            msg: 'OMG'
-          }
-        }
       },
       tabs: {
-        selectedTab: 'Table',
-        components: ['Table', 'T1', 'T2']
+        selectedTab: 'EmptyTab',
+        components: ['Table', 'EmptyTab']
       },
       popups: {
-        components: ['Table', 'P2'],
+        //components: ['Table'],
+        components: [],
         state: {
           'P2': {
             position: {
@@ -76,10 +50,10 @@ var LayoutStore = Fluxxor.createStore({
         }
       },
       modal: {
-        component:'containers/QueryPicker',
-        props: {
-          table: 'variants'
-        }
+        //component:'containers/QueryPicker',
+        //props: {
+        //  table: 'variants'
+        //}
       }
     });
 
@@ -93,6 +67,7 @@ var LayoutStore = Fluxxor.createStore({
       LAYOUT.POPUP_MOVE, this.popupMove,
       LAYOUT.POPUP_RESIZE, this.popupResize,
       LAYOUT.TAB_CLOSE, this.tabClose,
+      LAYOUT.TAB_OPEN, this.tabOpen,
       LAYOUT.TAB_SWITCH, this.tabSwitch
     );
   },
@@ -158,7 +133,14 @@ var LayoutStore = Fluxxor.createStore({
         this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
     this.emit('change');
   },
-
+  tabOpen(payload) {
+    payload = Immutable.fromJS(payload);
+    let id = uid(10);
+    this.state = this.state.setIn(['components', id], payload);
+    this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(id));
+    console.log(this.state.toJS());
+    this.emit('change');
+  },
   tabSwitch(payload) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], payload.compId);
     this.emit('change');
