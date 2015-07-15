@@ -23,7 +23,7 @@ const ColorManipulator = require('material-ui/src/utils/color-manipulator');
 const HelloWorld = require('ui/HelloWorld');
 const DataTable = require('containers/DataTableWithQuery');
 const QueryPicker = require('containers/QueryPicker');
-const NewTab = require('panoptes/EmptyTab');
+const NewTab = require('containers/EmptyTab');
 
 window.Perf = React.addons.Perf;
 
@@ -96,7 +96,7 @@ let Panoptes = React.createClass({
       <div>
         <div className="page">
           <div className="header">
-            <div className="title">{config.settings.Name}</div>
+            <div className="title">{config.settings.name}</div>
             <div className="username">{userID}</div>
             <img className="logo" src={config.logo}/>
             <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
@@ -106,7 +106,8 @@ let Panoptes = React.createClass({
           <div className="body">
             <TabbedArea activeTab={tabs.get('selectedTab')}
                         onSelect={actions.tabSwitch}
-                        onClose={actions.tabClose}>
+                        onClose={actions.tabClose}
+                        onAddTab={actions.tabOpen}>
               {tabs.get('components').map(compId => {
                 let tab = components.get(compId).toObject();
                 let props = tab.props ? tab.props.toObject() : {};

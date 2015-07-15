@@ -16,6 +16,7 @@ let EmptyTab = React.createClass({
   ],
 
   propTypes: {
+    componentUpdate: React.PropTypes.func.isRequired
   },
 
   icon() {
@@ -25,19 +26,25 @@ let EmptyTab = React.createClass({
     return `New tab`;
   },
 
+  handleClick(e, table) {
+    let actions = this.getFlux().actions.layout;
+    if (e.button == 1 || e.metaKey || e.ctrlKey)
+      actions.tabOpen('containers/DataTableWithQuery', {table:table.id}, false);
+    else {
+      this.props.componentUpdate({table: table.id}, 'containers/DataTableWithQuery');
+    }
+  },
+
   render() {
     let {tables} = this.config;
-    let actions = this.getFlux().actions.layout;
-    console.log(tables);
     return (
       <div className="centering-container">
         <List subheader="Open a table">
           {_.map(tables, (table) => (
-            <ListItem secondaryText={table.description}
-                      leftIcon={<Icon name={table.icon}/>}
-                      onClick={() => actions.tabOpen(
-                      'containers/DataTableWithQuery',
-                       {table:table.id})}
+            <ListItem key={table.id}
+                      secondaryText={table.description}
+                      leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
+                      onClick={(e) => this.handleClick(e, table)}
               >
               {table.tableCapNamePlural}
             </ListItem>
@@ -45,6 +52,7 @@ let EmptyTab = React.createClass({
           ))}
         </List>
       </div>
+
     );
   }
 });

@@ -7,6 +7,7 @@ const LAYOUT = Constants.LAYOUT;
 //For mock data:
 const SQL = require('panoptes/SQL');
 
+const EMPTY_TAB = 'containers/EmptyTab'
 
 var LayoutStore = Fluxxor.createStore({
 
@@ -26,7 +27,7 @@ var LayoutStore = Fluxxor.createStore({
           }
         },
         'EmptyTab': {
-          component: 'panoptes/EmptyTab'
+          component: EMPTY_TAB
         },
       },
       tabs: {
@@ -73,8 +74,17 @@ var LayoutStore = Fluxxor.createStore({
   },
 
   componentUpdate(payload) {
-    let {compId, newProps} = payload;
-    this.state = this.state.mergeIn(['components', compId, 'props'], newProps)
+    let {compId, newProps, newComponent} = payload;
+    if (newComponent) {
+      let component = Immutable.fromJS({
+        component: newComponent,
+        props: newProps
+      });
+      this.state = this.state.setIn(['components', compId], component);
+    }
+    else
+      this.state = this.state.mergeIn(['components', compId, 'props'], newProps);
+
     this.emit('change');
   },
   modalClose() {
@@ -121,24 +131,39 @@ var LayoutStore = Fluxxor.createStore({
 
   tabClose(payload) {
     let {compId} = payload;
+    //Closing the lone empty tab is a no-op
+    if (this.state.getIn(['tabs', 'components']).size == 1 &&
+        this.state.getIn(['components', compId, 'component']) === EMPTY_TAB)
+      return;
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
       throw Error("Closed non-existant tab");
     let new_tabs = this.state.getIn(['tabs', 'components']).delete(pos);
     this.state = this.state.setIn(['tabs', 'components'], new_tabs);
-    if (compId === this.state.getIn(['tabs', 'selectedTab']))
-      if (pos < new_tabs.size)
-        this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.get(pos));
-      else
-        this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
-    this.emit('change');
+    if (new_tabs.size == 0) {
+      this.tabOpen({
+        component: {component:EMPTY_TAB},
+        switchTo: true
+      });
+    } else {
+      if (compId === this.state.getIn(['tabs', 'selectedTab']))
+        if (pos < new_tabs.size)
+          this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.get(pos));
+        else
+          this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
+      this.emit('change');
+    }
   },
   tabOpen(payload) {
-    payload = Immutable.fromJS(payload);
+    let {component, switchTo} = payload;
+    if (!component.component)
+      component.component = EMPTY_TAB;
+    component = Immutable.fromJS(component);
     let id = uid(10);
-    this.state = this.state.setIn(['components', id], payload);
+    this.state = this.state.setIn(['components', id], component);
     this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(id));
-    console.log(this.state.toJS());
+    if (switchTo)
+      this.state = this.state.setIn(['tabs', 'selectedTab'], id);
     this.emit('change');
   },
   tabSwitch(payload) {

@@ -14,20 +14,6 @@ let TabbedArea = React.createClass({
     onClose: React.PropTypes.func
   },
 
-  handleClick(tabId, e) {
-    if (this.props.onSelect) {
-      e.preventDefault();
-      this.props.onSelect(tabId);
-    }
-  },
-  handleClose(tabId, event) {
-    if (this.props.onClose) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.props.onClose(tabId);
-    }
-  },
-
   getInitialState() {
     return {
       icons: {},
@@ -52,6 +38,27 @@ let TabbedArea = React.createClass({
         icons: icons,
         titles: titles
       });
+  },
+
+  handleClick(tabId, e) {
+    if (this.props.onSelect) {
+      e.preventDefault();
+      this.props.onSelect(tabId);
+    }
+  },
+  handleClose(tabId, event) {
+    if (this.props.onClose) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.onClose(tabId);
+    }
+  },
+  handleAddTab(e) {
+    if (this.props.onAddTab) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.onAddTab();
+    }
   },
 
   renderTab(tab) {
@@ -88,6 +95,7 @@ let TabbedArea = React.createClass({
       <div {...this.props} className="tabbed-area">
         <div className="tabs">
           {ValidComponentChildren.map(this.props.children, this.renderTab, this)}
+          {this.props.onAddTab ? <Icon name="plus-circle" onClick={this.handleAddTab}/> : null}
         </div>
         <div className="tab-content">
           {ValidComponentChildren.map(this.props.children, this.renderPane, this)}

@@ -14,17 +14,19 @@ function memoize(fn) {
 }
 
 let LayoutActions = {
-  componentUpdate(compId, newProps) {
+  componentUpdate(compId, newProps, newComponent = null) {
     this.dispatch(LAYOUT.COMPONENT_UPDATE, {
       compId: compId,
-      newProps: newProps
+      newProps: newProps,
+      newComponent: newComponent
     });
   },
   componentUpdateFor: memoize((compId) => {
-    return function (newProps) {
+    return function (newProps, newComponent = null) {
       this.dispatch(LAYOUT.COMPONENT_UPDATE, {
         compId: compId,
-        newProps: newProps
+        newProps: newProps,
+        newComponent: newComponent
       });
     }
   }),
@@ -68,10 +70,13 @@ let LayoutActions = {
       compId: compId
     });
   },
-  tabOpen(component, props) {
+  tabOpen(component = null, props = {}, switchTo = true) {
     this.dispatch(LAYOUT.TAB_OPEN, {
-      component: component,
-      props: props
+      component: {
+        component: component,
+        props: props
+      },
+      switchTo: switchTo
     });
   },
   tabSwitch(compId) {

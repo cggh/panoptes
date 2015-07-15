@@ -37,7 +37,7 @@ InitialConfig()
 
     //Listen to the layout store and update the URL when it changes.
     let last_state = stores.LayoutStore.getState().delete('modal');
-    stores.LayoutStore.on('change', () => {
+    stores.LayoutStore.on('change', _.debounce(() => {
       let new_state = stores.LayoutStore.getState().delete('modal');
       if (!last_state.equals(new_state)) {
         last_state = new_state;
@@ -45,7 +45,7 @@ InitialConfig()
           console.log(resp);
         });
       }
-    });
+    }, 200));
 
     let actions = {
       layout: LayoutActions,

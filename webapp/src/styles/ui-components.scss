@@ -14,22 +14,27 @@
       top: 0;
       left: 0;
       visibility: hidden;
+      overflow: hidden;
       clear: both;
       //z-index:1; Not sure why this was here
       padding: 10px 5px;
       width: 100%;
       height: 100%;
+
     }
     .tab-pane *{
       transition: none !important;
     }
     .tab-pane.active {
       visibility: visible;
+      overflow: auto;
     }
   }
   .tabs {
     display: flex;
-    height: $topbar-height;
+    flex-wrap: wrap;
+    width:100%;
+    min-height: $topbar-height;
     background: linear-gradient(to right, #000000 0%, #757575 100%);
     .tab {
       display: flex;
@@ -37,7 +42,6 @@
       border-top-right-radius: 8px;
       margin-right: 2px;
       margin-left: 2px;
-      padding: 0 7px 0px 7px;
       cursor: pointer;
       top: 1px;
       font-weight: bold;
@@ -46,15 +50,10 @@
       white-space: nowrap;
       color: rgb(255, 255, 255);
       background: $primary-color;
+      min-width: 100px;
       .title {
         flex: 1;
-        margin-left: 5px;
-        margin-right: 5px;
-        min-width: 75px;
         vertical-align: middle;
-        line-height: $topbar-height;
-      }
-      .icon {
         line-height: $topbar-height;
       }
     }
@@ -67,17 +66,26 @@
       opacity: 0.9;
     }
     .tab.inactive .action {
-      display: none;
+      visibility: hidden;
+    }
+    .icon {
+      line-height: $topbar-height;
+      color: white;
+      margin-left: 7px;
+      margin-right: 5px;
+      opacity: 0.3;
+    }
+    .icon:hover {
+      opacity: 1;
     }
   }
-
 }
 
 .icon {
   position: relative;
   vertical-align: middle;
   font-size: 22px;
-  color: white;
+  cursor: pointer;
 }
 .icon:hover {
   opacity: 1;
@@ -131,7 +139,11 @@
     box-shadow: $z-1-shadow;
     position: relative;
     z-index: 3;
-
+    .icon {
+      line-height: $topbar-height;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
     .title {
       flex: 1;
       vertical-align: middle;
@@ -273,7 +285,13 @@
     color: white;
     margin-left: 7px;
     margin-right: 7px;
+  }
 
+  .icon {
+    margin-left: 5px;
+    margin-right: 5px;
+    line-height: $topbar-height;
+    color: white;
   }
 
 }
