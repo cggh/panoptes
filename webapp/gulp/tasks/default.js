@@ -1,2 +1,2 @@
 var gulp = require('gulp');
-gulp.task('default', ['build', 'watch', 'server']);
+gulp.task("default", ["webpack-dev-server"]);

@@ -16,6 +16,8 @@ const InitialConfig = require('panoptes/InitialConfig');
 const ErrorReport = require('panoptes/ErrorReporter.js');
 const injectTapEventPlugin = require("react-tap-event-plugin");
 
+import 'normalize.css';
+
 //Needed for onTouchTap
 //Can go away when react 1.0 release
 //Check this repo:
