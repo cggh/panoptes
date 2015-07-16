@@ -32,16 +32,15 @@ var LayoutStore = Fluxxor.createStore({
       },
       tabs: {
         selectedTab: 'EmptyTab',
-        components: [ 'EmptyTab']
+        components: ['EmptyTab']
       },
       popups: {
-        //components: ['Table'],
         components: [],
         state: {
-          'P2': {
+          'Table': {
             position: {
-              x: 500,
-              y: 100
+              x: 0,
+              y: 0
             },
             size: {
               width: 300,
@@ -51,10 +50,10 @@ var LayoutStore = Fluxxor.createStore({
         }
       },
       modal: {
-        component:'containers/QueryPicker',
-        props: {
-          table: 'variants'
-        }
+        //component:'containers/QueryPicker',
+        //props: {
+        //  table: 'variants'
+        //}
       }
     });
 
@@ -66,9 +65,11 @@ var LayoutStore = Fluxxor.createStore({
       LAYOUT.POPUP_CLOSE, this.popupClose,
       LAYOUT.POPUP_FOCUS, this.popupFocus,
       LAYOUT.POPUP_MOVE, this.popupMove,
+      LAYOUT.POPUP_OPEN, this.popupOpen,
       LAYOUT.POPUP_RESIZE, this.popupResize,
       LAYOUT.TAB_CLOSE, this.tabClose,
       LAYOUT.TAB_OPEN, this.tabOpen,
+      LAYOUT.TAB_POP_OUT, this.tabPopOut,
       LAYOUT.TAB_SWITCH, this.tabSwitch
     );
   },
@@ -111,9 +112,8 @@ var LayoutStore = Fluxxor.createStore({
 
   popupFocus(payload) {
     let {compId} = payload;
-    let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
-    list = list.push(compId);
-    this.state = this.state.setIn(['popups', 'components'], list);
+    this.state = this.state.updateIn(['popups', 'components'],
+      (list) => list.filter((popupId) => popupId !== compId).push(compId));
     this.emit('change');
   },
 
@@ -123,17 +123,34 @@ var LayoutStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  popupOpen(payload) {
+    let {component, compId} = payload;
+    if (compId)
+      this.state = this.state.updateIn(['popups', 'components'],
+        (list) => list.filter((popupId) => popupId !== compId).push(compId));
+    else {
+      if (!component.component)
+        component.component = EMPTY_TAB;
+      component = Immutable.fromJS(component);
+      let id = uid(10);
+      this.state = this.state.setIn(['components', id], component);
+      this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(id));
+    }
+    //console.log(this.state.toJS());
+    this.emit('change');
+  },
+
   popupResize(payload) {
     let {compId, size} = payload;
     this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], size);
     this.emit('change');
   },
 
-  tabClose(payload) {
+  tabClose(payload, force) {
     let {compId} = payload;
     //Closing the lone empty tab is a no-op
-    if (this.state.getIn(['tabs', 'components']).size == 1 &&
-        this.state.getIn(['components', compId, 'component']) === EMPTY_TAB)
+    if (!force && this.state.getIn(['tabs', 'components']).size == 1 &&
+      this.state.getIn(['components', compId, 'component']) === EMPTY_TAB)
       return;
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
@@ -142,7 +159,7 @@ var LayoutStore = Fluxxor.createStore({
     this.state = this.state.setIn(['tabs', 'components'], new_tabs);
     if (new_tabs.size == 0) {
       this.tabOpen({
-        component: {component:EMPTY_TAB},
+        component: {component: EMPTY_TAB},
         switchTo: true
       });
     } else {
@@ -155,16 +172,29 @@ var LayoutStore = Fluxxor.createStore({
     }
   },
   tabOpen(payload) {
-    let {component, switchTo} = payload;
-    if (!component.component)
-      component.component = EMPTY_TAB;
-    component = Immutable.fromJS(component);
-    let id = uid(10);
-    this.state = this.state.setIn(['components', id], component);
-    this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(id));
-    if (switchTo)
-      this.state = this.state.setIn(['tabs', 'selectedTab'], id);
+    let {component, switchTo, compId} = payload;
+    if (compId)
+      this.state = this.state.updateIn(['popups', 'components'],
+        (list) => list.filter((popupId) => popupId !== compId).push(compId));
+    else {
+      if (!component.component)
+        component.component = EMPTY_TAB;
+      component = Immutable.fromJS(component);
+      let id = uid(10);
+      this.state = this.state.setIn(['components', id], component);
+      this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(id));
+      if (switchTo)
+        this.state = this.state.setIn(['tabs', 'selectedTab'], id);
+    }
     this.emit('change');
+  },
+  tabPopOut(payload) {
+    let {compId, pos} = payload;
+    this.state = this.state.updateIn(['popups', 'components'],
+      (list) => list.filter((popupId) => popupId !== compId).push(compId));
+    if (pos)
+      this.state = this.state.mergeIn(['popups','state', compId, 'position'], pos);
+    this.tabClose(payload, true);
   },
   tabSwitch(payload) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], payload.compId);

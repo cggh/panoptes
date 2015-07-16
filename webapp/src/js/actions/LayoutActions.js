@@ -79,6 +79,12 @@ let LayoutActions = {
       switchTo: switchTo
     });
   },
+  tabPopOut(compId, pos) {
+    this.dispatch(LAYOUT.TAB_POP_OUT, {
+      compId: compId,
+      pos: pos
+    });
+  },
   tabSwitch(compId) {
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId

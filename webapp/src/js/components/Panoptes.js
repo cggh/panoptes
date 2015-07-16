@@ -107,7 +107,9 @@ let Panoptes = React.createClass({
             <TabbedArea activeTab={tabs.get('selectedTab')}
                         onSelect={actions.tabSwitch}
                         onClose={actions.tabClose}
-                        onAddTab={actions.tabOpen}>
+                        onAddTab={actions.tabOpen}
+                        onDragAway={actions.tabPopOut}
+              >
               {tabs.get('components').map(compId => {
                 let tab = components.get(compId).toObject();
                 let props = tab.props ? tab.props.toObject() : {};
