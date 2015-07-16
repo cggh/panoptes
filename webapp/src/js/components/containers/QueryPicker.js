@@ -73,6 +73,8 @@ let QueryPicker = React.createClass({
       <div className='large-modal query-picker'>
         <Sidebar
           docked={true}
+          transitions={false}
+          touch={false}
           sidebar={(
           <div>
             <List>

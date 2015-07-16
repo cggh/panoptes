@@ -148,7 +148,6 @@ let Panoptes = React.createClass({
           {modal.component ? React.createElement(require(modal.component), modal.props.toObject()) : null}
         </Modal>
         <NotificationSystem ref="notificationSystem"/>
-
       </div>
     );
   }

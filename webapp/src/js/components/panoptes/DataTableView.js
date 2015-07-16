@@ -11,6 +11,7 @@ const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
+const SQL = require('panoptes/SQL');
 
 const {Table, Column} = require('fixed-data-table');
 const Loading = require('ui/Loading');
@@ -35,7 +36,7 @@ let DataTableView = React.createClass({
   getDefaultProps() {
     return {
       table: null,
-      query: null,
+      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       start: 0,
       columns: Immutable.OrderedMap()
@@ -87,6 +88,7 @@ let DataTableView = React.createClass({
   render() {
     let { query, className } = this.props;
     let { loadStatus, rows, width, height } = this.state;
+    console.log(this.state);
     return (
         <div className={classNames("datatable", className)}>
             <Table

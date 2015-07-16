@@ -83,7 +83,7 @@ let LayoutActions = {
     this.dispatch(LAYOUT.TAB_SWITCH, {
       compId: compId
     });
-  },
+  }
 };
 
 module.exports = LayoutActions;

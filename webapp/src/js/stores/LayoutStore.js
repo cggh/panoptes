@@ -31,8 +31,8 @@ var LayoutStore = Fluxxor.createStore({
         },
       },
       tabs: {
-        selectedTab: 'EmptyTab',
-        components: ['Table', 'EmptyTab']
+        selectedTab: 'Table',
+        components: [ 'EmptyTab']
       },
       popups: {
         //components: ['Table'],
@@ -51,10 +51,10 @@ var LayoutStore = Fluxxor.createStore({
         }
       },
       modal: {
-        //component:'containers/QueryPicker',
-        //props: {
-        //  table: 'variants'
-        //}
+        component:'containers/QueryPicker',
+        props: {
+          table: 'variants'
+        }
       }
     });
 
