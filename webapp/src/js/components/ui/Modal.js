@@ -2,9 +2,16 @@ const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const classNames = require('classnames');
 const Icon = require('ui/Icon');
+const Hotkey = require('react-hotkey');
+Hotkey.activate();
+
+var KEYCODE_ESC = 27;
 
 var Modal = React.createClass({
-  mixins: [PureRenderMixin],
+  mixins: [
+    PureRenderMixin,
+    Hotkey.Mixin('handleHotkey')
+  ],
 
   propTypes: {
     visible: React.PropTypes.bool,
@@ -55,6 +62,14 @@ var Modal = React.createClass({
       e.stopPropagation();
       if (this.props.onClose)
         this.props.onClose();
+    }
+  },
+
+  handleHotkey(e) {
+    if (e.keyCode == KEYCODE_ESC && !this.props.uncloseable) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.props.onClose();
     }
   },
 

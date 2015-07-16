@@ -31,7 +31,7 @@ var LayoutStore = Fluxxor.createStore({
         },
       },
       tabs: {
-        selectedTab: 'Table',
+        selectedTab: 'EmptyTab',
         components: [ 'EmptyTab']
       },
       popups: {
