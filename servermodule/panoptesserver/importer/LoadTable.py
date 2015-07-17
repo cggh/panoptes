@@ -107,7 +107,8 @@ class LoadTable(threading.Thread):
             #     print('==========' + str(col))
             colname = self._loadSettings.getPropertyValue(col,"Id")
             if (self._loadSettings.getPropertyValue(col,'ReadData') and (colname not in self._fileColIndex)):
-                raise Exception('File is missing column '+colname)
+                if not colname == "AutoKey":
+                    raise Exception('File is missing column '+colname)
     
     #Used if not bulk loading to encode the data for an insert statement
     def _encodeCell(self, icontent, col):
@@ -216,6 +217,8 @@ class LoadTable(threading.Thread):
             colTokens.append("`{}_row_index` INT  ".format(self._rowIndexField))
             
         for col in self._loadSettings.getPropertyNames():
+            if col == "AutoKey":
+                continue
             name = self._loadSettings.getPropertyValue(col,'Id')
             typedefn = self._loadSettings.getPropertyValue(col,'DataType')
             maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')

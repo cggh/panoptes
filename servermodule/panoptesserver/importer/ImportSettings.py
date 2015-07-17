@@ -326,7 +326,7 @@ class ImportSettings:
             
     def _addDefaultProperties(self):
         
-        if ('PrimKey' in self._settings and (self._settings == 'AutoKey')):
+        if ('PrimKey' in self._settings and (self._settings['PrimKey'] == 'AutoKey')):
             propid = 'AutoKey'
             self._propidMap[propid] = {
                                           'Id': propid,
