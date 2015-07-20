@@ -42,7 +42,7 @@ InitialConfig()
       if (!last_state.equals(new_state)) {
         last_state = new_state;
         API.storeData(new_state.toJS()).then((resp) => {
-          console.log(resp);
+          window.history.pushState({}, config.settings.name, `/${resp}`);
         });
       }
     }, 200));
