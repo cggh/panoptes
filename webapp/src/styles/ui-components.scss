@@ -137,7 +137,7 @@
     font-weight: bold;
     color: rgb(255, 255, 255);
     //background: $primary-color;
-    background: linear-gradient(to right, #000000 0%, #757575 100%);display: flex;
+    background: linear-gradient(to right, $primary-color 0%, $primary-color 100%);display: flex;
     //MD like shadow needs relative and z-index
     box-shadow: $z-1-shadow;
     position: relative;
