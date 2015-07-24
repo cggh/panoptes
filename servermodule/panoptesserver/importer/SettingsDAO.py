@@ -50,14 +50,14 @@ class SettingsDAO(object):
         return dbCursor
         
     def _execSqlQuery(self, sql, *args):
-        self._log('SQLQuery:' + self._datasetId + ';' + sql % args)
+        self._log('SQLQuery:' + (self._datasetId or 'no dataset') + ';' + sql % args)
         
         with self.getDBCursor() as cur:
             cur.execute(sql, args)
             return cur.fetchall()
     
     def _execSql(self, sql, *args):
-        self._log('SQL:' + str(self._datasetId) +';'+sql % args)
+        self._log('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args)
 
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
         self.__updateConnectionSettings(dbCursor, local_file = 0, db = self._datasetId)
@@ -107,7 +107,7 @@ class SettingsDAO(object):
         db = self._datasetId
         self._datasetId = None
         #Check existence of database
-        rs = self._execSqlQuery("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA  WHERE SCHEMA_NAME=".format(DBDBESC(db)))
+        rs = self._execSqlQuery("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA  WHERE SCHEMA_NAME='{}'".format(ToSafeIdentifier(db)))
         if len(rs) == 0:
             raise Exception('Database does not yet exist. Please do a full import or top N preview import.')
 
