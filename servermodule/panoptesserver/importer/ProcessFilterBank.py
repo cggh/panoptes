@@ -334,6 +334,8 @@ class ProcessFilterBank(BaseImport):
                 regex = fnmatch.translate(pattern).replace('.*','(.*)')
                 #self._log('Using {}'.format(regex))
                 reobj = re.compile(regex)
+                if len(files) == 0:
+                    self._log("No matches for pattern:" + pattern)
             for fileName in files:
                 if reobj is not None:
                     m = reobj.match(fileName)
