@@ -28,7 +28,11 @@ class SQLloader(BasePlugin):
         self._log("Loading SQL file:" + sqlFile)
         sql = open(sqlFile).read()
         sql_parts = sqlparse.split( sql )
-        for sql_part in sql_parts:
-            if sql_part.strip() ==  '':
-                continue 
-            self._execSql(sql_part)
+        
+        with self._dao.getDBCursor() as cur:
+            
+            for sql_part in sql_parts:
+                if sql_part.strip() ==  '':
+                    continue 
+                self._log('SQLQuery:' + (self._datasetId or 'no dataset') + ';' + sql_part)
+                cur.execute(sql_part)
