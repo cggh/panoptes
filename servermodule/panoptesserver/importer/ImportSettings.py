@@ -452,15 +452,17 @@ class ImportSettings:
                 if not (value in self._propidMap or (pkey == 'PrimKey' and value == 'AutoKey') or value == 'None' or ('AutoScanProperties' in self._settings and self._settings["AutoScanProperties"])):
                     self._errors.append("{} must be a valid PropertyId is {}".format(pkey, value))
             elif pdef['type'] == 'PropertyIDs':
+                pass
                 for propid in value.split(','):
                     propid = propid.strip()
-                    if not propid in self._propidMap:
+                    if not (propid in self._propidMap or '@' in propid):
                         self._errors.append("{} must be a valid PropertyId is {}".format(pkey, propid))
             elif pdef['type'] == 'PropertyIDList':
+                pass
                 if not type(value) is list:
                     self._errors.append("{} must be a List is {}".format(pkey, value))
                 for propid in value:
-                    if not propid in self._propidMap:
+                    if not (propid in self._propidMap or '@' in propid):
                         self._errors.append("{} must be a valid PropertyId is {}".format(pkey, propid))
             else:
                 #Error in definition above
