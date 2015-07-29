@@ -417,7 +417,7 @@ class SettingsDAO(object):
             #raise Exception(column + " column index field doesn't exist in table " + table)
             raise
         
-    def magic2D(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
+    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
 
@@ -431,8 +431,7 @@ class SettingsDAO(object):
             indexField = 'ColumnIndexField'
             dataTable = 'ColumnDataTable'
             tempTable = 'TempColIndex'
-          
-        if table_settings[indexArray]:  
+        if table_settings[indexArray]:
             #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
             #Firstly create a temporary table with the index array
             try:

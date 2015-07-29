@@ -137,13 +137,10 @@ class Import2DDataTable(BaseImport):
                     # We could just run the command and ignore the error raised if it already exists
                     # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['ColumnDataTable'], tableid)
                     # self._execSql(sql)
-                    if table_settings['ColumnIndexArray']:
-                        self._dao.magic2D(remote_hdf5, "column", tableid, table_settings, max_line_count)
+                    self._dao.insert2DIndexes(remote_hdf5, "column", tableid, table_settings, max_line_count)
 
                 if table_settings['RowDataTable']:
-                                                
-                    if table_settings['RowIndexArray']:
-                        self._dao.magic2D(remote_hdf5, "row", tableid, table_settings, None)
+                    self._dao.insert2DIndexes(remote_hdf5, "row", tableid, table_settings, None)
        
                 #We have the indexes - now we need a local copy of the HDF5 data for each property
                 ImpUtils.mkdir(os.path.join(self._config.getBaseDir(), '2D_data'))
