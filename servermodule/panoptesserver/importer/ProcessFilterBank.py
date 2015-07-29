@@ -7,14 +7,13 @@ import MultiCategoryDensityFilterBankData
 import ImpUtils
 import logging
 from BaseImport import BaseImport
-import config
 import gzip
 import shutil
+
 from DQXDbTools import DBCOLESC
-from DQXDbTools import DBTBESC, DBCursor
 import customresponders.panoptesserver.Utils as Utils
-import DQXDbTools
-import ImportSettings
+from SettingsDataTable import SettingsDataTable
+from SettingsSummary import SettingsSummary
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -139,7 +138,7 @@ class ProcessFilterBank(BaseImport):
                     self._log("Categories:" + str(output["Categories"]))
             
             if useDB:
-                source = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
+                source = self._dao.getDBCursor()
             else:
                 source = sourceFile
                             
@@ -218,39 +217,19 @@ class ProcessFilterBank(BaseImport):
                     output["destFile"].close()
 
 
-    def _replaceSummaryValuesDB(self, tableid, tableSettings, propid, sourceid):
-        workspaceid = self._workspaceId
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'summaryvalues'))
-            
-        summSettings = tableSettings.getPropertyValue(propid,'SummaryValues')
 
-        name = tableSettings.getPropertyValue(propid,'Name')
-        
+
+    def _replaceSummaryValuesDB(self, tableid, tableSettings, propid, sourceid):
+            
         #Don't know why here when createSummaryValues has already deleted all
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            stmt = "DELETE FROM summaryvalues WHERE (propid='{0}') and (tableid='{1}') and (source='{2}') and (workspaceid='{3}')"
-            sql = stmt.format(propid, tableid, sourceid, workspaceid)
-            self._execSql(sql)
-            stmt = "INSERT INTO summaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', {7}, {8}, {9})"
-            sql = stmt.format(workspaceid or '',
-                              sourceid,
-                              propid,
-                              tableid,
-                              name,
-                              tableSettings.getPropertyValue(propid,'Order'),
-                              tableSettings.serializeSummaryValues(propid),
-                              tableSettings.getPropertyValue(propid,'MinVal'),
-                              tableSettings.getPropertyValue(propid,'MaxVal'),
-                              summSettings['BlockSizeMin']
-                              )
-            self._execSql(sql)
+            self._dao.insertSummaryValues(tableid, tableSettings, propid, sourceid)
 
 
 
 
     def _getTrackDest(self, propid):
-        global config
-        destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, propid)
+        destFolder = os.path.join(self._config.getBaseDir(), 'SummaryTracks', self._datasetId, propid)
         if not os.path.exists(destFolder):
             os.makedirs(destFolder)
         dataFileName = os.path.join(destFolder, propid)
@@ -307,15 +286,14 @@ class ProcessFilterBank(BaseImport):
                 
         return outputs
     
+
+ 
+
     def _prepareSummaryValues(self, tableid):
         
-        import DQXDbTools
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'summaryvalues'))
-
         #See also _replaceSummaryValuesDB
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            sql = "DELETE FROM summaryvalues WHERE tableid='{0}'".format(tableid)
-            self._execSql(sql)
+            self._dao.deleteSummaryValuesForTable(tableid)
         
         settings, sourceFileName = self._getDataFiles(tableid)
         
@@ -333,7 +311,6 @@ class ProcessFilterBank(BaseImport):
         self._extractColumnsAndProcess(outputs, False, True, True)
         
     def _prepareSummaryFilterBank(self, tableid, tableSettings, summaryid):
-        global config
         
         outputs = []
         if self._getImportSetting('ScopeStr') == 'all':
@@ -357,6 +334,8 @@ class ProcessFilterBank(BaseImport):
                 regex = fnmatch.translate(pattern).replace('.*','(.*)')
                 #self._log('Using {}'.format(regex))
                 reobj = re.compile(regex)
+                if len(files) == 0:
+                    self._log("No matches for pattern:" + pattern)
             for fileName in files:
                 if reobj is not None:
                     m = reobj.match(fileName)
@@ -367,7 +346,7 @@ class ProcessFilterBank(BaseImport):
                 if not (os.path.isdir(fileName)):
                     itemtracknr += 1
                     #self._log('Processing {0}: {1}'.format(itemtracknr, fileid))
-                    destFolder = os.path.join(config.BASEDIR, 'SummaryTracks', self._datasetId, 'TableTracks', tableid, summaryid, fileid)
+                    destFolder = os.path.join(self._config.getBaseDir(), 'SummaryTracks', self._datasetId, 'TableTracks', tableid, summaryid, fileid)
                     #self._log('Destination: ' + destFolder)
                     if not os.path.exists(destFolder):
                         os.makedirs(destFolder)
@@ -391,13 +370,13 @@ class ProcessFilterBank(BaseImport):
                     
         return outputs
             
+
     def _prepareTableBasedSummaryValues(self, tableid):
            
         tableSettings = self._fetchSettings(tableid)
            
         if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            sql = "DELETE FROM tablebasedsummaryvalues WHERE tableid='{0}'".format(tableid)
-            self._execSql(sql)
+            sql = self._dao.deleteTableBasedSummaryValuesForTable(tableid)
             
         output = []
         if tableSettings['TableBasedSummaryValues']:
@@ -409,15 +388,7 @@ class ProcessFilterBank(BaseImport):
                 #with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
                 
                 if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-                    stmt = "INSERT INTO tablebasedsummaryvalues VALUES ('{0}', '{1}', '{2}', '{3}', {4}, {5}, {6}, 0)"
-                    sql = stmt.format(tableid,
-                                     summaryid, 
-                                     tableSettings.getTableBasedSummaryValue(summaryid)['Name'], 
-                                     tableSettings.serializeTableBasedValue(summaryid), 
-                                     tableSettings.getTableBasedSummaryValue(summaryid)['MinVal'], 
-                                     tableSettings.getTableBasedSummaryValue(summaryid)['MaxVal'], 
-                                     tableSettings.getTableBasedSummaryValue(summaryid)['BlockSizeMin'])
-                    self._execSql(sql)
+                    self._dao.insertTableBasedSummaryValues(tableid, tableSettings, summaryid)
                 
                 outputs = self._prepareSummaryFilterBank(tableid, tableSettings, summaryid)
                 output = output + outputs
@@ -443,7 +414,7 @@ class ProcessFilterBank(BaseImport):
     
         settings = self._fetchCustomSettings(sourceid, tableid)
         
-        tables = self._getTablesInfo(tableid)
+        tables = self._dao.getTablesInfo(tableid)
         tableSettings = tables[0]["settings"]
         
         isPositionOnGenome = False
@@ -494,18 +465,20 @@ class ProcessFilterBank(BaseImport):
         propertiesBased = False
         with self._logHeader('Importing reference genome summary data '+summaryid):
 
-            settings = ImportSettings.ImportSettings()
+            
 
             settingsFile = os.path.join(summaryFolder, 'settings')
             sourceFileName = os.path.join(summaryFolder, 'values')
             
             if os.path.isfile(sourceFileName):
+                settings = SettingsSummary()
                 settings.loadPropsFile(summaryid, settingsFile)
                 
                 values = self._defineSettings(tableid, settings, summaryid, sourceFileName, None)
                 if values != None:
                     outputs.append(values)
             else:
+                settings = SettingsDataTable()
                 settings.loadFile(settingsFile)
                 sourceFileName = os.path.join(summaryFolder, 'data')
                 propertiesBased = True

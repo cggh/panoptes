@@ -1,44 +1,50 @@
 import os
-import ImpUtils
 import ImportSettings
-import config
-import DQXDbTools
 import simplejson
 import logging
 import sys
-import warnings
+from SettingsDAO import SettingsDAO
+from PanoptesConfig import PanoptesConfig
+from SettingsDataTable import SettingsDataTable
+from SettingsCustomData import SettingsCustomData
+from Settings2Dtable import Settings2Dtable
+from SettingsGlobal import SettingsGlobal
+from SettingsWorkspace import SettingsWorkspace
 
 class BaseImport(object):
     
     def __init__ (self, calculationObject, datasetId, importSettings, workspaceId = None, baseFolder = None, dataDir = 'datatables'):
         
-        global config
-        
         self._calculationObject = calculationObject
+        self._config = PanoptesConfig(self._calculationObject)
+        
         self._datasetId = datasetId
         self._workspaceId = workspaceId
         self._importSettings = importSettings
         self._dataDir = dataDir
         
         if (baseFolder == None):
-            baseFolder = os.path.join(config.SOURCEDATADIR, 'datasets')
+            baseFolder = os.path.join(self._config.getSourceDataDir(), 'datasets')
 
         self._datasetFolder = os.path.join(baseFolder, self._datasetId)
         
         if dataDir == 'datatables':
             self._tablesToken = 'DataTables'
+            self._settingsLoader = SettingsDataTable()
         elif dataDir == 'customdata':
             self._tablesToken = 'CustomData'
+            self._settingsLoader = SettingsCustomData()
         elif dataDir == '2D_datatables':
             self._tablesToken = '2D_datatables'
+            self._settingsLoader = Settings2Dtable()
         elif dataDir == 'workspaces':
             self._tablesToken = 'workspaces'
+            self._settingsLoader = SettingsWorkspace()
         else:
             raise Exception('dataDir must be either datatables, customdata workspaces, or 2D_datatables')
       
         self._dataFile = 'data'
         
-        settingsDef = None
         
         if dataDir == 'datatables' or dataDir == 'workspaces':  
             datasetFolder = os.path.join(baseFolder, datasetId)
@@ -47,7 +53,6 @@ class BaseImport(object):
         elif dataDir == 'workspaces':
             datasetFolder = os.path.join(baseFolder,datasetId, self._workspaceId)
             self._datatablesFolder = os.path.join(datasetFolder, dataDir)
-            settingsDef = ImportSettings.ImportSettings._workspaceSettings
         elif dataDir == '2D_datatables':
             datasetFolder = os.path.join(baseFolder, datasetId)
         
@@ -56,11 +61,10 @@ class BaseImport(object):
         elif dataDir == 'customdata':
             self._datatablesFolder = os.path.join(baseFolder, self._workspaceId)           
             self._datasetFolder = self._datatablesFolder
-            settingsDef = ImportSettings.ImportSettings._workspaceSettings
             
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = ImportSettings.ImportSettings(settingsFile, False, settingsDef = settingsDef)
+            self._globalSettings = SettingsGlobal(settingsFile, False)
         else:
             self._globalSettings = None
             
@@ -88,8 +92,17 @@ class BaseImport(object):
             logging.basicConfig(stream=sys.stdout, level='DEBUG')
         #This allows the use of the python logging api
         self._logger = logging.getLogger()
+        
+        self._dao = SettingsDAO(self._calculationObject, self._datasetId, self._workspaceId)
 
+    def setWorkspaceId(self, workspaceId):
+        self._workspaceId = workspaceId
+        self._dao._workspaceId = workspaceId
 
+    #This changes the message displayed in the Server calcuations section on the web page
+    def setInfo(self, message):
+        self._calculationObject.SetInfo(message)
+        
     def copy (self, src):
         
         self._calculationObject = src._calculationObject
@@ -192,15 +205,16 @@ class BaseImport(object):
         if not os.path.isfile(settings):
             self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
         else:
-            tableSettings = ImportSettings.ImportSettings(settings, settingsDef = ImportSettings.ImportSettings._customDataSettings)
+            tableSettings = SettingsCustomData(settings)
         
         return tableSettings
     
-    def _fetchSettings(self, datatable, settingsDef = None):
+    def _fetchSettings(self, datatable):
                 
         settings, data = self._getDataFiles(datatable)
         
-        tableSettings = ImportSettings.ImportSettings(settings, settingsDef = settingsDef)
+        tableSettings = self._settingsLoader
+        tableSettings.loadFile(settings)
         #self._log("Loaded importsettings")
         #tableSettings = SettingsLoader.SettingsLoader(settings, False)
                 
@@ -225,50 +239,12 @@ class BaseImport(object):
         subDir = 'datatables'
         return os.path.join(self._datasetFolder, subDir, datatable)
     
-    def _execSqlQuery(self, sql):
-        return(ImpUtils.ExecuteSQLQuery(self._calculationObject, self._datasetId, sql))
-    
-    def _execSql(self, sql):
-        ImpUtils.ExecuteSQL(self._calculationObject, self._datasetId, sql)
-
-    def _dropTable(self, tableName, cur = None):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            stmt = 'DROP TABLE IF EXISTS {0}'.format(tableName)
-            if cur is None:
-                self._execSql(stmt)
-            else:
-                cur.execute(stmt)
-
-    def _dropView(self, tableName):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self._execSql('DROP VIEW IF EXISTS {0}'.format(tableName))
-
-    def _getTablesInfo(self, tableid = None):
-        tables = []
-        if tableid == None:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog'
-        else:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid)
-        with DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId) as cur:  
-            cur.execute(sql)
-            tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in cur.fetchall()]
-            
-            if not tableid is None and len(tables) != 1:
-                raise Exception("Index Table " + tableid + " doesn't exist")
-                
-            for table in tables:
-                tableSettings = ImportSettings.ImportSettings(settingsDef = ImportSettings.ImportSettings._dataTableSettings)
-                tableSettings.deserialize(table['settingsStr'])
-                table['settings'] = tableSettings
-                
-        return tables
     #This is overridden by classes that operate a multi-threading model 
     def _log(self, message):
         self._calculationObject.Log(message)
         
     def _logHeader(self, message):
+        self.setInfo(message)
         return CalcLogHeader(self, message)
 
 #        return self._calculationObject.LogHeader(message)

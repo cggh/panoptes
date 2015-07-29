@@ -1,25 +1,32 @@
 import ImpUtils
 from PluginSettings import PluginSettings
+from PanoptesConfig import PanoptesConfig
+from SettingsDAO import SettingsDAO
 
 class BasePlugin:
     
     def __init__(self, calculationObject, datasetId, settings, dirPath):
         self._dirPath = dirPath
         self._calculationObject = calculationObject
+        self._config = PanoptesConfig(calculationObject)
+        self._dao = SettingsDAO(calculationObject, datasetId, None) 
         self._datasetId = datasetId
-        settingsDef = self._getSettingsDef()
+        settingsDef = self.getSettings()
         self._log("Loading plugin settings from " + settings)
         if settingsDef != None:
-            self._plugin_settings = PluginSettings(settings, settingsDef = settingsDef)
+            self._plugin_settings = PluginSettings()
+            self._plugin_settings.setSettings(settingsDef)
+            self._plugin_settings.loadFile(settings)
     
-    def _getSettingsDef(self):
+    def getSettingsDef(self):
         return None
         
     def _log(self, message):
         self._calculationObject.Log(message)
         
     def _execSql(self, sql):
-        ImpUtils.ExecuteSQL(self._calculationObject, self._datasetId, sql)
+        self._dao._execSql(sql)
+        
         
     def generateDocs(self):
         

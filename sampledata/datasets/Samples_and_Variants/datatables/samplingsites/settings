@@ -75,3 +75,10 @@ DataItemViews: # Lists all the custom views that should appear in the popup for 
 
 - Type: Overview                                       # Specifies the default view of all fields
   Name: Overview
+
+- Type: FieldList                                      # Specifies a list of properties to be shown
+  Name: Selected Properies                             # Name of the view
+  Fields:                                              # List of the fields to be included
+  - SiteID
+  - Country
+  - Name@contributors

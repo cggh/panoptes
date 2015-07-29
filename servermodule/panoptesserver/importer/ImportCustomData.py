@@ -5,7 +5,6 @@
 import os
 import DQXDbTools
 import DQXUtils
-import config
 import ImpUtils
 import customresponders.panoptesserver.Utils as Utils
 from DQXDbTools import DBCOLESC
@@ -13,7 +12,7 @@ from DQXDbTools import DBTBESC
 from ProcessDatabase import ProcessDatabase
 from ProcessFilterBank import ProcessFilterBank
 from BaseImport import BaseImport
-from ImportSettings import ImportSettings
+from SettingsCustomData import SettingsCustomData
 
 class ImportCustomData(BaseImport):
     
@@ -40,12 +39,9 @@ class ImportCustomData(BaseImport):
             credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'workspaces'))
  
     
-            self._execSql('DELETE FROM customdatacatalog WHERE tableid="{tableid}" and sourceid="{sourceid}"'.format(
-                tableid=tableid,
-                sourceid=sourceid
-            ))
+            self._dao.deleteCustomDataCatalogEntry(sourceid, tableid)
     
-            tables = self._getTablesInfo(tableid)
+            tables = self._dao.getTablesInfo(tableid)
             tableSettings = tables[0]["settings"]
             primkey = tables[0]["primkey"]
     
@@ -53,11 +49,7 @@ class ImportCustomData(BaseImport):
     
             settings = self.getSettings(sourceid, tableid)
     
-            self._execSql("INSERT INTO customdatacatalog VALUES ('{tableid}', '{sourceid}', '{settings}')".format(
-                tableid=tableid,
-                sourceid=sourceid,
-                settings=settings.serialize()
-            ))
+            self._dao.insertCustomDataSettings(sourceid, tableid, settings)
             
             sourcetable=Utils.GetTableWorkspaceProperties(self._workspaceId, tableid)
             print('Source table: '+sourcetable)
@@ -83,10 +75,7 @@ class ImportCustomData(BaseImport):
                     print('Removing outdated information:')
                     if len(toRemoveExistingProperties) > 0:
                         for prop in toRemoveExistingProperties:
-                            print('Removing outdated information: {0} {1} {2}'.format(self._workspaceId, prop, tableid))
-                            sql = 'DELETE FROM propertycatalog WHERE (workspaceid="{0}") and (propid="{1}") and (tableid="{2}")'.format(self._workspaceId, prop, tableid)
-                            print(sql)
-                            cur.execute(sql)
+                            self._dao.deleteFromWorkspacePropertyCatalog(tableid, prop)
                         sql = "ALTER TABLE {0} ".format(DBTBESC(sourcetable))
                         for prop in toRemoveExistingProperties:
                             if prop != toRemoveExistingProperties[0]:
@@ -100,18 +89,8 @@ class ImportCustomData(BaseImport):
                 for propid in settings.getPropertyNames():
                     
                     print('Create property catalog entry for {0} {1} {2}'.format(self._workspaceId, tableid, propid))
-                    sql = "DELETE FROM propertycatalog WHERE (workspaceid='{0}') and (propid='{1}') and (tableid='{2}')".format(self._workspaceId, propid, tableid)
-                    self._execSql(sql)
-                    sql = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', '{1}', '{2}', '{3}', '{4}', {5}, '{6}')".format(
-                        self._workspaceId,
-                        settings.getPropertyValue(propid,'DataType'),
-                        propid,
-                        tableid,
-                        settings.getPropertyValue(propid,'Name'),
-                        0,
-                        settings.serializeProperty(propid)
-                    )
-                    self._execSql(sql)
+                    self._dao.deleteFromWorkspacePropertyCatalog(tableid, propid)
+                    self._dao.insertIntoWorkspacePropertyCatalog(tableid, propid, settings)
                     ranknr += 1
         
                 if not self._importSettings['ConfigOnly']:
@@ -122,7 +101,7 @@ class ImportCustomData(BaseImport):
                     importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, workspaceId = self._workspaceId, baseFolder = folder, dataDir = 'customdata')
                     importer._sourceId = self._sourceId
             
-                    tableSettings = ImportSettings()
+                    tableSettings = SettingsCustomData()
                     props = settings['Properties']
                     if primkey not in settings.getPropertyNames():
                         props.append({ 'Id': primkey, 'Name': primkey, 'DataType':'Text', 'Index': False, 'ReadData': True, 'MaxLen': 0})
@@ -174,7 +153,7 @@ class ImportCustomData(BaseImport):
     
     
                     print('Cleaning up')
-                    self._dropTable(tmptable, cur)
+                    self._dao.dropTable(tmptable, cur)
     
                 if not self._importSettings['ConfigOnly']:
                     print('Updating view')
@@ -214,11 +193,11 @@ class ImportCustomData(BaseImport):
 
     
     
-    def importAllCustomData(self):
+    def importAllCustomData(self, importTable = None):
     
         print('Scanning for custom data in {}'.format(self._workspaceId))
     
-        tables = self._getTablesInfo()
+        tables = self._dao.getTablesInfo(importTable)
             
         tableMap = {table['id']:table for table in tables}
                 
@@ -231,7 +210,11 @@ class ImportCustomData(BaseImport):
         for table in workspaces:
             #Only use of table map
             if not table in tableMap:
-                raise Exception('Invalid table id '+table)
+                if importTable == None:
+                    raise Exception('Invalid table id {}'.format(table) )
+                else:
+                    self._log("Ignoring table:" + table)
+                    continue
                         
             self._folder = os.path.join(self._datatablesFolder,self._dataDir,table)
                         

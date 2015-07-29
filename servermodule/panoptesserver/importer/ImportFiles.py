@@ -5,47 +5,25 @@
 import os
 import sys
 import shutil
-try:
-    import DQXDbTools
-except:
-    print('Failed to import DQXDbTools. Please add the DQXServer base directory to the Python path')
-    sys.exit()
-import DQXUtils
-import config
-import ImportSettings
-import ImpUtils
+from PanoptesConfig import PanoptesConfig
+from SettingsDAO import SettingsDAO
 import customresponders.panoptesserver.schemaversion as schemaversion
-import customresponders.panoptesserver.Utils as Utils
 
 from ImportDataTable import ImportDataTable
 from Import2DDataTable import Import2DDataTable
 import ImportRefGenome
 from ImportWorkspaces import ImportWorkspaces
-import time
-import math
-from DQXDbTools import DBCOLESC
-from DQXDbTools import DBTBESC
-from DQXDbTools import DBDBESC
-import sqlparse
 from PluginLoader import PluginLoader
 
-def GetCurrentSchemaVersion(calculationObject, datasetId):
-    with DQXDbTools.DBCursor(calculationObject.credentialInfo, datasetId) as cur:
-        cur.execute('SELECT `content` FROM `settings` WHERE `id`="DBSchemaVersion"')
-        rs = cur.fetchone()
-        if rs is None:
-            return (0, 0)
-        else:
-            majorversion = int(rs[0].split('.')[0])
-            minorversion = int(rs[0].split('.')[1])
-            return (majorversion, minorversion)
+
 
 def ImportDocs(calculationObject, datasetFolder, datasetId):
+    config = PanoptesConfig(calculationObject)
     sourceDocFolder = os.path.join(datasetFolder, 'doc')
     if not(os.path.exists(sourceDocFolder)):
         return
     with calculationObject.LogHeader('Creating documentation'):
-        destDocFolder = os.path.join(config.BASEDIR, 'Docs', datasetId)
+        destDocFolder = os.path.join(config.getBaseDir(), 'Docs', datasetId)
         try:
             shutil.rmtree(destDocFolder)
         except OSError:
@@ -54,68 +32,41 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         shutil.copytree(sourceDocFolder, destDocFolder)
 
 
+
+
+
 def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
-        DQXUtils.CheckValidDatabaseIdentifier(datasetId)
+
         datasetFolder = os.path.join(baseFolder, datasetId)
-        indexDb = config.DB
 
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(indexDb, 'datasetindex'))
-        calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(datasetId))
 
-        # Remove current reference in the index first: if import fails, nothing will show up
-        ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DELETE FROM datasetindex WHERE id="{0}"'.format(datasetId))
-
-        globalSettings = ImportSettings.ImportSettings(os.path.join(datasetFolder, 'settings'), settingsDef = ImportSettings.ImportSettings._datasetSettings)
-
-        print('Global settings: '+str(globalSettings))
-
+        dao = SettingsDAO(calculationObject, datasetId, None)
+        dao.removeDatasetMasterRef()
 
         if not importSettings['ConfigOnly']:
             # Dropping existing database
+            dao = SettingsDAO(calculationObject, datasetId, None)
             calculationObject.SetInfo('Dropping database')
-            print('Dropping database')
-            try:
-                ImpUtils.ExecuteSQL(calculationObject, indexDb, 'DROP DATABASE IF EXISTS {0}'.format(DBDBESC(datasetId)))
-            except:
-                pass
-            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'CREATE DATABASE {0}'.format(DBDBESC(datasetId)))
+            dao.createDatabase()
 
             # Creating new database
             scriptPath = os.path.dirname(os.path.realpath(__file__))
             calculationObject.SetInfo('Creating database')
-            print('Creating new database')
-            #Can't use source as it's part of the mysql client not the API
-            sql = open(scriptPath + "/createdataset.sql").read()
-            sql_parts = sqlparse.split( sql )
-            for sql_part in sql_parts:
-                if sql_part.strip() ==  '':
-                    continue 
-                ImpUtils.ExecuteSQL(calculationObject, datasetId, sql_part)
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'INSERT INTO `settings` VALUES ("DBSchemaVersion", "{0}.{1}")'.format(
-                schemaversion.major,
-                schemaversion.minor
-            ))
+            dao.loadFile(scriptPath + "/createdataset.sql")
+            
+            dao.setDatabaseVersion(schemaversion.major, schemaversion.minor)
         else:
-            #Check existence of database
-            sql = "SELECT SCHEMA_NAME FROM information_schema.SCHEMATA  WHERE SCHEMA_NAME='{0}'".format(datasetId)
-            with DQXDbTools.DBCursor(calculationObject.credentialInfo) as cur:
-                cur.execute(sql)
-                rs = cur.fetchone()
-                if rs is None:
-                    raise Exception('Database does not yet exist. Please do a full import or top N preview import.')
+            #Raises an exception if not present
+            dao.isDatabasePresent()
             # Verify is major schema version is OK - otherways we can't do config update only
-            currentVersion = GetCurrentSchemaVersion(calculationObject, datasetId)
+            currentVersion = dao.getCurrentSchemaVersion()
             if currentVersion[0] < schemaversion.major:
                 raise Exception("The database schema of this dataset is outdated. Actualise it by running a full data import or or top N preview import.")
  
 
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM propertycatalog')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM summaryvalues')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM tablecatalog')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM settings WHERE id<>"DBSchemaVersion"')
-        ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM customdatacatalog')
+        dao.clearDatasetCatalogs()
 
         workspaceId = None
         
@@ -128,7 +79,8 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         import2D = Import2DDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder, dataDir = '2D_datatables')
         import2D.importAll2DTables()
 
-
+        globalSettings = importer._globalSettings
+        
         if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             globalSettings['hasGenomeBrowser'] = True
         
@@ -143,15 +95,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
-
-            importtime = 0
-            if not importSettings['ConfigOnly']:
-                importtime = time.time()
-            ImpUtils.ExecuteSQL(calculationObject, indexDb, 'INSERT INTO datasetindex VALUES ("{0}", "{1}", "{2}")'.format(
-                datasetId,
-                globalSettings['Name'],
-                str(math.ceil(importtime))
-            ))
+            dao.registerDataset(globalSettings['Name'], importSettings['ConfigOnly'])
             
         modules.importAll('post')
 
@@ -181,9 +125,10 @@ if __name__ == "__main__":
 
     datasetid = sys.argv[3]
 
+    conf = PanoptesConfig(calc)
     if ImportDataType == 'dataset':
         print('Start importing dataset "{0}"...'.format(datasetid))
-        ImportDataSet(calc, config.SOURCEDATADIR + '/datasets', datasetid,
+        ImportDataSet(calc, conf.getSourceDataDir() + '/datasets', datasetid,
             {
                 'ConfigOnly': configOnly,
                  'ScopeStr': ImportMethod

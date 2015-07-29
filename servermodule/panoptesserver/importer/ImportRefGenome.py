@@ -3,19 +3,15 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-import DQXDbTools
-import DQXUtils
-import config
 from DQXTableUtils import VTTable
-from ImportSettings import ImportSettings
 import ImpUtils
 import shutil
 import customresponders.panoptesserver.Utils as Utils
-from DQXDbTools import DBCOLESC
-from DQXDbTools import DBTBESC
-from DQXDbTools import DBDBESC
 import sys
 from ProcessFilterBank import ProcessFilterBank
+from PanoptesConfig import PanoptesConfig
+from SettingsDAO import SettingsDAO
+from SettingsRefGenome import SettingsRefGenome
 
 def flattenarglist(arg):
     if isinstance(arg, list):
@@ -36,17 +32,20 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     folder = os.path.join(datasetFolder, 'refgenome')
     if not os.path.exists(folder):
         return False
-        
+
+    dao = SettingsDAO(calculationObject, datasetId, None)
+            
     with calculationObject.LogHeader('Importing reference genome data'):
 
         ImportRefGenomeSummaryData(calculationObject, datasetId, baseFolder, importSettings)
 
-        settings = ImportSettings(os.path.join(folder, 'settings'), settingsDef = ImportSettings._refGenomeSettings)
+        settings = SettingsRefGenome(os.path.join(folder, 'settings'))
         print('Settings: '+str(settings))
         #Do we really need to do this?
         #TODO
         #ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
 
+        conf = PanoptesConfig(calculationObject)
         # Import reference genome
         if not(importSettings['ConfigOnly']):
             str_maxbasecount = 'all'
@@ -57,7 +56,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
-                    destfolder = config.BASEDIR + '/SummaryTracks/' + datasetId + '/Sequence'
+                    destfolder = conf.getBaseDir() + '/SummaryTracks/' + datasetId + '/Sequence'
                     if not os.path.exists(destfolder):
                         os.makedirs(destfolder)
                     tempfastafile = destfolder + '/refsequence.fa'
@@ -83,8 +82,8 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                 tb.PrintRows(0, 99)
             sqlfile = ImpUtils.GetTempFileName()
             tb.SaveSQLDump(sqlfile, 'chromosomes')
-            ImpUtils.ExecuteSQL(calculationObject, datasetId, 'DELETE FROM chromosomes')
-            ImpUtils.ExecuteSQLScript(calculationObject, sqlfile, datasetId)
+            dao.deleteChromosomes()
+            dao.loadFile(sqlfile)
             os.remove(sqlfile)
 
         # Import annotation
@@ -132,7 +131,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                     os.path.basename(tempgfffile)
                 ])
                 print('Importing annotation')
-                ImpUtils.ExecuteSQLScript(calculationObject, os.path.join(temppath, 'annotation_dump.sql'), datasetId)
+                dao.loadFile(os.path.join(temppath, 'annotation_dump.sql'))
                 os.remove(tempgfffile)
                 os.remove(os.path.join(temppath, 'annotation.txt'))
                 os.remove(os.path.join(temppath, 'annotation_dump.sql'))
@@ -154,5 +153,6 @@ if __name__ == "__main__":
             }
     calculationObject = asyncresponder.CalculationThread('', None, {'isRunningLocal': True}, '')
     DQXDbTools.DbCredentialVerifier = None
-    baseFolder = os.path.join(config.SOURCEDATADIR, 'datasets')
+    conf = PanoptesConfig(calculationObject)
+    baseFolder = os.path.join(conf.getSourceDataDir(), 'datasets')
     ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings)

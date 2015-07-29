@@ -1,7 +1,6 @@
 import imp
 import os
 import sys
-import config
 from BaseImport import BaseImport
 from PluginSettings import PluginSettings
 
@@ -12,9 +11,8 @@ class PluginLoader(BaseImport):
         
         plugin_folders = []
         
-        
-        if hasattr(config, 'PLUGINPATH'):
-            pp = config.PLUGINPATH
+        pp = self._config.getPluginPath()
+        if pp:
             plugin_folders = pp.split(os.pathsep)
             
 
@@ -76,7 +74,7 @@ class PluginLoader(BaseImport):
             if not os.path.isfile(settings):
                 self._log("Missing settings file {}".format(settings))
                 
-            plugin_settings = PluginSettings(settings, validate = False)
+            plugin_settings = PluginSettings(fileName = settings, validate = False)
             
             self._log("Loading plugin:" + plugin_settings["plugin"]);
             for i in self.getPlugins():

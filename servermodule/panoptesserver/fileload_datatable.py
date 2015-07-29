@@ -2,9 +2,7 @@
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
-import config
 import asyncresponder
-import os
 
 from importer.ImportDataTable import ImportDataTable
 from importer.Import2DDataTable import Import2DDataTable
@@ -15,7 +13,7 @@ import importer.ImportError
 def ResponseExecute(data, calculationObject):
     datasetid = data['datasetid']
     tableid = data['tableid']
-    type = data['type']
+    importtype = data['type']
     importSettings = {}
     importSettings['ConfigOnly'] = False
     if data['ScopeStr'] == 'none':
@@ -23,9 +21,9 @@ def ResponseExecute(data, calculationObject):
     importSettings['ScopeStr'] = data['ScopeStr']
     importSettings['SkipTableTracks'] = data['SkipTableTracks']
 
-    datasetFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid)
-    if type == 'datatable':
-        datatableFolder = os.path.join(datasetFolder, 'datatables', tableid)
+
+    if importtype == 'datatable':
+
         try:
             idt = ImportDataTable(
                 calculationObject,
@@ -36,10 +34,10 @@ def ResponseExecute(data, calculationObject):
         except importer.ImportError.ImportException as e:
             calculationObject.fail(str(e))
         iw = ImportWorkspaces(calculationObject, datasetid, importSettings, dataDir = 'workspaces')
-        iw.importAllWorkspaces()
+        iw.importAllWorkspaces(tableid)
 
-    if type == '2D_datatable':
-        datatableFolder = os.path.join(datasetFolder, '2D_datatables', tableid)
+    if importtype == '2D_datatable':
+
         try:
             i2d = Import2DDataTable(
                 calculationObject,

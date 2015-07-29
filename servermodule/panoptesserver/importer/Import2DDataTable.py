@@ -1,20 +1,18 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-from _mysql import OperationalError, ProgrammingError
+
 
 import os
 import DQXDbTools
 import DQXUtils
 import h5py
-import simplejson
-import config
 import ImpUtils
 import copy
 import arraybuffer
 import customresponders.panoptesserver.Utils as Utils
 from BaseImport import BaseImport
-from ImportSettings import ImportSettings
+from Settings2Dtable import Settings2Dtable
 
 class Import2DDataTable(BaseImport):
 
@@ -55,7 +53,7 @@ class Import2DDataTable(BaseImport):
                         
     #Retrieve and validate settings
     def getSettings(self, tableid):
-        tableSettings = self._fetchSettings(tableid, settingsDef = ImportSettings._2DtableSettings)
+        tableSettings = self._fetchSettings(tableid)
         
         if tableSettings['ShowInGenomeBrowser']:
             sigb = tableSettings['ShowInGenomeBrowser']
@@ -84,28 +82,18 @@ class Import2DDataTable(BaseImport):
             remote_hdf5 = h5py.File(dataFile, 'r')
             #Check that the referenced tables exist and have the primary key specified.
             if table_settings['ColumnDataTable']:
-                tables = self._getTablesInfo(table_settings['ColumnDataTable'])
+                tables = self._dao.getTablesInfo(table_settings['ColumnDataTable'])
                 cat_id = tables[0]["id"]
-                sql = "SELECT {0} FROM {1} LIMIT 1".format(table_settings['ColumnIndexField'],
-                                                           table_settings['ColumnDataTable'])
-                try:
-                    idx_field = self._execSqlQuery(sql)
-                except:
-                    raise Exception(table_settings['ColumnIndexField'] + " column index field doesn't exist in table " + table_settings['ColumnDataTable'])
+                self._dao.checkForColumn(table_settings['ColumnDataTable'], table_settings['ColumnIndexField'])
             if table_settings['RowDataTable']:
-                tables = self._getTablesInfo(table_settings['RowDataTable'])
+                tables = self._dao.getTablesInfo(table_settings['RowDataTable'])
                 cat_id = tables[0]["id"]
 
-                sql = "SELECT {0} FROM {1} LIMIT 1".format(table_settings['RowIndexField'],
-                                                           table_settings['RowDataTable'])
-                try:
-                    idx_field = self._execSqlQuery(sql)
-                except:
-                    raise Exception(table_settings['RowIndexField'] + " row index field doesn't exist in table " + table_settings['RowDataTable'])
+                self._dao.checkForColumn(table_settings['RowDataTable'], table_settings['RowIndexField'])
     
             if table_settings['ShowInGenomeBrowser']:
                 sql = "SELECT IsPositionOnGenome FROM tablecatalog WHERE id='{0}' ".format(table_settings['ColumnDataTable'])
-                is_position = self._execSqlQuery(sql)[0][0]
+                is_position = self._dao._execSqlQuery(sql)[0][0]
                 if not is_position:
                     raise Exception(table_settings['ColumnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
             if table_settings['FirstArrayDimension'] not in ['column', 'row']:
@@ -121,7 +109,7 @@ class Import2DDataTable(BaseImport):
                 table_settings.serialize(),
                 self.tableOrder
             )
-            self._execSql(sql)
+            self._dao._execSql(sql)
             self.tableOrder += 1
     
             for propname in table_settings.getPropertyNames():
@@ -139,7 +127,7 @@ class Import2DDataTable(BaseImport):
                     table_settings.serializeProperty(propname),
                     arity
                 )
-                self._execSql(sql)
+                self._dao._execSql(sql)
                 self.property_order += 1
     
             if not self._importSettings['ConfigOnly']:
@@ -149,131 +137,14 @@ class Import2DDataTable(BaseImport):
                     # We could just run the command and ignore the error raised if it already exists
                     # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['ColumnDataTable'], tableid)
                     # self._execSql(sql)
-                    if table_settings['ColumnIndexArray']:
-                        #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
-                        #Firstly create a temporary table with the index array
-                        try:
-                            column_index = remote_hdf5[table_settings['ColumnIndexArray']]
-                        except KeyError:
-                            raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['ColumnIndexArray']))
-                        for prop in table_settings['Properties']:
-                            if len(column_index) != remote_hdf5[prop['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'column' else 1]:
-                                raise Exception("Property {0} has a different column length to the column index".format(property))
-                            
-                        #TempColIndex should really be a TEMPORARY table
-                        self._dropTable('`TempColIndex`')
-                        sql = ImpUtils.Numpy_to_SQL().create_table('TempColIndex', table_settings['ColumnIndexField'], column_index[0:max_line_count])
-                        ImpUtils.ExecuteSQLGenerator(self._calculationObject, self._datasetId, sql)
-    
-                        #Add an index to the table - catch the exception if it exists.
-                        sql = "ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;".format(
-                            table_settings['ColumnDataTable'],
-                            table_settings['ColumnIndexField'],
-                            tableid)
-                        try:
-                            self._execSql(sql)
-                        except OperationalError as e:
-                            if e[0] != 1060:
-                                raise e
-    
-                        # We have a datatable - add an index to it then copy that index across to the data table
-                        sql = """ALTER TABLE `TempColIndex` ADD `index` INT DEFAULT NULL;
-                                 SELECT @i:=-1;UPDATE `TempColIndex` SET `index` = @i:=@i+1;
-                                 UPDATE `{0}` INNER JOIN `TempColIndex` ON `{0}`.`{1}` = `TempColIndex`.`{1}` SET `{0}`.`{2}_column_index` = `TempColIndex`.`index`;
-                                 """.format(
-                            table_settings['ColumnDataTable'],
-                            table_settings['ColumnIndexField'],
-                            tableid)
-                        self._execSql(sql)
-                        self._dropTable('`TempColIndex`')
-                        #Now check we have no NULLS
-                        sql = "SELECT `{1}_column_index` from `{0}` where `{1}_column_index` IS NULL".format(
-                            table_settings['ColumnDataTable'],
-                            tableid)
-                        nulls = self._execSqlQuery(sql)
-                        if len(nulls) > 0:
-                            print("WARNING:Not all rows in {0} have a corresponding column in 2D datatable {1}".format(table_settings['ColumnDataTable'], tableid))
-                    else:
-                        #Add an index to the table - catch the exception if it exists.
-                        sql = "ALTER TABLE `{0}` ADD `{2}_column_index` INT DEFAULT NULL;".format(
-                            table_settings['ColumnDataTable'],
-                            table_settings['ColumnIndexField'],
-                            tableid)
-                        try:
-                            self._execSql(sql)
-                        except OperationalError as e:
-                            if e[0] != 1060:
-                                raise e
+                    self._dao.insert2DIndexes(remote_hdf5, "column", tableid, table_settings, max_line_count)
 
-                        #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
-                        if max_line_count:
-                            sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {3};"
-                        else:
-                            sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_column_index` = @i:=@i+1 ORDER BY `{1}`;"
-
-                        sql = sql.format(
-                            table_settings['ColumnDataTable'],
-                            table_settings['ColumnIndexField'],
-                            tableid, max_line_count)
-                        self._execSql(sql)
-    
                 if table_settings['RowDataTable']:
-                    #Add an index to the table - catch the exception if it exists.
-                    sql = "ALTER TABLE `{0}` ADD `{2}_row_index` INT DEFAULT NULL;".format(
-                        table_settings['RowDataTable'],
-                        table_settings['RowIndexField'],
-                        tableid)
-                    try:
-                        self._execSql(sql)
-                    except OperationalError as e:
-                        if e[0] != 1060:
-                            raise e
-                                                
-                    if table_settings['RowIndexArray']:
-                        #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
-                        #Firstly create a temporay table with the index array
-                        try:
-                            row_index = remote_hdf5[table_settings['RowIndexArray']]
-                        except KeyError:
-                            raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings['RowIndexArray']))
-                        for prop in table_settings['Properties']:
-                            if len(row_index) != remote_hdf5[prop['Id']].shape[0 if table_settings['FirstArrayDimension'] == 'row' else 1]:
-                                raise Exception("Property {0} has a different row length to the row index".format(property))
-                        self._dropTable('`TempRowIndex`')
-                        sql = ImpUtils.Numpy_to_SQL().create_table('TempRowIndex', table_settings['RowIndexField'], row_index)
-                        ImpUtils.ExecuteSQLGenerator(self._calculationObject, self._datasetId, sql)
-
-                        #We have a datatable - add an index to it then copy that index across to the data table
-                        sql = """ALTER TABLE `TempRowIndex` ADD `index` INT DEFAULT NULL;
-                                 SELECT @i:=-1;UPDATE `TempRowIndex` SET `index` = @i:=@i+1;
-                                 UPDATE `{0}` INNER JOIN `TempRowIndex` ON `{0}`.`{1}` = `TempRowIndex`.`{1}` SET `{0}`.`{2}_row_index` = `TempRowIndex`.`index`;
-                                 """.format(
-                            table_settings['RowDataTable'],
-                            table_settings['RowIndexField'],
-                            tableid)
-                        self._execSql(sql)
-                        self._dropTable('`TempRowIndex`')
-                        #Now check we have no NULLS
-                        sql = "SELECT `{1}_row_index` from `{0}` where `{1}_row_index` IS NULL".format(
-                            table_settings['RowDataTable'],
-                            tableid)
-                        nulls = self._execSqlQuery(sql)
-                        if len(nulls) > 0:
-                            print("WARNING: Not all rows in {0} have a corresponding row in 2D datatable {1}".format(table_settings['RowDataTable'], tableid))
-                    else:
-                        
-                        #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "RowIndexField" so we index by that column in order
-                        sql = """SELECT @i:=-1;UPDATE `{0}` SET `{2}_row_index` = @i:=@i+1 ORDER BY `{1}`;
-                                 """.format(
-                            table_settings['RowDataTable'],
-                            table_settings['RowIndexField'],
-                            tableid)
-                        self._execSql(sql)
-    
-    
+                    self._dao.insert2DIndexes(remote_hdf5, "row", tableid, table_settings, None)
+       
                 #We have the indexes - now we need a local copy of the HDF5 data for each property
-                ImpUtils.mkdir(os.path.join(config.BASEDIR, '2D_data'))
-                path_join = os.path.join(config.BASEDIR, '2D_data', self._datasetId + '_' + tableid + '.hdf5')
+                ImpUtils.mkdir(os.path.join(self._config.getBaseDir(), '2D_data'))
+                path_join = os.path.join(self._config.getBaseDir(), '2D_data', self._datasetId + '_' + tableid + '.hdf5')
                 try:
                     os.remove(path_join)
                 except OSError:

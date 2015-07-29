@@ -3,15 +3,12 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-import DQXDbTools
-import DQXUtils
-import config
 import shutil
 from ProcessDatabase import ProcessDatabase
 from ProcessFilterBank import ProcessFilterBank
 
 from BaseImport import BaseImport
-from ImportSettings import ImportSettings
+from SettingsGraph import SettingsGraph
 
 class ImportDataTable(BaseImport):
     tableOrder = 0
@@ -24,46 +21,19 @@ class ImportDataTable(BaseImport):
             self._log('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
                    
         return tableSettings
-                
-
-
 
     def ImportDataTable(self, tableid):
         
         with self._logHeader('Importing datatable {0}'.format(tableid)):
-
-            DQXUtils.CheckValidTableIdentifier(tableid)
-    
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablecatalog'))
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'propertycatalog'))
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'relations'))
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablebasedsummaryvalues'))
-    
+   
             tableSettings = self.getSettings(tableid)
     
-            # Drop existing tablecatalog record
-            sql = "DELETE FROM tablecatalog WHERE id='{0}'".format(tableid)
-            self._execSql(sql)
-
-            # Add to tablecatalog
-            sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES ('{0}', '{1}', '{2}', {3}, '{4}', '{5}', {6})".format(
-                tableid,
-                tableSettings['NamePlural'],
-                tableSettings['PrimKey'],
-                tableSettings['IsPositionOnGenome'],
-                tableSettings.serialize(),
-                "", #defaultQuery
-                self.tableOrder
-            )
-            self._execSql(sql)
+            self._dao.insertTableCatalogEntry(tableid, tableSettings, self.tableOrder)
             self.tableOrder += 1
-    
-
-    
-            sql = "DELETE FROM propertycatalog WHERE tableid='{0}'".format(tableid)
-            self._execSql(sql)
-            sql = "DELETE FROM relations WHERE childtableid='{0}'".format(tableid)
-            self._execSql(sql)
+       
+            self._dao.deletePropertiesForTable(tableid)
+            
+            self._dao.deleteRelationsForTable(tableid)
 
             ranknr = 0
             for propid in tableSettings.getPropertyNames():
@@ -71,28 +41,10 @@ class ImportDataTable(BaseImport):
                 if not tableSettings.getPropertyValue(propid,'ReadData'):
                     continue
                 
-                sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', '{0}', '{1}', '{2}', '{3}', {4}, '{5}')".format(
-                    tableSettings.getPropertyValue(propid, 'DataType'),
-                    propid,
-                    tableid,
-                    tableSettings.getPropertyValue(propid, 'Name'),
-                    0,
-                    tableSettings.serializeProperty(propid)
-                )
-                self._execSql(sql)
+                self._dao.insertTableProperty(tableid, tableSettings, propid)
                 
-                if 'Relation' in tableSettings.getProperty(propid):
-                    relationSettings = tableSettings.getPropertyValue(propid, 'Relation')
-                    self._log('Creating relation: {} {} {}'.format(relationSettings['TableId'],relationSettings['ForwardName'],relationSettings['ReverseName']))
-                    sql = "INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
-                        tableid,
-                        propid,
-                        relationSettings['TableId'],
-                        '',
-                        relationSettings['ForwardName'],
-                        relationSettings['ReverseName']
-                    )
-                    self._execSql(sql)
+                self._dao.insertTableRelation(tableid, tableSettings, propid)
+                
                 ranknr += 1    
  
             importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
@@ -110,11 +62,11 @@ class ImportDataTable(BaseImport):
             
             self.importGraphs(tableid)
 
+
     def importGraphs(self, tableid):
         folder = self._datatablesFolder
         with self._logHeader('Importing graphs'):
-            sql = "DELETE FROM graphs WHERE tableid='{0}'".format(tableid)
-            self._execSql(sql)
+            self._dao.deleteGraphsForTable(tableid)
             graphsfolder = os.path.join(folder, tableid, 'graphs')
             if os.path.exists(graphsfolder):
                 for graphid in os.listdir(graphsfolder):
@@ -122,19 +74,10 @@ class ImportDataTable(BaseImport):
                         print('Importing graph ' + graphid)
                         graphfolder = os.path.join(graphsfolder, graphid)
                         
-                        graphSettings = ImportSettings(os.path.join(graphfolder, 'settings'), settingsDef = ImportSettings._graphSettings)
+                        graphSettings = SettingsGraph(os.path.join(graphfolder, 'settings'))
                        
-                        crosslink = graphSettings['CrossLink']
-                        sql = "INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 0)".format(
-                            graphid,
-                            tableid,
-                            'tree',
-                            graphSettings['Name'],
-                            graphSettings.serialize(),
-                            crosslink
-                        )
-                        self._execSql(sql)
-                        destFolder = os.path.join(config.BASEDIR, 'Graphs', self._datasetId, tableid)
+                        self._dao.insertGraphForTable(tableid, graphid, graphSettings)
+                        destFolder = os.path.join(self._config.getBaseDir(), 'Graphs', self._datasetId, tableid)
                         if not os.path.exists(destFolder):
                             os.makedirs(destFolder)
                         shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
