@@ -53,7 +53,7 @@ ItemMap
 Displays the data item as a pin on a geographical map.
 Requires the presence of properties with data type ``GeoLongitude`` and ``GeoLattitude``
 MapZoom
-  *Value (required).* Start zoom factor of the map (integer, minimum value of 0)(only applies if *Type* is ItemMap).
+  *Value (required).* Start zoom factor of the map (integer, minimum value of 0)(only applies if one of the following is true:(*Type* is ItemMap)(*Type* is PieChartMap)).
 
 PieChartMap
 :::::::::::

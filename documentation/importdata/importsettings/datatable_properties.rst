@@ -70,6 +70,9 @@ MaxLen
 DecimDigits
   *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
+MaxDecimDigits
+  *Value.* (Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+
 Index
   *Boolean.*  Default:False.  If set, instructs Panoptes to create an index for this property in the relational database.
   For large datasets, this massively speeds up queries and sort commands based on this property.
