@@ -7,6 +7,9 @@ IsPositionOnGenome: true
 Chromosome: CHROM
 Position: POS
 
+AllowSubSampling: true
+
+
 Properties:
 - DataType: Text
   Id: CHROM

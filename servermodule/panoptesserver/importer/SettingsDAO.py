@@ -402,9 +402,9 @@ class SettingsDAO(object):
         self._execSql("CREATE TABLE {} LIKE {}".format(DBTBESC(sortRandTable), DBTBESC(tableid)))
         if primKey == "AutoKey":
             self._log('Restructuring AutoKey')
-            self._execSql("alter table %s drop column AutoKey",DBTBESC(sortRandTable))
-            self._execSql("alter table %s add column AutoKey int FIRST",DBTBESC(sortRandTable))
-            self._execSql("create index idx_autokey on %s(AutoKey)",DBTBESC(sortRandTable))
+            self._execSql("alter table {} drop column AutoKey".format(DBTBESC(sortRandTable)))
+            self._execSql("alter table {} add column AutoKey int FIRST".format(DBTBESC(sortRandTable)))
+            self._execSql("create index idx_autokey on {}(AutoKey)".format(DBTBESC(sortRandTable)))
         self._execSql("alter table {} add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(DBTBESC(sortRandTable)))
         
         # NOTE: there is little point in importing more than that!
