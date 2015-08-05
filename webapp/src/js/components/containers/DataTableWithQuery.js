@@ -69,7 +69,7 @@ let DataTableWithQuery = React.createClass({
 
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, order, sidebar, componentUpdate} = this.props;
+    let {table, query, columns, order, sidebar, componentUpdate} = this.props;
     let {icon, description} = this.config;
 
     let sidebar_content = (
@@ -101,7 +101,9 @@ let DataTableWithQuery = React.createClass({
           </div>
           <DataTableView className='grow'
             table={table}
-            query={query}/>
+            query={query}
+            columns={columns}
+            />
         </div>
       </Sidebar>
     );

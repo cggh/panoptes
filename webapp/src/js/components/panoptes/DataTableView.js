@@ -14,6 +14,7 @@ const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
 
 const {Table, Column} = require('fixed-data-table');
+import 'fixed-data-table/dist/fixed-data-table.css';
 const Loading = require('ui/Loading');
 
 
@@ -30,7 +31,7 @@ let DataTableView = React.createClass({
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
     start: React.PropTypes.number,
-    columns: ImmutablePropTypes.orderedMap.isRequired
+    columns: ImmutablePropTypes.listOf(React.PropTypes.string)
   },
 
   getDefaultProps() {
@@ -39,7 +40,7 @@ let DataTableView = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       start: 0,
-      columns: Immutable.OrderedMap()
+      columns: Immutable.List()
     };
   },
 
@@ -66,12 +67,17 @@ let DataTableView = React.createClass({
   },
 
   fetchData(props) {
+    let { table, query, className, columns } = props;
+    let tableConfig = this.config.tables[table];
+    console.log(tableConfig);
     this.setState({loadStatus: 'loading'});
+    let columnspec = {};
+    columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
     setTimeout(() => {
       API.pageQuery({
         database: this.config.dataset,
-        table: props.table,
-        columns: {SnpName: 'ST'}
+        table: table,
+        columns: columnspec
       })
         .then((data) => {
           this.setState({loadStatus: 'loaded'});
@@ -86,23 +92,38 @@ let DataTableView = React.createClass({
   },
 
   render() {
-    let { query, className } = this.props;
+    let { query, className, columns } = this.props;
     let { loadStatus, rows, width, height } = this.state;
-    console.log(this.state);
+    let tableConfig = this.config.tables[this.props.table];
+    if (!tableConfig) {
+      console.log(`Table ${this.props.table} doesn't exist'`);
+      return null;
+    }
     return (
         <div className={classNames("datatable", className)}>
             <Table
-              rowHeight={50}
+              rowHeight={30}
               rowGetter={(index) => rows[index]}
               rowsCount={rows.length}
               width={width}
               height={height}
               headerHeight={50}>
-              <Column
-                label="SnpName"
-                width={100}
-                dataKey="SnpName"
-                />
+              {columns.map(column => {
+                if (!tableConfig.propertiesMap[column]) {
+                  console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
+                  return;
+                }
+                let {name, propid, alignment} = tableConfig.propertiesMap[column];
+
+                return <Column
+                    label={name}
+                    width={200}
+                    dataKey={propid}
+                    align={alignment}
+                    allowCellsRecycling={true}
+                  />
+                })
+              }
             </Table>
             <Loading status={loadStatus}/>
         </div>

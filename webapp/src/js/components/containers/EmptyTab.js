@@ -39,7 +39,7 @@ let EmptyTab = React.createClass({
     let {tables} = this.config;
     return (
       <div className="centering-container">
-        <List subheader="Open a table">
+        <List subheader="Open a table:">
           {_.map(tables, (table) => (
             <ListItem key={table.id}
                       secondaryText={table.description}

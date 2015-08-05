@@ -1,29 +1,35 @@
-const React = require('react');
-const Immutable = require('immutable');
-const _ = require('lodash');
-const NotificationSystem = require('react-notification-system');
+import React from  'react';
+import Immutable from 'immutable';
+import _ from 'lodash';
+import NotificationSystem from 'react-notification-system';
 
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-const TabbedArea = require('ui/TabbedArea');
-const TabPane = require('ui/TabPane');
-const Popups = require('ui/Popups');
-const Popup = require('ui/Popup');
-const Modal = require('ui/Modal');
-const mui = require('material-ui');
-const {IconButton} = mui;
+import TabbedArea from 'ui/TabbedArea';
+import TabPane from 'ui/TabPane';
+import Popups from 'ui/Popups';
+import Popup from 'ui/Popup';
+import Modal from 'ui/Modal';
+import mui from 'material-ui';
+import {IconButton} from 'material-ui';
+import Colors from 'material-ui/src/styles/colors';
+import ColorManipulator from 'material-ui/src/utils/color-manipulator';
+
+import Icon from 'ui/Icon';
+
+import 'font-awesome.css';
+import 'ui-components.scss';
+import 'main.scss';
+
 const ThemeManager = new mui.Styles.ThemeManager();
-const Icon = require('ui/Icon');
-const Colors = require('material-ui/src/styles/colors');
-const ColorManipulator = require('material-ui/src/utils/color-manipulator');
 
-const HelloWorld = require('ui/HelloWorld');
-const DataTable = require('containers/DataTableWithQuery');
-const QueryPicker = require('containers/QueryPicker');
-const NewTab = require('containers/EmptyTab');
+
+
+let dynreq = require.context(".", true);
+const dynamic_require = (path) => dynreq("./"+path);
 
 window.Perf = React.addons.Perf;
 
@@ -118,7 +124,7 @@ let Panoptes = React.createClass({
                   <TabPane
                     compId={compId}
                     key={compId}>
-                    {React.createElement(require(tab.component), props)}
+                    {React.createElement(dynamic_require(tab.component), props)}
                   </TabPane>
                 )
               })}
@@ -140,14 +146,14 @@ let Panoptes = React.createClass({
                 onResizeStop={actions.popupResize.bind(this, compId)}
                 onClose={actions.popupClose.bind(this, compId)}
                 onClick={actions.popupFocus.bind(this, compId)}>
-                {React.createElement(require(popup.component), props)}
+                {React.createElement(dynamic_require(popup.component), props)}
               </Popup>
             )
           })}
         </Popups>
         <Modal visible={modal.component ? true : false}
                onClose={actions.modalClose}>
-          {modal.component ? React.createElement(require(modal.component), modal.props.toObject()) : null}
+          {modal.component ? React.createElement(dynamic_require(modal.component), modal.props.toObject()) : null}
         </Modal>
         <NotificationSystem ref="notificationSystem"/>
       </div>

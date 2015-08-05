@@ -7,7 +7,7 @@ const LAYOUT = Constants.LAYOUT;
 //For mock data:
 const SQL = require('panoptes/SQL');
 
-const EMPTY_TAB = 'containers/EmptyTab'
+const EMPTY_TAB = 'containers/EmptyTab';
 
 var LayoutStore = Fluxxor.createStore({
 
@@ -21,8 +21,8 @@ var LayoutStore = Fluxxor.createStore({
             dataset: initialConfig.dataset,
             table: 'variants',
             query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-            order: null
-            //columns etc.
+            order: null,
+            columns: ["chromosome", "position", "SnpName", "NRAF_EAF"]
 
           }
         },
@@ -31,8 +31,8 @@ var LayoutStore = Fluxxor.createStore({
         },
       },
       tabs: {
-        selectedTab: 'EmptyTab',
-        components: ['EmptyTab']
+        selectedTab: 'Table',
+        components: ['Table']
       },
       popups: {
         components: [],

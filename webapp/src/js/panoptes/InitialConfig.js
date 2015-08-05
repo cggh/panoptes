@@ -241,7 +241,7 @@ let parseCustomProperties = function () {
         tableInfo.hasGeoCoord = true;
     });
 
-    //Set a recommended encoder
+    //Set a recommended encoder - legacy from 1.X
     var encoding  = 'String';
     if (prop.datatype=='Value') {
       encoding  = 'Float3';
@@ -273,7 +273,27 @@ let parseCustomProperties = function () {
       "IntDiff": "Integer"     //returns exact integers as differences with previous values
     };
     prop.encodingType = encodingTypes[prop.encoding];
-
+    let fetchEncodingTypes = {
+      "Generic": "GN",
+      "String": "ST",
+      "Float2": "F2",
+      "Float3": "F3",
+      "Float4": "F4",
+      "FloatH": "FH",
+      "Int": "IN",
+      "IntB64": "IB",
+      "IntDiff": "ID"
+    };
+    prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
+    let alignment = {
+      Value: 'right',
+      HighPrecisionValue: 'right',
+      Boolean: 'center',
+      GeoLongitude: 'right',
+      GeoLattitude: 'right',
+      Date: 'left',
+    }
+    prop.alignment = alignment[prop.datatype] || 'left';
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);
