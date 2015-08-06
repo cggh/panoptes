@@ -44,6 +44,7 @@ let DataTableWithQuery = React.createClass({
       table: null,
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
+      ascending: true,
       columns: Immutable.List(),
       columnWidths: Immutable.Map(),
       start: 0,
@@ -72,9 +73,13 @@ let DataTableWithQuery = React.createClass({
     this.props.componentUpdate({columnWidths:{[column]:size}});
   },
 
+  handleOrderChange(column, ascending) {
+    this.props.componentUpdate({order:column, ascending: ascending});
+  },
+
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, columns, columnWidths, order, sidebar, componentUpdate} = this.props;
+    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
     let {icon, description} = this.config;
 
     let sidebar_content = (
@@ -102,16 +107,18 @@ let DataTableWithQuery = React.createClass({
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <QueryString className='text' prepend='Filter:' table={table} query={query}/>
+            <span className='text'>Sort: {order ? this.config.propertiesMap[order].name : "None"} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
 
           </div>
           <DataTableView className='grow'
                          table={table}
                          query={query}
+                         order={order}
+                         ascending={ascending}
                          columns={columns}
                          columnWidths={columnWidths}
                          onColumnResize={this.handleColumnResize}
-
-
+                         onOrderChange={this.handleOrderChange}
             />
         </div>
       </Sidebar>

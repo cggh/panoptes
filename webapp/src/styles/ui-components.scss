@@ -22,7 +22,7 @@
       height: 100%;
 
     }
-    .tab-pane *{
+    .tab-pane * {
       transition: none !important;
     }
     .tab-pane.active {
@@ -33,7 +33,7 @@
   .tabs {
     display: flex;
     flex-wrap: wrap;
-    width:100%;
+    width: 100%;
     min-height: $topbar-height;
     background: linear-gradient(to right, #000000 0%, #757575 100%);
     .tab {
@@ -90,6 +90,7 @@
   font-size: 22px;
   cursor: pointer;
 }
+
 .icon:hover {
   opacity: 1;
 }
@@ -97,10 +98,10 @@
 .icon.close {
   opacity: .3;
 }
+
 .icon.close:hover {
   opacity: 1;
 }
-
 
 .popups {
   overflow: hidden;
@@ -108,6 +109,7 @@
   top: 0;
   left: 0;
 }
+
 .popup {
   display: flex;
   flex-direction: column;
@@ -137,7 +139,8 @@
     font-weight: bold;
     color: rgb(255, 255, 255);
     //background: $primary-color;
-    background: linear-gradient(to right, $primary-color 0%, $primary-color 100%);display: flex;
+    background: linear-gradient(to right, $primary-color 0%, $primary-color 100%);
+    display: flex;
     //MD like shadow needs relative and z-index
     box-shadow: $z-1-shadow;
     position: relative;
@@ -181,7 +184,7 @@
   outline: 0;
   opacity: 0;
   background: rgba(0, 0, 0, 0.7);
-  transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+  transition: visibility 0s linear 0.5s, opacity 0.5s linear;
   .popup {
     position: static;
     transition: none;
@@ -196,12 +199,11 @@
 .modal.visible {
   visibility: visible;
   opacity: 1;
-  transition-delay:0s;
+  transition-delay: 0s;
   .popup {
     visibility: visible;
   }
 }
-
 
 //@import "../../node_modules/react-resizable/css/styles.css";
 //Had to inline as npm dir not accesible on build.
@@ -229,9 +231,8 @@
   -ms-transform: none !important;
   -o-transform: none !important;
   -moz-transform: none !important;
-  z-index:99;
+  z-index: 99;
 }
-
 
 .loading-container {
   position: absolute;
@@ -246,8 +247,8 @@
   width: 100%;
   background-color: rgba(255, 255, 255, 0.6);
   visibility: hidden;
-  opacity:0;
-  transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+  opacity: 0;
+  transition: visibility 0s linear 0.5s, opacity 0.5s linear;
   div {
     opacity: 0.5;
     height: 50%;
@@ -267,9 +268,9 @@
 }
 
 .loading-container.show {
-  visibility:inherit;
-  opacity:1;
-  transition-delay:0s;
+  visibility: inherit;
+  opacity: 1;
+  transition-delay: 0s;
 }
 
 .top-bar {
@@ -352,17 +353,16 @@
   cursor: pointer;
 }
 
-
 .large-modal {
   height: calc(100vh - 200px);
   width: calc(100vw - 200px);
 }
 
 .centering-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
 .scroll-within {
@@ -391,7 +391,7 @@
   background-repeat: repeat-y;
 
   .endpoint {
-    display:inline-block;
+    display: inline-block;
     border-radius: 18px;
     background: #e0e0e0;
     padding: 10px;
@@ -508,14 +508,37 @@ input {
   }
 }
 
-
 .table-cell {
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
 .table-row-header {
-  text-align: center;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  padding: 0 !important;
+  height: 100%;
+  line-height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .label {
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+  }
+  .icon {
+    min-width: 20px;
+    color: darkgrey;
+    font-size: 14px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+  .icon:hover {
+    color: #4e4e4e;
+  }
+}
+
+.table-row-header.sort-column-ascending,.table-row-header.sort-column-descending  {
+  background: #e8e8e8;
+  box-shadow: inset 1px 1px 1px darkgrey;
 }

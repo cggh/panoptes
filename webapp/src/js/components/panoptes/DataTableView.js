@@ -14,7 +14,9 @@ const SQL = require('panoptes/SQL');
 
 const {Table, Column} = require('fixed-data-table');
 import 'fixed-data-table/dist/fixed-data-table.css';
+
 const Loading = require('ui/Loading');
+const Icon = require('ui/Icon');
 
 let DataTableView = React.createClass({
   mixins: [
@@ -28,10 +30,12 @@ let DataTableView = React.createClass({
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
+    ascending: React.PropTypes.bool,
     start: React.PropTypes.number,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
-    onColumnResize: React.PropTypes.func
+    onColumnResize: React.PropTypes.func,
+    onOrderChange: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -39,6 +43,7 @@ let DataTableView = React.createClass({
       table: null,
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
+      ascending: true,
       start: 0,
       columns: Immutable.List(),
       columnWidths: Immutable.Map()
@@ -64,7 +69,7 @@ let DataTableView = React.createClass({
   },
 
   getDataIfNeeded(lastProps, nextProps) {
-    let queryKeys = ['table', 'query', 'columns', 'order', 'start'];
+    let queryKeys = ['table', 'query', 'columns', 'order', 'ascending', 'start'];
     let update_needed = false;
     queryKeys.forEach((key) => {
       if (!Immutable.is(lastProps[key], nextProps[key]))
@@ -75,7 +80,7 @@ let DataTableView = React.createClass({
   },
 
   fetchData(props) {
-    let { table, query, className, columns } = props;
+    let { table, query, className, columns, order, ascending } = props;
     let tableConfig = this.config.tables[table];
     this.setState({loadStatus: 'loading'});
     let columnspec = {};
@@ -85,6 +90,8 @@ let DataTableView = React.createClass({
       database: this.config.dataset,
       table: table,
       columns: columnspec,
+      order: order,
+      ascending: ascending,
       query: SQL.WhereClause.decode(query)
     })
       .then((data) => {
@@ -98,19 +105,57 @@ let DataTableView = React.createClass({
 
   },
 
+  headerData(column) {
+    return {
+      ascending: this.props.order == column && this.props.ascending,
+      descending: this.props.order == column && !this.props.ascending
+    }
+  },
+
   handleColumnResize(width, column) {
     if (this.props.onColumnResize)
       this.props.onColumnResize(column, width);
     //So that "isResizing" on FDT gets set back to false, force an update
-    //this.forceUpdate();
+    this.forceUpdate();
   },
 
-  renderHeader(label, cellDataKey, columnData, rowData, width) {
-    return <div className="table-row-header" style={{width:width}}> {label} </div>
+  handleOrderChange(column) {
+    let ascending = true;
+    if (this.props.order == column)
+      if (this.props.ascending)
+        ascending = false;
+      else
+        column = null;
+    if (this.props.onOrderChange) {
+      this.props.onOrderChange(column, ascending)
+    }
+  },
+
+  renderHeader(headerData, cellDataKey, columnData, rowData, width) {
+    let {ascending, descending} = headerData;
+    let {description} = columnData;
+    console.log(columnData);
+    return <div className={classNames({
+                              "pointer": true,
+                              "table-row-header": true,
+                              "sort-column-ascending": ascending,
+                              "sort-column-descending": descending
+                                    })}
+                style={{width:width}}
+                onClick={() => this.handleOrderChange(columnData.propid)}>
+      {(ascending || descending) ?
+        <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
+        null}
+      <span className="label">{columnData.name}</span>
+      {description ? <Icon className="info" name="info-circle"/> : null}
+    </div>
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
-    return <div className="table-cell" style={{textAlign:columnData.alignment, width:width}}> {cellData} </div>
+    return <div className="table-cell"
+                style={{textAlign:columnData.alignment, width:width}}>
+      {cellData}
+    </div>
   },
 
   render() {
@@ -130,6 +175,7 @@ let DataTableView = React.createClass({
           width={width}
           height={height}
           headerHeight={50}
+          headerDataGetter={this.headerData}
           onColumnResizeEndCallback={this.handleColumnResize}
           isColumnResizing={false}
           >
@@ -138,20 +184,19 @@ let DataTableView = React.createClass({
               console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
               return;
             }
-            let {name, propid} = tableConfig.propertiesMap[column];
-
+            let columnData = tableConfig.propertiesMap[column];
+            let {propid} = columnData;
             return <Column
-              label={name}
               //TODO Better default column widths
-              width={columnWidths.get(column,120)}
+              width={columnWidths.get(column,150)}
               dataKey={propid}
               key={propid}
               allowCellsRecycling={true}
               cellRenderer={this.renderCell}
               headerRenderer={this.renderHeader}
-              columnData={tableConfig.propertiesMap[column]}
+              columnData={columnData}
               isResizable={true}
-              minWidth={10}
+              minWidth={50}
               />
           })
           }

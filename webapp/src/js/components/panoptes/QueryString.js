@@ -64,7 +64,7 @@ let QueryString = React.createClass({
     };
     return (
       <span {...other}>
-        { qry.toQueryDisplayString(queryData, 0) }
+        { prepend + ' ' + qry.toQueryDisplayString(queryData, 0) }
       </span>
     );
   }

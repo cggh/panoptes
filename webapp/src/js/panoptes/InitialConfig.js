@@ -295,6 +295,8 @@ let parseCustomProperties = function () {
     }
     prop.alignment = alignment[prop.datatype] || 'left';
 
+    prop.description = prop.settings.Description || "";
+
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);
     tableInfo.propertiesMap = tableInfo.propertiesMap || {};

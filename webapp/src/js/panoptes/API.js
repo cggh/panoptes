@@ -64,14 +64,14 @@ function pageQuery(options) {
   let defaults = {
     query: SQL.WhereClause.Trivial(),
     order: null,
-    sortReverse: false,
+    ascending: false,
     count: false,
     start: 0,
     stop: 1000000,
     distinct: false
   };
   let {database, table, columns, query, order,
-    sortReverse, count, start, stop, distinct} = _.extend(defaults, options);
+    ascending, count, start, stop, distinct} = _.extend(defaults, options);
 
   let collist = "";
   _.each(columns, (encoding, id) => {
@@ -86,7 +86,7 @@ function pageQuery(options) {
     qry: SQL.WhereClause.encode(query),
     collist: LZString.compressToEncodedURIComponent(collist),
     order: order,
-    sortreverse: sortReverse ? '1' : '0',
+    sortreverse: ascending ? '0' : '1',
     needtotalcount: count ? '1' : '0',
     limit: `${start}~${stop}`,
     distinct: distinct ? '1' : '0'
