@@ -507,3 +507,15 @@ input {
     width: 250px;
   }
 }
+
+
+.table-cell {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.table-row-header {
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

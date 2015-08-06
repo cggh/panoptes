@@ -58,69 +58,82 @@ var LayoutStore = Fluxxor.createStore({
     });
 
     this.bindActions(
-      LAYOUT.COMPONENT_UPDATE, this.componentUpdate,
-      LAYOUT.MODAL_CLOSE, this.modalClose,
-      LAYOUT.MODAL_OPEN, this.modalOpen,
-      LAYOUT.NOTIFY, this.notify,
-      LAYOUT.POPUP_CLOSE, this.popupClose,
-      LAYOUT.POPUP_FOCUS, this.popupFocus,
-      LAYOUT.POPUP_MOVE, this.popupMove,
-      LAYOUT.POPUP_OPEN, this.popupOpen,
-      LAYOUT.POPUP_RESIZE, this.popupResize,
-      LAYOUT.TAB_CLOSE, this.tabClose,
-      LAYOUT.TAB_OPEN, this.tabOpen,
-      LAYOUT.TAB_POP_OUT, this.tabPopOut,
-      LAYOUT.TAB_SWITCH, this.tabSwitch
+      LAYOUT.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
+      LAYOUT.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
+      LAYOUT.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
+      LAYOUT.NOTIFY, this.emitIfNeeded(this.notify),
+      LAYOUT.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
+      LAYOUT.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
+      LAYOUT.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
+      LAYOUT.POPUP_OPEN, this.emitIfNeeded(this.popupOpen),
+      LAYOUT.POPUP_RESIZE, this.emitIfNeeded(this.popupResize),
+      LAYOUT.TAB_CLOSE, this.emitIfNeeded(this.tabClose),
+      LAYOUT.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
+      LAYOUT.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
+      LAYOUT.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch)
     );
   },
 
-  componentUpdate(payload) {
-    let {compId, newProps, newComponent} = payload;
-    if (newComponent) {
-      let component = Immutable.fromJS({
-        component: newComponent,
-        props: newProps
-      });
-      this.state = this.state.setIn(['components', compId], component);
+  emitIfNeeded(action, event="change") {
+    return (payload) => {
+      let old_state = this.state;
+      action(payload);
+      if (!old_state.equals(this.state))
+        this.emit(event);
     }
-    else
-      this.state = this.state.mergeIn(['components', compId, 'props'], newProps);
+  },
 
-    this.emit('change');
+  componentUpdate(payload) {
+    let {compId, updater, newComponent} = payload;
+    if (newComponent) {
+      if (_.isFunction(updater)) {
+        this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props:{}}));
+        this.state = this.state.updateIn(['components', compId, 'props'], updater);
+      }
+      else {
+        let component = Immutable.fromJS({
+          component: newComponent,
+          props: updater
+        });
+        this.state = this.state.setIn(['components', compId], component);
+      }
+    }
+    else {
+      if (_.isFunction(updater)) {
+        this.state = this.state.updateIn(['components', compId, 'props'], updater);
+      }
+      else {
+        this.state = this.state.mergeDeepIn(['components', compId, 'props'], updater);
+      }
+    }
   },
   modalClose() {
     this.state = this.state.set('modal', Immutable.Map());
-    this.emit('change');
   },
 
   modalOpen(payload) {
     this.state = this.state.set('modal', Immutable.fromJS(payload));
-    this.emit('change');
   },
 
   notify(payload) {
     this.lastNotification = payload;
-    this.emit('notify');
   },
 
   popupClose(payload) {
     let {compId} = payload;
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
-    this.emit('change');
   },
 
   popupFocus(payload) {
     let {compId} = payload;
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
-    this.emit('change');
   },
 
   popupMove(payload) {
     let {compId, pos} = payload;
     this.state = this.state.mergeIn(['popups', 'state', compId, 'position'], pos);
-    this.emit('change');
   },
 
   popupOpen(payload) {
@@ -136,14 +149,11 @@ var LayoutStore = Fluxxor.createStore({
       this.state = this.state.setIn(['components', id], component);
       this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(id));
     }
-    //console.log(this.state.toJS());
-    this.emit('change');
   },
 
   popupResize(payload) {
     let {compId, size} = payload;
     this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], size);
-    this.emit('change');
   },
 
   tabClose(payload, force) {
@@ -168,7 +178,6 @@ var LayoutStore = Fluxxor.createStore({
           this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.get(pos));
         else
           this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
-      this.emit('change');
     }
   },
   tabOpen(payload) {
@@ -186,7 +195,6 @@ var LayoutStore = Fluxxor.createStore({
       if (switchTo)
         this.state = this.state.setIn(['tabs', 'selectedTab'], id);
     }
-    this.emit('change');
   },
   tabPopOut(payload) {
     let {compId, pos} = payload;
@@ -198,7 +206,6 @@ var LayoutStore = Fluxxor.createStore({
   },
   tabSwitch(payload) {
     this.state = this.state.setIn(['tabs', 'selectedTab'], payload.compId);
-    this.emit('change');
   },
 
   getState() {

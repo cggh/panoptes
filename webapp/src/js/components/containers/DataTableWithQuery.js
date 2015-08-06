@@ -33,6 +33,7 @@ let DataTableWithQuery = React.createClass({
     columns: ImmutablePropTypes.listOf(
       React.PropTypes.string
     ),
+    columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     start: React.PropTypes.number,
     sidebar: React.PropTypes.bool
   },
@@ -44,6 +45,7 @@ let DataTableWithQuery = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       columns: Immutable.List(),
+      columnWidths: Immutable.Map(),
       start: 0,
       sidebar: true
     };
@@ -61,15 +63,18 @@ let DataTableWithQuery = React.createClass({
     return this.props.title || this.config.tableCapNamePlural;
   },
 
-  handlePick(query) {
-    let flux = this.getFlux();
-    flux.actions.layout.modalClose();
+  handleQueryPick(query) {
+    this.getFlux().actions.layout.modalClose();
     this.props.componentUpdate({query: query});
+  },
+
+  handleColumnResize(column, size) {
+    this.props.componentUpdate({columnWidths:{[column]:size}});
   },
 
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, columns, order, sidebar, componentUpdate} = this.props;
+    let {table, query, columns, columnWidths, order, sidebar, componentUpdate} = this.props;
     let {icon, description} = this.config;
 
     let sidebar_content = (
@@ -81,7 +86,7 @@ let DataTableWithQuery = React.createClass({
                       {
                         table: table,
                         initialQuery: query,
-                        onPick: this.handlePick
+                        onPick: this.handleQueryPick
                       })}/>
       </div>
     );
@@ -100,9 +105,13 @@ let DataTableWithQuery = React.createClass({
 
           </div>
           <DataTableView className='grow'
-            table={table}
-            query={query}
-            columns={columns}
+                         table={table}
+                         query={query}
+                         columns={columns}
+                         columnWidths={columnWidths}
+                         onColumnResize={this.handleColumnResize}
+
+
             />
         </div>
       </Sidebar>

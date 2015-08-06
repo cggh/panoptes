@@ -14,18 +14,18 @@ function memoize(fn) {
 }
 
 let LayoutActions = {
-  componentUpdate(compId, newProps, newComponent = null) {
+  componentUpdate(compId, updater, newComponent = null) {
     this.dispatch(LAYOUT.COMPONENT_UPDATE, {
       compId: compId,
-      newProps: newProps,
+      updater: updater,
       newComponent: newComponent
     });
   },
   componentUpdateFor: memoize((compId) => {
-    return function (newProps, newComponent = null) {
+    return function (updater, newComponent = null) {
       this.dispatch(LAYOUT.COMPONENT_UPDATE, {
         compId: compId,
-        newProps: newProps,
+        updater: updater,
         newComponent: newComponent
       });
     }

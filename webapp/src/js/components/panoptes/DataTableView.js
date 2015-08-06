@@ -1,7 +1,6 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
-const shallowEquals = require('shallow-equals');
 const classNames = require('classnames');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -17,7 +16,6 @@ const {Table, Column} = require('fixed-data-table');
 import 'fixed-data-table/dist/fixed-data-table.css';
 const Loading = require('ui/Loading');
 
-
 let DataTableView = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -31,7 +29,9 @@ let DataTableView = React.createClass({
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
     start: React.PropTypes.number,
-    columns: ImmutablePropTypes.listOf(React.PropTypes.string)
+    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
+    columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
+    onColumnResize: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -40,7 +40,8 @@ let DataTableView = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       start: 0,
-      columns: Immutable.List()
+      columns: Immutable.List(),
+      columnWidths: Immutable.Map()
     };
   },
 
@@ -61,38 +62,59 @@ let DataTableView = React.createClass({
   componentWillReceiveProps(nextProps) {
     this.getDataIfNeeded(this.props, nextProps);
   },
+
   getDataIfNeeded(lastProps, nextProps) {
-    if (!shallowEquals(lastProps, nextProps))
+    let queryKeys = ['table', 'query', 'columns', 'order', 'start'];
+    let update_needed = false;
+    queryKeys.forEach((key) => {
+      if (!Immutable.is(lastProps[key], nextProps[key]))
+        update_needed = true;
+    });
+    if (update_needed)
       this.fetchData(nextProps);
   },
 
   fetchData(props) {
     let { table, query, className, columns } = props;
     let tableConfig = this.config.tables[table];
-    console.log(tableConfig);
     this.setState({loadStatus: 'loading'});
     let columnspec = {};
     columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
-    setTimeout(() => {
-      API.pageQuery({
-        database: this.config.dataset,
-        table: table,
-        columns: columnspec
-      })
-        .then((data) => {
-          this.setState({loadStatus: 'loaded'});
-          this.setState({rows: data});
-        })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          this.setState({loadStatus: 'error'});
-        });
 
-    }, 2000);
+    API.pageQuery({
+      database: this.config.dataset,
+      table: table,
+      columns: columnspec,
+      query: SQL.WhereClause.decode(query)
+    })
+      .then((data) => {
+        this.setState({loadStatus: 'loaded'});
+        this.setState({rows: data});
+      })
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
+
+  },
+
+  handleColumnResize(width, column) {
+    if (this.props.onColumnResize)
+      this.props.onColumnResize(column, width);
+    //So that "isResizing" on FDT gets set back to false, force an update
+    //this.forceUpdate();
+  },
+
+  renderHeader(label, cellDataKey, columnData, rowData, width) {
+    return <div className="table-row-header" style={{width:width}}> {label} </div>
+  },
+
+  renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
+    return <div className="table-cell" style={{textAlign:columnData.alignment, width:width}}> {cellData} </div>
   },
 
   render() {
-    let { query, className, columns } = this.props;
+    let { query, className, columns, columnWidths } = this.props;
     let { loadStatus, rows, width, height } = this.state;
     let tableConfig = this.config.tables[this.props.table];
     if (!tableConfig) {
@@ -100,33 +122,42 @@ let DataTableView = React.createClass({
       return null;
     }
     return (
-        <div className={classNames("datatable", className)}>
-            <Table
-              rowHeight={30}
-              rowGetter={(index) => rows[index]}
-              rowsCount={rows.length}
-              width={width}
-              height={height}
-              headerHeight={50}>
-              {columns.map(column => {
-                if (!tableConfig.propertiesMap[column]) {
-                  console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
-                  return;
-                }
-                let {name, propid, alignment} = tableConfig.propertiesMap[column];
+      <div className={classNames("datatable", className)}>
+        <Table
+          rowHeight={30}
+          rowGetter={(index) => rows[index]}
+          rowsCount={rows.length}
+          width={width}
+          height={height}
+          headerHeight={50}
+          onColumnResizeEndCallback={this.handleColumnResize}
+          isColumnResizing={false}
+          >
+          {columns.map(column => {
+            if (!tableConfig.propertiesMap[column]) {
+              console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
+              return;
+            }
+            let {name, propid} = tableConfig.propertiesMap[column];
 
-                return <Column
-                    label={name}
-                    width={200}
-                    dataKey={propid}
-                    align={alignment}
-                    allowCellsRecycling={true}
-                  />
-                })
-              }
-            </Table>
-            <Loading status={loadStatus}/>
-        </div>
+            return <Column
+              label={name}
+              //TODO Better default column widths
+              width={columnWidths.get(column,120)}
+              dataKey={propid}
+              key={propid}
+              allowCellsRecycling={true}
+              cellRenderer={this.renderCell}
+              headerRenderer={this.renderHeader}
+              columnData={tableConfig.propertiesMap[column]}
+              isResizable={true}
+              minWidth={10}
+              />
+          })
+          }
+        </Table>
+        <Loading status={loadStatus}/>
+      </div>
     );
   }
 
