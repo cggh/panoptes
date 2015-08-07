@@ -11,53 +11,30 @@ const EMPTY_TAB = 'containers/EmptyTab';
 
 var LayoutStore = Fluxxor.createStore({
 
-  initialize() {
-    this.state = Immutable.fromJS({
-      components: {
-        'Table': {
-          component: 'containers/DataTableWithQuery',
-          props: {
-            compId: 'Table',
-            dataset: initialConfig.dataset,
-            table: 'variants',
-            query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-            order: null,
-            columns: ["chromosome", "position", "SnpName", "NRAF_EAF"]
-
+  initialize(state) {
+    if (state)
+      this.state = Immutable.fromJS(state);
+    else
+      this.state = Immutable.Map();
+    this.state = this.state.mergeDeep(Immutable.fromJS({
+        components: {
+        },
+        tabs: {
+          components: []
+        },
+        popups: {
+          components: [],
+          state: {
           }
         },
-        'EmptyTab': {
-          component: EMPTY_TAB
-        },
-      },
-      tabs: {
-        selectedTab: 'Table',
-        components: ['Table']
-      },
-      popups: {
-        components: [],
-        state: {
-          'Table': {
-            position: {
-              x: 0,
-              y: 0
-            },
-            size: {
-              width: 300,
-              height: 200
-            }
-          }
+        modal: {
+          //component:'containers/QueryPicker',
+          //props: {
+          //  table: 'variants'
+          //}
         }
-      },
-      modal: {
-        //component:'containers/QueryPicker',
-        //props: {
-        //  table: 'variants'
-        //}
-      }
-    });
-
-    this.bindActions(
+      }));
+  this.bindActions(
       LAYOUT.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
       LAYOUT.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
       LAYOUT.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
@@ -74,7 +51,7 @@ var LayoutStore = Fluxxor.createStore({
     );
   },
 
-  emitIfNeeded(action, event="change") {
+  emitIfNeeded(action, event = "change") {
     return (payload) => {
       let old_state = this.state;
       action(payload);
@@ -87,7 +64,7 @@ var LayoutStore = Fluxxor.createStore({
     let {compId, updater, newComponent} = payload;
     if (newComponent) {
       if (_.isFunction(updater)) {
-        this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props:{}}));
+        this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props: {}}));
         this.state = this.state.updateIn(['components', compId, 'props'], updater);
       }
       else {
@@ -201,7 +178,7 @@ var LayoutStore = Fluxxor.createStore({
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
     if (pos)
-      this.state = this.state.mergeIn(['popups','state', compId, 'position'], pos);
+      this.state = this.state.mergeIn(['popups', 'state', compId, 'position'], pos);
     this.tabClose(payload, true);
   },
   tabSwitch(payload) {

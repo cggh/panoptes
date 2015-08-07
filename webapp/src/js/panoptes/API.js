@@ -108,9 +108,15 @@ function storeData(data) {
   return postRequestJSON({datatype: 'storedata'}, data).then((resp) => resp.id);
 }
 
+function fetchData(id) {
+  return getRequestJSON({datatype: 'fetchstoredata', id:id}).then((resp) => JSON.parse(Base64.decode(resp.content)));
+}
+
+
 module.exports = {
   serverURL: serverURL,
   getRequestJSON: getRequestJSON,
   pageQuery: pageQuery,
-  storeData: storeData
+  storeData: storeData,
+  fetchData: fetchData
 };

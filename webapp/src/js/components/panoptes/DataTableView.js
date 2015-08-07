@@ -136,7 +136,6 @@ let DataTableView = React.createClass({
   renderHeader(headerData, cellDataKey, columnData, rowData, width) {
     let {ascending, descending} = headerData;
     let {description} = columnData;
-    console.log(columnData);
     return <div className={classNames({
                               "pointer": true,
                               "table-row-header": true,
