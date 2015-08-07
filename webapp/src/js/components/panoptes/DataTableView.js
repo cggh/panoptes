@@ -8,12 +8,14 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const SetSizeToParent = require('mixins/SetSizeToParent');
 
+const Tooltip = require('rc-tooltip');
+import 'rc-tooltip/assets/bootstrap.css'
+const {Table, Column} = require('fixed-data-table');
+import 'fixed-data-table/dist/fixed-data-table.css';
+
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
-
-const {Table, Column} = require('fixed-data-table');
-import 'fixed-data-table/dist/fixed-data-table.css';
 
 const Loading = require('ui/Loading');
 const Icon = require('ui/Icon');
@@ -142,12 +144,20 @@ let DataTableView = React.createClass({
                               "sort-column-descending": descending
                                     })}
                 style={{width:width}}
-                onClick={() => this.handleOrderChange(columnData.propid)}>
+                onClick={(e) => {
+                if (e.target.className.indexOf("info") == -1)
+                  this.handleOrderChange(columnData.propid);
+                }}
+      >
       {(ascending || descending) ?
         <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
         null}
       <span className="label">{columnData.name}</span>
-      {description ? <Icon className="info" name="info-circle"/> : null}
+      <Tooltip placement="bottom"
+               trigger={['click']}
+               overlay={<span>{description}</span>}>
+        <Icon className="info" name="info-circle"/>
+      </Tooltip>
     </div>
   },
 
