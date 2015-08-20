@@ -2,14 +2,14 @@ const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');
 const uid = require('uid');
 const Constants = require('../constants/Constants');
-const LAYOUT = Constants.LAYOUT;
+const SESSION = Constants.SESSION;
 
 //For mock data:
 const SQL = require('panoptes/SQL');
 
 const EMPTY_TAB = 'containers/EmptyTab';
 
-var LayoutStore = Fluxxor.createStore({
+var SessionStore = Fluxxor.createStore({
 
   initialize(state) {
     if (state)
@@ -35,19 +35,19 @@ var LayoutStore = Fluxxor.createStore({
         }
       }));
   this.bindActions(
-      LAYOUT.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
-      LAYOUT.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
-      LAYOUT.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
-      LAYOUT.NOTIFY, this.emitIfNeeded(this.notify),
-      LAYOUT.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
-      LAYOUT.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
-      LAYOUT.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
-      LAYOUT.POPUP_OPEN, this.emitIfNeeded(this.popupOpen),
-      LAYOUT.POPUP_RESIZE, this.emitIfNeeded(this.popupResize),
-      LAYOUT.TAB_CLOSE, this.emitIfNeeded(this.tabClose),
-      LAYOUT.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
-      LAYOUT.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
-      LAYOUT.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch)
+      SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
+      SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
+      SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
+      SESSION.NOTIFY, this.emitIfNeeded(this.notify),
+      SESSION.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
+      SESSION.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
+      SESSION.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
+      SESSION.POPUP_OPEN, this.emitIfNeeded(this.popupOpen),
+      SESSION.POPUP_RESIZE, this.emitIfNeeded(this.popupResize),
+      SESSION.TAB_CLOSE, this.emitIfNeeded(this.tabClose),
+      SESSION.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
+      SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
+      SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch)
     );
   },
 
@@ -195,4 +195,4 @@ var LayoutStore = Fluxxor.createStore({
 
 });
 
-module.exports = LayoutStore;
+module.exports = SessionStore;

@@ -27,7 +27,7 @@ let EmptyTab = React.createClass({
   },
 
   handleClick(e, table) {
-    let actions = this.getFlux().actions.layout;
+    let actions = this.getFlux().actions.session;
     if (e.button == 1 || e.metaKey || e.ctrlKey)
       actions.tabOpen('containers/DataTableWithQuery', {table:table.id}, false);
     else {

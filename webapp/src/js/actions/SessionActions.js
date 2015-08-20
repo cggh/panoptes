@@ -1,5 +1,5 @@
 const Constants = require('../constants/Constants');
-const LAYOUT = Constants.LAYOUT;
+const SESSION = Constants.SESSION;
 
 function memoize(fn) {
   let cache = {};
@@ -13,9 +13,9 @@ function memoize(fn) {
   };
 }
 
-let LayoutActions = {
+let SessionActions = {
   componentUpdate(compId, updater, newComponent = null) {
-    this.dispatch(LAYOUT.COMPONENT_UPDATE, {
+    this.dispatch(SESSION.COMPONENT_UPDATE, {
       compId: compId,
       updater: updater,
       newComponent: newComponent
@@ -23,7 +23,7 @@ let LayoutActions = {
   },
   componentUpdateFor: memoize((compId) => {
     return function (updater, newComponent = null) {
-      this.dispatch(LAYOUT.COMPONENT_UPDATE, {
+      this.dispatch(SESSION.COMPONENT_UPDATE, {
         compId: compId,
         updater: updater,
         newComponent: newComponent
@@ -31,47 +31,47 @@ let LayoutActions = {
     }
   }),
   modalClose() {
-    this.dispatch(LAYOUT.MODAL_CLOSE);
+    this.dispatch(SESSION.MODAL_CLOSE);
   },
   modalOpen(component, props) {
-    this.dispatch(LAYOUT.MODAL_OPEN,
+    this.dispatch(SESSION.MODAL_OPEN,
       {
         component: component,
         props: props
       });
   },
   notify(notification) {
-    this.dispatch(LAYOUT.NOTIFY, notification);
+    this.dispatch(SESSION.NOTIFY, notification);
   },
   popupClose(compId) {
-    this.dispatch(LAYOUT.POPUP_CLOSE, {
+    this.dispatch(SESSION.POPUP_CLOSE, {
       compId: compId
     });
   },
   popupFocus(compId) {
-    this.dispatch(LAYOUT.POPUP_FOCUS, {
+    this.dispatch(SESSION.POPUP_FOCUS, {
       compId: compId
     });
   },
   popupMove(compId, pos) {
-    this.dispatch(LAYOUT.POPUP_MOVE, {
+    this.dispatch(SESSION.POPUP_MOVE, {
       compId: compId,
       pos: pos
     });
   },
   popupResize(compId, size) {
-    this.dispatch(LAYOUT.POPUP_RESIZE, {
+    this.dispatch(SESSION.POPUP_RESIZE, {
       compId: compId,
       size: size
     });
   },
   tabClose(compId) {
-    this.dispatch(LAYOUT.TAB_CLOSE, {
+    this.dispatch(SESSION.TAB_CLOSE, {
       compId: compId
     });
   },
   tabOpen(component = null, props = {}, switchTo = true) {
-    this.dispatch(LAYOUT.TAB_OPEN, {
+    this.dispatch(SESSION.TAB_OPEN, {
       component: {
         component: component,
         props: props
@@ -80,16 +80,16 @@ let LayoutActions = {
     });
   },
   tabPopOut(compId, pos) {
-    this.dispatch(LAYOUT.TAB_POP_OUT, {
+    this.dispatch(SESSION.TAB_POP_OUT, {
       compId: compId,
       pos: pos
     });
   },
   tabSwitch(compId) {
-    this.dispatch(LAYOUT.TAB_SWITCH, {
+    this.dispatch(SESSION.TAB_SWITCH, {
       compId: compId
     });
   }
 };
 
-module.exports = LayoutActions;
+module.exports = SessionActions;

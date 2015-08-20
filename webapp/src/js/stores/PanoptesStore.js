@@ -4,7 +4,7 @@ const Immutable = require('immutable');
 const SQL = require('panoptes/SQL');
 
 const Constants = require('../constants/Constants');
-const LAYOUT = Constants.LAYOUT;
+const SESSION = Constants.SESSION;
 const API = Constants.API;
 
 

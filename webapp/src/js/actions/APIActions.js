@@ -1,6 +1,6 @@
 const Constants = require('../constants/Constants');
 const APICONST = Constants.API;
-const LAYOUT = Constants.LAYOUT;
+const SESSION = Constants.SESSION;
 const API = require('panoptes/API');
 const Immutable = require('immutable');
 
@@ -40,11 +40,11 @@ let APIActions = {
           };
           if (resp.needfullreload) {
             note.message = 'A full reload is needed';
-            this.flux.actions.layout.notify(note);
+            this.flux.actions.session.notify(note);
           }
           if (resp.needconfigreload) {
             note.message = 'A config update is needed';
-            this.flux.actions.layout.notify(note);
+            this.flux.actions.session.notify(note);
           }
           this.dispatch(APICONST.FETCH_USER_SUCCESS, {
             id: userID,

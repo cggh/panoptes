@@ -4,10 +4,10 @@ const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');
 const Panoptes = require('components/Panoptes.js');
 
-const LayoutStore = require('stores/LayoutStore');
+const SessionStore = require('stores/SessionStore');
 const PanoptesStore = require('stores/PanoptesStore');
 
-const LayoutActions = require('actions/LayoutActions');
+const SessionActions = require('actions/SessionActions');
 const PanoptesActions = require('actions/PanoptesActions');
 const APIActions = require('actions/APIActions');
 
@@ -54,13 +54,13 @@ Promise.all([InitialConfig(), getAppState(window.location)])
         defaultQueries: config.defaultQueries,
         storedQueries: config.storedQueries
       }),
-      LayoutStore: new LayoutStore(appState.layout) //Can grab link state before this and initalise store with it.
+      SessionStore: new SessionStore(appState.session) //Can grab link state before this and initalise store with it.
     };
 
     //Listen to the stores and update the URL after storing the state, when it changes.
     let getState = () => {
       let state = Immutable.Map();
-      state = state.set('layout', stores.LayoutStore.getState().delete('modal'));
+      state = state.set('session', stores.SessionStore.getState().delete('modal'));
       state = state.set('panoptes', stores.PanoptesStore.getState());
       return state;
     };
@@ -76,11 +76,11 @@ Promise.all([InitialConfig(), getAppState(window.location)])
 
     };
     storeState = _.debounce(storeState, 200);
-    stores.LayoutStore.on('change', storeState);
+    stores.SessionStore.on('change', storeState);
     stores.PanoptesStore.on('change', storeState);
 
     let actions = {
-      layout: LayoutActions,
+      session: SessionActions,
       panoptes: PanoptesActions,
       api: APIActions
     };

@@ -65,7 +65,7 @@ let DataTableWithQuery = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.getFlux().actions.layout.modalClose();
+    this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
   },
 
@@ -87,7 +87,7 @@ let DataTableWithQuery = React.createClass({
         <SidebarHeader icon={icon} description={description}/>
         <FlatButton label="Change Filter"
                     primary={true}
-                    onClick={() => actions.layout.modalOpen('containers/QueryPicker',
+                    onClick={() => actions.session.modalOpen('containers/QueryPicker',
                       {
                         table: table,
                         initialQuery: query,

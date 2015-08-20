@@ -38,10 +38,10 @@ let Panoptes = React.createClass({
     FluxMixin,
     ConfigMixin,
     PureRenderMixin,
-    StoreWatchMixin('LayoutStore', 'PanoptesStore')],
+    StoreWatchMixin('SessionStore', 'PanoptesStore')],
 
   componentDidMount() {
-    let store = this.getFlux().store('LayoutStore');
+    let store = this.getFlux().store('SessionStore');
     store.on("notify",
       () => this.refs.notificationSystem.addNotification(
         _.extend(store.getLastNotification(), {position: 'tc'})));
@@ -51,7 +51,7 @@ let Panoptes = React.createClass({
 
   getStateFromFlux() {
     return {
-      layout: this.getFlux().store('LayoutStore').getState(),
+      session: this.getFlux().store('SessionStore').getState(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
     }
   },
@@ -93,8 +93,8 @@ let Panoptes = React.createClass({
   },
 
   render() {
-    let actions = this.getFlux().actions.layout;
-    let {tabs, popups, modal, components} = this.state.layout.toObject();
+    let actions = this.getFlux().actions.session;
+    let {tabs, popups, modal, components} = this.state.session.toObject();
     modal = modal.toObject();
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.getConfig();

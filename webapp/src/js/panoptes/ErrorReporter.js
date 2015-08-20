@@ -15,7 +15,7 @@ function errorNotify(flux, message, retryFunc) {
       callback: retryFunc
     }
   }
-  flux.actions.layout.notify(note);
+  flux.actions.session.notify(note);
 }
 
 module.exports = errorNotify;

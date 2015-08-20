@@ -7,7 +7,7 @@ function nameSpace(namespace, obj) {
   return res;
 }
 
-let layout = keyMirror({
+let session = keyMirror({
   COMPONENT_UPDATE: null,
   MODAL_CLOSE: null,
   MODAL_OPEN: null,
@@ -34,7 +34,7 @@ let api = keyMirror({
 
 
 module.exports = {
-  LAYOUT: nameSpace('LAYOUT', layout),
+  SESSION: nameSpace('SESSION', session),
   PANOPTES: nameSpace('PANOPTES', panoptes),
   API: nameSpace('API', api)
 };

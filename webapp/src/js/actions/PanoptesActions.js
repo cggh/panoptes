@@ -1,5 +1,5 @@
 const Constants = require('../constants/Constants');
-const LAYOUT = Constants.LAYOUT;
+const SESSION = Constants.SESSION;
 
 let PanoptesActions = {
 
