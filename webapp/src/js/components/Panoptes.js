@@ -93,6 +93,7 @@ let Panoptes = React.createClass({
   },
 
   render() {
+    console.log(this.state.session.toJS());
     let actions = this.getFlux().actions.session;
     let {tabs, popups, modal, components} = this.state.session.toObject();
     modal = modal.toObject();

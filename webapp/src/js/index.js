@@ -26,9 +26,22 @@ import 'normalize.css';
 injectTapEventPlugin();
 
 function getAppState(location) {
-  let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location)
+  let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
   if (match)
-    return API.fetchData(match[0]);
+    return API.fetchData(match[0]).then((appState) => appState || {
+        session: {
+          components: {
+            FirstTab: {
+              component: 'containers/EmptyTab',
+              props: {}
+            }
+          },
+          tabs:{
+            components:['FirstTab'],
+            activeTab: 'FirstTab'
+          }
+        }}
+    );
 }
 
 Promise.prototype.done = function(onFulfilled, onRejected) {
@@ -45,7 +58,6 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
 Promise.all([InitialConfig(), getAppState(window.location)])
   .then((values) => {
     let [config, appState] = values;
-    appState = appState || {};
     let stores = {
       //USE STATE FROM APPSTATE? THINK WE NEED TO REFACTOR TO SESSION SPECIFIC VS DATASET SPECIFIC VS USER SPECIFIC?
       PanoptesStore: new PanoptesStore({
@@ -54,7 +66,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
         defaultQueries: config.defaultQueries,
         storedQueries: config.storedQueries
       }),
-      SessionStore: new SessionStore(appState.session) //Can grab link state before this and initalise store with it.
+      SessionStore: new SessionStore(appState.session)
     };
 
     //Listen to the stores and update the URL after storing the state, when it changes.
