@@ -175,44 +175,51 @@ let DataTableView = React.createClass({
       console.log(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    return (
-      <div className={classNames("datatable", className)}>
-        <Table
-          rowHeight={30}
-          rowGetter={(index) => rows[index]}
-          rowsCount={rows.length}
-          width={width}
-          height={height}
-          headerHeight={50}
-          headerDataGetter={this.headerData}
-          onColumnResizeEndCallback={this.handleColumnResize}
-          isColumnResizing={false}
-          >
-          {columns.map(column => {
-            if (!tableConfig.propertiesMap[column]) {
-              console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
-              return;
+    if (columns.size > 0)
+      return (
+        <div className={classNames("datatable", className)}>
+          <Table
+            rowHeight={30}
+            rowGetter={(index) => rows[index]}
+            rowsCount={rows.length}
+            width={width}
+            height={height}
+            headerHeight={50}
+            headerDataGetter={this.headerData}
+            onColumnResizeEndCallback={this.handleColumnResize}
+            isColumnResizing={false}
+            >
+            {columns.map(column => {
+              if (!tableConfig.propertiesMap[column]) {
+                console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
+                return;
+              }
+              let columnData = tableConfig.propertiesMap[column];
+              let {propid} = columnData;
+              return <Column
+                //TODO Better default column widths
+                width={columnWidths.get(column,150)}
+                dataKey={propid}
+                key={propid}
+                allowCellsRecycling={true}
+                cellRenderer={this.renderCell}
+                headerRenderer={this.renderHeader}
+                columnData={columnData}
+                isResizable={true}
+                minWidth={50}
+                />
+            })
             }
-            let columnData = tableConfig.propertiesMap[column];
-            let {propid} = columnData;
-            return <Column
-              //TODO Better default column widths
-              width={columnWidths.get(column,150)}
-              dataKey={propid}
-              key={propid}
-              allowCellsRecycling={true}
-              cellRenderer={this.renderCell}
-              headerRenderer={this.renderHeader}
-              columnData={columnData}
-              isResizable={true}
-              minWidth={50}
-              />
-          })
-          }
-        </Table>
-        <Loading status={loadStatus}/>
-      </div>
-    );
+          </Table>
+          <Loading status={loadStatus}/>
+        </div>
+      );
+    else
+      return (
+        <div className={classNames("datatable", className)}>
+          <Loading status="custom">No columns selected</Loading>
+        </div>
+      )
   }
 
 });

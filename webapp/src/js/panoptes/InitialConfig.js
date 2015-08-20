@@ -21,7 +21,11 @@ function caseChange(config) {
   _.each(_.keys(config), (key) => {
     let destKey = key[0].toLowerCase() + key.slice(1);
     let value = config[key];
-    if (typeof value === "object" && key !== 'propertiesMap') {
+    if (Array.isArray(value)) {
+      let arr = [];
+      _.forEach(value, (ele) => arr.push(caseChange(ele)));
+      value = arr;
+    } else if (typeof value === "object" && key !== 'propertiesMap') {
       value = caseChange(value);
     }
     out[destKey] = value;

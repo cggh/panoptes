@@ -5,11 +5,11 @@ let Loading = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    status: React.PropTypes.string.isRequired
+    status: React.PropTypes.string.isRequired,
   },
 
   render() {
-    let { status, ...other } = this.props;
+    let { status, customContent, ...other } = this.props;
     if (status == 'loading')
       return (
         <div className="loading-container show">
@@ -21,6 +21,13 @@ let Loading = React.createClass({
       return (
         <div className="loading-container show">
           <div className="error" />
+        </div>
+      );
+
+    if (status == 'custom')
+      return (
+        <div className="loading-container show">
+          <div className="custom">{this.props.children}</div>
         </div>
       );
 

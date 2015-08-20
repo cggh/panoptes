@@ -81,7 +81,6 @@ let DataTableWithQuery = React.createClass({
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
     let {icon, description} = this.config;
-
     let sidebar_content = (
       <div className="sidebar">
         <SidebarHeader icon={icon} description={description}/>
@@ -108,6 +107,7 @@ let DataTableWithQuery = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <QueryString className='text' prepend='Filter:' table={table} query={query}/>
             <span className='text'>Sort: {order ? this.config.propertiesMap[order].name : "None"} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className='text'>{columns.size} of {this.config.properties.length} columns shown</span>
 
           </div>
           <DataTableView className='grow'
