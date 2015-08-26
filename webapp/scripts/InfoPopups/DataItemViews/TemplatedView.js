@@ -83,7 +83,7 @@ define(["require", "handlebars", "DQX/base64", "DQX/Application", "DQX/Framework
                 _.each(that.child_fetchers, function(fetcher, childId) {
                     var query = SQL.WhereClause.CompareFixed(fetcher.relationInfo.childpropid, '=', itemData.fields[that.tableInfo.primkey]);
                     fetcher.setUserQuery1(query);
-                    //We jst set the query so we no it is not ready
+                    //We jst set the query so we know it is not ready
                     fetcher.IsDataReady(-1,1000000);
                     callback_will_fire = true;
                 });

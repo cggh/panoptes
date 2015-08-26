@@ -15,7 +15,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
               MetaData, GetFullDataItemInfo, MiscUtils, ItemGenomeTracksPopup, ItemView_DefaultView, ItemView_ItemMap,
               ItemView_PieChartMap, ItemView_FieldList, ItemView_PropertyGroup, ItemPopup, RelationTableView, SubsetsView, TemplatedView) {
 
-        var ItemView = function (frameRoot, itemInfo, initialItemData) {
+        var ItemView = function (frameRoot, itemInfo, initialItemData, parent) {
             var that = {};
             that.frameRoot = frameRoot;
             that.tableInfo = MetaData.getTableInfo(itemInfo.tableid);
@@ -59,7 +59,7 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                         dtViewObject = ItemView_PieChartMap.create(dtViewInfo, initialItemData);
                     }
                     if (dtViewInfo.Type == 'ItemMap') {
-                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, initialItemData);
+                        dtViewObject = ItemView_ItemMap.create(dtViewInfo, initialItemData, parent);
                     }
                     if (dtViewInfo.Type == 'FieldList') {
                         dtViewObject = ItemView_FieldList.create(dtViewInfo, initialItemData);

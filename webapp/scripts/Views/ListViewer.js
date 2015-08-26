@@ -176,7 +176,7 @@ define(["handlebars", "require", "DQX/Application", "DQX/Framework", "DQX/Contro
                     that.try_cache(item, function(data) {
                         that.frameTitle.setContentHtml('<div class="PnItemTitle">'+ that.compiledTitleTemplate(data.fields) +"</div>");
                         if (!that.itemView) {
-                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, data);
+                            that.itemView = ItemView(that.frameTemplate, {itemid:item, tableid:that.tableid}, data, that);
                             that.itemView.render()
                         } else {
                             that.itemView.update(data);
