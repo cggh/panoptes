@@ -12,6 +12,40 @@ define(["require", "handlebars", "DQX/base64", "DQX/Application", "DQX/Framework
         DefaultView.create = function(viewSettings, initialItemData) {
             var that = {};
             that.template = viewSettings.Content;
+            Handlebars.registerHelper("map", function (items, name_field, lat_field, long_field) {
+                var code = "<div style='overflow:hidden;height:400px;width:520px;'>\n" +
+"                  <div id='gmap_canvas' style='height:400px;width:520px;'></div>\n" +
+"                      <style>\n" +
+"                          #gmap_canvas img {\n" +
+"                          max-width: none!important;\n" +
+"                          background: none!important\n" +
+"                      }\n" +
+"                      </style>\n" +
+"                  </div>\n" +
+"                  <script type='text/javascript'>\n" +
+"                      var myOptions = {\n" +
+"                          zoom: 12,\n" +
+"                          center: new google.maps.LatLng(51.75, -1.25),\n" +
+"                          mapTypeId: google.maps.MapTypeId.ROADMAP\n" +
+"                      };\n" +
+"                      map = new google.maps.Map(document.getElementById('gmap_canvas'), myOptions);var bound = new google.maps.LatLngBounds();\n"
+                for (var i=0;i<items.length;i++) {
+                    var item = items[i];
+                    code +=  "var marker = new google.maps.Marker({\n"+
+                        "position: new google.maps.LatLng("+item[lat_field]+","+item[long_field]+"),\n" +
+                        "title:'" + item[name_field] +"'\n" +
+                    "});\n" +
+                    "marker.setMap(map);bound.extend(marker.getPosition());\n" +
+                    "var infowindow = new google.maps.InfoWindow({\n" +
+                    "content: '"+item[name_field]+"<br>'\n"+
+                    "});\n" +
+                    "infowindow.open(map, marker);\n"
+                }
+
+                code +="map.fitBounds(bound);</script>";
+
+                return new Handlebars.SafeString(code);
+            });
             that.compiled_template = Handlebars.compile(that.template);
             that.tableInfo = MetaData.getTableInfo(initialItemData.tableid);
             var childTables = DQX.attrMap(that.tableInfo.relationsParentOf, 'childtableid');

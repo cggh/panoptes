@@ -44,8 +44,8 @@ Properties:
   Name: Longitude
   DataType: GeoLongitude     # Specifies a geographic longitude property
 
-- Id: Lattitude
-  Name: Lattitude
+- Id: Latitude
+  Name: Latitude
   DataType: GeoLattitude     # Specifies a geographic latitude property
 
 - Id: Contributor_ID
@@ -71,7 +71,7 @@ DataItemViews: # Lists all the custom views that should appear in the popup for 
 
 - Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
   Name: Location                                       # Name of the view
-  MapZoom: 9                                           # Start zoom factor of the map
+  MapZoom: 7                                           # Start zoom factor of the map
 
 - Type: Overview                                       # Specifies the default view of all fields
   Name: Overview
