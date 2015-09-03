@@ -15,8 +15,8 @@ import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
 import mui from 'material-ui';
 import {IconButton} from 'material-ui';
-import Colors from 'material-ui/src/styles/colors';
-import ColorManipulator from 'material-ui/src/utils/color-manipulator';
+import Colors from 'material-ui/lib/styles/colors';
+import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
 
 import Icon from 'ui/Icon';
 
@@ -93,7 +93,6 @@ let Panoptes = React.createClass({
   },
 
   render() {
-    console.log(this.state.session.toJS());
     let actions = this.getFlux().actions.session;
     let {tabs, popups, modal, components} = this.state.session.toObject();
     modal = modal.toObject();

@@ -78,43 +78,37 @@ let QueryPicker = React.createClass({
           sidebar={(
           <div>
             <List>
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={defaultQuery}/></p>}
+              <ListItem primaryText="Default"
+                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={defaultQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(defaultQuery)}
                         onDoubleClick={() => {
                           this.handleQueryChange(defaultQuery);
                           this.handlePick();
                           }
-                        }>
-                Default
-              </ListItem>
+                        }/>
               <ListDivider />
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={lastQuery}/></p>}
+              <ListItem primaryText="Previous"
+                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={lastQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(lastQuery)}
                         onDoubleClick={() => {
                           this.handleQueryChange(lastQuery);
                           this.handlePick();
                           }
-                        }>
-                Previous
-              </ListItem>
+                        }/>
               <ListDivider />
-
             </List>
             <List  subheader="Stored Filters">
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+              <ListItem primaryText="Blue widgets"
+                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
                         secondaryTextLines={2}
-                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        >
-                Blue widgets
-              </ListItem>
-              <ListItem secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
+              <ListItem primaryText="Yellow birds"
+                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
                         secondaryTextLines={2}
-                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        >
-                Yellow birds
-              </ListItem>
+                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
             </List>
-
           </div>
         )}>
         <div className='vertical stack'>

@@ -96,7 +96,7 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    return SQL.WhereClause.CompareFixed(this.config.properties[0].propid, '=', '');
+    return SQL.WhereClause.CompareFixed(this.config.primkey, '=', '');
   },
 
   handleAddOr() {
@@ -138,8 +138,8 @@ let Criterion = React.createClass({
     let property = this.config.propertiesMap[component.ColName];
     let newComponent = _.find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
     //Copy over the vals so we don't wipe them
-    newComponent.ColName = component.ColName || this.config.properties[0].propid;
-    newComponent.ColName2 = component.ColName2 || this.config.properties[0].propid;
+    newComponent.ColName = component.ColName || this.config.primkey;
+    newComponent.ColName2 = component.ColName2 || this.config.primkey;
     _.each(['CompValue', 'CompValueMin', 'CompValueMax'], (name) => {
       if (this.state[name] !== undefined)
         newComponent[name] = Deformatter(property, this.state[name]);

@@ -42,13 +42,10 @@ let EmptyTab = React.createClass({
         <List subheader="Open a table:">
           {_.map(tables, (table) => (
             <ListItem key={table.id}
+                      primaryText={table.tableCapNamePlural}
                       secondaryText={table.description}
                       leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
-                      onClick={(e) => this.handleClick(e, table)}
-              >
-              {table.tableCapNamePlural}
-            </ListItem>
-
+                      onClick={(e) => this.handleClick(e, table)} />
           ))}
         </List>
       </div>

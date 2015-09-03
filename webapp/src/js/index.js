@@ -27,21 +27,25 @@ injectTapEventPlugin();
 
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
+  let default_state ={
+    session: {
+      components: {
+        FirstTab: {
+          component: 'containers/EmptyTab',
+          props: {}
+        }
+      },
+      tabs:{
+        components:['FirstTab'],
+        selectedTab: 'FirstTab'
+      }
+    }
+  };
   if (match)
-    return API.fetchData(match[0]).then((appState) => appState || {
-        session: {
-          components: {
-            FirstTab: {
-              component: 'containers/EmptyTab',
-              props: {}
-            }
-          },
-          tabs:{
-            components:['FirstTab'],
-            activeTab: 'FirstTab'
-          }
-        }}
+    return API.fetchData(match[0]).then((appState) => appState || default_state
     );
+  else
+    return default_state;
 }
 
 Promise.prototype.done = function(onFulfilled, onRejected) {
