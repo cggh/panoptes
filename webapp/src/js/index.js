@@ -38,6 +38,8 @@ function getAppState(location) {
       tabs:{
         components:['FirstTab'],
         selectedTab: 'FirstTab'
+      },
+      modal: {
       }
     }
   };

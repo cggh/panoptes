@@ -28,10 +28,6 @@ var SessionStore = Fluxxor.createStore({
           }
         },
         modal: {
-          //component:'containers/QueryPicker',
-          //props: {
-          //  table: 'variants'
-          //}
         }
       }));
   this.bindActions(

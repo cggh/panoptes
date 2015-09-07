@@ -131,6 +131,7 @@ let QueryPicker = React.createClass({
         </div>
         </Sidebar>
 
+
       </div>
     );
   }

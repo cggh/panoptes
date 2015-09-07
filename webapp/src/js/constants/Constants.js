@@ -1,4 +1,4 @@
-const keyMirror = require('react/lib/keyMirror');
+const keyMirror = require('keymirror');
 const _ = require('lodash');
 
 function nameSpace(namespace, obj) {

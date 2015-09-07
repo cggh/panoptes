@@ -69,6 +69,11 @@ let DataTableWithQuery = React.createClass({
     this.props.componentUpdate({query: query});
   },
 
+  handleColumnChange(columns) {
+    this.getFlux().actions.session.modalClose();
+    this.props.componentUpdate({columns: columns});
+  },
+
   handleColumnResize(column, size) {
     this.props.componentUpdate({columnWidths:{[column]:size}});
   },
@@ -92,6 +97,17 @@ let DataTableWithQuery = React.createClass({
                         initialQuery: query,
                         onPick: this.handleQueryPick
                       })}/>
+        <br/>
+        <FlatButton label="Add/Remove Columns"
+                    primary={true}
+                    onClick={() => actions.session.modalOpen('containers/ItemPicker',
+                      {
+                        groups: this.config.propertyGroups,
+                        initialPick: columns,
+                        title: `Pick columns for ${this.config.tableCapNamePlural} table`,
+                        onPick: this.handleColumnChange
+                      })}/>
+
       </div>
     );
 //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37

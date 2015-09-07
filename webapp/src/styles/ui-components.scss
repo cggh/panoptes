@@ -277,6 +277,12 @@
   transition-delay: 0s;
 }
 
+.status-text {
+  text-align: center;
+  font-style: italic;
+  opacity: .5;
+}
+
 .top-bar {
   height: $topbar-height;
   background: $primary-color;
@@ -358,8 +364,8 @@
 }
 
 .large-modal {
-  height: calc(100vh - 200px);
-  width: calc(100vw - 200px);
+  height: calc(100vh - 150px);
+  width: calc(100vw - 150px);
 }
 
 .centering-container {
@@ -552,4 +558,15 @@ input {
   font-size: inherit !important;
   font-weight: inherit !important;
   line-height: inherit !important;
+}
+
+.item-picker {
+  .picked {
+    opacity: 0.5;
+  }
+  .header {
+    text-align: center;
+    font-size: 18px;
+    padding-top: 5px;
+  }
 }

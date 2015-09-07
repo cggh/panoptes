@@ -25,7 +25,7 @@ function caseChange(config) {
       let arr = [];
       _.forEach(value, (ele) => arr.push(caseChange(ele)));
       value = arr;
-    } else if (typeof value === "object" && key !== 'propertiesMap') {
+    } else if (typeof value === "object" && key !== 'propertiesMap' && key !== 'propertyGroups') {
       value = caseChange(value);
     }
     out[destKey] = value;
@@ -93,7 +93,7 @@ let augmentTableInfo = function (table) {
   if (table.settings.PropertyGroups) {
     _.each(table.settings.PropertyGroups, function (groupInfo) {
       groupInfo.properties = [];
-      table.propertyGroups[groupInfo.Id] = groupInfo;
+      table.propertyGroups[groupInfo.Id] = caseChange(groupInfo);
     });
   }
 }
