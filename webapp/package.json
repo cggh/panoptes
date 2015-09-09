@@ -59,6 +59,7 @@
     "rc-tooltip": "^2.7.0",
     "react": "^0.13.3",
     "react-draggable": "git+https://github.com/benjeffery/react-draggable.git",
+    "react-highlighter": "^0.2.2",
     "react-hotkey": "^0.3.0",
     "react-immutable-proptypes": "^1.2.0",
     "react-notification-system": "^0.1.14",

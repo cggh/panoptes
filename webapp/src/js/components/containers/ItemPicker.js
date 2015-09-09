@@ -3,6 +3,7 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
+const Highlight = require('react-highlighter');
 
 const {TextField, RaisedButton, List, Paper, ListItem} = require('material-ui');
 import mui from 'material-ui';
@@ -106,8 +107,8 @@ let ItemPicker = React.createClass({
                         return (name+"#"+description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
                           <ListItem className={classNames({picked:picked.includes(propid)})}
                                     key={propid}
-                                    primaryText={name}
-                                    secondaryText={description}
+                                    primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
+                                    secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
                                     leftIcon={<div><Icon fixedWidth={true} name={picked.includes(propid) ? "minus" : "plus"} /></div>}
                                     onClick={() => this.handleAdd(propid)}
                             />) : null;
