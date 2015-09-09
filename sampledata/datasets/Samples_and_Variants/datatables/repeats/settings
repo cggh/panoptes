@@ -32,45 +32,37 @@ Properties:
   Name: Region ID                # Display name of the property
   Description: Region Identifier # Description of the property
   DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  ShowInTable: true              # If true, this property will appear by default in data table grids in the application
 
 - Id: chromosome
   Name: Chromosome
   Description: Chromosome name
   DataType: Text
-  ShowInTable: true
 
 - Id: regionstart
   Name: Start position
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
 
 - Id: regionstop
   Name: Stop position
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0
 
 - Id: length
   Name: Length
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0
 
 - Id: name
   Name: Region name
   DataType: Text
-  ShowInTable: true
 
 - Id: Value1, Value2, Value3  # Properties sharing the same settings can also be defined in group
   DataType: Value
-  ShowInTable: true
 
 - Id: type
   Name: Feature type
   Description: An example categorical property
   DataType: Text
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  ShowInTable: True
 

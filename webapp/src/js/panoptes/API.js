@@ -86,7 +86,7 @@ function pageQuery(options) {
     qry: SQL.WhereClause.encode(query),
     collist: LZString.compressToEncodedURIComponent(collist),
     order: order,
-    sortreverse: ascending ? '0' : '1',
+    sortreverse: ascending ? '1' : '0',
     needtotalcount: count ? '1' : '0',
     limit: `${start}~${stop}`,
     distinct: distinct ? '1' : '0'

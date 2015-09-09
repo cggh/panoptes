@@ -189,14 +189,22 @@ class ImportSettings:
                             ('ShowInTable', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'showInTable',
-                                   'description': 'If set, this property will appear by default in data table grids in the application'
+                                   'default': True,
+                                   'propName': 'ShowInTable',
+                                   'description': 'If set to false this property will not be available to be shown in tables in the application'
                                    }),
                             ('ShowInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'propName': 'showInBrowser',
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
+                                   }),
+                            ('TableDefaultVisible', {
+                                   'type': 'Boolean',
+                                   'required': False,
+                                   'default': True,
+                                   'propName': 'showInBrowser',
+                                   'description': 'If set to true (default) then this property will appear in tables when they are first shown'
                                    }),
                             ('BrowserDefaultVisible', {
                                    'type': 'Boolean',
@@ -331,7 +339,6 @@ class ImportSettings:
             self._propidMap[propid] = {
                                           'Id': propid,
                                           'Name': propid,
-                                          'ShowInTable': True,
                                           'DataType': 'Value',
                                           'DecimDigits': 0
                                           }

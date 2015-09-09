@@ -30,9 +30,7 @@ let DataTableWithQuery = React.createClass({
     query: React.PropTypes.string,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
-    columns: ImmutablePropTypes.listOf(
-      React.PropTypes.string
-    ),
+    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     start: React.PropTypes.number,
     sidebar: React.PropTypes.bool
@@ -45,7 +43,6 @@ let DataTableWithQuery = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       ascending: true,
-      columns: Immutable.List(),
       columnWidths: Immutable.Map(),
       start: 0,
       sidebar: true
@@ -54,6 +51,14 @@ let DataTableWithQuery = React.createClass({
 
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
+    this.propertyGroups = {};
+    _.forEach(this.config.propertyGroups, (val, key) => {
+      let filteredProps = _.filter(val.properties, {showInTable:true});
+      if (filteredProps.length > 0) {
+        this.propertyGroups[key] = _.clone(val);
+        this.propertyGroups[key].properties = filteredProps;
+      }
+    });
   },
 
   icon() {
@@ -71,7 +76,7 @@ let DataTableWithQuery = React.createClass({
 
   handleColumnChange(columns) {
     this.getFlux().actions.session.modalClose();
-    this.props.componentUpdate({columns: columns});
+    this.props.componentUpdate((props) => props.set('columns', columns));
   },
 
   handleColumnResize(column, size) {
@@ -85,6 +90,11 @@ let DataTableWithQuery = React.createClass({
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
+    //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
+    if (!columns)
+      columns = Immutable.List(this.config.properties)
+        .filter((prop) => prop.showByDefault && prop.showInTable)
+        .map((prop) => prop.propid);
     let {icon, description} = this.config;
     let sidebar_content = (
       <div className="sidebar">
@@ -102,7 +112,7 @@ let DataTableWithQuery = React.createClass({
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/ItemPicker',
                       {
-                        groups: this.config.propertyGroups,
+                        groups: this.propertyGroups,
                         initialPick: columns,
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange

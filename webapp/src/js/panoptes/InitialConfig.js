@@ -96,6 +96,8 @@ let augmentTableInfo = function (table) {
       table.propertyGroups[groupInfo.Id] = caseChange(groupInfo);
     });
   }
+  table.fetchTableName = table.id  + 'CMB_' + workspace;
+  table.fetchSubsamplingTableName = table.id  + 'CMBSORTRAND_' + workspace;
 }
 
 let augment2DTableInfo = function (table) {
@@ -151,7 +153,6 @@ let parseCustomProperties = function () {
       prop.isDate = true;
     if (!prop.name) prop.name = prop.propid;
     var settings = {
-      showInTable: true,
       showInBrowser: false,
       channelName: '',
       channelColor: 'rgb(0,0,0)',
@@ -206,20 +207,17 @@ let parseCustomProperties = function () {
       prop.dispDataType = 'Latitude';
 
     //Assign property group
-    prop.group = null;
     if (prop.settings.GroupId)
       if (tableInfo.propertyGroups[prop.settings.GroupId]) {
         tableInfo.propertyGroups[prop.settings.GroupId].properties.push(prop);
       }
-    //if (!prop.group) {
-    //  if (!tableInfo.propertyGroupMap['']) {
-    //    var grp = {Id: '', Name: 'Properties', properties: []};
-    //    tableInfo.propertyGroupMap[''] = grp;
-    //    tableInfo.propertyGroups.push(grp);
-    //  }
-    //  prop.group = tableInfo.propertyGroupMap[''];
-    //  tableInfo.propertyGroupMap[''].properties.push(prop);
-    //}
+    if (!prop.settings.GroupId) {
+      if (!tableInfo.propertyGroups['_UNGROUPED_']) {
+        var grp = {id: '_UNGROUPED_', name: 'Properties', properties: []};
+        tableInfo.propertyGroups['_UNGROUPED_'] = grp;
+      }
+      tableInfo.propertyGroups['_UNGROUPED_'].properties.push(prop);
+    }
 
     // Determine table name where the column is originally defined
     if (prop.source == 'fixed') {
@@ -300,6 +298,14 @@ let parseCustomProperties = function () {
     prop.alignment = alignment[prop.datatype] || 'left';
 
     prop.description = prop.settings.Description || "";
+    //TODO Set end to false when import sets default properly
+    prop.showInTable = prop.settings.ShowInTable || true;
+    prop.showByDefault = prop.settings.TableDefaultVisible ||
+      prop.isPrimKey ||
+      prop.propid == tableInfo.chromosomeField ||
+      prop.propid == tableInfo.positionField ||
+      false;
+
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);

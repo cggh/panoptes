@@ -64,7 +64,16 @@ let ItemPicker = React.createClass({
   },
 
   handlePick() {
-    this.props.onPick(this.state.picked.toList());
+    let result = Immutable.List();
+    this.props.groups.forEach((group) => {
+        group.get('properties').forEach((prop) => {
+          if (this.state.picked.has(prop.get('propid'))) {
+            result = result.push(prop.get('propid'));
+          }
+        })
+      }
+    );
+    this.props.onPick(result);
   },
 
   render() {

@@ -84,26 +84,31 @@ let DataTableView = React.createClass({
   fetchData(props) {
     let { table, query, className, columns, order, ascending } = props;
     let tableConfig = this.config.tables[table];
-    this.setState({loadStatus: 'loading'});
     let columnspec = {};
     columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
-
-    API.pageQuery({
-      database: this.config.dataset,
-      table: table,
-      columns: columnspec,
-      order: order,
-      ascending: ascending,
-      query: SQL.WhereClause.decode(query)
-    })
-      .then((data) => {
-        this.setState({loadStatus: 'loaded'});
-        this.setState({rows: data});
+    if (props.columns.size > 0) {
+      this.setState({loadStatus: 'loading'});
+      API.pageQuery({
+        database: this.config.dataset,
+        table: tableConfig.fetchTableName,
+        columns: columnspec,
+        order: order,
+        ascending: ascending,
+        query: SQL.WhereClause.decode(query)
       })
-      .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
-      });
+        .then((data) => {
+          this.setState({loadStatus: 'loaded'});
+          this.setState({rows: data});
+        })
+        .catch((error) => {
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          this.setState({loadStatus: 'error'});
+        });
+    }
+    else
+      this.setState({rows: []});
+
+
 
   },
 

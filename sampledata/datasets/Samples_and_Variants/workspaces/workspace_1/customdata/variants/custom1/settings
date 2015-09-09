@@ -13,7 +13,6 @@ Properties:
   GroupId: Custom
   Description: An example of a custom numerical value
   DataType: Value
-  ShowInTable: true
   ShowInBrowser: true
   MinVal: 0
   MaxVal: 20
@@ -28,7 +27,6 @@ Properties:
   GroupId: Custom
   Description: An example of a custom text value
   DataType: Text
-  ShowInTable: true
   ShowInBrowser: false
   IsCategorical: true
 
@@ -37,7 +35,6 @@ Properties:
   GroupId: Info
   DataType: Boolean
   ReadData: false
-  ShowInTable: true
   CanUpdate: true
 
 

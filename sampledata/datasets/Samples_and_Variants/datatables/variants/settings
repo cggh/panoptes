@@ -48,14 +48,12 @@ Properties:
   GroupId: Info
   Description: Chromosome name   # Description of the property
   DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  ShowInTable: true              # If true, this property will appear by default in data table grids in the application
 
 - Id: position
   Name: Position
   GroupId: Info
   Description: Genomic position of the variant on the chromosome (1-based)
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
 
 - Id: SnpName
@@ -63,7 +61,6 @@ Properties:
   GroupId: Info
   Description: Unique name of the variant
   DataType: Text
-  ShowInTable: true
   Search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
 - Id: HighQuality
@@ -71,7 +68,7 @@ Properties:
   GroupId: Info
   Description: Variant Quality filter
   DataType: Boolean
-  ShowInTable: true
+  TableDefaultVisible: false
   ShowInBrowser: true
   #BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
   BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
@@ -79,7 +76,6 @@ Properties:
 - Id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
   GroupId: Info
   Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
-  ShowInTable: true
   ShowInBrowser: true           # If true, this property will be displayed in the genome browser
   MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
   MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
@@ -118,7 +114,6 @@ Properties:
   GroupId: Info
   Description: An example categorical property
   DataType: Text
-  ShowInTable: true
   ShowInBrowser: true
   IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   CategoryColors:                   # Specifies display colours for the categorical states of this property
@@ -134,7 +129,6 @@ Properties:
 - Id: NRAF_WAF, NRAF_EAF, NRAF_SAF
   DataType: Value
   GroupId: AlleleFreq
-  ShowInTable: true
   MinVal: 0
   MaxVal: 1
   
