@@ -166,10 +166,23 @@ let DataTableView = React.createClass({
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
+    if (columnData.dispDataType == "Boolean" && cellData!=='') {
+      let val = (cellData == '1');
+      return (<div className={"table-cell bool " + (val ? "true" : "false")}
+                  style={{textAlign:columnData.alignment, width:width}}>
+        {<Icon fixedWidth={true} name={val ? "check" : "times"}/>}
+      </div>);
+    }
     return <div className="table-cell"
                 style={{textAlign:columnData.alignment, width:width}}>
       {cellData}
     </div>
+  },
+
+  defaultWidth(columnData) {
+    if (columnData.dispDataType == "Boolean")
+      return 75;
+    return 150;
   },
 
   render() {
@@ -203,7 +216,7 @@ let DataTableView = React.createClass({
               let {propid} = columnData;
               return <Column
                 //TODO Better default column widths
-                width={columnWidths.get(column,150)}
+                width={columnWidths.get(column,this.defaultWidth(columnData))}
                 dataKey={propid}
                 key={propid}
                 allowCellsRecycling={true}

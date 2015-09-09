@@ -521,6 +521,17 @@ input {
 .table-cell {
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
+}
+.table-cell.true {
+    color: #388E3C;
+}
+.table-cell.false {
+  color: #D32F2F
+;
+}
+.table-cell.bool {
+  opacity: 0.6;
 }
 
 .table-row-header {
@@ -535,6 +546,7 @@ input {
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: center;
+    white-space: nowrap;
   }
   .icon {
     min-width: 20px;
