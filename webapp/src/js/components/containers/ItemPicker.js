@@ -4,14 +4,17 @@ const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
 
-const {RaisedButton, List, Paper, ListItem} = require('material-ui');
-
+const {TextField, RaisedButton, List, Paper, ListItem} = require('material-ui');
 import mui from 'material-ui';
 const ThemeManager = new mui.Styles.ThemeManager();
 
+const Icon = require("ui/Icon");
+
+
 let ItemPicker = React.createClass({
   mixins: [
-    PureRenderMixin
+    PureRenderMixin,
+    React.addons.LinkedStateMixin
   ],
 
   propTypes: {
@@ -31,7 +34,8 @@ let ItemPicker = React.createClass({
 
   getInitialState() {
     return {
-      picked: this.props.initialPick.toSet()
+      picked: this.props.initialPick.toSet(),
+      search: ""
     }
   },
 
@@ -43,6 +47,10 @@ let ItemPicker = React.createClass({
   },
   title() {
     return this.props.title;
+  },
+
+  handleEnter() {
+      this.handlePick();
   },
 
   handleAdd(propId) {
@@ -77,48 +85,51 @@ let ItemPicker = React.createClass({
   },
 
   render() {
-    let {picked, groupOpen} = this.state;
+    let {picked, groupOpen, search} = this.state;
     let {groups} = this.props;
+    let count = groups.map((group) => group.get('properties').size).reduce((sum, v) => sum+v, 0);
     //"toJS" needed due to https://github.com/facebook/immutable-js/issues/554
     return (
       <div className='large-modal item-picker'>
         <div className="horizontal stack">
           <div className="grow scroll-within">
-            <div className="header">Available</div>
+            <div className="header">{count} Column{count!=1 ? "s":null} Available</div>
+            <div className="search">
+              <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+              </div>
             <List>
               {
                 _.map(groups.toJS(), (group) => {
                   let {id, name, properties} = group;
-                  return (
+                  let subItems = _.map(properties, (prop) => {
+                        let {name, description, propid} = prop;
+                        return (name+"#"+description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                          <ListItem className={classNames({picked:picked.includes(propid)})}
+                                    key={propid}
+                                    primaryText={name}
+                                    secondaryText={description}
+                                    leftIcon={<div><Icon fixedWidth={true} name={picked.includes(propid) ? "minus" : "plus"} /></div>}
+                                    onClick={() => this.handleAdd(propid)}
+                            />) : null;
+                      }
+                    );
+                  return _.filter(subItems).length > 0 ? (
                     <ListItem primaryText={name}
                               key={id}
                               initiallyOpen={true}
+                              leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
                               onClick={() => this.handleAddAll(id)}
-                              nestedItems={
-                      _.map(properties, (prop) => {
-                          let {name, description, propid} = prop;
-                          return (
-                            <ListItem className={classNames({picked:picked.includes(propid)})}
-                                      key={propid}
-                                      primaryText={name}
-                                      secondaryText={description}
-                                      onClick={() => this.handleAdd(propid)}
-                                      />
-                          );
-                        }
-                      )
-                    }
+                              nestedItems={subItems}
                       />
 
-                  )
+                  ) :null;
                 })
               }
             </List>
           </div>
           <div className="grow stack vertical">
             <div className="grow scroll-within">
-              <div className="header">Selected</div>
-              { picked.size > 0 ?
+              <div className="header">{picked.size ? picked.size: "No"} Column{picked.size!=1 ? "s":null} Selected</div>
                 <List>
                   {
                     _.map(groups.toJS(), (group) => {
@@ -127,6 +138,7 @@ let ItemPicker = React.createClass({
                           <ListItem primaryText={name}
                                     key={id}
                                     initiallyOpen={true}
+                                    leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
                                     onClick={() => this.handleRemoveAll(id)}
                                     nestedItems={
                         _.map(properties, (prop) => {
@@ -135,6 +147,7 @@ let ItemPicker = React.createClass({
                               <ListItem key={propid}
                                         secondaryText={description}
                                         primaryText={name}
+                                        leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
                                         onClick={() => this.handleRemove(propid)}/>
                             ) : null;
                           }
@@ -146,7 +159,6 @@ let ItemPicker = React.createClass({
                   }
 
                 </List>
-                : <div className="centering-container status-text">No columns selected</div>}
             </div>
             <div className='centering-container'>
               <RaisedButton label="Use" primary={true} onClick={this.handlePick}/>

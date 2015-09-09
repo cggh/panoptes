@@ -4,8 +4,7 @@ const classNames = require('classnames');
 const Icon = require('ui/Icon');
 const Hotkey = require('react-hotkey');
 Hotkey.activate();
-
-var KEYCODE_ESC = 27;
+const keycodes = require('keycodes');
 
 var Modal = React.createClass({
   mixins: [
@@ -66,10 +65,15 @@ var Modal = React.createClass({
   },
 
   handleHotkey(e) {
-    if (e.keyCode == KEYCODE_ESC && !this.props.uncloseable) {
+    let {child} = this.refs;
+    if (e.keyCode == keycodes('escape') && !this.props.uncloseable) {
       e.preventDefault();
       e.stopPropagation();
       this.props.onClose();
+    } else if (e.keyCode == keycodes('enter') && child && child.handleEnter) {
+      e.preventDefault();
+      e.stopPropagation();
+      child.handleEnter();
     }
   },
 

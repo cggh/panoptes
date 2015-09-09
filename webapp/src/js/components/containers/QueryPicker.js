@@ -57,6 +57,9 @@ let QueryPicker = React.createClass({
     return `Pick Filter for ${this.config.tableNamePlural}`;
   },
 
+  handleEnter() {
+    this.handlePick();
+  },
   handlePick() {
     this.props.onPick(this.state.query);
   },
