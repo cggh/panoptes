@@ -77,19 +77,18 @@ class ImportSettings:
                             ('CategoryColors', {
                                    'type': 'Block',
                                    'required': False,
-                                   'propName': 'categoryColors',
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
                             ('DefaultWidth', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Sets the deafult column width in pixels. Overridden if BarWidth is set.',
+                                   'description': 'Sets the deafult column width in pixels.',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('BarWidth', {
-                                   'type': 'Value',
+                            ('ShowBar', {
+                                   'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined. Overrides DefaultWidth',
+                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined.',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MinVal', {

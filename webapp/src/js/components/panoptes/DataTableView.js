@@ -2,6 +2,7 @@ const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
+const Color = require('color');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
@@ -16,7 +17,7 @@ import 'fixed-data-table/dist/fixed-data-table.css';
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
-const Formatter = require('panoptes/Formatter');
+const PropertyCell = require('panoptes/PropertyCell');
 
 const Loading = require('ui/Loading');
 const TooltipEllipsis = require('ui/TooltipEllipsis');
@@ -165,58 +166,42 @@ let DataTableView = React.createClass({
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
-    if (columnData.externalUrl) {
-      let refs = cellData.split(';');
-      return (<div className="table-cell"
-           style={{textAlign:columnData.alignment, width:width}}>
-        {_.map(refs, (ref, index) => (
-        <span>
-          <a href={columnData.externalUrl.replace("{value}", ref)}>
-            {ref}
-          </a>
-          {index < refs.length-1 ? ",": null}
-        </span>
-        ))}
-      </div>);
-    }
-    if (columnData.dispDataType == "Boolean" && cellData!=='') {
-      let val = (cellData == '1');
-      return (<div className={"table-cell bool " + (val ? "true" : "false")}
-                  style={{textAlign:columnData.alignment, width:width}}>
-        {<Icon fixedWidth={true} name={val ? "check" : "times"}/>}
-      </div>);
-    }
-    let text = Formatter(columnData, cellData);
-    if (columnData.barWidth && cellData !== null) {
+    let background = "rgba(0,0,0,0)";
+    if (columnData.showBar && cellData !== null) {
       cellData = parseFloat(cellData);
       let {maxVal, minVal} = columnData;
       let percent = 100*(cellData - minVal)/(maxVal-minVal);
-        return (<div className="table-cell"
-                   style={{textAlign:columnData.alignment,
-                    width:width,
-                    background: `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
-                    }}>
-        {text}
-      </div>);
+      background = `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
+    }
+    if (columnData.categoryColors) {
+      let col = columnData.categoryColors[cellData];
+      if (col) {
+        col = Color(col).lighten(0.3);
+        if (rowIndex % 2)
+          col.darken(0.1);
+        background = col.rgbString();
+      }
     }
     return <div className="table-cell"
-                style={{textAlign:columnData.alignment, width:width}}>
-      {text}
+                style={{
+                   textAlign:columnData.alignment,
+                   width:width,
+                   background: background
+                   }}>
+      <PropertyCell prop={columnData} value={cellData}/>
     </div>
   },
 
   defaultWidth(columnData) {
     if (columnData.dispDataType == "Boolean")
       return 75;
-    if (columnData.barWidth)
-      return columnData.barWidth;
     if (columnData.defaultWidth)
       return columnData.defaultWidth;
     if (columnData.isDate)
       return 110;
     if (columnData.decimDigits)
-      return Math.max(15+columnData.decimDigits*15, 80);
-    return 150;
+      return Math.max(15+columnData.decimDigits*15, 110);
+    return 110;
   },
 
   render() {

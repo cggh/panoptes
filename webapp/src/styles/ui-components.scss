@@ -523,16 +523,21 @@ input {
   overflow: hidden;
   white-space: nowrap;
 }
-.table-cell.true {
+
+.prop {
+  opacity: 0.6;
+}
+.prop.bool {
+  top: -4px;
+}
+.prop.true {
     color: $green;
 }
-.table-cell.false {
+.prop.false {
   color: $red;
-;
 }
+
 .table-cell.bool {
-  opacity: 0.6;
-  padding: 0;
 }
 
 .table-row-header {

@@ -11,7 +11,7 @@ let fetchedConfig = {};
 
 
 function columnSpec(list) {
-  let ret = {}
+  let ret = {};
   _.each(list, (item) => ret[item] = 'ST');
   return ret;
 }
@@ -310,13 +310,13 @@ let parseCustomProperties = function () {
     prop.alignment = alignment[prop.datatype] || 'left';
 
 
+    prop.categoryColors = prop.settings.CategoryColors || prop.settings.categoryColors;
     prop.description = prop.settings.Description || "";
     prop.externalUrl = prop.settings.ExternalUrl;
-    prop.barWidth = prop.settings.BarWidth;
+    prop.showBar = prop.settings.showBar || (prop.settings.BarWidth>0);
     prop.defaultWidth = prop.settings.DefaultWidth;
     prop.maxVal = prop.settings.MaxVal;
     prop.minVal = prop.settings.MinVal;
-    console.log(prop);
     prop.decimDigits = prop.settings.DecimDigits || prop.settings.decimDigits;
     //TODO Set end to false when import sets default properly
     prop.showInTable = prop.settings.ShowInTable || true;
