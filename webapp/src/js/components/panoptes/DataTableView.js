@@ -169,8 +169,8 @@ let DataTableView = React.createClass({
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
     let background = "rgba(0,0,0,0)";
-    let {maxVal, minVal} = columnData;
-    if (columnData.showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
+    let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
+    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
       let percent = 100*(cellData - minVal)/(maxVal-minVal);
       background = `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
@@ -178,8 +178,8 @@ let DataTableView = React.createClass({
       let clippedCellData = Math.min(Math.max(parseFloat(cellData),minVal),maxVal);
       background = MAX_COLOR.clone().lighten(1.37*(1-(clippedCellData - minVal)/(maxVal-minVal))).rgbString();
     }
-    if (columnData.categoryColors) {
-      let col = columnData.categoryColors[cellData];
+    if (categoryColors) {
+      let col = categoryColors[cellData] || categoryColors['_other_'];
       if (col) {
         col = Color(col).lighten(0.3);
         if (rowIndex % 2)
@@ -190,7 +190,7 @@ let DataTableView = React.createClass({
 
     return <div className="table-cell"
                 style={{
-                   textAlign:columnData.alignment,
+                   textAlign:alignment,
                    width:width,
                    background: background
                    }}>
