@@ -107,9 +107,6 @@ let DataTableView = React.createClass({
     }
     else
       this.setState({rows: []});
-
-
-
   },
 
   headerData(column) {
@@ -173,6 +170,18 @@ let DataTableView = React.createClass({
         {<Icon fixedWidth={true} name={val ? "check" : "times"}/>}
       </div>);
     }
+    if (columnData.barWidth && cellData !== null) {
+      cellData = parseFloat(cellData);
+      let {maxVal, minVal} = columnData;
+      let percent = 100*(cellData - minVal)/(maxVal-minVal);
+        return (<div className="table-cell"
+                   style={{textAlign:columnData.alignment,
+                    width:width,
+                    background: `linear-gradient(to right, #B2EBF2 ${percent}%, #ffffff ${percent}%`
+                    }}>
+        {cellData}
+      </div>);
+    }
     return <div className="table-cell"
                 style={{textAlign:columnData.alignment, width:width}}>
       {cellData}
@@ -182,6 +191,8 @@ let DataTableView = React.createClass({
   defaultWidth(columnData) {
     if (columnData.dispDataType == "Boolean")
       return 75;
+    if (columnData.barWidth)
+      return columnData.barWidth;
     return 150;
   },
 
@@ -213,6 +224,7 @@ let DataTableView = React.createClass({
                 return;
               }
               let columnData = tableConfig.propertiesMap[column];
+              console.log(columnData);
               let {propid} = columnData;
               return <Column
                 //TODO Better default column widths

@@ -297,7 +297,11 @@ let parseCustomProperties = function () {
     }
     prop.alignment = alignment[prop.datatype] || 'left';
 
+
     prop.description = prop.settings.Description || "";
+    prop.barWidth = prop.settings.BarWidth;
+    prop.maxVal = prop.settings.MaxVal;
+    prop.minVal = prop.settings.MinVal;
     //TODO Set end to false when import sets default properly
     prop.showInTable = prop.settings.ShowInTable || true;
     prop.showByDefault = prop.settings.TableDefaultVisible ||
@@ -305,7 +309,6 @@ let parseCustomProperties = function () {
       prop.propid == tableInfo.chromosomeField ||
       prop.propid == tableInfo.positionField ||
       false;
-
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);

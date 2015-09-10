@@ -80,11 +80,6 @@ class ImportSettings:
                                    'propName': 'categoryColors',
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
-                            ('MaxColumnWidth', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'description': 'Specifies the maximum width (in pixels) used for the column representing this property in a table view.\n  Longer text will be abbreviated with ellipsis'
-                                   }),
                             ('BarWidth', {
                                    'type': 'Value',
                                    'required': False,

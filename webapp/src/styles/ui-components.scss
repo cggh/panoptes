@@ -329,12 +329,12 @@
   line-height: normal;
   .icon-holder {
     border-radius: 9px;
-    border: 2px solid rgb(99, 201, 205);
+    border: 2px solid $light-primary-color;
     padding: 5px 12px;
     margin-right: 10px;
     margin-bottom: 10px;
     float: left;
-    background-color: $light-primary-color;
+    background-color: $light-background;
     .icon {
       font-size: 30px;
       color: $primary-color;
@@ -524,10 +524,10 @@ input {
   white-space: nowrap;
 }
 .table-cell.true {
-    color: #388E3C;
+    color: $green;
 }
 .table-cell.false {
-  color: #D32F2F
+  color: $red;
 ;
 }
 .table-cell.bool {
@@ -587,5 +587,5 @@ input {
 }
 
 .highlight {
-  color: #ff4081;
+  color: $accent;
 }
