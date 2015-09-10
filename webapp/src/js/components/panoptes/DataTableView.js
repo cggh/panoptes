@@ -238,12 +238,13 @@ let DataTableView = React.createClass({
                 return;
               }
               let columnData = tableConfig.propertiesMap[column];
-              let {propid} = columnData;
+              let {propid, isPrimKey} = columnData;
               return <Column
                 //TODO Better default column widths
                 width={columnWidths.get(column,this.defaultWidth(columnData))}
                 dataKey={propid}
                 key={propid}
+                fixed={isPrimKey}
                 allowCellsRecycling={true}
                 cellRenderer={this.renderCell}
                 headerRenderer={this.renderHeader}
