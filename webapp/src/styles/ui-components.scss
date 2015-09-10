@@ -595,3 +595,9 @@ input {
 .highlight {
   color: $accent;
 }
+
+.internal-link {
+  color: $primary-color;
+  text-decoration: underline;
+  cursor: pointer;
+}

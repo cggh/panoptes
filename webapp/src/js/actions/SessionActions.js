@@ -48,6 +48,14 @@ let SessionActions = {
       compId: compId
     });
   },
+  popupOpen(component = null, props = {}) {
+    this.dispatch(SESSION.POPUP_OPEN, {
+      component: {
+        component: component,
+        props: props
+      },
+    });
+  },
   popupFocus(compId) {
     this.dispatch(SESSION.POPUP_FOCUS, {
       compId: compId

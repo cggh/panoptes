@@ -192,6 +192,7 @@ let DataTableView = React.createClass({
                 style={{
                    textAlign:alignment,
                    width:width,
+                   height: "30px",
                    background: background
                    }}>
       <PropertyCell prop={columnData} value={cellData}/>

@@ -16,9 +16,7 @@ const QueryString = require('panoptes/QueryString');
 const mui = require('material-ui');
 const {FlatButton} = mui;
 
-//For mock data:
 const SQL = require('panoptes/SQL');
-const shallowEqual = require('shallow-equals');
 
 let DataTableWithQuery = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
