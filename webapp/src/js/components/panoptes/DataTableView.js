@@ -23,6 +23,8 @@ const Loading = require('ui/Loading');
 const TooltipEllipsis = require('ui/TooltipEllipsis');
 const Icon = require('ui/Icon');
 
+const MAX_COLOR = Color("#00BCD4");
+
 let DataTableView = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -167,11 +169,14 @@ let DataTableView = React.createClass({
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
     let background = "rgba(0,0,0,0)";
-    if (columnData.showBar && cellData !== null) {
+    let {maxVal, minVal} = columnData;
+    if (columnData.showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
-      let {maxVal, minVal} = columnData;
       let percent = 100*(cellData - minVal)/(maxVal-minVal);
       background = `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
+    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+      let clippedCellData = Math.min(Math.max(parseFloat(cellData),minVal),maxVal);
+      background = MAX_COLOR.clone().lighten(1.37*(1-(clippedCellData - minVal)/(maxVal-minVal))).rgbString();
     }
     if (columnData.categoryColors) {
       let col = columnData.categoryColors[cellData];
@@ -182,6 +187,7 @@ let DataTableView = React.createClass({
         background = col.rgbString();
       }
     }
+
     return <div className="table-cell"
                 style={{
                    textAlign:columnData.alignment,

@@ -94,14 +94,12 @@ class ImportSettings:
                             ('MinVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'default': 0,
                                    'description': 'For *Value* types, upper extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MaxVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'default': 1.0,
                                    'description': 'For *Value* types, lower extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
