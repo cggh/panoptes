@@ -32,7 +32,7 @@ module.exports = function(property, value) {
         if (isNaN(value))
           return '';
         else
-          return value.toFixed(property.settings.decimDigits).toString();
+          return value.toFixed(property.decimDigits).toString();
       }
     }
     return value.toString();

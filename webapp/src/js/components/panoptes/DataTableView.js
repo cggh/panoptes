@@ -16,8 +16,10 @@ import 'fixed-data-table/dist/fixed-data-table.css';
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
+const Formatter = require('panoptes/Formatter');
 
 const Loading = require('ui/Loading');
+const TooltipEllipsis = require('ui/TooltipEllipsis');
 const Icon = require('ui/Icon');
 
 let DataTableView = React.createClass({
@@ -85,7 +87,7 @@ let DataTableView = React.createClass({
     let { table, query, className, columns, order, ascending } = props;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
-    columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+    columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       API.pageQuery({
@@ -153,7 +155,7 @@ let DataTableView = React.createClass({
       {(ascending || descending) ?
         <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
         null}
-      <span className="label">{columnData.name}</span>
+      <TooltipEllipsis className="label">{columnData.name}</TooltipEllipsis>
       <Tooltip placement="bottom"
                trigger={['click']}
                overlay={<span>{description}</span>}>
@@ -163,6 +165,20 @@ let DataTableView = React.createClass({
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
+    if (columnData.externalUrl) {
+      let refs = cellData.split(';');
+      return (<div className="table-cell"
+           style={{textAlign:columnData.alignment, width:width}}>
+        {_.map(refs, (ref, index) => (
+        <span>
+          <a href={columnData.externalUrl.replace("{value}", ref)}>
+            {ref}
+          </a>
+          {index < refs.length-1 ? ",": null}
+        </span>
+        ))}
+      </div>);
+    }
     if (columnData.dispDataType == "Boolean" && cellData!=='') {
       let val = (cellData == '1');
       return (<div className={"table-cell bool " + (val ? "true" : "false")}
@@ -170,6 +186,7 @@ let DataTableView = React.createClass({
         {<Icon fixedWidth={true} name={val ? "check" : "times"}/>}
       </div>);
     }
+    let text = Formatter(columnData, cellData);
     if (columnData.barWidth && cellData !== null) {
       cellData = parseFloat(cellData);
       let {maxVal, minVal} = columnData;
@@ -177,14 +194,14 @@ let DataTableView = React.createClass({
         return (<div className="table-cell"
                    style={{textAlign:columnData.alignment,
                     width:width,
-                    background: `linear-gradient(to right, #B2EBF2 ${percent}%, #ffffff ${percent}%`
+                    background: `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
                     }}>
-        {cellData}
+        {text}
       </div>);
     }
     return <div className="table-cell"
                 style={{textAlign:columnData.alignment, width:width}}>
-      {cellData}
+      {text}
     </div>
   },
 
@@ -193,6 +210,12 @@ let DataTableView = React.createClass({
       return 75;
     if (columnData.barWidth)
       return columnData.barWidth;
+    if (columnData.defaultWidth)
+      return columnData.defaultWidth;
+    if (columnData.isDate)
+      return 110;
+    if (columnData.decimDigits)
+      return Math.max(15+columnData.decimDigits*15, 80);
     return 150;
   },
 
@@ -224,7 +247,6 @@ let DataTableView = React.createClass({
                 return;
               }
               let columnData = tableConfig.propertiesMap[column];
-              console.log(columnData);
               let {propid} = columnData;
               return <Column
                 //TODO Better default column widths

@@ -80,10 +80,16 @@ class ImportSettings:
                                    'propName': 'categoryColors',
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
+                            ('DefaultWidth', {
+                                   'type': 'Value',
+                                   'required': False,
+                                   'description': 'Sets the deafult column width in pixels. Overridden if BarWidth is set.',
+                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   }),
                             ('BarWidth', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined',
+                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined. Overrides DefaultWidth',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MinVal', {
@@ -110,7 +116,6 @@ class ImportSettings:
                             ('DecimDigits', {
                                    'type': 'Value',
                                    'required': False,
-                                   'propName': 'decimDigits',
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),

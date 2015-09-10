@@ -286,29 +286,45 @@ let parseCustomProperties = function () {
       "IntB64": "IB",
       "IntDiff": "ID"
     };
+    let displayEncodingTypes = {
+      "Generic": "GN",
+      "String": "ST",
+      "Float2": "FH",
+      "Float3": "FH",
+      "Float4": "FH",
+      "FloatH": "FH",
+      "Int": "IN",
+      "IntB64": "IB",
+      "IntDiff": "ID"
+    };
     prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
+    prop.defaultDisplayEncoding = displayEncodingTypes[prop.encoding];
     let alignment = {
       Value: 'right',
       HighPrecisionValue: 'right',
       Boolean: 'center',
       GeoLongitude: 'right',
       GeoLattitude: 'right',
-      Date: 'left',
+      Date: 'center'
     }
     prop.alignment = alignment[prop.datatype] || 'left';
 
 
     prop.description = prop.settings.Description || "";
+    prop.externalUrl = prop.settings.ExternalUrl;
     prop.barWidth = prop.settings.BarWidth;
+    prop.defaultWidth = prop.settings.DefaultWidth;
     prop.maxVal = prop.settings.MaxVal;
     prop.minVal = prop.settings.MinVal;
+    console.log(prop);
+    prop.decimDigits = prop.settings.DecimDigits || prop.settings.decimDigits;
     //TODO Set end to false when import sets default properly
     prop.showInTable = prop.settings.ShowInTable || true;
     prop.showByDefault = prop.settings.TableDefaultVisible ||
       prop.isPrimKey ||
       prop.propid == tableInfo.chromosomeField ||
       prop.propid == tableInfo.positionField ||
-      false;
+      true;
 
     tableInfo.properties = tableInfo.properties || [];
     tableInfo.properties.push(prop);

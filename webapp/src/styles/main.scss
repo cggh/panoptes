@@ -1,3 +1,5 @@
+@import "./variables";
+
 .green {
   background-color: green;
 }
@@ -68,3 +70,12 @@ body {
     }
   }
 }
+
+a {
+  color: $light-primary-color;
+}
+
+a:visited {
+  color: $primary-color;
+}
+
