@@ -100,7 +100,7 @@ define(["handlebars", "require", "DQX/Application", "DQX/Framework", "DQX/Contro
                     this.tableFetcher.myDataConsumer = that;
                     this.tableFetcher.setReportIfError(true);
                     this.tableFetcher.setMaxRecordCount(that.tableInfo.settings.MaxCountQueryAggregated || 1000000);
-                    this.tableFetcher.positionField = that.tableInfo.primkey;
+                    this.tableFetcher.positionField = null;
                     this.tableFetcher.addFetchColumnActive(that.tableInfo.primkey, MiscUtils.createEncoderId(tableid, that.tableInfo.primkey));
                     that.titleFields = Handlebars.fields_used(that.titleTemplate, _.map(that.tableInfo.properties,DQX.attr('propid')));
                     _.forEach(that.titleFields, function(prop) {
