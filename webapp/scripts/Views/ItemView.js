@@ -76,8 +76,10 @@ define(["require", "DQX/base64", "DQX/Application", "DQX/Framework", "DQX/Contro
                 });
 
                 $.each(that.tableInfo.relationsParentOf, function (idx, relationInfo) {
-                    var relationView = RelationTableView.create(initialItemData, relationInfo);
-                    that.itemViewObjects.push(relationView);
+                    if (relationInfo.reversename !== '_hide_') {
+                        var relationView = RelationTableView.create(initialItemData, relationInfo);
+                        that.itemViewObjects.push(relationView);
+                    }
                 });
 
                 if ((!that.tableInfo.settings.DisableSubsets) || (!that.tableInfo.settings.DisableNotes) ){
