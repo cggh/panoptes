@@ -39,7 +39,7 @@ define(["require", "handlebars", "DQX/base64", "DQX/Application", "DQX/Framework
                     "var infowindow = new google.maps.InfoWindow({\n" +
                     "content: '"+item[name_field]+"<br>'\n"+
                     "});\n" +
-                    "infowindow.open(map, marker);\n"
+                    "infowindow.open(map, marker);google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {if (this.getZoom() > 10) {this.setZoom(10);}});\n"
                 }
 
                 code +="map.fitBounds(bound);</script>";
