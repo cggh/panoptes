@@ -77,6 +77,9 @@
       margin-left: 7px;
       margin-right: 5px;
       opacity: 0.3;
+      .bitmap {
+        transform: translate(0px, 3px);
+      }
     }
     .icon:hover {
       opacity: 1;
@@ -89,6 +92,9 @@
   vertical-align: middle;
   font-size: 22px;
   cursor: pointer;
+  .bitmap {
+    height: 22px;
+  }
 }
 
 .icon:hover {
@@ -149,6 +155,9 @@
       line-height: $topbar-height;
       margin-left: 5px;
       margin-right: 5px;
+      .bitmap {
+        transform: translate(0px, 3px);
+      }
     }
     .title {
       flex: 1;
@@ -330,14 +339,18 @@
   .icon-holder {
     border-radius: 9px;
     border: 2px solid $light-primary-color;
-    padding: 5px 12px;
+    padding: 5px 5px;
     margin-right: 10px;
     margin-bottom: 10px;
     float: left;
     background-color: $light-background;
     .icon {
       font-size: 30px;
+      line-height: 30px;
       color: $primary-color;
+      .bitmap {
+        height: 30px;
+      }
     }
   }
 }
@@ -349,6 +362,11 @@
   div.grow {
     flex: 1;
   }
+}
+
+.stack.start-align {
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .stack.vertical {

@@ -1,9 +1,13 @@
 var React = require('react');
 var PropTypes = React.PropTypes;
 
+let dynreq = require.context("../../../images", true);
+const dynamic_require = (path) => dynreq("./"+path);
+
+
 var Icon = React.createClass({
 
-  propTypes: {
+propTypes: {
     name: PropTypes.string.isRequired,
     size: PropTypes.oneOf(['lg', '2x', '3x', '4x', '5x']),
     rotate: PropTypes.oneOf(['90', '180', '270']),
@@ -15,14 +19,19 @@ var Icon = React.createClass({
   },
 
   render() {
-    /*jshint eqnull:true */
     var {
       name, size, rotate, flip, spin, fixedWidth, stack, inverse,
       className, ...props
       } = this.props;
     if (!name)
       return;
-    var classNames = `fa fa-${name} icon`;
+    var classNames = '';
+    if (_.startsWith(name, 'bitmap:')) {
+      classNames += 'icon'
+    }
+    else {
+        classNames += `fa fa-${name} icon`;
+    }
     if (size) {
       classNames += ` fa-${size}`;
     }
@@ -49,7 +58,10 @@ var Icon = React.createClass({
     if (className) {
       classNames += ` ${className}`;
     }
-    return <span {...props} className={classNames}> { this.props.children} </span>;
+    if (_.startsWith(name, 'bitmap:'))
+      return <span {...props} className={classNames}><img className="bitmap" src={dynamic_require(name.substring(7))} /></span>;
+    else
+      return <span {...props} className={classNames}> { this.props.children} </span>;
   }
 });
 

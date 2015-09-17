@@ -18,7 +18,7 @@ const {FlatButton} = mui;
 
 const SQL = require('panoptes/SQL');
 
-let DataTableWithQuery = React.createClass({
+let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
@@ -93,10 +93,10 @@ let DataTableWithQuery = React.createClass({
       columns = Immutable.List(this.config.properties)
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
-    let {icon, description} = this.config;
+    let {description} = this.config;
     let sidebar_content = (
       <div className="sidebar">
-        <SidebarHeader icon={icon} description={description}/>
+        <SidebarHeader icon={this.icon()} description={description}/>
         <FlatButton label="Change Filter"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/QueryPicker',
@@ -150,4 +150,4 @@ let DataTableWithQuery = React.createClass({
   }
 });
 
-module.exports = DataTableWithQuery;
+module.exports = DataTableWithActions;
