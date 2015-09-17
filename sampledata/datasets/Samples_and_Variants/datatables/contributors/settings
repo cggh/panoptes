@@ -55,6 +55,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
       <ul>
       {{#each samplingsites}}
         <li>{{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}</li>
+        {{item_link 'samplingsites' SiteID SiteID}}
       {{else}}
         No sites from this contributor
       {{/each}}

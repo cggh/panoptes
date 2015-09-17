@@ -12,6 +12,11 @@ define(["require", "handlebars", "DQX/base64", "DQX/Application", "DQX/Framework
         DefaultView.create = function(viewSettings, initialItemData) {
             var that = {};
             that.template = viewSettings.Content;
+            Handlebars.registerHelper("item_link", function (table_name, primary_key, link_text) {
+              code = "<span onClick='require(\"DQX/Msg\").send({ type: \"ItemPopup\" }, { tableid: \""+table_name+"\", itemid: \""+primary_key+"\" } )' class='DQXQueryTableLinkCell'><span class='fa fa-external-link-square DQXQueryTableLinkIcon'></span>"+link_text+"</span>";
+              return new Handlebars.SafeString(code);
+            });
+
             Handlebars.registerHelper("map", function (items, name_field, lat_field, long_field) {
                 var code = "<div style='overflow:hidden;height:400px;width:520px;'>\n" +
 "                  <div id='gmap_canvas' style='height:400px;width:520px;'></div>\n" +
