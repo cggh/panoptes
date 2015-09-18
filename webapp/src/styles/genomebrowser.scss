@@ -1,0 +1,25 @@
+.genome-browser {
+  height: 100%;
+  .tracks {
+    height: calc(100% - 100px);  //TODO Should be 100 minus control height
+  }
+}
+
+
+svg.scale {
+  .tick {
+    text {
+      text-anchor: middle;
+      alignment-baseline: text-before-edge;
+    }
+    line {
+      stroke: darkgrey;
+      stroke-width: 1px;
+    }
+  }
+  .major  {
+    line {
+      stroke-width: 2px;
+    }
+  }
+}

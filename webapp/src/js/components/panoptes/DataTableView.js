@@ -184,6 +184,7 @@ let DataTableView = React.createClass({
         col = Color(col).lighten(0.3);
         if (rowIndex % 2)
           col.darken(0.1);
+
         background = col.rgbString();
       }
     }

@@ -10,6 +10,7 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const Sidebar = require('react-sidebar');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
+const GenomeBrowser = require('panoptes/genome/GenomeBrowser');
 
 const mui = require('material-ui');
 const {FlatButton} = mui;
@@ -21,13 +22,21 @@ let GenomeBrowserWithActions = React.createClass({
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool
+    sidebar: React.PropTypes.bool,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    components: ImmutablePropTypes.orderedMap
   },
 
   getDefaultProps() {
     return {
       componentUpdate: null,
-      sidebar: true
+      sidebar: true,
+      chromosome: '',
+      start: 0,
+      end:   1000,
+      components: Immutable.OrderedMap()
     };
   },
 
@@ -44,7 +53,7 @@ let GenomeBrowserWithActions = React.createClass({
 
   render() {
     let actions = this.getFlux().actions;
-    let {sidebar, componentUpdate} = this.props;
+    let {sidebar, componentUpdate, ...sub_props} = this.props;
     let sidebar_content = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
@@ -65,6 +74,7 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className='text'>WTF</span>
           </div>
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={100} {...sub_props} />
         </div>
       </Sidebar>
     );

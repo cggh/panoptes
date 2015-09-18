@@ -79,6 +79,7 @@
       opacity: 0.3;
       .bitmap {
         transform: translate(0px, 3px);
+        filter: invert(100%);
       }
     }
     .icon:hover {
@@ -156,6 +157,7 @@
       margin-left: 5px;
       margin-right: 5px;
       .bitmap {
+        filter: invert(100%);
         transform: translate(0px, 3px);
       }
     }

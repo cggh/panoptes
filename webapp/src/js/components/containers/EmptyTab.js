@@ -27,7 +27,6 @@ let EmptyTab = React.createClass({
   },
 
   handleOpen(e, container, props) {
-    console.log(container, props)
     let actions = this.getFlux().actions.session;
     if (e.button == 1 || e.metaKey || e.ctrlKey)
       actions.tabOpen(container, props, false);
