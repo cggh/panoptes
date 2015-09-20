@@ -5,6 +5,8 @@ const ConfigMixin = require('mixins/ConfigMixin');
 const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const Hammer = require('react-hammerjs');
+const Spring = require('react-motion').Spring;
 
 const GenomeScale = require('panoptes/genome/GenomeScale');
 import 'genomebrowser.scss';
@@ -18,7 +20,7 @@ let GenomeBrowser = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func,
+    componentUpdate: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string,
     start: React.PropTypes.number,
     end: React.PropTypes.number,
@@ -26,38 +28,49 @@ let GenomeBrowser = React.createClass({
     sideWidth: React.PropTypes.number
   },
 
-  handleMouseWheel(e) {
-    let pos = e.clientX - offset(e.currentTarget).left;
-    //var scaleFactor  = 1;
-    //if (delta < 0)//zoom out
-    //  scaleFactor = 1.0 / (1.0 + 0.4 * Math.abs(delta));
-    //else//zoom in
-    //  scaleFactor = 1.0 + 0.4 * Math.abs(delta);
-    ////Use the endpoint of the tween if we have one
-    //var left = that.currentTween ? that.currentTarget.left : that.domain()[0];
-    //var right = that.currentTween ? that.currentTarget.right : that.domain()[1];
-    //pos = (pos != undefined) ? that.invert(pos) : left+((right-left)/2);
-    //var frac_x = (pos - left) / (right - left);
-    //var new_width = (right - left)/scaleFactor;
-    //var target = {left: pos - (new_width*frac_x), right: pos + (new_width*(1-frac_x))};
-    //let change = e.deltaY;
-    if (change > 0) {
+  handleZoom(pos, delta) {
+    let { start, end, sideWidth} = this.props;
+    let { width } = this.state;
+    let scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
+    let scaleFactor = (delta > 0) ?
+    1.0 / (1.0 + 0.04 * Math.abs(delta)) :
+    1.0 + 0.04 * Math.abs(delta);
+    pos = (pos != undefined) ? scale.invert(pos) : start + ((end - start) / 2);
+    var frac_x = (pos - start) / (end - start);
+    var new_width = (end - start) / scaleFactor;
+    this.props.componentUpdate({start: pos - (new_width * frac_x), end: pos + (new_width * (1 - frac_x))});
+  },
 
-    }
+  handleMouseWheel(e) {
+    this.handleZoom(e.clientX - offset(e.currentTarget).left, e.deltaY)
   },
 
   render() {
     let { start, end, sideWidth, chomosome } = this.props;
     let {width, height} = this.state;
     return (
-      <div className="genome-browser">
-        <div> Controls?</div>
-          <div className="vertical stack tracks"
-             onWheel={this.handleMouseWheel}>
-          <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
-          <div>Other stuff</div>
-        </div>
-      </div>
+      <Spring endValue={{start: {val: start}, end: {val: end}}}>
+        {tweens => {
+          let start = tweens.start.val;
+          let end = tweens.end.val;
+          return <div className="genome-browser">
+            <div> Controls?</div>
+            <Hammer
+              onDoubleTap={(e) => console.log('t',e)}
+              onPan={(e) => console.log('p',e)}
+              onSwipe={(e) => console.log('s',e)}
+              onPinch={(e) => console.log('2',e)}
+              >
+              <div className="vertical stack tracks"
+                   onWheel={this.handleMouseWheel}>
+                <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
+
+                <div>Other stuff</div>
+              </div>
+            </Hammer>
+          </div>
+        }}
+      </Spring>
     );
   }
 

@@ -16,8 +16,6 @@ let GenomeScale = React.createClass({
   render() {
     let { start, end, width, sideWidth, ...other } = this.props;
     let num_ticks = Math.floor(width / 100);
-    start = 0;
-    end = 1000000;
     let scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     let M_ticks = scale.ticks(num_ticks);
     let m_ticks = scale.ticks(num_ticks * 5);
