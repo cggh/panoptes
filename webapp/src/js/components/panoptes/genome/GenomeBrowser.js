@@ -12,7 +12,7 @@ const GenomeScale = require('panoptes/genome/GenomeScale');
 import 'genomebrowser.scss';
 
 const DEFAULT_SPRING = [300,30];
-const TIGHT_SPRING = [2000,80];
+const NO_SPRING = "NO_SPRING";
 const MIN_WIDTH = 100;
 
 let GenomeBrowser = React.createClass({
@@ -39,6 +39,8 @@ let GenomeBrowser = React.createClass({
 
   componentWillMount() {
     this.panStartPixel = null;
+    this.last_start = this.props.start;
+    this.last_end = this.props.end;
   },
 
   componentWillReceiveProps(nextProps) {
@@ -48,8 +50,12 @@ let GenomeBrowser = React.createClass({
     } else {
       this.setState({
         springConfig: nextProps.chromosome !== this.props.chromosome ?
-          TIGHT_SPRING : DEFAULT_SPRING});
+          NO_SPRING : DEFAULT_SPRING});
     }
+    this.last_start = this.props.start;
+    this.last_end = this.props.end;
+    this.actual_start = this.props.start;
+    this.actual_end = this.props.end;
   },
 
   scaleClamp(start, end, fracPos) {
@@ -91,7 +97,8 @@ let GenomeBrowser = React.createClass({
   },
 
   handleZoom(pos, delta) {
-    let { start, end} = this.props;
+    let start = this.actual_start;
+    let end = this.actual_end;
     let scaleFactor = (delta > 0) ?
     1.0 / (1.0 + 0.04 * Math.abs(delta)) :
     1.0 + 0.04 * Math.abs(delta);
@@ -111,7 +118,8 @@ let GenomeBrowser = React.createClass({
     this.handleZoom(e.center.x - offset(this.hammer.getDOMNode()).left, -100)
   },
   handlePan(e) {
-    let { start, end } = this.props;
+    let start = this.actual_start;
+    let end = this.actual_end;
     let panStartPixel = (e.center.x - e.deltaX) - offset(this.hammer.getDOMNode()).left;
     if (this.panStartPixel !== panStartPixel) {
       this.panStartPixel = panStartPixel;
@@ -121,8 +129,12 @@ let GenomeBrowser = React.createClass({
     [start, end] = this.panStartGenome;
     start = start + shiftGenome;
     end = end + shiftGenome;
-    [start, end] = this.scaleClamp(start, end, 0.5);
-    this.nextSpringConfig = TIGHT_SPRING;
+    if (e.isFinal) {
+      [start, end] = this.scaleClamp(start, end, 0.5);
+      this.panStartPixel = null;
+    } else {
+      this.nextSpringConfig = NO_SPRING;
+    }
     this.props.componentUpdate({start: start, end: end});
   },
 
@@ -130,33 +142,43 @@ let GenomeBrowser = React.createClass({
     let { start, end, sideWidth, chomosome } = this.props;
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
-    //Animate middle and with for better experience
-    return (
-      <Spring endValue={{
+    let gb = (tweens, start, end) => {
+      start = tweens ? (tweens.mid.val - tweens.halfWidth.val) : start;
+      end = tweens ? (tweens.mid.val + tweens.halfWidth.val) : end;
+      this.actual_start = start;
+      this.actual_end = end;
+      return <div className="genome-browser">
+        <Hammer
+          ref={(c) => this.hammer = c}
+          onDoubleTap={this.handleDoubleTap}
+          onPan={this.handlePan}
+          onPinch={(e) => console.log('2',e)}
+          >
+          <div className="vertical stack tracks"
+               onWheel={this.handleMouseWheel}>
+            <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
+            <div>Other stuff</div>
+          </div>
+        </Hammer>
+      </div>
+    };
+
+    if (springConfig == NO_SPRING) {
+      return gb(null, start, end);
+    }
+    else {
+      //Animate middle and with for better experience
+      return (
+        <Spring defaultValue={{
+      mid: {val: (this.last_end+this.last_start)/2},
+      halfWidth: {val: (this.last_end-this.last_start)/2}}}
+          endValue={{
       mid: {val: (end+start)/2, config:springConfig},
       halfWidth: {val: (end-start)/2, config: springConfig}}}>
-        {tweens => {
-          let start = tweens.mid.val - tweens.halfWidth.val;
-          let end = tweens.mid.val + tweens.halfWidth.val;
-          return <div className="genome-browser">
-            <div> Controls?</div>
-            <Hammer
-              ref={(c) => this.hammer = c}
-              onDoubleTap={this.handleDoubleTap}
-              onPan={this.handlePan}
-              onPinch={(e) => console.log('2',e)}
-              >
-              <div className="vertical stack tracks"
-                   onWheel={this.handleMouseWheel}>
-                <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
-
-                <div>Other stuff</div>
-              </div>
-            </Hammer>
-          </div>
-        }}
-      </Spring>
-    );
+          {gb}
+        </Spring>
+      );
+    }
   }
 
 });
