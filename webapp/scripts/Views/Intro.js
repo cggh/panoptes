@@ -113,7 +113,7 @@ define(["require", "DQX/base64", "DQX/Msg", "DQX/Application", "DQX/Framework", 
                             FindGene.execute()
                         })
 
-                        var descr = MetaData.generalSettings.GenomeBrowserDescr||'<i>No description</i>';
+                        var descr = MetaData.generalSettings.GenomeBrowserDescr||'View data on the genome';
 
                         var grp = Controls.CompoundVert([
                             Controls.Static(descr),
