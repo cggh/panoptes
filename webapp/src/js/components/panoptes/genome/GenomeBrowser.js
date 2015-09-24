@@ -14,7 +14,7 @@ import 'genomebrowser.scss';
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
 const NO_SPRING = [2000,80];
-const MIN_WIDTH = 100;
+const MIN_WIDTH = 50;
 
 let GenomeBrowser = React.createClass({
   mixins: [
@@ -54,8 +54,6 @@ let GenomeBrowser = React.createClass({
           NO_SPRING : DEFAULT_SPRING
       });
     }
-    this.last_start = this.props.start;
-    this.last_end = this.props.end;
     this.actual_start = this.props.start;
     this.actual_end = this.props.end;
   },
@@ -159,6 +157,8 @@ let GenomeBrowser = React.createClass({
     let { start, end, sideWidth, chomosome } = this.props;
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
+    let pixelWidth = (end-start)/(width-sideWidth);
+    console.log('p',pixelWidth, width, end-start);
     //Animate middle and with for better experience
     let endValue = {
       mid: {val: (end+start)/2, config: springConfig},
@@ -171,6 +171,9 @@ let GenomeBrowser = React.createClass({
         {(tweens) => {
           start = tweens.mid.val - tweens.halfWidth.val;
           end = tweens.mid.val + tweens.halfWidth.val;
+          //Round to nearest pixel to stop unneeded updates
+          start = Math.floor(start/pixelWidth) * pixelWidth;
+          end = Math.ceil(end/pixelWidth) * pixelWidth;
           this.actual_start = start;
           this.actual_end = end;
           return <div key="gb"
