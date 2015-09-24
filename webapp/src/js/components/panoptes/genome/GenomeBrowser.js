@@ -11,8 +11,9 @@ const Spring = require('react-motion').Spring;
 const GenomeScale = require('panoptes/genome/GenomeScale');
 import 'genomebrowser.scss';
 
-const DEFAULT_SPRING = [300,30];
-const NO_SPRING = "NO_SPRING";
+const DEFAULT_SPRING = [160, 30];
+const FLING_SPRING = [60, 15];
+const NO_SPRING = [2000,80];
 const MIN_WIDTH = 100;
 
 let GenomeBrowser = React.createClass({
@@ -50,7 +51,8 @@ let GenomeBrowser = React.createClass({
     } else {
       this.setState({
         springConfig: nextProps.chromosome !== this.props.chromosome ?
-          NO_SPRING : DEFAULT_SPRING});
+          NO_SPRING : DEFAULT_SPRING
+      });
     }
     this.last_start = this.props.start;
     this.last_end = this.props.end;
@@ -80,9 +82,9 @@ let GenomeBrowser = React.createClass({
           start = min;
       }
     }
-    if (width < MIN_WIDTH){
-      start -= (MIN_WIDTH-width)*fracPos;
-      end += (MIN_WIDTH-width)*(1-fracPos);
+    if (width < MIN_WIDTH) {
+      start -= (MIN_WIDTH - width) * fracPos;
+      end += (MIN_WIDTH - width) * (1 - fracPos);
       if (start < min) {
         start = min;
         end = start + MIN_WIDTH;
@@ -130,10 +132,25 @@ let GenomeBrowser = React.createClass({
     start = start + shiftGenome;
     end = end + shiftGenome;
     if (e.isFinal) {
+      if (Math.abs(e.velocityX) > 0.5) {
+        let velGenome = (this.scale.invert(0) - this.scale.invert(e.velocityX));
+        start = start - velGenome * 1000;
+        end = end - velGenome * 1000;
+        this.nextSpringConfig = FLING_SPRING;
+      }
       [start, end] = this.scaleClamp(start, end, 0.5);
       this.panStartPixel = null;
     } else {
+      let endValue = {
+        mid: {val: (end+start)/2, config: NO_SPRING},
+        halfWidth: {val: (end-start)/2, config: NO_SPRING}
+      };
+      this.refs.spring.setState({
+        currValue: endValue,
+        currVelocity: {mid: {val:0}, halfWidth: {val:0}}
+      });
       this.nextSpringConfig = NO_SPRING;
+
     }
     this.props.componentUpdate({start: start, end: end});
   },
@@ -142,45 +159,40 @@ let GenomeBrowser = React.createClass({
     let { start, end, sideWidth, chomosome } = this.props;
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
-    let gb = (tweens, start, end) => {
-      start = tweens ? (tweens.mid.val - tweens.halfWidth.val) : start;
-      end = tweens ? (tweens.mid.val + tweens.halfWidth.val) : end;
-      this.actual_start = start;
-      this.actual_end = end;
-      return <div className="genome-browser">
-        <Hammer
-          ref={(c) => this.hammer = c}
-          onDoubleTap={this.handleDoubleTap}
-          onPan={this.handlePan}
-          onPinch={(e) => console.log('2',e)}
-          >
-          <div className="vertical stack tracks"
-               onWheel={this.handleMouseWheel}>
-            <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
-            <div>Other stuff</div>
-          </div>
-        </Hammer>
-      </div>
+    //Animate middle and with for better experience
+    let endValue = {
+      mid: {val: (end+start)/2, config: springConfig},
+      halfWidth: {val: (end-start)/2, config: springConfig}
     };
+    return (
+      <Spring ref="spring" key="spring"
+              endValue={endValue}
+              defaultValue={endValue}>
+        {(tweens) => {
+          start = tweens.mid.val - tweens.halfWidth.val;
+          end = tweens.mid.val + tweens.halfWidth.val;
+          this.actual_start = start;
+          this.actual_end = end;
+          return <div key="gb"
+                      className="genome-browser">
+            <Hammer
+              ref={(c) => this.hammer = c}
+              onDoubleTap={this.handleDoubleTap}
+              onPan={this.handlePan}
+              onPinch={(e) => console.log('2',e)}
+              >
+              <div className="vertical stack tracks"
+                   onWheel={this.handleMouseWheel}>
+                <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
 
-    if (springConfig == NO_SPRING) {
-      return gb(null, start, end);
-    }
-    else {
-      //Animate middle and with for better experience
-      return (
-        <Spring defaultValue={{
-      mid: {val: (this.last_end+this.last_start)/2},
-      halfWidth: {val: (this.last_end-this.last_start)/2}}}
-          endValue={{
-      mid: {val: (end+start)/2, config:springConfig},
-      halfWidth: {val: (end-start)/2, config: springConfig}}}>
-          {gb}
-        </Spring>
-      );
-    }
+                <div>Other stuff</div>
+              </div>
+            </Hammer>
+          </div>
+        }}
+      </Spring>
+    );
   }
-
 });
 
 module.exports = GenomeBrowser;
