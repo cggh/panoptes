@@ -1,7 +1,29 @@
+@import "./variables";
 .genome-browser {
-  height: 100%;
-  .tracks {
-    height: calc(100% - 100px);  //TODO Should be 100 minus control height
+  height: calc(100% - #{$topbar-height});
+  width: 100%;
+  .controls {
+    background: red;
+    height: $topbar-height;
+  }
+  .main-area {
+    position: relative;
+    height: calc(100% - #{$topbar-height});
+    .background {
+      z-index: 1;
+      position: absolute;
+      top:0;
+      left:0;
+    }
+    .tracks {
+      position: relative;
+      z-index: 2;
+      .fixed {
+      }
+      .scrolling {
+        //background: blue;
+      }
+    }
   }
 }
 
@@ -12,6 +34,7 @@
 }
 
 svg.scale {
+  background: white;
   .tick {
     text {
       text-anchor: middle;
@@ -28,3 +51,4 @@ svg.scale {
     }
   }
 }
+

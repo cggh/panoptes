@@ -17,10 +17,13 @@ var SessionStore = Fluxxor.createStore({
     else
       this.state = Immutable.Map();
     this.state = this.state.mergeDeep(Immutable.fromJS({
-        components: {
+        components: {'TEST': {
+          component: "containers/GenomeBrowserWithActions"
+        }
         },
         tabs: {
-          components: []
+          components: ['TEST'],
+          selectedTab: 'TEST'
         },
         popups: {
           components: [],
