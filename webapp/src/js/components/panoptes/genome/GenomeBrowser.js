@@ -9,6 +9,7 @@ const Hammer = require('react-hammerjs');
 const Spring = require('react-motion').Spring;
 
 const GenomeScale = require('panoptes/genome/GenomeScale');
+const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
 import 'genomebrowser.scss';
 
@@ -158,7 +159,11 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
+    console.log(this.config);
+    let { settings } = this.config;
     let { start, end, sideWidth, chromosome } = this.props;
+    if (!_.has(this.config.chromosomes, chromosome))
+      console.log('Unrecognised chromosome in genome browser', chromosome);
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     let pixelWidth = (end - start) / (width - sideWidth);
@@ -196,6 +201,10 @@ let GenomeBrowser = React.createClass({
                     <div className="tracks vertical stack">
                       <div className="fixed">
                         <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
+                        { settings.refSequenceSumm ?
+                          <ReferenceSequence start={start} end={end} width={width} sideWidth={sideWidth}/> :
+                          null }
+
                       </div>
                       <div className="grow scroll-within">
                       </div>

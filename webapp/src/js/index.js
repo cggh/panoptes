@@ -19,6 +19,8 @@ const injectTapEventPlugin = require("react-tap-event-plugin");
 
 const HelloWorld = require('ui/HelloWorld');
 
+require('console-polyfill');
+
 import 'normalize.css';
 
 //Needed for onTouchTap
