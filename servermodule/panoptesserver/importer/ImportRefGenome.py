@@ -12,6 +12,7 @@ from ProcessFilterBank import ProcessFilterBank
 from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
 from SettingsRefGenome import SettingsRefGenome
+import json
 
 def flattenarglist(arg):
     if isinstance(arg, list):
@@ -39,11 +40,14 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
 
         ImportRefGenomeSummaryData(calculationObject, datasetId, baseFolder, importSettings)
 
-        settings = SettingsRefGenome(os.path.join(folder, 'settings'))
+        settings = SettingsRefGenome(os.path.join(folder, 'settings'), validate=True)
         print('Settings: '+str(settings))
-        #Do we really need to do this?
-        #TODO
-        #ImpUtils.ImportGlobalSettings(calculationObject, datasetId, settings)
+
+        for token in settings.getLoadedSettings().keys():
+            val = settings[token]
+            if (type(val) is list) or (type(val) is dict):
+                val = json.dumps(val)
+            dao.saveSettings(token, val)
 
         conf = PanoptesConfig(calculationObject)
         # Import reference genome

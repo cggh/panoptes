@@ -585,6 +585,9 @@ class ImportSettings:
         '''The getSettings method should return an OrderedDict describing the configuration'''
         return
 
+    def getLoadedSettings(self):
+        return self._settings
+
     def _load(self, validate = True):
         
         self._propidMap = OrderedDict()
