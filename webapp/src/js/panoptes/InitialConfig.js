@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const API = require('panoptes/API');
 const SQL = require('panoptes/SQL');
+const attrMap = require('util/AttrMap');
 
 //TODO THIS WHOLE FILE SHOULD'T EXIST AS THIS SHOULD BE COMPILED SERVER SIDE AND SENT DOWN IN INDEX.HTML
 
@@ -96,8 +97,8 @@ let augmentTableInfo = function (table) {
       table.propertyGroups[groupInfo.Id] = caseChange(groupInfo);
     });
   }
-  table.fetchTableName = table.id  + 'CMB_' + workspace;
-  table.fetchSubsamplingTableName = table.id  + 'CMBSORTRAND_' + workspace;
+  table.fetchTableName = table.id + 'CMB_' + workspace;
+  table.fetchSubsamplingTableName = table.id + 'CMBSORTRAND_' + workspace;
 }
 
 let augment2DTableInfo = function (table) {
@@ -244,23 +245,23 @@ let parseCustomProperties = function () {
     });
 
     //Set a recommended encoder - legacy from 1.X
-    var encoding  = 'String';
-    if (prop.datatype=='Value') {
-      encoding  = 'Float3';
-      if ((prop.settings.decimDigits ==0 ) || (prop.isPrimKey))
-        encoding  = 'Int';
+    var encoding = 'String';
+    if (prop.datatype == 'Value') {
+      encoding = 'Float3';
+      if ((prop.settings.decimDigits == 0 ) || (prop.isPrimKey))
+        encoding = 'Int';
     }
-    if (prop.datatype=='HighPrecisionValue') {
-      encoding  = 'FloatH';
+    if (prop.datatype == 'HighPrecisionValue') {
+      encoding = 'FloatH';
     }
-    if ((prop.datatype=='Value') && (prop.propid==tableInfo.PositionField) && (tableInfo.hasGenomePositions) )
-      encoding  = 'Int';
-    if (prop.datatype=='Boolean')
-      encoding  = 'Int';
-    if ( (prop.datatype=='GeoLongitude') || (prop.datatype=='GeoLattitude') )
-      encoding  = 'Float4';
-    if ( (prop.datatype=='Date') )
-      encoding  = 'Float4';
+    if ((prop.datatype == 'Value') && (prop.propid == tableInfo.PositionField) && (tableInfo.hasGenomePositions))
+      encoding = 'Int';
+    if (prop.datatype == 'Boolean')
+      encoding = 'Int';
+    if ((prop.datatype == 'GeoLongitude') || (prop.datatype == 'GeoLattitude'))
+      encoding = 'Float4';
+    if ((prop.datatype == 'Date'))
+      encoding = 'Float4';
     prop.encoding = encoding;
 
     let encodingTypes = {
@@ -313,7 +314,7 @@ let parseCustomProperties = function () {
     prop.categoryColors = prop.settings.CategoryColors || prop.settings.categoryColors;
     prop.description = prop.settings.Description || "";
     prop.externalUrl = prop.settings.ExternalUrl;
-    prop.showBar = prop.settings.showBar || (prop.settings.BarWidth>0);
+    prop.showBar = prop.settings.showBar || (prop.settings.BarWidth > 0);
     prop.defaultWidth = prop.settings.DefaultWidth;
     prop.maxVal = prop.settings.MaxVal;
     prop.minVal = prop.settings.MinVal;
@@ -503,23 +504,30 @@ let fetchInitialConfig = function () {
       });
       parseSummaryValues();
     })
-  .then(parseCustomProperties)
-  //.then(() => {
-      //parse2DProperties();
-      //parseTableBasedSummaryValues();
-      //parseRelations();
-      //parseStoredSubsets();
+    .then(parseCustomProperties)
+    //.then(() => {
+    //parse2DProperties();
+    //parseTableBasedSummaryValues();
+    //parseRelations();
+    //parseStoredSubsets();
     //});
-  .then(() => {
+    .then(() => {
       let defaultQueries = {};
       let subsets = {};
-            _.each(fetchedConfig.tableCatalog, (table) => {
+      //Turn empty queries into trivial ones
+      _.each(fetchedConfig.tableCatalog, (table) => {
         if (table.defaultQuery != '')
           defaultQueries[table.id] = table.defaultQuery;
         else
           defaultQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
         subsets[table.id] = [];
       });
+      //Convert chromosome lengths to integer values
+      fetchedConfig.chromosomes = attrMap(_.map(fetchedConfig.chromosomes, (chrom) => {
+          return {id: chrom.id, len: parseFloat(chrom.len) * 1000000};
+        }
+      ), 'id');
+
       return caseChange(_.extend(initialConfig, {
         user: {
           id: initialConfig.userID,

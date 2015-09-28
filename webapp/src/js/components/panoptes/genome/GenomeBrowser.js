@@ -60,8 +60,9 @@ let GenomeBrowser = React.createClass({
   },
 
   scaleClamp(start, end, fracPos) {
+    let {chromosome} = this.props;
     let min = 0;
-    let max = 1000000;
+    let max = this.config.chromosomes[chromosome].len || 10000000;
     if (start <= min && end >= max) {
       start = min;
       end = max;
@@ -157,7 +158,7 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
-    let { start, end, sideWidth, chomosome } = this.props;
+    let { start, end, sideWidth, chromosome } = this.props;
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     let pixelWidth = (end - start) / (width - sideWidth);

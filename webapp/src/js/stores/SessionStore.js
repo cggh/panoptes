@@ -18,7 +18,11 @@ var SessionStore = Fluxxor.createStore({
       this.state = Immutable.Map();
     this.state = this.state.mergeDeep(Immutable.fromJS({
         components: {'TEST': {
-          component: "containers/GenomeBrowserWithActions"
+          component: "containers/GenomeBrowserWithActions",
+          props: {
+            chromosome : 'pf3D7_07_v3'
+
+          }
         }
         },
         tabs: {
