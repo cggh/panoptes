@@ -51,7 +51,7 @@ let GenomeScale = React.createClass({
 
     return (
       <div className="horizontal stack" style={{height:HEIGHT}}>
-          <Paper className="channel-side" zDepth={1}> Position(bp) </Paper>
+        <Paper className="channel-side" style={{width:`${sideWidth}px`}} zDepth={1}> Position(bp) </Paper>
         <div>
             <svg className="scale" width={width-sideWidth} height={HEIGHT}>
               {smallTicks}

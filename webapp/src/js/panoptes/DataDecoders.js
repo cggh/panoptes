@@ -11,6 +11,10 @@
  *************************************************************************************************************************************
  *************************************************************************************************************************************/
 
+function checkIsNumber(value) {
+  if (typeof value != 'number') throw Error('Expected number got' +(typeof value));
+}
+
 var DataDecoders = {};
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -152,14 +156,15 @@ DataDecoders.Encoder = {};
 
 DataDecoders.Encoder.FixedString = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.Len);
+  checkIsNumber(info.Len);
   that.length = parseFloat(info.Len);
   that.decodeArray = function (datastr) {
     var rs = [];
     var ct = datastr.length / this.length;
     for (var i = 0; i < ct; i++)
-      rs.push(datastr[i * this.length, (i + 1) * this.length])
+      rs.push(datastr.slice(i * this.length, (i + 1) * this.length))
     return rs;
+
   };
   that.decodeSingle = function (datastr, offset) {
     return datastr.substring(offset, offset + this.length);
@@ -190,7 +195,7 @@ DataDecoders.Encoder.Boolean = function (info) {
 
 DataDecoders.Encoder.Int2B64 = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.Len);
+  checkIsNumber(info.Len);
   that.length = parseFloat(info.Len);
   var _b64codec = DataDecoders.B64();
   that.decodeSingle = function (datastr, offset) {
@@ -205,9 +210,9 @@ DataDecoders.Encoder.Int2B64 = function (info) {
 
 DataDecoders.Encoder.Float2B64 = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.Len);
-  DQX.checkIsNumber(info.Offset);
-  DQX.checkIsNumber(info.Slope);
+  checkIsNumber(info.Len);
+  checkIsNumber(info.Offset);
+  checkIsNumber(info.Slope);
   that.offset = parseFloat(info.Offset);
   that.slope = parseFloat(info.Slope);
   that.length = parseFloat(info.Len);
@@ -226,9 +231,9 @@ DataDecoders.Encoder.Float2B64 = function (info) {
 
 DataDecoders.Encoder.FloatList2B64 = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.Count);
-  DQX.checkIsNumber(info.RangeOffset);
-  DQX.checkIsNumber(info.RangeSlope);
+  checkIsNumber(info.Count);
+  checkIsNumber(info.RangeOffset);
+  checkIsNumber(info.RangeSlope);
   that.rangeOffset = parseFloat(info.RangeOffset);
   that.rangeSlope = parseFloat(info.RangeSlope);
   that.count = parseInt(info.Count);
@@ -257,7 +262,7 @@ DataDecoders.Encoder.FloatList2B64 = function (info) {
 
 DataDecoders.Encoder.BooleanListB64 = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.Count);
+  checkIsNumber(info.Count);
   that.rangeSlope = parseFloat(info.RangeSlope);
   that.valueCount = parseInt(info.Count);
   that.byteCount = Math.floor((that.valueCount + 5) / 6.0)
@@ -284,8 +289,8 @@ DataDecoders.Encoder.BooleanListB64 = function (info) {
 
 DataDecoders.Encoder.MultiCatCount = function (info) {
   var that = {};
-  DQX.checkIsNumber(info.CatCount);
-  DQX.checkIsNumber(info.EncoderLen);
+  checkIsNumber(info.CatCount);
+  checkIsNumber(info.EncoderLen);
   that.catCount = parseInt(info.CatCount);
   that.encoderlen = parseInt(info.EncoderLen);
   var _b64codec = DataDecoders.B64();

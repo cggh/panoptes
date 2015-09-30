@@ -35,7 +35,7 @@ let GenomeBrowserWithActions = React.createClass({
       sidebar: true,
       chromosome: '',
       start: 0,
-      end:   1000,
+      end:   100,
       components: Immutable.OrderedMap()
     };
   },

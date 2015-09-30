@@ -20,7 +20,7 @@ var SessionStore = Fluxxor.createStore({
         components: {'TEST': {
           component: "containers/GenomeBrowserWithActions",
           props: {
-            chromosome : 'pf3D7_07_v3'
+            chromosome : 'Pf3D7_01_v3'
 
           }
         }

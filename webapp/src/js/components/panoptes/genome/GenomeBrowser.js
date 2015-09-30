@@ -159,7 +159,6 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
-    console.log(this.config);
     let { settings } = this.config;
     let { start, end, sideWidth, chromosome } = this.props;
     if (!_.has(this.config.chromosomes, chromosome))
@@ -200,9 +199,11 @@ let GenomeBrowser = React.createClass({
                     <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT} sideWidth={sideWidth}/>
                     <div className="tracks vertical stack">
                       <div className="fixed">
-                        <GenomeScale start={start} end={end} width={width} sideWidth={sideWidth}/>
+                        <GenomeScale start={start} end={end}
+                                     width={width} sideWidth={sideWidth}/>
                         { settings.refSequenceSumm ?
-                          <ReferenceSequence start={start} end={end} width={width} sideWidth={sideWidth}/> :
+                          <ReferenceSequence chromosome={chromosome} start={start} end={end}
+                                             width={width} sideWidth={sideWidth}/> :
                           null }
 
                       </div>

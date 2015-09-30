@@ -8,6 +8,8 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const SetSizeToParent = require('mixins/SetSizeToParent');
+const DataFetcherMixin = require('mixins/DataFetcherMixin');
+
 
 const Tooltip = require('rc-tooltip');
 import 'rc-tooltip/assets/bootstrap.css'
@@ -30,7 +32,8 @@ let DataTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    SetSizeToParent
+    SetSizeToParent,
+    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'start')
   ],
 
   propTypes: {
@@ -68,24 +71,7 @@ let DataTableView = React.createClass({
     };
   },
 
-  componentDidMount() {
-    this.getDataIfNeeded({}, this.props);
-  },
-  componentWillReceiveProps(nextProps) {
-    this.getDataIfNeeded(this.props, nextProps);
-  },
-
-  getDataIfNeeded(lastProps, nextProps) {
-    let queryKeys = ['table', 'query', 'columns', 'order', 'ascending', 'start'];
-    let update_needed = false;
-    queryKeys.forEach((key) => {
-      if (!Immutable.is(lastProps[key], nextProps[key]))
-        update_needed = true;
-    });
-    if (update_needed)
-      this.fetchData(nextProps);
-  },
-
+  //Called by DataFetcherMixin
   fetchData(props) {
     let { table, query, className, columns, order, ascending } = props;
     let tableConfig = this.config.tables[table];
@@ -102,8 +88,11 @@ let DataTableView = React.createClass({
         query: SQL.WhereClause.decode(query)
       })
         .then((data) => {
-          this.setState({loadStatus: 'loaded'});
-          this.setState({rows: data});
+          //Check our data is still relavent
+          if (Immutable.is(props, this.props)) {
+            this.setState({loadStatus: 'loaded'});
+            this.setState({rows: data});
+          }
         })
         .catch((error) => {
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
@@ -216,7 +205,6 @@ let DataTableView = React.createClass({
     let { query, className, columns, columnWidths } = this.props;
     let { loadStatus, rows, width, height } = this.state;
     let tableConfig = this.config.tables[this.props.table];
-    console.log(tableConfig)
     if (!tableConfig) {
       console.log(`Table ${this.props.table} doesn't exist'`);
       return null;

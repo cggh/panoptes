@@ -26,7 +26,11 @@ function caseChange(config) {
       let arr = [];
       _.forEach(value, (ele) => arr.push(caseChange(ele)));
       value = arr;
-    } else if (typeof value === "object" && key !== 'propertiesMap' && key !== 'propertyGroups') {
+    } else if (
+      typeof value === "object" &&
+      key !== 'propertiesMap' &&
+      key !== 'propertyGroups' &&
+      key !== 'chromosomes') {
       value = caseChange(value);
     }
     out[destKey] = value;

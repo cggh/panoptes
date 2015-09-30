@@ -1,3 +1,4 @@
+const Q = require('q');
 const Qajax = require('qajax');
 const _ = require('lodash');
 const LZString = require('lz-string');
@@ -10,7 +11,7 @@ const Base64 = require('panoptes/Base64');
 const serverURL = initialConfig.serverURL;
 
 //TODO: Refactor server errors to closer to HTTP standard
-function filterError(json) {
+function _filterError(json) {
   if (typeof(json) !== 'object') {
     if (json.indexOf('Authentication') > 0)
       throw Error('Client is not authenticated');
@@ -23,7 +24,7 @@ function filterError(json) {
     else
       throw Error(`Error: ${json.Error}`);
   }
-  return Promise.resolve(json);
+  return json;
 }
 
 function requestJSON(method, params = {}, data = null) {
@@ -31,13 +32,13 @@ function requestJSON(method, params = {}, data = null) {
   _.forOwn(params, function (val, id) {
     url += `&${id}=${val}`;
   });
-  return Qajax({url: url, method: method, data:data})
+  return Qajax({url: url, method: method, data: data})
     .then(Qajax.filterSuccess)
     .then(Qajax.toJSON)
-    .then(filterError)
+    .then(_filterError)
     .catch(err => {
-    throw Error(`There was a problem with a request to the server: ${err.statusText}`)
-  })
+      throw Error(`There was a problem with a request to the server: ${err.statusText}`)
+    });
 }
 
 function getRequestJSON(params = {}) {
@@ -48,7 +49,7 @@ function postRequestJSON(params = {}, data = null) {
 }
 
 
-function decodeValList(columns) {
+function _decodeValList(columns) {
   return function (json_response) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
@@ -58,6 +59,23 @@ function decodeValList(columns) {
     return ret;
   }
 }
+
+function _decodeSummaryList(columns) {
+  return function (json_response) {
+    let ret = {};
+    _.each(columns, (column, key) => {
+        let data = json_response.results[`${column.folder}_${column.config}_${column.name}`];
+        //For better or worse we imitate the original behaviour of passing on a lack of data
+        if (data)
+          ret[key] = DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data);
+        else
+          ret[key] = null;
+      }
+    );
+    return ret;
+  };
+}
+
 
 function pageQuery(options) {
   assertRequired(options, ['database', 'table', 'columns']);
@@ -91,10 +109,11 @@ function pageQuery(options) {
     limit: `${start}~${stop}`,
     distinct: distinct ? '1' : '0'
   })
-    .then(decodeValList(columns))
+    .then(_decodeValList(columns))
+    //Transpose into rows
     .then((columns) => {
       let rows = [];
-      for (let i=0;i < columns[_.keys(columns)[0]].length; i++) {
+      for (let i = 0; i < columns[_.keys(columns)[0]].length; i++) {
         let row = {};
         _.each(columns, (array, id) => row[id] = array[i]);
         rows.push(row);
@@ -103,13 +122,37 @@ function pageQuery(options) {
     });
 }
 
+function summaryData(options) {
+  assertRequired(options, ['chromosome', 'columns', 'blocksize', 'blockstart', 'blockcount']);
+  let defaults = {};
+  let {chromosome, columns, blocksize, blockstart, blockcount} = _.extend(defaults, options);
+
+  let collist = "";
+  _.each(columns, (column) => {
+    if (collist.length > 0) collist += "~";
+    collist += `${column.folder}~${column.config}~${column.name}`;
+  });
+
+  return getRequestJSON({
+    datatype: 'summinfo',
+    dataid: chromosome,
+    ids: collist,
+    blocksize: blocksize,
+    blockstart: blockstart,
+    blockcount: blockcount
+  })
+    .then(_decodeSummaryList(columns))
+    .delay(0);
+}
+
+
 function storeData(data) {
   data = Base64.encode(JSON.stringify(data));
   return postRequestJSON({datatype: 'storedata'}, data).then((resp) => resp.id);
 }
 
 function fetchData(id) {
-  return getRequestJSON({datatype: 'fetchstoredata', id:id}).then((resp) => JSON.parse(Base64.decode(resp.content)));
+  return getRequestJSON({datatype: 'fetchstoredata', id: id}).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
 
@@ -118,5 +161,6 @@ module.exports = {
   getRequestJSON: getRequestJSON,
   pageQuery: pageQuery,
   storeData: storeData,
-  fetchData: fetchData
+  fetchData: fetchData,
+  summaryData: summaryData
 };
