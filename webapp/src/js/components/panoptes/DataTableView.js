@@ -23,7 +23,7 @@ const Loading = require('ui/Loading');
 const TooltipEllipsis = require('ui/TooltipEllipsis');
 const Icon = require('ui/Icon');
 
-const MAX_COLOR = Color("#00BCD4");
+const MAX_COLOR = Color("#44aafb");
 
 let DataTableView = React.createClass({
   mixins: [
@@ -173,10 +173,10 @@ let DataTableView = React.createClass({
     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
       let percent = 100*(cellData - minVal)/(maxVal-minVal);
-      background = `linear-gradient(to right, ${rowIndex % 2 ? "#aee2e8" : "#B2EBF2"} ${percent}%, rgba(0,0,0,0) ${percent}%`
+      background = `linear-gradient(to right, ${rowIndex % 2 ? "rgb(115, 190, 252)" : "rgb(150, 207, 253)"} ${percent}%, rgba(0,0,0,0) ${percent}%`
     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
       let clippedCellData = Math.min(Math.max(parseFloat(cellData),minVal),maxVal);
-      background = MAX_COLOR.clone().lighten(1.37*(1-(clippedCellData - minVal)/(maxVal-minVal))).rgbString();
+      background = MAX_COLOR.clone().lighten(0.58*(1-(clippedCellData - minVal)/(maxVal-minVal))).rgbString();
     }
     if (categoryColors) {
       let col = categoryColors[cellData] || categoryColors['_other_'];
@@ -216,6 +216,7 @@ let DataTableView = React.createClass({
     let { query, className, columns, columnWidths } = this.props;
     let { loadStatus, rows, width, height } = this.state;
     let tableConfig = this.config.tables[this.props.table];
+    console.log(tableConfig)
     if (!tableConfig) {
       console.log(`Table ${this.props.table} doesn't exist'`);
       return null;
