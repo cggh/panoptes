@@ -186,6 +186,7 @@ let GenomeBrowser = React.createClass({
           return (
             <div className="genome-browser">
               <div className="controls">
+                Controls go here eventually CHROM ZOOM PAN GOTO .
               </div>
                 <Hammer
                   ref={(c) => this.root_hammer = c}

@@ -43,12 +43,11 @@ body {
       overflow: visible;
       z-index: 1;
       height: 50px;
-      background: linear-gradient(to right, #000000 0%, #757575 100%);
+      background: white;
 
       .title {
         flex: 1;
         margin: 25px;
-        color: white;
         font-weight: bold;
         font-size: large;
       }
@@ -59,7 +58,6 @@ body {
 
       .username {
         margin: 7px;
-        color: white;
         font-weight: bold;
       }
     }

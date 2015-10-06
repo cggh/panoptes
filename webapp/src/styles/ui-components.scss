@@ -7,7 +7,7 @@
   .tab-content {
     position: relative;
     width: 100%;
-    height: calc(100% - #{$topbar-height});
+    height: calc(100% - #{$tab-height} - 4px); /*4px for the border*/
     .tab-pane {
       display: block;
       position: absolute;
@@ -34,55 +34,57 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    min-height: $topbar-height;
-    background: linear-gradient(to right, #000000 0%, #757575 100%);
+    min-height: $tab-height;
+    border-bottom: 4px solid $primary-color;
     .tab {
+      font-size: 15px;
       display: flex;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
       margin-right: 2px;
       margin-left: 2px;
       cursor: pointer;
       top: 1px;
-      font-weight: bold;
-      opacity: 0.7;
       overflow: hidden;
       white-space: nowrap;
-      color: rgb(255, 255, 255);
-      background: $primary-color;
       min-width: 100px;
-      max-width: 200px;
+      max-width: 250px;
+      padding-left: 10px;
+      padding-right: 10px;
       .title {
         flex: 1;
         vertical-align: middle;
-        line-height: $topbar-height;
+        line-height: $tab-height;
         text-overflow: ellipsis;
         overflow: hidden;
       }
     }
     .tab.active {
       top: 0;
-      //color: rgb(0, 0, 0);
-      opacity: inherit;
+      background: $primary-color;
+      color: rgb(255, 255, 255);
+      .icon .bitmap {
+        filter: invert(100%);
+      }
     }
     .tab.inactive:hover {
-      opacity: 0.9;
+      background: $light-primary-color;
+      color: rgb(255, 255, 255);
+      .icon .bitmap {
+        filter: invert(100%);
+      }
     }
     .tab.inactive .action {
       visibility: hidden;
     }
     .icon {
-      line-height: $topbar-height;
-      color: white;
-      margin-left: 7px;
+      line-height: $tab-height;
+      margin-left:  5px;
       margin-right: 5px;
-      opacity: 0.3;
+      opacity: 0.5;
       .bitmap {
         transform: translate(0px, 3px);
-        filter: invert(100%);
       }
     }
-    .icon:hover {
+    .icon.close:hover {
       opacity: 1;
     }
   }
