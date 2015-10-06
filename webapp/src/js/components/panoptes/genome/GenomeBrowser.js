@@ -6,7 +6,7 @@ const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const Hammer = require('react-hammerjs');
-const Spring = require('react-motion').Spring;
+const { Motion, spring } = require('react-motion');
 
 const GenomeScale = require('panoptes/genome/GenomeScale');
 const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
@@ -168,16 +168,16 @@ let GenomeBrowser = React.createClass({
     let pixelWidth = (end - start) / (width - sideWidth);
     //Animate middle and with for better experience
     let endValue = {
-      mid: {val: (end + start) / 2, config: springConfig},
-      halfWidth: {val: (end - start) / 2, config: springConfig}
+      mid: spring((end + start) / 2, springConfig),
+      halfWidth: spring((end - start) / 2, springConfig)
     };
     return (
-      <Spring ref="spring"
-              endValue={endValue}
-              defaultValue={endValue}>
-        {(tweens) => {
-          start = tweens.mid.val - tweens.halfWidth.val;
-          end = tweens.mid.val + tweens.halfWidth.val;
+      <Motion ref="spring"
+              style={endValue}
+              defaultStyle={endValue}>
+        {(interpolated) => {
+          start = interpolated.mid - interpolated.halfWidth;
+          end = interpolated.mid + interpolated.halfWidth;
           //Round to nearest pixel to stop unneeded updates
           start = Math.floor(start / pixelWidth) * pixelWidth;
           end = Math.ceil(end / pixelWidth) * pixelWidth;
@@ -214,9 +214,8 @@ let GenomeBrowser = React.createClass({
                 </Hammer>
               </div>
           )
-
         }}
-      </Spring>
+      </Motion>
     );
   }
 });

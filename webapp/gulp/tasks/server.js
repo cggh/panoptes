@@ -12,7 +12,7 @@ gulp.task("webpack-dev-server", function(callback) {
   myConfig.devtool = "eval";
   myConfig.debug = true;
   myConfig.entry.panoptes = myConfig.entry.panoptes.concat(['webpack/hot/dev-server']);
-  myConfig.module.loaders[0].loaders = ['react-hot', 'babel?optional[]=runtime&stage=1']
+  myConfig.module.loaders[0].loaders = ['react-hot', 'babel?optional[]=runtime&stage=1'];
   myConfig.plugins = [
     new HtmlWebpackPlugin( {
       template: path.resolve(__dirname, "../../src/index.html"),
@@ -46,7 +46,7 @@ gulp.task("webpack-prodtest-server", function(callback) {
     stats: {
       colors: true
     }
-  }).listen(8080, "localhost", function(err) {
+  }).listen(8080, "0.0.0.0", function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
       gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/index.html");
     });

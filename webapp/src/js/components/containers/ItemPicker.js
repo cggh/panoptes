@@ -6,8 +6,6 @@ const classNames = require('classnames');
 const Highlight = require('react-highlighter');
 
 const {TextField, RaisedButton, List, Paper, ListItem} = require('material-ui');
-import mui from 'material-ui';
-const ThemeManager = new mui.Styles.ThemeManager();
 
 const Icon = require("ui/Icon");
 
