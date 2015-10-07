@@ -9,25 +9,19 @@
     width: 100%;
     height: calc(100% - #{$tab-height} - 4px); /*4px for the border*/
     .tab-pane {
-      display: block;
+      display: none;
       position: absolute;
       top: 0;
       left: 0;
-      visibility: hidden;
       overflow: hidden;
       clear: both;
-      //z-index:1; Not sure why this was here
       padding: 10px 5px;
       width: 100%;
       height: 100%;
-
-    }
-    .tab-pane * {
-      transition: none !important;
     }
     .tab-pane.active {
-      visibility: visible;
       overflow: auto;
+      display: block;
     }
   }
   .tabs {
