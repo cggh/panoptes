@@ -1,6 +1,5 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
-const {Paper} = require('material-ui');
 const tickWidth = require('panoptes/TickWidth.js');
 
 const d3 = require('d3');
@@ -51,7 +50,7 @@ let GenomeScale = React.createClass({
 
     return (
       <div className="horizontal stack" style={{height:HEIGHT}}>
-        <Paper className="channel-side" style={{width:`${sideWidth}px`}} zDepth={1}> Position(bp) </Paper>
+        <div className="channel-side" style={{width:`${sideWidth}px`}}> Position(bp) </div>
         <div>
             <svg className="scale" width={width-sideWidth} height={HEIGHT}>
               {smallTicks}

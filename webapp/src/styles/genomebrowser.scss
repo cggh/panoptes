@@ -1,9 +1,28 @@
 @import "./variables";
 .genome-browser {
-  height: calc(100% - #{$topbar-height});
+  height: calc(100% - 40px);
   width: 100%;
   .controls {
-    height: $topbar-height;
+    height: 40px;
+    line-height: 40px;
+    span {
+      select {
+        line-height: normal;
+        padding-right: 15px;
+      }
+    }
+    .loading-canvas {
+      //opacity: 0;
+      transition: opacity .5s ease-in-out;
+    }
+    .loading-canvas.loading {
+      opacity: 1;
+    }
+  }
+  .controls > * {
+    vertical-align: middle;
+    padding-left: 10px;
+
   }
   .main-area {
     position: relative;
@@ -16,7 +35,7 @@
     }
     .tracks {
       position: relative;
-      z-index: 2;
+      z-index: 1;
       .fixed {
       }
       .scrolling {
@@ -25,37 +44,40 @@
       .channel-side {
         padding: 12px;
         height: 100%;
+        background: white;
       }
       .channel-canvas {
         overflow: hidden;
       }
     }
   }
-}
-
-
-svg.scale {
-  background: white;
-  .tick {
-    text {
-      text-anchor: middle;
-      alignment-baseline: text-before-edge;
+  svg.scale {
+    background: white;
+    .tick {
+      text {
+        text-anchor: middle;
+        alignment-baseline: text-before-edge;
+      }
+      line {
+        stroke: darkgrey;
+        stroke-width: 1px;
+      }
     }
-    line {
-      stroke: darkgrey;
-      stroke-width: 1px;
-    }
-  }
-  .major  {
-    line {
-      stroke-width: 2px;
+    .major  {
+      line {
+        stroke-width: 2px;
+      }
     }
   }
+
+  .sequence-canvas {
+    will-change: transform;
+    image-rendering: optimizeSpeed;
+    image-rendering: pixelated;
+    transform-origin: top left;
+  }
+
 }
 
-canvas {
-  image-rendering: optimizeSpeed;
-  image-rendering: pixelated;
-  transform-origin: top left;
-}
+
 

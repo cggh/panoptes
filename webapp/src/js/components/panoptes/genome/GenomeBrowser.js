@@ -9,6 +9,7 @@ const Hammer = require('react-hammerjs');
 const { Motion, spring } = require('react-motion');
 
 const GenomeScale = require('panoptes/genome/GenomeScale');
+const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
 const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
 import 'genomebrowser.scss';
@@ -38,7 +39,8 @@ let GenomeBrowser = React.createClass({
 
   getInitialState() {
     return {
-      springConfig: DEFAULT_SPRING
+      springConfig: DEFAULT_SPRING,
+      loading: 0
     }
   },
 
@@ -115,9 +117,9 @@ let GenomeBrowser = React.createClass({
   },
 
   handleMouseWheel(e) {
-      this.handleZoom(e.clientX - offset(e.currentTarget).left, e.deltaY);
-      e.stopPropagation();
-      e.preventDefault();
+    this.handleZoom(e.clientX - offset(e.currentTarget).left, e.deltaY);
+    e.stopPropagation();
+    e.preventDefault();
   },
   handleDoubleTap(e) {
     this.handleZoom(e.center.x - offset(this.root_hammer.getDOMNode()).left, -100)
@@ -158,9 +160,17 @@ let GenomeBrowser = React.createClass({
     this.props.componentUpdate({start: start, end: end});
   },
 
+  handleChangeLoadStatus(status) {
+    if (status === 'LOADING')
+      this.setState({loading: this.state.loading + 1});
+    if (status === 'DONE')
+      this.setState({loading: this.state.loading - 1});
+  },
+
   render() {
     let { settings } = this.config;
     let { start, end, sideWidth, chromosome } = this.props;
+    let { loading } = this.state;
     if (!_.has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
     let {width, height, springConfig} = this.state;
@@ -186,34 +196,48 @@ let GenomeBrowser = React.createClass({
           return (
             <div className="genome-browser">
               <div className="controls">
-                Controls go here eventually CHROM ZOOM PAN GOTO .
+                <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+                <span> Chromosome: </span>
+                <span>
+                  <select ref="property" value={chromosome} onChange={this.handlePropertyChange}>
+                    {_.map(this.config.chromosomes, (length, name) =>
+                        <option key={name}
+                                value={name}>
+                          {name}
+                        </option>
+                    )}
+                  </select>
+                </span>
               </div>
-                <Hammer
-                  ref={(c) => this.root_hammer = c}
-                  onDoubleTap={this.handleDoubleTap}
-                  onPan={this.handlePan}
-                  vertical={true}
-                  onPinch={(e) => console.log('2',e)}
-                  onWheel={this.handleMouseWheel}
-                  >
-                  <div className="main-area">
-                    <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT} sideWidth={sideWidth}/>
-                    <div className="tracks vertical stack">
-                      <div className="fixed">
-                        <GenomeScale start={start} end={end}
-                                     width={width} sideWidth={sideWidth}/>
-                        { settings.refSequenceSumm ?
-                          <ReferenceSequence chromosome={chromosome} start={start} end={end}
-                                             width={width} sideWidth={sideWidth}/> :
-                          null }
+              <Hammer
+                ref={(c) => this.root_hammer = c}
+                onDoubleTap={this.handleDoubleTap}
+                onPan={this.handlePan}
+                vertical={true}
+                onPinch={(e) => console.log('2',e)}
+                onWheel={this.handleMouseWheel}
+                >
+                <div className="main-area">
+                  <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
+                              sideWidth={sideWidth}/>
 
-                      </div>
-                      <div className="grow scroll-within">
-                      </div>
+                  <div className="tracks vertical stack">
+                    <div className="fixed">
+                      <GenomeScale start={start} end={end}
+                                   width={width} sideWidth={sideWidth}/>
+                      { settings.refSequenceSumm ?
+                        <ReferenceSequence chromosome={chromosome} start={start} end={end}
+                                           width={width} sideWidth={sideWidth}
+                                           onChangeLoadStatus={this.handleChangeLoadStatus}/> :
+                        null }
+
+                    </div>
+                    <div className="grow scroll-within">
                     </div>
                   </div>
-                </Hammer>
-              </div>
+                </div>
+              </Hammer>
+            </div>
           )
         }}
       </Motion>

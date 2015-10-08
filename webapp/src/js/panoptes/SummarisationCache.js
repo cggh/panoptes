@@ -1,6 +1,7 @@
 const LRUCache = require('util/LRUCache');
 const API = require('panoptes/API');
 const Q = require('q');
+const {assertRequired} = require('util/Assert');
 
 const FETCH_SIZE = 10000;
 
@@ -30,7 +31,9 @@ let intervalsFromRange = (start, end, size) => {
 };
 
 let SummarisationCache = {
-  fetch(columns, minBlockSize, chromosome, start, end, targetPointCount, invalidationID) {
+  fetch(options) {
+    assertRequired(options, ['columns', 'minBlockSize', 'chromosome', 'start', 'end', 'targetPointCount', 'invalidationID']);
+    let { columns, minBlockSize, chromosome, start, end, targetPointCount, invalidationID } = options;
     let optimalBlockSize = findOptimalBlockSize(start, end, targetPointCount, minBlockSize);
     let [blockStart, blockEnd] = blockStartEnd(start, end, optimalBlockSize);
     let promises = _.map(intervalsFromRange(blockStart, blockEnd, FETCH_SIZE), (sliceStart) =>
@@ -74,8 +77,9 @@ let SummarisationCache = {
         );
       return {
         columns: data,
-        start: blockStart * optimalBlockSize,
-        step: optimalBlockSize
+        dataStart: blockStart * optimalBlockSize,
+        dataStep: optimalBlockSize,
+        chromosome: chromosome
       }
     };
 
