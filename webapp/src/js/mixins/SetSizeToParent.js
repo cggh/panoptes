@@ -1,4 +1,4 @@
-
+const ReactDOM =require('react-dom');
 const detectResize = require('util/DetectElementResize');
 
 var SetSizeToParent = {
@@ -11,15 +11,15 @@ var SetSizeToParent = {
 
   componentDidMount : function(){
     this._onResize();
-    detectResize.addResizeListener(this.getDOMNode().parentNode, this._onResize);
+    detectResize.addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
   },
 
   componentWillUnmount : function(){
-    detectResize.removeResizeListener(this.getDOMNode().parentNode, this._onResize);
+    detectResize.removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
   },
 
   _onResize : function() {
-    var node = this.getDOMNode();
+    var node = ReactDOM.findDOMNode(this);
 
     this.setState({
       width:node.offsetWidth,

@@ -26,14 +26,8 @@ import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
 
-
-
-
-
 let dynreq = require.context(".", true);
 const dynamic_require = (path) => dynreq("./"+path);
-
-window.Perf = React.addons.Perf;
 
 let Panoptes = React.createClass({
   mixins: [
@@ -67,6 +61,7 @@ let Panoptes = React.createClass({
       muiTheme: ThemeManager.getMuiTheme(RawTheme)
     };
   },
+
 
   render() {
     let actions = this.getFlux().actions.session;

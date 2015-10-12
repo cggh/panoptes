@@ -157,7 +157,7 @@ let Criterion = React.createClass({
 
   handlePropertyChange() {
     let {component, onChange} = this.props;
-    component.ColName = this.refs.property.getDOMNode().value;
+    component.ColName = this.refs.property.value;
     let property = this.config.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
@@ -169,7 +169,7 @@ let Criterion = React.createClass({
 
   handleOperatorChange() {
     let {component, onChange} = this.props;
-    component.type = this.refs.operator.getDOMNode().value;
+    component.type = this.refs.operator.value;
     this.validateOperatorAndValues();
     onChange();
   },
@@ -182,30 +182,30 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error("SQL Critiera operator not valid");
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = Deformatter(property, this.refs.value.getDOMNode().value);
-      this.setState({CompValue: this.refs.value.getDOMNode().value});
+      component.CompValue = Deformatter(property, this.refs.value.value);
+      this.setState({CompValue: this.refs.value.value});
     }
     else if (currentOperator.fieldType === 'minMax') {
-      component.CompValueMin = Deformatter(property, this.refs.min.getDOMNode().value);
-      component.CompValueMax = Deformatter(property, this.refs.max.getDOMNode().value);
+      component.CompValueMin = Deformatter(property, this.refs.min.value);
+      component.CompValueMax = Deformatter(property, this.refs.max.value);
       this.setState({
-        CompValueMin: this.refs.min.getDOMNode().value,
-        CompValueMax: this.refs.max.getDOMNode().value
+        CompValueMin: this.refs.min.value,
+        CompValueMax: this.refs.max.value
       });
     }
     else if (currentOperator.fieldType === 'otherColumn')
-      component.ColName2 = this.refs.otherColumn.getDOMNode().value;
+      component.ColName2 = this.refs.otherColumn.value;
     else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
-      component.ColName2 = this.refs.otherColumn.getDOMNode().value;
-      component.Factor = this.refs.scale.getDOMNode().value;
-      component.Offset = this.refs.offset.getDOMNode().value;
+      component.ColName2 = this.refs.otherColumn.value;
+      component.Factor = this.refs.scale.value;
+      component.Offset = this.refs.offset.value;
       this.setState({
-        Factor: this.refs.min.getDOMNode().value,
-        Offset: this.refs.max.getDOMNode().value
+        Factor: this.refs.min.value,
+        Offset: this.refs.max.value
       });
     }
     else if (currentOperator.fieldType === 'subset')
-      component.Subset = this.refs.subset.getDOMNode().value;
+      component.Subset = this.refs.subset.value;
     onChange();
   },
 

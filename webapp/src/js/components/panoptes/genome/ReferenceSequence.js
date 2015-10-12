@@ -117,13 +117,11 @@ let SequenceSquares = React.createClass({
   ],
 
   componentDidMount() {
-    var canvas = this.getDOMNode();
-    this.paint(canvas);
+    this.paint(this.refs.canvas);
   },
 
   componentDidUpdate() {
-    var canvas = this.getDOMNode();
-    this.paint(canvas);
+    this.paint(this.refs.canvas);
   },
 
   paint(canvas) {
@@ -170,7 +168,8 @@ let SequenceSquares = React.createClass({
     let scale = d3.scale.linear().domain([start, end]).range([0, width]);
     let stepWidth = scale(dataStep) - scale(0);
     let offset = scale(dataStart) - scale(start);
-    return <canvas className="sequence-canvas"
+    return <canvas ref="canvas"
+                   className="sequence-canvas"
                    style={{transform:`translateX(${offset}px) scale(${stepWidth},${height})`}} width={sequence.length}
                    height={1}/>;
   }

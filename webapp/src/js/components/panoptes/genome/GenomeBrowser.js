@@ -1,4 +1,5 @@
 const React = require('react');
+const ReactDOM = require('react-dom');
 const offset = require("bloody-offset");
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
@@ -122,12 +123,12 @@ let GenomeBrowser = React.createClass({
     e.preventDefault();
   },
   handleDoubleTap(e) {
-    this.handleZoom(e.center.x - offset(this.root_hammer.getDOMNode()).left, -100)
+    this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.root_hammer)).left, -100);
   },
   handlePan(e) {
     let start = this.actual_start;
     let end = this.actual_end;
-    let panStartPixel = (e.center.x - e.deltaX) - offset(this.root_hammer.getDOMNode()).left;
+    let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.root_hammer)).left;
     if (this.panStartPixel !== panStartPixel) {
       this.panStartPixel = panStartPixel;
       this.panStartGenome = [start, end];
@@ -167,6 +168,10 @@ let GenomeBrowser = React.createClass({
       this.setState({loading: this.state.loading - 1});
   },
 
+  handleChromosomeChange(e) {
+    console.log(e);
+  },
+
   render() {
     let { settings } = this.config;
     let { start, end, sideWidth, chromosome } = this.props;
@@ -199,7 +204,7 @@ let GenomeBrowser = React.createClass({
                 <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
                 <span> Chromosome: </span>
                 <span>
-                  <select ref="property" value={chromosome} onChange={this.handlePropertyChange}>
+                  <select ref="property" value={chromosome} onChange={this.handleChromosomeChange}>
                     {_.map(this.config.chromosomes, (length, name) =>
                         <option key={name}
                                 value={name}>

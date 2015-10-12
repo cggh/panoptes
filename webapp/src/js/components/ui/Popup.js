@@ -112,7 +112,7 @@ let Popup = React.createClass({
               <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
-              {React.addons.cloneWithProps(children, {ref: 'child' })}
+              {React.cloneElement(children, {ref: 'child' })}
             </div>
             <div className="popup-drag"></div>
           </div>

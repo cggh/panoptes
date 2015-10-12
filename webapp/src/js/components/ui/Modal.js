@@ -1,4 +1,5 @@
 const React = require('react');
+const ReactDOM =require('react-dom');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const classNames = require('classnames');
 const Icon = require('ui/Icon');
@@ -56,7 +57,7 @@ var Modal = React.createClass({
   },
 
   handleOverlayClick(e) {
-    if (e.target === this.refs.overlay.getDOMNode() && this.props.closable) {
+    if (e.target === ReactDOM.findDOMNode(this.refs.overlay) && this.props.closable) {
       e.preventDefault();
       e.stopPropagation();
       if (this.props.onClose)
@@ -98,7 +99,7 @@ var Modal = React.createClass({
             {!unclosable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
           </div>
           <div className="popup-body">
-            {React.addons.cloneWithProps(children, {ref: 'child' })}
+            {React.cloneElement(children, {ref: 'child' })}
           </div>
         </div>
       </div>)

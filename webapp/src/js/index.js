@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const React = require('react');
+const ReactDOM = require('react-dom');
 const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');
 const Panoptes = require('components/Panoptes.js');
@@ -109,7 +110,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
-    React.render(<Panoptes flux={flux} config={config}/>, document.getElementById('main'));
+    ReactDOM.render(<Panoptes flux={flux} config={config}/>, document.getElementById('main'));
   }).done();
 
 

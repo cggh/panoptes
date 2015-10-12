@@ -12,8 +12,7 @@ let LoadingIndicator = React.createClass({
 
 
   componentDidMount() {
-    var canvas = this.getDOMNode();
-    this.paint(canvas, now()/100 % 100);
+    this.paint(this.refs.canvas, now()/100 % 100);
     if (this.props.animate)
       this.raf = RAF(this.onTick);
   },
@@ -33,8 +32,7 @@ let LoadingIndicator = React.createClass({
   },
 
   onTick() {
-    var canvas = this.getDOMNode();
-    this.paint(canvas, now()/100 % 100);
+    this.paint(this.refs.canvas, now()/100 % 100);
     this.raf = RAF(this.onTick);
   },
 
@@ -86,7 +84,8 @@ let LoadingIndicator = React.createClass({
   },
 
   render() {
-    return <canvas className={classnames({
+    return <canvas ref="canvas"
+                   className={classnames({
                                 'loading-canvas': true,
                                 'loading': this.props.animate
                               })}
