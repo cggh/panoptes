@@ -213,6 +213,10 @@ let GenomeBrowser = React.createClass({
                     )}
                   </select>
                 </span>
+                <input type="number" onSelect={(e) => {
+                console.log('b');
+                
+                }}/>
               </div>
               <Hammer
                 ref={(c) => this.root_hammer = c}

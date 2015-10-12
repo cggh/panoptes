@@ -82,7 +82,7 @@ let Panoptes = React.createClass({
           </div>
           <div className="body">
             <TabbedArea activeTab={tabs.get('selectedTab')}
-                        onSelect={actions.tabSwitch}
+                        onSwitch={actions.tabSwitch}
                         onClose={actions.tabClose}
                         onAddTab={actions.tabOpen}
                         onDragAway={actions.tabPopOut}
