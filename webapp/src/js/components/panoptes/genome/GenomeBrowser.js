@@ -11,6 +11,7 @@ const { Motion, spring } = require('react-motion');
 
 const GenomeScale = require('panoptes/genome/GenomeScale');
 const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
+const Controls = require('panoptes/genome/Controls');
 const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
 import 'genomebrowser.scss';
@@ -31,11 +32,11 @@ let GenomeBrowser = React.createClass({
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    components: ImmutablePropTypes.orderedMap,
-    sideWidth: React.PropTypes.number
+    chromosome: React.PropTypes.string.isRequired,
+    start: React.PropTypes.number.isRequired,
+    end: React.PropTypes.number.isRequired,
+    components: ImmutablePropTypes.orderedMap.isRequired,
+    sideWidth: React.PropTypes.number.isRequired
   },
 
   getInitialState() {
@@ -200,24 +201,8 @@ let GenomeBrowser = React.createClass({
           this.actual_end = end;
           return (
             <div className="genome-browser">
-              <div className="controls">
-                <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
-                <span> Chromosome: </span>
-                <span>
-                  <select ref="property" value={chromosome} onChange={this.handleChromosomeChange}>
-                    {_.map(this.config.chromosomes, (length, name) =>
-                        <option key={name}
-                                value={name}>
-                          {name}
-                        </option>
-                    )}
-                  </select>
-                </span>
-                <input type="number" onSelect={(e) => {
-                console.log('b');
-                
-                }}/>
-              </div>
+              <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+              <Controls {...this.props} />
               <Hammer
                 ref={(c) => this.root_hammer = c}
                 onDoubleTap={this.handleDoubleTap}
