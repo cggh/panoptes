@@ -20,7 +20,7 @@ const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
 const NO_SPRING = [2000, 80];
 const MIN_WIDTH = 50;
-
+const FALLBACK_MAXIMUM = 1000000000;
 const CONTROLS_HEIGHT = 33;
 
 let GenomeBrowser = React.createClass({
@@ -36,7 +36,8 @@ let GenomeBrowser = React.createClass({
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     components: ImmutablePropTypes.orderedMap.isRequired,
-    sideWidth: React.PropTypes.number.isRequired
+    sideWidth: React.PropTypes.number.isRequired,
+    chromPositions: ImmutablePropTypes.map  //Stores the position on each chrom so you can flick back without losing place
   },
 
   getInitialState() {
@@ -48,9 +49,11 @@ let GenomeBrowser = React.createClass({
 
   componentWillMount() {
     this.panStartPixel = null;
+    this.validateAndAdjustView(this.props);
   },
 
   componentWillReceiveProps(nextProps) {
+    this.validateAndAdjustView(nextProps);
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;
@@ -64,10 +67,33 @@ let GenomeBrowser = React.createClass({
     this.actual_end = this.props.end;
   },
 
+  validateAndAdjustView(newProps) {
+    let { chromosome, start, end } = newProps;
+    let chromChanged = (chromosome !== this.props.chromosome);
+    let startChanged = (start !== this.props.start);
+    let endChanged =  (end !== this.props.end);
+    start = Math.max(start, 0);
+    end = Math.min(end, this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM);
+    let frac = 0.5;
+    if (startChanged && !endChanged && !chromChanged) {
+      frac = 0;
+    } if (!startChanged && endChanged && !chromChanged) {
+      frac = 1;
+    }
+    [start, end] = this.scaleClamp(start, end, frac);
+    if (start !== newProps.start || end !== newProps.end) {
+      newProps.componentUpdate({
+        start: start,
+        end: end
+      });
+    }
+  },
+
+
   scaleClamp(start, end, fracPos) {
     let {chromosome} = this.props;
     let min = 0;
-    let max = this.config.chromosomes[chromosome].len || 10000000;
+    let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
     if (start <= min && end >= max) {
       start = min;
       end = max;
@@ -169,8 +195,12 @@ let GenomeBrowser = React.createClass({
       this.setState({loading: this.state.loading - 1});
   },
 
-  handleChromosomeChange(e) {
-    console.log(e);
+  handleViewChange(chromosome, start, end) {
+    this.props.componentUpdate({
+      chromosome: chromosome,
+      start: start,
+      end: end
+    })
   },
 
   render() {
@@ -201,8 +231,10 @@ let GenomeBrowser = React.createClass({
           this.actual_end = end;
           return (
             <div className="genome-browser">
-              <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
-              <Controls {...this.props} />
+              <div className="control-bar">
+                <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+                <Controls {...this.props} onChange={this.handleViewChange}/>
+              </div>
               <Hammer
                 ref={(c) => this.root_hammer = c}
                 onDoubleTap={this.handleDoubleTap}

@@ -2,15 +2,9 @@
 .genome-browser {
   height: calc(100% - 40px);
   width: 100%;
-  .controls {
+  .control-bar {
     height: 40px;
     line-height: 40px;
-    span {
-      select {
-        line-height: normal;
-        padding-right: 15px;
-      }
-    }
     .loading-canvas {
       //opacity: 0;
       transition: opacity .5s ease-in-out;
@@ -18,11 +12,25 @@
     .loading-canvas.loading {
       opacity: 1;
     }
+    .controls {
+      span {
+        select {
+          line-height: normal;
+          padding-right: 15px;
+        }
+        input {
+          width: 100px;
+        }
+      }
+
+    }
+    .controls > * {
+      padding-left: 10px;
+    }
   }
-  .controls > * {
+  .control-bar > * {
     vertical-align: middle;
     padding-left: 10px;
-
   }
   .main-area {
     position: relative;
