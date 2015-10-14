@@ -14,7 +14,7 @@ const ErrorReport = require('panoptes/ErrorReporter');
 const API = require('panoptes/API');
 
 
-const HEIGHT = 40;
+const HEIGHT = 20;
 
 let ReferenceSequence = React.createClass({
   mixins: [
@@ -93,11 +93,11 @@ let ReferenceSequence = React.createClass({
     if (width == 0)
       return null;
     return (
-      <div className="horizontal stack" style={{height:HEIGHT}}>
+      <div className="channel" style={{height:HEIGHT}}>
         <div className="channel-side" style={{width:`${sideWidth}px`}}> Ref. Seq.</div>
-        <div style={{width:`${width-sideWidth}px`}} className="channel-canvas">
+        <div className="channel-data" style={{width:`${width-sideWidth}px`}} >
           <SequenceSquares
-            width={width-sideWidth}
+            width={width}
             height={HEIGHT}
             start={start}
             end={end}
@@ -105,6 +105,7 @@ let ReferenceSequence = React.createClass({
             dataStep={dataStep}
             sequence={sequence}/>
         </div>
+
       </div>
     );
   }
@@ -170,7 +171,8 @@ let SequenceSquares = React.createClass({
     let offset = scale(dataStart) - scale(start);
     return <canvas ref="canvas"
                    className="sequence-canvas"
-                   style={{transform:`translateX(${offset}px) scale(${stepWidth},${height})`}} width={sequence.length}
+                   style={{transform:`translateX(${offset}px) scale(${stepWidth},${height})`}}
+                   width={sequence.length}
                    height={1}/>;
   }
 });

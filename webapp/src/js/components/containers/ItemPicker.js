@@ -1,5 +1,6 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
+const LinkedStateMixin = require('react-addons-linked-state-mixin');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
@@ -13,7 +14,7 @@ const Icon = require("ui/Icon");
 let ItemPicker = React.createClass({
   mixins: [
     PureRenderMixin,
-    React.addons.LinkedStateMixin
+    LinkedStateMixin
   ],
 
   propTypes: {

@@ -35,24 +35,24 @@ let GenomeScale = React.createClass({
       if (pos/smallTickWidth % 5 === 0) {
         largeTicks.push(
           <g className="major tick" key={pos}>
-            <line x1={x} x2={x} y1={18} y2={40}/>
-            <text x={pos == 0 && start == 0 ? x+10 : x} y={0}>{format(pos)}</text>
+            <line x1={x} x2={x} y1={26} y2={40}/>
+            <text x={pos == 0 && start == 0 ? x+10 : x} y={10}>{format(pos)}</text>
           </g>
         );
       } else {
         smallTicks.push(
           <g className="minor tick" key={pos}>
-            <line x1={x} x2={x} y1={30} y2={40}/>
+            <line x1={x} x2={x} y1={34} y2={40}/>
           </g>
         );
       }
     }
 
     return (
-      <div className="horizontal stack" style={{height:HEIGHT}}>
-        <div className="channel-side" style={{width:`${sideWidth}px`}}> Position(bp) </div>
-        <div>
-            <svg className="scale" width={width-sideWidth} height={HEIGHT}>
+      <div className="channel" style={{height:HEIGHT}}>
+        <div className="channel-side" style={{width:`${sideWidth}px`, height:HEIGHT}}></div>
+        <div className="channel-data" >
+            <svg className="scale" width={width} height={HEIGHT}>
               {smallTicks}
               {largeTicks}
             </svg>

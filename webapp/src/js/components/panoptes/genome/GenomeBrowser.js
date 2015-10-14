@@ -244,10 +244,10 @@ let GenomeBrowser = React.createClass({
                 onWheel={this.handleMouseWheel}
                 >
                 <div className="main-area">
-                  <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
-                              sideWidth={sideWidth}/>
-
                   <div className="tracks vertical stack">
+                    <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
+                                sideWidth={sideWidth}/>
+
                     <div className="fixed">
                       <GenomeScale start={start} end={end}
                                    width={width} sideWidth={sideWidth}/>
@@ -261,6 +261,7 @@ let GenomeBrowser = React.createClass({
                     <div className="grow scroll-within">
                     </div>
                   </div>
+                  <div className="main-area-shadow" style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>
                 </div>
               </Hammer>
             </div>

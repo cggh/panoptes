@@ -19,10 +19,9 @@
           padding-right: 15px;
         }
         input {
-          width: 100px;
+          width: 80px;
         }
       }
-
     }
     .controls > * {
       padding-left: 10px;
@@ -35,27 +34,42 @@
   .main-area {
     position: relative;
     height: calc(100% - #{$topbar-height});
-    .background {
-      z-index: 1;
+    .main-area-shadow {
       position: absolute;
-      top:0;
-      left:0;
+      height: 100%;
+      top: 0;
+      box-shadow: inset $z-2-shadow;
+      z-index: 1;
     }
     .tracks {
       position: relative;
-      z-index: 1;
+      .background {
+        position: absolute;
+        top:0;
+        left:0;
+      }
       .fixed {
+        z-index: 1;
       }
       .scrolling {
-        //background: blue;
       }
-      .channel-side {
-        padding: 12px;
-        height: 100%;
-        background: white;
-      }
-      .channel-canvas {
-        overflow: hidden;
+      .channel {
+        display: flex;
+        flex-direction: row;
+        .channel-side {
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          background: white;
+        }
+        .channel-data {
+          flex: 1;
+          background: blue;
+          overflow: hidden;
+          canvas {
+            display: block;
+          }
+        }
       }
     }
   }

@@ -118,7 +118,7 @@
   flex-direction: column;
   position: fixed;
   border: 1px solid rgb(110, 110, 110);
-  box-shadow: 4px 4px 20px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: $z-5-shadow;
   background: white;
   z-index: 2;
 
@@ -293,7 +293,7 @@
 .top-bar {
   height: $topbar-height;
   background: $primary-color;
-  box-shadow: $z-1-shadow;
+  box-shadow: $z-2-shadow;
   position: relative;
   z-index: 2;
 

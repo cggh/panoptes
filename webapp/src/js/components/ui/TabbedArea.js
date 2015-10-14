@@ -11,7 +11,7 @@ let TabbedArea = React.createClass({
 
   propTypes: {
     activeTab: React.PropTypes.string,
-    onSelect: React.PropTypes.func,
+    onSwitch: React.PropTypes.func,
     onClose: React.PropTypes.func
   },
 
@@ -42,9 +42,9 @@ let TabbedArea = React.createClass({
   },
 
   handleClick(tabId, e) {
-    if (this.props.onSelect) {
+    if (this.props.onSwitch) {
       e.preventDefault();
-      this.props.onSelect(tabId);
+      this.props.onSwitch(tabId);
     }
   },
   handleClose(tabId, event) {
@@ -85,6 +85,7 @@ let TabbedArea = React.createClass({
       <Draggable
         ref={"drag_"+id}
         key={id}
+        zIndex={99999}
         onStop={this.handleDragStop.bind(this, id)}>
           <div className={classNames(classes)}
              onClick={this.handleClick.bind(this, id)}>

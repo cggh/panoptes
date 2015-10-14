@@ -26,7 +26,7 @@ let Background = React.createClass({
     let smallTickWidth = Math.max(tickWidth(end - start, width, SMALL_TICK),1);
     start = Math.max(0,start);
     //Overdraw in the negative direction to go under side controls
-    start = Math.floor((start/smallTickWidth)-(sideWidth*2/SMALL_TICK)) * smallTickWidth;
+    start = Math.ceil((start/smallTickWidth)) * smallTickWidth;
     start = Math.max(0,start);
     end = Math.max(start, end);
     let smallTicks = [];

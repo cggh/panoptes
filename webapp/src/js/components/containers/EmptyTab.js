@@ -40,7 +40,8 @@ let EmptyTab = React.createClass({
   },
 
   render() {
-    let {tables} = this.config;
+    let {tables, chromosomes} = this.config;
+    console.log(this.config)
     let actions = this.getFlux().actions.session;
     return (
       <div className="horizontal stack start-align">
@@ -57,7 +58,7 @@ let EmptyTab = React.createClass({
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})} />
+                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome:_.keys(chromosomes)[0]})} />
         </List>
       </div>
     );
