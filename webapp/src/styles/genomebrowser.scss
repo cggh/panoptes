@@ -64,7 +64,6 @@
         }
         .channel-data {
           flex: 1;
-          background: blue;
           overflow: hidden;
           canvas {
             display: block;
@@ -93,7 +92,7 @@
   }
 
   .sequence-canvas {
-    will-change: transform;
+    //will-change: transform;
     image-rendering: optimizeSpeed;
     image-rendering: pixelated;
     transform-origin: top left;
