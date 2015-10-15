@@ -1,36 +1,75 @@
+const _ = require('lodash');
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 
+const FALLBACK_MAXIMUM = 1000000000;
 
 let Controls = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin
+    ConfigMixin,
   ],
 
   propTypes: {
-    onChange: React.PropTypes.func.isRequired,
+    componentUpdate: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
   },
 
-  handleChange() {
-    this.props.onChange(
-      this.refs.chromosome.value,
-      parseInt(this.refs.start.value),
-      parseInt(this.refs.end.value)
-    );
+  componentWillMount() {
+    this.setFromProps(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.setFromProps(nextProps);
+  },
+
+  setFromProps(props) {
+    let { start, end } = props;
+    this.setState({
+      midpoint: (end + start) / 2,
+      width: end - start
+    });
+  },
+
+  handleChromChange() {
+    this.props.componentUpdate({
+      chromosome: this.refs.chromosome.value
+    });
+  },
+
+  handleRangeChange() {
+    this.setState({
+      midpoint: this.refs.midpoint.value,
+      width: this.refs.width.value
+    });
+    let mid = parseInt(this.refs.midpoint.value);
+    let width = parseInt(this.refs.width.value);
+    if (
+      _.isFinite(mid) &&
+      _.isFinite(width) &&
+      mid >= 0 &&
+      mid <= (this.config.chromosomes[this.props.chromosome].len || FALLBACK_MAXIMUM) &&
+      width > this.props.minWidth
+    ) {
+      this.props.componentUpdate({
+        start: mid - (width / 2),
+        end: mid + (width / 2)
+      });
+    }
   },
 
   render() {
-    let { chromosome, start, end } = this.props;
+    let { chromosome, minWidth} = this.props;
+    let { midpoint, width } = this.state;
+    let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
     return (
       <span className="controls">
         <span> Chromosome: </span>
         <span>
-          <select ref="chromosome" value={chromosome} onChange={this.handleChange}>
+          <select ref="chromosome" value={chromosome} onChange={this.handleChromChange}>
             {_.map(this.config.chromosomes, (length, name) =>
                 <option key={name}
                         value={name}>
@@ -39,13 +78,23 @@ let Controls = React.createClass({
             )}
           </select>
         </span>
-        <span> Start: </span>
+        <span> Midpoint: </span>
         <span>
-          <input ref="start" type="number" value={Math.round(start)} onChange={this.handleChange}/>
+          <input ref="midpoint"
+                 type="number"
+                 min={0}
+                 max={max}
+                 value={parseInt(midpoint)}
+                 onChange={this.handleRangeChange}/>
         </span>
-        <span> End: </span>
+        <span> Width: </span>
         <span>
-          <input ref="end" type="number" value={Math.round(end)} onChange={this.handleChange}/>
+          <input ref="width"
+                 type="number"
+                 value={parseInt(width)}
+                 min={minWidth}
+                 max={max}
+                 onChange={this.handleRangeChange}/>
         </span>
       </span>
     );

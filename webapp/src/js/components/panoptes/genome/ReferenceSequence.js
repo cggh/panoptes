@@ -97,7 +97,7 @@ let ReferenceSequence = React.createClass({
         <div className="channel-side" style={{width:`${sideWidth}px`}}> Ref. Seq.</div>
         <div className="channel-data" style={{width:`${width-sideWidth}px`}} >
           <SequenceSquares
-            width={width}
+            width={width-sideWidth}
             height={HEIGHT}
             start={start}
             end={end}

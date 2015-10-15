@@ -19,7 +19,7 @@ import 'genomebrowser.scss';
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
 const NO_SPRING = [2000, 80];
-const MIN_WIDTH = 50;
+const MIN_WIDTH = 5;
 const FALLBACK_MAXIMUM = 1000000000;
 const CONTROLS_HEIGHT = 33;
 
@@ -49,11 +49,11 @@ let GenomeBrowser = React.createClass({
 
   componentWillMount() {
     this.panStartPixel = null;
-    this.validateAndAdjustView(this.props);
+    //this.validateAndAdjustView(this.props);
   },
 
   componentWillReceiveProps(nextProps) {
-    this.validateAndAdjustView(nextProps);
+    //this.validateAndAdjustView(nextProps);
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;
@@ -65,28 +65,6 @@ let GenomeBrowser = React.createClass({
     }
     this.actual_start = this.props.start;
     this.actual_end = this.props.end;
-  },
-
-  validateAndAdjustView(newProps) {
-    let { chromosome, start, end } = newProps;
-    let chromChanged = (chromosome !== this.props.chromosome);
-    let startChanged = (start !== this.props.start);
-    let endChanged =  (end !== this.props.end);
-    start = Math.max(start, 0);
-    end = Math.min(end, this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM);
-    let frac = 0.5;
-    if (startChanged && !endChanged && !chromChanged) {
-      frac = 0;
-    } if (!startChanged && endChanged && !chromChanged) {
-      frac = 1;
-    }
-    [start, end] = this.scaleClamp(start, end, frac);
-    if (start !== newProps.start || end !== newProps.end) {
-      newProps.componentUpdate({
-        start: start,
-        end: end
-      });
-    }
   },
 
 
@@ -195,14 +173,6 @@ let GenomeBrowser = React.createClass({
       this.setState({loading: this.state.loading - 1});
   },
 
-  handleViewChange(chromosome, start, end) {
-    this.props.componentUpdate({
-      chromosome: chromosome,
-      start: start,
-      end: end
-    })
-  },
-
   render() {
     let { settings } = this.config;
     let { start, end, sideWidth, chromosome } = this.props;
@@ -218,22 +188,10 @@ let GenomeBrowser = React.createClass({
       halfWidth: spring((end - start) / 2, springConfig)
     };
     return (
-      <Motion ref="spring"
-              style={endValue}
-              defaultStyle={endValue}>
-        {(interpolated) => {
-          start = interpolated.mid - interpolated.halfWidth;
-          end = interpolated.mid + interpolated.halfWidth;
-          //Round to nearest pixel to stop unneeded updates
-          start = Math.floor(start / pixelWidth) * pixelWidth;
-          end = Math.ceil(end / pixelWidth) * pixelWidth;
-          this.actual_start = start;
-          this.actual_end = end;
-          return (
             <div className="genome-browser">
               <div className="control-bar">
                 <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
-                <Controls {...this.props} onChange={this.handleViewChange}/>
+                <Controls {...this.props} minWidth={MIN_WIDTH} />
               </div>
               <Hammer
                 ref={(c) => this.root_hammer = c}
@@ -244,7 +202,19 @@ let GenomeBrowser = React.createClass({
                 onWheel={this.handleMouseWheel}
                 >
                 <div className="main-area">
-                  <div className="tracks vertical stack">
+                  <Motion ref="spring"
+                          style={endValue}
+                          defaultStyle={endValue}>
+                    {(interpolated) => {
+                      start = interpolated.mid - interpolated.halfWidth;
+                      end = interpolated.mid + interpolated.halfWidth;
+                      //Round to nearest pixel to stop unneeded updates
+                      start = Math.floor(start / pixelWidth) * pixelWidth;
+                      end = Math.ceil(end / pixelWidth) * pixelWidth;
+                      this.actual_start = start;
+                      this.actual_end = end;
+                      return (
+                      <div className="tracks vertical stack">
                     <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
                                 sideWidth={sideWidth}/>
 
@@ -261,13 +231,14 @@ let GenomeBrowser = React.createClass({
                     <div className="grow scroll-within">
                     </div>
                   </div>
+                      )
+                    }}
+                  </Motion>
+
                   <div className="main-area-shadow" style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>
                 </div>
               </Hammer>
             </div>
-          )
-        }}
-      </Motion>
     );
   }
 });
