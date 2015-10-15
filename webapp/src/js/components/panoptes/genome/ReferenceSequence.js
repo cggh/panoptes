@@ -2,7 +2,6 @@ const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
 const Immutable = require('immutable');
-const shallowEquals = require('shallow-equals');
 const uid = require('uid');
 
 const ConfigMixin = require('mixins/ConfigMixin');

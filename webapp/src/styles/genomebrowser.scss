@@ -91,12 +91,23 @@
     }
   }
 
-  .sequence-canvas {
+  canvas.sequence-canvas {
     //will-change: transform;
     image-rendering: optimizeSpeed;
     image-rendering: pixelated;
     transform-origin: top left;
   }
+
+  svg.numerical-summary {
+    * {
+      vector-effect: non-scaling-stroke;
+      transform-origin: top left;
+    }
+    fill: none;
+    stroke: rgba(0,0,0,0.7);
+  }
+
+
 
 }
 

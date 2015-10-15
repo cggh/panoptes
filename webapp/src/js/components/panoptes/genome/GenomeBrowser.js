@@ -16,6 +16,8 @@ const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
 import 'genomebrowser.scss';
 
+const NumericalSummary = require('panoptes/genome/NumericalSummary');
+
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
 const NO_SPRING = [2000, 80];
@@ -188,33 +190,41 @@ let GenomeBrowser = React.createClass({
       halfWidth: spring((end - start) / 2, springConfig)
     };
     return (
-            <div className="genome-browser">
-              <div className="control-bar">
-                <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
-                <Controls {...this.props} minWidth={MIN_WIDTH} />
-              </div>
-              <Hammer
-                ref={(c) => this.root_hammer = c}
-                onDoubleTap={this.handleDoubleTap}
-                onPan={this.handlePan}
-                vertical={true}
-                onPinch={(e) => console.log('2',e)}
-                onWheel={this.handleMouseWheel}
-                >
-                <div className="main-area">
-                  <Motion ref="spring"
-                          style={endValue}
-                          defaultStyle={endValue}>
-                    {(interpolated) => {
-                      start = interpolated.mid - interpolated.halfWidth;
-                      end = interpolated.mid + interpolated.halfWidth;
-                      //Round to nearest pixel to stop unneeded updates
-                      start = Math.floor(start / pixelWidth) * pixelWidth;
-                      end = Math.ceil(end / pixelWidth) * pixelWidth;
-                      this.actual_start = start;
-                      this.actual_end = end;
-                      return (
-                      <div className="tracks vertical stack">
+      <div className="genome-browser">
+        <div className="control-bar">
+          <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+          <Controls {...this.props} minWidth={MIN_WIDTH}/>
+        </div>
+        <Hammer
+          ref={(c) => this.root_hammer = c}
+          onDoubleTap={this.handleDoubleTap}
+          onPan={this.handlePan}
+          vertical={true}
+          onPinch={(e) => console.log('2',e)}
+          onWheel={this.handleMouseWheel}
+          >
+          <div className="main-area">
+            <Motion ref="spring"
+                    style={endValue}
+                    defaultStyle={endValue}>
+              {(interpolated) => {
+                start = interpolated.mid - interpolated.halfWidth;
+                end = interpolated.mid + interpolated.halfWidth;
+                //Round to nearest pixel to stop unneeded updates
+                start = Math.floor(start / pixelWidth) * pixelWidth;
+                end = Math.ceil(end / pixelWidth) * pixelWidth;
+                this.actual_start = start;
+                this.actual_end = end;
+                let track_props = {
+                  chromosome: chromosome,
+                  start: start,
+                  end: end,
+                  width: width,
+                  sideWidth: sideWidth,
+                  onChangeLoadStatus: this.handleChangeLoadStatus
+                };
+                return (
+                  <div className="tracks vertical stack">
                     <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
                                 sideWidth={sideWidth}/>
 
@@ -222,23 +232,23 @@ let GenomeBrowser = React.createClass({
                       <GenomeScale start={start} end={end}
                                    width={width} sideWidth={sideWidth}/>
                       { settings.refSequenceSumm ?
-                        <ReferenceSequence chromosome={chromosome} start={start} end={end}
-                                           width={width} sideWidth={sideWidth}
-                                           onChangeLoadStatus={this.handleChangeLoadStatus}/> :
+                        <ReferenceSequence {...track_props} /> :
                         null }
+                      <NumericalSummary {...track_props} />
 
                     </div>
                     <div className="grow scroll-within">
                     </div>
                   </div>
-                      )
-                    }}
-                  </Motion>
+                )
+              }}
+            </Motion>
 
-                  <div className="main-area-shadow" style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>
-                </div>
-              </Hammer>
-            </div>
+            <div className="main-area-shadow"
+                 style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>
+          </div>
+        </Hammer>
+      </div>
     );
   }
 });
