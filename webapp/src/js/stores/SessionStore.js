@@ -59,6 +59,7 @@ var SessionStore = Fluxxor.createStore({
     return (payload) => {
       let old_state = this.state;
       action(payload);
+      console.log(this.state.toJS());
       if (!old_state.equals(this.state))
         this.emit(event);
     }

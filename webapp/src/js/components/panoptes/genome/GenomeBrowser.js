@@ -211,8 +211,8 @@ let GenomeBrowser = React.createClass({
                 start = interpolated.mid - interpolated.halfWidth;
                 end = interpolated.mid + interpolated.halfWidth;
                 //Round to nearest pixel to stop unneeded updates
-                start = Math.floor(start / pixelWidth) * pixelWidth;
-                end = Math.ceil(end / pixelWidth) * pixelWidth;
+                start = Math.round(start / pixelWidth) * pixelWidth;
+                end = Math.round(end / pixelWidth) * pixelWidth;
                 this.actual_start = start;
                 this.actual_end = end;
                 let track_props = {
@@ -234,18 +234,16 @@ let GenomeBrowser = React.createClass({
                       { settings.refSequenceSumm ?
                         <ReferenceSequence {...track_props} /> :
                         null }
-                      <NumericalSummary {...track_props} />
-
                     </div>
-                    <div className="grow scroll-within">
+                    <div className="scrolling grow scroll-within">
+                      <NumericalSummary {...track_props} />
+                      <NumericalSummary {...track_props} />
                     </div>
                   </div>
                 )
               }}
             </Motion>
 
-            <div className="main-area-shadow"
-                 style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>
           </div>
         </Hammer>
       </div>
@@ -254,3 +252,7 @@ let GenomeBrowser = React.createClass({
 });
 
 module.exports = GenomeBrowser;
+
+
+//<div className="main-area-shadow"
+//     style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>

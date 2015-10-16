@@ -52,6 +52,7 @@
         z-index: 1;
       }
       .scrolling {
+        z-index: 1;
       }
       .channel {
         display: flex;
@@ -68,6 +69,17 @@
           canvas {
             display: block;
           }
+        }
+      }
+      .channel-controls {
+        transition-property: all;
+        transition-duration: .5s;
+        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+        overflow: hidden;
+        background: white;
+        height: 0;
+        .control {
+          padding: 16px;
         }
       }
     }
@@ -101,10 +113,15 @@
   svg.numerical-summary {
     * {
       vector-effect: non-scaling-stroke;
-      transform-origin: top left;
     }
     fill: none;
-    stroke: rgba(0,0,0,0.7);
+    .line {
+      stroke: $primary-color;
+    }
+    .area {
+      stroke: none;
+      fill: rgba(61,139,213, 0.3);
+    }
   }
 
 
