@@ -243,7 +243,6 @@ let GenomeBrowser = React.createClass({
                 )
               }}
             </Motion>
-
           </div>
         </Hammer>
       </div>
@@ -254,5 +253,3 @@ let GenomeBrowser = React.createClass({
 module.exports = GenomeBrowser;
 
 
-//<div className="main-area-shadow"
-//     style={{left:`${sideWidth}px`, width:`calc(100% - ${sideWidth}px)`}}></div>

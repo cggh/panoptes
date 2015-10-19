@@ -49,13 +49,15 @@ let GenomeScale = React.createClass({
     }
 
     return (
-      <div className="channel" style={{height:HEIGHT}}>
-        <div className="channel-side" style={{width:`${sideWidth}px`, height:HEIGHT}}></div>
-        <div className="channel-data" >
-            <svg className="scale" width={width} height={HEIGHT}>
-              {smallTicks}
-              {largeTicks}
-            </svg>
+      <div className="channel-container">
+        <div className="channel" style={{height:HEIGHT}}>
+          <div className="channel-side" style={{width:`${sideWidth}px`, height:HEIGHT}}></div>
+          <div className="channel-data scale" >
+              <svg className="scale" width={width} height={HEIGHT}>
+                {smallTicks}
+                {largeTicks}
+              </svg>
+          </div>
         </div>
       </div>
     );

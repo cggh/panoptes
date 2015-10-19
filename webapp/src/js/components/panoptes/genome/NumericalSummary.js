@@ -59,6 +59,8 @@ let NumericalSummary = React.createClass({
         , 0
         ) + 'px' :
       0;
+    this.refs.controls.style.width = this.state.controlsOpen ?
+    "100%" : this.props.sideWidth+'px';
   },
 
   applyData(data) {
@@ -135,14 +137,17 @@ let NumericalSummary = React.createClass({
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
     let offset = scale(dataStart) - scale(start);
-    let line = d3.svg.line().interpolate('step-after').x((d,i) => i).y((d) => d/140)(avg);
-    let area = d3.svg.area().interpolate('step-after').x((d,i) => i).y((d) => d/140).y0((d,i) => min[i]/140)(max);
+    let line = d3.svg.line().interpolate('step-after').x((d,i) => i).y((d) => d/210)(avg);
+    let area = d3.svg.area().interpolate('step-after').x((d,i) => i).y((d) => d/210).y0((d,i) => min[i]/210)(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
           <div className="channel-side" style={{width:`${sideWidth}px`}}>
-            YOLO
-            <Icon name="cog" onClick={this.handleControlToggle}/>
+            <div className="side-controls">
+              <Icon className="close" name="times" onClick={this.handleControlToggle}/>
+              <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
+            </div>
+            <div className="side-name"> Uniqueness </div>
           </div>
           <div className="channel-data" style={{width:`${effWidth}px`}} >
             <svg className="numerical-summary" width={effWidth} height={height}>
@@ -154,9 +159,9 @@ let NumericalSummary = React.createClass({
             </svg>
           </div>
         </div>
-          <div ref="controls" className="channel-controls">
-            <div className="control">LOLWUT</div><div className="control">YEAH YOU HEARD</div>
-          </div>
+        <div ref="controls" className="channel-controls">
+          <div className="control">LOLWUT</div><div className="control">YEAH YOU HEARD</div>
+        </div>
       </div>
     );
   }

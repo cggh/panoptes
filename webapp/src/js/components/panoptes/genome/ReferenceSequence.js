@@ -92,19 +92,24 @@ let ReferenceSequence = React.createClass({
     if (width == 0)
       return null;
     return (
-      <div className="channel" style={{height:HEIGHT}}>
-        <div className="channel-side" style={{width:`${sideWidth}px`}}> Ref. Seq.</div>
-        <div className="channel-data" style={{width:`${width-sideWidth}px`}} >
-          <SequenceSquares
-            width={width-sideWidth}
-            height={HEIGHT}
-            start={start}
-            end={end}
-            dataStart={dataStart}
-            dataStep={dataStep}
-            sequence={sequence}/>
+      <div className="channel-container">
+        <div className="channel" style={{height:HEIGHT}}>
+          <div className="channel-side" style={{width:`${sideWidth}px`}}>
+            <div className="side-name">
+              Ref. Seq.
+            </div>
+          </div>
+          <div className="channel-data" style={{width:`${width-sideWidth}px`}} >
+            <SequenceSquares
+              width={width-sideWidth}
+              height={HEIGHT}
+              start={start}
+              end={end}
+              dataStart={dataStart}
+              dataStep={dataStep}
+              sequence={sequence}/>
+          </div>
         </div>
-
       </div>
     );
   }
