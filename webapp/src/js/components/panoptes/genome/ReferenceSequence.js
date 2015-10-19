@@ -13,7 +13,7 @@ const ErrorReport = require('panoptes/ErrorReporter');
 const API = require('panoptes/API');
 
 
-const HEIGHT = 20;
+const HEIGHT = 25;
 
 let ReferenceSequence = React.createClass({
   mixins: [

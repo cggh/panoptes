@@ -1,9 +1,5 @@
 @import "./variables";
 
-.header {
-  height: 0 !important;
-}
-
 .genome-browser {
   height: calc(100% - 40px);
   width: 100%;
@@ -54,13 +50,30 @@
         left:0;
       }
       .fixed {
-        z-index: 1;
+        z-index: 2;
         .channel-container:first-child .channel .channel-data{
-          box-shadow:  inset 1px 2px 4px rgba(0, 0, 0, 0.24);
+          //Shadow of position control-bar
+          box-shadow:  inset 2px 2px 4px rgba(0, 0, 0, 0.24);
+        }
+        .channel-container:last-child .channel{
+          //Shadow of fixed tracks
+          box-shadow: -1px 1px 4px rgba(0, 0, 0, 0.24);
+        }
+        .channel .channel-data {
+          //Shadow of side onto data
+          box-shadow:  inset 4px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
       }
       .scrolling {
         z-index: 1;
+        .channel-container:last-child .channel .channel-side{
+          //Shadow of las side controls
+          box-shadow: -1px 2px 4px rgba(0, 0, 0, 0.24);
+        }
+        .channel .channel-data {
+          //Shadow of side onto data
+          box-shadow:  inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
+        }
       }
       .channel {
         display: flex;
@@ -68,7 +81,6 @@
         .channel-side {
           background: white;
           position: relative;
-          box-shadow: $z-1-shadow;
           .side-controls {
             padding-left:10px;
             padding-top:10px;
@@ -89,7 +101,7 @@
 
         }
         .channel-data {
-          box-shadow:  inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
+          border-bottom: 1px solid $primary-color;
           flex: 1;
           overflow: hidden;
           canvas {
@@ -99,7 +111,6 @@
       }
       .channel-controls {
         box-shadow: $z-1-shadow;
-        z-index: 1;
         position: relative;
         transition-property: all;
         transition-duration: .5s;

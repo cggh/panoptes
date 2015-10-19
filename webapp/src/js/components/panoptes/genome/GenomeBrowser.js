@@ -238,6 +238,10 @@ let GenomeBrowser = React.createClass({
                     <div className="scrolling grow scroll-within">
                       <NumericalSummary {...track_props} />
                       <NumericalSummary {...track_props} />
+                      <NumericalSummary {...track_props} />
+                      <NumericalSummary {...track_props} />
+                      <NumericalSummary {...track_props} />
+                      <NumericalSummary {...track_props} />
                     </div>
                   </div>
                 )
