@@ -136,9 +136,9 @@ let NumericalSummary = React.createClass({
     let effWidth = width-sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
-    let offset = scale(dataStart) - scale(start);
-    let line = d3.svg.line().interpolate('step-after').x((d,i) => i).y((d) => d/210)(avg);
-    let area = d3.svg.area().interpolate('step-after').x((d,i) => i).y((d) => d/210).y0((d,i) => min[i]/210)(max);
+    let offset = scale(dataStart) - scale(start - dataStep/2); //Shift by half width to middle of window
+    let line = d3.svg.line().interpolate('step').x((d,i) => i).y((d) => d/210)(avg);
+    let area = d3.svg.area().interpolate('step').x((d,i) => i).y((d) => d/210).y0((d,i) => min[i]/210)(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>

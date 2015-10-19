@@ -14,9 +14,9 @@ let findOptimalBlockSize = (start, end, desiredCount, minBlockSize) => {
 };
 
 let blockStartEnd = (start, end, blockSize) => {
-  let blockStart = Math.max(0, Math.floor(start / blockSize));
+  let blockStart = Math.max(0, Math.floor(start / blockSize)-1);
   return [blockStart,
-    Math.max(blockStart, Math.ceil(end / blockSize))
+    Math.max(blockStart, Math.ceil(end / blockSize)+1)
   ]
 };
 
