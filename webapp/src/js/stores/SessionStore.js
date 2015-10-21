@@ -17,28 +17,33 @@ var SessionStore = Fluxxor.createStore({
     else
       this.state = Immutable.Map();
     this.state = this.state.mergeDeep(Immutable.fromJS({
-        components: {
-          'TEST': {
-            component: "containers/GenomeBrowserWithActions",
-            props: {
-              chromosome : 'Pf3D7_01_v3'
+      components: {
+        'TEST': {
+          component: "containers/GenomeBrowserWithActions",
+          props: {
+            chromosome: 'Pf3D7_01_v3',
+            components: {
+              test: {
+                component: 'NumericalSummary',
+                props: {}
+              }
+            }
+          }
+        }
+      },
+      tabs: {
+        components: ['TEST'],
+        selectedTab: 'TEST'
+      },
+      popups: {
+        components: [],
+        state: {}
+      },
+      modal: {}
+    }));
+    this.state = this.state.updateIn(['components', 'TEST', 'props', 'components'], Immutable.OrderedMap);
 
-          }
-        }
-        },
-        tabs: {
-          components: ['TEST'],
-          selectedTab: 'TEST'
-        },
-        popups: {
-          components: [],
-          state: {
-          }
-        },
-        modal: {
-        }
-      }));
-  this.bindActions(
+    this.bindActions(
       SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
       SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
       SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
@@ -59,7 +64,6 @@ var SessionStore = Fluxxor.createStore({
     return (payload) => {
       let old_state = this.state;
       action(payload);
-      console.log(this.state.toJS());
       if (!old_state.equals(this.state))
         this.emit(event);
     }

@@ -17,7 +17,14 @@ const Icon = require('ui/Icon');
 
 
 const HEIGHT= 100;
-
+const INTERPOLATIONS = [
+  'linear',
+  'step',
+  'basis',
+  'bundle',
+  'cardinal',
+  'monotone'
+];
 
 let NumericalSummary = React.createClass({
   mixins: [
@@ -28,11 +35,19 @@ let NumericalSummary = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string,
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number
+    componentUpdate: React.PropTypes.func.isRequired,
+    chromosome: React.PropTypes.string.isRequired,
+    start: React.PropTypes.number.isRequired,
+    end: React.PropTypes.number.isRequired,
+    width: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number.isRequired,
+    interpolation: React.PropTypes.string
+  },
+
+  getDefaultProps() {
+    return {
+      interpolation: 'step',
+    }
   },
 
   getInitialState() {
@@ -124,9 +139,15 @@ let NumericalSummary = React.createClass({
     e.stopPropagation();
   },
 
+  handleControlsChange() {
+    this.props.componentUpdate({
+      interpolation: this.refs.interpolation.value
+    })
+  },
+
   render() {
     let height = HEIGHT;
-    let { start, end, width, sideWidth, ...other } = this.props;
+    let { start, end, width, sideWidth, interpolation, ...other } = this.props;
     let { dataStart, dataStep, columns, controlsOpen} = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
@@ -137,8 +158,17 @@ let NumericalSummary = React.createClass({
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
     let offset = scale(dataStart) - scale(start - dataStep/2); //Shift by half width to middle of window
-    let line = d3.svg.line().interpolate('step').x((d,i) => i).y((d) => d/210)(avg);
-    let area = d3.svg.area().interpolate('step').x((d,i) => i).y((d) => d/210).y0((d,i) => min[i]/210)(max);
+    let line = d3.svg.line()
+      .interpolate(interpolation)
+      .defined(_.isFinite)
+      .x((d,i) => i)
+      .y((d) => d/210)(avg);
+    let area = d3.svg.area()
+      .interpolate(interpolation)
+      .defined(_.isFinite)
+      .x((d,i) => i)
+      .y((d) => d/210)
+      .y0((d,i) => min[i]/210)(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -160,7 +190,17 @@ let NumericalSummary = React.createClass({
           </div>
         </div>
         <div ref="controls" className="channel-controls">
-          <div className="control">LOLWUT</div><div className="control">YEAH YOU HEARD</div>
+          <div className="control">
+            Interpolation mode:
+            <select ref="interpolation" value={interpolation} onChange={this.handleControlsChange}>
+              {_.map(INTERPOLATIONS, (name) =>
+                  <option key={name}
+                          value={name}>
+                    {name}
+                  </option>
+              )}
+            </select>
+          </div>
         </div>
       </div>
     );

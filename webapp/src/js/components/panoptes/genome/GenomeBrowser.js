@@ -9,14 +9,16 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 const Hammer = require('react-hammerjs');
 const { Motion, spring } = require('react-motion');
 
-const GenomeScale = require('panoptes/genome/GenomeScale');
+const GenomeScale = require('panoptes/genome/tracks/GenomeScale');
 const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
 const Controls = require('panoptes/genome/Controls');
-const ReferenceSequence = require('panoptes/genome/ReferenceSequence');
+const ReferenceSequence = require('panoptes/genome/tracks/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
 import 'genomebrowser.scss';
 
-const NumericalSummary = require('panoptes/genome/NumericalSummary');
+let dynreq = require.context(".", true);
+const dynamic_require = (path) => dynreq("./tracks/" + path);
+
 
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
@@ -133,6 +135,9 @@ let GenomeBrowser = React.createClass({
     this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.root_hammer)).left, -100);
   },
   handlePan(e) {
+    //Hack to fix erroneous pans on control buttons... need a better solution
+    if (e.center.x === 0)
+      return;
     let start = this.actual_start;
     let end = this.actual_end;
     let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.root_hammer)).left;
@@ -177,7 +182,7 @@ let GenomeBrowser = React.createClass({
 
   render() {
     let { settings } = this.config;
-    let { start, end, sideWidth, chromosome } = this.props;
+    let { componentUpdate, start, end, sideWidth, chromosome, components } = this.props;
     let { loading } = this.state;
     if (!_.has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
@@ -236,12 +241,22 @@ let GenomeBrowser = React.createClass({
                         null }
                     </div>
                     <div className="scrolling grow scroll-within">
-                      <NumericalSummary {...track_props} />
-                      <NumericalSummary {...track_props} />
-                      <NumericalSummary {...track_props} />
-                      <NumericalSummary {...track_props} />
-                      <NumericalSummary {...track_props} />
-                      <NumericalSummary {...track_props} />
+                      {components.map((componentSpec, name) => {
+                          let { component, props } = componentSpec.toJS();
+                          return React.createElement(dynamic_require(component),
+                            _.extend({
+                              key: name,
+                              componentUpdate: (updater) => componentUpdate({
+                                components: {
+                                  [name]: {
+                                    props: updater
+                                  }
+                                }
+                              })
+                            }, props, track_props));
+                        }
+                      ).toList()
+                      }
                     </div>
                   </div>
                 )
