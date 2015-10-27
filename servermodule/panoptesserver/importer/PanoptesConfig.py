@@ -56,19 +56,18 @@ class PanoptesConfig(object):
                
     def getImportConnectionSettings(self, db = None):
         db_args = {
-            'host': self._getGlobalVar('DBSRV'),
-            'charset': 'utf8',
+            'host': 'localhost'
         }
         
-        db_args['user'] = self._config.get(self._importSectionName, 'DBUSER').strip("'\"")
-        db_args['passwd'] = self._config.get(self._importSectionName, 'DBPASS').strip("'\"")
+        db_args['user'] = 'monetdb'
+        db_args['password'] = 'monetdb'
 
         if db != None:
             useDB = db
         else:
-            useDB = self._getGlobalVar('DB')
+            useDB = 'datasets'
 
-        db_args['db'] = ToSafeIdentifier(useDB)
+        db_args['database'] = ToSafeIdentifier(useDB)
         
         return db_args
     
@@ -82,5 +81,5 @@ class PanoptesConfig(object):
         return self._getGlobalVar('PLUGINPATH', True)
     
     def getMasterDbName(self):
-        return self._getGlobalVar('DB')
+        return 'datasets'
             

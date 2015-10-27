@@ -5,6 +5,7 @@
 import threading
 import uuid
 import DQXDbTools
+import monetdb.sql
 import DQXUtils
 import datetime
 import config
@@ -24,7 +25,7 @@ class CalculationThreadList:
             self.threads[id] = {'status': 'Calculating', 'progress': None, 'failed': False}
         with DQXDbTools.DBCursor() as cur:
             timestamp = str(datetime.datetime.now())[0:19]
-            sqlstring = 'INSERT INTO calculations VALUES ("{0}", "{1}", "{2}", "{3}", "Calculating", 0, 0, 0, "")'.format(
+            sqlstring = "INSERT INTO calculations VALUES ('{0}', '{1}', '{2}', '{3}', 'Calculating', 0, 0, 0, '')".format(
                 id,
                 userid,
                 timestamp,
@@ -42,7 +43,7 @@ class CalculationThreadList:
                 del self.threads[id]
         with DQXDbTools.DBCursor() as cur:
             if not(hasfailed):
-                sqlstring = 'UPDATE calculations SET completed=1, status="Finished", progress=0 WHERE id="{0}"'.format(id)
+                sqlstring = "UPDATE calculations SET completed=1, status='Finished', progress=0 WHERE id='{0}'".format(id)
                 cur.execute(sqlstring)
                 cur.commit()
 
@@ -59,21 +60,21 @@ class CalculationThreadList:
                 self.threads[id]['progress'] = progress
         with DQXDbTools.DBCursor() as cur:
             status = cap(status,250)
-            status = cur.db.escape_string(status)
-            status = status.encode('ascii','ignore')
-            sqlstring = 'UPDATE calculations SET status="{1}", progress={2} WHERE id="{0}"'.format(id, status, progress)
-            cur.execute(sqlstring)
+            # status = monetdb.sql.escape_string(status)
+            # status = status.encode('ascii','ignore')
+            sqlstring = "UPDATE calculations SET status=%s, progress=%s WHERE id=%s" #.format(id, status, progress)
+            cur.execute(sqlstring, (status, progress, id))
             cur.commit()
 
     def SetName(self, id, name):
         with DQXDbTools.DBCursor() as cur:
-            sqlstring = 'UPDATE calculations SET name="{1}" WHERE id="{0}"'.format(id, name)
+            sqlstring = "UPDATE calculations SET name='{1}' WHERE id='{0}'".format(id, name)
             cur.execute(sqlstring)
             cur.commit()
 
     def SetScope(self, id, scope):
         with DQXDbTools.DBCursor() as cur:
-            sqlstring = 'UPDATE calculations SET scope="{1}" WHERE id="{0}"'.format(id, scope)
+            sqlstring = "UPDATE calculations SET scope='{1}' WHERE id='{0}'".format(id, scope)
             cur.execute(sqlstring)
             cur.commit()
 
@@ -82,13 +83,13 @@ class CalculationThreadList:
             if id in self.threads:
                 self.threads[id]['failed'] = True
         with DQXDbTools.DBCursor() as cur:
-            sqlstring = 'UPDATE calculations SET failed=1 WHERE id="{0}"'.format(id)
+            sqlstring = "UPDATE calculations SET failed=1 WHERE id='{0}'".format(id)
             cur.execute(sqlstring)
             cur.commit()
 
     def GetInfo(self,id):
         with DQXDbTools.DBCursor() as cur:
-            cur.execute('SELECT status, progress, failed, completed FROM calculations WHERE id="{0}"'.format(id))
+            cur.execute("SELECT status, progress, failed, completed FROM calculations WHERE id='{0}'".format(id))
             rs = cur.fetchone()
             if rs is None:
                 return None

@@ -36,14 +36,15 @@ class SettingsDAO(object):
             #self._calculationObject.Log(message)
             self._calculationObject.LogSQLCommand(message)
                 
-    def __updateConnectionSettings(self, dbCursor, local_file = 0, db = None):
-        dbCursor.db_args = self._config.getImportConnectionSettings(db)
-        dbCursor.db_args.update({'local_infile': local_file})
+    def __updateConnectionSettings(self, dbCursor, local_file = 0, database = None):
+        dbCursor.db_args = self._config.getImportConnectionSettings(database)
+        #local_file option not supported by monet
+        # dbCursor.db_args.update({'local_infile': local_file})
     
     #Think carefully before using outside this class
     def getDBCursor(self, local_files = 0):
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = local_files, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = local_files, database = self._datasetId)
         
         return dbCursor
         
@@ -58,10 +59,10 @@ class SettingsDAO(object):
         self._log('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args)
 
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = 0, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
         
         with self.getDBCursor() as cur:
-            cur.db.autocommit(True)
+            cur.db.set_autocommit(True)
             cur.execute(sql, args)
         
 
@@ -70,7 +71,7 @@ class SettingsDAO(object):
         self._log('SQL:' + self._datasetId+';'+sql % args)
 
         with self.getDBCursor(local_files = 1) as cur:
-            cur.db.autocommit(True)
+            cur.db.set_autocommit(True)
             cur.execute(sql, args)
 
     def createDatabase(self):
@@ -115,10 +116,10 @@ class SettingsDAO(object):
     def _multiStatementExecSql(self, commands):
         
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = 0, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
         
         with dbCursor as cur:
-            cur.db.autocommit(False)
+            cur.db.set_autocommit(False)
             
             sql_parts = sqlparse.split(commands)
             i = 0
