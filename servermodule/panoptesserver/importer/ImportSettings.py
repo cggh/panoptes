@@ -306,8 +306,8 @@ class ImportSettings:
                     raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
                 
             self._load(validate)
-            if self._logLevel:
-                self._log('Settings: '+str(self._settings))
+#            if self._logLevel:
+#                self._log('Settings: '+str(self._settings))
         else:
             self.fileName = ''
             self._settings = {}
