@@ -1,1 +1,1 @@
-SELECT * FROM `settings`
+SELECT * FROM settings

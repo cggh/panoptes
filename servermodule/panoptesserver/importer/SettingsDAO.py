@@ -16,7 +16,7 @@ import math
 import sqlparse
 from _mysql import OperationalError, ProgrammingError
 from Numpy_to_SQL import Numpy_to_SQL
-
+import monetdb.control
 
 class SettingsDAO(object):
     
@@ -64,15 +64,6 @@ class SettingsDAO(object):
         with self.getDBCursor() as cur:
             cur.db.set_autocommit(True)
             cur.execute(sql, args)
-        
-
-    #Function specifically for LOAD DATA LOCAL INFILE
-    def _execSqlLoad(self, sql, *args):
-        self._log('SQL:' + self._datasetId+';'+sql % args)
-
-        with self.getDBCursor(local_files = 1) as cur:
-            cur.db.set_autocommit(True)
-            cur.execute(sql, args)
 
     def createDatabase(self):
         
@@ -80,21 +71,26 @@ class SettingsDAO(object):
         self._datasetId = None
         
         DQXUtils.CheckValidDatabaseIdentifier(db)
-                
+        control = monetdb.control.Control(passphrase='monetdb')
         try:
-            self._execSql('DROP DATABASE IF EXISTS {}'.format(db))
-        except:
+            control.stop(db)
+            control.destroy(db)
+        except monetdb.exceptions.OperationalError:
             pass
-        self._execSql('CREATE DATABASE {}'.format(db))
+        control.create(db)
+        control.release(db)
         self._datasetId = db
-            
+        self._execSql('CREATE SCHEMA "%s"' % db)
+        self._execSql('ALTER USER "monetdb" SET SCHEMA "%s"' % db)
+        self._execSql('SET SCHEMA "%s"' % db)
+
     def setDatabaseVersion(self, major, minor):
         self._checkPermissions('settings', None)
-        self._execSql('INSERT INTO `settings` VALUES ("DBSchemaVersion", %s)', str(major) + "." + str(minor))
+        self._execSql("INSERT INTO settings VALUES ('DBSchemaVersion', %s)", str(major) + "." + str(minor))
     
     def getCurrentSchemaVersion(self):
         self._checkPermissions('settings', None)
-        rs = self._execSqlQuery('SELECT `content` FROM `settings` WHERE `id`="DBSchemaVersion"')
+        rs = self._execSqlQuery('SELECT content FROM settings WHERE id="DBSchemaVersion"')
         if len(rs) > 0:
             majorversion = int(rs[0][0].split('.')[0])
             minorversion = int(rs[0][0].split('.')[1])
@@ -145,11 +141,11 @@ class SettingsDAO(object):
         
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            stmt = 'DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid))
+            stmt = 'DROP TABLE {}'.format(DBTBESC(tableid))
             if cur is None:
                 self._execSql(stmt)
             else:
-                self._log('DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid)))
+                self._log('DROP TABLE {}'.format(DBTBESC(tableid)))
                 cur.execute(stmt)
 
     #Check if the user has permission to write
@@ -171,19 +167,19 @@ class SettingsDAO(object):
         db = self._datasetId
         self._datasetId = indexDb
     # Remove current reference in the index first: if import fails, nothing will show up
-        self._execSql('DELETE FROM datasetindex WHERE id="{0}"'.format(db))
+        self._execSql('DELETE FROM datasetindex WHERE id=%s', db)
         self._datasetId = db
     
     
     def clearDatasetCatalogs(self):
         self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'settings'))
-        self._execSql('DELETE FROM settings WHERE id<>"DBSchemaVersion"')
+        self._execSql("DELETE FROM settings WHERE id<>'DBSchemaVersion'")
 
     def insertGraphForTable(self, tableid, graphid, graphSettings):
         self._checkPermissions('graphs', tableid)
         crosslink = graphSettings['crossLink']
 
-        self._execSql("INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, 0)", graphid, 
+        self._execSql("INSERT INTO graphs (graphid, tableid, tpe, dispname, settings, crosslnk, ordr) VALUES (%s, %s, %s, %s, %s, %s, 0)", graphid,
             tableid, 
             'tree', 
             graphSettings['name'],
@@ -195,7 +191,7 @@ class SettingsDAO(object):
         self._checkPermissions('graphs', tableid)
         
         self._execSql("DELETE FROM graphs WHERE tableid=%s",tableid)
-    
+
     def dropColumns(self, table, columns):
         sql = "ALTER TABLE {0} ".format(DBTBESC(table))
         for prop in columns:
@@ -204,7 +200,7 @@ class SettingsDAO(object):
             sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
         
         self._execSql(sql)
-    
+
     def createIndex(self, indexName, tableid, columns, unique = False):
         cols = columns.split(",")
         modifier = ''
@@ -321,7 +317,7 @@ class SettingsDAO(object):
     def saveSettings(self, token, st):
         self._checkPermissions('settings', None)
         self._execSql("INSERT INTO settings VALUES (%s, %s)", token, st)
-                
+
     def registerDataset(self, name, configOnly):
         importtime = 0
         if not configOnly:

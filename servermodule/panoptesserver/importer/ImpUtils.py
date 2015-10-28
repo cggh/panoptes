@@ -40,7 +40,7 @@ def GetSQLDataType(datatypeIdentifier):
     if (datatypeIdentifier == 'LowPrecisionValue'):
         datatypestr = 'float'
     if datatypeIdentifier == 'Boolean':
-        datatypestr = 'int'
+        datatypestr = 'boolean'
     return datatypestr
 
 def GetTempFileName():

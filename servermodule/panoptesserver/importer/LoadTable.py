@@ -239,83 +239,7 @@ class LoadTable(threading.Thread):
 
 
     def _loadTable(self, inputFile): 
-        
-        colTokens = []
-        transform = []
-        
-        for col in self._fileColNames:
-
-            colDescrip = self._loadSettings.getProperty(col)
-
-                
-            if colDescrip is None:
-                self._log('Not loading column: ' + col)
-                colTokens.append('@dummy')
-            else:
-                dt = colDescrip['dataType']
-                if dt == 'Text':
-                    colTokens.append(DBCOLESC(col))
-                elif dt == 'Boolean':
-                    var = '@' + col
-                    colTokens.append(var)
-                    ts = DBCOLESC(col) + " = CASE " + var
-                    #This could be made a bit less painful by looking at the values when parsing
-                    ts += " WHEN 'Yes' THEN 1 WHEN 'No' THEN 0 "
-                    ts += " WHEN 'yes' THEN 1 WHEN 'no' THEN 0 "
-                    ts += " WHEN 'YES' THEN 1 WHEN 'NO' THEN 0 "
-                    ts += " WHEN 'y' THEN 1 WHEN 'n' THEN 0 "
-                    ts += " WHEN 'Y' THEN 1 WHEN 'N' THEN 0 "
-                    ts += " WHEN 'True' THEN 1 WHEN 'False' THEN 0 "
-                    ts += " WHEN 'true' THEN 1 WHEN 'false' THEN 0 "
-                    ts += " WHEN 'TRUE' THEN 1 WHEN 'FALSE' THEN 0 "
-                    ts += " WHEN '1' THEN 1 WHEN '0' THEN 0 "
-                    ts += " END"
-                    transform.append(ts)
-                elif dt == 'Value' or dt == 'HighPrecisionValue' or dt == 'GeoLongitude' or dt == 'GeoLatitude':
-                    var = '@' + col
-                    colTokens.append(var)
-                    ts = DBCOLESC(col) + " = CASE " + var
-                    #This could be made a bit less painful by looking at the values when parsing
-                    for nullval in [ 'NA', '', 'None', 'NULL', 'null', 'inf', '-', 'nan' ]:
-                        ts += " WHEN '" + nullval + "' THEN NULL"
-                    ts += " ELSE " + var
-                    ts += " END"
-                    transform.append(ts)
-                elif dt == 'Date':
-                    var = '@' + col
-                    colTokens.append(var)
-                    #Set at noon
-                    #The date format is interpreted as being in the current time zone e.g. 2007-11-30
-                    #For other formats - see http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html#function_str-to-date
-                    #"DATE_FORMAT(STR_TO_DATE(" + var + ", ''), '%Y-%m-%d')" 
-                    # The date is stored as Julian Days
-                    ts = DBCOLESC(col) + " = CASE " + var + " WHEN '' THEN NULL ELSE ((UNIX_TIMESTAMP(CONCAT(" + var + ",' 12:00:00')) / 86400) + 2440587 + 1) END"
-                    transform.append(ts)
-                else:
-                    self._log('Defaulting to text type for column: ' + col)
-                    colTokens.append(DBCOLESC(col))
-
-        if self._allowSubSampling:
-            transform.append(' _randomval_ = RAND()')
-            
-        ignoreLines = 1
-            
-        sql = "LOAD DATA LOCAL INFILE '" + inputFile + "' INTO TABLE " + DBDBESC(self._datasetId) + '.' + DBTBESC(self._tableId) 
-        #This line not strictly necessary
-        sql += " FIELDS TERMINATED BY '" + self._separator + "' LINES TERMINATED BY '" + self._lineSeparator + "'" 
-        sql += " IGNORE " + str(ignoreLines) + " LINES "
-        sql += "(" + ', '.join(colTokens)
-        sql += ")"
-        if len(transform) > 0:
-            sql += ' SET '
-            sql += ','.join(transform)
-        
-        #Note the local_infile = 1 is required if the LOCAL keyword is used above
-        #This could be avoided but that would mean that the file has to be on the database server
-        #LOCAL is also a bit slower
-        #LOCAL also means warnings not errors
-#        with warnings.catch_warnings():
-        warnings.filterwarnings('error', category=MySQLdb.Warning)
+        sql = "COPY OFFSET 2 INTO %s from '%s' USING DELIMITERS '%s','%s' NULL AS ''" % (DBTBESC(self._tableId), inputFile, self._separator, self._lineSeparator);
         self._dao._execSqlLoad(sql)
         
         
@@ -349,7 +273,7 @@ class LoadTable(threading.Thread):
         
         databaseid = self._datasetId
         tableid = self._tableId
-        
+
     def _preprocessFile(self, sourceFileName, tableid):
         
             self._destFileName = ImpUtils.GetTempFileName()
@@ -489,14 +413,17 @@ class LoadTable(threading.Thread):
         
             subsetTableName = tableid + '_subsets'
             
-            self._dao.dropTable(subsetTableName)
+            try:
+                self._dao.dropTable(subsetTableName)
+            except:
+                pass
             
-            self._dao._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
+            self._dao._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} with no data'.format(
                 subsettable=DBTBESC(subsetTableName),
                 primkey=DBCOLESC(self._loadSettings["primKey"]),
                 table=DBTBESC(tableid)
             ))
-            self._dao._execSql('ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
+            self._dao._execSql('ALTER TABLE {0} ADD COLUMN subsetid INT'.format(DBTBESC(subsetTableName)))
             self._dao.createIndex('primkey',subsetTableName, self._loadSettings["primKey"])
             self._dao.createIndex('subsetid',subsetTableName, 'subsetid')
             

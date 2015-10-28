@@ -126,6 +126,8 @@ EOF
     else
         monetdbd start $BASEDIR/monetdb
     fi
+    monetdbd set control=True $BASEDIR/monetdb
+    monetdbd set passphrase=monetdb $BASEDIR/monetdb
     if monetdb create $DB ; then
         monetdb release $DB
         DOTMONETDBFILE=$PROJECT_ROOT/.monetdb mclient -d ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
