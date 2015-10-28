@@ -13,14 +13,12 @@ def response(returndata):
     #Obtain the settings from storeddata
     with DQXDbTools.DBCursor(returndata) as cur:
         cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(None, 'storedviews'))
-        sqlstring = 'SELECT content FROM storage WHERE id="{0}"'.format(id)
-        cur.execute(sqlstring)
+        cur.execute('SELECT content FROM storage WHERE id=%s', (id,))
         therow = cur.fetchone()
         settings = therow[0]
         #todo: remove that record
 
-        sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}")'.format(databaseName, id, settings)
-        cur.execute(sql)
+        cur.execute('INSERT INTO storedviews VALUES (%s, %s, %s)', (databaseName, id, settings))
         cur.commit()
 
         return returndata
