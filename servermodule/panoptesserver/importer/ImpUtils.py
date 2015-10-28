@@ -8,6 +8,7 @@ import uuid
 import DQXDbTools
 import DQXUtils
 import errno
+import monetdb.control
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -26,8 +27,7 @@ def IsValueDataTypeIdenfifier(datatypeIdentifier):
            (datatypeIdentifier == 'GeoLongitude') or\
            (datatypeIdentifier == 'GeoLatitude') or\
            (datatypeIdentifier == 'LowPrecisionValue') or\
-           (datatypeIdentifier == 'HighPrecisionValue') or\
-           (datatypeIdentifier == 'Date')
+           (datatypeIdentifier == 'HighPrecisionValue')
 
 def IsDateDataTypeIdenfifier(datatypeIdentifier):
     return (datatypeIdentifier == 'Date')
@@ -41,6 +41,8 @@ def GetSQLDataType(datatypeIdentifier):
         datatypestr = 'float'
     if datatypeIdentifier == 'Boolean':
         datatypestr = 'boolean'
+    if IsDateDataTypeIdenfifier(datatypestr):
+        datatypestr = 'TIMESTAMP'
     return datatypestr
 
 def GetTempFileName():
@@ -70,7 +72,6 @@ def mkdir(name):
 
 
 def IsDatasetPresentInServer(credInfo, datasetId):
-    with DQXDbTools.DBCursor(credInfo, datasetId) as cur:
-        cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
-        return cur.fetchone()[0] > 0
-
+    control = monetdb.control.Control(passphrase='monetdb')
+    datasets = [db['name'] for db in control.status()]
+    return datasetId in datasets

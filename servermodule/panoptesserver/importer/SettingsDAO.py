@@ -139,14 +139,10 @@ class SettingsDAO(object):
     def dropTable(self, tableid, cur = None):
         self._checkPermissions('', tableid)
         
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            stmt = 'DROP TABLE {}'.format(DBTBESC(tableid))
-            if cur is None:
-                self._execSql(stmt)
-            else:
-                self._log('DROP TABLE {}'.format(DBTBESC(tableid)))
-                cur.execute(stmt)
+        try:
+            self._execSql('DROP TABLE {}'.format(DBTBESC(tableid)))
+        except:
+            pass
 
     #Check if the user has permission to write
     #The settingsTable is the global table
@@ -179,8 +175,8 @@ class SettingsDAO(object):
         self._checkPermissions('graphs', tableid)
         crosslink = graphSettings['crossLink']
 
-        self._execSql("INSERT INTO graphs (graphid, tableid, tpe, dispname, settings, crosslnk, ordr) VALUES (%s, %s, %s, %s, %s, %s, 0)", graphid,
-            tableid, 
+        self._execSql("INSERT INTO graphs (graphid, tableid, tpe, dispname, settings, crosslnk) VALUES (%s, %s, %s, %s, %s, %s)", graphid,
+            tableid,
             'tree', 
             graphSettings['name'],
             graphSettings.serialize(), 

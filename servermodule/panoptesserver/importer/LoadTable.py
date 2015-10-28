@@ -215,8 +215,16 @@ class LoadTable(threading.Thread):
             colTokens.append("`{}_column_index` INT ".format(self._columnIndexField))
         if self._rowIndexField is not None:
             colTokens.append("`{}_row_index` INT  ".format(self._rowIndexField))
-            
+
+        #Get names in header file
+        with open(self._sourceFileName, 'r') as sourceFile:
+            header_names = sourceFile.readline().strip().replace(' ', '_').split(self._separator)
         for col in self._loadSettings.getPropertyNames():
+            if col not in header_names:
+                raise Exception("Can't find column %s in data file for %s" % (col, tableid))
+        for col in header_names:
+            if col not in self._loadSettings.getPropertyNames():
+                raise Exception("Data file for %s contains column %s not seen in settings" % (tableid, col))
             if col == "AutoKey":
                 continue
             name = self._loadSettings.getPropertyValue(col,'id')
@@ -238,9 +246,9 @@ class LoadTable(threading.Thread):
         return sql
 
 
-    def _loadTable(self, inputFile): 
+    def _loadTable(self, inputFile):
         sql = "COPY OFFSET 2 INTO %s from '%s' USING DELIMITERS '%s','%s' NULL AS ''" % (DBTBESC(self._tableId), inputFile, self._separator, self._lineSeparator);
-        self._dao._execSqlLoad(sql)
+        self._dao._execSql(sql)
         
         
 
@@ -287,7 +295,7 @@ class LoadTable(threading.Thread):
                 with open(self._destFileName, 'w') as ofp:
                     if ofp is None:
                         raise Exception('Unable to write to temporary file ' + self._destFileName)
-    
+
                     header = ifp.readline()
                     
                     if "\r\n" in header:
@@ -424,7 +432,8 @@ class LoadTable(threading.Thread):
                 table=DBTBESC(tableid)
             ))
             self._dao._execSql('ALTER TABLE {0} ADD COLUMN subsetid INT'.format(DBTBESC(subsetTableName)))
-            self._dao.createIndex('primkey',subsetTableName, self._loadSettings["primKey"])
-            self._dao.createIndex('subsetid',subsetTableName, 'subsetid')
+            # Taken out when changing to monetdb, need to understand if these are needed.
+            # self._dao.createIndex('primkey',subsetTableName, self._loadSettings["primKey"])
+            # self._dao.createIndex('subsetid',subsetTableName, 'subsetid')
             
 

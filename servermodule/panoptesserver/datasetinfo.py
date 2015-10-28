@@ -20,7 +20,7 @@ def response(returndata):
     needfullreload = False
     needconfigreload = False
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
-        cur.execute('SELECT `content` FROM `settings` WHERE `id`="DBSchemaVersion"')
+        cur.execute('SELECT "content" FROM "settings" WHERE "id"=%s', ("DBSchemaVersion",))
         rs = cur.fetchone()
         if rs is None:
             needfullreload = True
