@@ -247,7 +247,7 @@ class LoadTable(threading.Thread):
 
 
     def _loadTable(self, inputFile):
-        sql = "COPY OFFSET 2 INTO %s from '%s' USING DELIMITERS '%s','%s' NULL AS ''" % (DBTBESC(self._tableId), inputFile, self._separator, self._lineSeparator);
+        sql = "COPY OFFSET 2 INTO %s from '%s' USING DELIMITERS '%s','%s' NULL AS '' LOCKED" % (DBTBESC(self._tableId), inputFile, self._separator, self._lineSeparator);
         self._dao._execSql(sql)
         
         
