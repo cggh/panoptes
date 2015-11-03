@@ -8,7 +8,7 @@ CREATE TABLE datasetindex  (
     PRIMARY KEY (id)
 );
 CREATE TABLE calculations (
-  id varchar(255) DEFAULT NULL,
+  id varchar(255) NOT NULL,
   "user" varchar(255) DEFAULT NULL,
   "timestamp" varchar(255) DEFAULT NULL,
   name varchar(300) DEFAULT NULL,

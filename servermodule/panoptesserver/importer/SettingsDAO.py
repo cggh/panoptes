@@ -14,7 +14,6 @@ from PanoptesConfig import PanoptesConfig
 import time
 import math
 import sqlparse
-from _mysql import OperationalError, ProgrammingError
 from Numpy_to_SQL import Numpy_to_SQL
 import monetdb.control
 
@@ -56,7 +55,7 @@ class SettingsDAO(object):
             return cur.fetchall()
     
     def _execSql(self, sql, *args):
-        self._log('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args)
+        self._log(repr('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args))
 
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
         self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
@@ -252,21 +251,16 @@ class SettingsDAO(object):
             self._log("Created table using Numpy_to_SQL")
     
             #Add an index to the table - catch the exception if it exists.
-            sql = "ALTER TABLE `{0}` ADD `{2}_{3}_index` INT DEFAULT NULL;".format(
+            sql = 'ALTER TABLE "{0}" ADD "{2}_{3}_index" INT DEFAULT NULL;'.format(
                 table_settings[dataTable],
                 table_settings[indexField],
                 tableid,
                 dimension)
-            try:
-                self._execSql(sql)
-            except OperationalError as e:
-                if e[0] != 1060:
-                    raise e
-                    
+            self._execSql(sql)
+
             #We have a datatable - add an index to it then copy that index across to the data table
-            self._execSql("ALTER TABLE {} ADD `index` INT DEFAULT NULL;".format(DBTBESC(tempTable)))
-            self._execSql("SELECT @i:=-1;UPDATE {} SET `index` = @i:=@i+1;".format(DBTBESC(tempTable)))
-            sql = """UPDATE `{0}` INNER JOIN `{3}` ON `{0}`.`{1}` = `{3}`.`{1}` SET `{0}`.`{2}_{4}_index` = `{3}`.`index`;
+            self._execSql('alter table "{}" add column "index" int auto_increment;'.format(tempTable))
+            sql = """UPDATE "{0}" SET "{2}_{4}_index" = (select "{3}"."index" from "{3}" where "{0}"."{1}" = "{3}"."{1}") ;
                      """.format(
                 table_settings[dataTable],
                 table_settings[indexField],
@@ -277,7 +271,7 @@ class SettingsDAO(object):
             self.dropTable(tempTable)
             #Now check we have no NULLS
     
-            sql = "SELECT `{1}_{2}_index` from `{0}` where `{1}_{2}_index` IS NULL".format(
+            sql = 'SELECT "{1}_{2}_index" from "{0}" where "{1}_{2}_index" IS NULL'.format(
                 table_settings[dataTable],
                 tableid,
                 dimension)
@@ -287,29 +281,22 @@ class SettingsDAO(object):
 
         else:
             #Add an index to the table - catch the exception if it exists.
-            sql = "ALTER TABLE `{0}` ADD `{2}_{3}_index` INT DEFAULT NULL;".format(
+            sql = 'ALTER TABLE "{0}" ADD "{2}_{3}_index" INT DEFAULT NULL;'.format(
                 table_settings[dataTable],
                 table_settings[indexField],
                 tableid,
                 dimension)
-            try:
-                self._execSql(sql)
-            except OperationalError as e:
-                if e[0] != 1060:
-                    raise e
+            self._execSql(sql)
 
             #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
-            if max_line_count:
-                sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_{3}_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {4};"
-            else:
-                sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_{3}_index` = @i:=@i+1 ORDER BY `{1}`;"
-
+            sql = 'create temporary table "index" as select "{5}", row_number() over (order by "{1}") from "{0}" with data;' \
+                  'update "{0}" set {2}_{3}_index=(select "L1" from "index" where "index"."{5}"="{0}"."{5}");'
             sql = sql.format(
                 table_settings[dataTable],
                 table_settings[indexField],
-                tableid, dimension, max_line_count)
+                tableid, dimension, max_line_count, primKey)
             self._execSql(sql)
-    
+
     def saveSettings(self, token, st):
         self._checkPermissions('settings', None)
         self._execSql("INSERT INTO settings VALUES (%s, %s)", token, st)

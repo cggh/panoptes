@@ -203,33 +203,29 @@ class LoadTable(threading.Thread):
     def _createTable(self, tableid):
         sql = 'CREATE TABLE {0} (\n'.format(DBTBESC(tableid))
         colTokens = []
-        if self._loadSettings["primKey"] == "AutoKey":
-            colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(DBCOLESC(self._loadSettings["primKey"])))
-        if self._allowSubSampling:
-            colTokens.append("_randomval_ double")
-        
-        #This is connected to Import2DDataTable - it's much quicker to add it now rather than 
-        #when doing the import
-        #Note - not the same table
-        if self._columnIndexField is not None:
-            colTokens.append("`{}_column_index` INT ".format(self._columnIndexField))
-        if self._rowIndexField is not None:
-            colTokens.append("`{}_row_index` INT  ".format(self._rowIndexField))
 
         #Get names in header file
         with open(self._sourceFileName, 'r') as sourceFile:
             header_names = sourceFile.readline().strip().replace(' ', '_').split(self._separator)
         for col in self._loadSettings.getPropertyNames():
-            if col not in header_names:
+            if col not in header_names and col != 'AutoKey':
                 raise Exception("Can't find column %s in data file for %s" % (col, tableid))
-        for col in header_names:
+        additional_cols = []
+        for i,col in enumerate(header_names):
             if col not in self._loadSettings.getPropertyNames():
-                raise Exception("Data file for %s contains column %s not seen in settings" % (tableid, col))
+                additional_cols.append((i, col))
             if col == "AutoKey":
                 continue
-            name = self._loadSettings.getPropertyValue(col,'id')
-            typedefn = self._loadSettings.getPropertyValue(col,'dataType')
-            maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
+        if len(additional_cols) > 0:
+            cols = ','.join(col for (i,col) in additional_cols)
+            positions = ','.join(str(i+1) for (i,col) in additional_cols)
+            raise Exception("Data file for %s contains column(s) %s at position(s) %s not seen in settings. You can "
+                            "cut out this column with 'cut -f %s data --complement'" % (tableid, cols, positions, positions))
+        #Table order has to be file order
+        for col in header_names:
+            name = self._loadSettings.getPropertyValue(col,'Id')
+            typedefn = self._loadSettings.getPropertyValue(col,'DataType')
+            maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
             st = DBCOLESC(name)
             typestr = ''
             if typedefn == 'Text':
@@ -249,7 +245,20 @@ class LoadTable(threading.Thread):
     def _loadTable(self, inputFile):
         sql = "COPY OFFSET 2 INTO %s from '%s' USING DELIMITERS '%s','%s' NULL AS '' LOCKED" % (DBTBESC(self._tableId), inputFile, self._separator, self._lineSeparator);
         self._dao._execSql(sql)
-        
+
+        if self._loadSettings["primKey"] == "AutoKey":
+            self._dao._execSql("ALTER TABLE %s ADD COLUMN %s int AUTO_INCREMENT PRIMARY KEY" % (DBTBESC(self._tableId),
+                                                                                            DBCOLESC(self._loadSettings["PrimKey"])))
+        #
+        # #This is connected to Import2DDataTable - it's much quicker to add it now rather than
+        # #when doing the import
+        # #Note - not the same table
+        # if self._columnIndexField is not None:
+        #     colTokens.append('"{}_column_index" INT '.format(self._columnIndexField))
+        # if self._rowIndexField is not None:
+        #     colTokens.append('"{}_row_index" INT  '.format(self._rowIndexField))
+
+
         
 
     def _addIndexes(self):
@@ -268,14 +277,6 @@ class LoadTable(threading.Thread):
         if self._isPositionOnGenome:
             self._log('Indexing chromosome')
             self._dao.createIndex(tableid + '_chrompos', tableid, self._chrom + "," + self._pos)
-            
-            
-        if self._allowSubSampling:
-            self._dao.createIndex(tableid + '_randomindex', tableid, '_randomval_')
-            
-
-
-
 
     def _createSubSampleTables(self):
         

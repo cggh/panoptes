@@ -37,11 +37,11 @@ class Numpy_to_SQL(object):
     #Currently assumes simple 1D
     def create_table(self, table_name, column_name, array):
         column_type = self.dtype_to_column_type(str(array.dtype))
-        sql = "CREATE TABLE `{0}` (`{1}` {2})".format(table_name, column_name, column_type)
+        sql = 'CREATE TABLE "{0}" ("{1}" {2})'.format(table_name, column_name, column_type)
         yield lambda cur: cur.execute(sql)
         for start in xrange(0, len(array), 500):
             end = min(start + 500, len(array))
-            sql = "INSERT INTO `{0}` (`{1}`) VALUES (%s)".format(table_name, column_name)
+            sql = 'INSERT INTO "{0}" ("{1}") VALUES (%s)'.format(table_name, column_name)
             data = [(ele,) for ele in array[start: end]]
             yield lambda cur: cur.executemany(sql,
                                               data)
