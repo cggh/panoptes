@@ -73,6 +73,9 @@ class SettingsDAO(object):
         control = monetdb.control.Control(passphrase='monetdb')
         try:
             control.stop(db)
+        except monetdb.exceptions.OperationalError:
+            pass
+        try:
             control.destroy(db)
         except monetdb.exceptions.OperationalError:
             pass
