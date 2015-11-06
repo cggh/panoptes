@@ -77,31 +77,29 @@ class ImportSettings:
                             ('CategoryColors', {
                                    'type': 'Block',
                                    'required': False,
-                                   'propName': 'categoryColors',
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
-                            ('MaxColumnWidth', {
+                            ('DefaultWidth', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'Specifies the maximum width (in pixels) used for the column representing this property in a table view.\n  Longer text will be abbreviated with ellipsis'
+                                   'description': 'Sets the deafult column width in pixels.',
+                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('BarWidth', {
-                                   'type': 'Value',
+                            ('ShowBar', {
+                                   'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined',
+                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined.',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MinVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'default': 0,
                                    'description': 'For *Value* types, upper extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
                             ('MaxVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'default': 1.0,
                                    'description': 'For *Value* types, lower extent of scale',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
@@ -115,7 +113,6 @@ class ImportSettings:
                             ('DecimDigits', {
                                    'type': 'Value',
                                    'required': False,
-                                   'propName': 'decimDigits',
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
                                    'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
@@ -189,14 +186,22 @@ class ImportSettings:
                             ('ShowInTable', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'showInTable',
-                                   'description': 'If set, this property will appear by default in data table grids in the application'
+                                   'default': True,
+                                   'propName': 'ShowInTable',
+                                   'description': 'If set to false this property will not be available to be shown in tables in the application'
                                    }),
                             ('ShowInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'propName': 'showInBrowser',
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
+                                   }),
+                            ('TableDefaultVisible', {
+                                   'type': 'Boolean',
+                                   'required': False,
+                                   'default': True,
+                                   'propName': 'showInBrowser',
+                                   'description': 'If set to true (default) then this property will appear in tables when they are first shown'
                                    }),
                             ('BrowserDefaultVisible', {
                                    'type': 'Boolean',
@@ -331,7 +336,6 @@ class ImportSettings:
             self._propidMap[propid] = {
                                           'Id': propid,
                                           'Name': propid,
-                                          'ShowInTable': True,
                                           'DataType': 'Value',
                                           'DecimDigits': 0
                                           }

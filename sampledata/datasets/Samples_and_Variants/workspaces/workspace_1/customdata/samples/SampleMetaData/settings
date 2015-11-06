@@ -6,7 +6,6 @@ Properties:
   Name: The Year
   Description: The year the sample was collected
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0
   ExternalUrl: http://en.wikipedia.org/wiki/{value}
 

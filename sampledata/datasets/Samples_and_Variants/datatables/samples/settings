@@ -27,14 +27,12 @@ Properties:
   Name: Sample key                 # Display name of the property
   Description: Sample identifier   # Description of the property
   DataType: Text                   # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  ShowInTable: true                # If true, this property will appear by default in data table grids in the application
   Search: StartPattern             # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
 - Id: Site_ID
   Name: Site ID
   Description: Identifier of the site the sample was collected from
   DataType: Text
-  ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: samplingsites          # Datatable id of the parent table
@@ -45,7 +43,6 @@ Properties:
   Name: Contributor_ID
   Description: Identifier of the contributing entity
   DataType: Text
-  ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: contributors           # Data table id of the parent table
@@ -62,18 +59,15 @@ Properties:
   MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
   MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   DecimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
-  ShowInTable: true
 
 - Id: InUse
   Name: Used
   Description: Flag determining if sample is used for analysis
   DataType: Boolean
-  ShowInTable: true
 
 - Id: SampleTypeID
   Name: Sample type ID
   DataType: Text
-  ShowInTable: true
   Relation:
     TableId: sampletypes
     ForwardName: is
@@ -83,15 +77,12 @@ Properties:
   Name: Comment
   Description: An example of a comment string
   DataType: Text
-  ShowInTable: true
-  MaxColumnWidth: 120               # Specifies the maximum pixel width used for the column representing this property in a table
   Search: Pattern
 
 - Id: ExternalRef
   Name: External Reference
   Description: Reference on some other site with a link
   DataType: Text
-  ShowInTable: true
   ExternalUrl: http://en.wikipedia.org/wiki/{value}
 
   

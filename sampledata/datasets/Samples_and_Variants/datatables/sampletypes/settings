@@ -26,7 +26,6 @@ Properties:
   Name: Type ID                                      # Display name of the property
   Description: Unique identifier of a sampling type  # Description of the property
   DataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  ShowInTable: true                                  # If true, this property will appear by default in data table grids in the application
 
 - Id: TypeName
   Name: Type name
@@ -37,5 +36,4 @@ Properties:
   Name: Description
   DataType: Text
   Search: Pattern
-  MaxColumnWidth: 120
 

@@ -15,27 +15,22 @@ Properties:
 - Id: ID
   Description: Population identifier
   DataType: Text
-  ShowInTable: true
   Search: Pattern
 
 - Id: Name
   Description: Population name
   DataType: Text
-  ShowInTable: true
   Search: Pattern
 
 - Id: Longitude
   Description: Longitude of the center of gravity of the population
   DataType: GeoLongitude
-  ShowInTable: true
 
 - Id: Lattitude
   Description: Lattitude of the center of gravity of the population
   DataType: GeoLattitude
-  ShowInTable: true
 
 - Id: SampleCount
   Name: Sample count
   Description: Number of samples in the population
   DataType: Value
-  ShowInTable: true

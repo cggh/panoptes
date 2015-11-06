@@ -19,25 +19,21 @@ Properties:
   Name: Chromosome
   Description: Chromosome name
   DataType: Text
-  ShowInTable: true
 
 - Id: pos
   Name: Position
   Description: Genomic position of the variant on the chromosome (1-based)
   DataType: Value
-  ShowInTable: true
   DecimDigits: 0
 
 - Id: SnpName
   Name: Variant name
   Description: Unique name of the variant
   DataType: Text
-  ShowInTable: true
 
 - Id: Value1, Value2, Value3
   DataType: Value
   Index: true
-  ShowInTable: true
   ShowInBrowser: true
   MinVal: 0
   MaxVal: 2
@@ -63,7 +59,6 @@ Properties:
   Name: Extra 1
   Description: An example categorical property
   DataType: Text
-  ShowInTable: true
   ShowInBrowser: true
   CategoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }
 

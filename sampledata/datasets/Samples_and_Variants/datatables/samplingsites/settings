@@ -29,14 +29,12 @@ Properties:
   Name: Site ID                                      # Display name of the property
   Description: Unique identifier of a sampling site  # Description of the property
   DataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  ShowInTable: true                                  # If true, this property will appear by default in data table grids in the application
   Search: StartPattern
 
 - Id: Country
   Name: Country Code
   DataType: Text
   IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  ShowInTable: true
   Index: true                # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Search: Pattern
 
@@ -52,7 +50,6 @@ Properties:
   Name: Contributor_ID
   Description: Identifier of the contributing entity
   DataType: Text
-  ShowInTable: true
   Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
   Relation:                         # This block defines a many-to-one foreign relation to a parent table
     TableId: contributors           # Data table id of the parent table

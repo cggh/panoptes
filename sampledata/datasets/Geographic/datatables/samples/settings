@@ -19,41 +19,34 @@ Properties:
 
 - Id: ID
   Name: Sample ID
-  ShowInTable: true
   DataType: Text
   Search: StartPattern
 
 - Id: CatId
   Name: Category ID
   DataType: Text
-  ShowInTable: true
   IsCategorical: true
 
 - Id: RegionId
   Name: Region ID
   DataType: Text
-  ShowInTable: true
   IsCategorical: true
 
 - Id: CollectionDate
   Name: Collection date
   DataType: Date
-  ShowInTable: true
 
 - Id: Longitude
   Name: Longitude
   DataType: GeoLongitude
-  ShowInTable: true
 
 - Id: Lattitude
   Name: Lattitude
   DataType: GeoLattitude
-  ShowInTable: true
 
 - Id: NumProp1
   Name: Numerical 1
   DataType: Value
-  ShowInTable: true
   MinVal: -10
   MaxVal: 10
   BarWidth: 100
@@ -61,7 +54,6 @@ Properties:
 - Id: NumProp2
   Name: Numerical 2
   DataType: Value
-  ShowInTable: true
   MinVal: -10
   MaxVal: 10
   BarWidth: 100
@@ -70,7 +62,6 @@ Properties:
   Name: Filtered
   DataType: Boolean
   ReadData: false
-  ShowInTable: true
   CanUpdate: true
   CategoryColors:
     "No": rgb(255,128,60)
