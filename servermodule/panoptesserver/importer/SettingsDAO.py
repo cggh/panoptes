@@ -293,7 +293,7 @@ class SettingsDAO(object):
 
             #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
             sql = 'create temporary table "index" as select "{5}", row_number() over (order by "{1}") from "{0}" with data;' \
-                  'update "{0}" set {2}_{3}_index=(select "L1" from "index" where "index"."{5}"="{0}"."{5}");'
+                  'update "{0}" set {2}_{3}_index=(select "v" from "index" where "index"."{5}"="{0}"."{5}");'
             sql = sql.format(
                 table_settings[dataTable],
                 table_settings[indexField],

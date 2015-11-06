@@ -15,7 +15,6 @@ from DQXDbTools import DBCursor
 import logging
 import warnings
 import threading
-import MySQLdb
 from SettingsDAO import SettingsDAO
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
