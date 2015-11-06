@@ -68,6 +68,7 @@
     "rc-tooltip": "^2.10.1",
     "react": "^0.14.0",
     "react-addons-create-fragment": "^0.14.0",
+    "react-addons-linked-state-mixin": "^0.14.2",
     "react-addons-pure-render-mixin": "^0.14.0",
     "react-addons-transition-group": "^0.14.0",
     "react-addons-update": "^0.14.0",
