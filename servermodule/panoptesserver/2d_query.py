@@ -50,10 +50,10 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
         query = "WHERE " + where.querystring_params + ' AND ' + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
     else:
         query = "WHERE " + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
-    fields_string = ','.join('`'+DQXDbTools.ToSafeIdentifier(f)+'`' for f in fields)
+    fields_string = ','.join('"'+DQXDbTools.ToSafeIdentifier(f)+'"' for f in fields)
     table = DQXDbTools.ToSafeIdentifier(table)
     order = DQXDbTools.ToSafeIdentifier(order)
-    sqlquery = "SELECT {fields_string} FROM {table} {query} ORDER BY {order}".format(**locals())
+    sqlquery = 'SELECT {fields_string} FROM "{table}" {query} ORDER BY "{order}"'.format(**locals())
     params = where.queryparams
     #Set the limit to one past the req
     limit = limit or fail_limit
