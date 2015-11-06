@@ -21,8 +21,8 @@ fi
 
 echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
-mkdir -p webapp/scripts/Local
-cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
+#mkdir -p webapp/scripts/Local
+#cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
 mkdir -p build
 rm -rf build/DQX
 rm -rf build/DQXServer
@@ -151,16 +151,17 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
-cd $PROJECT_ROOT
-if [ "$1" = "DEV" ]; then
-    echo -e "${green}  Creating DEVELOPMENT html${NC}"
-    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
-else
-    echo -e "${green}  Creating PRODUCTION html${NC}"
-    VERSION=`uuidgen`
-    cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
-    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION
-fi
+#Don't need to do this in react world
+#cd $PROJECT_ROOT
+#if [ "$1" = "DEV" ]; then
+#    echo -e "${green}  Creating DEVELOPMENT html${NC}"
+#    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
+#else
+#    echo -e "${green}  Creating PRODUCTION html${NC}"
+#    VERSION=`uuidgen`
+#    cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
+#    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION
+#fi
 echo -e "${green}Done!${NC}"
 
 #if [ -z "$WSGI_FOLDER" ]; then
