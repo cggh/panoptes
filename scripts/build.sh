@@ -19,6 +19,7 @@ then
   exit 1
 fi
 
+echo -e "${red}THIS BRANCH IS UNDERGOING LARGE REWRITES YOU SHOULD USE 1.6.2${NC}"
 echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
 #mkdir -p webapp/scripts/Local
