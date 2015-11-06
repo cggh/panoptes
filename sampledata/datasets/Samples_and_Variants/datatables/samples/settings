@@ -77,7 +77,6 @@ Properties:
   Name: Comment
   Description: An example of a comment string
   DataType: Text
-  MaxColumnWidth: 120               # Specifies the maximum pixel width used for the column representing this property in a table
   Search: Pattern
 
 - Id: ExternalRef
