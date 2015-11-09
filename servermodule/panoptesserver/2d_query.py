@@ -5,7 +5,6 @@
 import DQXDbTools
 from operator import itemgetter
 import os
-import MySQLdb
 import h5py
 import itertools
 import numpy as np
@@ -21,20 +20,17 @@ CHUNK_SIZE = 400
 
 def desc_to_dtype(desc):
     col_type = desc[1]
-    if col_type in MySQLdb.STRING:
-        #Returning none lets numpy figure it out
-        return None
     dtype = {
-        MySQLdb.FIELD_TYPE.BIT: '?',
-        MySQLdb.FIELD_TYPE.SHORT: 'i1',
-        MySQLdb.FIELD_TYPE.CHAR: 'u1',
-        MySQLdb.FIELD_TYPE.LONG: 'i4',
-        MySQLdb.FIELD_TYPE.LONGLONG: 'i8',
-        MySQLdb.FIELD_TYPE.TINY: 'i1',
-        MySQLdb.FIELD_TYPE.DOUBLE: 'f8',
-        MySQLdb.FIELD_TYPE.FLOAT: 'f4'
+        'boolean': '?',
+        'tinyint': 'i1',
+        'char': 'u1',
+        'int': 'i4',
+        'bigint': 'i8',
+        'double': 'f8',
+        'float': 'f8',
+        'real': 'f4',
     }
-    return dtype[col_type]
+    return dtype.get(col_type,None)
 
 
 def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field):
@@ -113,13 +109,6 @@ def select_by_list(properties, row_idx, col_idx):
 def get_table_ids(cur, dataset, datatable):
     tableSettings = Settings2Dtable()
     tableSettings.loadFile(os.path.join(config.SOURCEDATADIR, 'datasets', dataset, '2D_datatables', datatable, 'settings'))
-    # rowTableSettings = SettingsDataTable()
-    # rowTableSettings.loadFile(
-    #     os.path.join(os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['rowDataTable'], 'settings'))
-    # columnTableSettings = SettingsDataTable()
-    # columnTableSettings.loadFile(
-    #     os.path.join(
-    #         os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['columnDataTable'], 'settings'))
 
     return tableSettings['columnDataTable'], tableSettings['rowDataTable']
 
@@ -262,7 +251,7 @@ def handler(start_response, request_data):
         else:
             if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
-                sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
+                sqlquery = 'SELECT "{col_field}", "{idx_field}" FROM "{table}" WHERE "{col_field}" IN ({params})'.format(
                     idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
                     table=DQXDbTools.ToSafeIdentifier(col_tablename),
                     params="'"+"','".join(map(DQXDbTools.ToSafeIdentifier, row_order_columns))+"'",
