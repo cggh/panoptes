@@ -24,6 +24,7 @@ echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
 #mkdir -p webapp/scripts/Local
 #cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
+mkdir -p webapp/scripts
 mkdir -p build
 rm -rf build/DQX
 rm -rf build/DQXServer
