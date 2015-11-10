@@ -168,13 +168,6 @@ class ImportSettings:
                                                                 })
                                                 ))
                                    }),
-                          
-                            ('readData', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'default': True,
-                                   'description': 'If set to false, this property will not be imported from the TAB-delimited source file'
-                                   }),
                             ('canUpdate', {
                                    'type': 'Boolean',
                                    'default': False,

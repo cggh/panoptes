@@ -102,10 +102,8 @@ class LoadTable(threading.Thread):
         if not(self._loadSettings["primKey"] == "AutoKey") and (self._loadSettings["primKey"] not in self._fileColIndex):
             raise Exception('File is missing primary key '+self._loadSettings["primKey"])
         for col in self._loadSettings.getPropertyNames():
-            # if 'ReadData' not in col:
-            #     print('==========' + str(col))
             colname = self._loadSettings.getPropertyValue(col,"id")
-            if (self._loadSettings.getPropertyValue(col,'readData') and (colname not in self._fileColIndex)):
+            if colname not in self._fileColIndex:
                 if not colname == "AutoKey":
                     raise Exception('File is missing column '+colname)
     
