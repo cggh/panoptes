@@ -19,15 +19,10 @@ var SessionStore = Fluxxor.createStore({
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
-          component: "containers/GenomeBrowserWithActions",
+          component: "containers/DataItem",
           props: {
-            chromosome: 'Pf3D7_01_v3',
-            components: {
-              test: {
-                component: 'NumericalSummary',
-                props: {}
-              }
-            }
+            table: 'variants',
+            primKey: 'SNP_00003'
           }
         }
       },
@@ -47,7 +42,7 @@ var SessionStore = Fluxxor.createStore({
       SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
       SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
       SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
-      SESSION.NOTIFY, this.emitIfNeeded(this.notify),
+      SESSION.NOTIFY, this.emitIfNeeded(this.notify, 'notify'),
       SESSION.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
       SESSION.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
       SESSION.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
@@ -64,7 +59,7 @@ var SessionStore = Fluxxor.createStore({
     return (payload) => {
       let old_state = this.state;
       action(payload);
-      if (!old_state.equals(this.state))
+      if (!old_state.equals(this.state) || event==='notify')
         this.emit(event);
     }
   },
