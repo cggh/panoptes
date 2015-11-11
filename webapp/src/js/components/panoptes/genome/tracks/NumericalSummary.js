@@ -14,16 +14,17 @@ const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
 const API = require('panoptes/API');
 const Icon = require('ui/Icon');
+const Toggle = require('material-ui/lib/toggle');
+const DropDownMenu = require('material-ui/lib/drop-down-menu');
 
-
-const HEIGHT= 100;
+const HEIGHT = 100;
 const INTERPOLATIONS = [
-  'linear',
-  'step',
-  'basis',
-  'bundle',
-  'cardinal',
-  'monotone'
+  {payload:'linear', text: 'Linear'},
+  {payload:'step', text: 'Step'},
+  {payload:'basis', text: 'Basis'},
+  {payload:'bundle', text: 'Bundle'},
+  {payload:'cardinal', text: 'Cardinal'},
+  {payload:'monotone', text: 'Monotone'}
 ];
 
 let NumericalSummary = React.createClass({
@@ -47,6 +48,7 @@ let NumericalSummary = React.createClass({
   getDefaultProps() {
     return {
       interpolation: 'step',
+      yScaleMode: 'dynamic'
     }
   },
 
@@ -66,16 +68,20 @@ let NumericalSummary = React.createClass({
   },
 
   updateControlsHeight() {
-    this.refs.controls.style.height = this.state.controlsOpen ?
-      _.reduce(this.refs.controls.childNodes,
-        (p, c) =>  {
-          return p + offset(c).height
-        }
-        , 0
-        ) + 'px' :
-      0;
-    this.refs.controls.style.width = this.state.controlsOpen ?
-    "100%" : this.props.sideWidth+'px';
+    console.log(this.refs);
+    let height = _.reduce(this.refs.controls.childNodes,
+        (p, c) => p + offset(c).height, 0) + 'px';
+    this.refs.controls.style.height = height;
+    this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
+    this.refs.controlsContainer.style.width = this.state.controlsOpen ?
+      "100%" : this.props.sideWidth + 'px';
+    //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
+    if (!this.state.controlsOpen) {
+      this.refs.controlsContainer.style.overflow = 'hidden';
+      clearTimeout(this.controlOverFlowTimeout);
+    }
+    else
+      this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500)
   },
 
   applyData(data) {
@@ -139,9 +145,9 @@ let NumericalSummary = React.createClass({
     e.stopPropagation();
   },
 
-  handleControlsChange() {
+  handleControlsChange(event, selectedIndex) {
     this.props.componentUpdate({
-      interpolation: this.refs.interpolation.value
+      interpolation: INTERPOLATIONS[selectedIndex].payload
     })
   },
 
@@ -154,21 +160,21 @@ let NumericalSummary = React.createClass({
     let min = columns ? columns.min || [] : [];
     if (width == 0)
       return null;
-    let effWidth = width-sideWidth;
+    let effWidth = width - sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
-    let offset = scale(dataStart) - scale(start - dataStep/2); //Shift by half width to middle of window
+    let offset = scale(dataStart) - scale(start - dataStep / 2); //Shift by half width to middle of window
     let line = d3.svg.line()
       .interpolate(interpolation)
       .defined(_.isFinite)
-      .x((d,i) => i)
-      .y((d) => d/210)(avg);
+      .x((d, i) => i)
+      .y((d) => d / 210)(avg);
     let area = d3.svg.area()
       .interpolate(interpolation)
       .defined(_.isFinite)
-      .x((d,i) => i)
-      .y((d) => d/210)
-      .y0((d,i) => min[i]/210)(max);
+      .x((d, i) => i)
+      .y((d) => d / 210)
+      .y0((d, i) => min[i] / 210)(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -177,9 +183,9 @@ let NumericalSummary = React.createClass({
               <Icon className="close" name="times" onClick={this.handleControlToggle}/>
               <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
             </div>
-            <div className="side-name"> Uniqueness </div>
+            <div className="side-name"> Uniqueness</div>
           </div>
-          <div className="channel-data" style={{width:`${effWidth}px`}} >
+          <div className="channel-data" style={{width:`${effWidth}px`}}>
             <svg className="numerical-summary" width={effWidth} height={height}>
               <g style={{transform:`translate(${offset}px, ${height}px) scale(${stepWidth},${-height})`}}>
                 <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
@@ -189,17 +195,18 @@ let NumericalSummary = React.createClass({
             </svg>
           </div>
         </div>
-        <div ref="controls" className="channel-controls">
-          <div className="control">
-            Interpolation mode:
-            <select ref="interpolation" value={interpolation} onChange={this.handleControlsChange}>
-              {_.map(INTERPOLATIONS, (name) =>
-                  <option key={name}
-                          value={name}>
-                    {name}
-                  </option>
-              )}
-            </select>
+        <div ref="controlsContainer" className="channel-controls-container">
+          <div ref="controls" className="channel-controls" style={{width:width+'px'}}>
+            <div className="control">
+              Interpolation
+              <DropDownMenu menuItems={INTERPOLATIONS} value={interpolation} onChange={this.handleControlsChange}/>
+            </div>
+            <div className="control">
+              <Toggle
+                name="toggleName1"
+                value="toggleValue1"
+                label="Dynamic Y Scale"/>
+            </div>
           </div>
         </div>
       </div>

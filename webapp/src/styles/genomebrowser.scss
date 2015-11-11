@@ -109,18 +109,18 @@
           }
         }
       }
-      .channel-controls {
+      .channel-controls-container {
         box-shadow: $z-1-shadow;
         position: relative;
-        transition-property: all;
-        transition-duration: .5s;
-        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-        overflow: hidden;
+        transition: height .5s, width .5s;
         background: white;
         height: 0;
         width: 0;
-        .control {
-          padding: 16px;
+        overflow: hidden;
+        .channel-controls {
+          .control {
+          }
+
         }
       }
     }
