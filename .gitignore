@@ -53,3 +53,4 @@ nosetests.xml
 .project
 .pydevproject
 gunicorn.pid
+config.py
