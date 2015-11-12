@@ -12,7 +12,7 @@ gulp.task("webpack-dev-server", function(callback) {
   myConfig.devtool = "eval";
   myConfig.debug = true;
   myConfig.entry.panoptes = myConfig.entry.panoptes.concat(['webpack/hot/dev-server']);
-  myConfig.module.loaders[0].loaders = ['react-hot', 'babel?optional[]=runtime&stage=1'];
+  myConfig.module.loaders[0].loaders = ['react-hot', myConfig.module.loaders[0].loaders[0]];
   myConfig.plugins = [
     new HtmlWebpackPlugin( {
       template: path.resolve(__dirname, "../../src/index.html"),

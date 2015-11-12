@@ -4,6 +4,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   cache: true,
   entry: {
+    babel:['babel-polyfill'],
     panoptes: [path.resolve(__dirname, "../src/js/index.js")]
   },
   output: {
@@ -21,7 +22,7 @@ module.exports = {
       {
         test: /\.js?$/,
         exclude: /(node_modules|bower_components)/,
-        loaders: ['babel?optional[]=runtime&stage=1']
+        loaders: ['babel?presets[]=es2015&presets[]=stage-1&presets[]=react']
       },
       // required to write "require('./style.css')"
       { test: /\.css$/,    loader: "style!css!autoprefixer" },
