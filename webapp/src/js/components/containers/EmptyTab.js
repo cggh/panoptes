@@ -41,7 +41,6 @@ let EmptyTab = React.createClass({
 
   render() {
     let {tables, chromosomes} = this.config;
-    console.log(this.config)
     let actions = this.getFlux().actions.session;
     return (
       <div className="horizontal stack start-align">
