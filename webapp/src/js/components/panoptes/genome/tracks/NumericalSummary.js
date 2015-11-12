@@ -14,7 +14,7 @@ const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
 const API = require('panoptes/API');
 const Icon = require('ui/Icon');
-const Toggle = require('material-ui/lib/toggle');
+const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
 
 const HEIGHT = 100;
@@ -48,7 +48,7 @@ let NumericalSummary = React.createClass({
   getDefaultProps() {
     return {
       interpolation: 'step',
-      yScaleMode: 'dynamic'
+      autoYScale: true
     }
   },
 
@@ -145,15 +145,9 @@ let NumericalSummary = React.createClass({
     e.stopPropagation();
   },
 
-  handleControlsChange(event, selectedIndex) {
-    this.props.componentUpdate({
-      interpolation: INTERPOLATIONS[selectedIndex].payload
-    })
-  },
-
   render() {
     let height = HEIGHT;
-    let { start, end, width, sideWidth, interpolation, ...other } = this.props;
+    let { start, end, width, sideWidth, interpolation, autoYScale, componentUpdate, ...other } = this.props;
     let { dataStart, dataStep, columns, controlsOpen} = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
@@ -198,14 +192,22 @@ let NumericalSummary = React.createClass({
         <div ref="controlsContainer" className="channel-controls-container">
           <div ref="controls" className="channel-controls" style={{width:width+'px'}}>
             <div className="control">
-              Interpolation
-              <DropDownMenu menuItems={INTERPOLATIONS} value={interpolation} onChange={this.handleControlsChange}/>
+              <div className="label">Interpolation</div>
+              <DropDownMenu className="dropdown"
+                            menuItems={INTERPOLATIONS}
+                            value={interpolation}
+                            onChange={(e, i) => componentUpdate({interpolation: INTERPOLATIONS[i].payload})}/>
             </div>
             <div className="control">
-              <Toggle
-                name="toggleName1"
+              <div className="label">Auto Y Scale</div>
+              <Checkbox
+                name="autoYScale"
                 value="toggleValue1"
-                label="Dynamic Y Scale"/>
+                defaultChecked={autoYScale}
+                onCheck={(e, checked) => {
+                console.log(checked);
+                componentUpdate({autoYScale:checked})
+                }}/>
             </div>
           </div>
         </div>

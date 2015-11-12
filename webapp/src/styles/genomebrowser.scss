@@ -118,7 +118,21 @@
         width: 0;
         overflow: hidden;
         .channel-controls {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
           .control {
+            padding-left: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            .dropdown {
+              top: -4px;
+            }
+            label {
+              //white-space: nowrap;
+            }
           }
 
         }
