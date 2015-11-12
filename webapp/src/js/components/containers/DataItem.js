@@ -1,17 +1,22 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
-const PureRenderMixin = require('mixins/PureRenderMixin');
 
+// Mixins
+const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
+// Panoptes components
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
+const PropertyList = require('panoptes/PropertyList');
 
+// UI components
 const Icon = require('ui/Icon');
+const Loading = require('ui/Loading');
 
 let DataItem = React.createClass({
   mixins: [
@@ -24,15 +29,14 @@ let DataItem = React.createClass({
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string.isRequired
   },
-
+  
   getInitialState() {
     return {
       loadStatus: 'loaded'
     };
   },
-
 
   fetchData(props) {
     let {table, primKey} = props;
@@ -61,17 +65,29 @@ let DataItem = React.createClass({
   },
 
   title() {
-    return `${this.config.tables[this.props.table].tableCapNameSingle}:${this.props.primKey}`;
+    return `${this.config.tables[this.props.table].tableCapNameSingle} "${this.props.primKey}"`;
   },
 
   render() {
     let {table, primKey, componentUpdate} = this.props;
-    let { data } = this.state;
-    return <div>
-      {`${this.config.tables[this.props.table].tableCapNameSingle}:${this.props.primKey}`}
-      { JSON.stringify(data) }
-      </div>
+    let {data, loadStatus} = this.state;
+    
+    if (data)
+        return (
+          <div>
+            <PropertyList data={data}/>
+            <Loading status={loadStatus}/>
+          </div>
+        )
+    else 
+        return (
+          <div>
+            <Loading status="custom">No data</Loading>
+          </div>
+        )
+        
   }
+
 });
 
 module.exports = DataItem;
