@@ -1,6 +1,6 @@
 Please note that master is undergoing large rewrites - you should use branch 1.6.2
 
-![logo](https://raw.github.com/cggh/panoptes/master/webapp/Bitmaps/PanoptesLarge.png)
+![logo](https://raw.github.com/cggh/panoptes/master/logo.png)
 
 Panoptes
 ========
