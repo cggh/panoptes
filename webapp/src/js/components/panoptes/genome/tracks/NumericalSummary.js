@@ -1,4 +1,5 @@
 const React = require('react');
+const ReactDOM = require('react-dom');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
@@ -16,6 +17,7 @@ const API = require('panoptes/API');
 const Icon = require('ui/Icon');
 const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
+const Slider = require('material-ui/lib/slider');
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -26,6 +28,9 @@ const INTERPOLATIONS = [
   {payload:'cardinal', text: 'Cardinal'},
   {payload:'monotone', text: 'Monotone'}
 ];
+const INTERPOLATION_HAS_TENSION = {
+  cardinal: true
+};
 
 let NumericalSummary = React.createClass({
   mixins: [
@@ -42,13 +47,16 @@ let NumericalSummary = React.createClass({
     end: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
-    interpolation: React.PropTypes.string
+    interpolation: React.PropTypes.string,
+    autoYScale: React.PropTypes.bool,
+    tension: React.PropTypes.number
   },
 
   getDefaultProps() {
     return {
       interpolation: 'step',
-      autoYScale: true
+      autoYScale: true,
+      tension: 0.5
     }
   },
 
@@ -68,10 +76,7 @@ let NumericalSummary = React.createClass({
   },
 
   updateControlsHeight() {
-    console.log(this.refs);
-    let height = _.reduce(this.refs.controls.childNodes,
-        (p, c) => p + offset(c).height, 0) + 'px';
-    this.refs.controls.style.height = height;
+    let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
     this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
     this.refs.controlsContainer.style.width = this.state.controlsOpen ?
       "100%" : this.props.sideWidth + 'px';
@@ -147,8 +152,8 @@ let NumericalSummary = React.createClass({
 
   render() {
     let height = HEIGHT;
-    let { start, end, width, sideWidth, interpolation, autoYScale, componentUpdate, ...other } = this.props;
-    let { dataStart, dataStep, columns, controlsOpen} = this.state;
+    let { start, end, width, sideWidth, interpolation, autoYScale, tension, componentUpdate, ...other } = this.props;
+    let { dataStart, dataStep, columns } = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
     let min = columns ? columns.min || [] : [];
@@ -160,11 +165,13 @@ let NumericalSummary = React.createClass({
     let offset = scale(dataStart) - scale(start - dataStep / 2); //Shift by half width to middle of window
     let line = d3.svg.line()
       .interpolate(interpolation)
+      .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
       .y((d) => d / 210)(avg);
     let area = d3.svg.area()
       .interpolate(interpolation)
+      .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
       .y((d) => d / 210)
@@ -183,39 +190,80 @@ let NumericalSummary = React.createClass({
             <svg className="numerical-summary" width={effWidth} height={height}>
               <g style={{transform:`translate(${offset}px, ${height}px) scale(${stepWidth},${-height})`}}>
                 <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
-                <path className="area" vector-effect="non-scaling-stroke" d={area}/>
-                <path className="line" vector-effect="non-scaling-stroke" d={line}/>
+                <path className="area" d={area}/>
+                <path className="line" d={line}/>
               </g>
             </svg>
           </div>
         </div>
         <div ref="controlsContainer" className="channel-controls-container">
-          <div ref="controls" className="channel-controls" style={{width:width+'px'}}>
-            <div className="control">
-              <div className="label">Interpolation</div>
-              <DropDownMenu className="dropdown"
-                            menuItems={INTERPOLATIONS}
-                            value={interpolation}
-                            onChange={(e, i) => componentUpdate({interpolation: INTERPOLATIONS[i].payload})}/>
-            </div>
-            <div className="control">
-              <div className="label">Auto Y Scale</div>
-              <Checkbox
-                name="autoYScale"
-                value="toggleValue1"
-                defaultChecked={autoYScale}
-                onCheck={(e, checked) => {
-                console.log(checked);
-                componentUpdate({autoYScale:checked})
-                }}/>
-            </div>
-          </div>
+          <Controls ref="controls" {...this.props} />
         </div>
       </div>
     );
   }
 
 });
+
+let Controls = React.createClass({
+
+  //As component update is an anon func, it looks different on every prop change,
+  // so skip it when checking
+  shouldComponentUpdate(nextProps) {
+    let { width, interpolation, tension, autoYScale } = this.props;
+    return width !== nextProps.width ||
+      interpolation !== nextProps.interpolation ||
+      tension !== nextProps.tension ||
+      autoYScale !== nextProps.autoYScale;
+  },
+
+  //Then we need to redirect componentUpdate so we always use the latest as
+  //render might not have been called if only componentUpdate changed
+  componentUpdate() {
+    this.props.componentUpdate.apply(this, arguments);
+  },
+
+  render() {
+    let { width, interpolation, tension, autoYScale } = this.props;
+    return (
+      <div className="channel-controls" style={{width:width+'px'}}>
+        <div className="control">
+          <div className="label">Interpolation</div>
+          <DropDownMenu className="dropdown"
+                        menuItems={INTERPOLATIONS}
+                        value={interpolation}
+                        onChange={(e, i) => this.componentUpdate({interpolation: INTERPOLATIONS[i].payload})}/>
+        </div>
+        {INTERPOLATION_HAS_TENSION[interpolation] ?
+          <div className="control" >
+            <div className="label">Tension</div>
+            <Slider className="slider"
+                    style={{marginBottom:'0', marginTop:'0'}}
+                    name="tension"
+                    value={tension}
+                    defaultValue={tension}
+                    onChange={(e, value) => this.componentUpdate({tension: value})}/>
+          </div>
+          : null
+        }
+
+        <div className="control">
+          <div className="label">Auto Y Scale</div>
+          <Checkbox
+            name="autoYScale"
+            value="toggleValue1"
+            defaultChecked={autoYScale}
+            onCheck={(e, checked) => this.componentUpdate({autoYScale:checked})}/>
+        </div>
+      </div>
+    );
+  }
+
+});
+
+
+
+
 
 module.exports = NumericalSummary;
 

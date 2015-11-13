@@ -1,17 +1,7 @@
 const Constants = require('../constants/Constants');
 const SESSION = Constants.SESSION;
+const memoize = require('utils/Memoize');
 
-function memoize(fn) {
-  let cache = {};
-  return function (arg) {
-    if (cache[arg] !== undefined) {
-      return cache[arg];
-    }
-    var result = fn(arg).bind(this);
-    cache[arg] = result;
-    return result;
-  };
-}
 
 let SessionActions = {
   componentUpdate(compId, updater, newComponent = null) {
@@ -21,6 +11,8 @@ let SessionActions = {
       newComponent: newComponent
     });
   },
+  //We cache these, other wise the prop looks different causing a re-render
+  //TODO Strictly speaking this is memory leak, albeit a small one
   componentUpdateFor: memoize((compId) => {
     return function (updater, newComponent = null) {
       this.dispatch(SESSION.COMPONENT_UPDATE, {
