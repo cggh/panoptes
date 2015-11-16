@@ -49,7 +49,9 @@ let NumericalSummary = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
-    tension: React.PropTypes.number
+    tension: React.PropTypes.number,
+    yMin: React.PropTypes.number,
+    yMax: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -152,8 +154,13 @@ let NumericalSummary = React.createClass({
 
   render() {
     let height = HEIGHT;
-    let { start, end, width, sideWidth, interpolation, autoYScale, tension, componentUpdate, ...other } = this.props;
-    let { dataStart, dataStep, columns } = this.state;
+    let props = Object.assign({
+      yMin: 0,
+      yMax: 1
+    }, this.props);
+    let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
+      componentUpdate, ...other } = props;
+    let { dataStart, dataStep, columns, controlsOpen} = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
     let min = columns ? columns.min || [] : [];
@@ -168,14 +175,14 @@ let NumericalSummary = React.createClass({
       .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
-      .y((d) => d / 210)(avg);
+      .y((d) => (d-yMin) / (yMax-yMin))(avg);
     let area = d3.svg.area()
       .interpolate(interpolation)
       .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
-      .y((d) => d / 210)
-      .y0((d, i) => min[i] / 210)(max);
+      .y((d) => (d-yMin) / (yMax-yMin))
+      .y0((d, i) => (min[i]-yMin) / (yMax-yMin))(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -197,7 +204,7 @@ let NumericalSummary = React.createClass({
           </div>
         </div>
         <div ref="controlsContainer" className="channel-controls-container">
-          <Controls ref="controls" {...this.props} />
+          <Controls ref="controls" {...props} />
         </div>
       </div>
     );
@@ -210,11 +217,14 @@ let Controls = React.createClass({
   //As component update is an anon func, it looks different on every prop change,
   // so skip it when checking
   shouldComponentUpdate(nextProps) {
-    let { width, interpolation, tension, autoYScale } = this.props;
+    let { width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
     return width !== nextProps.width ||
       interpolation !== nextProps.interpolation ||
       tension !== nextProps.tension ||
-      autoYScale !== nextProps.autoYScale;
+      autoYScale !== nextProps.autoYScale ||
+      yMin !== nextProps.yMin ||
+      yMax !== nextProps.yMax
+      ;
   },
 
   //Then we need to redirect componentUpdate so we always use the latest as
@@ -224,11 +234,11 @@ let Controls = React.createClass({
   },
 
   render() {
-    let { width, interpolation, tension, autoYScale } = this.props;
+    let { width, interpolation, tension, autoYScale, yMin, yMax } = this.props;
     return (
       <div className="channel-controls" style={{width:width+'px'}}>
         <div className="control">
-          <div className="label">Interpolation</div>
+          <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
                         menuItems={INTERPOLATIONS}
                         value={interpolation}
@@ -236,7 +246,7 @@ let Controls = React.createClass({
         </div>
         {INTERPOLATION_HAS_TENSION[interpolation] ?
           <div className="control" >
-            <div className="label">Tension</div>
+            <div className="label">Tension:</div>
             <Slider className="slider"
                     style={{marginBottom:'0', marginTop:'0'}}
                     name="tension"
@@ -248,13 +258,44 @@ let Controls = React.createClass({
         }
 
         <div className="control">
-          <div className="label">Auto Y Scale</div>
+          <div className="label">Auto Y Scale:</div>
           <Checkbox
             name="autoYScale"
             value="toggleValue1"
             defaultChecked={autoYScale}
+            style={{width:'inherit'}}
             onCheck={(e, checked) => this.componentUpdate({autoYScale:checked})}/>
         </div>
+        {!autoYScale ? <div className="control">
+                         <div className="label">Y Min:</div>
+                         <input className="numeric-input"
+                                ref="yMin"
+                                type="number"
+                                value={yMin}
+                                onChange={() => {
+                                  let value = parseFloat(this.refs.yMin.value);
+                                  if (_.isFinite(value))
+                                    this.componentUpdate({yMin: value});
+                                  }
+                                }/>
+                       </div>
+          :null}
+        {!autoYScale ? <div className="control">
+                         <div className="label">Y Max:</div>
+                         <input className="numeric-input"
+                                ref="yMax"
+                                type="number"
+                                value={yMax}
+                                onChange={this.handleRangeChange}
+                                onChange={() => {
+                                  let value = parseFloat(this.refs.yMax.value);
+                                  if (_.isFinite(value))
+                                    this.componentUpdate({yMax: value});
+                                  }
+                                }/>
+                       </div>
+          : null}
+
       </div>
     );
   }
