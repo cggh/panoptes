@@ -8,6 +8,12 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
+// UI components
+const TooltipEllipsis = require('ui/TooltipEllipsis');
+const Icon = require('ui/Icon');
+
+const Tooltip = require('rc-tooltip');
+import 'rc-tooltip/assets/bootstrap.css'
 
 let PropertyHeader = React.createClass({
 
@@ -18,18 +24,27 @@ let PropertyHeader = React.createClass({
   ],
 
   propTypes: {
-    propertyName: React.PropTypes.string.isRequired
+    name: React.PropTypes.string.isRequired,
+    description: React.PropTypes.string.isRequired,
+    tooltipPlacement: React.PropTypes.string.isRequired,
+    tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string)
   },
 
 
   render: function() {
     
-    let {propertyName} = this.props;
+    let {name, description, tooltipPlacement, tooltipTrigger} = this.props;
     
-    return <div>
-        {propertyName}
-    </div>
-    
+    return (
+      <div>
+        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
+        <Tooltip placement={tooltipPlacement}
+                 trigger={tooltipTrigger}
+                 overlay={<span>{description}</span>}>
+          <Icon className="info" name="info-circle"/>
+        </Tooltip>
+      </div>
+    );
   }
 
 });
