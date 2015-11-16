@@ -1,6 +1,7 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const shallowEquals = require('shallow-equals');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -31,13 +32,23 @@ let DataItem = React.createClass({
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
   },
+
+  getDefaultProps() {
+    return {
+      table: null,
+      primKey: null
+    };
+  },
   
   getInitialState() {
     return {
+      data: null,
       loadStatus: 'loaded'
     };
   },
-
+  
+  
+  
   fetchData(props) {
     let {table, primKey} = props;
     this.setState({loadStatus: 'loading'});
@@ -48,7 +59,7 @@ let DataItem = React.createClass({
       primKeyValue: primKey}
     )
       .then((data) => {
-        if (Immutable.is(props, this.props)) {
+        if (shallowEquals(props, this.props)) {
           this.setState({loadStatus: 'loaded'});
           this.setState({data: data});
         }
@@ -69,16 +80,17 @@ let DataItem = React.createClass({
   },
 
   render() {
-    let {table, primKey, componentUpdate} = this.props;
+    let {table, primKey, activeTab, componentUpdate} = this.props;
+    let tableConfig = this.config.tables[table];
     let {data, loadStatus} = this.state;
     
     if (data)
-        return (
-          <div>
-            <PropertyList data={data}/>
-            <Loading status={loadStatus}/>
-          </div>
-        )
+      return (
+                <div>
+                  <PropertyList data={data} tableConfig={tableConfig}/>
+                  <Loading status={loadStatus}/>
+                </div>
+      )
     else 
         return (
           <div>
