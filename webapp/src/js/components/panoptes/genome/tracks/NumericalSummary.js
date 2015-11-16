@@ -154,9 +154,10 @@ let NumericalSummary = React.createClass({
 
   render() {
     let height = HEIGHT;
+    let config = this.config.summaryValues.__reference__.uniqueness;
     let props = Object.assign({
-      yMin: 0,
-      yMax: 1
+      yMin: config.minval,
+      yMax: config.maxval
     }, this.props);
     let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
       componentUpdate, ...other } = props;

@@ -126,6 +126,7 @@ let augment2DTableInfo = function (table) {
 };
 
 let parseSummaryValues = function () {
+  let summaryValueMap = {};
   _.each(fetchedConfig.summaryValues, function (summaryValue) {
     if (summaryValue.minval)
       summaryValue.minval = parseFloat(summaryValue.minval);
@@ -141,7 +142,14 @@ let parseSummaryValues = function () {
     if (summaryValue.settings)
       settings = _.extend(settings, JSON.parse(summaryValue.settings));
     summaryValue.settings = settings;
+    if (summaryValue.tableid === '-') {
+      summaryValue.tableid = '__reference__';
+    }
+    summaryValueMap[summaryValue.tableid] || (summaryValueMap[summaryValue.tableid] = {});
+    summaryValueMap[summaryValue.tableid][summaryValue.propid] = summaryValue;
   });
+  fetchedConfig.summaryValues = summaryValueMap;
+
 };
 
 let parseCustomProperties = function () {
@@ -541,6 +549,7 @@ let fetchInitialConfig = function () {
         chromosomes: fetchedConfig.chromosomes,
         tables: fetchedConfig.mapTableCatalog,
         settings: fetchedConfig.generalSettings,
+        summaryValues: fetchedConfig.summaryValues,
         defaultQueries: defaultQueries,
         subsets: subsets
       }))
