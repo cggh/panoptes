@@ -34,9 +34,8 @@ let PropertyList = React.createClass({
           {
             Object.keys(data).map(
               function(key, i){
-                let {description} = tableConfig.propertiesMap[key]
                 let columnData = tableConfig.propertiesMap[key];
-                return <PropertyListItem key={i} name={key} value={data[key]} columnData={columnData} description={description} tooltipPlacement={"right"} tooltipTrigger={['hover']} />
+                return <PropertyListItem key={i} name={key} value={data[key]} columnData={columnData} tooltipPlacement={"right"} tooltipTrigger={['hover']} />
               }
             )
           }
