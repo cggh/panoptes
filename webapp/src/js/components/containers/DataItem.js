@@ -32,23 +32,13 @@ let DataItem = React.createClass({
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
   },
-
-  getDefaultProps() {
-    return {
-      table: null,
-      primKey: null
-    };
-  },
   
   getInitialState() {
     return {
-      data: null,
       loadStatus: 'loaded'
     };
   },
-  
-  
-  
+
   fetchData(props) {
     let {table, primKey} = props;
     this.setState({loadStatus: 'loading'});
@@ -80,7 +70,7 @@ let DataItem = React.createClass({
   },
 
   render() {
-    let {table, primKey, activeTab, componentUpdate} = this.props;
+    let {table, primKey, componentUpdate} = this.props;
     let tableConfig = this.config.tables[table];
     let {data, loadStatus} = this.state;
     
