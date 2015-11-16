@@ -20,17 +20,26 @@ let PropertyList = React.createClass({
   ],
 
   propTypes: {
-        data: React.PropTypes.object.isRequired
+        data: React.PropTypes.object.isRequired,
+        tableConfig: React.PropTypes.object.isRequired
   },
 
   render: function() {
     
-    let {data} = this.props;
+    let {data, tableConfig} = this.props;
     
     return (
       <table>
         <tbody>
-          {Object.keys(data).map(function(key, i){return <PropertyListItem key={i} name={key} value={data[key]}/>})}
+          {
+            Object.keys(data).map(
+              function(key, i){
+                let {description} = tableConfig.propertiesMap[key]
+                let columnData = tableConfig.propertiesMap[key];
+                return <PropertyListItem key={i} name={key} value={data[key]} columnData={columnData} description={description} tooltipPlacement={"right"} tooltipTrigger={['hover']} />
+              }
+            )
+          }
         </tbody>
       </table>
     );
