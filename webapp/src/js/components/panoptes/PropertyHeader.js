@@ -36,14 +36,14 @@ let PropertyHeader = React.createClass({
     let {name, description, tooltipPlacement, tooltipTrigger} = this.props;
     
     return (
-      <div>
+      <span>
         <TooltipEllipsis className="label">{name}</TooltipEllipsis>
         <Tooltip placement={tooltipPlacement}
                  trigger={tooltipTrigger}
                  overlay={<span>{description}</span>}>
           <Icon className="info" name="info-circle"/>
         </Tooltip>
-      </div>
+      </span>
     );
   }
 
