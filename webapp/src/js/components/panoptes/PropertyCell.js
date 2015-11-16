@@ -13,8 +13,8 @@ let PropertyCell = React.createClass({
   ],
 
   propTypes: {
-    prop: React.PropTypes.object
-    //value: ANY
+    prop: React.PropTypes.object,
+    value: React.PropTypes.any
   },
 
   handleClick() {
