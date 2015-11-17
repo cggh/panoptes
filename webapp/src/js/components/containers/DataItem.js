@@ -73,15 +73,16 @@ let DataItem = React.createClass({
 
   render() {
     let {table, primKey, componentUpdate} = this.props;
-    let tableConfig = this.config.tables[table];
+    let propertiesMap = this.config.tables[table].propertiesMap;
     let {data, loadStatus} = this.state;
+    let propertyListTitle = this.config.tables[this.props.table].tableCapNameSingle + " properties";
     
     if (data)
       return (
                 <div>
-                  <TabbedArea>
-                    <TabPane>
-                        <PropertyList data={data} tableConfig={tableConfig}/>
+                  <TabbedArea activeTab={"something"} >
+                    <TabPane compId={"something"} >
+                        <PropertyList title={propertyListTitle} data={data} propertiesMap={propertiesMap}/>
                     </TabPane>
                   </TabbedArea>
                   <Loading status={loadStatus}/>
