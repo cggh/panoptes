@@ -18,6 +18,8 @@ const PropertyList = require('panoptes/PropertyList');
 // UI components
 const Icon = require('ui/Icon');
 const Loading = require('ui/Loading');
+const TabbedArea = require('ui/TabbedArea');
+const TabPane = require('ui/TabPane');
 
 let DataItem = React.createClass({
   mixins: [
@@ -77,7 +79,11 @@ let DataItem = React.createClass({
     if (data)
       return (
                 <div>
-                  <PropertyList data={data} tableConfig={tableConfig}/>
+                  <TabbedArea>
+                    <TabPane>
+                        <PropertyList data={data} tableConfig={tableConfig}/>
+                    </TabPane>
+                  </TabbedArea>
                   <Loading status={loadStatus}/>
                 </div>
       )
