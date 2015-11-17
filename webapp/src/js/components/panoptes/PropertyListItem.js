@@ -22,7 +22,6 @@ let PropertyListItem = React.createClass({
            ],
 
    propTypes: {
-        propId: React.PropTypes.string.isRequired,
         value: React.PropTypes.string.isRequired,
         columnData: React.PropTypes.object.isRequired,
         tooltipPlacement: React.PropTypes.string.isRequired,
@@ -33,7 +32,7 @@ let PropertyListItem = React.createClass({
       
       
   render: function() {
-    let {propId, value, columnData, tooltipPlacement, tooltipTrigger} = this.props;
+    let {value, columnData, tooltipPlacement, tooltipTrigger} = this.props;
     let {description, name} = columnData;
     
     return (
