@@ -35,14 +35,22 @@ let PropertyHeader = React.createClass({
     
     let {name, description, tooltipPlacement, tooltipTrigger} = this.props;
     
-    return (
-      <span>
-        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
-        <Tooltip placement={tooltipPlacement}
+    var tooltip = "";
+    if (description)
+    {
+      tooltip = <Tooltip placement={tooltipPlacement}
                  trigger={tooltipTrigger}
                  overlay={<span>{description}</span>}>
           <Icon className="info" name="info-circle"/>
-        </Tooltip>
+        </Tooltip>;
+    }
+    
+    
+    
+    return (
+      <span>
+        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
+        {tooltip}
       </span>
     );
   }
