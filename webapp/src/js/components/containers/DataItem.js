@@ -92,7 +92,7 @@ let DataItem = React.createClass({
                 <div>
                   <TabbedArea activeTab={"something"} >
                     <TabPane compId={"something"} >
-                        <PropertyList title={propertyListTitle} propertiesData={propertiesData}/>
+                        <PropertyList title={propertyListTitle} propertiesData={propertiesData} className='stack' />
                     </TabPane>
                   </TabbedArea>
                   <Loading status={loadStatus}/>
