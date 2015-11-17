@@ -75,7 +75,7 @@ let DataItem = React.createClass({
     let {table, primKey, componentUpdate} = this.props;
     let propertiesMap = this.config.tables[table].propertiesMap;
     let {data, loadStatus} = this.state;
-    let propertyListTitle = this.config.tables[this.props.table].tableCapNameSingle + " properties";
+    let propertyListTitle = "Overview";
     
     if (data)
       return (
