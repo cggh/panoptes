@@ -81,6 +81,13 @@ let TabbedArea = React.createClass({
       active: (id === this.props.activeTab),
       inactive: (id !== this.props.activeTab)
     };
+    
+    let closeIcon = "";
+    if (this.props.onClose)
+    {
+      closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
+    }
+    
     return (
       <Draggable
         ref={"drag_"+id}
@@ -91,7 +98,7 @@ let TabbedArea = React.createClass({
              onClick={this.handleClick.bind(this, id)}>
           {icons[id] ? <Icon name={icons[id]}/> : null}
           <div className="title">{titles[id]}</div>
-          <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
+          {closeIcon}
         </div>
       </Draggable>
     )
