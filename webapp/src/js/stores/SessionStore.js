@@ -16,6 +16,60 @@ var SessionStore = Fluxxor.createStore({
       this.state = Immutable.fromJS(state);
     else
       this.state = Immutable.Map();
+    
+    
+    this.state = this.state.mergeDeep(Immutable.fromJS({
+      components: {
+        'TEST': {
+          component: "containers/DataTableWithActions",
+          props: {
+            table: 'samples'
+          }
+        }
+      },
+      tabs: {
+        components: ['TEST'],
+        selectedTab: 'TEST'
+      },
+      popups: {
+        components: [],
+        state: {}
+      },
+      modal: {}
+    }));
+    
+    
+    /*
+    this.state = this.state.mergeDeep(Immutable.fromJS({
+      components: {
+        'TEST': {
+          component: "containers/GenomeBrowserWithActions",
+          props: {
+            chromosome: 'Pf3D7_01_v3',
+            components: {
+              test: {
+                component: 'NumericalSummary',
+                props: {}
+              }
+            }
+          }
+        }
+      },
+      tabs: {
+        components: ['TEST'],
+        selectedTab: 'TEST'
+      },
+      popups: {
+        components: [],
+        state: {}
+      },
+      modal: {}
+    }));
+    /*
+    
+    
+    
+    /*
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
@@ -36,6 +90,9 @@ var SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
+    */
+
+
     this.state = this.state.updateIn(['components', 'TEST', 'props', 'components'], Immutable.OrderedMap);
 
     this.bindActions(
