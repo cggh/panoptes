@@ -39,7 +39,9 @@ let PropertyListItem = React.createClass({
     
     return (
        <tr>
-         <th><PropertyHeader name={name} description={description} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} /></th>
+         <th style={{"text-align": "left"}}>
+           <PropertyHeader name={name} description={description} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} />
+         </th>
          <td><PropertyCell prop={propertyData} value={value}/></td>
        </tr>
     );
