@@ -36,8 +36,6 @@ let PropertyListItem = React.createClass({
     let {propId, value, columnData, tooltipPlacement, tooltipTrigger} = this.props;
     let {description, name} = columnData;
     
-    console.log("columnData: " + JSON.stringify(columnData));
-    
     return (
        <tr>
          <th><PropertyHeader name={name} description={description} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} /></th>
