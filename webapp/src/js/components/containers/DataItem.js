@@ -73,28 +73,40 @@ let DataItem = React.createClass({
 
   render() {
     let {table, primKey, componentUpdate} = this.props;
-    let propertiesMap = this.config.tables[table].propertiesMap;
     let {data, loadStatus} = this.state;
+    
+    let propertiesData = this.config.tables[table].properties;
+    let propertiesMap = this.config.tables[table].propertiesMap;
     let propertyListTitle = "Overview";
     
     if (data)
+    {
+      
+      // Augment the propertiesData array with each property's value
+      for (let i = 0; i < propertiesData.length; i++)
+      {
+        propertiesData[i].value = data[propertiesData[i].propid];
+      }
+      
       return (
                 <div>
                   <TabbedArea activeTab={"something"} >
                     <TabPane compId={"something"} >
-                        <PropertyList title={propertyListTitle} data={data} propertiesMap={propertiesMap}/>
+                        <PropertyList title={propertyListTitle} propertiesData={propertiesData}/>
                     </TabPane>
                   </TabbedArea>
                   <Loading status={loadStatus}/>
                 </div>
       )
-    else 
+    }
+    else
+    {
         return (
           <div>
-            <Loading status="custom">No data</Loading>
+            <Loading status="custom">No properties data</Loading>
           </div>
         )
-        
+    }
   }
 
 });
