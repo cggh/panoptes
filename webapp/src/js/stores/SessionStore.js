@@ -65,7 +65,7 @@ var SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
-    /*
+    */
     
     
     
