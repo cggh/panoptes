@@ -3,7 +3,6 @@ const ReactDOM = require('react-dom');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
-const Immutable = require('immutable');
 const uid = require('uid');
 const offset = require("bloody-offset");
 
@@ -18,6 +17,7 @@ const Icon = require('ui/Icon');
 const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
 const Slider = require('material-ui/lib/slider');
+const { Motion, spring } = require('react-motion');
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -175,7 +175,7 @@ let NumericalSummary = React.createClass({
         minVal = minVal - margin;
         maxVal = maxVal + margin;
       }
-      if (minVal && maxVal && maxVal !== 0 && minVal !== 0) {
+      if (_.isFinite(minVal) && _.isFinite(maxVal) && maxVal !== 0 && minVal !== 0) {
         props.yMin = minVal;
         props.yMax = maxVal;
       }
@@ -203,6 +203,11 @@ let NumericalSummary = React.createClass({
       .x((d, i) => i)
       .y((d) => d)
       .y0((d, i) => min[i])(max);
+
+    let yAxisSpring = {
+      yMin: spring(yMin),
+      yMax: spring(yMax)
+    };
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -215,11 +220,16 @@ let NumericalSummary = React.createClass({
           </div>
           <div className="channel-data" style={{width:`${effWidth}px`}}>
             <svg className="numerical-summary" width={effWidth} height={height}>
-              <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
-                <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
-                <path className="area" d={area}/>
-                <path className="line" d={line}/>
-              </g>
+              <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
+                {(interpolated) => {
+                  let {yMin, yMax} = interpolated;
+                  return <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
+                    <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
+                    <path className="area" d={area}/>
+                    <path className="line" d={line}/>
+                  </g>
+                }}
+              </Motion>
             </svg>
           </div>
         </div>
