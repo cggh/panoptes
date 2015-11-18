@@ -431,6 +431,30 @@ require([
                         view.postLoadAction();
                 });
                 $(".PanoptesLogoBox").click(PanoptesActions);
+                var query = window.location.search.substring(1);
+                var vars = query.split('&');
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    if (decodeURIComponent(pair[0]) == 'genome_region') {
+                        var str = decodeURIComponent(pair[1]);
+                        var chrom = str.split(':')[0];
+                        if (!_.contains(_.pluck(MetaData.chromosomes,'id'), chrom))
+                            DQX.reportError("Unknown chrom in URL");
+                        var pos = str.split(':')[1];
+                        if (pos) {
+                            var start = pos.split('-')[0];
+                            var stop = pos.split('-')[1];
+                            if (start && stop) {
+                                Msg.send({type: 'FindGenomeRegion'}, {
+                                    chromosome: chrom,
+                                    start: parseInt(start),
+                                    end: parseInt(stop),
+                                    buttonShowRegion: true
+                                });
+                            }
+                        }
+                    }
+                }
             }
 
             function PanoptesActions() {
