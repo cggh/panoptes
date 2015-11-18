@@ -75,7 +75,7 @@ let DataItem = React.createClass({
     let {table, primKey, componentUpdate} = this.props;
     let {data, loadStatus} = this.state;
     
-    let propertiesData = _.clone(this.config.tables[table].properties);
+    let propertiesData = _.cloneDeep(this.config.tables[table].properties);
     let propertyListTitle = "Overview";
     
     if (data)
