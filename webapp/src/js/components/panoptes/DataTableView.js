@@ -133,23 +133,22 @@ let DataTableView = React.createClass({
   renderHeader(headerData, cellDataKey, columnData, rowData, width) {
     let {ascending, descending} = headerData;
     let {description, name} = columnData;
-    return <div className={classNames({
-                              "pointer": true,
-                              "table-row-header": true,
-                              "sort-column-ascending": ascending,
-                              "sort-column-descending": descending
-                                    })}
-                style={{width:width}}
-                onClick={(e) => {
-                if (e.target.className.indexOf("info") == -1)
-                  this.handleOrderChange(columnData.propid);
-                }}
-      >
-      {(ascending || descending) ?
+    return <PropertyHeader
+        className={classNames({
+                                "pointer": true,
+                                "table-row-header": true,
+                                "sort-column-ascending": ascending,
+                                "sort-column-descending": descending
+                                      })}
+        style={{width:width}}
+        onClick={() => this.handleOrderChange(columnData.propid)}
+        prefix={(ascending || descending) ?
         <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
         null}
-      <PropertyHeader name={name} description={description} tooltipPlacement={"bottom"} tooltipTrigger={['click']} />
-    </div>
+        name={name}
+        description={description}
+        tooltipPlacement={"bottom"}
+        tooltipTrigger={['click']} />
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {

@@ -24,17 +24,19 @@ let PropertyHeader = React.createClass({
   ],
 
   propTypes: {
+    prefix: React.PropTypes.node,
     name: React.PropTypes.string.isRequired,
     description: React.PropTypes.string.isRequired,
     tooltipPlacement: React.PropTypes.string.isRequired,
-    tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string)
+    tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string),
+    onClick: React.PropTypes.func
   },
 
 
   render: function() {
-    
-    let {name, description, tooltipPlacement, tooltipTrigger} = this.props;
-    
+
+    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+
     var tooltip = "";
     if (description)
     {
@@ -44,11 +46,16 @@ let PropertyHeader = React.createClass({
           <Icon className="info" name="info-circle"/>
         </Tooltip>;
     }
-    
-    
-    
+
+
+
     return (
-      <span>
+      <span onClick={(event) => {
+              if (onClick && event.target.className.indexOf("info") == -1)
+                onClick(event);
+                }}
+        {...other}>
+        {prefix}
         <TooltipEllipsis className="label">{name}</TooltipEllipsis>
         {tooltip}
       </span>
