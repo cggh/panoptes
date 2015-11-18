@@ -1,6 +1,8 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
+import 'tooltip-ellipsis.scss';
+
 let TooltipEllipsis = React.createClass({
   mixins: [PureRenderMixin],
 
@@ -16,7 +18,7 @@ let TooltipEllipsis = React.createClass({
 
   render() {
     return (
-      <span className={this.props.className} ref="element">
+      <span className={this.props.className + ' tooltip-ellipsis'} ref="element">
         {this.props.children}
       </span>
     );

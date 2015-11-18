@@ -565,10 +565,7 @@ input {
   align-items: center;
   .label {
     flex-shrink: 1;
-    text-overflow: ellipsis;
-    overflow: hidden;
     text-align: center;
-    white-space: nowrap;
   }
   .icon {
     min-width: 20px;
