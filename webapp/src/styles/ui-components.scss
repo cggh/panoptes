@@ -584,6 +584,34 @@ input {
   box-shadow: inset 1px 1px 1px darkgrey;
 }
 
+.table-col-header {
+  padding: 0 !important;
+  height: 100%;
+  line-height: 25px;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  .label {
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .icon {
+    min-width: 20px;
+    color: darkgrey;
+    font-size: 14px;
+    padding-left: 3px;
+    padding-right: 3px;
+    vertical-align: baseline;
+  }
+  .icon:hover {
+    color: #4e4e4e;
+  }
+}
+
+
 .rc-tooltip {
   font-family: inherit !important;
   font-size: inherit !important;
@@ -613,4 +641,8 @@ input {
   color: $primary-color;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.external-link-icon {
+  margin-right: 5px;
 }

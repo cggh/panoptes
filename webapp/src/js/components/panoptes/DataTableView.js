@@ -4,6 +4,7 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
 const Color = require('color');
 
+// Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
@@ -11,18 +12,18 @@ const SetSizeToParent = require('mixins/SetSizeToParent');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
 
-const Tooltip = require('rc-tooltip');
-import 'rc-tooltip/assets/bootstrap.css'
 const {Table, Column} = require('fixed-data-table');
 import 'fixed-data-table/dist/fixed-data-table.css';
 
+// Panoptes components
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
 const PropertyCell = require('panoptes/PropertyCell');
+const PropertyHeader = require('panoptes/PropertyHeader');
 
+// UI components
 const Loading = require('ui/Loading');
-const TooltipEllipsis = require('ui/TooltipEllipsis');
 const Icon = require('ui/Icon');
 
 const MAX_COLOR = Color("#44aafb");
@@ -131,29 +132,23 @@ let DataTableView = React.createClass({
 
   renderHeader(headerData, cellDataKey, columnData, rowData, width) {
     let {ascending, descending} = headerData;
-    let {description} = columnData;
-    return <div className={classNames({
-                              "pointer": true,
-                              "table-row-header": true,
-                              "sort-column-ascending": ascending,
-                              "sort-column-descending": descending
-                                    })}
-                style={{width:width}}
-                onClick={(e) => {
-                if (e.target.className.indexOf("info") == -1)
-                  this.handleOrderChange(columnData.propid);
-                }}
-      >
-      {(ascending || descending) ?
+    let {description, name} = columnData;
+    return <PropertyHeader
+        className={classNames({
+                                "pointer": true,
+                                "table-row-header": true,
+                                "sort-column-ascending": ascending,
+                                "sort-column-descending": descending
+                                      })}
+        style={{width:width}}
+        onClick={() => this.handleOrderChange(columnData.propid)}
+        prefix={(ascending || descending) ?
         <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
         null}
-      <TooltipEllipsis className="label">{columnData.name}</TooltipEllipsis>
-      <Tooltip placement="bottom"
-               trigger={['click']}
-               overlay={<span>{description}</span>}>
-        <Icon className="info" name="info-circle"/>
-      </Tooltip>
-    </div>
+        name={name}
+        description={description}
+        tooltipPlacement={"bottom"}
+        tooltipTrigger={['click']} />
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {

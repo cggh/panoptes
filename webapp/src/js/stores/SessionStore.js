@@ -16,6 +16,30 @@ var SessionStore = Fluxxor.createStore({
       this.state = Immutable.fromJS(state);
     else
       this.state = Immutable.Map();
+    
+    
+    this.state = this.state.mergeDeep(Immutable.fromJS({
+      components: {
+        'TEST': {
+          component: "containers/DataTableWithActions",
+          props: {
+            table: 'samples'
+          }
+        }
+      },
+      tabs: {
+        components: ['TEST'],
+        selectedTab: 'TEST'
+      },
+      popups: {
+        components: [],
+        state: {}
+      },
+      modal: {}
+    }));
+    
+    
+    /*
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
@@ -41,13 +65,41 @@ var SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
+    /*
+    
+    
+    
+    /*
+    this.state = this.state.mergeDeep(Immutable.fromJS({
+      components: {
+        'TEST': {
+          component: "containers/DataItem",
+          props: {
+            table: 'variants',
+            primKey: 'SNP_00003'
+          }
+        }
+      },
+      tabs: {
+        components: ['TEST'],
+        selectedTab: 'TEST'
+      },
+      popups: {
+        components: [],
+        state: {}
+      },
+      modal: {}
+    }));
+    */
+
+
     this.state = this.state.updateIn(['components', 'TEST', 'props', 'components'], Immutable.OrderedMap);
 
     this.bindActions(
       SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
       SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
       SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
-      SESSION.NOTIFY, this.emitIfNeeded(this.notify),
+      SESSION.NOTIFY, this.emitIfNeeded(this.notify, 'notify'),
       SESSION.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
       SESSION.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
       SESSION.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
@@ -64,7 +116,7 @@ var SessionStore = Fluxxor.createStore({
     return (payload) => {
       let old_state = this.state;
       action(payload);
-      if (!old_state.equals(this.state))
+      if (!old_state.equals(this.state) || event==='notify')
         this.emit(event);
     }
   },

@@ -37,7 +37,7 @@ function requestJSON(method, params = {}, data = null) {
     .then(Qajax.toJSON)
     .then(_filterError)
     .catch(err => {
-      throw Error(`There was a problem with a request to the server: ${err.statusText}`)
+      throw Error(`There was a problem with a request to the server: ${err.statusText || err.message}`)
     });
 }
 
@@ -155,6 +155,16 @@ function fetchData(id) {
   return getRequestJSON({datatype: 'fetchstoredata', id: id}).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
+function fetchSingleRecord(options) {
+  assertRequired(options, ['database', 'table', 'primKeyField', 'primKeyValue']);
+  let {database, table, primKeyField, primKeyValue} = options;
+  return getRequestJSON({
+    datatype: 'recordinfo',
+    database: database,
+    tbname: table,
+    qry: SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue))
+  }).then((response) => response.Data)
+}
 
 module.exports = {
   serverURL: serverURL,
@@ -162,5 +172,6 @@ module.exports = {
   pageQuery: pageQuery,
   storeData: storeData,
   fetchData: fetchData,
-  summaryData: summaryData
+  summaryData: summaryData,
+  fetchSingleRecord: fetchSingleRecord
 };

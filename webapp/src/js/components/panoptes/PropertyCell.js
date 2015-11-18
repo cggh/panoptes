@@ -13,8 +13,8 @@ let PropertyCell = React.createClass({
   ],
 
   propTypes: {
-    prop: React.PropTypes.object
-    //value: ANY
+    prop: React.PropTypes.object,
+    value: React.PropTypes.any
   },
 
   handleClick() {
@@ -26,15 +26,17 @@ let PropertyCell = React.createClass({
   render() {
     let { prop, value, ...other } = this.props;
     let text = Formatter(prop, value);
+    let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     if (prop.externalUrl) {
       let refs = value.split(';');
       return (<span className="prop">
         {_.map(refs, (ref, index) => (
           <span key={index}>
-          <a href={prop.externalUrl.replace("{value}", ref)}>
+          {index === 0 ? externalLinkIcon : null}
+          <a target='_blank' href={prop.externalUrl.replace("{value}", ref)}>
             {ref}
           </a>
-            {index < refs.length - 1 ? "," : null}
+            {index < refs.length - 1 ? ", " : null}
         </span>
         ))}
       </span>);
