@@ -76,7 +76,6 @@ let DataItem = React.createClass({
     let {data, loadStatus} = this.state;
     
     let propertiesData = this.config.tables[table].properties;
-    let propertiesMap = this.config.tables[table].propertiesMap;
     let propertyListTitle = "Overview";
     
     if (data)
