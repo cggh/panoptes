@@ -1,6 +1,7 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const classNames = require('classnames');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -39,7 +40,7 @@ let PropertyListItem = React.createClass({
     
     return (
        <tr>
-         <th style={{"text-align": "left"}}>
+         <th className={classNames({"table-col-header": true})}>
            <PropertyHeader name={name} description={description} tooltipPlacement={tooltipPlacement} tooltipTrigger={tooltipTrigger} />
          </th>
          <td><PropertyCell prop={propertyData} value={value}/></td>
