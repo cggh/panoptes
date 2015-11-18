@@ -26,15 +26,17 @@ let PropertyCell = React.createClass({
   render() {
     let { prop, value, ...other } = this.props;
     let text = Formatter(prop, value);
+    let externalLinkIcon = <i className="fa fa-external-link" style={{marginRight: "5px"}}></i>;
     if (prop.externalUrl) {
       let refs = value.split(';');
       return (<span className="prop">
         {_.map(refs, (ref, index) => (
           <span key={index}>
+          {index === 0 ? externalLinkIcon : null}
           <a href={prop.externalUrl.replace("{value}", ref)}>
             {ref}
           </a>
-            {index < refs.length - 1 ? "," : null}
+            {index < refs.length - 1 ? ", " : null}
         </span>
         ))}
       </span>);
