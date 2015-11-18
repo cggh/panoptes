@@ -34,7 +34,7 @@ let DataItem = React.createClass({
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
   },
-  
+
   getInitialState() {
     return {
       loadStatus: 'loaded'
@@ -74,38 +74,41 @@ let DataItem = React.createClass({
   render() {
     let {table, primKey, componentUpdate} = this.props;
     let {data, loadStatus} = this.state;
-    
+
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
     let propertyListTitle = "Overview";
-    
+
+    let tabArea = null;
     if (data)
     {
-      
       // Augment the propertiesData array with each property's value
       for (let i = 0; i < propertiesData.length; i++)
       {
         propertiesData[i].value = data[propertiesData[i].propid];
       }
-      
-      return (
-                <div>
+
+      tabArea =  (
                   <TabbedArea activeTab={"something"} >
                     <TabPane compId={"something"} >
                         <PropertyList title={propertyListTitle} propertiesData={propertiesData} className='stack' />
                     </TabPane>
                   </TabbedArea>
-                  <Loading status={loadStatus}/>
-                </div>
       )
     }
+    if (loadStatus == 'loaded' && !tabArea)
+      return (
+        <div>
+          <Loading status="custom">No properties data</Loading>
+        </div>
+      );
     else
-    {
-        return (
-          <div>
-            <Loading status="custom">No properties data</Loading>
-          </div>
-        )
-    }
+      return (
+      <div>
+        {tabArea}
+        <Loading status={loadStatus}/>
+      </div>
+
+    );
   }
 
 });
