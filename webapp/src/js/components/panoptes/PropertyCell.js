@@ -33,7 +33,7 @@ let PropertyCell = React.createClass({
         {_.map(refs, (ref, index) => (
           <span key={index}>
           {index === 0 ? externalLinkIcon : null}
-          <a href={prop.externalUrl.replace("{value}", ref)}>
+          <a target='_blank' href={prop.externalUrl.replace("{value}", ref)}>
             {ref}
           </a>
             {index < refs.length - 1 ? ", " : null}
