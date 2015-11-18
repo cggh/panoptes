@@ -1,6 +1,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const offset = require("bloody-offset");
+const memoize = require('utils/Memoize');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const SetSizeToParent = require('mixins/SetSizeToParent');
@@ -111,6 +112,21 @@ let GenomeBrowser = React.createClass({
     return [start, end];
   },
 
+  isEventInPanningArea(e) {
+    let element = e.target;
+    while (true) {
+      if (element.className === "channel-controls")
+        return false;
+      if (element.className === "channel-side")
+        return false;
+      if (element.className === "main-area")
+        return true;
+      element = element.parentElement;
+      if (!element)
+        return true;
+    }
+  },
+
   handleZoom(pos, delta) {
     let start = this.actual_start;
     let end = this.actual_end;
@@ -127,16 +143,19 @@ let GenomeBrowser = React.createClass({
   },
 
   handleMouseWheel(e) {
+    if (!this.isEventInPanningArea(e))
+      return;
     this.handleZoom(e.clientX - offset(e.currentTarget).left, e.deltaY);
     e.stopPropagation();
     e.preventDefault();
   },
   handleDoubleTap(e) {
+    if (!this.isEventInPanningArea(e))
+      return;
     this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.root_hammer)).left, -100);
   },
   handlePan(e) {
-    //Hack to fix erroneous pans on control buttons... need a better solution
-    if (e.center.x === 0)
+    if (!this.isEventInPanningArea(e))
       return;
     let start = this.actual_start;
     let end = this.actual_end;
@@ -241,14 +260,14 @@ let GenomeBrowser = React.createClass({
                         null }
                     </div>
                     <div className="scrolling grow scroll-within">
-                      {components.map((componentSpec, name) => {
+                      {components.map((componentSpec, componentId) => {
                           let { component, props } = componentSpec.toJS();
                           return React.createElement(dynamic_require(component),
                             _.extend({
-                              key: name,
+                              key: componentId,
                               componentUpdate: (updater) => componentUpdate({
                                 components: {
-                                  [name]: {
+                                  [componentId]: {
                                     props: updater
                                   }
                                 }

@@ -50,7 +50,7 @@ var SessionStore = Fluxxor.createStore({
               test: {
                 component: 'NumericalSummary',
                 props: {}
-              }
+              },
             }
           }
         }
