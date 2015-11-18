@@ -28,28 +28,28 @@ let PropertyList = React.createClass({
   title() {
     return this.props.title;
   },
-  
-  
-  
+
+
+
   render: function() {
-    
+
     let {propertiesData, title, className} = this.props;
-    
+
     return (
       <table className={classNames("datatable", className)}>
         <tbody>
           {
             propertiesData.map(
               function(object, i){
-                return <PropertyListItem key={i} propertyData={object} tooltipPlacement={"right"} tooltipTrigger={['hover']} />
+                return <PropertyListItem key={i} propertyData={object} tooltipPlacement={"right"} tooltipTrigger={['click']} />
               }
             )
           }
         </tbody>
       </table>
     );
-    
-    
+
+
   }
 
 });
