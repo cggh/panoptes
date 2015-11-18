@@ -159,14 +159,33 @@ let NumericalSummary = React.createClass({
       yMin: config.minval,
       yMax: config.maxval
     }, this.props);
-    let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
-      componentUpdate, ...other } = props;
     let { dataStart, dataStep, columns, controlsOpen} = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
     let min = columns ? columns.min || [] : [];
+    if (props.autoYScale) {
+      let minVal = _.min(min);
+      let maxVal = _.max(max);
+      if (minVal === maxVal) {
+        minVal = minVal - 0.1*minVal;
+        maxVal = maxVal + 0.1*maxVal;
+      }
+      else {
+        let margin = 0.1*(maxVal-minVal);
+        minVal = minVal - margin;
+        maxVal = maxVal + margin;
+      }
+      if (minVal && maxVal && maxVal !== 0 && minVal !== 0) {
+        props.yMin = minVal;
+        props.yMax = maxVal;
+      }
+    }
+
+    let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
+      componentUpdate, ...other } = props;
     if (width == 0)
       return null;
+
     let effWidth = width - sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
