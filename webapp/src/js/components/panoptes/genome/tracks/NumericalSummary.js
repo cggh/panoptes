@@ -5,7 +5,7 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
 const Immutable = require('immutable');
 const uid = require('uid');
-var offset = require("bloody-offset");
+const offset = require("bloody-offset");
 
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
@@ -195,14 +195,14 @@ let NumericalSummary = React.createClass({
       .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
-      .y((d) => (d-yMin) / (yMax-yMin))(avg);
+      .y((d) => d)(avg);
     let area = d3.svg.area()
       .interpolate(interpolation)
       .tension(tension)
       .defined(_.isFinite)
       .x((d, i) => i)
-      .y((d) => (d-yMin) / (yMax-yMin))
-      .y0((d, i) => (min[i]-yMin) / (yMax-yMin))(max);
+      .y((d) => d)
+      .y0((d, i) => min[i])(max);
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -215,7 +215,7 @@ let NumericalSummary = React.createClass({
           </div>
           <div className="channel-data" style={{width:`${effWidth}px`}}>
             <svg className="numerical-summary" width={effWidth} height={height}>
-              <g style={{transform:`translate(${offset}px, ${height}px) scale(${stepWidth},${-height})`}}>
+              <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
                 <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
                 <path className="area" d={area}/>
                 <path className="line" d={line}/>
@@ -235,16 +235,9 @@ let NumericalSummary = React.createClass({
 let Controls = React.createClass({
 
   //As component update is an anon func, it looks different on every prop change,
-  // so skip it when checking
+  //so skip it when checking
   shouldComponentUpdate(nextProps) {
-    let { width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
-    return width !== nextProps.width ||
-      interpolation !== nextProps.interpolation ||
-      tension !== nextProps.tension ||
-      autoYScale !== nextProps.autoYScale ||
-      yMin !== nextProps.yMin ||
-      yMax !== nextProps.yMax
-      ;
+    return _(this.props).keys().without('componentUpdate').map((name) => this.props[name] !== nextProps[name]).any();
   },
 
   //Then we need to redirect componentUpdate so we always use the latest as
