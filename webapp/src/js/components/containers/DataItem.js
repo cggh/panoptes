@@ -90,7 +90,7 @@ let DataItem = React.createClass({
       tabArea =  (
                   <TabbedArea activeTab={"something"} >
                     <TabPane compId={"something"} >
-                        <PropertyList title={propertyListTitle} propertiesData={propertiesData} className='stack' />
+                        <PropertyList title={propertyListTitle} propertiesData={propertiesData} className='table-col' />
                     </TabPane>
                   </TabbedArea>
       )

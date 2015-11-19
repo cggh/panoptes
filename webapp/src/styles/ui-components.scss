@@ -538,18 +538,33 @@ input {
   }
 }
 
-.table-cell {
+.table-row-cell {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
+.table-col {
+  border: solid 1px $thin-grey-border-color;
+}
+
+.table-col-row-odd {
+  background-color: $dark-row-color;
+}
+
+.table-col-row-even {
+  background-color: $light-row-color;
+}
+
+.table-col-cell {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 .prop {
   opacity: 0.6;
 }
-.prop.bool {
-  top: -4px;
-}
+
 .prop.true {
     color: $green;
 }
@@ -557,7 +572,10 @@ input {
   color: $red;
 }
 
-.table-cell.bool {
+.table-row-cell {
+  .prop.bool {
+    top: -4px;
+  }
 }
 
 .table-row-header {
@@ -589,9 +607,13 @@ input {
 }
 
 .table-col-header {
-  padding: 0 !important;
+  border-right: solid 1px $thin-grey-border-color;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   height: 100%;
-  line-height: 25px;
+  line-height: 30px;
   display: flex;
   justify-content: left;
   align-items: left;
