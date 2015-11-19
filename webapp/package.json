@@ -68,6 +68,7 @@
     "lz-string": "git+https://github.com/benjeffery/lz-string.git",
     "material-ui": "^0.15.0-alpha.2",
     "performance-now": "^0.2.0",
+    "plotly.js": "git://github.com/plotly/plotly.js.git#734f75fdb9ccd6ca362c0b01b632f01eb2c0066e",
     "q": "^1.4.1",
     "qajax": "^1.3.0",
     "raf": "^3.2.0",
