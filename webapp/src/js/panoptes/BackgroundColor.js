@@ -15,9 +15,6 @@ module.exports = function(maxVal, minVal, categoryColors, showBar, value, rowInd
   }
   if (categoryColors) {
     let categoryColor = categoryColors[value] || categoryColors['_other_'];
-    
-    console.log("BackgroundColor categoryColor: " + categoryColor);
-    
     if (categoryColors) {
       let col = categoryColors[value] || categoryColors['_other_'];
       if (col) {
