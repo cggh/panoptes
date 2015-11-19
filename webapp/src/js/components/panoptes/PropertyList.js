@@ -1,7 +1,6 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
-const classNames = require('classnames');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -34,14 +33,14 @@ let PropertyList = React.createClass({
   render: function() {
 
     let {propertiesData, title, className} = this.props;
-
+    
     return (
-      <table className={classNames("datatable", className)}>
+      <table className={className}>
         <tbody>
           {
             propertiesData.map(
-              function(object, i){
-                return <PropertyListItem key={i} propertyData={object} tooltipPlacement={"right"} tooltipTrigger={['click']} />
+              function(object, index){
+                return <PropertyListItem key={index} rowIndex={index} propertyData={object} tooltipPlacement={"right"} tooltipTrigger={['click']} />
               }
             )
           }
