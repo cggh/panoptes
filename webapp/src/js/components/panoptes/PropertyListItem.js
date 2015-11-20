@@ -30,11 +30,7 @@ let PropertyListItem = React.createClass({
   render: function() {
     let {propertyData, tooltipPlacement, tooltipTrigger, rowIndex} = this.props;
     
-    let name = propertyData.name;
-    let description = propertyData.description;
-    let value = propertyData.value;
-    
-    let {maxVal, minVal, categoryColors, showBar} = propertyData;
+    let {name, description, value, maxVal, minVal, categoryColors, showBar} = propertyData;
     let backgroundColor = "inherit";
     
     let rowClass = "table-col-row-odd";
