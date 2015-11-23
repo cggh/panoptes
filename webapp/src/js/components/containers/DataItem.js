@@ -54,11 +54,15 @@ let DataItem = React.createClass({
     activeTab: React.PropTypes.string
   },
 
-  // TODO: if there is no activeTab, then show the Overview or the first tab.
+  getDefaultProps: function() {
+    return {
+      activeTab: 'tab_0'
+    };
+  },
+
   getInitialState() {
     return {
       loadStatus: 'loaded',
-      activeTab: 'Overview'
     };
   },
   
@@ -73,8 +77,7 @@ let DataItem = React.createClass({
     )
       .then((data) => {
         if (shallowEquals(props, this.props)) {
-          this.setState({loadStatus: 'loaded'});
-          this.setState({data: data});
+          this.setState({loadStatus: 'loaded', data: data});
         }
       })
       .catch((error) => {
@@ -128,20 +131,31 @@ let DataItem = React.createClass({
     {
       if (data)
       {
+        // If there are no dataItemViews specified, but there are fetched data, then default to showing an Overview.
         let tabPane = (
-          <TabPane key="0" compId="overview" >
+          <TabPane key="0" compId="tab_0" >
               <PropertyList title="Overview" propertiesData={propertiesData} className='table-col' />
           </TabPane>
         );
         
         tabPanes.push(tabPane);
       }
+      
+      // If there are no dataItemViews specified, and there are no fetched data, then show nothing.
+      
+      /*
+         This is an expected temporary state, which occurs while data is being fetched. 
+         Having no fetched data would be unexpected, but should be anticipated as a possible error. (TODO: anticipate no fetched data) 
+         DataItem opens from a hypertext link on the primKey, so we should at least have that datum.
+      */
     }
     else
     {
       for (let i = 0; i < dataItemViews.length; i++)
       {
-        let tabPaneCompId = dataItemViews[i].name;
+        // Compose a tabPane for each of the specified dataItemViews
+        
+        let tabPaneCompId = "tab_" + i;
         let tabPaneContents = null;
         
         if (dataItemViews[i].type === "Overview" && data)
