@@ -103,8 +103,12 @@ let DataItem = React.createClass({
     let propertiesDataIndexes = {};
     let propertiesDataUsingGroupId = {};
     
-    // Make a clone of the propertiesData
+    // Get the PropertyGroupData
+    let propertyGroupsData = this.config.tables[table].propertyGroups;
+    
+    // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
+    
     if (data)
     {
       for (let i = 0; i < propertiesData.length; i++)
@@ -164,19 +168,19 @@ let DataItem = React.createClass({
             <PropertyList title={dataItemViews[i].name} propertiesData={propertiesData} className='table-col' />
           )
         }
-        if (dataItemViews[i].type === "PieChartMap")
+        else if (dataItemViews[i].type === "PieChartMap")
         {
           tabPaneContents = (
             <div>PieChartMap, TODO</div>
           )
         }
-        if (dataItemViews[i].type === "ItemMap")
+        else if (dataItemViews[i].type === "ItemMap")
         {
           tabPaneContents = (
             <div>ItemMap, TODO</div>
           )
         }
-        if (dataItemViews[i].type === "FieldList" && data)
+        else if (dataItemViews[i].type === "FieldList" && data)
         {
           let fieldListPropertiesData = [];
           for (let j = 0; j < dataItemViews[i].fields.length; j++)
@@ -191,13 +195,25 @@ let DataItem = React.createClass({
             <PropertyList title={dataItemViews[i].name} propertiesData={fieldListPropertiesData} className='table-col' />
           )
         }
-        if (dataItemViews[i].type === "PropertyGroup" && data)
+        else if (dataItemViews[i].type === "PropertyGroup" && data)
         {
+          let propertyListTitle = null;
+          if (dataItemViews[i].name)
+          {
+            propertyListTitle = dataItemViews[i].name;
+          }
+          else
+          {
+            // Use the PropertyGroup name if there is no DataItemViews name.
+            propertyListTitle = propertyGroupsData[dataItemViews[i].groupId].name;
+          }
+          
+          
           tabPaneContents = (
-            <PropertyList title={dataItemViews[i].name} propertiesData={propertiesDataUsingGroupId[dataItemViews[i].groupId]} className='table-col' />
+            <PropertyList title={propertyListTitle} propertiesData={propertiesDataUsingGroupId[dataItemViews[i].groupId]} className='table-col' />
           )
         }
-        if (dataItemViews[i].type === "Template")
+        else if (dataItemViews[i].type === "Template")
         {
           tabPaneContents = (
             <div>Template, TODO</div>
