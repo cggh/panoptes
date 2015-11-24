@@ -64,7 +64,7 @@ let NumericalSummary = React.createClass({
 
   getInitialState() {
     return {
-      controlsOpen: false
+      controlsOpen: false,
     };
   },
 
@@ -91,10 +91,6 @@ let NumericalSummary = React.createClass({
       this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500)
   },
 
-  applyData(data) {
-    this.setState(data)
-  },
-
   //Called by DataFetcherMixin on prop change
   fetchData(props) {
     let {chromosome, start, end, width, sideWidth} = props;
@@ -103,6 +99,24 @@ let NumericalSummary = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
+    let effWidth = (width - sideWidth);
+
+    //We now work out the boundaries of a larger containing area such that some movement can be made without a refetch.
+    //Note that the benfit here comes not from network as there is a caching layer there, but from not having to recaclulate the
+    //svg path
+    //First find a block size - here we use the first power of 2 that is larger than 3x our width.
+    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log(effWidth * 3) / Math.log(2))));
+    //Then find the first multiple below our start
+    let blockStart = Math.floor(start / blockSize) * blockSize;
+    //However we might end outside this block, so add an overlappuing set of blocks shifted by blockSize/2
+    if (start + blockSize < end)
+      start += blockSize /2;
+    let blockEnd = blockStart + blockSize;
+
+    //If we already have the data then we haven't moved blocks.
+    if (this.blockEnd === blockEnd && this.blockStart === blockStart)
+      return;
+
     let [data, promise] = SummarisationCache.fetch({
       columns: {
         avg: {
@@ -125,17 +139,24 @@ let NumericalSummary = React.createClass({
       chromosome: chromosome,
       start: start,
       end: end,
-      targetPointCount: (width - sideWidth) / 2,
+      targetPointCount: (blockEnd - blockStart) / 2,
       invalidationID: this.id
     });
-    if (data)
-      this.applyData(data);
+    if (data) {
+      this.data = data;
+      this.blockStart = blockStart;
+      this.blockEnd = blockEnd;
+      this.applyData();
+    }
     if (promise) {
       this.props.onChangeLoadStatus('LOADING');
       promise
         .then((data) => {
           this.props.onChangeLoadStatus('DONE');
-          this.applyData(data);
+          this.data = data;
+          this.blockStart = blockStart;
+          this.blockEnd = blockEnd;
+          this.applyData();
         })
         .catch((data) => {
           this.props.onChangeLoadStatus('DONE');
@@ -147,49 +168,25 @@ let NumericalSummary = React.createClass({
     }
   },
 
-  handleControlToggle(e) {
-    this.setState({controlsOpen: !this.state.controlsOpen});
-    e.stopPropagation();
-  },
+  applyData() {
+    let { dataStart, dataStep, columns } = this.data;
+    let { interpolation, tension } = this.props;
 
-  render() {
-    let height = HEIGHT;
-    let config = this.config.summaryValues.__reference__.uniqueness;
-    let props = Object.assign({
-      yMin: config.minval,
-      yMax: config.maxval
-    }, this.props);
-    let { dataStart, dataStep, columns, controlsOpen} = this.state;
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
     let min = columns ? columns.min || [] : [];
-    if (props.autoYScale) {
-      let minVal = _.min(min);
-      let maxVal = _.max(max);
-      if (minVal === maxVal) {
-        minVal = minVal - 0.1*minVal;
-        maxVal = maxVal + 0.1*maxVal;
-      }
-      else {
-        let margin = 0.1*(maxVal-minVal);
-        minVal = minVal - margin;
-        maxVal = maxVal + margin;
-      }
-      if (_.isFinite(minVal) && _.isFinite(maxVal) && maxVal !== 0 && minVal !== 0) {
-        props.yMin = minVal;
-        props.yMax = maxVal;
-      }
+    let minVal = _.min(min);
+    let maxVal = _.max(max);
+    if (minVal === maxVal) {
+      minVal = minVal - 0.1*minVal;
+      maxVal = maxVal + 0.1*maxVal;
+    }
+    else {
+      let margin = 0.1*(maxVal-minVal);
+      minVal = minVal - margin;
+      maxVal = maxVal + margin;
     }
 
-    let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
-      componentUpdate, ...other } = props;
-    if (width == 0)
-      return null;
-
-    let effWidth = width - sideWidth;
-    let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
-    let stepWidth = scale(dataStep) - scale(0);
-    let offset = scale(dataStart) - scale(start - dataStep / 2); //Shift by half width to middle of window
     let line = d3.svg.line()
       .interpolate(interpolation)
       .tension(tension)
@@ -203,6 +200,45 @@ let NumericalSummary = React.createClass({
       .x((d, i) => i)
       .y((d) => d)
       .y0((d, i) => min[i])(max);
+
+    this.setState({
+      dataStart: dataStart,
+      dataStep: dataStep,
+      area: area,
+      line: line,
+      dataYMin: minVal,
+      dataYMax: maxVal
+    });
+  },
+
+  handleControlToggle(e) {
+    this.setState({controlsOpen: !this.state.controlsOpen});
+    e.stopPropagation();
+  },
+
+
+
+  render() {
+    let height = HEIGHT;
+    let config = this.config.summaryValues.__reference__.uniqueness;
+    let props = Object.assign({
+      yMin: config.minval,
+      yMax: config.maxval
+    }, this.props);
+    let { start, end, width, sideWidth, yMin, yMax, autoYScale } = props;
+    let { dataStart, dataStep, area, line, dataYMin, dataYMax } = this.state;
+    if (autoYScale && _.isFinite(dataYMin) && _.isFinite(dataYMax) && dataYMin !== 0 && dataYMax !== 0) {
+      yMin = dataYMin;
+      yMax = dataYMax;
+    }
+
+    if (width === 0 || !line)
+      return null;
+
+    let effWidth = width - sideWidth;
+    let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
+    let stepWidth = scale(dataStep) - scale(0);
+    let offset = scale(dataStart) - scale(start - dataStep / 2); //Shift by half width to middle of window
 
     let yAxisSpring = {
       yMin: spring(yMin),
@@ -225,8 +261,8 @@ let NumericalSummary = React.createClass({
                   let {yMin, yMax} = interpolated;
                   return <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
                     <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
-                    <path className="area" d={area}/>
-                    <path className="line" d={line}/>
+                    <Path className="area" d={area}/>
+                    <Path className="line" d={line}/>
                   </g>
                 }}
               </Motion>
@@ -240,6 +276,16 @@ let NumericalSummary = React.createClass({
     );
   }
 
+});
+
+//Seperate component for perf
+let Path = React.createClass({
+  mixins: [PureRenderMixin],
+
+  render() {
+    console.log('BOOM');
+    return <path {...this.props} />;
+  }
 });
 
 let Controls = React.createClass({
