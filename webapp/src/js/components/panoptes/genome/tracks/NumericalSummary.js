@@ -64,12 +64,18 @@ let NumericalSummary = React.createClass({
 
   getInitialState() {
     return {
-      controlsOpen: false,
+      controlsOpen: false
     };
   },
 
   componentWillMount() {
     this.id = uid(10);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    //TODO Could be more selective about this
+    if (this.state)
+      this.applyData(nextProps);
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -99,19 +105,23 @@ let NumericalSummary = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    let effWidth = (width - sideWidth);
 
+    let effStart = Math.max(start,0);
     //We now work out the boundaries of a larger containing area such that some movement can be made without a refetch.
     //Note that the benfit here comes not from network as there is a caching layer there, but from not having to recaclulate the
-    //svg path
+    //svg path. If needed we could also consider adding some hysteresis
     //First find a block size - here we use the first power of 2 that is larger than 3x our width.
-    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log(effWidth * 3) / Math.log(2))));
+    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log((end-start) * 3) / Math.log(2))));
     //Then find the first multiple below our start
-    let blockStart = Math.floor(start / blockSize) * blockSize;
+    let blockStart = Math.floor(effStart / blockSize) * blockSize;
     //However we might end outside this block, so add an overlappuing set of blocks shifted by blockSize/2
-    if (start + blockSize < end)
-      start += blockSize /2;
     let blockEnd = blockStart + blockSize;
+    if (blockEnd < end) {
+      blockStart += blockSize / 2;
+      blockEnd += blockSize / 2;
+    }
+    //Then we need to determine the resolution required
+    let targetPointCount = blockSize * ((width - sideWidth /2)/(end-start));
 
     //If we already have the data then we haven't moved blocks.
     if (this.blockEnd === blockEnd && this.blockStart === blockStart)
@@ -137,16 +147,16 @@ let NumericalSummary = React.createClass({
       },
       minBlockSize: 80,
       chromosome: chromosome,
-      start: start,
-      end: end,
-      targetPointCount: (blockEnd - blockStart) / 2,
+      start: blockStart,
+      end: blockEnd,
+      targetPointCount: targetPointCount,
       invalidationID: this.id
     });
     if (data) {
       this.data = data;
       this.blockStart = blockStart;
       this.blockEnd = blockEnd;
-      this.applyData();
+      this.applyData(props);
     }
     if (promise) {
       this.props.onChangeLoadStatus('LOADING');
@@ -156,7 +166,7 @@ let NumericalSummary = React.createClass({
           this.data = data;
           this.blockStart = blockStart;
           this.blockEnd = blockEnd;
-          this.applyData();
+          this.applyData(props);
         })
         .catch((data) => {
           this.props.onChangeLoadStatus('DONE');
@@ -168,24 +178,13 @@ let NumericalSummary = React.createClass({
     }
   },
 
-  applyData() {
+  applyData(props) {
     let { dataStart, dataStep, columns } = this.data;
-    let { interpolation, tension } = this.props;
+    let { interpolation, tension } = props;
 
     let avg = columns ? columns.avg || [] : [];
     let max = columns ? columns.max || [] : [];
     let min = columns ? columns.min || [] : [];
-    let minVal = _.min(min);
-    let maxVal = _.max(max);
-    if (minVal === maxVal) {
-      minVal = minVal - 0.1*minVal;
-      maxVal = maxVal + 0.1*maxVal;
-    }
-    else {
-      let margin = 0.1*(maxVal-minVal);
-      minVal = minVal - margin;
-      maxVal = maxVal + margin;
-    }
 
     let line = d3.svg.line()
       .interpolate(interpolation)
@@ -205,18 +204,43 @@ let NumericalSummary = React.createClass({
       dataStart: dataStart,
       dataStep: dataStep,
       area: area,
-      line: line,
-      dataYMin: minVal,
-      dataYMax: maxVal
+      line: line
     });
+    this.calculateYScale(props);
+  },
+
+  calculateYScale(props) {
+    if (props.autoYScale) {
+      let { start, end } = props;
+      let { dataStart, dataStep, columns } = this.data;
+
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
+
+      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+      let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
+      let minVal = _.min(min.slice(startIndex, endIndex));
+      let maxVal = _.max(max.slice(startIndex, endIndex));
+      if (minVal === maxVal) {
+        minVal = minVal - 0.1 * minVal;
+        maxVal = maxVal + 0.1 * maxVal;
+      }
+      else {
+        let margin = 0.1 * (maxVal - minVal);
+        minVal = minVal - margin;
+        maxVal = maxVal + margin;
+      }
+      this.setState({
+        dataYMin: minVal,
+        dataYMax: maxVal
+      });
+    }
   },
 
   handleControlToggle(e) {
     this.setState({controlsOpen: !this.state.controlsOpen});
     e.stopPropagation();
   },
-
-
 
   render() {
     let height = HEIGHT;
@@ -283,7 +307,6 @@ let Path = React.createClass({
   mixins: [PureRenderMixin],
 
   render() {
-    console.log('BOOM');
     return <path {...this.props} />;
   }
 });
