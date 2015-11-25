@@ -179,34 +179,36 @@ let NumericalSummary = React.createClass({
   },
 
   applyData(props) {
-    let { dataStart, dataStep, columns } = this.data;
-    let { interpolation, tension } = props;
+    if (this.data) {
+      let { dataStart, dataStep, columns } = this.data;
+      let { interpolation, tension } = props;
 
-    let avg = columns ? columns.avg || [] : [];
-    let max = columns ? columns.max || [] : [];
-    let min = columns ? columns.min || [] : [];
+      let avg = columns ? columns.avg || [] : [];
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
 
-    let line = d3.svg.line()
-      .interpolate(interpolation)
-      .tension(tension)
-      .defined(_.isFinite)
-      .x((d, i) => i)
-      .y((d) => d)(avg);
-    let area = d3.svg.area()
-      .interpolate(interpolation)
-      .tension(tension)
-      .defined(_.isFinite)
-      .x((d, i) => i)
-      .y((d) => d)
-      .y0((d, i) => min[i])(max);
+      let line = d3.svg.line()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_.isFinite)
+        .x((d, i) => i)
+        .y((d) => d)(avg);
+      let area = d3.svg.area()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_.isFinite)
+        .x((d, i) => i)
+        .y((d) => d)
+        .y0((d, i) => min[i])(max);
 
-    this.setState({
-      dataStart: dataStart,
-      dataStep: dataStep,
-      area: area,
-      line: line
-    });
-    this.calculateYScale(props);
+      this.setState({
+        dataStart: dataStart,
+        dataStep: dataStep,
+        area: area,
+        line: line
+      });
+      this.calculateYScale(props);
+    }
   },
 
   calculateYScale(props) {
