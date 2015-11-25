@@ -367,6 +367,10 @@
   justify-content: center;
 }
 
+.stack.wrap    {
+  flex-wrap: wrap;
+}
+
 .stack.vertical {
   flex-direction: column;
 }

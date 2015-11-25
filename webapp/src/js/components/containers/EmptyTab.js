@@ -43,8 +43,14 @@ let EmptyTab = React.createClass({
     let {tables, chromosomes} = this.config;
     let actions = this.getFlux().actions.session;
     return (
-      <div className="horizontal stack start-align">
-        <List subheader="Open a table:">
+      <div className="horizontal stack start-align wrap">
+        <List subheader="Open a view:" style={{width:'500px'}}>
+          <ListItem primaryText="Genome Browser"
+                    secondaryText="View table data and sequence data on the genome"
+                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
+                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome:_.keys(chromosomes)[0]})} />
+        </List>
+        <List subheader="Open a table:" style={{width:'500px'}}>
           {_.map(tables, (table) => (
             <ListItem key={table.id}
                       primaryText={table.tableCapNamePlural}
@@ -52,12 +58,6 @@ let EmptyTab = React.createClass({
                       leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
                       onClick={(e) => this.handleTableClick(e, table)} />
           ))}
-        </List>
-        <List subheader="Open a view:">
-          <ListItem primaryText="Genome Browser"
-                    secondaryText="View table data and sequence data on the genome"
-                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome:_.keys(chromosomes)[0]})} />
         </List>
       </div>
     );
