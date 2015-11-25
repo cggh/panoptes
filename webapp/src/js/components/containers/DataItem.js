@@ -10,6 +10,9 @@ const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
+// Containers
+const MapContainer = require('containers/MapContainer');
+
 // Panoptes components
 const API = require('panoptes/API');
 const ErrorReport = require('panoptes/ErrorReporter');
@@ -20,7 +23,6 @@ const Icon = require('ui/Icon');
 const Loading = require('ui/Loading');
 const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
-
 
 // TODO: fix field name mangling at the source
 function rectifyString(strObj)
@@ -62,7 +64,7 @@ let DataItem = React.createClass({
 
   getInitialState() {
     return {
-      loadStatus: 'loaded',
+      loadStatus: 'loaded'
     };
   },
   
@@ -84,8 +86,9 @@ let DataItem = React.createClass({
       ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
       this.setState({loadStatus: 'error'});
     });
-
   },
+  
+
 
   icon() {
     return this.config.tables[this.props.table].icon;
@@ -171,7 +174,13 @@ let DataItem = React.createClass({
         else if (dataItemViews[i].type === "PieChartMap")
         {
           tabPaneContents = (
-            <div>PieChartMap, TODO</div>
+              <MapContainer title={dataItemViews[i].name} 
+                center={{lat: dataItemViews[i].mapCenter.lattitude, lng:  dataItemViews[i].mapCenter.longitude}} 
+                zoom={3} 
+                table={dataItemViews[i].locationDataTable} 
+                locationNameProperty={dataItemViews[i].locationNameProperty}
+                locationSizeProperty={dataItemViews[i].locationSizeProperty}
+              />
           )
         }
         else if (dataItemViews[i].type === "ItemMap")
