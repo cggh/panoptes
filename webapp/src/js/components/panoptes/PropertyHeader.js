@@ -5,8 +5,6 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 // UI components
 const TooltipEllipsis = require('ui/TooltipEllipsis');
@@ -19,8 +17,7 @@ let PropertyHeader = React.createClass({
 
   mixins: [
              PureRenderMixin,
-             FluxMixin,
-             ConfigMixin
+             FluxMixin
   ],
 
   propTypes: {
