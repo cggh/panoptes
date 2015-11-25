@@ -19,6 +19,8 @@ function columnSpec(list) {
 
 function caseChange(config) {
   let out = {};
+  if (_.isString(config))
+    return config;
   _.each(_.keys(config), (key) => {
     let destKey = key[0].toLowerCase() + key.slice(1);
     let value = config[key];
@@ -35,6 +37,7 @@ function caseChange(config) {
     }
     out[destKey] = value;
   });
+
   return out;
 }
 
@@ -81,6 +84,8 @@ let augmentTableInfo = function (table) {
     table.tableNameSingle = table.settings.NameSingle;
   if (table.settings.NamePlural)
     table.tableNamePlural = table.settings.NamePlural;
+  if (table.settings.DataItemViews)
+    table.dataItemViews = table.settings.DataItemViews;
   table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
   table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
   table.hasGenomeRegions = !!(table.settings.IsRegionOnGenome);
