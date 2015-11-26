@@ -177,7 +177,15 @@ let DataItem = React.createClass({
           let fieldListPropertiesData = [];
           for (let j = 0; j < dataItemViews[i].fields.length; j++)
           {
-            fieldListPropertiesData.push(propertiesData[propertiesDataIndexes[dataItemViews[i].fields[j]]]);
+            let propertiesDataIndex = propertiesDataIndexes[dataItemViews[i].fields[j]];
+            if (typeof propertiesDataIndex !== 'undefined')
+            {
+              fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
+            }
+            else
+            {
+              console.log("Foreign property: " + dataItemViews[i].fields[j]);
+            }
           }
           
           tabPaneContents = (
