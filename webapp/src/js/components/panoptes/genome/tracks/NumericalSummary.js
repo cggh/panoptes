@@ -3,9 +3,8 @@ const ReactDOM = require('react-dom');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
-const Immutable = require('immutable');
 const uid = require('uid');
-var offset = require("bloody-offset");
+const offset = require("bloody-offset");
 
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
@@ -18,6 +17,7 @@ const Icon = require('ui/Icon');
 const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
 const Slider = require('material-ui/lib/slider');
+const { Motion, spring } = require('react-motion');
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -72,6 +72,12 @@ let NumericalSummary = React.createClass({
     this.id = uid(10);
   },
 
+  componentWillReceiveProps(nextProps) {
+    //TODO Could be more selective about this
+    if (this.state)
+      this.applyData(nextProps);
+  },
+
   componentDidUpdate(prevProps, prevState) {
     if (prevState.controlsOpen !== this.state.controlsOpen)
       this.updateControlsHeight();
@@ -91,10 +97,6 @@ let NumericalSummary = React.createClass({
       this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500)
   },
 
-  applyData(data) {
-    this.setState(data)
-  },
-
   //Called by DataFetcherMixin on prop change
   fetchData(props) {
     let {chromosome, start, end, width, sideWidth} = props;
@@ -103,6 +105,28 @@ let NumericalSummary = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
+
+    let effStart = Math.max(start,0);
+    //We now work out the boundaries of a larger containing area such that some movement can be made without a refetch.
+    //Note that the benfit here comes not from network as there is a caching layer there, but from not having to recaclulate the
+    //svg path. If needed we could also consider adding some hysteresis
+    //First find a block size - here we use the first power of 2 that is larger than 3x our width.
+    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log((end-start) * 3) / Math.log(2))));
+    //Then find the first multiple below our start
+    let blockStart = Math.floor(effStart / blockSize) * blockSize;
+    //However we might end outside this block, so add an overlappuing set of blocks shifted by blockSize/2
+    let blockEnd = blockStart + blockSize;
+    if (blockEnd < end) {
+      blockStart += blockSize / 2;
+      blockEnd += blockSize / 2;
+    }
+    //Then we need to determine the resolution required
+    let targetPointCount = blockSize * ((width - sideWidth /2)/(end-start));
+
+    //If we already have the data then we haven't moved blocks.
+    if (this.blockEnd === blockEnd && this.blockStart === blockStart)
+      return;
+
     let [data, promise] = SummarisationCache.fetch({
       columns: {
         avg: {
@@ -123,19 +147,26 @@ let NumericalSummary = React.createClass({
       },
       minBlockSize: 80,
       chromosome: chromosome,
-      start: start,
-      end: end,
-      targetPointCount: (width - sideWidth) / 2,
+      start: blockStart,
+      end: blockEnd,
+      targetPointCount: targetPointCount,
       invalidationID: this.id
     });
-    if (data)
-      this.applyData(data);
+    if (data) {
+      this.data = data;
+      this.blockStart = blockStart;
+      this.blockEnd = blockEnd;
+      this.applyData(props);
+    }
     if (promise) {
       this.props.onChangeLoadStatus('LOADING');
       promise
         .then((data) => {
           this.props.onChangeLoadStatus('DONE');
-          this.applyData(data);
+          this.data = data;
+          this.blockStart = blockStart;
+          this.blockEnd = blockEnd;
+          this.applyData(props);
         })
         .catch((data) => {
           this.props.onChangeLoadStatus('DONE');
@@ -144,6 +175,67 @@ let NumericalSummary = React.createClass({
             this.setState({loadStatus: 'error'});
           }
         });
+    }
+  },
+
+  applyData(props) {
+    if (this.data) {
+      let { dataStart, dataStep, columns } = this.data;
+      let { interpolation, tension } = props;
+
+      let avg = columns ? columns.avg || [] : [];
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
+
+      let line = d3.svg.line()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_.isFinite)
+        .x((d, i) => i)
+        .y((d) => d)(avg);
+      let area = d3.svg.area()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_.isFinite)
+        .x((d, i) => i)
+        .y((d) => d)
+        .y0((d, i) => min[i])(max);
+
+      this.setState({
+        dataStart: dataStart,
+        dataStep: dataStep,
+        area: area,
+        line: line
+      });
+      this.calculateYScale(props);
+    }
+  },
+
+  calculateYScale(props) {
+    if (props.autoYScale) {
+      let { start, end } = props;
+      let { dataStart, dataStep, columns } = this.data;
+
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
+
+      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+      let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
+      let minVal = _.min(min.slice(startIndex, endIndex));
+      let maxVal = _.max(max.slice(startIndex, endIndex));
+      if (minVal === maxVal) {
+        minVal = minVal - 0.1 * minVal;
+        maxVal = maxVal + 0.1 * maxVal;
+      }
+      else {
+        let margin = 0.1 * (maxVal - minVal);
+        minVal = minVal - margin;
+        maxVal = maxVal + margin;
+      }
+      this.setState({
+        dataYMin: minVal,
+        dataYMax: maxVal
+      });
     }
   },
 
@@ -159,50 +251,25 @@ let NumericalSummary = React.createClass({
       yMin: config.minval,
       yMax: config.maxval
     }, this.props);
-    let { dataStart, dataStep, columns, controlsOpen} = this.state;
-    let avg = columns ? columns.avg || [] : [];
-    let max = columns ? columns.max || [] : [];
-    let min = columns ? columns.min || [] : [];
-    if (props.autoYScale) {
-      let minVal = _.min(min);
-      let maxVal = _.max(max);
-      if (minVal === maxVal) {
-        minVal = minVal - 0.1*minVal;
-        maxVal = maxVal + 0.1*maxVal;
-      }
-      else {
-        let margin = 0.1*(maxVal-minVal);
-        minVal = minVal - margin;
-        maxVal = maxVal + margin;
-      }
-      if (minVal && maxVal && maxVal !== 0 && minVal !== 0) {
-        props.yMin = minVal;
-        props.yMax = maxVal;
-      }
+    let { start, end, width, sideWidth, yMin, yMax, autoYScale } = props;
+    let { dataStart, dataStep, area, line, dataYMin, dataYMax } = this.state;
+    if (autoYScale && _.isFinite(dataYMin) && _.isFinite(dataYMax) && dataYMin !== 0 && dataYMax !== 0) {
+      yMin = dataYMin;
+      yMax = dataYMax;
     }
 
-    let { start, end, width, sideWidth, interpolation, autoYScale, tension, yMin, yMax,
-      componentUpdate, ...other } = props;
-    if (width == 0)
+    if (width === 0 || !line)
       return null;
 
     let effWidth = width - sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = scale(dataStep) - scale(0);
     let offset = scale(dataStart) - scale(start - dataStep / 2); //Shift by half width to middle of window
-    let line = d3.svg.line()
-      .interpolate(interpolation)
-      .tension(tension)
-      .defined(_.isFinite)
-      .x((d, i) => i)
-      .y((d) => (d-yMin) / (yMax-yMin))(avg);
-    let area = d3.svg.area()
-      .interpolate(interpolation)
-      .tension(tension)
-      .defined(_.isFinite)
-      .x((d, i) => i)
-      .y((d) => (d-yMin) / (yMax-yMin))
-      .y0((d, i) => (min[i]-yMin) / (yMax-yMin))(max);
+
+    let yAxisSpring = {
+      yMin: spring(yMin),
+      yMax: spring(yMax)
+    };
     return (
       <div className="channel-container">
         <div className="channel" style={{height:HEIGHT}}>
@@ -215,11 +282,16 @@ let NumericalSummary = React.createClass({
           </div>
           <div className="channel-data" style={{width:`${effWidth}px`}}>
             <svg className="numerical-summary" width={effWidth} height={height}>
-              <g style={{transform:`translate(${offset}px, ${height}px) scale(${stepWidth},${-height})`}}>
-                <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
-                <path className="area" d={area}/>
-                <path className="line" d={line}/>
-              </g>
+              <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
+                {(interpolated) => {
+                  let {yMin, yMax} = interpolated;
+                  return <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
+                    <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
+                    <Path className="area" d={area}/>
+                    <Path className="line" d={line}/>
+                  </g>
+                }}
+              </Motion>
             </svg>
           </div>
         </div>
@@ -232,19 +304,21 @@ let NumericalSummary = React.createClass({
 
 });
 
+//Seperate component for perf
+let Path = React.createClass({
+  mixins: [PureRenderMixin],
+
+  render() {
+    return <path {...this.props} />;
+  }
+});
+
 let Controls = React.createClass({
 
   //As component update is an anon func, it looks different on every prop change,
-  // so skip it when checking
+  //so skip it when checking
   shouldComponentUpdate(nextProps) {
-    let { width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
-    return width !== nextProps.width ||
-      interpolation !== nextProps.interpolation ||
-      tension !== nextProps.tension ||
-      autoYScale !== nextProps.autoYScale ||
-      yMin !== nextProps.yMin ||
-      yMax !== nextProps.yMax
-      ;
+    return _(this.props).keys().without('componentUpdate').map((name) => this.props[name] !== nextProps[name]).any();
   },
 
   //Then we need to redirect componentUpdate so we always use the latest as

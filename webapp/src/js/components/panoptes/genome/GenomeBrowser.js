@@ -54,11 +54,9 @@ let GenomeBrowser = React.createClass({
 
   componentWillMount() {
     this.panStartPixel = null;
-    //this.validateAndAdjustView(this.props);
   },
 
   componentWillReceiveProps(nextProps) {
-    //this.validateAndAdjustView(nextProps);
     if (this.nextSpringConfig) {
       this.setState({springConfig: this.nextSpringConfig});
       this.nextSpringConfig = null;
