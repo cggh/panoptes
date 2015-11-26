@@ -169,7 +169,10 @@ let DataItem = React.createClass({
         else if (dataItemViews[i].type === "ItemMap")
         {
           tabPaneContents = (
-            <div>ItemMap, TODO</div>
+              <MapContainer title={dataItemViews[i].name} 
+                zoom={dataItemViews[i].mapZoom} 
+                table={table} 
+              />
           )
         }
         else if (dataItemViews[i].type === "FieldList" && data)
