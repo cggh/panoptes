@@ -24,23 +24,6 @@ const Loading = require('ui/Loading');
 const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
 
-// TODO: fix field name mangling at the source
-function rectifyString(strObj)
-{
-  /*
-    Convert {"0":"c","1":"h","2":"r","3":"o","4":"m","5":"o","6":"s","7":"o","8":"m","9":"e"}
-    Into "chromosome"
-  */
-  
-  let rectifiedString = "";
-  for (let i = 0; i < Object.keys(strObj).length; i++)
-  {
-    rectifiedString += strObj[i];
-  }
-  
-  return rectifiedString;
-}
-
 let DataItem = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -102,7 +85,7 @@ let DataItem = React.createClass({
     let {table, primKey, componentUpdate, activeTab} = this.props;
     let {data, loadStatus} = this.state;
     
-    let dataItemViews = this.config.tables[table].settings.dataItemViews;
+    let dataItemViews = this.config.tables[table].dataItemViews;
     let propertiesDataIndexes = {};
     let propertiesDataUsingGroupId = {};
     
@@ -194,10 +177,7 @@ let DataItem = React.createClass({
           let fieldListPropertiesData = [];
           for (let j = 0; j < dataItemViews[i].fields.length; j++)
           {
-            // TODO: fix field name mangling at the source
-            let rectifiedFieldName = rectifyString(dataItemViews[i].fields[j]);
-            
-            fieldListPropertiesData.push(propertiesData[propertiesDataIndexes[rectifiedFieldName]]);
+            fieldListPropertiesData.push(propertiesData[propertiesDataIndexes[dataItemViews[i].fields[j]]]);
           }
           
           tabPaneContents = (
