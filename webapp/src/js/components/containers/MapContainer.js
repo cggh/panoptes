@@ -34,6 +34,12 @@ let MapContainer = React.createClass({
     locationSizeProperty: React.PropTypes.string
   },
   
+  getDefaultProps() {
+    return {
+      center: {lat: 0, lng:  0}
+    };
+  },
+  
   getInitialState() {
     return {
       rows: [],
@@ -52,7 +58,18 @@ let MapContainer = React.createClass({
     {
       this.setState({loadStatus: 'loading'});
       
-      let columns = [tableConfig.propIdGeoCoordLongit, tableConfig.propIdGeoCoordLattit, locationNameProperty, locationSizeProperty];
+      let columns = [tableConfig.propIdGeoCoordLongit, tableConfig.propIdGeoCoordLattit];
+      
+      if (locationNameProperty)
+      {
+        columns.push(locationNameProperty);
+      }
+      
+      if (locationSizeProperty)
+      {
+        columns.push(locationSizeProperty);
+      }
+      
       let columnspec = {};
       columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
       
