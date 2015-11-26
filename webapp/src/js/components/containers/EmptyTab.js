@@ -56,6 +56,10 @@ let EmptyTab = React.createClass({
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome: _keys(chromosomes)[0]})} />
+          <ListItem primaryText="Plot"
+                    secondaryText="View table data graphically"
+                    leftIcon={<div><Icon fixedWidth={true} name="area-chart "/></div>}
+                    onClick={(e) => this.handleOpen(e, 'containers/PlotWithActions', {})} />
         </List>
         <List style={{width: '500px'}}>
           <Subheader>Open a table:</Subheader>
