@@ -43,7 +43,7 @@ let PropertyCell = React.createClass({
     } else if (prop.dispDataType == "Boolean" && value !== '') {
       let val = (value == '1');
       return <Icon className={(val ? "prop bool true" : "prop bool false")}
-                   fixedWidth={true}
+                   fixedWidth={false}
                    name={val ? "check" : "times"}/>
     } else if (prop.isPrimKey) {
       return <span className="prop internal-link"

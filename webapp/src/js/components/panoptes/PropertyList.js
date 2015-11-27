@@ -1,13 +1,10 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
-const classNames = require('classnames');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 // Panoptes components
 const PropertyListItem = require('panoptes/PropertyListItem');
@@ -16,8 +13,7 @@ let PropertyList = React.createClass({
 
   mixins: [
              PureRenderMixin,
-             FluxMixin,
-             ConfigMixin
+             FluxMixin
   ],
 
   propTypes: {
@@ -30,18 +26,18 @@ let PropertyList = React.createClass({
   },
 
 
-
   render: function() {
 
     let {propertiesData, title, className} = this.props;
-
+    
     return (
-      <table className={classNames("datatable", className)}>
+      <table className={className}>
         <tbody>
           {
             propertiesData.map(
-              function(object, i){
-                return <PropertyListItem key={i} propertyData={object} tooltipPlacement={"right"} tooltipTrigger={['click']} />
+              function(propertyData, index)
+              {
+                return <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={"right"} tooltipTrigger={['click']} />
               }
             )
           }
