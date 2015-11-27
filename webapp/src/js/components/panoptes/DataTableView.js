@@ -8,7 +8,6 @@ const Color = require('color');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
-const SetSizeToParent = require('mixins/SetSizeToParent');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
 
@@ -25,6 +24,7 @@ const PropertyHeader = require('panoptes/PropertyHeader');
 // UI components
 const Loading = require('ui/Loading');
 const Icon = require('ui/Icon');
+const DetectResize = require('utils/DetectResize');
 
 const MAX_COLOR = Color("#44aafb");
 
@@ -33,7 +33,6 @@ let DataTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    SetSizeToParent,
     DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'start')
   ],
 
@@ -65,10 +64,8 @@ let DataTableView = React.createClass({
     return {
       rows: [],
       loadStatus: 'loaded',
-      size: {
-        width: 0,
-        height: 0
-      }
+      width: 0,
+      height: 0
     };
   },
 
@@ -81,13 +78,13 @@ let DataTableView = React.createClass({
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       API.pageQuery({
-        database: this.config.dataset,
-        table: tableConfig.fetchTableName,
-        columns: columnspec,
-        order: order,
-        ascending: ascending,
-        query: SQL.WhereClause.decode(query)
-      })
+          database: this.config.dataset,
+          table: tableConfig.fetchTableName,
+          columns: columnspec,
+          order: order,
+          ascending: ascending,
+          query: SQL.WhereClause.decode(query)
+        })
         .then((data) => {
           //Check our data is still relavent
           if (Immutable.is(props, this.props)) {
@@ -134,21 +131,21 @@ let DataTableView = React.createClass({
     let {ascending, descending} = headerData;
     let {description, name} = columnData;
     return <PropertyHeader
-        className={classNames({
+      className={classNames({
                                 "pointer": true,
                                 "table-row-header": true,
                                 "sort-column-ascending": ascending,
                                 "sort-column-descending": descending
                                       })}
-        style={{width:width}}
-        onClick={() => this.handleOrderChange(columnData.propid)}
-        prefix={(ascending || descending) ?
+      style={{width:width}}
+      onClick={() => this.handleOrderChange(columnData.propid)}
+      prefix={(ascending || descending) ?
         <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
         null}
-        name={name}
-        description={description}
-        tooltipPlacement={"bottom"}
-        tooltipTrigger={['click']} />
+      name={name}
+      description={description}
+      tooltipPlacement={"bottom"}
+      tooltipTrigger={['click']}/>
   },
 
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
@@ -156,11 +153,11 @@ let DataTableView = React.createClass({
     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
-      let percent = 100*(cellData - minVal)/(maxVal-minVal);
+      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
       background = `linear-gradient(to right, ${rowIndex % 2 ? "rgb(115, 190, 252)" : "rgb(150, 207, 253)"} ${percent}%, rgba(0,0,0,0) ${percent}%`
     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
-      let clippedCellData = Math.min(Math.max(parseFloat(cellData),minVal),maxVal);
-      background = MAX_COLOR.clone().lighten(0.58*(1-(clippedCellData - minVal)/(maxVal-minVal))).rgbString();
+      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+      background = MAX_COLOR.clone().lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
     }
     if (categoryColors) {
       let col = categoryColors[cellData] || categoryColors['_other_'];
@@ -192,7 +189,7 @@ let DataTableView = React.createClass({
     if (columnData.isDate)
       return 110;
     if (columnData.decimDigits)
-      return Math.max(15+columnData.decimDigits*15, 110);
+      return Math.max(15 + columnData.decimDigits * 15, 110);
     return 110;
   },
 
@@ -206,43 +203,45 @@ let DataTableView = React.createClass({
     }
     if (columns.size > 0)
       return (
-        <div className={classNames("datatable", className)}>
-          <Table
-            rowHeight={30}
-            rowGetter={(index) => rows[index]}
-            rowsCount={rows.length}
-            width={width}
-            height={height}
-            headerHeight={50}
-            headerDataGetter={this.headerData}
-            onColumnResizeEndCallback={this.handleColumnResize}
-            isColumnResizing={false}
+        <DetectResize onResize={(size) => this.setState(size)}>
+          <div className={classNames("datatable", className)}>
+            <Table
+              rowHeight={30}
+              rowGetter={(index) => rows[index]}
+              rowsCount={rows.length}
+              width={width}
+              height={height}
+              headerHeight={50}
+              headerDataGetter={this.headerData}
+              onColumnResizeEndCallback={this.handleColumnResize}
+              isColumnResizing={false}
             >
-            {columns.map(column => {
-              if (!tableConfig.propertiesMap[column]) {
-                console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
-                return;
-              }
-              let columnData = tableConfig.propertiesMap[column];
-              let {propid, isPrimKey} = columnData;
-              return <Column
-                //TODO Better default column widths
-                width={columnWidths.get(column,this.defaultWidth(columnData))}
-                dataKey={propid}
-                key={propid}
-                fixed={isPrimKey}
-                allowCellsRecycling={true}
-                cellRenderer={this.renderCell}
-                headerRenderer={this.renderHeader}
-                columnData={columnData}
-                isResizable={true}
-                minWidth={50}
+              {columns.map(column => {
+                if (!tableConfig.propertiesMap[column]) {
+                  console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
+                  return;
+                }
+                let columnData = tableConfig.propertiesMap[column];
+                let {propid, isPrimKey} = columnData;
+                return <Column
+                  //TODO Better default column widths
+                  width={columnWidths.get(column,this.defaultWidth(columnData))}
+                  dataKey={propid}
+                  key={propid}
+                  fixed={isPrimKey}
+                  allowCellsRecycling={true}
+                  cellRenderer={this.renderCell}
+                  headerRenderer={this.renderHeader}
+                  columnData={columnData}
+                  isResizable={true}
+                  minWidth={50}
                 />
-            })
-            }
-          </Table>
-          <Loading status={loadStatus}/>
-        </div>
+              })
+              }
+            </Table>
+            <Loading status={loadStatus}/>
+          </div>
+        </DetectResize>
       );
     else
       return (
