@@ -1,10 +1,8 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const offset = require("bloody-offset");
-const memoize = require('utils/Memoize');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
-const SetSizeToParent = require('mixins/SetSizeToParent');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const Hammer = require('react-hammerjs');
@@ -15,6 +13,7 @@ const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
 const Controls = require('panoptes/genome/Controls');
 const ReferenceSequence = require('panoptes/genome/tracks/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
+const DetectResize = require('utils/DetectResize')
 import 'genomebrowser.scss';
 
 let dynreq = require.context(".", true);
@@ -31,8 +30,7 @@ const CONTROLS_HEIGHT = 33;
 let GenomeBrowser = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
-    SetSizeToParent
+    ConfigMixin
   ],
 
   propTypes: {
@@ -48,7 +46,9 @@ let GenomeBrowser = React.createClass({
   getInitialState() {
     return {
       springConfig: DEFAULT_SPRING,
-      loading: 0
+      loading: 0,
+      width: 0,
+      height: 0
     }
   },
 
@@ -212,76 +212,78 @@ let GenomeBrowser = React.createClass({
       halfWidth: spring((end - start) / 2, springConfig)
     };
     return (
-      <div className="genome-browser">
-        <div className="control-bar">
-          <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
-          <Controls {...this.props} minWidth={MIN_WIDTH}/>
-        </div>
-        <Hammer
-          ref={(c) => this.root_hammer = c}
-          onDoubleTap={this.handleDoubleTap}
-          onPan={this.handlePan}
-          vertical={true}
-          onPinch={(e) => console.log('2',e)}
-          onWheel={this.handleMouseWheel}
-          >
-          <div className="main-area">
-            <Motion ref="spring"
-                    style={endValue}
-                    defaultStyle={endValue}>
-              {(interpolated) => {
-                start = interpolated.mid - interpolated.halfWidth;
-                end = interpolated.mid + interpolated.halfWidth;
-                //Round to nearest pixel to stop unneeded updates
-                start = Math.round(start / pixelWidth) * pixelWidth;
-                end = Math.round(end / pixelWidth) * pixelWidth;
-                this.actual_start = start;
-                this.actual_end = end;
-                let track_props = {
-                  chromosome: chromosome,
-                  start: start,
-                  end: end,
-                  width: width,
-                  sideWidth: sideWidth,
-                  onChangeLoadStatus: this.handleChangeLoadStatus
-                };
-                return (
-                  <div className="tracks vertical stack">
-                    <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
-                                sideWidth={sideWidth}/>
-
-                    <div className="fixed">
-                      <GenomeScale start={start} end={end}
-                                   width={width} sideWidth={sideWidth}/>
-                      { settings.refSequenceSumm ?
-                        <ReferenceSequence {...track_props} /> :
-                        null }
-                    </div>
-                    <div className="scrolling grow scroll-within">
-                      {components.map((componentSpec, componentId) => {
-                          let { component, props } = componentSpec.toJS();
-                          return React.createElement(dynamic_require(component),
-                            _.extend({
-                              key: componentId,
-                              componentUpdate: (updater) => componentUpdate({
-                                components: {
-                                  [componentId]: {
-                                    props: updater
-                                  }
-                                }
-                              })
-                            }, props, track_props));
-                        }
-                      ).toList()
-                      }
-                    </div>
-                  </div>
-                )
-              }}
-            </Motion>
+      <DetectResize onResize={(size) => this.setState(size)}>
+        <div className="genome-browser">
+          <div className="control-bar">
+            <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+            <Controls {...this.props} minWidth={MIN_WIDTH}/>
           </div>
-        </Hammer>
-      </div>
+          <Hammer
+            ref={(c) => this.root_hammer = c}
+            onDoubleTap={this.handleDoubleTap}
+            onPan={this.handlePan}
+            vertical={true}
+            onPinch={(e) => console.log('2',e)}
+            onWheel={this.handleMouseWheel}
+          >
+            <div className="main-area">
+              <Motion ref="spring"
+                      style={endValue}
+                      defaultStyle={endValue}>
+                {(interpolated) => {
+                  start = interpolated.mid - interpolated.halfWidth;
+                  end = interpolated.mid + interpolated.halfWidth;
+                  //Round to nearest pixel to stop unneeded updates
+                  start = Math.round(start / pixelWidth) * pixelWidth;
+                  end = Math.round(end / pixelWidth) * pixelWidth;
+                  this.actual_start = start;
+                  this.actual_end = end;
+                  let track_props = {
+                    chromosome: chromosome,
+                    start: start,
+                    end: end,
+                    width: width,
+                    sideWidth: sideWidth,
+                    onChangeLoadStatus: this.handleChangeLoadStatus
+                  };
+                  return (
+                    <div className="tracks vertical stack">
+                      <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
+                                  sideWidth={sideWidth}/>
+
+                      <div className="fixed">
+                        <GenomeScale start={start} end={end}
+                                     width={width} sideWidth={sideWidth}/>
+                        { settings.refSequenceSumm ?
+                          <ReferenceSequence {...track_props} /> :
+                          null }
+                      </div>
+                      <div className="scrolling grow scroll-within">
+                        {components.map((componentSpec, componentId) => {
+                            let { component, props } = componentSpec.toJS();
+                            return React.createElement(dynamic_require(component),
+                              _.extend({
+                                key: componentId,
+                                componentUpdate: (updater) => componentUpdate({
+                                  components: {
+                                    [componentId]: {
+                                      props: updater
+                                    }
+                                  }
+                                })
+                              }, props, track_props));
+                          }
+                        ).toList()
+                        }
+                      </div>
+                    </div>
+                  )
+                }}
+              </Motion>
+            </div>
+          </Hammer>
+        </div>
+      </DetectResize>
     );
   }
 });
