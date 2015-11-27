@@ -14,14 +14,15 @@ const FluxMixin = require('mixins/FluxMixin');
 // Panoptes components
 const Circle = require('panoptes/Circle');
 
+// TODO: Can we move these option settings upstream?
 function getMapOptions(maps) {
   return {
     zoomControlOptions: {
-      position: maps.ControlPosition.RIGHT_BOTTOM,
-      style: maps.ZoomControlStyle.SMALL
+      position: maps.ControlPosition.RIGHT_BOTTOM, //9
+      style: maps.ZoomControlStyle.SMALL //1
     },
     mapTypeControlOptions: {
-      position: maps.ControlPosition.TOP_LEFT,
+      position: maps.ControlPosition.TOP_LEFT, //1
       StreetViewStatus: true
     },
     mapTypeControl: true
@@ -51,17 +52,20 @@ let Map = React.createClass({
   componentDidMount : function(){
     detectResize.addResizeListener(ReactDOM.findDOMNode(this), this.onResize);
   },
-
+  
   componentWillUnmount : function(){
     detectResize.removeResizeListener(ReactDOM.findDOMNode(this), this.onResize);
   },
   
-  
   onResize : function() 
   {
+    this._googleMapRef._setViewSize();
+    
     if (this.state.maps && this.state.map)
     {
+      let center =  this.state.map.getCenter();
       this.state.maps.event.trigger(this.state.map, 'resize');
+      this.state.map.setCenter(center);
     }
   },
   
@@ -83,6 +87,7 @@ let Map = React.createClass({
           yesIWantToUseGoogleMapApiInternals={true}
           onGoogleApiLoaded={({map, maps}) => this.setState({map: map, maps: maps})}
           options={getMapOptions}
+          ref={r => this._googleMapRef = r}
         >
           {markers.map(function(marker, index){
             return <Circle key={index} lat={marker.lat} lng={marker.lng}/>
