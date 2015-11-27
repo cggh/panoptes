@@ -9,19 +9,19 @@
     width: 100%;
     height: calc(100% - #{$tab-height} - 4px); /*4px for the border*/
     .tab-pane {
-      display: none;
+      visibility: hidden;
       position: absolute;
       top: 0;
       left: 0;
       overflow: hidden;
       clear: both;
-      padding: 10px 5px;
+      padding-bottom: 22px;
       width: 100%;
       height: 100%;
     }
     .tab-pane.active {
       overflow: auto;
-      display: block;
+      visibility: visible;
     }
   }
   .tabs {
@@ -33,8 +33,8 @@
     .tab {
       font-size: 15px;
       display: flex;
-      margin-right: 2px;
-      margin-left: 2px;
+      margin-right: 0;
+      margin-left: 3px;
       cursor: pointer;
       top: 1px;
       overflow: hidden;
@@ -137,6 +137,7 @@
     white-space: nowrap;
     height: $topbar-height;
     //padding: 7px 7px 7px 12px;
+    margin-bottom: 3px;
     cursor: move;
     font-size: 10pt;
     font-weight: bold;
@@ -538,18 +539,25 @@ input {
   }
 }
 
-.table-cell {
+.table-row-cell {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
+.table-col {
+  margin: 5px;
+}
+
+.table-col-cell {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 .prop {
   opacity: 0.6;
 }
-.prop.bool {
-  top: -4px;
-}
+
 .prop.true {
     color: $green;
 }
@@ -557,7 +565,10 @@ input {
   color: $red;
 }
 
-.table-cell.bool {
+.table-row-cell {
+  .prop.bool {
+    top: -4px;
+  }
 }
 
 .table-row-header {
@@ -589,9 +600,12 @@ input {
 }
 
 .table-col-header {
-  padding: 0 !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   height: 100%;
-  line-height: 25px;
+  line-height: 30px;
   display: flex;
   justify-content: left;
   align-items: left;

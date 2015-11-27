@@ -12,7 +12,8 @@ let TabbedArea = React.createClass({
   propTypes: {
     activeTab: React.PropTypes.string,
     onSwitch: React.PropTypes.func,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    onDragAway: React.PropTypes.func
   },
 
   getInitialState() {
@@ -63,14 +64,14 @@ let TabbedArea = React.createClass({
   },
 
   handleDragStop(id) {
-    let state = this.refs['drag_'+id].state;
-    let dist = Math.sqrt(state.clientY*state.clientY + state.clientX*state.clientX);
-    this.refs['drag_'+id].resetState();
-    if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
-      this.props.onDragAway(id, {
-        x:state.clientX+state.offsetX,
-        y:state.clientY+state.offsetY
-      })
+      let state = this.refs['drag_'+id].state;
+      let dist = Math.sqrt(state.clientY*state.clientY + state.clientX*state.clientX);
+      this.refs['drag_'+id].resetState();
+      if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
+        this.props.onDragAway(id, {
+          x:state.clientX+state.offsetX,
+          y:state.clientY+state.offsetY
+        })
   },
 
   renderTab(tab) {
@@ -88,20 +89,30 @@ let TabbedArea = React.createClass({
       closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
     }
     
-    return (
-      <Draggable
-        ref={"drag_"+id}
-        key={id}
-        zIndex={99999}
-        onStop={this.handleDragStop.bind(this, id)}>
-          <div className={classNames(classes)}
-             onClick={this.handleClick.bind(this, id)}>
-          {icons[id] ? <Icon name={icons[id]}/> : null}
-          <div className="title">{titles[id]}</div>
-          {closeIcon}
-        </div>
-      </Draggable>
-    )
+    let tabMarkup = (
+          <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
+            {icons[id] ? <Icon name={icons[id]}/> : null}
+            <div className="title">{titles[id]}</div>
+            {closeIcon}
+          </div>
+    );
+    
+    if (this.props.onDragAway)
+    {
+      // Wrap tabMarkup in Draggable 
+      tabMarkup = (
+        <Draggable
+          ref={"drag_" + id}
+          key={id}
+          zIndex={99999}
+          onStop={this.handleDragStop.bind(this, id)}>
+        {tabMarkup}
+        </Draggable>
+      );
+      
+    }
+    
+    return tabMarkup;
   },
 
   renderPane(tab) {

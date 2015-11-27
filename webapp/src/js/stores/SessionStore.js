@@ -23,7 +23,7 @@ var SessionStore = Fluxxor.createStore({
         'TEST': {
           component: "containers/DataTableWithActions",
           props: {
-            table: 'samples'
+            table: 'variants'
           }
         }
       },
@@ -65,7 +65,7 @@ var SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
-    /*
+    */
     
     
     

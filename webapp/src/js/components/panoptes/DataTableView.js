@@ -147,10 +147,11 @@ let DataTableView = React.createClass({
       tooltipPlacement={"bottom"}
       tooltipTrigger={['click']}/>
   },
-
+  
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
     let background = "rgba(0,0,0,0)";
     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
+    
     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
       let percent = 100 * (cellData - minVal) / (maxVal - minVal);
@@ -169,8 +170,8 @@ let DataTableView = React.createClass({
         background = col.rgbString();
       }
     }
-
-    return <div className="table-cell"
+    
+    return <div className="table-row-cell"
                 style={{
                    textAlign:alignment,
                    width:width,
