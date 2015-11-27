@@ -19,6 +19,9 @@ module.exports = {
     headers: { "Access-Control-Allow-Origin": "*" }
   },
   module: {
+    noParse: [
+      /plotly\.js/
+    ],
     loaders: [
       // required for react jsx and es6
       {
