@@ -10,7 +10,7 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const Sidebar = require('react-sidebar');
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
-const Plot = require('panoptes/Plot');
+const PlotContainer = require('containers/PlotContainer');
 
 const mui = require('material-ui');
 const {FlatButton} = mui;
@@ -64,9 +64,11 @@ let GenomeBrowserWithActions = React.createClass({
             <Icon className='pointer icon'
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className='text'>WTF</span>
+            <span className='text'>Plot</span>
           </div>
-          <Plot className="grow"/>
+          <PlotContainer style = {{height: 'calc(100% - 40px)',
+                                   width: '100%'}}
+                         className="grow wtfdude"/>
         </div>
       </Sidebar>
     );
