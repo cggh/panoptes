@@ -98,7 +98,7 @@ function pageQuery(options) {
     transpose: true
   };
   let {database, table, columns, query, order,
-    ascending, count, start, stop, distinct, transpose} = Object.assign(defaults, options);
+    ascending, count, start, stop, distinct, transpose} = {...defaults, ...options};
 
   let collist = '';
   _forEach(columns, (encoding, id) => {
@@ -136,7 +136,6 @@ function pageQuery(options) {
         return columns;
       }
     });
-
 }
 
 function annotationData(options) {

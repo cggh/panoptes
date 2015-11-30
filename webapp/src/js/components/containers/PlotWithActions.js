@@ -22,7 +22,7 @@ let GenomeBrowserWithActions = React.createClass({
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
-    sidebar: React.PropTypes.bool,
+    sidebar: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -49,9 +49,6 @@ let GenomeBrowserWithActions = React.createClass({
     let sidebar_content = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
-        <FlatButton label="Add Channel"
-                    primary={true}
-                    onClick={null}/>
 
       </div>
     );
@@ -66,9 +63,12 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className='text'>Plot</span>
           </div>
-          <PlotContainer style = {{height: 'calc(100% - 40px)',
+          <PlotContainer {...sub_props}
+                         style = {{height: 'calc(100% - 40px)',
                                    width: '100%'}}
-                         className="grow wtfdude"/>
+                         className="grow wtfdude"
+                         componentUpdate={componentUpdate}
+          />
         </div>
       </Sidebar>
     );

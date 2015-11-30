@@ -1,0 +1,30 @@
+@import "./variables";
+
+
+.plot {
+  height: 100%;
+  width: 100%;
+}
+
+.plot-controls {
+  width: 200px;
+  .dropdown {
+    width: 200px;
+  }
+  .dropdown-option {
+    width: 140px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    .icon {
+      color: $light-text-colour;
+      padding-right: 7px;
+    }
+  }
+
+  select {
+    margin: 5px;
+    width: 150px;
+  }
+
+}
