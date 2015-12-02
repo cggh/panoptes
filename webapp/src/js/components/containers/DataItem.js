@@ -158,24 +158,28 @@ let DataItem = React.createClass({
             <PropertyList title={dataItemViews[i].name} propertiesData={propertiesData} className='table-col' />
           )
         }
-        else if (dataItemViews[i].type === "PieChartMap")
+        else if (dataItemViews[i].type === "PieChartMap" && data)
         {
+          
+          // TODO: if a module for PieChartMap becomes responsible for fetching chartData, then we will pass in the table name and key value.
+          
           tabPaneContents = (
-              <MapContainer title={dataItemViews[i].name}
-                center={{lat: dataItemViews[i].mapCenter.lattitude, lng:  dataItemViews[i].mapCenter.longitude}}
-                zoom={3}
-                table={dataItemViews[i].locationDataTable}
-                locationNameProperty={dataItemViews[i].locationNameProperty}
-                locationSizeProperty={dataItemViews[i].locationSizeProperty}
+              <MapContainer 
+                title={dataItemViews[i].name} 
+                zoom={3} 
+                locationDataTable={dataItemViews[i].locationDataTable} 
+                properties={dataItemViews[i]} 
+                chartData={data} 
               />
           )
         }
         else if (dataItemViews[i].type === "ItemMap")
         {
           tabPaneContents = (
-              <MapContainer title={dataItemViews[i].name}
-                zoom={dataItemViews[i].mapZoom}
-                table={table}
+              <MapContainer 
+                title={dataItemViews[i].name} 
+                table={table} 
+                zoom={dataItemViews[i].mapZoom} 
               />
           )
         }

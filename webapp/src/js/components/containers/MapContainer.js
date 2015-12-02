@@ -23,27 +23,26 @@ let MapContainer = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table')
+    DataFetcherMixin('locationDataTable', 'chartDataTable')
   ],
 
   propTypes: {
     title: React.PropTypes.string,
-    center: React.PropTypes.object,
     zoom: React.PropTypes.number,
-    table: React.PropTypes.string,
-    locationNameProperty: React.PropTypes.string,
-    locationSizeProperty: React.PropTypes.string
+    locationDataTable: React.PropTypes.string,
+    properties: React.PropTypes.object
   },
 
   getDefaultProps() {
     return {
-      center: {lat: 0, lng:  0}
+      zoom: 3
     };
   },
 
   getInitialState() {
     return {
-      rows: [],
+      locationData: [],
+      chartData: [],
       loadStatus: 'loaded'
     };
   },
@@ -51,56 +50,49 @@ let MapContainer = React.createClass({
 
   fetchData(props, requestContext)
   {
-    let {table, locationNameProperty, locationSizeProperty} = props;
+    let {locationDataTable, properties} = props;
 
-    let tableConfig = this.config.tables[table];
+    let locationTableConfig = this.config.tables[locationDataTable];
 
-    if (tableConfig.hasGeoCoord)
+    // Check that the table specified for locations has geo coordinates.
+    if (locationTableConfig.hasGeoCoord === false)
     {
-      this.setState({loadStatus: 'loading'});
-
-      let columns = [tableConfig.propIdGeoCoordLongit, tableConfig.propIdGeoCoordLattit];
-
-      if (locationNameProperty)
-      {
-        columns.push(locationNameProperty);
-      }
-
-      if (locationSizeProperty)
-      {
-        columns.push(locationSizeProperty);
-      }
-
-      let columnspec = {};
-      columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
-
-      let APIargs = {
-        database: this.config.dataset,
-        table: tableConfig.fetchTableName,
-        columns: columnspec
-      };
-      requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'pageQuery' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
-          )
-        )
-        .then((data) => {
-            this.setState({loadStatus: 'loaded',
-                           rows: data});
-        })
-          .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-            this.setState({loadStatus: 'error'});
-          });
-    }
-    else
-    {
-     config.log("tableConfig.hasGeoCoord is false");
+     console.error("locationTableConfig.hasGeoCoord === false");
+     return null;
     }
 
+    this.setState({loadStatus: 'loading'});
+
+    let locationPrimKeyProperty = locationTableConfig.primkey;
+
+    let locationColumns = [locationPrimKeyProperty, locationTableConfig.propIdGeoCoordLongit, locationTableConfig.propIdGeoCoordLattit];
+
+    if (properties.locationNameProperty)
+    {
+      locationColumns.push(properties.locationNameProperty);
+    }
+
+    if (properties.locationSizeProperty)
+    {
+      locationColumns.push(properties.locationSizeProperty);
+    }
+
+    let locationColumnsColumnSpec = {};
+    locationColumns.map(column => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
+
+    API.pageQuery({
+      database: this.config.dataset,
+      table: locationTableConfig.fetchTableName,
+      columns: locationColumnsColumnSpec
+    })
+      .then((data) => {
+          this.setState({locationData: data});
+          this.setState({loadStatus: 'loaded'});
+      })
+        .catch((error) => {
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          this.setState({loadStatus: 'error'});
+        });
   },
 
   title() {
@@ -109,26 +101,61 @@ let MapContainer = React.createClass({
 
   render()
   {
-    let {title, center, zoom, table, locationNameProperty, locationSizeProperty} = this.props;
-    let {rows, loadStatus} = this.state;
+    let {locationDataTable, zoom, properties, chartData} = this.props;
+
+    let {locationNameProperty, locationSizeProperty, residualFractionName, positionOffsetFraction, pieChartSize, componentColumns, dataType} = properties;
+
+    let center = {lat: properties.mapCenter.lattitude, lng: properties.mapCenter.longitude};
+
+    let {locationData, loadStatus} = this.state;
 
     let markers = [];
 
-    if (rows)
+    if (locationData)
     {
-      // Translate the fetched rows into markers.
+      // Translate the fetched locationData into markers.
 
-      let tableConfig = this.config.tables[table];
+      let locationTableConfig = this.config.tables[locationDataTable];
+      let locationPrimKeyProperty = locationTableConfig.primkey
 
-      for (let i = 0; i < rows.length; i++)
+      for (let i = 0; i < locationData.length; i++)
       {
-        markers.push({lat: rows[i][tableConfig.propIdGeoCoordLattit], lng: rows[i][tableConfig.propIdGeoCoordLongit]});
+        let markerChartData = [];
+
+        for (let j = 0; j < componentColumns.length; j++)
+        {
+          markerChartData.push(
+            {
+              name: componentColumns[j].name,
+              value: chartData[componentColumns[j].pattern.replace('{locid}', locationData[i][locationPrimKeyProperty])],
+              color: componentColumns[j].color
+            }
+          );
+        }
+
+        markers.push(
+          {
+             lat: locationData[i][locationTableConfig.propIdGeoCoordLattit],
+             lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
+             locationName: locationData[i][locationNameProperty],
+             locationSize: locationData[i][locationSizeProperty],
+             chartData: markerChartData
+          }
+        );
       }
     }
 
     return (
       <div style = {{width:'100%', height:'100%'}}>
-        <Map center={center} zoom={zoom} markers={markers} />
+        <Map
+          center={center}
+          zoom={zoom}
+          markers={markers}
+          pieChartSize={pieChartSize}
+          residualFractionName={residualFractionName}
+          positionOffsetFraction={positionOffsetFraction}
+          dataType={dataType}
+        />
         <Loading status={loadStatus}/>
       </div>
     );

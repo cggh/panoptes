@@ -13,6 +13,7 @@ const FluxMixin = require('mixins/FluxMixin');
 
 // Panoptes components
 const Circle = require('panoptes/Circle');
+const PieChart = require('panoptes/PieChart');
 
 // TODO: Can we move these option settings upstream?
 function getMapOptions(maps) {
@@ -63,10 +64,13 @@ let Map = React.createClass({
   
   render()
   {
-    let {center, zoom, markers} = this.props;
+    let {center, zoom, markers, pieChartSize, residualFractionName, positionOffsetFraction, dataType} = this.props;
     
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
+    
+    // TODO: open popup on onClick
+    // () => actions.popupOpen('containers/DataItem', {table: "populations", primKey: "WAF".toString()})
     
     return (
       <DetectResize onResize={this.onResize}>
@@ -78,9 +82,28 @@ let Map = React.createClass({
           options={getMapOptions}
           ref={r => this._googleMapRef = r}
         >
-          {markers.map(function(marker, index){
-            return <Circle key={index} lat={marker.lat} lng={marker.lng}/>
-          })}
+          {
+            markers.map(
+              function(marker, index)
+              {
+                return (
+                  <PieChart 
+                    key={index} 
+                    lat={marker.lat} 
+                    lng={marker.lng} 
+                    locationName={marker.locationName} 
+                    locationSize={marker.locationSize} 
+                    size={pieChartSize} 
+                    residualFractionName={residualFractionName} 
+                    componentColumns={marker.componentColumns}
+                    positionOffsetFraction={positionOffsetFraction}
+                    chartData={marker.chartData}
+                    dataType={dataType}
+                  />
+                );
+              }
+            )
+          }
         </GoogleMap>
       </DetectResize>
     );
