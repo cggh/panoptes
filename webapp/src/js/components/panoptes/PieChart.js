@@ -42,14 +42,14 @@ let PieChart = React.createClass({
     
     for (let i = 0; i < chartData.length; i++)
     {
-      sectorsData.push({value: chartData[i].value, color: chartData[i].color, title: chartData[i].name});
+      sectorsData.push({value: chartData[i].value, color: chartData[i].color, title: locationName + "\n" + chartData[i].name + ": " + chartData[i].value});
       pieData.push(chartData[i].value);
       residualFraction -= chartData[i].value;
     }
     
     if (residualFraction > 0)
     {
-      sectorsData.push({value: residualFraction, color: "rgb(191,191,191)", title: residualFractionName});
+      sectorsData.push({value: residualFraction, color: "rgb(191,191,191)", title: locationName + "\n" + residualFractionName + ": " + residualFraction.toFixed(3)});
       pieData.push(residualFraction);
     }
     
@@ -57,13 +57,21 @@ let PieChart = React.createClass({
     let arcDescriptors = pie(pieData);
     
     let sectors = sectorsData.map(function(sectorData, i) {
+      
+      let outerRadius = 25;
+      if (locationSize)
+      {
+        outerRadius = locationSize / 30;
+      }
+      
+      
       return (
         <PieChartSector 
           key={i} 
           arcDescriptor={arcDescriptors[i]} 
-          outerRadius={locationSize/100} 
+          outerRadius={outerRadius} 
           color={sectorData.color}
-          name={sectorData.name}
+          title={sectorData.title}
         />
       )
     });
@@ -71,18 +79,14 @@ let PieChart = React.createClass({
     
     let height = 50;
     let width = 50;
-    let transformHeight = height / 2;
-    let transformWidth = width / 2;
+    let translateX = 0;
+    let translateY = 0;
     
-    if (positionOffsetFraction)
-    {
-      transformHeight = transformHeight * positionOffsetFraction;
-      transformWidth = transformWidth * positionOffsetFraction;
-    }
+    // TODO: positionOffsetFraction
     
     return (
-      <svg width={width} height={height}>
-        <g transform="translate(25, 25)">{sectors}</g>
+      <svg style={{overflow: "visible"}} width={width} height={height}>
+        <g transform={"translate(" + translateX + ", " + translateY + ")"}>{sectors}</g>
       </svg>
     );
   
