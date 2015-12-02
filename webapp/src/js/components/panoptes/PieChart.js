@@ -23,6 +23,12 @@ let PieChart = React.createClass({
     onClick: React.PropTypes.func
   },
   
+  getDefaultProps() {
+    return {
+      residualFractionName: "Other"
+    };
+  },
+  
   render()
   {
 
