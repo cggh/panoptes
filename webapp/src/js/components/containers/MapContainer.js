@@ -35,7 +35,8 @@ let MapContainer = React.createClass({
 
   getDefaultProps() {
     return {
-      zoom: 3
+      zoom: 3,
+      center: {lat: 0, lng: 0}
     };
   },
 
@@ -101,11 +102,9 @@ let MapContainer = React.createClass({
 
   render()
   {
-    let {locationDataTable, zoom, properties, chartData} = this.props;
+    let {locationDataTable, zoom, center, properties, chartData} = this.props;
 
     let {locationNameProperty, locationSizeProperty, residualFractionName, positionOffsetFraction, pieChartSize, componentColumns, dataType} = properties;
-
-    let center = {lat: properties.mapCenter.lattitude, lng: properties.mapCenter.longitude};
 
     let {locationData, loadStatus} = this.state;
 
@@ -146,7 +145,7 @@ let MapContainer = React.createClass({
     }
 
     return (
-      <div style = {{width:'100%', height:'100%'}}>
+      <div style={{width:'100%', height:'100%'}}>
         <Map
           center={center}
           zoom={zoom}
