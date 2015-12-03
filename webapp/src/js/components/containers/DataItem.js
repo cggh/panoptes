@@ -167,6 +167,7 @@ let DataItem = React.createClass({
               <MapContainer 
                 title={dataItemViews[i].name} 
                 zoom={3} 
+                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}}
                 locationDataTable={dataItemViews[i].locationDataTable} 
                 properties={dataItemViews[i]} 
                 chartData={data} 
@@ -176,11 +177,7 @@ let DataItem = React.createClass({
         else if (dataItemViews[i].type === "ItemMap")
         {
           tabPaneContents = (
-              <MapContainer 
-                title={dataItemViews[i].name} 
-                table={table} 
-                zoom={dataItemViews[i].mapZoom} 
-              />
+              <div>TODO: ItemMap</div>
           )
         }
         else if (dataItemViews[i].type === "FieldList" && data)
