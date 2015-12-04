@@ -59,7 +59,7 @@ let PieChart = React.createClass({
       pieData.push(residualFraction);
     }
     
-    let pie = d3.layout.pie();
+    let pie = d3.layout.pie().sort(null);
     let arcDescriptors = pie(pieData);
     
     let sectors = sectorsData.map(function(sectorData, i) {

@@ -24,7 +24,7 @@ let PieChartSector = React.createClass({
     var arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
     
     return (
-      <g className="pie-chart-sector" style={{fill: color}} transform="rotate(90) scale(-1,1)">
+      <g className="pie-chart-sector" style={{fill: color}} transform="rotate(90)">
         <title>{title}</title>
         <path d={arc(arcDescriptor)}></path>
       </g>
