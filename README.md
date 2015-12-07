@@ -26,7 +26,7 @@ Mailing list: https://groups.google.com/forum/#!forum/panoptes-dev
 
 
 For an example of a currently deployed Panoptes see the AG1000G instance at:
-http://www.malariagen.net/apps/ag1000g/phase1-AR2/index.html
+http://www.malariagen.net/apps/ag1000g/phase1-AR3/index.html
 
 ![logo](https://raw.github.com/cggh/panoptes/master/documentation/screenies.png "Screenshots")
 
