@@ -11,26 +11,28 @@ const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
 // Panoptes components
 const API = require('panoptes/API');
-const SQL = require('panoptes/SQL');
-const Map = require('panoptes/Map');
+const PieChartMap = require('panoptes/PieChartMap');
 
 // UI components
 const Loading = require('ui/Loading');
 
-let MapContainer = React.createClass({
+let PieChartMapTab = React.createClass({
 
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'chartDataTable')
+    DataFetcherMixin('locationDataTable', 'chartDataTable', 'chartDataTablePrimKey')
   ],
 
   propTypes: {
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
     locationDataTable: React.PropTypes.string,
-    properties: React.PropTypes.object
+    properties: React.PropTypes.object,
+    chartDataTable: React.PropTypes.string,
+    chartDataTablePrimKey: React.PropTypes.string,
+    center: React.PropTypes.object
   },
 
   getDefaultProps() {
@@ -42,8 +44,6 @@ let MapContainer = React.createClass({
 
   getInitialState() {
     return {
-      locationData: [],
-      chartData: [],
       loadStatus: 'loaded'
     };
   },
@@ -51,11 +51,11 @@ let MapContainer = React.createClass({
 
   fetchData(props, requestContext)
   {
-    let {locationDataTable, properties} = props;
+    let {locationDataTable, properties, chartDataTable, chartDataTablePrimKey} = props;
 
     let locationTableConfig = this.config.tables[locationDataTable];
 
-    // Check that the table specified for locations has geo coordinates.
+    // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false)
     {
      console.error("locationTableConfig.hasGeoCoord === false");
@@ -86,14 +86,28 @@ let MapContainer = React.createClass({
       table: locationTableConfig.fetchTableName,
       columns: locationColumnsColumnSpec
     })
-      .then((data) => {
-          this.setState({locationData: data});
-          this.setState({loadStatus: 'loaded'});
+      .then((locationData) => {
+          this.setState({locationData: locationData});
       })
         .catch((error) => {
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
           this.setState({loadStatus: 'error'});
         });
+
+    API.fetchSingleRecord({
+      database: this.config.dataset,
+      table: chartDataTable,
+      primKeyField: this.config.tables[chartDataTable].primkey,
+      primKeyValue: chartDataTablePrimKey}
+    )
+      .then((chartData) => {
+          this.setState({loadStatus: 'loaded', chartData: chartData});
+      })
+        .catch((error) => {
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          this.setState({loadStatus: 'error'});
+        });
+
   },
 
   title() {
@@ -102,18 +116,17 @@ let MapContainer = React.createClass({
 
   render()
   {
-    let {locationDataTable, zoom, center, properties, chartData} = this.props;
+    let {locationDataTable, zoom, center, properties} = this.props;
 
     let {locationNameProperty, locationSizeProperty, residualFractionName, positionOffsetFraction, pieChartSize, componentColumns, dataType} = properties;
 
-    let {locationData, loadStatus} = this.state;
+    let {locationData, loadStatus, chartData} = this.state;
 
     let markers = [];
 
-    if (locationData)
+    if (locationData && chartData)
     {
-      // Translate the fetched locationData into markers.
-
+      // Translate the fetched locationData and chartData into markers.
       let locationTableConfig = this.config.tables[locationDataTable];
       let locationPrimKeyProperty = locationTableConfig.primkey
 
@@ -123,10 +136,13 @@ let MapContainer = React.createClass({
 
         for (let j = 0; j < componentColumns.length; j++)
         {
+          let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
+          let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
+
           markerChartData.push(
             {
               name: componentColumns[j].name,
-              value: chartData[componentColumns[j].pattern.replace('{locid}', locationData[i][locationPrimKeyProperty])],
+              value: chartData[chartDataColumnIndex],
               color: componentColumns[j].color
             }
           );
@@ -146,7 +162,7 @@ let MapContainer = React.createClass({
 
     return (
       <div style={{width:'100%', height:'100%'}}>
-        <Map
+        <PieChartMap
           center={center}
           zoom={zoom}
           markers={markers}
@@ -163,4 +179,4 @@ let MapContainer = React.createClass({
 
 });
 
-module.exports = MapContainer;
+module.exports = PieChartMapTab;

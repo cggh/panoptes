@@ -12,7 +12,6 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
 // Panoptes components
-const Circle = require('panoptes/Circle');
 const PieChart = require('panoptes/PieChart');
 
 // TODO: Can we move these option settings upstream?
@@ -30,7 +29,7 @@ function getMapOptions(maps) {
   };
 }
 
-let Map = React.createClass({
+let PieChartMap = React.createClass({
   
   mixins: [
     PureRenderMixin,
@@ -112,4 +111,4 @@ let Map = React.createClass({
 
 });
 
-module.exports = Map;
+module.exports = PieChartMap;
