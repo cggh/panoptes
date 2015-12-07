@@ -27,12 +27,17 @@ function _filterError(json) {
   return json;
 }
 
-function requestJSON(method, params = {}, data = null) {
-  let url = `${serverURL}?`;
-  _.forOwn(params, function (val, id) {
-    url += `&${id}=${val}`;
-  });
-  return Qajax({url: url, method: method, data: data})
+function requestJSON(options) {
+  let defaults = {
+    url: serverURL,
+    method: 'GET',
+    params: {},
+    timeout: 60000,
+    data: null
+  };
+
+  //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with Qajax.
+  return Qajax(Object.assign(defaults, options))
     .then(Qajax.filterSuccess)
     .then(Qajax.toJSON)
     .then(_filterError)
@@ -41,20 +46,12 @@ function requestJSON(method, params = {}, data = null) {
     });
 }
 
-function getRequestJSON(params = {}) {
-  return requestJSON("GET", params);
-}
-function postRequestJSON(params = {}, data = null) {
-  return requestJSON("POST", params, data);
-}
-
-
 function _decodeValList(columns) {
   return function (json_response) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
     _.each(columns, (encoding, id) =>
-        ret[id] = vallistdecoder.doDecode(json_response[id])
+      ret[id] = vallistdecoder.doDecode(json_response[id])
     );
     return ret;
   }
@@ -89,7 +86,7 @@ function pageQuery(options) {
     distinct: false
   };
   let {database, table, columns, query, order,
-    ascending, count, start, stop, distinct} = _.extend(defaults, options);
+    ascending, count, start, stop, distinct} = Object.assign(defaults, options);
 
   let collist = "";
   _.each(columns, (encoding, id) => {
@@ -97,17 +94,19 @@ function pageQuery(options) {
     collist += encoding + id;
   });
 
-  return getRequestJSON({
-    datatype: 'pageqry',
-    database: database,
-    tbname: table,
-    qry: SQL.WhereClause.encode(query),
-    collist: LZString.compressToEncodedURIComponent(collist),
-    order: order,
-    sortreverse: ascending ? '1' : '0',
-    needtotalcount: count ? '1' : '0',
-    limit: `${start}~${stop}`,
-    distinct: distinct ? '1' : '0'
+  return requestJSON({
+    params: {
+      datatype: 'pageqry',
+      database: database,
+      tbname: table,
+      qry: SQL.WhereClause.encode(query),
+      collist: LZString.compressToEncodedURIComponent(collist),
+      order: order,
+      sortreverse: ascending ? '1' : '0',
+      needtotalcount: count ? '1' : '0',
+      limit: `${start}~${stop}`,
+      distinct: distinct ? '1' : '0'
+    }
   })
     .then(_decodeValList(columns))
     //Transpose into rows
@@ -125,7 +124,7 @@ function pageQuery(options) {
 function summaryData(options) {
   assertRequired(options, ['chromosome', 'columns', 'blocksize', 'blockstart', 'blockcount']);
   let defaults = {};
-  let {chromosome, columns, blocksize, blockstart, blockcount} = _.extend(defaults, options);
+  let {chromosome, columns, blocksize, blockstart, blockcount} = Object.assign(defaults, options);
 
   let collist = "";
   _.each(columns, (column) => {
@@ -133,42 +132,51 @@ function summaryData(options) {
     collist += `${column.folder}~${column.config}~${column.name}`;
   });
 
-  return getRequestJSON({
-    datatype: 'summinfo',
-    dataid: chromosome,
-    ids: collist,
-    blocksize: blocksize,
-    blockstart: blockstart,
-    blockcount: blockcount
+  return requestJSON({
+    params: {
+      datatype: 'summinfo',
+      dataid: chromosome,
+      ids: collist,
+      blocksize: blocksize,
+      blockstart: blockstart,
+      blockcount: blockcount
+    }
   })
     .then(_decodeSummaryList(columns))
-    .delay(0);
 }
 
 
 function storeData(data) {
   data = Base64.encode(JSON.stringify(data));
-  return postRequestJSON({datatype: 'storedata'}, data).then((resp) => resp.id);
+  return requestJSON({
+    method: 'POST',
+    params: {datatype: 'storedata'},
+    data: data
+  }).then((resp) => resp.id);
 }
 
 function fetchData(id) {
-  return getRequestJSON({datatype: 'fetchstoredata', id: id}).then((resp) => JSON.parse(Base64.decode(resp.content)));
+  return requestJSON({
+    params: {datatype: 'fetchstoredata', id: id}
+  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
 function fetchSingleRecord(options) {
   assertRequired(options, ['database', 'table', 'primKeyField', 'primKeyValue']);
   let {database, table, primKeyField, primKeyValue} = options;
-  return getRequestJSON({
-    datatype: 'recordinfo',
-    database: database,
-    tbname: table,
-    qry: SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue))
+  return requestJSON({
+    params: {
+      datatype: 'recordinfo',
+      database: database,
+      tbname: table,
+      qry: SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue))
+    }
   }).then((response) => response.Data)
 }
 
 module.exports = {
   serverURL: serverURL,
-  getRequestJSON: getRequestJSON,
+  requestJSON: requestJSON,
   pageQuery: pageQuery,
   storeData: storeData,
   fetchData: fetchData,
