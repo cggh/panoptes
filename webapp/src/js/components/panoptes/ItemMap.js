@@ -64,7 +64,7 @@ let ItemMap = React.createClass({
   {
     let {marker, zoom} = this.props;
     
-    let googleMap = <div>wha</div>;
+    let googleMap = <div></div>;
     let itemMapMarker = null;
     let center = null;
     
@@ -73,7 +73,6 @@ let ItemMap = React.createClass({
     
     // TODO: open popup on onClick
     // () => actions.popupOpen('containers/DataItem', {table: "populations", primKey: "WAF".toString()})
-    
     
     if (marker.lat && marker.lng)
     {
