@@ -102,13 +102,12 @@ let DataItem = React.createClass({
         }
         else if (dataItemViews[i].type === "ItemMap")
         {
-          // TODO: .mapZoom is not right unmodified
-          
           tabPaneContents = (
               <ItemMapTab 
                 title={dataItemViews[i].name} 
                 zoom={dataItemViews[i].mapZoom} 
                 locationDataTable={table} 
+                locationDataTablePrimKey={primKey} 
               />
           )
         }

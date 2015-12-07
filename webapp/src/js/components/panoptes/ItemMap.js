@@ -37,9 +37,8 @@ let ItemMap = React.createClass({
   ],
   
   propTypes: {
-    center: React.PropTypes.object,
-    zoom: React.PropTypes.number,
-    markers: React.PropTypes.array
+    marker: React.PropTypes.object,
+    zoom: React.PropTypes.number
   },
   
   getInitialState() {
@@ -63,7 +62,11 @@ let ItemMap = React.createClass({
   
   render()
   {
-    let {center, zoom, markers} = this.props;
+    let {marker, zoom} = this.props;
+    
+    let googleMap = <div>wha</div>;
+    let itemMapMarker = null;
+    let center = null;
     
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
@@ -71,33 +74,32 @@ let ItemMap = React.createClass({
     // TODO: open popup on onClick
     // () => actions.popupOpen('containers/DataItem', {table: "populations", primKey: "WAF".toString()})
     
-    return (
-      <DetectResize onResize={this.onResize}>
-        <GoogleMap
-          center={center}
-          zoom={zoom}
-          yesIWantToUseGoogleMapApiInternals={true}
-          onGoogleApiLoaded={({map, maps}) => this.setState({map: map, maps: maps})}
-          options={getMapOptions}
-          ref={r => this._googleMapRef = r}
-        >
-          {
-            markers.map(
-              function(marker, index)
-              {
-                return (
-                  <ItemMapMarker 
-                    key={index} 
-                    lat={marker.lat} 
-                    lng={marker.lng} 
-                  />
-                );
-              }
-            )
-          }
-        </GoogleMap>
-      </DetectResize>
-    );
+    
+    if (marker.lat && marker.lng)
+    {
+      // Prop up the ItemMapMarker component.
+      itemMapMarker = <ItemMapMarker lat={marker.lat} lng={marker.lng} />;
+      
+      // Set the map's center to the coordinates of the marker.
+      center = {lat: marker.lat, lng: marker.lng};
+      
+      googleMap = (
+        <DetectResize onResize={this.onResize}>
+          <GoogleMap
+            center={center}
+            zoom={zoom}
+            yesIWantToUseGoogleMapApiInternals={true}
+            onGoogleApiLoaded={({map, maps}) => this.setState({map: map, maps: maps})}
+            options={getMapOptions}
+            ref={r => this._googleMapRef = r}
+          >
+          {itemMapMarker}
+          </GoogleMap>
+        </DetectResize>
+      );
+    }
+    
+    return googleMap;
     
   }
 

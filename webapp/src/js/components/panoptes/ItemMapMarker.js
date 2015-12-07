@@ -14,22 +14,30 @@ let ItemMapMarker = React.createClass({
      FluxMixin
   ],
   
-  render() {
+  render()
+  {
     
+    // TODO: SVG marker
+    //    return (
+    //      <svg style={{'overflow':'visible'}}><circle r="5" fill="blue"/></svg>
+    //    );
     
-      // TODO: use the classic marker
-    
-      //let marker = new google.maps.Marker({position: new google.maps.LatLng(this.props.lat, this.props.lng), title: 'title goes here'});
-      
-//      return (
-//          <div>{marker}</div>
-//      );
-    
+    let markerSizeInPixels = 32;
+    let markerStyle = {
+      position: 'absolute',
+      width: markerSizeInPixels,
+      height: markerSizeInPixels,
+      left: -(markerSizeInPixels / 2),
+      top: -markerSizeInPixels
+    }
     
     return (
-      <svg style={{'overflow':'visible'}}><circle r="5" fill="blue"/></svg>
+        <img style={markerStyle} src="http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png" />
     );
+    
   }
+  
+  
 });
 
 module.exports = ItemMapMarker;
