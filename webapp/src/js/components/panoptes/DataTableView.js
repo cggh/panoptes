@@ -26,6 +26,7 @@ const Loading = require('ui/Loading');
 const Icon = require('ui/Icon');
 const DetectResize = require('utils/DetectResize');
 
+
 const MAX_COLOR = Color("#44aafb");
 
 let DataTableView = React.createClass({
@@ -48,6 +49,7 @@ let DataTableView = React.createClass({
     onOrderChange: React.PropTypes.func
   },
 
+
   getDefaultProps() {
     return {
       table: null,
@@ -69,15 +71,17 @@ let DataTableView = React.createClass({
     };
   },
 
+
   //Called by DataFetcherMixin
-  fetchData(props) {
+  fetchData(props, requestContext) {
     let { table, query, className, columns, order, ascending } = props;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
-      API.pageQuery({
+      requestContext.request(API.pageQuery,
+        {
           database: this.config.dataset,
           table: tableConfig.fetchTableName,
           columns: columnspec,
@@ -86,14 +90,15 @@ let DataTableView = React.createClass({
           query: SQL.WhereClause.decode(query)
         })
         .then((data) => {
-          //Check our data is still relavent
-          if (Immutable.is(props, this.props)) {
-            this.setState({loadStatus: 'loaded'});
-            this.setState({rows: data});
-          }
+          this.setState({
+            loadStatus: 'loaded',
+            rows: data
+          });
         })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        .catch(API.filterAborted)
+        .catch((xhr) => {
+          console.log(xhr);
+          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
           this.setState({loadStatus: 'error'});
         });
     }
@@ -147,11 +152,11 @@ let DataTableView = React.createClass({
       tooltipPlacement={"bottom"}
       tooltipTrigger={['click']}/>
   },
-  
+
   renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
     let background = "rgba(0,0,0,0)";
     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
-    
+
     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
       cellData = parseFloat(cellData);
       let percent = 100 * (cellData - minVal) / (maxVal - minVal);
@@ -170,7 +175,7 @@ let DataTableView = React.createClass({
         background = col.rgbString();
       }
     }
-    
+
     return <div className="table-row-cell"
                 style={{
                    textAlign:alignment,

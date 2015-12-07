@@ -27,6 +27,19 @@ function _filterError(json) {
   return json;
 }
 
+function filterAborted(xhr) {
+  if (xhr.status === 0 && xhr.readyState == 0)  //This seems to be the only way to detect the cancel
+    return('__SUPERSEEDED__');
+  else
+    throw xhr;
+}
+
+function errorMessage(xhr) {
+  return `There was a problem with a request to the server: ${xhr.statusText || xhr.message}`
+}
+
+
+
 function requestJSON(options) {
   let defaults = {
     url: serverURL,
@@ -40,10 +53,7 @@ function requestJSON(options) {
   return Qajax(Object.assign(defaults, options))
     .then(Qajax.filterSuccess)
     .then(Qajax.toJSON)
-    .then(_filterError)
-    .catch(err => {
-      throw Error(`There was a problem with a request to the server: ${err.statusText || err.message}`)
-    });
+    .then(_filterError);
 }
 
 function _decodeValList(columns) {
@@ -93,8 +103,8 @@ function pageQuery(options) {
     if (collist.length > 0) collist += "~";
     collist += encoding + id;
   });
-
-  return requestJSON({
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON(Object.assign(args, {
     params: {
       datatype: 'pageqry',
       database: database,
@@ -107,7 +117,7 @@ function pageQuery(options) {
       limit: `${start}~${stop}`,
       distinct: distinct ? '1' : '0'
     }
-  })
+  }))
     .then(_decodeValList(columns))
     //Transpose into rows
     .then((columns) => {
@@ -118,7 +128,8 @@ function pageQuery(options) {
         rows.push(row);
       }
       return rows;
-    });
+    })
+
 }
 
 function summaryData(options) {
@@ -176,6 +187,8 @@ function fetchSingleRecord(options) {
 
 module.exports = {
   serverURL: serverURL,
+  filterAborted: filterAborted,
+  errorMessage: errorMessage,
   requestJSON: requestJSON,
   pageQuery: pageQuery,
   storeData: storeData,
