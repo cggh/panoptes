@@ -7,7 +7,7 @@
   .tab-content {
     position: relative;
     width: 100%;
-    height: calc(100% - #{$tab-height} - 4px); /*4px for the border*/
+    height: calc(100% - #{$tab-height} - #{$tab-border} - #{$tab-padding-top}); /*4px for the border*/
     .tab-pane {
       visibility: hidden;
       position: absolute;
@@ -15,7 +15,6 @@
       left: 0;
       overflow: hidden;
       clear: both;
-      padding-bottom: 22px;
       width: 100%;
       height: 100%;
     }
@@ -29,7 +28,8 @@
     flex-wrap: wrap;
     width: 100%;
     min-height: $tab-height;
-    border-bottom: 4px solid $primary-color;
+    border-bottom: $tab-border solid $primary-color;
+    padding-top: $tab-padding-top;
     .tab {
       font-size: 15px;
       display: flex;
@@ -137,7 +137,6 @@
     white-space: nowrap;
     height: $topbar-height;
     //padding: 7px 7px 7px 12px;
-    margin-bottom: 3px;
     cursor: move;
     font-size: 10pt;
     font-weight: bold;

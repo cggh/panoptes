@@ -10,6 +10,11 @@
   background-color: blue;
 }
 
+//We have to use visibility to switch tabs due to a google maps issue, but then mui tries to animate visibility...
+//So override that here.
+* {
+  transition: visibility 0ms linear !important;
+}
 
 * {
   -webkit-box-sizing: border-box;
