@@ -34,7 +34,7 @@ let ItemMapTab = React.createClass({
   
   getDefaultProps() {
     return {
-      zoom: 3
+      zoom: 4
     };
   },
   
