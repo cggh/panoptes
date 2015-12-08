@@ -9,7 +9,6 @@ const FluxMixin = require('mixins/FluxMixin');
 
 let PieChartSector = React.createClass({
   
-  
   getDefaultProps() {
     return {
       outerRadius: 20,
@@ -19,12 +18,12 @@ let PieChartSector = React.createClass({
   
   render: function()
   {
-    let {outerRadius, innerRadius, color, arcDescriptor, title} = this.props;
+    let {outerRadius, innerRadius, color, arcDescriptor, title, onClick} = this.props;
     
     var arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
     
     return (
-      <g className="pie-chart-sector" style={{fill: color}} transform="rotate(90)">
+      <g className="pie-chart-sector" style={{fill: color}} transform="rotate(90)" onClick={onClick}>
         <title>{title}</title>
         <path d={arc(arcDescriptor)}></path>
       </g>

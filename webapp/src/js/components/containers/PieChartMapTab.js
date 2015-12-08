@@ -48,7 +48,6 @@ let PieChartMapTab = React.createClass({
     };
   },
 
-
   fetchData(props, requestContext)
   {
     let {locationDataTable, properties, chartDataTable, chartDataTablePrimKey} = props;
@@ -134,9 +133,10 @@ let PieChartMapTab = React.createClass({
       {
         let markerChartData = [];
 
+        let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
+
         for (let j = 0; j < componentColumns.length; j++)
         {
-          let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
           let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
 
           markerChartData.push(
@@ -154,7 +154,9 @@ let PieChartMapTab = React.createClass({
              lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
              locationName: locationData[i][locationNameProperty],
              locationSize: locationData[i][locationSizeProperty],
-             chartData: markerChartData
+             chartData: markerChartData,
+             locationTable: locationDataTable,
+             locationPrimKey: locationDataPrimKey
           }
         );
       }

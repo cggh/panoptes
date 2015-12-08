@@ -10,6 +10,12 @@ const FluxMixin = require('mixins/FluxMixin');
 // Panoptes components
 const PieChartSector = require('panoptes/PieChartSector');
 
+// constants in this component
+// TODO: to go in config?
+const RESIDUAL_SECTOR_COLOR = "rgb(191,191,191)";
+const DEFAULT_OUTER_RADIUS = 25;
+const LOCATION_SIZE_TO_OUTER_RADIUS_DIVISOR = 30;
+
 let PieChart = React.createClass({
   
   mixins: [
@@ -32,7 +38,7 @@ let PieChart = React.createClass({
   render()
   {
 
-    let {locationName, locationSize, size, residualFractionName, positionOffsetFraction, chartData, dataType} = this.props;
+    let {locationName, locationSize, size, residualFractionName, positionOffsetFraction, chartData, dataType, onClick} = this.props;
     
     let sectorsData = [];
     
@@ -55,7 +61,7 @@ let PieChart = React.createClass({
     
     if (residualFraction > 0)
     {
-      sectorsData.push({value: residualFraction, color: "rgb(191,191,191)", title: locationName + "\n" + residualFractionName + ": " + residualFraction.toFixed(3)});
+      sectorsData.push({value: residualFraction, color: RESIDUAL_SECTOR_COLOR, title: locationName + "\n" + residualFractionName + ": " + residualFraction.toFixed(3)});
       pieData.push(residualFraction);
     }
     
@@ -64,20 +70,20 @@ let PieChart = React.createClass({
     
     let sectors = sectorsData.map(function(sectorData, i) {
       
-      let outerRadius = 25;
+      let outerRadius = DEFAULT_OUTER_RADIUS;
       if (locationSize)
       {
-        outerRadius = locationSize / 30;
+        outerRadius = locationSize / LOCATION_SIZE_TO_OUTER_RADIUS_DIVISOR;
       }
-      
       
       return (
         <PieChartSector 
           key={i} 
           arcDescriptor={arcDescriptors[i]} 
           outerRadius={outerRadius} 
-          color={sectorData.color}
-          title={sectorData.title}
+          color={sectorData.color} 
+          title={sectorData.title} 
+          onClick={onClick}
         />
       )
     });

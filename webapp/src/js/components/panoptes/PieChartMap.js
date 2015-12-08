@@ -71,6 +71,8 @@ let PieChartMap = React.createClass({
     // TODO: open popup on onClick
     // () => actions.popupOpen('containers/DataItem', {table: "populations", primKey: "WAF".toString()})
     
+    let actions = this.getFlux().actions;
+    
     return (
       <DetectResize onResize={this.onResize}>
         <GoogleMap
@@ -94,10 +96,11 @@ let PieChartMap = React.createClass({
                     locationSize={marker.locationSize} 
                     size={pieChartSize} 
                     residualFractionName={residualFractionName} 
-                    componentColumns={marker.componentColumns}
-                    positionOffsetFraction={positionOffsetFraction}
-                    chartData={marker.chartData}
-                    dataType={dataType}
+                    componentColumns={marker.componentColumns} 
+                    positionOffsetFraction={positionOffsetFraction} 
+                    chartData={marker.chartData} 
+                    dataType={dataType} 
+                    onClick={() => actions.session.popupOpen('containers/DataItem', {table: marker.locationTable, primKey: marker.locationPrimKey.toString()})}
                   />
                 );
               }
