@@ -62,14 +62,30 @@ let DataItem = React.createClass({
 
     if (!dataItemViews)
     {
-        // If there are no dataItemViews specified then default to showing an Overview.
-        let tabPane = (
-          <TabPane key="0" compId="tab_0" >
-              <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
+      // If there are no dataItemViews specified, then default to showing an Overview.
+      let overviewTabPane = (
+        <TabPane key="0" compId="tab_0" >
+            <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
+        </TabPane>
+      );
+      
+      tabPanes.push(overviewTabPane);
+      
+      if (this.config.tables[table].hasGeoCoord)
+      {
+        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
+        let itemMapTabPane = (
+          <TabPane key="1" compId="tab_1" >
+              <ItemMapTab 
+                title="Location" 
+                locationDataTable={table} 
+                locationDataTablePrimKey={primKey} 
+              />
           </TabPane>
         );
-
-        tabPanes.push(tabPane);
+        
+        tabPanes.push(itemMapTabPane);
+      }
     }
     else
     {
@@ -91,7 +107,6 @@ let DataItem = React.createClass({
           tabPaneContents = (
               <PieChartMapTab 
                 title={dataItemViews[i].name} 
-                zoom={3} 
                 center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}} 
                 locationDataTable={dataItemViews[i].locationDataTable} 
                 properties={dataItemViews[i]} 
