@@ -71,9 +71,6 @@ let ItemMap = React.createClass({
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
     
-    // TODO: open popup on onClick
-    // () => actions.popupOpen('containers/DataItem', {table: "populations", primKey: "WAF".toString()})
-    
     if (marker.lat && marker.lng)
     {
       // Prop up the ItemMapMarker component.
