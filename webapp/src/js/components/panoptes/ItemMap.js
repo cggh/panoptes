@@ -11,9 +11,6 @@ const DetectResize = require('utils/DetectResize');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
-// Panoptes components
-const ItemMapMarker = require('panoptes/ItemMapMarker');
-
 // TODO: Can we move these option settings upstream?
 function getMapOptions(maps) {
   return {
@@ -63,6 +60,7 @@ let ItemMap = React.createClass({
   render()
   {
     let {marker, zoom} = this.props;
+    let {maps, map} = this.state;
     
     let googleMap = <div></div>;
     let itemMapMarker = null;
@@ -73,8 +71,14 @@ let ItemMap = React.createClass({
     
     if (marker.lat && marker.lng)
     {
-      // Prop up the ItemMapMarker component.
-      itemMapMarker = <ItemMapMarker lat={marker.lat} lng={marker.lng} />;
+      if (maps && map)
+      {
+        // Create a new marker at the given position.
+        let itemMapMarker = new maps.Marker({
+          position: {lat: marker.lat, lng: marker.lng},
+          map: map
+        });
+      }
       
       // Set the map's center to the coordinates of the marker.
       center = {lat: marker.lat, lng: marker.lng};
@@ -89,7 +93,6 @@ let ItemMap = React.createClass({
             options={getMapOptions}
             ref={r => this._googleMapRef = r}
           >
-          {itemMapMarker}
           </GoogleMap>
         </DetectResize>
       );
