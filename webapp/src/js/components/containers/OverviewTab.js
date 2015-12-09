@@ -63,7 +63,7 @@ let OverviewTab = React.createClass({
   
   render()
   {
-    let {table, primKey} = this.props;
+    let {table, primKey, className} = this.props;
     let {data, loadStatus} = this.state;
     
     if (! data) return null;
@@ -81,7 +81,7 @@ let OverviewTab = React.createClass({
     
     return (
         <div>
-          <PropertyList propertiesData={propertiesData} className='table-col' />
+          <PropertyList propertiesData={propertiesData} className={className} />
           <Loading status={loadStatus}/>
         </div>
     );

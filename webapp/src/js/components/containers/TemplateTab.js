@@ -16,7 +16,7 @@ const PropertyList = require('panoptes/PropertyList');
 // UI components
 const Loading = require('ui/Loading');
 
-let PropertyGroupTab = React.createClass({
+let TemplateTab = React.createClass({
   
   mixins: [
     PureRenderMixin,
@@ -63,36 +63,25 @@ let PropertyGroupTab = React.createClass({
   
   render()
   {
-    let {table, primKey, propertyGroupId, className} = this.props;
+    let {table, primKey} = this.props;
     let {data, loadStatus} = this.state;
     
     if (! data) return null;
     
-    if (! propertyGroupId) return null;
-    
-    // Collect the propertiesData for the specified propertyGroup.
-    let propertyGroupPropertiesData = [];
-    
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
     
-    for (let i = 0; i < propertiesData.length; i++)
     {
-      if (propertiesData[i].settings.groupId === propertyGroupId)
+      for (let i = 0; i < propertiesData.length; i++)
       {
-        // Only collect data for the specified propertyGroup.
-        
         // Augment the array element (an object) with the fetched value of the property.
         propertiesData[i].value = data[propertiesData[i].propid];
-        
-        // Push the array element (an object) into the array of propertiesData for the specified propertyGroup.
-        propertyGroupPropertiesData.push(propertiesData[i]);
       }
     }
     
     return (
         <div>
-          <PropertyList propertiesData={propertyGroupPropertiesData} className={className} />
+          <PropertyList propertiesData={propertiesData} className='table-col' />
           <Loading status={loadStatus}/>
         </div>
     );
@@ -100,4 +89,4 @@ let PropertyGroupTab = React.createClass({
 
 });
 
-module.exports = PropertyGroupTab;
+module.exports = TemplateTab;

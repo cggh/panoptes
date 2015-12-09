@@ -63,7 +63,7 @@ let FieldListTab = React.createClass({
   
   render()
   {
-    let {table, primKey, fields} = this.props;
+    let {table, primKey, fields, className} = this.props;
     let {data, loadStatus} = this.state;
     
     if (! data) return null;
@@ -100,7 +100,7 @@ let FieldListTab = React.createClass({
     
     return (
         <div>
-          <PropertyList propertiesData={fieldListPropertiesData} className='table-col' />
+          <PropertyList propertiesData={fieldListPropertiesData} className={className} />
           <Loading status={loadStatus}/>
         </div>
     );

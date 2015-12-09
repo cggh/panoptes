@@ -14,6 +14,7 @@ const PieChartMapTab = require('containers/PieChartMapTab');
 const ItemMapTab = require('containers/ItemMapTab');
 const FieldListTab = require('containers/FieldListTab');
 const PropertyGroupTab = require('containers/PropertyGroupTab');
+const TemplateTab = require('containers/TemplateTab');
 
 // Panoptes components
 const API = require('panoptes/API');
@@ -152,8 +153,10 @@ let DataItem = React.createClass({
         }
         else if (dataItemViews[i].type === "Template")
         {
+          console.log("Template dataItemViews[i]: " + dataItemViews[i]);
+          
           tabPaneContents = (
-            <div>Template, TODO</div>
+            <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} />
           )
         }
 
