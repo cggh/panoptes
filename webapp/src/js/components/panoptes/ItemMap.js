@@ -11,15 +11,14 @@ const DetectResize = require('utils/DetectResize');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
-// TODO: Can we move these option settings upstream?
 function getMapOptions(maps) {
   return {
     zoomControlOptions: {
-      position: maps.ControlPosition.RIGHT_BOTTOM, //9
-      style: maps.ZoomControlStyle.SMALL //1
+      position: maps.ControlPosition.RIGHT_BOTTOM, 
+      style: maps.ZoomControlStyle.SMALL 
     },
     mapTypeControlOptions: {
-      position: maps.ControlPosition.TOP_LEFT, //1
+      position: maps.ControlPosition.TOP_LEFT, 
       StreetViewStatus: true
     },
     mapTypeControl: true
