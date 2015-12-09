@@ -63,8 +63,10 @@ let TemplateTab = React.createClass({
   
   render()
   {
-    let {table, primKey} = this.props;
+    let {table, primKey, content} = this.props;
     let {data, loadStatus} = this.state;
+    
+    console.log("content: " + content);
     
     if (! data) return null;
     

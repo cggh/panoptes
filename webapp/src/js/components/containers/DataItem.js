@@ -153,10 +153,8 @@ let DataItem = React.createClass({
         }
         else if (dataItemViews[i].type === "Template")
         {
-          console.log("Template dataItemViews[i]: " + dataItemViews[i]);
-          
           tabPaneContents = (
-            <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} />
+            <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} content={dataItemViews[i].content} />
           )
         }
 
