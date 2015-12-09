@@ -76,8 +76,6 @@ let PropertyGroupTab = React.createClass({
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
     
-    // TODO: There must be a more efficient way?!
-    
     for (let i = 0; i < propertiesData.length; i++)
     {
       if (propertiesData[i].settings.groupId === propertyGroupId)

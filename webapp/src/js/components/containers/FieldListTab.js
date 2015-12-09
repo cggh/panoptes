@@ -68,9 +68,6 @@ let FieldListTab = React.createClass({
     
     if (! data) return null;
     
-    
-    // TODO: There must be a more efficient way?!
-    
     let propertiesDataIndexes = {};
     
     // Make a clone of the propertiesData, which will be augmented.
