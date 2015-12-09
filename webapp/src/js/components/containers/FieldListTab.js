@@ -75,7 +75,7 @@ let FieldListTab = React.createClass({
     
     for (let i = 0; i < propertiesData.length; i++)
     {
-      // Augment the array element with the fetched value of the property.
+      // Augment the array element (an object) with the fetched value of the property.
       propertiesData[i].value = data[propertiesData[i].propid];
       
       // Record which array index in propertiesData relates to which property Id.
