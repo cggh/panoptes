@@ -6,11 +6,11 @@ class RequestContext {
     this.canceller = null;
   }
 
-  request(method, args) {
+  request(method) {
     if (this.canceller)
       this.canceller.resolve();
     this.canceller = Q.defer();
-    return method(Object.assign(args, {cancellation: this.canceller.promise}))
+    return method(this.canceller.promise);
   }
 
   destroy() {

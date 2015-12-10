@@ -46,7 +46,7 @@ function requestJSON(options) {
     method: 'GET',
     params: {},
     timeout: 60000,
-    data: null
+    data: null,
   };
 
   //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with Qajax.

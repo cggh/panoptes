@@ -1,18 +1,22 @@
 const _ = require('lodash');
 const Q = require('q');
+const uid = require('uid');
+
+const CANCELLED = {status: '__CANCELLED__'};
 
 //Global cache with max num of refs
 let LRUCache = {
   MAX_ENTRIES: 10000,
   cache: {},
   lru: [],
-  pending: {},
+  cancellers: {},
+  numberWaitingFor: {},
 
-  get(namespace, args, provider, invalidationID, fetchIfAbsent=true) {
-    let key = namespace+JSON.stringify(args);
+  get(key, method, cancellation=null, fetchIfAbsent=true) {
     let present = _.has(this.cache, key);
     if (!present && !fetchIfAbsent)
       return null;
+
     if (present) {
       //Make the key be the most recent used
       this.lru = _.without(this.lru, key);
@@ -20,39 +24,52 @@ let LRUCache = {
     } else {
       this.lru.push(key);
       //Insert a promise into the cache
-      this.cache[key] = provider.apply(this, args)
+      this.cancellers[key] = Q.defer();
+      this.cache[key] = method(this.cancellers[key].promise)
         .then((data) => {
           //If the promise completes we check the cache hasn't gotten too large.
           if (this.lru.length > this.MAX_ENTRIES) {
             delete this.cache[this.lru[0]];
             this.lru = this.lru.slice(1);
           }
+          delete this.cancellers[key];
           return data;
         })
-        .catch(() => {
+        .catch((err) => {
           //If the promise fails we remove it's entry altogether
           delete this.cache[key];
+          delete this.cancellers[key];
           this.lru = _.without(this.lru, key);
+          throw err;
         });
     }
-    //We now have a promise in the cache if this request can't be invalidated just return the promise
-    if (!invalidationID || this.cache[key].isFulfilled())
-      return this.cache[key];
-    else {
-      //If this request comes after one with the same ID we reject the former one.
-      //If it hasn't completed then it will ativate the client's catch block
-      //If it has activated this will do nothing
-      if (this.pending[invalidationID])
-        this.pending[invalidationID].reject('SUPERSEDED');
-      //Store a promise that is resolved when the actual request is. If the line above rejects before this then this will do nothing as desired.
-      let deferred = this.pending[invalidationID] = Q.defer();
-      this.cache[key].then((data) => {
-        return deferred.resolve(data);
-      })
-        .catch((err) => deferred.reject(err));
-      return deferred.promise;
-    }
+    //We now have a promise in the cache, either fulfilled or not.
+    let returned = Q.defer();
+    this.numberWaitingFor[key] || (this.numberWaitingFor[key] = 0);
+    this.numberWaitingFor[key] += 1;
+    cancellation.then(() => {
+      this.numberWaitingFor[key] -= 1;
+      //If none are left waiting then kill the request
+      if (this.numberWaitingFor[key] === 0 && this.cancellers[key]) {
+        this.cancellers[key].resolve(); //This cancels the backend request
+      }
+      returned.reject(CANCELLED);
+    });
+    this.cache[key].then((data) => {
+      this.numberWaitingFor[key] -= 1;
+      returned.resolve(data);
+    });
+    this.cache[key].catch((err) => {
+      this.numberWaitingFor[key] -= 1;
+      returned.reject(err);
+    });
 
+    return returned.promise;
+  },
+
+  filterCancelled(err) {
+    if (err !== CANCELLED)
+      throw err;
   }
 };
 

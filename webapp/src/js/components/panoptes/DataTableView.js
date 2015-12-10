@@ -16,6 +16,7 @@ import 'fixed-data-table/dist/fixed-data-table.css';
 
 // Panoptes components
 const API = require('panoptes/API');
+const LRUCache = require('util/LRUCache');
 const ErrorReport = require('panoptes/ErrorReporter');
 const SQL = require('panoptes/SQL');
 const PropertyCell = require('panoptes/PropertyCell');
@@ -80,15 +81,22 @@ let DataTableView = React.createClass({
     columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
-      requestContext.request(API.pageQuery,
-        {
-          database: this.config.dataset,
-          table: tableConfig.fetchTableName,
-          columns: columnspec,
-          order: order,
-          ascending: ascending,
-          query: SQL.WhereClause.decode(query)
-        })
+      let APIargs = {
+        database: this.config.dataset,
+        table: tableConfig.fetchTableName,
+        columns: columnspec,
+        order: order,
+        ascending: ascending,
+        query: SQL.WhereClause.decode(query)
+      };
+      requestContext.request((componentCancellation) =>
+        LRUCache.get(
+          'pageQuery'+JSON.stringify(APIargs),
+          (cacheCancellation) =>
+            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+          componentCancellation
+        )
+      )
         .then((data) => {
           this.setState({
             loadStatus: 'loaded',
@@ -96,6 +104,7 @@ let DataTableView = React.createClass({
           });
         })
         .catch(API.filterAborted)
+        .catch(LRUCache.filterCancelled)
         .catch((xhr) => {
           console.log(xhr);
           ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
