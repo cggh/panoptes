@@ -1,7 +1,4 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const LRUCache = require('util/LRUCache');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -9,9 +6,13 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
+// Utils
+const LRUCache = require('util/LRUCache');
+
 // Panoptes components
 const API = require('panoptes/API');
 const PieChartMap = require('panoptes/PieChartMap');
+const ErrorReport = require('panoptes/ErrorReporter');
 
 // UI components
 const Loading = require('ui/Loading');
@@ -80,32 +81,45 @@ let PieChartMapTab = React.createClass({
     let locationColumnsColumnSpec = {};
     locationColumns.map(column => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
 
-    API.pageQuery({
+    let locationAPIargs = {
       database: this.config.dataset,
       table: locationTableConfig.fetchTableName,
       columns: locationColumnsColumnSpec
+    };
+
+    requestContext.request((componentCancellation) =>
+      LRUCache.get(
+        'pageQuery' + JSON.stringify(locationAPIargs),
+        (cacheCancellation) =>
+          API.pageQuery({cancellation: cacheCancellation, ...locationAPIargs}),
+        componentCancellation
+      )
+    )
+    .then((locationData) => {
+        this.setState({locationData: locationData});
     })
-      .then((locationData) => {
-          this.setState({locationData: locationData});
-      })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          this.setState({loadStatus: 'error'});
-        });
+    .catch(API.filterAborted)
+    .catch(LRUCache.filterCancelled)
+    .catch((error) => {
+      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      this.setState({loadStatus: 'error'});
+    });
+
+    // TODO: Can't use requestContext again
 
     API.fetchSingleRecord({
       database: this.config.dataset,
       table: chartDataTable,
       primKeyField: this.config.tables[chartDataTable].primkey,
-      primKeyValue: chartDataTablePrimKey}
-    )
-      .then((chartData) => {
-          this.setState({loadStatus: 'loaded', chartData: chartData});
-      })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          this.setState({loadStatus: 'error'});
-        });
+      primKeyValue: chartDataTablePrimKey
+    })
+    .then((chartData) => {
+        this.setState({loadStatus: 'loaded', chartData: chartData});
+    })
+    .catch((error) => {
+      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      this.setState({loadStatus: 'error'});
+    });
 
   },
 

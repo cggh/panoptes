@@ -1,6 +1,4 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -16,13 +14,7 @@ const FieldListTab = require('containers/FieldListTab');
 const PropertyGroupTab = require('containers/PropertyGroupTab');
 const TemplateTab = require('containers/TemplateTab');
 
-// Panoptes components
-const API = require('panoptes/API');
-const LRUCache = require('util/LRUCache');
-const ErrorReport = require('panoptes/ErrorReporter');
-
 // UI components
-const Icon = require('ui/Icon');
 const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
 

@@ -1,7 +1,4 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const shallowEquals = require('shallow-equals');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -9,9 +6,13 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
+// Utils
+const LRUCache = require('util/LRUCache');
+
 // Panoptes components
 const API = require('panoptes/API');
 const PropertyList = require('panoptes/PropertyList');
+const ErrorReport = require('panoptes/ErrorReporter');
 
 // UI components
 const Loading = require('ui/Loading');
@@ -37,24 +38,36 @@ let FieldListTab = React.createClass({
     };
   },
   
-  fetchData(props) {
+  fetchData(props, requestContext)
+  {
     let {table, primKey} = props;
+    
     this.setState({loadStatus: 'loading'});
-    API.fetchSingleRecord({
+    
+    let APIargs = {
       database: this.config.dataset,
       table: table,
       primKeyField: this.config.tables[table].primkey,
-      primKeyValue: primKey}
+      primKeyValue: primKey
+    };
+    
+    requestContext.request((componentCancellation) =>
+      LRUCache.get(
+        'fetchSingleRecord' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
+      )
     )
-      .then((data) => {
-        if (shallowEquals(props, this.props)) {
+    .then((data) => {
           this.setState({loadStatus: 'loaded', data: data});
-        }
-      })
-        .catch((error) => {
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          this.setState({loadStatus: 'error'});
-        });
+    })
+    .catch(API.filterAborted)
+    .catch(LRUCache.filterCancelled)
+    .catch((error) => {
+      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      this.setState({loadStatus: 'error'});
+    });
   },
   
   title() {
