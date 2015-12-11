@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const Q = require('q');
-const uid = require('uid');
 
 const CANCELLED = {status: '__CANCELLED__'};
 
