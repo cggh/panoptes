@@ -373,12 +373,13 @@ let parseCustomProperties = function () {
 };
 
 let fetchInitialConfig = function () {
-  return API.getRequestJSON({
-    datatype: 'custom',
-    respmodule: 'panoptesserver',
-    respid: 'datasetinfo',
-    database: dataset
-  })
+  return API.requestJSON({
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'datasetinfo',
+      database: dataset
+    }})
     .then((resp) => {
       if (resp.needfullreload)
         console.log("Schema full reload");
