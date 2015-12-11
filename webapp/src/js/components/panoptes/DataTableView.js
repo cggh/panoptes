@@ -90,13 +90,13 @@ let DataTableView = React.createClass({
         query: SQL.WhereClause.decode(query)
       };
       requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'pageQuery'+JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
+          LRUCache.get(
+            'pageQuery' + JSON.stringify(APIargs),
+            (cacheCancellation) =>
+              API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+            componentCancellation
+          )
         )
-      )
         .then((data) => {
           this.setState({
             loadStatus: 'loaded',
@@ -106,7 +106,6 @@ let DataTableView = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((xhr) => {
-          console.log(xhr);
           ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
           this.setState({loadStatus: 'error'});
         });
