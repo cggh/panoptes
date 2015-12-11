@@ -60,7 +60,7 @@ let LRUCache = {
       returned.resolve(data);
     });
     this.cache[key].catch((err) => {
-      this.numberWaitingFor[key] -= 1;
+      this.numberWaitingFor[key] = 0;
       returned.reject(err);
     });
 
