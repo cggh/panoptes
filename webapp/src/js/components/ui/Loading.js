@@ -1,6 +1,8 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
+import "loading.scss"
+
 let Loading = React.createClass({
   mixins: [PureRenderMixin],
 

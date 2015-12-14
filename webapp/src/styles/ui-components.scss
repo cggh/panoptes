@@ -241,49 +241,6 @@
   z-index: 99;
 }
 
-.loading-container {
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.6);
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s linear 0.5s, opacity 0.5s linear;
-  div {
-    opacity: 0.5;
-    height: 50%;
-    width: 50%;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-  .spinner {
-    background-image: url(../images/panoptes-logo.png);
-    animation: fa-spin 2s infinite linear;
-  }
-  .error {
-    background-image: url(../images/error.svg);
-  }
-  .custom {
-    text-align: center;
-    font-style: italic;
-  }
-
-}
-
-.loading-container.show {
-  visibility: inherit;
-  opacity: 1;
-  transition-delay: 0s;
-}
-
 .status-text {
   text-align: center;
   font-style: italic;
