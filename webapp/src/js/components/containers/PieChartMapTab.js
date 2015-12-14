@@ -87,40 +87,40 @@ let PieChartMapTab = React.createClass({
       columns: locationColumnsColumnSpec
     };
 
-    requestContext.request((componentCancellation) =>
-      LRUCache.get(
-        'pageQuery' + JSON.stringify(locationAPIargs),
-        (cacheCancellation) =>
-          API.pageQuery({cancellation: cacheCancellation, ...locationAPIargs}),
-        componentCancellation
-      )
-    )
-    .then((locationData) => {
-        this.setState({locationData: locationData});
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      this.setState({loadStatus: 'error'});
-    });
-
-    // TODO: Can't use requestContext again
-
-    API.fetchSingleRecord({
+    let chartAPIargs = {
       database: this.config.dataset,
       table: chartDataTable,
       primKeyField: this.config.tables[chartDataTable].primkey,
       primKeyValue: chartDataTablePrimKey
-    })
-    .then((chartData) => {
-        this.setState({loadStatus: 'loaded', chartData: chartData});
-    })
-    .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      this.setState({loadStatus: 'error'});
-    });
+    };
 
+    requestContext.request(
+      (componentCancellation) =>
+        Promise.all([
+          LRUCache.get(
+            'pageQuery' + JSON.stringify(locationAPIargs),
+            (cacheCancellation) =>
+              API.pageQuery({cancellation: cacheCancellation, ...locationAPIargs}),
+            componentCancellation
+          ),
+          LRUCache.get(
+            'fetchSingleRecord' + JSON.stringify(chartAPIargs),
+            (cacheCancellation) =>
+              API.fetchSingleRecord({cancellation: cacheCancellation, ...chartAPIargs}),
+            componentCancellation
+          )])
+      )
+      .then(([locationData, chartData]) => this.setState({
+        loadStatus: 'loaded',
+        locationData: locationData,
+        chartData: chartData
+      }))
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   title() {
