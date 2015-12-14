@@ -53,6 +53,26 @@ let parseTableSettings = function(table) {
   table.settings = settings;
 };
 
+let parseRelations = function() {
+  _.each(fetchedConfig.tableCatalog, function(tableInfo) {
+    tableInfo.relationsChildOf = [];
+    tableInfo.relationsParentOf = [];
+  });
+  _.each(fetchedConfig.relations, function(relationInfo) {
+    let childTableInfo = fetchedConfig.mapTableCatalog[relationInfo.childtableid];
+
+    //TODO These should error on import
+    //if (!childTableInfo)
+    //  DQX.reportError('Invalid child table in relation: '+relationInfo.childtableid)
+    let parentTableInfo = fetchedConfig.mapTableCatalog[relationInfo.parenttableid];
+    //if (!parentTableInfo)
+    //  DQX.reportError('Invalid parent table in relation: '+relationInfo.parenttableid)
+    childTableInfo.relationsChildOf.push(relationInfo);
+    parentTableInfo.relationsParentOf.push(relationInfo);
+    fetchedConfig.mapTableCatalog[childTableInfo.id].propertiesMap[relationInfo.childpropid].relationParentTableId = parentTableInfo.id;
+  });
+};
+
 let mapExtraTableSettings = function(tableInfo, customDataCatalog) {
   let tokensList = ['DataItemViews', 'PropertyGroups']; //List of all settings tokens for which this mechanism applies
   _.each(customDataCatalog, (customData) => {
@@ -492,7 +512,7 @@ let fetchInitialConfig = function() {
           columns: columnSpec(['linktype', 'linkname', 'linkurl']),
           order: 'linkname'
         })
-          .then((data) => fetchedConfig.relations = data)
+          .then((data) => fetchedConfig.externalLinks = data)
       ]
     ))
     .then(() => {
@@ -524,12 +544,12 @@ let fetchInitialConfig = function() {
       parseSummaryValues();
     })
     .then(parseCustomProperties)
-    //.then(() => {
+    .then(() => {
     //parse2DProperties();
     //parseTableBasedSummaryValues();
-    //parseRelations();
+      parseRelations();
     //parseStoredSubsets();
-    //});
+    })
     .then(() => {
       let defaultQueries = {};
       let subsets = {};
@@ -556,6 +576,7 @@ let fetchInitialConfig = function() {
         tables: fetchedConfig.mapTableCatalog,
         settings: fetchedConfig.generalSettings,
         summaryValues: fetchedConfig.summaryValues,
+        tableRelations: fetchedConfig.tableRelations,
         defaultQueries: defaultQueries,
         subsets: subsets
       }));
