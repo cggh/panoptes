@@ -44,7 +44,7 @@ module.exports = {
       'prefer-double'
     ],
 
-    'new-cap': 2,
+    //'new-cap': 2, //Disabled as lots of legacy DQX uses caps
     'arrow-body-style': 2,
     'arrow-parens': 2,
     'arrow-spacing': 2,
