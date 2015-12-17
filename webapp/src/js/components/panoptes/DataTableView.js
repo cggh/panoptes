@@ -28,7 +28,7 @@ const Icon = require('ui/Icon');
 const DetectResize = require('utils/DetectResize');
 
 
-const MAX_COLOR = Color("#44aafb");
+const MAX_COLOR = Color('#44aafb');
 
 let DataTableView = React.createClass({
   mixins: [
@@ -75,10 +75,10 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let { table, query, className, columns, order, ascending } = props;
+    let {table, query, columns, order, ascending} = props;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
-    columns.map(column => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
+    columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
@@ -114,13 +114,6 @@ let DataTableView = React.createClass({
       this.setState({rows: []});
   },
 
-  headerData(column) {
-    return {
-      ascending: this.props.order == column && this.props.ascending,
-      descending: this.props.order == column && !this.props.ascending
-    }
-  },
-
   handleColumnResize(width, column) {
     if (this.props.onColumnResize)
       this.props.onColumnResize(column, width);
@@ -136,67 +129,12 @@ let DataTableView = React.createClass({
       else
         column = null;
     if (this.props.onOrderChange) {
-      this.props.onOrderChange(column, ascending)
+      this.props.onOrderChange(column, ascending);
     }
-  },
-
-  renderHeader(headerData, cellDataKey, columnData, rowData, width) {
-    let {ascending, descending} = headerData;
-    let {description, name} = columnData;
-    return <PropertyHeader
-      className={classNames({
-                                "pointer": true,
-                                "table-row-header": true,
-                                "sort-column-ascending": ascending,
-                                "sort-column-descending": descending
-                                      })}
-      style={{width:width}}
-      onClick={() => this.handleOrderChange(columnData.propid)}
-      prefix={(ascending || descending) ?
-        <Icon className="sort" name={ascending ? "sort-amount-asc" : "sort-amount-desc"}/> :
-        null}
-      name={name}
-      description={description}
-      tooltipPlacement={"bottom"}
-      tooltipTrigger={['click']}/>
-  },
-
-  renderCell(cellData, cellDataKey, rowData, rowIndex, columnData, width) {
-    let background = "rgba(0,0,0,0)";
-    let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
-
-    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
-      cellData = parseFloat(cellData);
-      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
-      background = `linear-gradient(to right, ${rowIndex % 2 ? "rgb(115, 190, 252)" : "rgb(150, 207, 253)"} ${percent}%, rgba(0,0,0,0) ${percent}%`
-    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
-      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-      background = MAX_COLOR.clone().lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
-    }
-    if (categoryColors) {
-      let col = categoryColors[cellData] || categoryColors['_other_'];
-      if (col) {
-        col = Color(col).lighten(0.3);
-        if (rowIndex % 2)
-          col.darken(0.1);
-
-        background = col.rgbString();
-      }
-    }
-
-    return <div className="table-row-cell"
-                style={{
-                   textAlign:alignment,
-                   width:width,
-                   height: "30px",
-                   background: background
-                   }}>
-      <PropertyCell prop={columnData} value={cellData}/>
-    </div>
   },
 
   defaultWidth(columnData) {
-    if (columnData.dispDataType == "Boolean")
+    if (columnData.dispDataType == 'Boolean')
       return 75;
     if (columnData.defaultWidth)
       return columnData.defaultWidth;
@@ -208,8 +146,8 @@ let DataTableView = React.createClass({
   },
 
   render() {
-    let { query, className, columns, columnWidths } = this.props;
-    let { loadStatus, rows, width, height } = this.state;
+    let {className, columns, columnWidths, order, ascending} = this.props;
+    let {loadStatus, rows, width, height} = this.state;
     let tableConfig = this.config.tables[this.props.table];
     if (!tableConfig) {
       console.log(`Table ${this.props.table} doesn't exist'`);
@@ -218,38 +156,91 @@ let DataTableView = React.createClass({
     if (columns.size > 0)
       return (
         <DetectResize onResize={(size) => this.setState(size)}>
-          <div className={classNames("datatable", className)}>
+          <div className={classNames('datatable', className)}>
             <Table
               rowHeight={30}
-              rowGetter={(index) => rows[index]}
+              //rowGetter={(index) => rows[index]}
               rowsCount={rows.length}
               width={width}
               height={height}
               headerHeight={50}
-              headerDataGetter={this.headerData}
+              //headerDataGetter={this.headerData}
               onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={false}
             >
-              {columns.map(column => {
+              {columns.map((column) => {
                 if (!tableConfig.propertiesMap[column]) {
                   console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
                   return;
                 }
                 let columnData = tableConfig.propertiesMap[column];
-                let {propid, isPrimKey} = columnData;
+                let {propid, isPrimKey, description, name} = columnData;
+                let asc = order == column && ascending;
+                let desc = order == column && !ascending;
+                let width = columnWidths.get(column, this.defaultWidth(columnData));
                 return <Column
                   //TODO Better default column widths
-                  width={columnWidths.get(column,this.defaultWidth(columnData))}
-                  dataKey={propid}
+                  width={width}
                   key={propid}
                   fixed={isPrimKey}
                   allowCellsRecycling={true}
-                  cellRenderer={this.renderCell}
-                  headerRenderer={this.renderHeader}
-                  columnData={columnData}
                   isResizable={true}
                   minWidth={50}
-                />
+                  header={
+                    <PropertyHeader
+                      className={classNames({
+                        'pointer': true,
+                        'table-row-header': true,
+                        'sort-column-ascending': asc,
+                        'sort-column-descending': desc
+                      })}
+                      style={{width: width}}
+                      onClick={() => this.handleOrderChange(propid)}
+                      prefix={(asc || desc) ?
+                        <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
+                        null}
+                      name={name}
+                      description={description}
+                      tooltipPlacement={"bottom"}
+                      tooltipTrigger={['click']}/>
+                  }
+                  cell={({rowIndex}) => {
+
+                    let background = 'rgba(0,0,0,0)';
+                    let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
+                    let cellData = rows[rowIndex][propid];
+                    if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                      cellData = parseFloat(cellData);
+                      let percent = 100 * (cellData - minVal) / (maxVal - minVal);
+                      background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
+                    } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+                      let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+                      background = MAX_COLOR.clone().lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
+                    }
+                    if (categoryColors) {
+                      let col = categoryColors[cellData] || categoryColors['_other_'];
+                      if (col) {
+                        col = Color(col).lighten(0.3);
+                        if (rowIndex % 2)
+                          col.darken(0.1);
+
+                        background = col.rgbString();
+                      }
+                    }
+
+                    return (
+                        <div className="table-row-cell"
+                                        style={{
+                                          textAlign: alignment,
+                                          width: width,
+                                          height: '30px',
+                                          background: background
+                                        }}>
+                          <PropertyCell prop={columnData} value={cellData}/>
+                        </div>
+                  );
+                  }}
+                />;
               })
               }
             </Table>
@@ -259,10 +250,10 @@ let DataTableView = React.createClass({
       );
     else
       return (
-        <div className={classNames("datatable", className)}>
+        <div className={classNames('datatable', className)}>
           <Loading status="custom">No columns selected</Loading>
         </div>
-      )
+      );
   }
 
 });
