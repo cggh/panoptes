@@ -938,15 +938,8 @@ input.PnGenotypesPageEdit{
     bottom: 0px;
 }
 
-#PanoptesAppHeader,.DQXTabs,.DQXPopupFrameHeader{
-    background: #000000; /* Old browsers */
-    background: -moz-linear-gradient(left, #000000 0%, #757575 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#000000), color-stop(100%,#757575)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(left, #000000 0%,#757575 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(left, #000000 0%,#757575 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(left, #000000 0%,#757575 100%); /* IE10+ */
-    background: linear-gradient(to right, #000000 0%,#757575 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#757575',GradientType=1 ); /* IE6-9 */
+#PanoptesAppHeader,.DQXTabs {
+    background: #FFFFFF; /* Old browsers */
 }
 
 #PanoptesAppHeader > * {
@@ -956,7 +949,7 @@ input.PnGenotypesPageEdit{
 
 .PnTitleBox {
     font-weight: bold;
-    color: #FFFFFF;
+    color: #000000;
     font-size: 21px;
     padding-top: 0px;
     padding-left: 3px;
@@ -995,8 +988,8 @@ input.PnGenotypesPageEdit{
     border-color:rgb(210,210,210);
 }
 .OrgLogoBox {
-    height: 20px;
-    padding-top: 17px;
+    height: 40px;
+    padding-top: 12px;
     float:right;
     padding-right: 115px;
 }
@@ -1020,7 +1013,9 @@ input.PnGenotypesPageEdit{
     background-color:rgb(184,184,184);
 }
 .DQXTabBodyStyled, .DQXTabActive {
-    border-color:rgb(255,255,255);
+    border-color:rgb(128,128,128);
+    border:1px solid grey;
+    border-bottom:transparent;
     background-color:rgb(255,255,255);
 }
 
