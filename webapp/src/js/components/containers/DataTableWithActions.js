@@ -7,7 +7,7 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
-const Sidebar = require('react-sidebar');
+const Sidebar = require('react-sidebar').default;
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
 const DataTableView = require('panoptes/DataTableView');
