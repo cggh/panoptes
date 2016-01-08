@@ -87,7 +87,8 @@ let DataTableView = React.createClass({
         columns: columnspec,
         order: order,
         ascending: ascending,
-        query: SQL.WhereClause.decode(query)
+        query: SQL.WhereClause.decode(query),
+        stop: 1000
       };
       requestContext.request((componentCancellation) =>
           LRUCache.get(
