@@ -1,6 +1,7 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const LRUCache = require('util/LRUCache');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
