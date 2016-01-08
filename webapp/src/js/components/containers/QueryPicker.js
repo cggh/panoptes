@@ -9,7 +9,7 @@ const SQL = require('panoptes/SQL');
 const {RaisedButton, IconButton, List, ListItem, Paper, ListDivider} = require('material-ui');
 const QueryString = require('panoptes/QueryString');
 const QueryEditor = require('panoptes/QueryEditor');
-const Sidebar = require('react-sidebar');
+const Sidebar = require('react-sidebar').default;
 
 
 let QueryPicker = React.createClass({
