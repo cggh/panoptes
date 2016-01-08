@@ -88,8 +88,8 @@ let Popup = React.createClass({
   },
 
   render() {
-    let { position, size, children, ...other } = this.props;
-    let { icon, title } = this.state;
+    let {position, size, children, ...other} = this.props;
+    let {icon, title} = this.state;
     if (!children)
       return null;
     return (
@@ -100,7 +100,7 @@ let Popup = React.createClass({
                  onStop={this.handleMoveStop}>
         <Resizable width={size.get('width')} height={size.get('height')}
                    minConstraints={[50, 50]}
-                   handleSize={[20,20]}
+                   handleSize={[20, 20]}
                    onResize={this.handleResize}
                    onResizeStop={this.handleResizeStop}>
           <div className="popup"
@@ -112,7 +112,7 @@ let Popup = React.createClass({
               <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
-              {React.cloneElement(children, {ref: 'child' })}
+              {React.cloneElement(children, {ref: 'child'})}
             </div>
             <div className="popup-drag"></div>
           </div>

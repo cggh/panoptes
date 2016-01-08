@@ -4,7 +4,7 @@ const tickWidth = require('panoptes/TickWidth.js');
 
 const d3 = require('d3');
 
-const HEIGHT=40;
+const HEIGHT = 40;
 
 let GenomeScale = React.createClass({
   mixins: [PureRenderMixin],
@@ -17,26 +17,26 @@ let GenomeScale = React.createClass({
   },
 
   render() {
-    let { start, end, width, sideWidth, ...other } = this.props;
-    let scale = d3.scale.linear().domain([start, end]).range([0, width-sideWidth]);
+    let {start, end, width, sideWidth, ...other} = this.props;
+    let scale = d3.scale.linear().domain([start, end]).range([0, width - sideWidth]);
     if (width == 0)
       return null;
     //Make a small tick be close to this many pixels:
     let SMALL_TICK = 50;
-    let smallTickWidth = Math.max(tickWidth(end - start, width, SMALL_TICK),1);
-    start = Math.max(0,start);
-    start = Math.floor(start/smallTickWidth) * smallTickWidth;
+    let smallTickWidth = Math.max(tickWidth(end - start, width, SMALL_TICK), 1);
+    start = Math.max(0, start);
+    start = Math.floor(start / smallTickWidth) * smallTickWidth;
     end = Math.max(start, end);
-    let format = scale.tickFormat((end - start)/(smallTickWidth*5), end - start > 5000 ? 's' : null);
+    let format = scale.tickFormat((end - start) / (smallTickWidth * 5), end - start > 5000 ? 's' : null);
     let smallTicks = [];
     let largeTicks = [];
     for (let pos = start; pos < end; pos += smallTickWidth) {
       let x = scale(pos);
-      if (pos/smallTickWidth % 5 === 0) {
+      if (pos / smallTickWidth % 5 === 0) {
         largeTicks.push(
           <g className="major tick" key={pos}>
             <line x1={x} x2={x} y1={26} y2={40}/>
-            <text x={pos == 0 && start == 0 ? x+10 : x} y={10}>{format(pos)}</text>
+            <text x={pos == 0 && start == 0 ? x + 10 : x} y={10}>{format(pos)}</text>
           </g>
         );
       } else {

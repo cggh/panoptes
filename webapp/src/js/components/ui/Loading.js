@@ -1,7 +1,7 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
-import "loading.scss"
+import "loading.scss";
 
 let Loading = React.createClass({
   mixins: [PureRenderMixin],
@@ -11,7 +11,7 @@ let Loading = React.createClass({
   },
 
   render() {
-    let { status, customContent, ...other } = this.props;
+    let {status, customContent, ...other} = this.props;
     if (status == 'loading')
       return (
         <div className="loading-container show">

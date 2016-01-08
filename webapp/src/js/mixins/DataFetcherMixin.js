@@ -1,6 +1,6 @@
 const RequestContext = require('util/RequestContext');
 
-var DataFetcherMixin = function () {
+var DataFetcherMixin = function() {
   var propsToWatch = Array.prototype.slice.call(arguments);
   return {
     componentWillMount() {
@@ -13,7 +13,7 @@ var DataFetcherMixin = function () {
 
     _getDataIfNeeded(lastProps, nextProps) {
       if (propsToWatch.some((key) => lastProps[key] !== nextProps[key]))
-          this.fetchData(nextProps, this._requestContext);
+        this.fetchData(nextProps, this._requestContext);
     },
     componentWillUnmount() {
       this._requestContext.destroy();
@@ -22,10 +22,10 @@ var DataFetcherMixin = function () {
   };
 };
 
-DataFetcherMixin.componentWillMount = function () {
-  throw new Error("DataFetcherMixin is a function that takes one or more " +
-    "prop names to watch as parameters and returns the mixin, e.g.: " +
-    "mixins: [DataFetcherMixin(\"Prop1\", \"Prop2\")]");
+DataFetcherMixin.componentWillMount = function() {
+  throw new Error('DataFetcherMixin is a function that takes one or more ' +
+    'prop names to watch as parameters and returns the mixin, e.g.: ' +
+    'mixins: [DataFetcherMixin("Prop1", "Prop2")]');
 };
 
 module.exports = DataFetcherMixin;

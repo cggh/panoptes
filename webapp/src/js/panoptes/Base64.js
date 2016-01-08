@@ -13,11 +13,11 @@
 var Base64 = {
 
   // private property
-  _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=",
+  _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=',
 
   // public method for encoding
-  encode: function (input) {
-    var output = "";
+  encode: function(input) {
+    var output = '';
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     var i = 0;
 
@@ -50,8 +50,8 @@ var Base64 = {
   },
 
   // public method for decoding
-  decode: function (input) {
-    var output = "";
+  decode: function(input) {
+    var output = '';
     var chr1, chr2, chr3;
     var enc1, enc2, enc3, enc4;
     var i = 0;
@@ -87,9 +87,9 @@ var Base64 = {
   },
 
   // private method for UTF-8 encoding
-  _utf8_encode: function (string) {
-    string = string.replace(/\r\n/g, "\n");
-    var utftext = "";
+  _utf8_encode: function(string) {
+    string = string.replace(/\r\n/g, '\n');
+    var utftext = '';
 
     for (var n = 0; n < string.length; n++) {
 
@@ -114,8 +114,8 @@ var Base64 = {
   },
 
   // private method for UTF-8 decoding
-  _utf8_decode: function (utftext) {
-    var string = "";
+  _utf8_decode: function(utftext) {
+    var string = '';
     var i = 0;
     var c, c1, c2, c3;
     c = c1 = c2 = 0;

@@ -11,33 +11,33 @@ let APIActions = {
     let userID = null;
     this.dispatch(APICONST.FETCH_USER);
     API.requestJSON({
-        params: {
+      params: {
           datatype: 'custom',
           respmodule: 'panoptesserver',
           respid: 'serverstatus'
         }
-      })
+    })
       .then(status => {
         if ('issue' in status)
           throw Error(status.issue);
         userID = status.userid;
       })
       .then(API.requestJSON({
-          params: {
+        params: {
             datatype: 'custom',
             respmodule: 'panoptesserver',
             respid: 'datasetinfo',
             database: dataset
           }
-        })
+      })
         .then((resp) => {
           let note = {
-            title: "Schema Outdated",
+            title: 'Schema Outdated',
             level: 'error',
             autoDismiss: 0,
             action: {
               label: 'Open admin',
-              callback: function () {
+              callback: function() {
                 window.open('admin.html', '_blank');
               }
             }
@@ -53,7 +53,7 @@ let APIActions = {
           this.dispatch(APICONST.FETCH_USER_SUCCESS, {
             id: userID,
             isManager: resp.manager
-          })
+          });
         })
         .catch(error => {
           this.dispatch(APICONST.FETCH_USER_FAIL);

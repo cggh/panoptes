@@ -1,6 +1,6 @@
 function memoize(fn) {
   let cache = {};
-  return function (arg) {
+  return function(arg) {
     if (cache[arg] !== undefined) {
       return cache[arg];
     }

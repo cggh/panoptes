@@ -9,7 +9,7 @@ let HelloWorld = React.createClass({
   },
 
   render() {
-    let { msg, ...other } = this.props;
+    let {msg, ...other} = this.props;
     return (
       <div {...other}>
         Hello World! {msg}

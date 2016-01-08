@@ -26,7 +26,7 @@ let TabPane = React.createClass({
 
     return (
       <div {...this.props} className={classNames(this.props.className, classes)}>
-        {React.cloneElement(this.props.children, {ref: 'child' })}
+        {React.cloneElement(this.props.children, {ref: 'child'})}
       </div>
     );
   }

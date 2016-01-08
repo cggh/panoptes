@@ -64,14 +64,14 @@ let TabbedArea = React.createClass({
   },
 
   handleDragStop(id) {
-      let state = this.refs['drag_'+id].state;
-      let dist = Math.sqrt(state.clientY*state.clientY + state.clientX*state.clientX);
-      this.refs['drag_'+id].resetState();
-      if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
+    let state = this.refs['drag_' + id].state;
+    let dist = Math.sqrt(state.clientY * state.clientY + state.clientX * state.clientX);
+    this.refs['drag_' + id].resetState();
+    if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
         this.props.onDragAway(id, {
-          x:state.clientX+state.offsetX,
-          y:state.clientY+state.offsetY
-        })
+          x:state.clientX + state.offsetX,
+          y:state.clientY + state.offsetY
+        });
   },
 
   renderTab(tab) {
@@ -82,13 +82,13 @@ let TabbedArea = React.createClass({
       active: (id === this.props.activeTab),
       inactive: (id !== this.props.activeTab)
     };
-    
-    let closeIcon = "";
+
+    let closeIcon = '';
     if (this.props.onClose)
     {
-      closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>
+      closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>;
     }
-    
+
     let tabMarkup = (
           <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
             {icons[id] ? <Icon name={icons[id]}/> : null}
@@ -96,22 +96,22 @@ let TabbedArea = React.createClass({
             {closeIcon}
           </div>
     );
-    
+
     if (this.props.onDragAway)
     {
-      // Wrap tabMarkup in Draggable 
+      // Wrap tabMarkup in Draggable
       tabMarkup = (
         <Draggable
-          ref={"drag_" + id}
+          ref={'drag_' + id}
           key={id}
           zIndex={99999}
           onStop={this.handleDragStop.bind(this, id)}>
         {tabMarkup}
         </Draggable>
       );
-      
+
     }
-    
+
     return tabMarkup;
   },
 
@@ -122,7 +122,7 @@ let TabbedArea = React.createClass({
         active: (tab.props.compId === this.props.activeTab),
         key: tab.props.compId,
         ref: tab.props.compId
-      })
+      });
   },
 
   render() {
@@ -136,7 +136,7 @@ let TabbedArea = React.createClass({
           {ValidComponentChildren.map(this.props.children, this.renderPane, this)}
         </div>
       </div>
-    )
+    );
   }
 });
 

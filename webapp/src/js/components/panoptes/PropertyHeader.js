@@ -11,13 +11,13 @@ const TooltipEllipsis = require('ui/TooltipEllipsis');
 const Icon = require('ui/Icon');
 
 const Tooltip = require('rc-tooltip');
-import 'rc-tooltip/assets/bootstrap.css'
+import 'rc-tooltip/assets/bootstrap.css';
 
 let PropertyHeader = React.createClass({
 
   mixins: [
-             PureRenderMixin,
-             FluxMixin
+    PureRenderMixin,
+    FluxMixin
   ],
 
   propTypes: {
@@ -34,7 +34,7 @@ let PropertyHeader = React.createClass({
 
     let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
 
-    var tooltip = "";
+    var tooltip = '';
     if (description)
     {
       tooltip = <Tooltip placement={tooltipPlacement}
@@ -48,9 +48,9 @@ let PropertyHeader = React.createClass({
 
     return (
       <span onClick={(event) => {
-              if (onClick && event.target.className.indexOf("info") == -1)
+        if (onClick && event.target.className.indexOf('info') == -1)
                 onClick(event);
-                }}
+      }}
         {...other}>
         {prefix}
         <TooltipEllipsis className="label">{name}</TooltipEllipsis>

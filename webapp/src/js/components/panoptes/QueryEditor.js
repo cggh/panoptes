@@ -33,7 +33,7 @@ let And = React.createClass({
       <div className="and">
         {_.map(component.components, (subComponent, key) => <Component {...other} key={key} component={subComponent}/>)}
       </div>
-    )
+    );
   }
 });
 
@@ -45,17 +45,17 @@ let Or = React.createClass({
         <div className="startline">OR</div>
         <div className="components">
           {_.map(component.components, (subComponent, key) => {
-              return (
+            return (
                 <div key={key} className="or-criteria-wrapper">
                   <Component {...other} component={subComponent}/>
                 </div>
               );
-            }
+          }
           )}
         </div>
         <div className="endline"></div>
       </div>
-    )
+    );
   }
 });
 
@@ -74,7 +74,7 @@ let Criterion = React.createClass({
   getStateFromFlux() {
     return {
       subsets: this.getFlux().store('PanoptesStore').getStoredSubsetsFor(this.props.table)
-    }
+    };
   },
 
   handleReplaceTrivial() {
@@ -180,7 +180,7 @@ let Criterion = React.createClass({
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
     if (!currentOperator)
-      throw Error("SQL Critiera operator not valid");
+      throw Error('SQL Critiera operator not valid');
     if (currentOperator.fieldType === 'value') {
       component.CompValue = Deformatter(property, this.refs.value.value);
       this.setState({CompValue: this.refs.value.value});
@@ -226,7 +226,7 @@ let Criterion = React.createClass({
       name: 'Other',
       properties: [{
         propid: '_subset_',
-        name: "In subset",
+        name: 'In subset',
         disabled: (this.state.subsets.size === 0)
       }]
     };
@@ -234,7 +234,7 @@ let Criterion = React.createClass({
     let propertySelect = (
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
         {_.map(groups, (group) => {
-            return (
+          return (
               <optgroup key={group.id} label={group.name}>
                 {_.map(group.properties, (property) => {
                   let {propid, disabled, name} = property;
@@ -249,7 +249,7 @@ let Criterion = React.createClass({
                 }
               </optgroup>
             );
-          }
+        }
         )}
       </select>
     );
@@ -258,30 +258,30 @@ let Criterion = React.createClass({
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let operatorSelect = null;
     if (validOperators.length == 1) {
-      operatorSelect = <div className="operator">{validOperators[0].name}</div>
+      operatorSelect = <div className="operator">{validOperators[0].name}</div>;
     } else {
       operatorSelect = (
         <select ref="operator" value={component.type} onChange={this.handleOperatorChange}>
           {_.map(validOperators, (operator) => {
-              let {ID, name} = operator;
-              return (
+            let {ID, name} = operator;
+            return (
                 <option key={ID}
                         value={ID}>
                   {name}
                 </option>
               );
-            }
+          }
           )}
         </select>
-      )
+      );
     }
 
     let otherColumnSelect = () => {
       return (
         <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
           {_.map(groups, (group) => {
-              if (group.id === 'other') return null;
-              return (
+            if (group.id === 'other') return null;
+            return (
                 <optgroup key={group.id} label={group.name}>
                   {_.map(group.properties, (property) => {
                     let {propid, disabled, name} = property;
@@ -296,16 +296,16 @@ let Criterion = React.createClass({
                   }
                 </optgroup>
               );
-            }
+          }
           )}
         </select>
-      )
+      );
     };
 
     let fields = null;
     let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
     if (!currentOperator)
-      throw Error("SQL Critiera operator not valid");
+      throw Error('SQL Critiera operator not valid');
     if (currentOperator.fieldType === 'value')
       if (property.propCategories)
         fields = (
@@ -324,7 +324,7 @@ let Criterion = React.createClass({
               }
             </select>
           </div>
-        )
+        );
       else
         fields = (
           <div className="fields">
@@ -405,7 +405,7 @@ let Criterion = React.createClass({
           </div>
         </div>
       </Paper>
-    )
+    );
   }
 });
 
@@ -428,7 +428,7 @@ let QueryEditor = React.createClass({
     let {query, table, className, ...other} = this.props;
     query = SQL.WhereClause.decode(query);
     return (
-      <div className={classNames("query-editor", className)}>
+      <div className={classNames('query-editor', className)}>
         <div className="endpoint">Full data set</div>
         <br/>
 

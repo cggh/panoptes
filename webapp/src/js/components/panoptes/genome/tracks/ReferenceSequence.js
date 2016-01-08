@@ -40,7 +40,7 @@ let ReferenceSequence = React.createClass({
   },
 
   applyData(data) {
-    this.setState(data)
+    this.setState(data);
   },
 
   //Called by DataFetcherMixin on prop change
@@ -72,9 +72,9 @@ let ReferenceSequence = React.createClass({
       this.props.onChangeLoadStatus('LOADING');
       promise
         .then((data) => {
-        this.props.onChangeLoadStatus('DONE');
-        this.applyData(data);
-      })
+          this.props.onChangeLoadStatus('DONE');
+          this.applyData(data);
+        })
         .catch((data) => {
           this.props.onChangeLoadStatus('DONE');
           if (data !== 'SUPERSEDED') {
@@ -86,8 +86,8 @@ let ReferenceSequence = React.createClass({
   },
 
   render() {
-    let { start, end, width, sideWidth, ...other } = this.props;
-    let { dataStart, dataStep, columns} = this.state;
+    let {start, end, width, sideWidth, ...other} = this.props;
+    let {dataStart, dataStep, columns} = this.state;
     let sequence = columns ? columns.sequence || [] : [];
     if (width == 0)
       return null;
@@ -99,9 +99,9 @@ let ReferenceSequence = React.createClass({
               Ref. Seq.
             </div>
           </div>
-          <div className="channel-data" style={{width:`${width-sideWidth}px`}} >
+          <div className="channel-data" style={{width:`${width - sideWidth}px`}} >
             <SequenceSquares
-              width={width-sideWidth}
+              width={width - sideWidth}
               height={HEIGHT}
               start={start}
               end={end}
@@ -134,7 +134,7 @@ let SequenceSquares = React.createClass({
     canvas.width = sequence.length;
     canvas.height = 1;
     if (canvas.width !== sequence.length)
-      console.log("Unequal lengths");
+      console.log('Unequal lengths');
     if (sequence.length < 1)
       return;
     let ctx = canvas.getContext('2d');

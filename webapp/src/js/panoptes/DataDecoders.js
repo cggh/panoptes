@@ -12,7 +12,7 @@
  *************************************************************************************************************************************/
 
 function checkIsNumber(value) {
-  if (typeof value != 'number') throw Error('Expected number got' +(typeof value));
+  if (typeof value != 'number') throw Error('Expected number got' + (typeof value));
 }
 
 var DataDecoders = {};
@@ -21,40 +21,40 @@ var DataDecoders = {};
 //Basic base64 encoding/decoding
 /////////////////////////////////////////////////////////////////////////////////////////
 
-DataDecoders.B64 = function () {
+DataDecoders.B64 = function() {
   var that = {};
-  that.encodestr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-";
+  that.encodestr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-';
   that.invencode = [];
   for (var i = 0; i < 255; i++) that.invencode.push(0);
   for (var i = 0; i < that.encodestr.length; i++)
     that.invencode[that.encodestr[i].charCodeAt(0)] = i;
 
   //Converts a 64bit encoded integer to an integer
-  that.B642Int = function (st) {
+  that.B642Int = function(st) {
     var rs = 0;
     for (var i = 0; i < st.length; i++)
-      rs = (rs << 6) + this.invencode[st.charCodeAt(i)]
+      rs = (rs << 6) + this.invencode[st.charCodeAt(i)];
     return rs;
   };
 
   //Converts a 64bit encoded integer to an integer
-  that.B642IntFixed = function (st, offset, len) {
+  that.B642IntFixed = function(st, offset, len) {
     if (st[offset] == '~')
       return null;
     rs = 0;
     for (var i = 0; i < len; i++)
-      rs = (rs << 6) + this.invencode[st.charCodeAt(offset + i)]
+      rs = (rs << 6) + this.invencode[st.charCodeAt(offset + i)];
     return rs;
   };
 
 
   //Converts a set of 64bit encoded integers to float array, applying a linear mapping using slope and offset
-  that.arrayB642Float = function (st, bytecount, slope, offset) {
+  that.arrayB642Float = function(st, bytecount, slope, offset) {
     var vals = [];
     var cnt = st.length / bytecount;
     var ps = 0;
     for (var i = 0; i < cnt; i++) {
-      if ((st[ps] == '~') || (st[ps] == '#')) {//coding for absent value
+      if ((st[ps] == '~') || (st[ps] == '#')) { //coding for absent value
         vals.push(null);
         ps += bytecount;
       }
@@ -78,10 +78,10 @@ DataDecoders.B64 = function () {
 //Decoder for different formats of value lists as provided by the server
 /////////////////////////////////////////////////////////////////////////////////////////
 
-DataDecoders.ValueListDecoder = function () {
+DataDecoders.ValueListDecoder = function() {
   var that = {};
   that.b64codec = DataDecoders.B64();
-  that.doDecode = function (data) {
+  that.doDecode = function(data) {
 
     if (data['Encoding'] == 'IntegerDiffB64') {
       if (data['Data'].length == 0) return [];
@@ -142,7 +142,7 @@ DataDecoders.ValueListDecoder = function () {
       var vals = data['Data'].split('~');
       return vals;
     }
-    throw Error("Unknown value list encoding: " + data['Encoding']);
+    throw Error('Unknown value list encoding: ' + data['Encoding']);
   };
 
   return that;
@@ -154,61 +154,61 @@ DataDecoders.ValueListDecoder = function () {
 
 DataDecoders.Encoder = {};
 
-DataDecoders.Encoder.FixedString = function (info) {
+DataDecoders.Encoder.FixedString = function(info) {
   var that = {};
   checkIsNumber(info.Len);
   that.length = parseFloat(info.Len);
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     var rs = [];
     var ct = datastr.length / this.length;
     for (var i = 0; i < ct; i++)
-      rs.push(datastr.slice(i * this.length, (i + 1) * this.length))
+      rs.push(datastr.slice(i * this.length, (i + 1) * this.length));
     return rs;
 
   };
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     return datastr.substring(offset, offset + this.length);
   };
-  that.getRecordLength = function () {
+  that.getRecordLength = function() {
     return this.length;
   };
   return that;
 };
 
-DataDecoders.Encoder.Boolean = function (info) {
+DataDecoders.Encoder.Boolean = function(info) {
   var that = {};
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     var rs = [];
     var ct = datastr.length;
     for (var i = 0; i < ct; i++)
-      rs.push(datastr[i] == '1')
+      rs.push(datastr[i] == '1');
     return rs;
   };
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     return datastr[offset] == '1';
   };
-  that.getRecordLength = function () {
+  that.getRecordLength = function() {
     return 1;
   };
   return that;
 };
 
-DataDecoders.Encoder.Int2B64 = function (info) {
+DataDecoders.Encoder.Int2B64 = function(info) {
   var that = {};
   checkIsNumber(info.Len);
   that.length = parseFloat(info.Len);
   var _b64codec = DataDecoders.B64();
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     return _b64codec.B642IntFixed(datastr, offset, this.length);
-  }
-  that.getRecordLength = function () {
+  };
+  that.getRecordLength = function() {
     return this.length;
   };
   return that;
 };
 
 
-DataDecoders.Encoder.Float2B64 = function (info) {
+DataDecoders.Encoder.Float2B64 = function(info) {
   var that = {};
   checkIsNumber(info.Len);
   checkIsNumber(info.Offset);
@@ -217,19 +217,19 @@ DataDecoders.Encoder.Float2B64 = function (info) {
   that.slope = parseFloat(info.Slope);
   that.length = parseFloat(info.Len);
   var _b64codec = DataDecoders.B64();
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     return _b64codec.arrayB642Float(datastr, this.length, this.slope, this.offset);
   };
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     return _b64codec.B642IntFixed(datastr, offset, this.length) * this.slope + this.offset;
   };
-  that.getRecordLength = function () {
+  that.getRecordLength = function() {
     return this.length;
   };
   return that;
 };
 
-DataDecoders.Encoder.FloatList2B64 = function (info) {
+DataDecoders.Encoder.FloatList2B64 = function(info) {
   var that = {};
   checkIsNumber(info.Count);
   checkIsNumber(info.RangeOffset);
@@ -238,7 +238,7 @@ DataDecoders.Encoder.FloatList2B64 = function (info) {
   that.rangeSlope = parseFloat(info.RangeSlope);
   that.count = parseInt(info.Count);
   var _b64codec = DataDecoders.B64();
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     var strlen = datastr.length;
     var reclen = that.count + 4;
     var rs = [];
@@ -252,25 +252,25 @@ DataDecoders.Encoder.FloatList2B64 = function (info) {
     }
     return rs;
   };
-  that.getRecordLength = function () {
-    throw Error("Undefined record length")
+  that.getRecordLength = function() {
+    throw Error('Undefined record length');
   };
 
   return that;
 };
 
 
-DataDecoders.Encoder.BooleanListB64 = function (info) {
+DataDecoders.Encoder.BooleanListB64 = function(info) {
   var that = {};
   checkIsNumber(info.Count);
   that.rangeSlope = parseFloat(info.RangeSlope);
   that.valueCount = parseInt(info.Count);
-  that.byteCount = Math.floor((that.valueCount + 5) / 6.0)
+  that.byteCount = Math.floor((that.valueCount + 5) / 6.0);
   var _b64codec = DataDecoders.B64();
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     return '-';
   };
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     var vl = _b64codec.B642IntFixed(datastr, offset, this.byteCount);
     var rs = [];
     for (var i = 0; i < this.valueCount; i++) {
@@ -279,7 +279,7 @@ DataDecoders.Encoder.BooleanListB64 = function (info) {
     }
     return rs;
   };
-  that.getRecordLength = function () {
+  that.getRecordLength = function() {
     return this.byteCount;
   };
 
@@ -287,14 +287,14 @@ DataDecoders.Encoder.BooleanListB64 = function (info) {
 };
 
 
-DataDecoders.Encoder.MultiCatCount = function (info) {
+DataDecoders.Encoder.MultiCatCount = function(info) {
   var that = {};
   checkIsNumber(info.CatCount);
   checkIsNumber(info.EncoderLen);
   that.catCount = parseInt(info.CatCount);
   that.encoderlen = parseInt(info.EncoderLen);
   var _b64codec = DataDecoders.B64();
-  that.decodeArray = function (datastr) {
+  that.decodeArray = function(datastr) {
     var strlen = datastr.length;
     var reclen = that.catCount * that.encoderlen;
     var rs = [];
@@ -308,10 +308,10 @@ DataDecoders.Encoder.MultiCatCount = function (info) {
     }
     return rs;
   };
-  that.decodeSingle = function (datastr, offset) {
+  that.decodeSingle = function(datastr, offset) {
     throw 'Not implemented';
   };
-  that.getRecordLength = function () {
+  that.getRecordLength = function() {
     return this.byteCount;
   };
 
@@ -320,7 +320,7 @@ DataDecoders.Encoder.MultiCatCount = function (info) {
 
 
 //Factory function that automatically creates a codec based on the properties
-DataDecoders.Encoder.Create = function (info) {
+DataDecoders.Encoder.Create = function(info) {
   if (info['ID'] == 'Int2B64')
     return DataDecoders.Encoder.Int2B64(info);
   if (info['ID'] == 'Float2B64')
@@ -335,7 +335,7 @@ DataDecoders.Encoder.Create = function (info) {
     return DataDecoders.Encoder.BooleanListB64(info);
   if (info['ID'] == 'MultiCatCount')
     return DataDecoders.Encoder.MultiCatCount(info);
-  throw Error("Invalid encoder id " + info['ID']);
+  throw Error('Invalid encoder id ' + info['ID']);
 };
 
 

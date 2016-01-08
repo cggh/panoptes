@@ -29,13 +29,13 @@ let QueryPicker = React.createClass({
     return {
       defaultQuery: this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table),
       lastQuery: this.getFlux().store('PanoptesStore').getLastQueryFor(this.props.table)
-    }
+    };
   },
 
   getInitialState() {
     return {
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
-    }
+    };
   },
 
   componentWillMount() {
@@ -88,7 +88,7 @@ let QueryPicker = React.createClass({
                         onDoubleClick={() => {
                           this.handleQueryChange(defaultQuery);
                           this.handlePick();
-                          }
+                        }
                         }/>
               <ListDivider />
               <ListItem primaryText="Previous"
@@ -98,7 +98,7 @@ let QueryPicker = React.createClass({
                         onDoubleClick={() => {
                           this.handleQueryChange(lastQuery);
                           this.handlePick();
-                          }
+                        }
                         }/>
               <ListDivider />
             </List>
