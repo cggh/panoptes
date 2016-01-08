@@ -15,10 +15,8 @@ const APIActions = require('actions/APIActions');
 const API = require('panoptes/API');
 
 const InitialConfig = require('panoptes/InitialConfig');
-const ErrorReport = require('panoptes/ErrorReporter.js');
-const injectTapEventPlugin = require("react-tap-event-plugin");
+const injectTapEventPlugin = require('react-tap-event-plugin');
 
-const HelloWorld = require('ui/HelloWorld');
 
 require('console-polyfill');
 
@@ -33,7 +31,7 @@ injectTapEventPlugin();
 
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
-  let default_state ={
+  let defaultState = {
     session: {
       components: {
         FirstTab: {
@@ -41,28 +39,27 @@ function getAppState(location) {
           props: {}
         }
       },
-      tabs:{
-        components:['FirstTab'],
+      tabs: {
+        components: ['FirstTab'],
         selectedTab: 'FirstTab'
       },
-      modal: {
-      }
+      modal: {}
     }
   };
   if (match)
-    return API.fetchData(match[0]).then((appState) => appState || default_state
+    return API.fetchData(match[0]).then((appState) => appState || defaultState
     );
   else
-    return default_state;
+    return defaultState;
 }
 
 Promise.prototype.done = function(onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
-      .catch(function(e) {
-        setTimeout(function() {
-          console.log(e.stack);
-          throw e;
-        });
+    .catch((e) => {
+      setTimeout(() => {
+        console.log(e.stack);
+        throw e;
+      });
     })
   ;
 };
@@ -73,7 +70,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     let stores = {
       //USE STATE FROM APPSTATE? THINK WE NEED TO REFACTOR TO SESSION SPECIFIC VS DATASET SPECIFIC VS USER SPECIFIC?
       PanoptesStore: new PanoptesStore({
-        user:config.user,
+        user: config.user,
         storedSubsets: config.subsets,
         defaultQueries: config.defaultQueries,
         storedQueries: config.storedQueries
@@ -88,13 +85,19 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       state = state.set('panoptes', stores.PanoptesStore.getState());
       return state;
     };
-    let last_state = getState();
+    let lastState = getState();
+    let backbutton = null;
     let storeState = () => {
-      let new_state = getState();
-      if (!last_state.equals(new_state)) {
-        last_state = new_state;
-        API.storeData(new_state.toJS()).then((resp) => {
-          window.history.pushState({}, `Panoptes: ${config.settings.name}`, `/${resp}`);
+      if (backbutton) {
+        backbutton = false;
+        return;
+      }
+      backbutton = false;
+      let newState = getState();
+      if (!lastState.equals(newState)) {
+        lastState = newState;
+        API.storeData(newState.toJS()).then((resp) => {
+          window.history.pushState(newState.toJS(), `Panoptes: ${config.settings.name}`, `/${resp}`);
         });
       }
 
@@ -102,6 +105,13 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     storeState = _.debounce(storeState, 200);
     stores.SessionStore.on('change', storeState);
     stores.PanoptesStore.on('change', storeState);
+
+    window.addEventListener('popstate', (event) => {
+      backbutton = true;
+      //TODO If there is no state we are at the start so use default view
+      stores.SessionStore.state = Immutable.fromJS(event.state.session).set('modal', Immutable.Map());
+      stores.SessionStore.emit('change');
+    });
 
     let actions = {
       session: SessionActions,
