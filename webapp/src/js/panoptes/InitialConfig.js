@@ -98,7 +98,10 @@ let augmentTableInfo = function (table) {
   if ('QuickFindFields' in table.settings)
     table.quickFindFields = table.settings.QuickFindFields.split(',');
   //TODO Remove the fa here for now - sholuld be in settings
-  table.icon = table.settings.Icon.substring(3);
+  if (table.settings.Icon)
+    table.icon = table.settings.Icon.substring(3);
+  else
+    table.icon = 'table';
   table.propertyGroups = {};
   if (table.settings.PropertyGroups) {
     _.each(table.settings.PropertyGroups, function (groupInfo) {
