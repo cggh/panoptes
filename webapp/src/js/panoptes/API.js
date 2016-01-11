@@ -1,5 +1,4 @@
-const Q = require('q');
-const Qajax = require('qajax');
+const qajax = require('qajax');
 const _ = require('lodash');
 const LZString = require('lz-string');
 
@@ -12,14 +11,14 @@ const serverURL = initialConfig.serverURL;
 
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {
-  if (typeof(json) !== 'object') {
+  if (typeof (json) !== 'object') {
     if (json.indexOf('Authentication') > 0)
       throw Error('Client is not authenticated');
     throw Error('Invalid server response type');
   }
   if ('Error' in json) {
     if (json.Error == 'NotAuthenticated') {
-      throw Error("Not Authenticated");
+      throw Error('Not Authenticated');
     }
     else
       throw Error(`Error: ${json.Error}`);
@@ -29,13 +28,13 @@ function _filterError(json) {
 
 function filterAborted(xhr) {
   if (xhr.status === 0 && xhr.readyState == 0)  //This seems to be the only way to detect the cancel
-    return('__SUPERSEEDED__');
+    return ('__SUPERSEEDED__');
   else
     throw xhr;
 }
 
 function errorMessage(xhr) {
-  return `There was a problem with a request to the server: ${xhr.statusText || xhr.message}`
+  return `There was a problem with a request to the server: ${xhr.statusText || xhr.message}`;
 }
 
 
@@ -46,38 +45,38 @@ function requestJSON(options) {
     method: 'GET',
     params: {},
     timeout: 60000,
-    data: null,
+    data: null
   };
 
-  //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with Qajax.
-  return Qajax(Object.assign(defaults, options))
-    .then(Qajax.filterSuccess)
-    .then(Qajax.toJSON)
+  //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with qajax.
+  return qajax(Object.assign(defaults, options))
+    .then(qajax.filterSuccess)
+    .then(qajax.toJSON)
     .then(_filterError);
 }
 
 function _decodeValList(columns) {
-  return function (json_response) {
+  return function(jsonResponse) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
     _.each(columns, (encoding, id) =>
-      ret[id] = vallistdecoder.doDecode(json_response[id])
+      ret[id] = vallistdecoder.doDecode(jsonResponse[id])
     );
     return ret;
-  }
+  };
 }
 
 function _decodeSummaryList(columns) {
-  return function (json_response) {
+  return function(jsonResponse) {
     let ret = {};
     _.each(columns, (column, key) => {
-        let data = json_response.results[`${column.folder}_${column.config}_${column.name}`];
+      let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
         //For better or worse we imitate the original behaviour of passing on a lack of data
-        if (data)
-          ret[key] = DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data);
+      if (data)
+        ret[key] = DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data);
         else
           ret[key] = null;
-      }
+    }
     );
     return ret;
   };
@@ -98,9 +97,9 @@ function pageQuery(options) {
   let {database, table, columns, query, order,
     ascending, count, start, stop, distinct} = Object.assign(defaults, options);
 
-  let collist = "";
+  let collist = '';
   _.each(columns, (encoding, id) => {
-    if (collist.length > 0) collist += "~";
+    if (collist.length > 0) collist += '~';
     collist += encoding + id;
   });
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
@@ -128,7 +127,7 @@ function pageQuery(options) {
         rows.push(row);
       }
       return rows;
-    })
+    });
 
 }
 
@@ -137,9 +136,9 @@ function summaryData(options) {
   let defaults = {};
   let {chromosome, columns, blocksize, blockstart, blockcount} = Object.assign(defaults, options);
 
-  let collist = "";
+  let collist = '';
   _.each(columns, (column) => {
-    if (collist.length > 0) collist += "~";
+    if (collist.length > 0) collist += '~';
     collist += `${column.folder}~${column.config}~${column.name}`;
   });
 
@@ -153,7 +152,7 @@ function summaryData(options) {
       blockcount: blockcount
     }
   })
-    .then(_decodeSummaryList(columns))
+    .then(_decodeSummaryList(columns));
 }
 
 
@@ -182,7 +181,7 @@ function fetchSingleRecord(options) {
       tbname: table,
       qry: SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue))
     }
-  }).then((response) => response.Data)
+  }).then((response) => response.Data);
 }
 
 module.exports = {

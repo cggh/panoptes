@@ -29,7 +29,7 @@ function caseChange(config) {
       _.forEach(value, (ele) => arr.push(caseChange(ele)));
       value = arr;
     } else if (
-      typeof value === "object" &&
+      typeof value === 'object' &&
       key !== 'propertiesMap' &&
       key !== 'propertyGroups' &&
       key !== 'chromosomes') {
@@ -41,30 +41,49 @@ function caseChange(config) {
   return out;
 }
 
-let parseTableSettings = function (table) {
+let parseTableSettings = function(table) {
   //TODO Default should be at import level
   let settings = {GenomeMaxViewportSizeX: 50000};
   if (table.settings) {
     //FIXME We need a proper escaping of the json
     table.settings = table.settings.replace(/`/g, '\\"');
-    table.settings = table.settings.replace(/\n/g, "\\n");
+    table.settings = table.settings.replace(/\n/g, '\\n');
     settings = _.extend(settings, JSON.parse(table.settings));
   }
   table.settings = settings;
-}
+};
 
-let mapExtraTableSettings = function (tableInfo, customDataCatalog) {
+let parseRelations = function() {
+  _.each(fetchedConfig.tableCatalog, function(tableInfo) {
+    tableInfo.relationsChildOf = [];
+    tableInfo.relationsParentOf = [];
+  });
+  _.each(fetchedConfig.relations, function(relationInfo) {
+    let childTableInfo = fetchedConfig.mapTableCatalog[relationInfo.childtableid];
+
+    //TODO These should error on import
+    //if (!childTableInfo)
+    //  DQX.reportError('Invalid child table in relation: '+relationInfo.childtableid)
+    let parentTableInfo = fetchedConfig.mapTableCatalog[relationInfo.parenttableid];
+    //if (!parentTableInfo)
+    //  DQX.reportError('Invalid parent table in relation: '+relationInfo.parenttableid)
+    childTableInfo.relationsChildOf.push(relationInfo);
+    parentTableInfo.relationsParentOf.push(relationInfo);
+    fetchedConfig.mapTableCatalog[childTableInfo.id].propertiesMap[relationInfo.childpropid].relationParentTableId = parentTableInfo.id;
+  });
+};
+
+let mapExtraTableSettings = function(tableInfo, customDataCatalog) {
   let tokensList = ['DataItemViews', 'PropertyGroups']; //List of all settings tokens for which this mechanism applies
-  _.each(customDataCatalog, function (customData) {
+  _.each(customDataCatalog, (customData) => {
     if (customData.tableid == tableInfo.id) {
       let customSettings = JSON.parse(customData.settings);
-      _.each(tokensList, function (token) {
+      _.each(tokensList, (token) => {
         if (customSettings[token]) {
           if (!tableInfo.settings[token]) {
             tableInfo.settings[token] = customSettings[token];
-          }
-          else {
-            _.each(customSettings[token], function (extraItem) {
+          } else {
+            _.each(customSettings[token], (extraItem) => {
               tableInfo.settings[token].push(extraItem);
             });
           }
@@ -74,7 +93,7 @@ let mapExtraTableSettings = function (tableInfo, customDataCatalog) {
   });
 };
 
-let augmentTableInfo = function (table) {
+let augmentTableInfo = function(table) {
   table.hasGenomePositions = table.IsPositionOnGenome == '1';
   table.tableNameSingle = table.name;
   table.tableNamePlural = table.name;
@@ -104,16 +123,16 @@ let augmentTableInfo = function (table) {
     table.icon = 'table';
   table.propertyGroups = {};
   if (table.settings.PropertyGroups) {
-    _.each(table.settings.PropertyGroups, function (groupInfo) {
+    _.each(table.settings.PropertyGroups, (groupInfo) => {
       groupInfo.properties = [];
       table.propertyGroups[groupInfo.Id] = caseChange(groupInfo);
     });
   }
   table.fetchTableName = table.id + 'CMB_' + workspace;
   table.fetchSubsamplingTableName = table.id + 'CMBSORTRAND_' + workspace;
-}
+};
 
-let augment2DTableInfo = function (table) {
+let augment2DTableInfo = function(table) {
   table.tableNameSingle = table.name;
   table.tableNamePlural = table.name;
   if (table.settings.NameSingle)
@@ -126,16 +145,16 @@ let augment2DTableInfo = function (table) {
   table.col_table = MetaData.mapTableCatalog[table.col_table];
   table.row_table = MetaData.mapTableCatalog[table.row_table];
   table.hasGenomePositions = table.col_table.hasGenomePositions;
-  var settings = {};
+  let settings = {};
   if (table.settings)
     settings = _.extend(settings, JSON.parse(table.settings));
   settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
   table.settings = settings;
 };
 
-let parseSummaryValues = function () {
+let parseSummaryValues = function() {
   let summaryValueMap = {};
-  _.each(fetchedConfig.summaryValues, function (summaryValue) {
+  _.each(fetchedConfig.summaryValues, (summaryValue) => {
     if (summaryValue.minval)
       summaryValue.minval = parseFloat(summaryValue.minval);
     else
@@ -146,7 +165,7 @@ let parseSummaryValues = function () {
       summaryValue.maxval = 0;
     summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
     summaryValue.isCustom = true;
-    var settings = {channelColor: 'rgb(0,0,180)'};
+    let settings = {channelColor: 'rgb(0,0,180)'};
     if (summaryValue.settings)
       settings = _.extend(settings, JSON.parse(summaryValue.settings));
     summaryValue.settings = settings;
@@ -160,9 +179,9 @@ let parseSummaryValues = function () {
 
 };
 
-let parseCustomProperties = function () {
-  _.each(fetchedConfig.customProperties, function (prop) {
-    var tableInfo = fetchedConfig.mapTableCatalog[prop.tableid];
+let parseCustomProperties = function() {
+  _.each(fetchedConfig.customProperties, (prop) => {
+    let tableInfo = fetchedConfig.mapTableCatalog[prop.tableid];
     prop.isCustom = (prop.source == 'custom');
     if (prop.datatype == 'Text')
       prop.isText = true;
@@ -173,7 +192,7 @@ let parseCustomProperties = function () {
     if (prop.datatype == 'Date')
       prop.isDate = true;
     if (!prop.name) prop.name = prop.propid;
-    var settings = {
+    let settings = {
       showInBrowser: false,
       channelName: '',
       channelColor: 'rgb(0,0,0)',
@@ -184,7 +203,7 @@ let parseCustomProperties = function () {
       settings.maxval = 1;
       settings.decimDigits = 2;
     }
-    ;
+
     if (prop.datatype == 'GeoLongitude') {
       settings.minval = 0;
       settings.maxval = 360;
@@ -199,13 +218,13 @@ let parseCustomProperties = function () {
     }
     if (prop.propid == tableInfo.primkey)
       prop.isPrimKey = true;
+    let settingsObj = {};
     if (prop.settings) {
       try {
-        var settingsObj = JSON.parse(prop.settings);
+        settingsObj = JSON.parse(prop.settings);
         if ('maxval' in settingsObj)
           settingsObj.hasValueRange = true;
-      }
-      catch (e) {
+      } catch (e) {
         throw Error(`Invalid settings string for ${prop.tableid}.${prop.propid}: ${prop.settings}\n${e}`);
       }
       settings = _.extend(settings, settingsObj);
@@ -234,7 +253,7 @@ let parseCustomProperties = function () {
       }
     if (!prop.settings.GroupId) {
       if (!tableInfo.propertyGroups['_UNGROUPED_']) {
-        var grp = {id: '_UNGROUPED_', name: 'Properties', properties: []};
+        let grp = {id: '_UNGROUPED_', name: 'Properties', properties: []};
         tableInfo.propertyGroups['_UNGROUPED_'] = grp;
       }
       tableInfo.propertyGroups['_UNGROUPED_'].properties.push(prop);
@@ -243,8 +262,7 @@ let parseCustomProperties = function () {
     // Determine table name where the column is originally defined
     if (prop.source == 'fixed') {
       prop.originalTableName = prop.tableid;
-    }
-    else {
+    } else {
       prop.originalTableName = prop.tableid + 'INFO_' + initialConfig.workspace;
     }
 
@@ -259,13 +277,13 @@ let parseCustomProperties = function () {
     }
 
     // Determine of datatables have geographic info
-    _.each(fetchedConfig.tableCatalog, function (tableInfo) {
+    _.each(fetchedConfig.tableCatalog, (tableInfo) => {
       if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
         tableInfo.hasGeoCoord = true;
     });
 
     //Set a recommended encoder - legacy from 1.X
-    var encoding = 'String';
+    let encoding = 'String';
     if (prop.datatype == 'Value') {
       encoding = 'Float3';
       if ((prop.settings.decimDigits == 0 ) || (prop.isPrimKey))
@@ -285,38 +303,38 @@ let parseCustomProperties = function () {
     prop.encoding = encoding;
 
     let encodingTypes = {
-      "Generic": "String",     //returns string data, also works for other data
-      "String": "String",      //returns string data
-      "Float2": "Float",       //returns floats in 2 base64 bytes
-      "Float3": "Float",       //returns floats in 3 base64 bytes
-      "Float4": "Float",       //returns floats in 4 base64 bytes
-      "FloatH": "Float",       //returns floats as string
-      "Int": "Integer",        //returns exact integers
-      "IntB64": "Integer",     //returns exact integers, base64 encoded
-      "IntDiff": "Integer"     //returns exact integers as differences with previous values
+      'Generic': 'String',     //returns string data, also works for other data
+      'String': 'String',      //returns string data
+      'Float2': 'Float',       //returns floats in 2 base64 bytes
+      'Float3': 'Float',       //returns floats in 3 base64 bytes
+      'Float4': 'Float',       //returns floats in 4 base64 bytes
+      'FloatH': 'Float',       //returns floats as string
+      'Int': 'Integer',        //returns exact integers
+      'IntB64': 'Integer',     //returns exact integers, base64 encoded
+      'IntDiff': 'Integer'     //returns exact integers as differences with previous values
     };
     prop.encodingType = encodingTypes[prop.encoding];
     let fetchEncodingTypes = {
-      "Generic": "GN",
-      "String": "ST",
-      "Float2": "F2",
-      "Float3": "F3",
-      "Float4": "F4",
-      "FloatH": "FH",
-      "Int": "IN",
-      "IntB64": "IB",
-      "IntDiff": "ID"
+      'Generic': 'GN',
+      'String': 'ST',
+      'Float2': 'F2',
+      'Float3': 'F3',
+      'Float4': 'F4',
+      'FloatH': 'FH',
+      'Int': 'IN',
+      'IntB64': 'IB',
+      'IntDiff': 'ID'
     };
     let displayEncodingTypes = {
-      "Generic": "GN",
-      "String": "ST",
-      "Float2": "FH",
-      "Float3": "FH",
-      "Float4": "FH",
-      "FloatH": "FH",
-      "Int": "IN",
-      "IntB64": "IB",
-      "IntDiff": "ID"
+      'Generic': 'GN',
+      'String': 'ST',
+      'Float2': 'FH',
+      'Float3': 'FH',
+      'Float4': 'FH',
+      'FloatH': 'FH',
+      'Int': 'IN',
+      'IntB64': 'IB',
+      'IntDiff': 'ID'
     };
     prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
     prop.defaultDisplayEncoding = displayEncodingTypes[prop.encoding];
@@ -327,12 +345,12 @@ let parseCustomProperties = function () {
       GeoLongitude: 'right',
       GeoLattitude: 'right',
       Date: 'center'
-    }
+    };
     prop.alignment = alignment[prop.datatype] || 'left';
 
 
     prop.categoryColors = prop.settings.CategoryColors || prop.settings.categoryColors;
-    prop.description = prop.settings.Description || "";
+    prop.description = prop.settings.Description || '';
     prop.externalUrl = prop.settings.ExternalUrl;
     prop.showBar = prop.settings.showBar || (prop.settings.BarWidth > 0);
     prop.defaultWidth = prop.settings.DefaultWidth;
@@ -353,19 +371,19 @@ let parseCustomProperties = function () {
     tableInfo.propertiesMap[prop.propid] = prop;
   });
 
-  var promises = [];
-  _.each(fetchedConfig.customProperties, function (prop) {
+  let promises = [];
+  _.each(fetchedConfig.customProperties, (prop) => {
     if (prop.settings.isCategorical) {
       promises.push(API.pageQuery({
-          database: dataset,
-          table: prop.originalTableName,
-          columns: columnSpec([prop.propid]),
-          order: prop.propid,
-          distinct: true
-        })
+        database: dataset,
+        table: prop.originalTableName,
+        columns: columnSpec([prop.propid]),
+        order: prop.propid,
+        distinct: true
+      })
           .then((data) => {
             prop.propCategories = [];
-            _.each(data, function (rec) {
+            _.each(data, (rec) => {
               prop.propCategories.push(rec[prop.propid]);
             });
           })
@@ -375,7 +393,7 @@ let parseCustomProperties = function () {
   return Promise.all(promises);
 };
 
-let fetchInitialConfig = function () {
+let fetchInitialConfig = function() {
   return API.requestJSON({
     params: {
       datatype: 'custom',
@@ -385,9 +403,9 @@ let fetchInitialConfig = function () {
     }})
     .then((resp) => {
       if (resp.needfullreload)
-        console.log("Schema full reload");
+        console.log('Schema full reload');
       if (resp.needconfigreload)
-        console.log("Schema config reload");
+        console.log('Schema config reload');
       initialConfig.isManager = resp.manager;
     })
     .then(() => Promise.all(
@@ -397,37 +415,37 @@ let fetchInitialConfig = function () {
           table: 'chromosomes',
           columns: {id: 'ST', len: 'ST'}
         })
-          .then(data => fetchedConfig.chromosomes = data),
+          .then((data) => fetchedConfig.chromosomes = data),
         API.pageQuery({
           database: dataset,
           table: 'tablecatalog',
           columns: columnSpec(['id', 'name', 'primkey', 'IsPositionOnGenome', 'defaultQuery', 'settings']),
           order: 'ordr'
         })
-          .then(data => fetchedConfig.tableCatalog = data),
+          .then((data) => fetchedConfig.tableCatalog = data),
         API.pageQuery({
           database: dataset,
           table: 'customdatacatalog',
           columns: columnSpec(['tableid', 'sourceid', 'settings']),
           order: 'tableid'
         })
-          .then(data => fetchedConfig.customDataCatalog = data),
+          .then((data) => fetchedConfig.customDataCatalog = data),
         API.pageQuery({
           database: dataset,
           table: '2D_tablecatalog',
           columns: columnSpec(['id', 'name', 'col_table', 'row_table', 'first_dimension', 'settings']),
           order: 'ordr'
         })
-          .then(data => fetchedConfig.twoDTableCatalog = data),
+          .then((data) => fetchedConfig.twoDTableCatalog = data),
         API.pageQuery({
           database: dataset,
           table: 'settings',
           columns: columnSpec(['id', 'content']),
           order: 'id'
         })
-          .then(data => {
+          .then((data) => {
             fetchedConfig.generalSettings = {};
-            _.each(data, function (sett) {
+            _.each(data, (sett) => {
               if (sett.content == 'False')
                 sett.content = false;
               if (sett.id == 'IntroSections') {
@@ -442,7 +460,7 @@ let fetchInitialConfig = function () {
           columns: columnSpec(['graphid', 'tableid', 'tpe', 'dispname', 'crosslnk']),
           order: 'graphid'
         })
-          .then(data => fetchedConfig.graphs = data),
+          .then((data) => fetchedConfig.graphs = data),
         API.pageQuery({
           database: dataset,
           table: 'propertycatalog',
@@ -452,14 +470,14 @@ let fetchInitialConfig = function () {
             SQL.WhereClause.CompareFixed('workspaceid', '=', workspace),
             SQL.WhereClause.CompareFixed('workspaceid', '=', '')])
         })
-          .then(data => fetchedConfig.customProperties = data),
+          .then((data) => fetchedConfig.customProperties = data),
         API.pageQuery({
           database: dataset,
           table: '2D_propertycatalog',
           columns: columnSpec(['id', 'tableid', 'col_table', 'row_table', 'name', 'dtype', 'settings']),
           order: 'ordr'
         })
-          .then(data => fetchedConfig.twoDProperties = data),
+          .then((data) => fetchedConfig.twoDProperties = data),
         API.pageQuery({
           database: dataset,
           table: 'summaryvalues',
@@ -473,48 +491,48 @@ let fetchInitialConfig = function () {
           ])
 
         })
-          .then(data => fetchedConfig.summaryValues = data),
+          .then((data) => fetchedConfig.summaryValues = data),
         API.pageQuery({
           database: dataset,
           table: 'tablebasedsummaryvalues',
           columns: columnSpec(['tableid', 'trackid', 'trackname', 'minval', 'maxval', 'minblocksize', 'settings']),
           order: 'ordr'
         })
-          .then(data => fetchedConfig.tableBasedSummaryValues = data),
+          .then((data) => fetchedConfig.tableBasedSummaryValues = data),
         API.pageQuery({
           database: dataset,
           table: 'relations',
           columns: columnSpec(['childtableid', 'childpropid', 'parenttableid', 'parentpropid', 'forwardname', 'reversename']),
           order: 'childtableid'
         })
-          .then(data => fetchedConfig.relations = data),
+          .then((data) => fetchedConfig.relations = data),
         API.pageQuery({
           database: dataset,
           table: 'externallinks',
           columns: columnSpec(['linktype', 'linkname', 'linkurl']),
           order: 'linkname'
         })
-          .then(data => fetchedConfig.relations = data)
+          .then((data) => fetchedConfig.externalLinks = data)
       ]
     ))
     .then(() => {
       fetchedConfig.mapTableCatalog = {};
-      _.each(fetchedConfig.tableCatalog, function (table) {
+      _.each(fetchedConfig.tableCatalog, (table) => {
         parseTableSettings(table);
         mapExtraTableSettings(table, fetchedConfig.customDataCatalog);
         augmentTableInfo(table);
         fetchedConfig.mapTableCatalog[table.id] = table;
       });
       fetchedConfig.map2DTableCatalog = {};
-      _.each(fetchedConfig.twoDTableCatalog, function (table) {
+      _.each(fetchedConfig.twoDTableCatalog, (table) => {
         augment2DTableInfo(table);
         fetchedConfig.map2DTableCatalog[table.id] = table;
       });
       //parse graph info
-      _.each(fetchedConfig.tableCatalog, function (tableInfo) {
+      _.each(fetchedConfig.tableCatalog, (tableInfo) => {
         tableInfo.trees = [];
       });
-      _.each(fetchedConfig.graphs, function (graphInfo) {
+      _.each(fetchedConfig.graphs, (graphInfo) => {
         if (graphInfo.tpe == 'tree') {
           fetchedConfig.mapTableCatalog[graphInfo.tableid].trees.push({
             id: graphInfo.graphid,
@@ -526,12 +544,12 @@ let fetchInitialConfig = function () {
       parseSummaryValues();
     })
     .then(parseCustomProperties)
-    //.then(() => {
+    .then(() => {
     //parse2DProperties();
     //parseTableBasedSummaryValues();
-    //parseRelations();
+      parseRelations();
     //parseStoredSubsets();
-    //});
+    })
     .then(() => {
       let defaultQueries = {};
       let subsets = {};
@@ -544,9 +562,8 @@ let fetchInitialConfig = function () {
         subsets[table.id] = [];
       });
       //Convert chromosome lengths to integer values
-      fetchedConfig.chromosomes = attrMap(_.map(fetchedConfig.chromosomes, (chrom) => {
-          return {id: chrom.id, len: parseFloat(chrom.len) * 1000000};
-        }
+      fetchedConfig.chromosomes = attrMap(_.map(fetchedConfig.chromosomes, (chrom) =>
+        ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
 
       return caseChange(_.extend(initialConfig, {
@@ -559,9 +576,10 @@ let fetchInitialConfig = function () {
         tables: fetchedConfig.mapTableCatalog,
         settings: fetchedConfig.generalSettings,
         summaryValues: fetchedConfig.summaryValues,
+        tableRelations: fetchedConfig.tableRelations,
         defaultQueries: defaultQueries,
         subsets: subsets
-      }))
+      }));
     });
 };
 
