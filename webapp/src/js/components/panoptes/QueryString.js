@@ -31,7 +31,7 @@ let QueryString = React.createClass({
   getStateFromFlux() {
     return {
       subsets: this.getFlux().store('PanoptesStore').getStoredSubsetsFor(this.props.table)
-    }
+    };
   },
 
   render() {
@@ -45,7 +45,7 @@ let QueryString = React.createClass({
 
     var nameMap = {};
     _.each(this.config.properties, (property) => {
-        nameMap[property.propid] = {
+      nameMap[property.propid] = {
           name: property.name,
           toDisplayString: Formatter.bind(this, property)
         };

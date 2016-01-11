@@ -33,16 +33,6 @@ cd build
 echo -e "${green}  Fetching dependancies${NC}"
 cd $PROJECT_ROOT/build
 
-echo -e "${green}    DQX${NC}"
-if [ -z "$GITSSH" ]; then
-    git clone https://github.com/cggh/DQX.git
-else
-    git clone git@github.com:cggh/DQX.git
-fi
-cd DQX
-git checkout `cat $PROJECT_ROOT/dependencies/DQX_Version`
-cd ..
-
 echo -e "${green}    DQXServer${NC}"
 if [ -z "$GITSSH" ]; then
     git clone https://github.com/cggh/DQXServer.git
@@ -71,11 +61,6 @@ pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
 echo -e "${green}      gunicorn...${NC}"
 pip install -q gunicorn==19.1.0 #For testing and instant run, not a strict requirement of DQXServer
 
-echo -e "${green}  Linking DQX${NC}"
-cd $PROJECT_ROOT
-rm -rf webapp/scripts/DQX
-cd webapp/scripts
-ln -s $PROJECT_ROOT/build/DQX DQX
 
 echo -e "${green}  Linking custom responders into DQXServer${NC}"
 cd $PROJECT_ROOT

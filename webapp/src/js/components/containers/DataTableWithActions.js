@@ -7,7 +7,7 @@ const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
-const Sidebar = require('react-sidebar');
+const Sidebar = require('react-sidebar').default;
 const SidebarHeader = require('ui/SidebarHeader');
 const Icon = require('ui/Icon');
 const DataTableView = require('panoptes/DataTableView');
@@ -130,7 +130,7 @@ let DataTableWithActions = React.createClass({
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <QueryString className='text' prepend='Filter:' table={table} query={query}/>
-            <span className='text'>Sort: {order ? this.config.propertiesMap[order].name : "None"} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className='text'>Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className='text'>{columns.size} of {this.config.properties.length} columns shown</span>
 
           </div>

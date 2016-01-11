@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 function nameSpace(namespace, obj) {
   let res = {};
-  _.forOwn(obj, (key, val) => res[key] = namespace+'_'+val);
+  _.forOwn(obj, (key, val) => res[key] = namespace + '_' + val);
   return res;
 }
 

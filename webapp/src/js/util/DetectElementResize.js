@@ -8,24 +8,24 @@
  **/
 
 let attachEvent = document.attachEvent,
-stylesCreated = false;
+  stylesCreated = false;
 
 let polyfill = {};
 
 if (!attachEvent) {
-  var requestFrame = (function(){
+  var requestFrame = (function() {
     var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
-      function(fn){ return window.setTimeout(fn, 20); };
-    return function(fn){ return raf(fn); };
+      function(fn) { return window.setTimeout(fn, 20); };
+    return function(fn) { return raf(fn); };
   })();
 
-  var cancelFrame = (function(){
+  var cancelFrame = (function() {
     var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame ||
       window.clearTimeout;
-    return function(id){ return cancel(id); };
+    return function(id) { return cancel(id); };
   })();
 
-  polyfill.resetTriggers = function (element){
+  polyfill.resetTriggers = function(element) {
     var triggers = element.__resizeTriggers__,
       expand = triggers.firstElementChild,
       contract = triggers.lastElementChild,
@@ -38,20 +38,20 @@ if (!attachEvent) {
     expand.scrollTop = expand.scrollHeight;
   };
 
-  polyfill.checkTriggers = function (element){
+  polyfill.checkTriggers = function(element) {
     return element.offsetWidth != element.__resizeLast__.width ||
       element.offsetHeight != element.__resizeLast__.height;
   };
 
-  polyfill.scrollListener = function (e){
+  polyfill.scrollListener = function(e) {
     var element = this;
     polyfill.resetTriggers(this);
     if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
-    this.__resizeRAF__ = requestFrame(function(){
+    this.__resizeRAF__ = requestFrame(function() {
       if (polyfill.checkTriggers(element)) {
         element.__resizeLast__.width = element.offsetWidth;
         element.__resizeLast__.height = element.offsetHeight;
-        element.__resizeListeners__.forEach(function(fn){
+        element.__resizeListeners__.forEach(function(fn) {
           fn.call(element, e);
         });
       }
@@ -68,11 +68,11 @@ if (!attachEvent) {
     pfx  = '';
   {
     var elm = document.createElement('fakeelement');
-    if( elm.style.animationName !== undefined ) { animation = true; }
+    if ( elm.style.animationName !== undefined ) { animation = true; }
 
-    if( animation === false ) {
-      for( var i = 0; i < domPrefixes.length; i++ ) {
-        if( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
+    if ( animation === false ) {
+      for ( var i = 0; i < domPrefixes.length; i++ ) {
+        if ( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
           pfx = domPrefixes[ i ];
           animationstring = pfx + 'Animation';
           keyframeprefix = '-' + pfx.toLowerCase() + '-';
@@ -110,7 +110,7 @@ function createStyles() {
   }
 }
 
-let addResizeListener = function(element, fn){
+let addResizeListener = function(element, fn) {
   if (attachEvent) element.attachEvent('onresize', fn);
   else {
     if (!element.__resizeTriggers__) {
@@ -127,7 +127,7 @@ let addResizeListener = function(element, fn){
 
       /* Listen for a css animation to detect element display/re-attach */
       animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
-        if(e.animationName == animationName)
+        if (e.animationName == animationName)
           polyfill.resetTriggers(element);
       });
     }
@@ -135,7 +135,7 @@ let addResizeListener = function(element, fn){
   }
 };
 
-let removeResizeListener = function(element, fn){
+let removeResizeListener = function(element, fn) {
   if (attachEvent) element.detachEvent('onresize', fn);
   else {
     element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);

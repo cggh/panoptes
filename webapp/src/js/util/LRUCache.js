@@ -11,7 +11,7 @@ let LRUCache = {
   cancellers: {},
   numberWaitingFor: {},
 
-  get(key, method, cancellation=null, fetchIfAbsent=true) {
+  get(key, method, cancellation = null, fetchIfAbsent = true) {
     let present = _.has(this.cache, key);
     if (!present && !fetchIfAbsent)
       return null;

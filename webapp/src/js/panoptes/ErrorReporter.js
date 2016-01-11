@@ -1,6 +1,6 @@
 function errorNotify(flux, message, retryFunc) {
   let note = {
-    title: "Error",
+    title: 'Error',
     level: 'error',
     message: message,
     autoDismiss: 0,
@@ -13,7 +13,7 @@ function errorNotify(flux, message, retryFunc) {
     note.action = {
       label: 'Retry',
       callback: retryFunc
-    }
+    };
   }
   flux.actions.session.notify(note);
 }

@@ -9,7 +9,7 @@ const SQL = require('panoptes/SQL');
 const {RaisedButton, IconButton, List, ListItem, Paper, ListDivider} = require('material-ui');
 const QueryString = require('panoptes/QueryString');
 const QueryEditor = require('panoptes/QueryEditor');
-const Sidebar = require('react-sidebar');
+const Sidebar = require('react-sidebar').default;
 
 
 let QueryPicker = React.createClass({
@@ -29,13 +29,13 @@ let QueryPicker = React.createClass({
     return {
       defaultQuery: this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table),
       lastQuery: this.getFlux().store('PanoptesStore').getLastQueryFor(this.props.table)
-    }
+    };
   },
 
   getInitialState() {
     return {
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
-    }
+    };
   },
 
   componentWillMount() {
@@ -88,7 +88,7 @@ let QueryPicker = React.createClass({
                         onDoubleClick={() => {
                           this.handleQueryChange(defaultQuery);
                           this.handlePick();
-                          }
+                        }
                         }/>
               <ListDivider />
               <ListItem primaryText="Previous"
@@ -98,7 +98,7 @@ let QueryPicker = React.createClass({
                         onDoubleClick={() => {
                           this.handleQueryChange(lastQuery);
                           this.handlePick();
-                          }
+                        }
                         }/>
               <ListDivider />
             </List>

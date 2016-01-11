@@ -26,8 +26,8 @@ import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
 
-let dynreq = require.context(".", true);
-const dynamic_require = (path) => dynreq("./"+path);
+let dynreq = require.context('.', true);
+const dynamic_require = (path) => dynreq("./" + path);
 
 let Panoptes = React.createClass({
   mixins: [
@@ -38,7 +38,7 @@ let Panoptes = React.createClass({
 
   componentDidMount() {
     let store = this.getFlux().store('SessionStore');
-    store.on("notify",
+    store.on('notify',
       () => this.refs.notificationSystem.addNotification(
         _.extend(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
@@ -49,7 +49,7 @@ let Panoptes = React.createClass({
     return {
       session: this.getFlux().store('SessionStore').getState(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
-    }
+    };
   },
 
   childContextTypes: {
@@ -97,7 +97,7 @@ let Panoptes = React.createClass({
                     key={compId}>
                     {React.createElement(dynamic_require(tab.component), props)}
                   </TabPane>
-                )
+                );
               })}
             </TabbedArea>
           </div>
@@ -107,7 +107,7 @@ let Panoptes = React.createClass({
             let popup = components.get(compId).toObject();
             let props = popup.props ? popup.props.toObject() : {};
             props.componentUpdate = actions.componentUpdateFor(compId);
-            let state = popups.getIn(['state',compId]) || Immutable.Map();
+            let state = popups.getIn(['state', compId]) || Immutable.Map();
             return (
               <Popup
                 {...state.toObject()}
@@ -119,7 +119,7 @@ let Panoptes = React.createClass({
                 onClick={actions.popupFocus.bind(this, compId)}>
                 {React.createElement(dynamic_require(popup.component), props)}
               </Popup>
-            )
+            );
           })}
         </Popups>
         <Modal visible={modal.component ? true : false}

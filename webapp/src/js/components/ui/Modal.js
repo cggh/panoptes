@@ -1,5 +1,5 @@
 const React = require('react');
-const ReactDOM =require('react-dom');
+const ReactDOM = require('react-dom');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const classNames = require('classnames');
 const Icon = require('ui/Icon');
@@ -22,7 +22,7 @@ var Modal = React.createClass({
 
   getDefaultProps() {
     return {
-      onClose: function () {
+      onClose: function() {
       },
       closable: true,
       visible: true
@@ -33,7 +33,7 @@ var Modal = React.createClass({
     return {
       icon: null,
       title: null
-    }
+    };
   },
 
   componentDidMount() {
@@ -78,9 +78,9 @@ var Modal = React.createClass({
     }
   },
 
-  render: function () {
-    let { visible, unclosable, onClose, children, ...other } = this.props;
-    let { icon, title } = this.state;
+  render: function() {
+    let {visible, unclosable, onClose, children, ...other} = this.props;
+    let {icon, title} = this.state;
     if (!children)
       return null;
     let classes = {
@@ -99,10 +99,10 @@ var Modal = React.createClass({
             {!unclosable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
           </div>
           <div className="popup-body">
-            {React.cloneElement(children, {ref: 'child' })}
+            {React.cloneElement(children, {ref: 'child'})}
           </div>
         </div>
-      </div>)
+      </div>);
   }
 });
 

@@ -6,7 +6,7 @@ function map(children, func, context) {
       return func.call(context, child);
     }
     return child;
-  })
+  });
 }
 
 

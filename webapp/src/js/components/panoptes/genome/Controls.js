@@ -27,7 +27,7 @@ let Controls = React.createClass({
   },
 
   setFromProps(props) {
-    let { start, end } = props;
+    let {start, end} = props;
     this.setState({
       midpoint: (end + start) / 2,
       width: end - start
@@ -62,8 +62,8 @@ let Controls = React.createClass({
   },
 
   render() {
-    let { chromosome, minWidth} = this.props;
-    let { midpoint, width } = this.state;
+    let {chromosome, minWidth} = this.props;
+    let {midpoint, width} = this.state;
     let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
     return (
       <span className="controls">

@@ -24,7 +24,7 @@ let PropertyCell = React.createClass({
   },
 
   render() {
-    let { prop, value, ...other } = this.props;
+    let {prop, value, ...other} = this.props;
     let text = Formatter(prop, value);
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     if (prop.externalUrl) {
@@ -33,23 +33,23 @@ let PropertyCell = React.createClass({
         {_.map(refs, (ref, index) => (
           <span key={index}>
           {index === 0 ? externalLinkIcon : null}
-          <a target='_blank' href={prop.externalUrl.replace("{value}", ref)}>
+          <a target='_blank' href={prop.externalUrl.replace('{value}', ref)}>
             {ref}
           </a>
-            {index < refs.length - 1 ? ", " : null}
+            {index < refs.length - 1 ? ', ' : null}
         </span>
         ))}
       </span>);
-    } else if (prop.dispDataType == "Boolean" && value !== '') {
+    } else if (prop.dispDataType == 'Boolean' && value !== '') {
       let val = (value == '1');
-      return <Icon className={(val ? "prop bool true" : "prop bool false")}
+      return <Icon className={(val ? 'prop bool true' : 'prop bool false')}
                    fixedWidth={false}
-                   name={val ? "check" : "times"}/>
+                   name={val ? 'check' : 'times'}/>;
     } else if (prop.isPrimKey) {
       return <span className="prop internal-link"
             onClick={this.handleClick}>
       {text}
-    </span>
+    </span>;
     }
     return <span className="prop">
       {text}
