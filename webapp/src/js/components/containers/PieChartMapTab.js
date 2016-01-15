@@ -17,6 +17,10 @@ const ErrorReport = require('panoptes/ErrorReporter');
 // UI components
 const Loading = require('ui/Loading');
 
+// Constants in this component
+const MAX_PIE_CHART_RADIUS = 100;
+const MIN_PIE_CHART_RADIUS = 10;
+
 let PieChartMapTab = React.createClass({
 
   mixins: [
@@ -39,7 +43,10 @@ let PieChartMapTab = React.createClass({
   getDefaultProps() {
     return {
       zoom: 3,
-      center: {lat: 0, lng: 0}
+      center: {
+        lat: 0,
+        lng: 0
+      }
     };
   },
 
@@ -49,37 +56,35 @@ let PieChartMapTab = React.createClass({
     };
   },
 
-  fetchData(props, requestContext)
-  {
+  fetchData(props, requestContext) {
     let {locationDataTable, properties, chartDataTable, chartDataTablePrimKey} = props;
 
     let locationTableConfig = this.config.tables[locationDataTable];
 
     // Check that the table specified for locations has geographic coordinates.
-    if (locationTableConfig.hasGeoCoord === false)
-    {
-     console.error("locationTableConfig.hasGeoCoord === false");
-     return null;
+    if (locationTableConfig.hasGeoCoord === false) {
+      console.error('locationTableConfig.hasGeoCoord === false');
+      return null;
     }
 
-    this.setState({loadStatus: 'loading'});
+    this.setState({
+      loadStatus: 'loading'
+    });
 
     let locationPrimKeyProperty = locationTableConfig.primkey;
 
     let locationColumns = [locationPrimKeyProperty, locationTableConfig.propIdGeoCoordLongit, locationTableConfig.propIdGeoCoordLattit];
 
-    if (properties.locationNameProperty)
-    {
+    if (properties.locationNameProperty) {
       locationColumns.push(properties.locationNameProperty);
     }
 
-    if (properties.locationSizeProperty)
-    {
+    if (properties.locationSizeProperty) {
       locationColumns.push(properties.locationSizeProperty);
     }
 
     let locationColumnsColumnSpec = {};
-    locationColumns.map(column => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
+    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
 
     let locationAPIargs = {
       database: this.config.dataset,
@@ -95,20 +100,25 @@ let PieChartMapTab = React.createClass({
     };
 
     requestContext.request(
-      (componentCancellation) =>
+        (componentCancellation) =>
         Promise.all([
           LRUCache.get(
-            'pageQuery' + JSON.stringify(locationAPIargs),
-            (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...locationAPIargs}),
+            'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+            API.pageQuery({
+              cancellation: cacheCancellation,
+              ...locationAPIargs
+            }),
             componentCancellation
           ),
           LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(chartAPIargs),
-            (cacheCancellation) =>
-              API.fetchSingleRecord({cancellation: cacheCancellation, ...chartAPIargs}),
+            'fetchSingleRecord' + JSON.stringify(chartAPIargs), (cacheCancellation) =>
+            API.fetchSingleRecord({
+              cancellation: cacheCancellation,
+              ...chartAPIargs
+            }),
             componentCancellation
-          )])
+          )
+        ])
       )
       .then(([locationData, chartData]) => this.setState({
         loadStatus: 'loaded',
@@ -119,7 +129,9 @@ let PieChartMapTab = React.createClass({
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
+        this.setState({
+          loadStatus: 'error'
+        });
       });
   },
 
@@ -127,8 +139,7 @@ let PieChartMapTab = React.createClass({
     return this.props.title;
   },
 
-  render()
-  {
+  render() {
     let {locationDataTable, zoom, center, properties} = this.props;
 
     let {locationNameProperty, locationSizeProperty, residualFractionName, positionOffsetFraction, pieChartSize, componentColumns, dataType} = properties;
@@ -137,55 +148,81 @@ let PieChartMapTab = React.createClass({
 
     let markers = [];
 
-    if (locationData && chartData)
-    {
+    if (locationData && chartData) {
+
       // Translate the fetched locationData and chartData into markers.
       let locationTableConfig = this.config.tables[locationDataTable];
-      let locationPrimKeyProperty = locationTableConfig.primkey
+      let locationPrimKeyProperty = locationTableConfig.primkey;
 
-      for (let i = 0; i < locationData.length; i++)
-      {
+      for (let i = 0; i < locationData.length; i++) {
         let markerChartData = [];
 
         let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
 
-        for (let j = 0; j < componentColumns.length; j++)
-        {
+        for (let j = 0; j < componentColumns.length; j++) {
           let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
 
-          markerChartData.push(
-            {
-              name: componentColumns[j].name,
-              value: chartData[chartDataColumnIndex],
-              color: componentColumns[j].color
-            }
-          );
+          markerChartData.push({
+            name: componentColumns[j].name,
+            value: chartData[chartDataColumnIndex],
+            color: componentColumns[j].color
+          });
         }
 
-        markers.push(
-          {
-             lat: locationData[i][locationTableConfig.propIdGeoCoordLattit],
-             lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
-             locationName: locationData[i][locationNameProperty],
-             locationSize: locationData[i][locationSizeProperty],
-             chartData: markerChartData,
-             locationTable: locationDataTable,
-             locationPrimKey: locationDataPrimKey
-          }
-        );
+        markers.push({
+          lat: locationData[i][locationTableConfig.propIdGeoCoordLattit],
+          lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
+          locationName: locationData[i][locationNameProperty],
+          locationSize: locationData[i][locationSizeProperty],
+          chartData: markerChartData,
+          locationTable: locationDataTable,
+          locationPrimKey: locationDataPrimKey
+        });
+
       }
+
+      // "Normalize" by taking pieChartSize as the maximum size
+      // and having all smaller sizes a relative fraction of that.
+      // For example, if the pieChartSize was 1000, then
+      // a locationSize of 1200 will give a normalizedLocationSize of 1000, a normalizedLocationSizeRatio of 1
+      // a locationSize of 1000 will give a normalizedLocationSize of 1000, a normalizedLocationSizeRatio of 1
+      // a locationSize of 900 will give a normalizedLocationSize of 900, a normalizedLocationSizeRatio of 0.9
+
+      // PieChartSize: "Value (required). Displayed size of the largest pie chart"
+
+      for (let i = 0; i < markers.length; i++) {
+
+        if (markers[i].locationSize > pieChartSize) {
+          markers[i].normalizedLocationSize = pieChartSize;
+          markers[i].normalizedLocationSizeRatio = 1;
+        }
+
+        if (markers[i].locationSize <= pieChartSize && pieChartSize != 0) {
+          markers[i].normalizedLocationSize = (markers[i].locationSize / pieChartSize) * pieChartSize;
+          markers[i].normalizedLocationSizeRatio = markers[i].normalizedLocationSize / pieChartSize;
+        }
+
+        // NB: Not using normalizedLocationSize, only using normalizedLocationSizeRatio
+
+        // NB: Not sure about this. (It differs from the v1 approach.)
+        markers[i].radius = MAX_PIE_CHART_RADIUS * markers[i].normalizedLocationSizeRatio;
+        if (markers[i].radius < MIN_PIE_CHART_RADIUS) {
+          markers[i].radius = MIN_PIE_CHART_RADIUS;
+        }
+
+      }
+
     }
 
     return (
-      <div style={{width:'100%', height:'100%'}}>
+      <div style={{width: '100%', height: '100%'}}>
         <PieChartMap
           center={center}
           zoom={zoom}
           markers={markers}
-          pieChartSize={pieChartSize}
           residualFractionName={residualFractionName}
-          positionOffsetFraction={positionOffsetFraction}
           dataType={dataType}
+          positionOffsetFraction={positionOffsetFraction}
         />
         <Loading status={loadStatus}/>
       </div>

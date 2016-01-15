@@ -1,29 +1,25 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
 const d3 = require('d3');
 
-// Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-
 let PieChartSector = React.createClass({
-  
+
   getDefaultProps() {
     return {
       outerRadius: 20,
-      innerRadius: 0
+      innerRadius: 0,
+      transform: 'rotate(90)',
+      className: 'pie-chart-sector'
     };
   },
-  
-  render: function()
-  {
-    let {outerRadius, innerRadius, color, arcDescriptor, title, onClick} = this.props;
-    
-    var arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
-    
+
+  render: function() {
+
+    let {outerRadius, innerRadius, fillColor, arcDescriptor, title, onClick, transform, className} = this.props;
+
+    let arc = d3.svg.arc().outerRadius(outerRadius).innerRadius(innerRadius);
+
     return (
-      <g className="pie-chart-sector" style={{fill: color}} transform="rotate(90)" onClick={onClick}>
+      <g className={className} style={{fill: fillColor}} transform={transform} onClick={onClick}>
         <title>{title}</title>
         <path d={arc(arcDescriptor)}></path>
       </g>
