@@ -18,17 +18,11 @@ let PropertyList = React.createClass({
 
   propTypes: {
         propertiesData: React.PropTypes.array.isRequired,
-        title: React.PropTypes.string
   },
-
-  title() {
-    return this.props.title;
-  },
-
 
   render: function() {
 
-    let {propertiesData, title, className} = this.props;
+    let {propertiesData, className} = this.props;
     
     return (
       <table className={className}>

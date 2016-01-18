@@ -5,20 +5,16 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const StoreWatchMixin = require('mixins/StoreWatchMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
 
 // Containers
-const MapContainer = require('containers/MapContainer');
-
-// Panoptes components
-const API = require('panoptes/API');
-const LRUCache = require('util/LRUCache');
-const ErrorReport = require('panoptes/ErrorReporter');
-const PropertyList = require('panoptes/PropertyList');
+const OverviewTab = require('containers/OverviewTab');
+const PieChartMapTab = require('containers/PieChartMapTab');
+const ItemMapTab = require('containers/ItemMapTab');
+const FieldListTab = require('containers/FieldListTab');
+const PropertyGroupTab = require('containers/PropertyGroupTab');
+const TemplateTab = require('containers/TemplateTab');
 
 // UI components
-const Icon = require('ui/Icon');
-const Loading = require('ui/Loading');
 const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
 
@@ -26,8 +22,7 @@ let DataItem = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
-    DataFetcherMixin('table', 'primKey')
+    ConfigMixin
   ],
 
   propTypes: {
@@ -42,41 +37,7 @@ let DataItem = React.createClass({
       activeTab: 'tab_0'
     };
   },
-
-  getInitialState() {
-    return {
-      loadStatus: 'loaded'
-    };
-  },
-
-  fetchData(props, requestContext) {
-    let {table, primKey} = props;
-    this.setState({loadStatus: 'loading'});
-    let APIargs = {
-      database: this.config.dataset,
-      table: table,
-      primKeyField: this.config.tables[table].primkey,
-      primKeyValue: primKey
-    };
-    requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'fetchSingleRecord' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )
-      )
-      .then((data) => {
-        this.setState({loadStatus: 'loaded', data: data});
-      })
-      .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
-      .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
-      });
-  },
-
+  
   icon() {
     return this.config.tables[this.props.table].icon;
   },
@@ -87,61 +48,37 @@ let DataItem = React.createClass({
 
   render() {
     let {table, primKey, componentUpdate, activeTab} = this.props;
-    let {data, loadStatus} = this.state;
-
+    
     let dataItemViews = this.config.tables[table].dataItemViews;
-    let propertiesDataIndexes = {};
-    let propertiesDataUsingGroupId = {};
-
-    // Get the PropertyGroupData
-    let propertyGroupsData = this.config.tables[table].propertyGroups;
-
-    // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _.cloneDeep(this.config.tables[table].properties);
-
-    if (data)
-    {
-      for (let i = 0; i < propertiesData.length; i++)
-      {
-        // Augment the array element with the fetched value of the property.
-        propertiesData[i].value = data[propertiesData[i].propid];
-
-        // Record which property each propertiesData index relates to.
-        propertiesDataIndexes[propertiesData[i].propid] = i;
-
-        // Record which properties are in each property group.
-        if (typeof propertiesDataUsingGroupId[propertiesData[i].settings.groupId] == 'undefined')
-        {
-          propertiesDataUsingGroupId[propertiesData[i].settings.groupId] = [];
-        }
-        propertiesDataUsingGroupId[propertiesData[i].settings.groupId].push(propertiesData[i]);
-
-      }
-    }
-
+    
     let tabPanes = [];
 
     if (!dataItemViews)
     {
-      if (data)
+      // If there are no dataItemViews specified, then default to showing an Overview.
+      let overviewTabPane = (
+        <TabPane key="0" compId="tab_0" >
+            <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
+        </TabPane>
+      );
+      
+      tabPanes.push(overviewTabPane);
+      
+      if (this.config.tables[table].hasGeoCoord)
       {
-        // If there are no dataItemViews specified, but there are fetched data, then default to showing an Overview.
-        let tabPane = (
-          <TabPane key="0" compId="tab_0" >
-              <PropertyList title="Overview" propertiesData={propertiesData} className='table-col' />
+        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
+        let itemMapTabPane = (
+          <TabPane key="1" compId="tab_1" >
+              <ItemMapTab 
+                title="Location" 
+                locationDataTable={table} 
+                locationDataTablePrimKey={primKey} 
+              />
           </TabPane>
         );
-
-        tabPanes.push(tabPane);
+        
+        tabPanes.push(itemMapTabPane);
       }
-
-      // If there are no dataItemViews specified, and there are no fetched data, then show nothing.
-
-      /*
-         This is an expected temporary state, which occurs while data is being fetched.
-         Having no fetched data would be unexpected, but should be anticipated as a possible error. (TODO: anticipate no fetched data)
-         DataItem opens from a hypertext link on the primKey, so we should at least have that datum.
-      */
     }
     else
     {
@@ -151,56 +88,46 @@ let DataItem = React.createClass({
 
         let tabPaneCompId = "tab_" + i;
         let tabPaneContents = null;
-
-        if (dataItemViews[i].type === "Overview" && data)
+        
+        if (dataItemViews[i].type === "Overview")
         {
           tabPaneContents = (
-            <PropertyList title={dataItemViews[i].name} propertiesData={propertiesData} className='table-col' />
+            <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
           )
         }
         else if (dataItemViews[i].type === "PieChartMap")
         {
           tabPaneContents = (
-              <MapContainer title={dataItemViews[i].name}
-                center={{lat: dataItemViews[i].mapCenter.lattitude, lng:  dataItemViews[i].mapCenter.longitude}}
-                zoom={3}
-                table={dataItemViews[i].locationDataTable}
-                locationNameProperty={dataItemViews[i].locationNameProperty}
-                locationSizeProperty={dataItemViews[i].locationSizeProperty}
+              <PieChartMapTab 
+                title={dataItemViews[i].name} 
+                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}} 
+                locationDataTable={dataItemViews[i].locationDataTable} 
+                properties={dataItemViews[i]} 
+                chartDataTable={table} 
+                chartDataTablePrimKey={primKey} 
               />
           )
         }
         else if (dataItemViews[i].type === "ItemMap")
         {
           tabPaneContents = (
-              <MapContainer title={dataItemViews[i].name}
-                zoom={dataItemViews[i].mapZoom}
-                table={table}
+              <ItemMapTab 
+                title={dataItemViews[i].name} 
+                zoom={dataItemViews[i].mapZoom} 
+                locationDataTable={table} 
+                locationDataTablePrimKey={primKey} 
               />
           )
         }
-        else if (dataItemViews[i].type === "FieldList" && data)
+        else if (dataItemViews[i].type === "FieldList")
         {
-          let fieldListPropertiesData = [];
-          for (let j = 0; j < dataItemViews[i].fields.length; j++)
-          {
-            let propertiesDataIndex = propertiesDataIndexes[dataItemViews[i].fields[j]];
-            if (typeof propertiesDataIndex !== 'undefined')
-            {
-              fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
-            }
-            else
-            {
-              console.log("Foreign property: " + dataItemViews[i].fields[j]);
-            }
-          }
-
           tabPaneContents = (
-            <PropertyList title={dataItemViews[i].name} propertiesData={fieldListPropertiesData} className='table-col' />
+            <FieldListTab title={dataItemViews[i].name} fields={dataItemViews[i].fields} table={table} primKey={primKey} className='table-col' />
           )
         }
-        else if (dataItemViews[i].type === "PropertyGroup" && data)
+        else if (dataItemViews[i].type === "PropertyGroup")
         {
+          // Determine which title to use for the PropertyGroup tab.
           let propertyListTitle = null;
           if (dataItemViews[i].name)
           {
@@ -211,16 +138,15 @@ let DataItem = React.createClass({
             // Use the PropertyGroup name if there is no DataItemViews name.
             propertyListTitle = propertyGroupsData[dataItemViews[i].groupId].name;
           }
-
-
+          
           tabPaneContents = (
-            <PropertyList title={propertyListTitle} propertiesData={propertiesDataUsingGroupId[dataItemViews[i].groupId]} className='table-col' />
+            <PropertyGroupTab title={propertyListTitle} propertyGroupId={dataItemViews[i].groupId} table={table} primKey={primKey} className='table-col' />
           )
         }
         else if (dataItemViews[i].type === "Template")
         {
           tabPaneContents = (
-            <div>Template, TODO</div>
+            <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} content={dataItemViews[i].content} />
           )
         }
 
@@ -239,12 +165,9 @@ let DataItem = React.createClass({
     }
 
     return (
-        <div>
-          <TabbedArea activeTab={activeTab} onSwitch={(id) => componentUpdate({activeTab:id})} >
-            {tabPanes}
-          </TabbedArea>
-          <Loading status={loadStatus}/>
-        </div>
+      <TabbedArea activeTab={activeTab} onSwitch={(id) => componentUpdate({activeTab:id})} >
+        {tabPanes}
+      </TabbedArea>
     )
 
   }
