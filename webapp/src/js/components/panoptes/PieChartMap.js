@@ -48,7 +48,7 @@ let PieChartMap = React.createClass({
   },
 
   onGoogleApiLoaded: function(map, maps) {
-    this.setState({map: map, maps: maps, zoom: map.getZoom()})
+    this.setState({map: map, maps: maps, zoom: map.getZoom()});
   },
 
   onResize: function() {

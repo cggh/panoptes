@@ -27,7 +27,7 @@ import 'ui-components.scss';
 import 'main.scss';
 
 let dynreq = require.context('.', true);
-const dynamic_require = (path) => dynreq("./" + path);
+const dynamic_require = (path) => dynreq('./' + path);
 
 let Panoptes = React.createClass({
   mixins: [

@@ -46,9 +46,9 @@ let QueryString = React.createClass({
     var nameMap = {};
     _.each(this.config.properties, (property) => {
       nameMap[property.propid] = {
-          name: property.name,
-          toDisplayString: Formatter.bind(this, property)
-        };
+        name: property.name,
+        toDisplayString: Formatter.bind(this, property)
+      };
     });
 
     var subsetMap = {};

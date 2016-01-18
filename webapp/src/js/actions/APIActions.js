@@ -12,10 +12,10 @@ let APIActions = {
     this.dispatch(APICONST.FETCH_USER);
     API.requestJSON({
       params: {
-          datatype: 'custom',
-          respmodule: 'panoptesserver',
-          respid: 'serverstatus'
-        }
+        datatype: 'custom',
+        respmodule: 'panoptesserver',
+        respid: 'serverstatus'
+      }
     })
       .then(status => {
         if ('issue' in status)
@@ -24,11 +24,11 @@ let APIActions = {
       })
       .then(API.requestJSON({
         params: {
-            datatype: 'custom',
-            respmodule: 'panoptesserver',
-            respid: 'datasetinfo',
-            database: dataset
-          }
+          datatype: 'custom',
+          respmodule: 'panoptesserver',
+          respid: 'datasetinfo',
+          database: dataset
+        }
       })
         .then((resp) => {
           let note = {

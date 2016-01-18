@@ -12,18 +12,18 @@ const PropertyListItem = require('panoptes/PropertyListItem');
 let PropertyList = React.createClass({
 
   mixins: [
-             PureRenderMixin,
-             FluxMixin
+    PureRenderMixin,
+    FluxMixin
   ],
 
   propTypes: {
-        propertiesData: React.PropTypes.array.isRequired,
+    propertiesData: React.PropTypes.array.isRequired,
   },
 
   render: function() {
 
     let {propertiesData, className} = this.props;
-    
+
     return (
       <table className={className}>
         <tbody>
@@ -31,7 +31,7 @@ let PropertyList = React.createClass({
             propertiesData.map(
               function(propertyData, index)
               {
-                return <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={"right"} tooltipTrigger={['click']} />
+                return <PropertyListItem key={index} rowIndex={index} propertyData={propertyData} tooltipPlacement={"right"} tooltipTrigger={['click']} />;
               }
             )
           }

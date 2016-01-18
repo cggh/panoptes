@@ -44,11 +44,11 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   icon() {
-    return "bitmap:genomebrowser.png";
+    return 'bitmap:genomebrowser.png';
   },
 
   title() {
-    return this.props.title || "Genome Browser";
+    return this.props.title || 'Genome Browser';
   },
 
   render() {

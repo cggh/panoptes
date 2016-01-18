@@ -4,7 +4,7 @@ const ReactDOM = require('react-dom');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
 const uid = require('uid');
-const offset = require("bloody-offset");
+const offset = require('bloody-offset');
 
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
@@ -17,7 +17,7 @@ const Icon = require('ui/Icon');
 const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
 const Slider = require('material-ui/lib/slider');
-const { Motion, spring } = require('react-motion');
+const {Motion, spring} = require('react-motion');
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -59,7 +59,7 @@ let NumericalSummary = React.createClass({
       interpolation: 'step',
       autoYScale: true,
       tension: 0.5
-    }
+    };
   },
 
   getInitialState() {
@@ -87,14 +87,14 @@ let NumericalSummary = React.createClass({
     let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
     this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
     this.refs.controlsContainer.style.width = this.state.controlsOpen ?
-      "100%" : this.props.sideWidth + 'px';
+      '100%' : this.props.sideWidth + 'px';
     //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
     if (!this.state.controlsOpen) {
       this.refs.controlsContainer.style.overflow = 'hidden';
       clearTimeout(this.controlOverFlowTimeout);
     }
     else
-      this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500)
+      this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500);
   },
 
   //Called by DataFetcherMixin on prop change
@@ -106,12 +106,12 @@ let NumericalSummary = React.createClass({
       return;
     }
 
-    let effStart = Math.max(start,0);
+    let effStart = Math.max(start, 0);
     //We now work out the boundaries of a larger containing area such that some movement can be made without a refetch.
     //Note that the benfit here comes not from network as there is a caching layer there, but from not having to recaclulate the
     //svg path. If needed we could also consider adding some hysteresis
     //First find a block size - here we use the first power of 2 that is larger than 3x our width.
-    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log((end-start) * 3) / Math.log(2))));
+    let blockSize = Math.max(1, Math.pow(2.0, Math.ceil(Math.log((end - start) * 3) / Math.log(2))));
     //Then find the first multiple below our start
     let blockStart = Math.floor(effStart / blockSize) * blockSize;
     //However we might end outside this block, so add an overlappuing set of blocks shifted by blockSize/2
@@ -121,7 +121,7 @@ let NumericalSummary = React.createClass({
       blockEnd += blockSize / 2;
     }
     //Then we need to determine the resolution required
-    let targetPointCount = blockSize * ((width - sideWidth /2)/(end-start));
+    let targetPointCount = blockSize * ((width - sideWidth / 2) / (end - start));
 
     //If we already have the data then we haven't moved blocks.
     if (this.blockEnd === blockEnd && this.blockStart === blockStart)
@@ -180,8 +180,8 @@ let NumericalSummary = React.createClass({
 
   applyData(props) {
     if (this.data) {
-      let { dataStart, dataStep, columns } = this.data;
-      let { interpolation, tension } = props;
+      let {dataStart, dataStep, columns} = this.data;
+      let {interpolation, tension} = props;
 
       let avg = columns ? columns.avg || [] : [];
       let max = columns ? columns.max || [] : [];
@@ -213,8 +213,8 @@ let NumericalSummary = React.createClass({
 
   calculateYScale(props) {
     if (props.autoYScale) {
-      let { start, end } = props;
-      let { dataStart, dataStep, columns } = this.data;
+      let {start, end} = props;
+      let {dataStart, dataStep, columns} = this.data;
 
       let max = columns ? columns.max || [] : [];
       let min = columns ? columns.min || [] : [];
@@ -251,8 +251,8 @@ let NumericalSummary = React.createClass({
       yMin: config.minval,
       yMax: config.maxval
     }, this.props);
-    let { start, end, width, sideWidth, yMin, yMax, autoYScale } = props;
-    let { dataStart, dataStep, area, line, dataYMin, dataYMax } = this.state;
+    let {start, end, width, sideWidth, yMin, yMax, autoYScale} = props;
+    let {dataStart, dataStep, area, line, dataYMin, dataYMax} = this.state;
     if (autoYScale && _.isFinite(dataYMin) && _.isFinite(dataYMax) && dataYMin !== 0 && dataYMax !== 0) {
       yMin = dataYMin;
       yMax = dataYMax;
@@ -285,11 +285,11 @@ let NumericalSummary = React.createClass({
               <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
                 {(interpolated) => {
                   let {yMin, yMax} = interpolated;
-                  return <g style={{transform:`translate(${offset}px, ${height+(yMin*(height/(yMax-yMin)))}px) scale(${stepWidth},${-(height/(yMax-yMin))})`}}>
-                    <rect className="origin-shifter" x={-effWidth} y={-height} width={2*effWidth} height={2*height}/>
+                  return <g style={{transform:`translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
+                    <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth} height={2 * height}/>
                     <Path className="area" d={area}/>
                     <Path className="line" d={line}/>
-                  </g>
+                  </g>;
                 }}
               </Motion>
             </svg>
@@ -328,9 +328,9 @@ let Controls = React.createClass({
   },
 
   render() {
-    let { width, interpolation, tension, autoYScale, yMin, yMax } = this.props;
+    let {width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
     return (
-      <div className="channel-controls" style={{width:width+'px'}}>
+      <div className="channel-controls" style={{width:width + 'px'}}>
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
@@ -370,10 +370,10 @@ let Controls = React.createClass({
                                   let value = parseFloat(this.refs.yMin.value);
                                   if (_.isFinite(value))
                                     this.componentUpdate({yMin: value});
-                                  }
+                                }
                                 }/>
                        </div>
-          :null}
+          : null}
         {!autoYScale ? <div className="control">
                          <div className="label">Y Max:</div>
                          <input className="numeric-input"
@@ -385,7 +385,7 @@ let Controls = React.createClass({
                                   let value = parseFloat(this.refs.yMax.value);
                                   if (_.isFinite(value))
                                     this.componentUpdate({yMax: value});
-                                  }
+                                }
                                 }/>
                        </div>
           : null}

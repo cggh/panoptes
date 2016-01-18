@@ -68,7 +68,7 @@ let TabbedArea = React.createClass({
     let dist = Math.sqrt(state.clientY * state.clientY + state.clientX * state.clientX);
     this.refs['drag_' + id].resetState();
     if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
-        this.props.onDragAway(id, {
+      this.props.onDragAway(id, {
           x:state.clientX + state.offsetX,
           y:state.clientY + state.offsetY
         });

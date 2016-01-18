@@ -9,16 +9,16 @@ var DetectResize = React.createClass({
     children: React.PropTypes.element.isRequired
   },
 
-  componentDidMount: function () {
+  componentDidMount: function() {
     this._onResize();
     detectResize.addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
   },
 
-  componentWillUnmount: function () {
+  componentWillUnmount: function() {
     detectResize.removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
   },
 
-  _onResize: function () {
+  _onResize: function() {
     var node = ReactDOM.findDOMNode(this);
 
     if (this.props.onResize)
@@ -28,7 +28,7 @@ var DetectResize = React.createClass({
       });
   },
 
-  render: function () {
+  render: function() {
     return React.cloneElement(React.Children.only(this.props.children));
   }
 });

@@ -75,10 +75,10 @@ let ItemPicker = React.createClass({
     let result = Immutable.List();
     this.props.groups.forEach((group) => {
       group.get('properties').forEach((prop) => {
-          if (this.state.picked.has(prop.get('propid'))) {
+        if (this.state.picked.has(prop.get('propid'))) {
             result = result.push(prop.get('propid'));
           }
-        });
+      });
     }
     );
     this.props.onPick(result);
@@ -93,7 +93,7 @@ let ItemPicker = React.createClass({
       <div className='large-modal item-picker'>
         <div className="horizontal stack">
           <div className="grow scroll-within">
-            <div className="header">{count} Column{count != 1 ? "s" : null} Available</div>
+            <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
             <div className="search">
               <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
               </div>
@@ -103,7 +103,7 @@ let ItemPicker = React.createClass({
                   let {id, name, properties} = group;
                   let subItems = _.map(properties, (prop) => {
                     let {name, description, propid} = prop;
-                    return (name + "#" + description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                    return (name + '#' + description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
                           <ListItem className={classNames({picked:picked.includes(propid)})}
                                     key={propid}
                                     primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
@@ -129,7 +129,7 @@ let ItemPicker = React.createClass({
           </div>
           <div className="grow stack vertical">
             <div className="grow scroll-within">
-              <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? "s" : null} Selected</div>
+              <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
                 <List>
                   {
                     _.map(groups.toJS(), (group) => {

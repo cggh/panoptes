@@ -37,7 +37,7 @@ let DataItem = React.createClass({
       activeTab: 'tab_0'
     };
   },
-  
+
   icon() {
     return this.config.tables[this.props.table].icon;
   },
@@ -48,9 +48,9 @@ let DataItem = React.createClass({
 
   render() {
     let {table, primKey, componentUpdate, activeTab} = this.props;
-    
+
     let dataItemViews = this.config.tables[table].dataItemViews;
-    
+
     let tabPanes = [];
 
     if (!dataItemViews)
@@ -61,71 +61,70 @@ let DataItem = React.createClass({
             <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
         </TabPane>
       );
-      
+
       tabPanes.push(overviewTabPane);
-      
+
       if (this.config.tables[table].hasGeoCoord)
       {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         let itemMapTabPane = (
           <TabPane key="1" compId="tab_1" >
-              <ItemMapTab 
-                title="Location" 
-                locationDataTable={table} 
-                locationDataTablePrimKey={primKey} 
+              <ItemMapTab
+                title="Location"
+                locationDataTable={table}
+                locationDataTablePrimKey={primKey}
               />
           </TabPane>
         );
-        
+
         tabPanes.push(itemMapTabPane);
       }
     }
-    else
-    {
+    else {
       for (let i = 0; i < dataItemViews.length; i++)
       {
         // Compose a tabPane for each of the specified dataItemViews
 
-        let tabPaneCompId = "tab_" + i;
+        let tabPaneCompId = 'tab_' + i;
         let tabPaneContents = null;
-        
-        if (dataItemViews[i].type === "Overview")
+
+        if (dataItemViews[i].type === 'Overview')
         {
           tabPaneContents = (
             <OverviewTab title="Overview" table={table} primKey={primKey} className='table-col' />
-          )
+          );
         }
-        else if (dataItemViews[i].type === "PieChartMap")
+        else if (dataItemViews[i].type === 'PieChartMap')
         {
           tabPaneContents = (
-              <PieChartMapTab 
-                title={dataItemViews[i].name} 
-                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}} 
-                locationDataTable={dataItemViews[i].locationDataTable} 
-                properties={dataItemViews[i]} 
-                chartDataTable={table} 
-                chartDataTablePrimKey={primKey} 
+              <PieChartMapTab
+                title={dataItemViews[i].name}
+                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}}
+                locationDataTable={dataItemViews[i].locationDataTable}
+                properties={dataItemViews[i]}
+                chartDataTable={table}
+                chartDataTablePrimKey={primKey}
               />
-          )
+          );
         }
-        else if (dataItemViews[i].type === "ItemMap")
+        else if (dataItemViews[i].type === 'ItemMap')
         {
           tabPaneContents = (
-              <ItemMapTab 
-                title={dataItemViews[i].name} 
-                zoom={dataItemViews[i].mapZoom} 
-                locationDataTable={table} 
-                locationDataTablePrimKey={primKey} 
+              <ItemMapTab
+                title={dataItemViews[i].name}
+                zoom={dataItemViews[i].mapZoom}
+                locationDataTable={table}
+                locationDataTablePrimKey={primKey}
               />
-          )
+          );
         }
-        else if (dataItemViews[i].type === "FieldList")
+        else if (dataItemViews[i].type === 'FieldList')
         {
           tabPaneContents = (
             <FieldListTab title={dataItemViews[i].name} fields={dataItemViews[i].fields} table={table} primKey={primKey} className='table-col' />
-          )
+          );
         }
-        else if (dataItemViews[i].type === "PropertyGroup")
+        else if (dataItemViews[i].type === 'PropertyGroup')
         {
           // Determine which title to use for the PropertyGroup tab.
           let propertyListTitle = null;
@@ -133,21 +132,20 @@ let DataItem = React.createClass({
           {
             propertyListTitle = dataItemViews[i].name;
           }
-          else
-          {
+          else {
             // Use the PropertyGroup name if there is no DataItemViews name.
             propertyListTitle = propertyGroupsData[dataItemViews[i].groupId].name;
           }
-          
+
           tabPaneContents = (
             <PropertyGroupTab title={propertyListTitle} propertyGroupId={dataItemViews[i].groupId} table={table} primKey={primKey} className='table-col' />
-          )
+          );
         }
-        else if (dataItemViews[i].type === "Template")
+        else if (dataItemViews[i].type === 'Template')
         {
           tabPaneContents = (
             <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} content={dataItemViews[i].content} />
-          )
+          );
         }
 
         if (tabPaneContents)
@@ -168,7 +166,7 @@ let DataItem = React.createClass({
       <TabbedArea activeTab={activeTab} onSwitch={(id) => componentUpdate({activeTab:id})} >
         {tabPanes}
       </TabbedArea>
-    )
+    );
 
   }
 

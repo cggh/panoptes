@@ -4,7 +4,7 @@ let Assert = {
   assertRequired(obj, required_key) {
     _.each(required_key, key => {
       if (!(key in obj))
-          throw Error(key + 'is a required arg');
+        throw Error(key + 'is a required arg');
     }
     );
   }

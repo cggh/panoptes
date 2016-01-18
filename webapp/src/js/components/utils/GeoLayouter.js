@@ -126,7 +126,7 @@ let GeoLayouter = React.createClass({
       // Don't apply any charge to fixedNodes.
       // Negative charge is repulsive.
       // Charge should be proportional to radius and inversely propoprtional to zoom level.
-      this.force.charge(function(d){return d.fixed ? 0 : (-2500 * d.radius * d.radius) / (d.zoom ? d.zoom : 1); });
+      this.force.charge(function(d) { return d.fixed ? 0 : (-2500 * d.radius * d.radius) / (d.zoom ? d.zoom : 1); });
 
       this.force.start();
 

@@ -18,39 +18,39 @@ const ErrorReport = require('panoptes/ErrorReporter');
 const Loading = require('ui/Loading');
 
 let OverviewTab = React.createClass({
-  
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
     DataFetcherMixin('table', 'primKey')
   ],
-  
+
   propTypes: {
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
   },
-  
+
   getInitialState() {
     return {
       loadStatus: 'loaded'
     };
   },
-  
+
   fetchData(props, requestContext)
   {
     let {table, primKey} = props;
-    
+
     this.setState({loadStatus: 'loading'});
-    
+
     let APIargs = {
       database: this.config.dataset,
       table: table,
       primKeyField: this.config.tables[table].primkey,
       primKeyValue: primKey
     };
-    
+
     requestContext.request((componentCancellation) =>
       LRUCache.get(
         'fetchSingleRecord' + JSON.stringify(APIargs),
@@ -60,7 +60,7 @@ let OverviewTab = React.createClass({
       )
     )
     .then((data) => {
-        this.setState({loadStatus: 'loaded', data: data});
+      this.setState({loadStatus: 'loaded', data: data});
     })
     .catch(API.filterAborted)
     .catch(LRUCache.filterCancelled)
@@ -69,21 +69,21 @@ let OverviewTab = React.createClass({
       this.setState({loadStatus: 'error'});
     });
   },
-  
+
   title() {
     return this.props.title;
   },
-  
+
   render()
   {
     let {table, primKey, className} = this.props;
     let {data, loadStatus} = this.state;
-    
-    if (! data) return null;
-    
+
+    if (!data) return null;
+
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
-    
+
     {
       for (let i = 0; i < propertiesData.length; i++)
       {
@@ -91,7 +91,7 @@ let OverviewTab = React.createClass({
         propertiesData[i].value = data[propertiesData[i].propid];
       }
     }
-    
+
     return (
         <div>
           <PropertyList propertiesData={propertiesData} className={className} />

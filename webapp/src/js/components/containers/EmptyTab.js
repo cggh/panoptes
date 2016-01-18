@@ -6,7 +6,7 @@ const ConfigMixin = require('mixins/ConfigMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
 const {RaisedButton, List, ListItem, ListDivider, FontIcon} = require('material-ui');
-const Icon = require("ui/Icon");
+const Icon = require('ui/Icon');
 
 let EmptyTab = React.createClass({
   mixins: [

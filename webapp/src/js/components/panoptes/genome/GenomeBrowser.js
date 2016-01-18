@@ -1,23 +1,23 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
-const offset = require("bloody-offset");
+const offset = require('bloody-offset');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const Hammer = require('react-hammerjs');
-const { Motion, spring } = require('react-motion');
+const {Motion, spring} = require('react-motion');
 
 const GenomeScale = require('panoptes/genome/tracks/GenomeScale');
 const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
 const Controls = require('panoptes/genome/Controls');
 const ReferenceSequence = require('panoptes/genome/tracks/ReferenceSequence');
 const Background = require('panoptes/genome/Background');
-const DetectResize = require('utils/DetectResize')
+const DetectResize = require('utils/DetectResize');
 import 'genomebrowser.scss';
 
-let dynreq = require.context(".", true);
-const dynamic_require = (path) => dynreq("./tracks/" + path);
+let dynreq = require.context('.', true);
+const dynamic_require = (path) => dynreq('./tracks/' + path);
 
 
 const DEFAULT_SPRING = [160, 30];
@@ -49,7 +49,7 @@ let GenomeBrowser = React.createClass({
       loading: 0,
       width: 0,
       height: 0
-    }
+    };
   },
 
   componentWillMount() {
@@ -113,11 +113,11 @@ let GenomeBrowser = React.createClass({
   isEventInPanningArea(e) {
     let element = e.target;
     while (true) {
-      if (element.className === "channel-controls")
+      if (element.className === 'channel-controls')
         return false;
-      if (element.className === "channel-side")
+      if (element.className === 'channel-side')
         return false;
-      if (element.className === "main-area")
+      if (element.className === 'main-area')
         return true;
       element = element.parentElement;
       if (!element)
@@ -198,9 +198,9 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
-    let { settings } = this.config;
-    let { componentUpdate, start, end, sideWidth, chromosome, components } = this.props;
-    let { loading } = this.state;
+    let {settings} = this.config;
+    let {componentUpdate, start, end, sideWidth, chromosome, components} = this.props;
+    let {loading} = this.state;
     if (!_.has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
     let {width, height, springConfig} = this.state;
@@ -215,7 +215,7 @@ let GenomeBrowser = React.createClass({
       <DetectResize onResize={(size) => this.setState(size)}>
         <div className="genome-browser">
           <div className="control-bar">
-            <LoadingIndicator width={sideWidth-20} animate={loading > 0}/>
+            <LoadingIndicator width={sideWidth - 20} animate={loading > 0}/>
             <Controls {...this.props} minWidth={MIN_WIDTH}/>
           </div>
           <Hammer
@@ -223,7 +223,7 @@ let GenomeBrowser = React.createClass({
             onDoubleTap={this.handleDoubleTap}
             onPan={this.handlePan}
             vertical={true}
-            onPinch={(e) => console.log('2',e)}
+            onPinch={(e) => console.log('2', e)}
             onWheel={this.handleMouseWheel}
           >
             <div className="main-area">
@@ -248,7 +248,7 @@ let GenomeBrowser = React.createClass({
                   };
                   return (
                     <div className="tracks vertical stack">
-                      <Background start={start} end={end} width={width} height={height-CONTROLS_HEIGHT}
+                      <Background start={start} end={end} width={width} height={height - CONTROLS_HEIGHT}
                                   sideWidth={sideWidth}/>
 
                       <div className="fixed">
@@ -260,8 +260,8 @@ let GenomeBrowser = React.createClass({
                       </div>
                       <div className="scrolling grow scroll-within">
                         {components.map((componentSpec, componentId) => {
-                            let { component, props } = componentSpec.toJS();
-                            return React.createElement(dynamic_require(component),
+                          let {component, props} = componentSpec.toJS();
+                          return React.createElement(dynamic_require(component),
                               _.extend({
                                 key: componentId,
                                 componentUpdate: (updater) => componentUpdate({
@@ -272,12 +272,12 @@ let GenomeBrowser = React.createClass({
                                   }
                                 })
                               }, props, track_props));
-                          }
+                        }
                         ).toList()
                         }
                       </div>
                     </div>
-                  )
+                  );
                 }}
               </Motion>
             </div>

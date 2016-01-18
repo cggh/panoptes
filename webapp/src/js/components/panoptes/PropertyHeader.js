@@ -49,7 +49,7 @@ let PropertyHeader = React.createClass({
     return (
       <span onClick={(event) => {
         if (onClick && event.target.className.indexOf('info') == -1)
-                onClick(event);
+          onClick(event);
       }}
         {...other}>
         {prefix}

@@ -2,7 +2,7 @@ const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const GoogleMap = require('google-map-react');
-const ReactDOM =require('react-dom');
+const ReactDOM = require('react-dom');
 
 // Utils
 const DetectResize = require('utils/DetectResize');
@@ -14,11 +14,11 @@ const FluxMixin = require('mixins/FluxMixin');
 function getMapOptions(maps) {
   return {
     zoomControlOptions: {
-      position: maps.ControlPosition.RIGHT_BOTTOM, 
-      style: maps.ZoomControlStyle.SMALL 
+      position: maps.ControlPosition.RIGHT_BOTTOM,
+      style: maps.ZoomControlStyle.SMALL
     },
     mapTypeControlOptions: {
-      position: maps.ControlPosition.TOP_LEFT, 
+      position: maps.ControlPosition.TOP_LEFT,
       StreetViewStatus: true
     },
     mapTypeControl: true
@@ -26,28 +26,28 @@ function getMapOptions(maps) {
 }
 
 let ItemMap = React.createClass({
-  
+
   mixins: [
     PureRenderMixin,
     FluxMixin
   ],
-  
+
   propTypes: {
     marker: React.PropTypes.object,
     zoom: React.PropTypes.number
   },
-  
+
   getInitialState() {
     return {
       maps: null,
       map: null
     };
   },
-  
-  onResize : function() 
+
+  onResize : function()
   {
     this._googleMapRef._setViewSize();
-    
+
     if (this.state.maps && this.state.map)
     {
       let center =  this.state.map.getCenter();
@@ -55,19 +55,19 @@ let ItemMap = React.createClass({
       this.state.map.setCenter(center);
     }
   },
-  
+
   render()
   {
     let {marker, zoom} = this.props;
     let {maps, map} = this.state;
-    
+
     let googleMap = <div></div>;
     let itemMapMarker = null;
     let center = null;
-    
+
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
-    
+
     if (marker.lat && marker.lng)
     {
       if (maps && map)
@@ -78,10 +78,10 @@ let ItemMap = React.createClass({
           map: map
         });
       }
-      
+
       // Set the map's center to the coordinates of the marker.
       center = {lat: marker.lat, lng: marker.lng};
-      
+
       googleMap = (
         <DetectResize onResize={this.onResize}>
           <GoogleMap
@@ -96,9 +96,9 @@ let ItemMap = React.createClass({
         </DetectResize>
       );
     }
-    
+
     return googleMap;
-    
+
   }
 
 });

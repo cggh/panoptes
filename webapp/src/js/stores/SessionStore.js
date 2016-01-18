@@ -16,12 +16,12 @@ var SessionStore = Fluxxor.createStore({
       this.state = Immutable.fromJS(state);
     else
       this.state = Immutable.Map();
-    
-    
+
+
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
-          component: "containers/DataTableWithActions",
+          component: 'containers/DataTableWithActions',
           props: {
             table: 'variants'
           }
@@ -37,8 +37,8 @@ var SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
-    
-    
+
+
     /*
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
@@ -66,9 +66,9 @@ var SessionStore = Fluxxor.createStore({
       modal: {}
     }));
     */
-    
-    
-    
+
+
+
     /*
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
@@ -112,13 +112,13 @@ var SessionStore = Fluxxor.createStore({
     );
   },
 
-  emitIfNeeded(action, event = "change") {
+  emitIfNeeded(action, event = 'change') {
     return (payload) => {
       let old_state = this.state;
       action(payload);
-      if (!old_state.equals(this.state) || event==='notify')
+      if (!old_state.equals(this.state) || event === 'notify')
         this.emit(event);
-    }
+    };
   },
 
   componentUpdate(payload) {
@@ -202,7 +202,7 @@ var SessionStore = Fluxxor.createStore({
       return;
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
-      throw Error("Closed non-existant tab");
+      throw Error('Closed non-existant tab');
     let new_tabs = this.state.getIn(['tabs', 'components']).delete(pos);
     this.state = this.state.setIn(['tabs', 'components'], new_tabs);
     if (new_tabs.size == 0) {
