@@ -466,9 +466,9 @@ let fetchInitialConfig = function() {
           table: 'propertycatalog',
           columns: columnSpec(['propid', 'datatype', 'tableid', 'source', 'name', 'settings']),
           order: 'ordr',
-          query: SQL.WhereClause.OR([
+          query: SQL.WhereClause.encode(SQL.WhereClause.OR([
             SQL.WhereClause.CompareFixed('workspaceid', '=', workspace),
-            SQL.WhereClause.CompareFixed('workspaceid', '=', '')])
+            SQL.WhereClause.CompareFixed('workspaceid', '=', '')]))
         })
           .then((data) => fetchedConfig.customProperties = data),
         API.pageQuery({
@@ -483,13 +483,12 @@ let fetchInitialConfig = function() {
           table: 'summaryvalues',
           columns: columnSpec(['propid', 'name', 'minval', 'maxval', 'minblocksize', 'tableid', 'settings']),
           order: 'ordr',
-          query: SQL.WhereClause.AND([
+          query: SQL.WhereClause.encode(SQL.WhereClause.AND([
             SQL.WhereClause.OR([
               SQL.WhereClause.CompareFixed('workspaceid', '=', workspace),
               SQL.WhereClause.CompareFixed('workspaceid', '=', '')]),
             SQL.WhereClause.CompareFixed('tableid', '<>', '')
-          ])
-
+          ]))
         })
           .then((data) => fetchedConfig.summaryValues = data),
         API.pageQuery({

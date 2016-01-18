@@ -87,7 +87,7 @@ function _decodeSummaryList(columns) {
 function pageQuery(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
-    query: SQL.WhereClause.Trivial(),
+    query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
     order: null,
     ascending: false,
     count: false,
@@ -109,7 +109,7 @@ function pageQuery(options) {
       datatype: 'pageqry',
       database: database,
       tbname: table,
-      qry: SQL.WhereClause.encode(query),
+      qry: query,
       collist: LZString.compressToEncodedURIComponent(collist),
       order: order,
       sortreverse: ascending ? '1' : '0',

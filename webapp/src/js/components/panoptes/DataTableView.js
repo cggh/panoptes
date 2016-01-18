@@ -87,7 +87,7 @@ let DataTableView = React.createClass({
         columns: columnspec,
         order: order,
         ascending: ascending,
-        query: SQL.WhereClause.decode(query),
+        query: query,
         stop: 1000
       };
       requestContext.request((componentCancellation) =>
