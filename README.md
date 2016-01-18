@@ -6,6 +6,8 @@ Panoptes
 ========
 
 [![Join the chat at https://gitter.im/cggh/panoptes](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cggh/panoptes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Dependency Status](https://david-dm.org/cggh/panoptes.svg?path=webapp)](https://david-dm.org/cggh/panoptes?path=webapp)
+[![devDependency Status](https://david-dm.org/cggh/panoptes/dev-status.svg?path=webapp)](https://david-dm.org/cggh/panoptes?path=webapp#info=devDependencies)
 
 Panoptes is a web application for exploration and visualisation of
 data, with special focus on genomic data. It includes:
