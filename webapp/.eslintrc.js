@@ -19,7 +19,7 @@ module.exports = {
     ],
 
     'no-console': 0,
-
+    'no-unused-vars': [2, {'vars': 'all', 'args': 'none'}],
     'array-bracket-spacing': 2,
     'block-spacing': 2,
     'brace-style': [2, '1tbs', {'allowSingleLine': true}],

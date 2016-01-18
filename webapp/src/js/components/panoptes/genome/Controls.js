@@ -8,14 +8,14 @@ const FALLBACK_MAXIMUM = 1000000000;
 let Controls = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
+    ConfigMixin
   ],
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
+    end: React.PropTypes.number.isRequired
   },
 
   componentWillMount() {

@@ -4,11 +4,12 @@ const Immutable = require('immutable');
 const SQL = require('panoptes/SQL');
 
 const Constants = require('../constants/Constants');
-const SESSION = Constants.SESSION;
+//Not implemeted yet
+const SESSION = Constants.SESSION; //eslint-disable-line no-unused-vars
 const API = Constants.API;
 
 
-var PanoptesStore = Fluxxor.createStore({
+let PanoptesStore = Fluxxor.createStore({
 
   initialize(init) {
     this.state = Immutable.fromJS(

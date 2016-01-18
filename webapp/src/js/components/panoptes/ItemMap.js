@@ -1,8 +1,5 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
 const GoogleMap = require('google-map-react');
-const ReactDOM = require('react-dom');
 
 // Utils
 const DetectResize = require('utils/DetectResize');
@@ -44,36 +41,30 @@ let ItemMap = React.createClass({
     };
   },
 
-  onResize : function()
-  {
+  onResize: function() {
     this._googleMapRef._setViewSize();
 
-    if (this.state.maps && this.state.map)
-    {
+    if (this.state.maps && this.state.map) {
       let center =  this.state.map.getCenter();
       this.state.maps.event.trigger(this.state.map, 'resize');
       this.state.map.setCenter(center);
     }
   },
 
-  render()
-  {
+  render() {
     let {marker, zoom} = this.props;
     let {maps, map} = this.state;
 
     let googleMap = <div></div>;
-    let itemMapMarker = null;
     let center = null;
 
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
 
-    if (marker.lat && marker.lng)
-    {
-      if (maps && map)
-      {
+    if (marker.lat && marker.lng) {
+      if (maps && map) {
         // Create a new marker at the given position.
-        let itemMapMarker = new maps.Marker({
+        new maps.Marker({
           position: {lat: marker.lat, lng: marker.lng},
           map: map
         });
@@ -90,7 +81,7 @@ let ItemMap = React.createClass({
             yesIWantToUseGoogleMapApiInternals={true}
             onGoogleApiLoaded={({map, maps}) => this.setState({map: map, maps: maps})}
             options={getMapOptions}
-            ref={r => this._googleMapRef = r}
+            ref={(r) => this._googleMapRef = r}
           >
           </GoogleMap>
         </DetectResize>

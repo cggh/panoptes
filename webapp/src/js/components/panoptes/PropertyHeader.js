@@ -1,6 +1,4 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -34,9 +32,8 @@ let PropertyHeader = React.createClass({
 
     let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
 
-    var tooltip = '';
-    if (description)
-    {
+    let tooltip = '';
+    if (description) {
       tooltip = <Tooltip placement={tooltipPlacement}
                  trigger={tooltipTrigger}
                  overlay={<span>{description}</span>}>

@@ -88,8 +88,7 @@ let PieChartMap = React.createClass({
         map={this.state.map}
       >
       {
-        (renderNodes) => {
-          return (
+        (renderNodes) =>
             <DetectResize onResize={this.onResize}>
               <GoogleMap
                 center={center}
@@ -103,29 +102,24 @@ let PieChartMap = React.createClass({
               >
                 {
                   renderNodes.map(
-                    function(marker, index) {
-                      return (
-                          <PieChart
-                            lng={marker.lng}
-                            lat={marker.lat}
-                            key={index}
-                            locationName={marker.locationName}
-                            locationSize={marker.locationSize}
-                            outerRadius={marker.radius}
-                            residualFractionName={residualFractionName}
-                            componentColumns={marker.componentColumns}
-                            chartData={marker.chartData}
-                            dataType={dataType}
-                            onClick={() => actions.session.popupOpen('containers/DataItem', {table: marker.locationTable, primKey: marker.locationPrimKey.toString()})}
-                          />
-                      );
-                    }
+                    (marker, index) =>
+                      <PieChart
+                        lng={marker.lng}
+                        lat={marker.lat}
+                        key={index}
+                        locationName={marker.locationName}
+                        locationSize={marker.locationSize}
+                        outerRadius={marker.radius}
+                        residualFractionName={residualFractionName}
+                        componentColumns={marker.componentColumns}
+                        chartData={marker.chartData}
+                        dataType={dataType}
+                        onClick={() => actions.session.popupOpen('containers/DataItem', {table: marker.locationTable, primKey: marker.locationPrimKey.toString()})}
+                      />
                   )
                 }
               </GoogleMap>
             </DetectResize>
-          );
-        }
       }
       </GeoLayouter>
     );

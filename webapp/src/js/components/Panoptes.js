@@ -13,21 +13,17 @@ import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
-import mui from 'material-ui';
 import {IconButton} from 'material-ui';
-import Colors from 'material-ui/lib/styles/colors';
 import ThemeManager from  'material-ui/lib/styles/theme-manager';
 import RawTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme';
-import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
 
-import Icon from 'ui/Icon';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
 
 let dynreq = require.context('.', true);
-const dynamic_require = (path) => dynreq('./' + path);
+const dynamicRequire = (path) => dynreq('./' + path);
 
 let Panoptes = React.createClass({
   mixins: [
@@ -87,7 +83,7 @@ let Panoptes = React.createClass({
                         onAddTab={actions.tabOpen}
                         onDragAway={actions.tabPopOut}
               >
-              {tabs.get('components').map(compId => {
+              {tabs.get('components').map((compId) => {
                 let tab = components.get(compId).toObject();
                 let props = tab.props ? tab.props.toObject() : {};
                 props.componentUpdate = actions.componentUpdateFor(compId);
@@ -95,7 +91,7 @@ let Panoptes = React.createClass({
                   <TabPane
                     compId={compId}
                     key={compId}>
-                    {React.createElement(dynamic_require(tab.component), props)}
+                    {React.createElement(dynamicRequire(tab.component), props)}
                   </TabPane>
                 );
               })}
@@ -103,7 +99,7 @@ let Panoptes = React.createClass({
           </div>
         </div>
         <Popups>
-          {popups.get('components').map(compId => {
+          {popups.get('components').map((compId) => {
             let popup = components.get(compId).toObject();
             let props = popup.props ? popup.props.toObject() : {};
             props.componentUpdate = actions.componentUpdateFor(compId);
@@ -117,14 +113,14 @@ let Panoptes = React.createClass({
                 onResizeStop={actions.popupResize.bind(this, compId)}
                 onClose={actions.popupClose.bind(this, compId)}
                 onClick={actions.popupFocus.bind(this, compId)}>
-                {React.createElement(dynamic_require(popup.component), props)}
+                {React.createElement(dynamicRequire(popup.component), props)}
               </Popup>
             );
           })}
         </Popups>
         <Modal visible={modal.component ? true : false}
                onClose={actions.modalClose}>
-          {modal.component ? React.createElement(dynamic_require(modal.component), modal.props.toObject()) : null}
+          {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
         </Modal>
         <NotificationSystem ref="notificationSystem"/>
       </div>

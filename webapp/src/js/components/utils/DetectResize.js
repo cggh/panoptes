@@ -2,7 +2,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const detectResize = require('util/DetectElementResize');
 
-var DetectResize = React.createClass({
+let DetectResize = React.createClass({
 
   propTypes: {
     onResize: React.PropTypes.func,
@@ -19,7 +19,7 @@ var DetectResize = React.createClass({
   },
 
   _onResize: function() {
-    var node = ReactDOM.findDOMNode(this);
+    let node = ReactDOM.findDOMNode(this);
 
     if (this.props.onResize)
       this.props.onResize({

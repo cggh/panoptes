@@ -17,7 +17,7 @@ let GenomeScale = React.createClass({
   },
 
   render() {
-    let {start, end, width, sideWidth, ...other} = this.props;
+    let {start, end, width, sideWidth} = this.props;
     let scale = d3.scale.linear().domain([start, end]).range([0, width - sideWidth]);
     if (width == 0)
       return null;
@@ -50,8 +50,8 @@ let GenomeScale = React.createClass({
 
     return (
       <div className="channel-container">
-        <div className="channel" style={{height:HEIGHT}}>
-          <div className="channel-side" style={{width:`${sideWidth}px`, height:HEIGHT}}></div>
+        <div className="channel" style={{height: HEIGHT}}>
+          <div className="channel-side" style={{width: `${sideWidth}px`, height: HEIGHT}}></div>
           <div className="channel-data scale" >
               <svg className="scale" width={width} height={HEIGHT}>
                 {smallTicks}

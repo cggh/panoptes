@@ -2,12 +2,13 @@ const LRUCache = require('util/LRUCache');
 const API = require('panoptes/API');
 const Q = require('q');
 const {assertRequired} = require('util/Assert');
+const _ = require('lodash');
 
 const FETCH_SIZE = 10000;
 
 let findOptimalBlockSize = (start, end, desiredCount, minBlockSize) => {
-  var desiredBlockSize = (end - start) / desiredCount;
-  var blockSize = Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize / minBlockSize) / Math.log(2)))) * minBlockSize;
+  let desiredBlockSize = (end - start) / desiredCount;
+  let blockSize = Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize / minBlockSize) / Math.log(2)))) * minBlockSize;
   //Maximum replicates original behaviour - I'm guessing the summary generation code must stop at this size too?
   blockSize = Math.min(blockSize, 1.0e9);
   return blockSize;

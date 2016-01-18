@@ -1,8 +1,6 @@
 const Constants = require('../constants/Constants');
 const APICONST = Constants.API;
-const SESSION = Constants.SESSION;
 const API = require('panoptes/API');
-const Immutable = require('immutable');
 
 const ErrorReport = require('panoptes/ErrorReporter.js');
 
@@ -17,7 +15,7 @@ let APIActions = {
         respid: 'serverstatus'
       }
     })
-      .then(status => {
+      .then((status) => {
         if ('issue' in status)
           throw Error(status.issue);
         userID = status.userid;
@@ -55,15 +53,15 @@ let APIActions = {
             isManager: resp.manager
           });
         })
-        .catch(error => {
+        .catch((error) => {
           this.dispatch(APICONST.FETCH_USER_FAIL);
           ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
         }))
-      .catch(error => {
+      .catch((error) => {
         this.dispatch(APICONST.FETCH_USER_FAIL);
         ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
       });
-  },
+  }
 };
 
 module.exports = APIActions;

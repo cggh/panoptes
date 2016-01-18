@@ -47,15 +47,13 @@ let ItemMapTab = React.createClass({
   },
 
 
-  fetchData(props, requestContext)
-  {
+  fetchData(props, requestContext) {
     let {locationDataTable, locationDataTablePrimKey} = props;
 
     let locationTableConfig = this.config.tables[locationDataTable];
 
     // Check that the table specified for locations has geographic coordinates.
-    if (locationTableConfig.hasGeoCoord === false)
-    {
+    if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
       return null;
     }
@@ -67,7 +65,7 @@ let ItemMapTab = React.createClass({
     let locationColumns = [locationPrimKeyProperty, locationTableConfig.propIdGeoCoordLongit, locationTableConfig.propIdGeoCoordLattit];
 
     let locationColumnsColumnSpec = {};
-    locationColumns.map(column => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
+    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
 
     let APIargs = {
       database: this.config.dataset,
@@ -99,16 +97,14 @@ let ItemMapTab = React.createClass({
     return this.props.title;
   },
 
-  render()
-  {
+  render() {
     let {locationDataTable, zoom} = this.props;
 
     let {locationData, loadStatus} = this.state;
 
     let marker = {};
 
-    if (locationData)
-    {
+    if (locationData) {
       // Translate the fetched locationData into a marker.
       let locationTableConfig = this.config.tables[locationDataTable];
 
@@ -119,7 +115,7 @@ let ItemMapTab = React.createClass({
     }
 
     return (
-      <div style={{width:'100%', height:'100%'}}>
+      <div style={{width: '100%', height: '100%'}}>
         <ItemMap marker={marker} zoom={zoom}/>
         <Loading status={loadStatus}/>
       </div>

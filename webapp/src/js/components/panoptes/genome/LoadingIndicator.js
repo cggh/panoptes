@@ -28,7 +28,7 @@ let LoadingIndicator = React.createClass({
 
   componentWillUnmount() {
     if (this.raf)
-      raf.cancel(this.raf);
+      RAF.cancel(this.raf);
   },
 
   onTick() {
@@ -44,14 +44,14 @@ let LoadingIndicator = React.createClass({
     ctx.fillRect(0, 0, 101, 21);
     ctx.beginPath();
     ctx.moveTo(0, 10 + (10 * Math.sin(state)));
-    for (var i = 0; i <= 100; i += 4) {
+    for (let i = 0; i <= 100; i += 4) {
       ctx.lineTo(i, 10 + (10 * Math.sin(((i * Math.PI * 4) / 100) + state)));
     }
     ctx.moveTo(0, 10 + (10 * Math.cos(state)));
-    for (i = 0; i <= 100; i += 4) {
+    for (let i = 0; i <= 100; i += 4) {
       ctx.lineTo(i, 10 + (10 * Math.cos(((i * Math.PI * 4) / 100) + state)));
     }
-    for (i = 0; i <= 100; i += 10) {
+    for (let i = 0; i <= 100; i += 10) {
       ctx.moveTo(i, 10 + (10 * Math.cos(((i * Math.PI * 4) / 100) + state)));
       ctx.lineTo(i, 10 + (10 * Math.sin(((i * Math.PI * 4) / 100) + state)));
     }

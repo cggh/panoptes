@@ -7,7 +7,8 @@ const SQL = require('panoptes/SQL');
 const DataDecoders = require('panoptes/DataDecoders');
 const Base64 = require('panoptes/Base64');
 
-const serverURL = initialConfig.serverURL;
+//Global for now
+const serverURL = initialConfig.serverURL; //eslint-disable-line no-undef
 
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {

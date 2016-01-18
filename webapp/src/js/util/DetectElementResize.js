@@ -6,6 +6,7 @@
  *
  * version: 0.5.3
  **/
+/*eslint-disable */
 
 let attachEvent = document.attachEvent,
   stylesCreated = false;

@@ -3,6 +3,8 @@ const ReactDOM = require('react-dom');
 const offset = require('bloody-offset');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
+const _ = require('lodash');
+const d3 = require('d3');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const Hammer = require('react-hammerjs');
@@ -17,7 +19,7 @@ const DetectResize = require('utils/DetectResize');
 import 'genomebrowser.scss';
 
 let dynreq = require.context('.', true);
-const dynamic_require = (path) => dynreq('./tracks/' + path);
+const dynamicRequire = (path) => dynreq('./tracks/' + path);
 
 
 const DEFAULT_SPRING = [160, 30];
@@ -66,8 +68,8 @@ let GenomeBrowser = React.createClass({
           NO_SPRING : DEFAULT_SPRING
       });
     }
-    this.actual_start = this.props.start;
-    this.actual_end = this.props.end;
+    this.actualStart = this.props.start;
+    this.actualEnd = this.props.end;
   },
 
 
@@ -75,12 +77,12 @@ let GenomeBrowser = React.createClass({
     let {chromosome} = this.props;
     let min = 0;
     let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
+    let width = end - start;
     if (start <= min && end >= max) {
       start = min;
       end = max;
-    }
-    else {
-      var width = end - start;
+      width = max - min;
+    } else {
       if (start < min) {
         start = min;
         end = start + width;
@@ -112,7 +114,7 @@ let GenomeBrowser = React.createClass({
 
   isEventInPanningArea(e) {
     let element = e.target;
-    while (true) {
+    while (true) {  //eslint-disable-line no-constant-condition
       if (element.className === 'channel-controls')
         return false;
       if (element.className === 'channel-side')
@@ -126,17 +128,17 @@ let GenomeBrowser = React.createClass({
   },
 
   handleZoom(pos, delta) {
-    let start = this.actual_start;
-    let end = this.actual_end;
+    let start = this.actualStart;
+    let end = this.actualEnd;
     let scaleFactor = (delta > 0) ?
     1.0 / (1.0 + 0.04 * Math.abs(delta)) :
     1.0 + 0.04 * Math.abs(delta);
     pos = (pos != undefined) ? this.scale.invert(pos) : start + ((end - start) / 2);
-    var frac_x = (pos - start) / (end - start);
-    var new_width = (end - start) / scaleFactor;
-    start = pos - (new_width * frac_x);
-    end = pos + (new_width * (1 - frac_x));
-    [start, end] = this.scaleClamp(start, end, frac_x);
+    let fracX = (pos - start) / (end - start);
+    let newWidth = (end - start) / scaleFactor;
+    start = pos - (newWidth * fracX);
+    end = pos + (newWidth * (1 - fracX));
+    [start, end] = this.scaleClamp(start, end, fracX);
     this.props.componentUpdate({start: start, end: end});
   },
 
@@ -150,14 +152,14 @@ let GenomeBrowser = React.createClass({
   handleDoubleTap(e) {
     if (!this.isEventInPanningArea(e))
       return;
-    this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.root_hammer)).left, -100);
+    this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.rootHammer)).left, -100);
   },
   handlePan(e) {
     if (!this.isEventInPanningArea(e))
       return;
-    let start = this.actual_start;
-    let end = this.actual_end;
-    let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.root_hammer)).left;
+    let start = this.actualStart;
+    let end = this.actualEnd;
+    let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.rootHammer)).left;
     if (this.panStartPixel !== panStartPixel) {
       this.panStartPixel = panStartPixel;
       this.panStartGenome = [start, end];
@@ -219,7 +221,7 @@ let GenomeBrowser = React.createClass({
             <Controls {...this.props} minWidth={MIN_WIDTH}/>
           </div>
           <Hammer
-            ref={(c) => this.root_hammer = c}
+            ref={(c) => this.rootHammer = c}
             onDoubleTap={this.handleDoubleTap}
             onPan={this.handlePan}
             vertical={true}
@@ -236,9 +238,9 @@ let GenomeBrowser = React.createClass({
                   //Round to nearest pixel to stop unneeded updates
                   start = Math.round(start / pixelWidth) * pixelWidth;
                   end = Math.round(end / pixelWidth) * pixelWidth;
-                  this.actual_start = start;
-                  this.actual_end = end;
-                  let track_props = {
+                  this.actualStart = start;
+                  this.actualEnd = end;
+                  let trackProps = {
                     chromosome: chromosome,
                     start: start,
                     end: end,
@@ -255,13 +257,13 @@ let GenomeBrowser = React.createClass({
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
                         { settings.refSequenceSumm ?
-                          <ReferenceSequence {...track_props} /> :
+                          <ReferenceSequence {...trackProps} /> :
                           null }
                       </div>
                       <div className="scrolling grow scroll-within">
                         {components.map((componentSpec, componentId) => {
                           let {component, props} = componentSpec.toJS();
-                          return React.createElement(dynamic_require(component),
+                          return React.createElement(dynamicRequire(component),
                               _.extend({
                                 key: componentId,
                                 componentUpdate: (updater) => componentUpdate({
@@ -271,7 +273,7 @@ let GenomeBrowser = React.createClass({
                                     }
                                   }
                                 })
-                              }, props, track_props));
+                              }, props, trackProps));
                         }
                         ).toList()
                         }

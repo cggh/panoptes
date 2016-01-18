@@ -55,7 +55,7 @@ let TabbedArea = React.createClass({
       this.props.onClose(tabId);
     }
   },
-  handleAddTab(e) {
+  handleAddTab() {
     if (this.props.onAddTab) {
       event.preventDefault();
       event.stopPropagation();
@@ -69,9 +69,9 @@ let TabbedArea = React.createClass({
     this.refs['drag_' + id].resetState();
     if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
       this.props.onDragAway(id, {
-          x:state.clientX + state.offsetX,
-          y:state.clientY + state.offsetY
-        });
+        x: state.clientX + state.offsetX,
+        y: state.clientY + state.offsetY
+      });
   },
 
   renderTab(tab) {
@@ -84,8 +84,7 @@ let TabbedArea = React.createClass({
     };
 
     let closeIcon = '';
-    if (this.props.onClose)
-    {
+    if (this.props.onClose) {
       closeIcon = <Icon className="action close" name="close" onClick={this.handleClose.bind(this, id)}/>;
     }
 
@@ -97,8 +96,7 @@ let TabbedArea = React.createClass({
           </div>
     );
 
-    if (this.props.onDragAway)
-    {
+    if (this.props.onDragAway) {
       // Wrap tabMarkup in Draggable
       tabMarkup = (
         <Draggable

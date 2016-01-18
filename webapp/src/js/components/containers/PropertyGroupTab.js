@@ -1,5 +1,5 @@
 const React = require('react');
-
+const _ = require('lodash');
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
@@ -38,8 +38,7 @@ let PropertyGroupTab = React.createClass({
     };
   },
 
-  fetchData(props, requestContext)
-  {
+  fetchData(props, requestContext) {
     let {table, primKey} = props;
 
     this.setState({loadStatus: 'loading'});
@@ -74,9 +73,8 @@ let PropertyGroupTab = React.createClass({
     return this.props.title;
   },
 
-  render()
-  {
-    let {table, primKey, propertyGroupId, className} = this.props;
+  render() {
+    let {table, propertyGroupId, className} = this.props;
     let {data, loadStatus} = this.state;
 
     if (!data) return null;
@@ -89,10 +87,8 @@ let PropertyGroupTab = React.createClass({
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
 
-    for (let i = 0; i < propertiesData.length; i++)
-    {
-      if (propertiesData[i].settings.groupId === propertyGroupId)
-      {
+    for (let i = 0; i < propertiesData.length; i++) {
+      if (propertiesData[i].settings.groupId === propertyGroupId) {
         // Only collect data for the specified propertyGroup.
 
         // Augment the array element (an object) with the fetched value of the property.

@@ -5,9 +5,9 @@ const attrMap = require('util/AttrMap');
 
 //TODO THIS WHOLE FILE SHOULD'T EXIST AS THIS SHOULD BE COMPILED SERVER SIDE AND SENT DOWN IN INDEX.HTML
 
-
-let dataset = initialConfig.dataset;
-let workspace = initialConfig.workspace;
+//Global for now till requested from server
+let dataset = initialConfig.dataset; //eslint-disable-line no-undef
+let workspace = initialConfig.workspace; //eslint-disable-line no-undef
 let fetchedConfig = {};
 
 
@@ -54,11 +54,11 @@ let parseTableSettings = function(table) {
 };
 
 let parseRelations = function() {
-  _.each(fetchedConfig.tableCatalog, function(tableInfo) {
+  _.each(fetchedConfig.tableCatalog, (tableInfo) => {
     tableInfo.relationsChildOf = [];
     tableInfo.relationsParentOf = [];
   });
-  _.each(fetchedConfig.relations, function(relationInfo) {
+  _.each(fetchedConfig.relations, (relationInfo) => {
     let childTableInfo = fetchedConfig.mapTableCatalog[relationInfo.childtableid];
 
     //TODO These should error on import
@@ -132,25 +132,25 @@ let augmentTableInfo = function(table) {
   table.fetchSubsamplingTableName = table.id + 'CMBSORTRAND_' + workspace;
 };
 
-let augment2DTableInfo = function(table) {
-  table.tableNameSingle = table.name;
-  table.tableNamePlural = table.name;
-  if (table.settings.NameSingle)
-    table.tableNameSingle = table.settings.NameSingle;
-  if (table.settings.NamePlural)
-    table.tableNamePlural = table.settings.NamePlural;
-  table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
-  table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
-
-  table.col_table = MetaData.mapTableCatalog[table.col_table];
-  table.row_table = MetaData.mapTableCatalog[table.row_table];
-  table.hasGenomePositions = table.col_table.hasGenomePositions;
-  let settings = {};
-  if (table.settings)
-    settings = _.extend(settings, JSON.parse(table.settings));
-  settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
-  table.settings = settings;
-};
+//let augment2DTableInfo = function(table) {
+//  table.tableNameSingle = table.name;
+//  table.tableNamePlural = table.name;
+//  if (table.settings.NameSingle)
+//    table.tableNameSingle = table.settings.NameSingle;
+//  if (table.settings.NamePlural)
+//    table.tableNamePlural = table.settings.NamePlural;
+//  table.tableCapNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
+//  table.tableCapNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
+//
+//  table.col_table = MetaData.mapTableCatalog[table.col_table];
+//  table.row_table = MetaData.mapTableCatalog[table.row_table];
+//  table.hasGenomePositions = table.col_table.hasGenomePositions;
+//  let settings = {};
+//  if (table.settings)
+//    settings = _.extend(settings, JSON.parse(table.settings));
+//  settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
+//  table.settings = settings;
+//};
 
 let parseSummaryValues = function() {
   let summaryValueMap = {};
@@ -263,7 +263,7 @@ let parseCustomProperties = function() {
     if (prop.source == 'fixed') {
       prop.originalTableName = prop.tableid;
     } else {
-      prop.originalTableName = prop.tableid + 'INFO_' + initialConfig.workspace;
+      prop.originalTableName = prop.tableid + 'INFO_' + initialConfig.workspace; //eslint-disable-line no-undef
     }
 
 
@@ -406,7 +406,7 @@ let fetchInitialConfig = function() {
         console.log('Schema full reload');
       if (resp.needconfigreload)
         console.log('Schema config reload');
-      initialConfig.isManager = resp.manager;
+      initialConfig.isManager = resp.manager; //eslint-disable-line no-undef
     })
     .then(() => Promise.all(
       [
@@ -525,7 +525,7 @@ let fetchInitialConfig = function() {
       });
       fetchedConfig.map2DTableCatalog = {};
       _.each(fetchedConfig.twoDTableCatalog, (table) => {
-        augment2DTableInfo(table);
+        //augment2DTableInfo(table);
         fetchedConfig.map2DTableCatalog[table.id] = table;
       });
       //parse graph info
@@ -566,10 +566,10 @@ let fetchInitialConfig = function() {
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
 
-      return caseChange(_.extend(initialConfig, {
+      return caseChange(_.extend(initialConfig, { //eslint-disable-line no-undef
         user: {
-          id: initialConfig.userID,
-          isManager: initialConfig.isManager
+          id: initialConfig.userID, //eslint-disable-line no-undef
+          isManager: initialConfig.isManager //eslint-disable-line no-undef
         },
 
         chromosomes: fetchedConfig.chromosomes,

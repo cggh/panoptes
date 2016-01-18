@@ -13,15 +13,15 @@ let SessionActions = {
   },
   //We cache these, other wise the prop looks different causing a re-render
   //TODO Strictly speaking this is memory leak, albeit a small one
-  componentUpdateFor: memoize((compId) => {
-    return function(updater, newComponent = null) {
+  componentUpdateFor: memoize((compId) =>
+    function(updater, newComponent = null) {
       this.dispatch(SESSION.COMPONENT_UPDATE, {
         compId: compId,
         updater: updater,
         newComponent: newComponent
       });
-    };
-  }),
+    }
+  ),
   modalClose() {
     this.dispatch(SESSION.MODAL_CLOSE);
   },
@@ -45,7 +45,7 @@ let SessionActions = {
       component: {
         component: component,
         props: props
-      },
+      }
     });
   },
   popupFocus(compId) {

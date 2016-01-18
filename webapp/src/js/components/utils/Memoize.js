@@ -4,7 +4,7 @@ function memoize(fn) {
     if (cache[arg] !== undefined) {
       return cache[arg];
     }
-    var result = fn(arg).bind(this);
+    let result = fn(arg).bind(this);
     cache[arg] = result;
     return result;
   };

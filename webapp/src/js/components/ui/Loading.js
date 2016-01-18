@@ -7,11 +7,11 @@ let Loading = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    status: React.PropTypes.string.isRequired,
+    status: React.PropTypes.string.isRequired
   },
 
   render() {
-    let {status, customContent, ...other} = this.props;
+    let {status} = this.props;
     if (status == 'loading')
       return (
         <div className="loading-container show">

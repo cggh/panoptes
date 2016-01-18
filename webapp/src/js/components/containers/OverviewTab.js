@@ -1,4 +1,5 @@
 const React = require('react');
+const _ = require('lodash');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -38,8 +39,7 @@ let OverviewTab = React.createClass({
     };
   },
 
-  fetchData(props, requestContext)
-  {
+  fetchData(props, requestContext) {
     let {table, primKey} = props;
 
     this.setState({loadStatus: 'loading'});
@@ -74,22 +74,17 @@ let OverviewTab = React.createClass({
     return this.props.title;
   },
 
-  render()
-  {
-    let {table, primKey, className} = this.props;
+  render() {
+    let {table, className} = this.props;
     let {data, loadStatus} = this.state;
 
     if (!data) return null;
 
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
-
-    {
-      for (let i = 0; i < propertiesData.length; i++)
-      {
-        // Augment the array element (an object) with the fetched value of the property.
-        propertiesData[i].value = data[propertiesData[i].propid];
-      }
+    for (let i = 0; i < propertiesData.length; i++) {
+      // Augment the array element (an object) with the fetched value of the property.
+      propertiesData[i].value = data[propertiesData[i].propid];
     }
 
     return (

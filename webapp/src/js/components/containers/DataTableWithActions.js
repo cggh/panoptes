@@ -5,7 +5,6 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar').default;
 const SidebarHeader = require('ui/SidebarHeader');
@@ -14,6 +13,7 @@ const DataTableView = require('panoptes/DataTableView');
 const QueryString = require('panoptes/QueryString');
 
 const mui = require('material-ui');
+const _ = require('lodash');
 const {FlatButton} = mui;
 
 const SQL = require('panoptes/SQL');
@@ -51,7 +51,7 @@ let DataTableWithActions = React.createClass({
     this.config = this.config.tables[this.props.table];
     this.propertyGroups = {};
     _.forEach(this.config.propertyGroups, (val, key) => {
-      let filteredProps = _.filter(val.properties, {showInTable:true});
+      let filteredProps = _.filter(val.properties, {showInTable: true});
       if (filteredProps.length > 0) {
         this.propertyGroups[key] = _.clone(val);
         this.propertyGroups[key].properties = filteredProps;
@@ -78,11 +78,11 @@ let DataTableWithActions = React.createClass({
   },
 
   handleColumnResize(column, size) {
-    this.props.componentUpdate({columnWidths:{[column]:size}});
+    this.props.componentUpdate({columnWidths: {[column]: size}});
   },
 
   handleOrderChange(column, ascending) {
-    this.props.componentUpdate({order:column, ascending: ascending});
+    this.props.componentUpdate({order: column, ascending: ascending});
   },
 
   render() {
@@ -94,7 +94,7 @@ let DataTableWithActions = React.createClass({
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
     let {description} = this.config;
-    let sidebar_content = (
+    let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
         <FlatButton label="Change Filter"
@@ -123,18 +123,18 @@ let DataTableWithActions = React.createClass({
     return (
       <Sidebar
         docked={sidebar}
-        sidebar={sidebar_content}>
+        sidebar={sidebarContent}>
         <div className="vertical stack">
           <div className="top-bar">
-            <Icon className='pointer icon'
+            <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <QueryString className='text' prepend='Filter:' table={table} query={query}/>
-            <span className='text'>Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
-            <span className='text'>{columns.size} of {this.config.properties.length} columns shown</span>
+            <QueryString className="text" prepend="Filter:" table={table} query={query}/>
+            <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className="text">{columns.size} of {this.config.properties.length} columns shown</span>
 
           </div>
-          <DataTableView className='grow'
+          <DataTableView className="grow"
                          table={table}
                          query={query}
                          order={order}

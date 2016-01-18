@@ -1,5 +1,6 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
+const _ = require('lodash');
 
 const Formatter = require('panoptes/Formatter');
 const Icon = require('ui/Icon');
@@ -20,11 +21,11 @@ let PropertyCell = React.createClass({
   handleClick() {
     let actions = this.getFlux().actions.session;
     let {prop, value} = this.props;
-    actions.popupOpen('containers/DataItem', {table:prop.tableid, primKey: value.toString()});
+    actions.popupOpen('containers/DataItem', {table: prop.tableid, primKey: value.toString()});
   },
 
   render() {
-    let {prop, value, ...other} = this.props;
+    let {prop, value} = this.props;
     let text = Formatter(prop, value);
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     if (prop.externalUrl) {
@@ -33,7 +34,7 @@ let PropertyCell = React.createClass({
         {_.map(refs, (ref, index) => (
           <span key={index}>
           {index === 0 ? externalLinkIcon : null}
-          <a target='_blank' href={prop.externalUrl.replace('{value}', ref)}>
+          <a target="_blank" href={prop.externalUrl.replace('{value}', ref)}>
             {ref}
           </a>
             {index < refs.length - 1 ? ', ' : null}

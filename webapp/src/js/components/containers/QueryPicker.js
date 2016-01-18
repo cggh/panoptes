@@ -6,7 +6,7 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const SQL = require('panoptes/SQL');
 
-const {RaisedButton, IconButton, List, ListItem, Paper, ListDivider} = require('material-ui');
+const {RaisedButton, IconButton, List, ListItem, Divider} = require('material-ui');
 const QueryString = require('panoptes/QueryString');
 const QueryEditor = require('panoptes/QueryEditor');
 const Sidebar = require('react-sidebar').default;
@@ -73,7 +73,7 @@ let QueryPicker = React.createClass({
     let {query, lastQuery, defaultQuery} = this.state;
     let {table} = this.props;
     return (
-      <div className='large-modal query-picker'>
+      <div className="large-modal query-picker">
         <Sidebar
           docked={true}
           transitions={false}
@@ -82,7 +82,7 @@ let QueryPicker = React.createClass({
           <div>
             <List>
               <ListItem primaryText="Default"
-                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={defaultQuery}/></p>}
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(defaultQuery)}
                         onDoubleClick={() => {
@@ -90,9 +90,9 @@ let QueryPicker = React.createClass({
                           this.handlePick();
                         }
                         }/>
-              <ListDivider />
+              <Divider />
               <ListItem primaryText="Previous"
-                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={lastQuery}/></p>}
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={lastQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(lastQuery)}
                         onDoubleClick={() => {
@@ -100,28 +100,28 @@ let QueryPicker = React.createClass({
                           this.handlePick();
                         }
                         }/>
-              <ListDivider />
+              <Divider />
             </List>
             <List  subheader="Stored Filters">
               <ListItem primaryText="Blue widgets"
-                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query}/></p>}
                         secondaryTextLines={2}
                         rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
               <ListItem primaryText="Yellow birds"
-                        secondaryText={<p className="list-string"><QueryString className='text' prepend='' table={table} query={query}/></p>}
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query}/></p>}
                         secondaryTextLines={2}
                         rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
             </List>
           </div>
         )}>
-        <div className='vertical stack'>
-          <div className='grow scroll-within query-editor-container'>
+        <div className="vertical stack">
+          <div className="grow scroll-within query-editor-container">
             <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
           </div>
-          <div className='centering-container'>
-            <QueryString className='text' prepend='' table={table} query={query}/>
+          <div className="centering-container">
+            <QueryString className="text" prepend="" table={table} query={query}/>
           </div>
-          <div className='centering-container'>
+          <div className="centering-container">
             <RaisedButton label="Set as Default"
                           onClick={this.handlePick}/>
             <RaisedButton label="Store"

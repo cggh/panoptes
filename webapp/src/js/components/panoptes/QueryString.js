@@ -43,7 +43,7 @@ let QueryString = React.createClass({
         {`${prepend} All`}
       </span>;
 
-    var nameMap = {};
+    let nameMap = {};
     _.each(this.config.properties, (property) => {
       nameMap[property.propid] = {
         name: property.name,
@@ -51,14 +51,14 @@ let QueryString = React.createClass({
       };
     });
 
-    var subsetMap = {};
+    let subsetMap = {};
     this.state.subsets.map((subset) => {
       subsetMap[subset.id] = {
         name: subset.name
       };
     });
 
-    var queryData = {
+    let queryData = {
       fieldInfoMap: nameMap,
       subsetMap: subsetMap
     };

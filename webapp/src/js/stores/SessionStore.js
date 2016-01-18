@@ -3,13 +3,11 @@ const Immutable = require('immutable');
 const uid = require('uid');
 const Constants = require('../constants/Constants');
 const SESSION = Constants.SESSION;
-
-//For mock data:
-const SQL = require('panoptes/SQL');
+const _ = require('lodash');
 
 const EMPTY_TAB = 'containers/EmptyTab';
 
-var SessionStore = Fluxxor.createStore({
+let SessionStore = Fluxxor.createStore({
 
   initialize(state) {
     if (state)
@@ -114,9 +112,9 @@ var SessionStore = Fluxxor.createStore({
 
   emitIfNeeded(action, event = 'change') {
     return (payload) => {
-      let old_state = this.state;
+      let oldState = this.state;
       action(payload);
-      if (!old_state.equals(this.state) || event === 'notify')
+      if (!oldState.equals(this.state) || event === 'notify')
         this.emit(event);
     };
   },
@@ -127,20 +125,17 @@ var SessionStore = Fluxxor.createStore({
       if (_.isFunction(updater)) {
         this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props: {}}));
         this.state = this.state.updateIn(['components', compId, 'props'], updater);
-      }
-      else {
+      } else {
         let component = Immutable.fromJS({
           component: newComponent,
           props: updater
         });
         this.state = this.state.setIn(['components', compId], component);
       }
-    }
-    else {
+    } else {
       if (_.isFunction(updater)) {
         this.state = this.state.updateIn(['components', compId, 'props'], updater);
-      }
-      else {
+      } else {
         this.state = this.state.mergeDeepIn(['components', compId, 'props'], updater);
       }
     }
@@ -203,19 +198,19 @@ var SessionStore = Fluxxor.createStore({
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
       throw Error('Closed non-existant tab');
-    let new_tabs = this.state.getIn(['tabs', 'components']).delete(pos);
-    this.state = this.state.setIn(['tabs', 'components'], new_tabs);
-    if (new_tabs.size == 0) {
+    let newTabs = this.state.getIn(['tabs', 'components']).delete(pos);
+    this.state = this.state.setIn(['tabs', 'components'], newTabs);
+    if (newTabs.size == 0) {
       this.tabOpen({
         component: {component: EMPTY_TAB},
         switchTo: true
       });
     } else {
       if (compId === this.state.getIn(['tabs', 'selectedTab']))
-        if (pos < new_tabs.size)
-          this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.get(pos));
+        if (pos < newTabs.size)
+          this.state = this.state.setIn(['tabs', 'selectedTab'], newTabs.get(pos));
         else
-          this.state = this.state.setIn(['tabs', 'selectedTab'], new_tabs.last());
+          this.state = this.state.setIn(['tabs', 'selectedTab'], newTabs.last());
     }
   },
   tabOpen(payload) {

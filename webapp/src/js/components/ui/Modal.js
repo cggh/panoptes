@@ -7,7 +7,7 @@ const Hotkey = require('react-hotkey');
 Hotkey.activate();
 const keycodes = require('keycodes');
 
-var Modal = React.createClass({
+let Modal = React.createClass({
   mixins: [
     PureRenderMixin,
     Hotkey.Mixin('handleHotkey')
@@ -43,8 +43,8 @@ var Modal = React.createClass({
   componentDidUpdate() {
     let {child} = this.refs;
     if (child) {
-      child.icon ? this.setState({icon:child.icon()}) : null;
-      child.title ? this.setState({title:child.title()}) : null;
+      child.icon ? this.setState({icon: child.icon()}) : null;
+      child.title ? this.setState({title: child.title()}) : null;
     }
   },
 
@@ -79,7 +79,7 @@ var Modal = React.createClass({
   },
 
   render: function() {
-    let {visible, unclosable, onClose, children, ...other} = this.props;
+    let {visible, unclosable, children, ...other} = this.props;
     let {icon, title} = this.state;
     if (!children)
       return null;
@@ -89,7 +89,7 @@ var Modal = React.createClass({
     };
     return (
       <div className={classNames(classes)}
-           ref='overlay'
+           ref="overlay"
            onClick={this.handleOverlayClick}>
         <div className="popup"
           {...other}>

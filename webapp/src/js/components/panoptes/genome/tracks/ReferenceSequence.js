@@ -1,8 +1,8 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
-const Immutable = require('immutable');
 const uid = require('uid');
+const _ = require('lodash');
 
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
@@ -10,7 +10,6 @@ const FluxMixin = require('mixins/FluxMixin');
 
 const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
-const API = require('panoptes/API');
 
 
 const HEIGHT = 25;
@@ -75,7 +74,7 @@ let ReferenceSequence = React.createClass({
           this.props.onChangeLoadStatus('DONE');
           this.applyData(data);
         })
-        .catch((data) => {
+        .catch((error) => {
           this.props.onChangeLoadStatus('DONE');
           if (data !== 'SUPERSEDED') {
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
@@ -86,20 +85,20 @@ let ReferenceSequence = React.createClass({
   },
 
   render() {
-    let {start, end, width, sideWidth, ...other} = this.props;
+    let {start, end, width, sideWidth} = this.props;
     let {dataStart, dataStep, columns} = this.state;
     let sequence = columns ? columns.sequence || [] : [];
     if (width == 0)
       return null;
     return (
       <div className="channel-container">
-        <div className="channel" style={{height:HEIGHT}}>
-          <div className="channel-side" style={{width:`${sideWidth}px`}}>
+        <div className="channel" style={{height: HEIGHT}}>
+          <div className="channel-side" style={{width: `${sideWidth}px`}}>
             <div className="side-name">
               Ref. Seq.
             </div>
           </div>
-          <div className="channel-data" style={{width:`${width - sideWidth}px`}} >
+          <div className="channel-data" style={{width: `${width - sideWidth}px`}} >
             <SequenceSquares
               width={width - sideWidth}
               height={HEIGHT}
@@ -130,7 +129,7 @@ let SequenceSquares = React.createClass({
   },
 
   paint(canvas) {
-    let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
+    let {sequence} = this.props;
     canvas.width = sequence.length;
     canvas.height = 1;
     if (canvas.width !== sequence.length)
@@ -175,7 +174,7 @@ let SequenceSquares = React.createClass({
     let offset = scale(dataStart) - scale(start);
     return <canvas ref="canvas"
                    className="sequence-canvas"
-                   style={{transform:`translateX(${offset}px) scale(${stepWidth},${height})`}}
+                   style={{transform: `translateX(${offset}px) scale(${stepWidth},${height})`}}
                    width={sequence.length}
                    height={1}/>;
   }

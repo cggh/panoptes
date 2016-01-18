@@ -5,7 +5,6 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
 
 const Sidebar = require('react-sidebar').default;
 const SidebarHeader = require('ui/SidebarHeader');
@@ -35,7 +34,7 @@ let GenomeBrowserWithActions = React.createClass({
       sidebar: true,
       chromosome: '',
       start: 0,
-      end:   10000,
+      end: 10000,
       components: Immutable.OrderedMap()
     };
   },
@@ -52,9 +51,8 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   render() {
-    let actions = this.getFlux().actions;
-    let {sidebar, componentUpdate, ...sub_props} = this.props;
-    let sidebar_content = (
+    let {sidebar, componentUpdate, ...subProps} = this.props;
+    let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
         <FlatButton label="Add Channel"
@@ -66,15 +64,15 @@ let GenomeBrowserWithActions = React.createClass({
     return (
       <Sidebar
         docked={sidebar}
-        sidebar={sidebar_content}>
+        sidebar={sidebarContent}>
         <div className="vertical stack">
           <div className="top-bar">
-            <Icon className='pointer icon'
+            <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className='text'>WTF</span>
+            <span className="text">WTF</span>
           </div>
-          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={100} {...sub_props} />
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={100} {...subProps} />
         </div>
       </Sidebar>
     );

@@ -17,7 +17,7 @@ let Background = React.createClass({
   },
 
   render() {
-    let {start, end, width, height, sideWidth, ...other} = this.props;
+    let {start, end, width, height, sideWidth} = this.props;
     let scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     if (width == 0 || height == 0)
       return null;

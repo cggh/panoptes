@@ -1,12 +1,11 @@
-const _ = require('lodash');
 const React = require('react');
 
 let ConfigMixin = {
   componentWillMount: function() {
     if (!this.props.config && (!this.context || !this.context.config)) {
-        var namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
-        throw new Error('Could not find config on this.props or this.context' + namePart);
-      }
+      let namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
+      throw new Error('Could not find config on this.props or this.context' + namePart);
+    }
     this.config = this.getConfig();
   },
 
@@ -20,8 +19,8 @@ let ConfigMixin = {
 
   getChildContext: function() {
     return {
-        config: this.getConfig()
-      };
+      config: this.getConfig()
+    };
   },
 
   getConfig: function() {

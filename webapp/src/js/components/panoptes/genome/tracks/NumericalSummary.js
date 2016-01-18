@@ -3,6 +3,7 @@ const ReactDOM = require('react-dom');
 
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
+const _ = require('lodash');
 const uid = require('uid');
 const offset = require('bloody-offset');
 
@@ -12,7 +13,6 @@ const FluxMixin = require('mixins/FluxMixin');
 
 const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
-const API = require('panoptes/API');
 const Icon = require('ui/Icon');
 const Checkbox = require('material-ui/lib/checkbox');
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
@@ -21,12 +21,12 @@ const {Motion, spring} = require('react-motion');
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
-  {payload:'linear', text: 'Linear'},
-  {payload:'step', text: 'Step'},
-  {payload:'basis', text: 'Basis'},
-  {payload:'bundle', text: 'Bundle'},
-  {payload:'cardinal', text: 'Cardinal'},
-  {payload:'monotone', text: 'Monotone'}
+  {payload: 'linear', text: 'Linear'},
+  {payload: 'step', text: 'Step'},
+  {payload: 'basis', text: 'Basis'},
+  {payload: 'bundle', text: 'Bundle'},
+  {payload: 'cardinal', text: 'Cardinal'},
+  {payload: 'monotone', text: 'Monotone'}
 ];
 const INTERPOLATION_HAS_TENSION = {
   cardinal: true
@@ -168,7 +168,7 @@ let NumericalSummary = React.createClass({
           this.blockEnd = blockEnd;
           this.applyData(props);
         })
-        .catch((data) => {
+        .catch((error) => {
           this.props.onChangeLoadStatus('DONE');
           if (data !== 'SUPERSEDED') {
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
@@ -226,8 +226,7 @@ let NumericalSummary = React.createClass({
       if (minVal === maxVal) {
         minVal = minVal - 0.1 * minVal;
         maxVal = maxVal + 0.1 * maxVal;
-      }
-      else {
+      } else {
         let margin = 0.1 * (maxVal - minVal);
         minVal = minVal - margin;
         maxVal = maxVal + margin;
@@ -272,20 +271,20 @@ let NumericalSummary = React.createClass({
     };
     return (
       <div className="channel-container">
-        <div className="channel" style={{height:HEIGHT}}>
-          <div className="channel-side" style={{width:`${sideWidth}px`}}>
+        <div className="channel" style={{height: HEIGHT}}>
+          <div className="channel-side" style={{width: `${sideWidth}px`}}>
             <div className="side-controls">
               <Icon className="close" name="times" onClick={this.handleControlToggle}/>
               <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
             </div>
             <div className="side-name"> Uniqueness</div>
           </div>
-          <div className="channel-data" style={{width:`${effWidth}px`}}>
+          <div className="channel-data" style={{width: `${effWidth}px`}}>
             <svg className="numerical-summary" width={effWidth} height={height}>
               <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
                 {(interpolated) => {
                   let {yMin, yMax} = interpolated;
-                  return <g style={{transform:`translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
+                  return <g style={{transform: `translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
                     <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth} height={2 * height}/>
                     <Path className="area" d={area}/>
                     <Path className="line" d={line}/>
@@ -330,7 +329,7 @@ let Controls = React.createClass({
   render() {
     let {width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
     return (
-      <div className="channel-controls" style={{width:width + 'px'}}>
+      <div className="channel-controls" style={{width: width + 'px'}}>
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
@@ -342,7 +341,7 @@ let Controls = React.createClass({
           <div className="control" >
             <div className="label">Tension:</div>
             <Slider className="slider"
-                    style={{marginBottom:'0', marginTop:'0'}}
+                    style={{marginBottom: '0', marginTop: '0'}}
                     name="tension"
                     value={tension}
                     defaultValue={tension}
@@ -357,8 +356,8 @@ let Controls = React.createClass({
             name="autoYScale"
             value="toggleValue1"
             defaultChecked={autoYScale}
-            style={{width:'inherit'}}
-            onCheck={(e, checked) => this.componentUpdate({autoYScale:checked})}/>
+            style={{width: 'inherit'}}
+            onCheck={(e, checked) => this.componentUpdate({autoYScale: checked})}/>
         </div>
         {!autoYScale ? <div className="control">
                          <div className="label">Y Min:</div>

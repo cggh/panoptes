@@ -1,5 +1,6 @@
 const React = require('react');
 const d3 = require('d3');
+const _ = require('lodash');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -126,7 +127,7 @@ let GeoLayouter = React.createClass({
       // Don't apply any charge to fixedNodes.
       // Negative charge is repulsive.
       // Charge should be proportional to radius and inversely propoprtional to zoom level.
-      this.force.charge(function(d) { return d.fixed ? 0 : (-2500 * d.radius * d.radius) / (d.zoom ? d.zoom : 1); });
+      this.force.charge((d) => d.fixed ? 0 : (-2500 * d.radius * d.radius) / (d.zoom ? d.zoom : 1));
 
       this.force.start();
 

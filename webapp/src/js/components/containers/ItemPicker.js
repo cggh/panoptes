@@ -5,8 +5,9 @@ const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 const classNames = require('classnames');
 const Highlight = require('react-highlighter');
+const _ = require('lodash');
 
-const {TextField, RaisedButton, List, Paper, ListItem} = require('material-ui');
+const {TextField, RaisedButton, List, ListItem} = require('material-ui');
 
 const Icon = require('ui/Icon');
 
@@ -76,8 +77,8 @@ let ItemPicker = React.createClass({
     this.props.groups.forEach((group) => {
       group.get('properties').forEach((prop) => {
         if (this.state.picked.has(prop.get('propid'))) {
-            result = result.push(prop.get('propid'));
-          }
+          result = result.push(prop.get('propid'));
+        }
       });
     }
     );
@@ -85,12 +86,12 @@ let ItemPicker = React.createClass({
   },
 
   render() {
-    let {picked, groupOpen, search} = this.state;
+    let {picked, search} = this.state;
     let {groups} = this.props;
     let count = groups.map((group) => group.get('properties').size).reduce((sum, v) => sum + v, 0);
     //"toJS" needed due to https://github.com/facebook/immutable-js/issues/554
     return (
-      <div className='large-modal item-picker'>
+      <div className="large-modal item-picker">
         <div className="horizontal stack">
           <div className="grow scroll-within">
             <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
@@ -104,7 +105,7 @@ let ItemPicker = React.createClass({
                   let subItems = _.map(properties, (prop) => {
                     let {name, description, propid} = prop;
                     return (name + '#' + description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                          <ListItem className={classNames({picked:picked.includes(propid)})}
+                          <ListItem className={classNames({picked: picked.includes(propid)})}
                                     key={propid}
                                     primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
                                     secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
@@ -160,7 +161,7 @@ let ItemPicker = React.createClass({
 
                 </List>
             </div>
-            <div className='centering-container'>
+            <div className="centering-container">
               <RaisedButton label="Use" primary={true} onClick={this.handlePick}/>
 
             </div>

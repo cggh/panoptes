@@ -1,7 +1,7 @@
 const RequestContext = require('util/RequestContext');
 
-var DataFetcherMixin = function() {
-  var propsToWatch = Array.prototype.slice.call(arguments);
+let DataFetcherMixin = function() {
+  let propsToWatch = Array.prototype.slice.call(arguments);
   return {
     componentWillMount() {
       this._requestContext = new RequestContext();

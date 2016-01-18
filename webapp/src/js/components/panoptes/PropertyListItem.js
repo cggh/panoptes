@@ -1,6 +1,4 @@
 const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -27,13 +25,12 @@ let PropertyListItem = React.createClass({
   render: function() {
     let {propertyData, tooltipPlacement, tooltipTrigger, rowIndex} = this.props;
 
-    let {name, description, value, maxVal, minVal, categoryColors, showBar} = propertyData;
+    let {name, description, value} = propertyData;
 
     let backgroundColor = 'inherit';
 
     let rowClass = 'table-col-row-odd';
-    if (rowIndex % 2)
-    {
+    if (rowIndex % 2) {
       rowClass = 'table-col-row-even';
     }
 

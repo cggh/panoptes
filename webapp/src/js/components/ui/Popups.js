@@ -1,6 +1,5 @@
 const React = require('react');
 const ValidComponentChildren = require('../utils/ValidComponentChildren');
-const classNames = require('classnames');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 
 let Popups = React.createClass({

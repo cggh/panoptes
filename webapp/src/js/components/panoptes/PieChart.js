@@ -62,8 +62,7 @@ let PieChart = React.createClass({
     let pie = d3.layout.pie().sort(null);
     let arcDescriptors = pie(pieData);
 
-    let sectors = sectorsData.map(function(sectorData, i) {
-
+    let sectors = sectorsData.map((sectorData, i) => {
       let outerRadius = DEFAULT_OUTER_RADIUS;
       if (locationSize) {
         outerRadius = locationSize / LOCATION_SIZE_TO_OUTER_RADIUS_DIVISOR;

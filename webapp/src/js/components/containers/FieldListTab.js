@@ -1,4 +1,5 @@
 const React = require('react');
+const _ = require('lodash');
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -38,8 +39,7 @@ let FieldListTab = React.createClass({
     };
   },
 
-  fetchData(props, requestContext)
-  {
+  fetchData(props, requestContext) {
     let {table, primKey} = props;
 
     this.setState({loadStatus: 'loading'});
@@ -74,9 +74,8 @@ let FieldListTab = React.createClass({
     return this.props.title;
   },
 
-  render()
-  {
-    let {table, primKey, fields, className} = this.props;
+  render() {
+    let {table, fields, className} = this.props;
     let {data, loadStatus} = this.state;
 
     if (!data) return null;
@@ -86,8 +85,7 @@ let FieldListTab = React.createClass({
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _.cloneDeep(this.config.tables[table].properties);
 
-    for (let i = 0; i < propertiesData.length; i++)
-    {
+    for (let i = 0; i < propertiesData.length; i++) {
       // Augment the array element (an object) with the fetched value of the property.
       propertiesData[i].value = data[propertiesData[i].propid];
 
@@ -97,14 +95,11 @@ let FieldListTab = React.createClass({
 
     // Collect the propertiesData for the specified list of fields.
     let fieldListPropertiesData = [];
-    for (let j = 0; j < fields.length; j++)
-    {
+    for (let j = 0; j < fields.length; j++) {
       let propertiesDataIndex = propertiesDataIndexes[fields[j]];
-      if (typeof propertiesDataIndex !== 'undefined')
-      {
+      if (typeof propertiesDataIndex !== 'undefined') {
         fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
-      }
-      else {
+      } else {
         console.log('Foreign property: ' + fields[j]);
       }
     }

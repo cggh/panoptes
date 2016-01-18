@@ -1,17 +1,17 @@
-var _each = require('lodash/collection/forEach');
+const _each = require('lodash/collection/forEach');
 
-var StoreWatchMixin = function() {
-  var storeNames = Array.prototype.slice.call(arguments);
+let StoreWatchMixin = function() {
+  let storeNames = Array.prototype.slice.call(arguments);
   return {
     componentDidMount: function() {
-      var flux = this.props.flux || this.context.flux;
+      let flux = this.props.flux || this.context.flux;
       _each(storeNames, function(store) {
         flux.store(store).on('change', this._setStateFromFlux);
       }, this);
     },
 
     componentWillUnmount: function() {
-      var flux = this.props.flux || this.context.flux;
+      let flux = this.props.flux || this.context.flux;
       _each(storeNames, function(store) {
         flux.store(store).removeListener('change', this._setStateFromFlux);
       }, this);

@@ -10,7 +10,7 @@ const StoreWatchMixin = require('mixins/StoreWatchMixin');
 const SQL = require('panoptes/SQL');
 const Formatter = require('panoptes/Formatter');
 const Deformatter = require('panoptes/Deformatter');
-const {RaisedButton, IconButton, Paper} = require('material-ui');
+const {RaisedButton, Paper} = require('material-ui');
 const Icon = require('ui/Icon');
 
 
@@ -44,13 +44,10 @@ let Or = React.createClass({
       <div className="or">
         <div className="startline">OR</div>
         <div className="components">
-          {_.map(component.components, (subComponent, key) => {
-            return (
-                <div key={key} className="or-criteria-wrapper">
-                  <Component {...other} component={subComponent}/>
-                </div>
-              );
-          }
+          {_.map(component.components, (subComponent, key) =>
+            <div key={key} className="or-criteria-wrapper">
+              <Component {...other} component={subComponent}/>
+            </div>
           )}
         </div>
         <div className="endline"></div>
@@ -184,8 +181,7 @@ let Criterion = React.createClass({
     if (currentOperator.fieldType === 'value') {
       component.CompValue = Deformatter(property, this.refs.value.value);
       this.setState({CompValue: this.refs.value.value});
-    }
-    else if (currentOperator.fieldType === 'minMax') {
+    } else if (currentOperator.fieldType === 'minMax') {
       component.CompValueMin = Deformatter(property, this.refs.min.value);
       component.CompValueMax = Deformatter(property, this.refs.max.value);
       this.setState({
@@ -233,23 +229,20 @@ let Criterion = React.createClass({
 
     let propertySelect = (
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
-        {_.map(groups, (group) => {
-          return (
-              <optgroup key={group.id} label={group.name}>
-                {_.map(group.properties, (property) => {
-                  let {propid, disabled, name} = property;
-                  return (
-                    <option key={propid}
-                            value={propid}
-                            disabled={disabled}>
-                      {name}
-                    </option>
-                  );
-                })
-                }
-              </optgroup>
-            );
-        }
+        {_.map(groups, (group) =>
+          <optgroup key={group.id} label={group.name}>
+            {_.map(group.properties, (property) => {
+              let {propid, disabled, name} = property;
+              return (
+                <option key={propid}
+                        value={propid}
+                        disabled={disabled}>
+                  {name}
+                </option>
+              );
+            })
+            }
+          </optgroup>
         )}
       </select>
     );
@@ -276,9 +269,8 @@ let Criterion = React.createClass({
       );
     }
 
-    let otherColumnSelect = () => {
-      return (
-        <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
+    let otherColumnSelect = () =>
+      <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
           {_.map(groups, (group) => {
             if (group.id === 'other') return null;
             return (
@@ -298,9 +290,7 @@ let Criterion = React.createClass({
               );
           }
           )}
-        </select>
-      );
-    };
+        </select>;
 
     let fields = null;
     let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
@@ -313,14 +303,11 @@ let Criterion = React.createClass({
             <select className="field" ref="value"
                     value={component.CompValue}
                     onChange={this.handleValueChange}>
-              {_.map(property.propCategories, (cat) => {
-                return (
-                  <option key={cat}
-                          value={cat}>
-                    {cat}
-                  </option>
-                );
-              })
+              {_.map(property.propCategories, (cat) =>
+                <option key={cat}
+                        value={cat}>
+                  {cat}
+                </option>)
               }
             </select>
           </div>
@@ -425,7 +412,7 @@ let QueryEditor = React.createClass({
   },
 
   render() {
-    let {query, table, className, ...other} = this.props;
+    let {query, table, className} = this.props;
     query = SQL.WhereClause.decode(query);
     return (
       <div className={classNames('query-editor', className)}>

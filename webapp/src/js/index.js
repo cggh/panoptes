@@ -1,5 +1,7 @@
 const _ = require('lodash');
-const React = require('react');
+
+//Needed for JSX
+const React = require('react'); //eslint-disable-line no-unused-vars
 const ReactDOM = require('react-dom');
 const Fluxxor = require('fluxxor');
 const Immutable = require('immutable');

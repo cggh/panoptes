@@ -1,6 +1,5 @@
 const React = require('react');
 const PureRenderMixin = require('mixins/PureRenderMixin');
-const _ = require('lodash');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
 
@@ -56,24 +55,24 @@ let Popup = React.createClass({
   componentDidUpdate() {
     let {child} = this.refs;
     if (child) {
-      child.icon ? this.setState({icon:child.icon()}) : null;
-      child.title ? this.setState({title:child.title()}) : null;
+      child.icon ? this.setState({icon: child.icon()}) : null;
+      child.title ? this.setState({title: child.title()}) : null;
     }
   },
 
-  handleResize(event, {element, size}) {
-    this.setState(prev => ({
+  handleResize(event, {element, size}) { //eslint-disable-line no-unused-vars
+    this.setState((prev) => ({
       size: prev.size.merge(size)
     }));
   },
-  handleResizeStop(event, {element, size}) {
+  handleResizeStop(event, {element, size}) { //eslint-disable-line no-unused-vars
     if (this.props.onResizeStop)
       this.props.onResizeStop(size);
   },
   handleMoveStop(event, ui) {
     let {left, top} = ui.position;
     if (this.props.onMoveStop)
-      this.props.onMoveStop({x:left, y:top});
+      this.props.onMoveStop({x: left, y: top});
   },
   handleClose(event) {
     if (this.props.onClose) {
@@ -93,7 +92,7 @@ let Popup = React.createClass({
     if (!children)
       return null;
     return (
-      <Draggable handle='.popup-drag'
+      <Draggable handle=".popup-drag"
                  start={position.toObject()}
                  moveOnStartChange={true}
                  onStart={this.handleClick}
