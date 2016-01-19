@@ -12,6 +12,8 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-1": "^6.3.13",
     "css-loader": "^0.23.1",
+    "eslint": "^1.10.3",
+    "eslint-plugin-react": "^3.15.0",
     "file-loader": "^0.8.5",
     "gulp": "^3.9.0",
     "gulp-util": "^3.0.7",
