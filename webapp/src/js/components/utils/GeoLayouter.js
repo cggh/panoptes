@@ -1,21 +1,29 @@
 const React = require('react');
 const d3 = require('d3');
-const _ = require('lodash');
+const _cloneDeep = require('lodash/cloneDeep');
+const _each = require('lodash/each');
+const _zip = require('lodash/zip');
+const {latlngToMercatorXY, mercatorXYtolatlng} = require('util/WebMercator');
+
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
 // TODO: How to best name and place such helper functions?
-function updateXYUsingLngLat(nodes) {
-
-  for (let i = 0; i < nodes.length; i++) {
-
-    nodes[i].x = nodes[i].lng * Math.cos(nodes[i].lat / 180 * Math.PI) * 40000 / 360;
-    nodes[i].y = nodes[i].lat / 360 * 40000;
-  }
-
-  return nodes;
+function updateXYUsingLngLat(node) {
+  let {x, y} = latlngToMercatorXY(node);
+  node.x = x;
+  node.y = y;
+}
+function updateLngLatUsingXY(node) {
+  let {lat, lng} = mercatorXYtolatlng(node);
+  node.lng = lng;
+  node.lat = lat;
+}
+function setRadius(node) {
+  //Convert the radius from degress to the -1 - 1 mercator projection.
+  node.collisionRadius = latlngToMercatorXY({lat:0, lng:node.radius}).x;
 }
 
 
@@ -28,7 +36,7 @@ let GeoLayouter = React.createClass({
 
   getDefaultProps() {
     return {
-      initialNodes: [],
+      nodes: [],
       positionOffsetFraction: 0, // TODO: Deprecate?
       zoom: 1
     };
@@ -43,16 +51,17 @@ let GeoLayouter = React.createClass({
 
     // Since this.forceNodes is used in render(), this.forceNodes is initialized here.
     this.forceNodes = [];
+    this.renderNodes = [];
 
     // Since this.force.stop() needs to occur in componentWillUnmount(), this.force is also initialized here.
     this.force = d3.layout.force();
     this.force.on('tick', this.onTick);
 
-    this.force.gravity(0.2); // 0 is gravityless
+    this.force.gravity(0); // 0 is gravityless
     this.force.friction(0.1); // 1 is frictionless
-    this.force.linkStrength(0.5); // 1 is rigid
-    //this.force.linkDistance('100'); // TODO: positionOffset, deprecated?
-    //this.force.charge(-999); // negative is repulsive
+    this.force.linkStrength(0.1); // 1 is rigid
+    this.force.linkDistance(0); // Ideally renderNodes should be on top of fixedNodes
+    this.force.charge(0); // negative is repulsive
 
     // TODO: .size([width, height]) according to box size
     //let width = 1500, height = 1400;
@@ -83,127 +92,87 @@ let GeoLayouter = React.createClass({
 
     console.log('componentWillReceiveProps');
 
-    // NB: The first time this is invoked, this.props.initialNodes is [] but not because of getDefaultProps()
+    // NB: The first time this is invoked, this.props.nodes is [] but not because of getDefaultProps()
 
-    if (this.props.initialNodes.length > 0) {
+    if (this.props.nodes.length > 0) {
 
-      let fixedNodes = _.cloneDeep(this.props.initialNodes); // props should be treated as immutable
-      fixedNodes = updateXYUsingLngLat(fixedNodes);
+      let fixedNodes = _cloneDeep(this.props.nodes); // props should be treated as immutable
+      _each(fixedNodes, updateXYUsingLngLat);
+      _each(fixedNodes, setRadius);
 
       // Clone needs to be deep, otherwise it will get fixed = true when fixedNodes is mutated later.
-      let renderNodes = _.cloneDeep(fixedNodes);
-
-      if (this.forceLinks) {
-        // Remove the old lines from the map.
-        for (let i = 0; i < this.forceLinks.length; i++) {
-          if (this.forceLinks[i].line) {
-            this.forceLinks[i].line.setMap(null);
-          }
-        }
-      }
+      this.renderNodes = _cloneDeep(fixedNodes);
+      //Assign the fixed node so that the renderNode knows where it came from.
+      _each(_zip(fixedNodes, this.renderNodes), ([fixedNode, renderNode]) =>
+        renderNode.originalNode = fixedNode
+      );
 
       this.forceLinks = [];
-      for (let i = 0; i < this.props.initialNodes.length; i++) {
-
-        this.forceLinks.push({source: i, target: this.props.initialNodes.length + i});
-
+      for (let i = 0; i < this.props.nodes.length; i++) {
+        this.forceLinks.push({source: i, target: this.props.nodes.length + i});
         fixedNodes[i].fixed = true;
-        fixedNodes[i].render = false;
-        fixedNodes[i].radius = 0;
-
-        renderNodes[i].fixed = false;
-        renderNodes[i].render = true;
-        renderNodes[i].zoom = this.props.zoom;
-
-        renderNodes[i].initialLng = this.props.initialNodes[i].lng;
-        renderNodes[i].initialLat = this.props.initialNodes[i].lat;
+        this.renderNodes[i].fixed = false;
       }
 
-      this.forceNodes = fixedNodes.concat(renderNodes);
+      this.forceNodes = fixedNodes.concat(this.renderNodes);
 
       this.force.nodes(this.forceNodes);
       this.force.links(this.forceLinks);
-
-      // Don't apply any charge to fixedNodes.
-      // Negative charge is repulsive.
-      // Charge should be proportional to radius and inversely propoprtional to zoom level.
-      this.force.charge((d) => d.fixed ? 0 : (-2500 * d.radius * d.radius) / (d.zoom ? d.zoom : 1));
-
       this.force.start();
 
     }
 
   },
 
-  onStarted: function() {
+  collide(node) {
+    let r = node.collisionRadius + 16,
+      nx1 = node.x - r,
+      nx2 = node.x + r,
+      ny1 = node.y - r,
+      ny2 = node.y + r;
+    return (quad, x1, y1, x2, y2) => {
+      if (quad.point && (quad.point !== node)) {
+        var x = node.x - quad.point.x,
+          y = node.y - quad.point.y,
+          l = Math.sqrt(x * x + y * y),
+          r = node.collisionRadius + quad.point.collisionRadius;
+        if (l < r) {
+          l = (l - r) / l * .5;
+          node.x -= x *= l;
+          node.y -= y *= l;
+          quad.point.x += x;
+          quad.point.y += y;
+        }
+      }
+      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+    };
+  },
+
+  detectCollisions() {
+    let q = d3.geom.quadtree(this.renderNodes);
+    _each(this.renderNodes, (node) =>
+      q.visit(this.collide(node))
+    );
+  },
+
+  onStarted() {
     console.log('onStarted');
   },
 
-  onStopped: function() {
+  onStopped() {
     console.log('onStopped');
   },
 
-  onTick: function() {
-
-    // Define a dashed-line symbol for the force link Polyline.
-    let lineSymbol = {
-      path: 'M 0,-1 0,1',
-      strokeOpacity: 1,
-      scale: 1,
-      strokeColor: '#000000',
-      strokeWeight: 2
-    };
-
-    for (let i = 0; i < this.forceLinks.length; i++) {
-
-      // Remove the old line from the map.
-      if (this.forceLinks[i].line) {
-        this.forceLinks[i].line.setMap(null);
-      }
-
-      // Create a new Polyline using the maps API.
-      this.forceLinks[i].line = new this.props.maps.Polyline({
-        path: [
-          new this.props.maps.LatLng(this.forceLinks[i].source.lat, this.forceLinks[i].source.lng),
-          new this.props.maps.LatLng(this.forceLinks[i].target.lat, this.forceLinks[i].target.lng)
-        ],
-        strokeOpacity: 0,
-        icons: [{
-          icon: lineSymbol,
-          offset: '0',
-          repeat: '6px'
-        }]
-      });
-
-      // Add the Polyline to the map.
-      this.forceLinks[i].line.setMap(this.props.map);
-
-    }
-
+  onTick() {
+    this.detectCollisions();
     this.forceUpdate();
   },
 
-  render: function() {
-
+  render() {
     console.log('render');
-
     // Extract the renderNodes from the forceNodes
-
-    let renderNodes = [];
-    for (let i = 0; i < this.forceNodes.length; i++) {
-
-      if (this.forceNodes[i].render) {
-
-        // Update the (lng, lat) of this node using the new (x, y) coordinates.
-        this.forceNodes[i].lng = this.forceNodes[i].x / Math.cos(this.forceNodes[i].lat / 180 * Math.PI) / 40000 * 360;
-        this.forceNodes[i].lat = this.forceNodes[i].y / 40000 * 360;
-
-        renderNodes.push(this.forceNodes[i]);
-      }
-
-    }
-
-    return this.props.children(renderNodes);
+    _each(this.renderNodes, updateLngLatUsingXY);
+    return this.props.children(this.renderNodes);
   }
 });
 

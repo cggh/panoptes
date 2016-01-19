@@ -91,9 +91,8 @@ let DataItem = React.createClass({
           tabPaneContents = (
               <PieChartMapTab
                 title={dataItemViews[i].name}
-                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}}
                 locationDataTable={dataItemViews[i].locationDataTable}
-                properties={dataItemViews[i]}
+                chartConfig={dataItemViews[i]}
                 chartDataTable={table}
                 chartDataTablePrimKey={primKey}
               />
@@ -102,7 +101,6 @@ let DataItem = React.createClass({
           tabPaneContents = (
               <ItemMapTab
                 title={dataItemViews[i].name}
-                zoom={dataItemViews[i].mapZoom}
                 locationDataTable={table}
                 locationDataTablePrimKey={primKey}
               />
