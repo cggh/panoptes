@@ -1,13 +1,14 @@
 const _each = require('lodash/forEach');
+const _bind = require('lodash/bind');
 
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);
   return {
     componentDidMount: function() {
       let flux = this.props.flux || this.context.flux;
-      _each(storeNames, function(store) {
+      _each(storeNames, _bind(function(store) {
         flux.store(store).on('change', this._setStateFromFlux);
-      }, this);
+      }, this));
     },
 
     componentWillUnmount: function() {
