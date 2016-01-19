@@ -1,4 +1,4 @@
-const _each = require('lodash/collection/forEach');
+const _each = require('lodash/forEach');
 
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);
