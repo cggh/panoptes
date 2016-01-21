@@ -141,7 +141,7 @@ let PieChartMap = React.createClass({
                       name={marker.name}
                       radius={marker.radius}
                       chartData={marker.chartData}
-                      onClick={() => actions.session.popupOpen('containers/DataItem', {table: marker.locationTable, primKey: marker.locationPrimKey.toString()})}
+                      onClick={() => actions.panoptes.dataItemPopup(marker.locationTable, marker.locationPrimKey.toString())}
                     />
                 )
               }

@@ -117,7 +117,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
 
     let actions = {
       session: SessionActions,
-      panoptes: PanoptesActions,
+      panoptes: PanoptesActions(config),
       api: APIActions
     };
 

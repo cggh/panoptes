@@ -95,14 +95,14 @@ let FieldListTab = React.createClass({
 
     // Collect the propertiesData for the specified list of fields.
     let fieldListPropertiesData = [];
-    for (let j = 0; j < fields.length; j++) {
-      let propertiesDataIndex = propertiesDataIndexes[fields[j]];
+    fields.forEach((field) => {
+      let propertiesDataIndex = propertiesDataIndexes[field];
       if (typeof propertiesDataIndex !== 'undefined') {
         fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
       } else {
-        console.log('Foreign property: ' + fields[j]);
+        console.log('Foreign property: ' + field);
       }
-    }
+    });
 
 
     return (

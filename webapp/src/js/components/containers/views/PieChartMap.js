@@ -1,5 +1,8 @@
 const React = require('react');
 const _sumBy = require('lodash/sumBy');
+const ImmutablePropTypes = require('react-immutable-proptypes');
+
+
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
@@ -26,16 +29,15 @@ let PieChartMapTab = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'chartDataTable', 'chartDataTablePrimKey')
+    DataFetcherMixin('chartConfig', 'table', 'primKey')
   ],
 
   propTypes: {
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
-    locationDataTable: React.PropTypes.string,
-    config: React.PropTypes.object,
-    chartDataTable: React.PropTypes.string,
-    chartDataTablePrimKey: React.PropTypes.string,
+    table: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string.isRequired,
+    chartConfig: ImmutablePropTypes.map.isRequired,
     center: React.PropTypes.object
   },
 
@@ -46,10 +48,11 @@ let PieChartMapTab = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {locationDataTable, chartConfig, chartDataTable, chartDataTablePrimKey} = props;
+    let {chartConfig, table, primKey} = props;
+    chartConfig = chartConfig.toJS();
+    let {locationDataTable} = chartConfig;
 
     let locationTableConfig = this.config.tables[locationDataTable];
-
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -83,9 +86,9 @@ let PieChartMapTab = React.createClass({
 
     let chartAPIargs = {
       database: this.config.dataset,
-      table: chartDataTable,
-      primKeyField: this.config.tables[chartDataTable].primkey,
-      primKeyValue: chartDataTablePrimKey
+      table: table,
+      primKeyField: this.config.tables[table].primkey,
+      primKeyValue: primKey
     };
 
     requestContext.request(
@@ -129,8 +132,9 @@ let PieChartMapTab = React.createClass({
   },
 
   render() {
-    let {locationDataTable, zoom, center, chartConfig} = this.props;
-    let {locationNameProperty, locationSizeProperty,
+    let {chartConfig, table, primKey, zoom, center} = this.props;
+    chartConfig = chartConfig.toJS();
+    let {locationDataTable, locationNameProperty, locationSizeProperty,
       residualFractionName, componentColumns} = chartConfig;
     let {locationData, loadStatus, chartData} = this.state;
 
@@ -156,10 +160,10 @@ let PieChartMapTab = React.createClass({
           let sum = _sumBy(markerChartData, 'value');
           if (sum < 1)
             markerChartData.push({
-            name: residualFractionName,
-            value: 1-sum,
-            color: RESIDUAL_SECTOR_COLOR
-          });
+              name: residualFractionName,
+              value: 1-sum,
+              color: RESIDUAL_SECTOR_COLOR
+            });
         }
 
         markers.push({
