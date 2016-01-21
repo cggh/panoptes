@@ -1,5 +1,7 @@
 const React = require('react');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const _isFunction = require('lodash/isFunction');
+
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
@@ -66,7 +68,7 @@ let DataItem = React.createClass({
                   {table, primKey},
                   {
                     componentUpdate: (updater) => componentUpdate((props) => {
-                      if (_.isFunction(updater))
+                      if (_isFunction(updater))
                         return props.updateIn(['views', i, 'props'], updater);
                       else
                         return props.mergeIn(['views', i, 'props'], updater);
@@ -75,7 +77,7 @@ let DataItem = React.createClass({
               )}
             </TabPane>
           );
-        }).toList()}
+        })}
 
       </TabbedArea>
     );

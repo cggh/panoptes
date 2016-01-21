@@ -54,8 +54,7 @@ let PieChart = React.createClass({
     if (radius) {
       outerRadius = geoService.project({lat: 0, lng: radius}).x - geoService.project({lat: 0, lng: 0}).x;
     }
-    let sectors = sectorsData.map((sectorData, i) => {
-      return (
+    let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSector
           key={i}
           arcDescriptor={arcDescriptors[i]}
@@ -64,8 +63,7 @@ let PieChart = React.createClass({
           title={sectorData.title}
           onClick={onClick}
         />
-      );
-    });
+    );
 
     let height = 50;
     let width = 50;

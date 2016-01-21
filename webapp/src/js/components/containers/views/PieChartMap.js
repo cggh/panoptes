@@ -4,7 +4,6 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
@@ -132,7 +131,7 @@ let PieChartMapTab = React.createClass({
   },
 
   render() {
-    let {chartConfig, table, primKey, zoom, center} = this.props;
+    let {chartConfig, zoom, center} = this.props;
     chartConfig = chartConfig.toJS();
     let {locationDataTable, locationNameProperty, locationSizeProperty,
       residualFractionName, componentColumns} = chartConfig;
@@ -161,7 +160,7 @@ let PieChartMapTab = React.createClass({
           if (sum < 1)
             markerChartData.push({
               name: residualFractionName,
-              value: 1-sum,
+              value: 1 - sum,
               color: RESIDUAL_SECTOR_COLOR
             });
         }

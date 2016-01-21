@@ -23,7 +23,7 @@ function updateLngLatUsingXY(node) {
 }
 function setRadius(node) {
   //Convert the radius from degress to the -1 - 1 mercator projection.
-  node.collisionRadius = latlngToMercatorXY({lat:0, lng:node.radius}).x;
+  node.collisionRadius = latlngToMercatorXY({lat: 0, lng: node.radius}).x;
 }
 
 
@@ -132,7 +132,7 @@ let GeoLayouter = React.createClass({
       ny2 = node.y + r;
     return (quad, x1, y1, x2, y2) => {
       if (quad.point && (quad.point !== node)) {
-        var x = node.x - quad.point.x,
+        let x = node.x - quad.point.x,
           y = node.y - quad.point.y,
           l = Math.sqrt(x * x + y * y),
           r = node.collisionRadius + quad.point.collisionRadius;
