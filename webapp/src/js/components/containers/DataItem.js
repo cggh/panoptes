@@ -36,7 +36,7 @@ let DataItem = React.createClass({
 
   getDefaultProps: function() {
     return {
-      activeTab: 'view_0'
+      activeTab: 'view_2'
     };
   },
 

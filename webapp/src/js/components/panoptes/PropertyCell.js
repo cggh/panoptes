@@ -21,7 +21,7 @@ let PropertyCell = React.createClass({
   handleClick() {
     let actions = this.getFlux().actions.panoptes;
     let {prop, value} = this.props;
-    actions.dataItemPopup(prop.tableid, value.toString());
+    actions.dataItemPopup({table: prop.tableid, primKey: value.toString()});
   },
 
   render() {

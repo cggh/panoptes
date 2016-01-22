@@ -3,12 +3,13 @@ const d3 = require('d3');
 const _cloneDeep = require('lodash/cloneDeep');
 const _each = require('lodash/each');
 const _zip = require('lodash/zip');
+const _keyBy = require('lodash/keyBy');
 const {latlngToMercatorXY, mercatorXYtolatlng} = require('util/WebMercator');
 
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+const Immutable = require('immutable');
+const ImmutablePropTypes = require('react-immutable-proptypes');
 
 // TODO: How to best name and place such helper functions?
 function updateXYUsingLngLat(node) {
@@ -29,14 +30,13 @@ function setRadius(node) {
 
 let GeoLayouter = React.createClass({
 
-  mixins: [
-    PureRenderMixin,
-    FluxMixin
-  ],
+  propTypes: {
+    nodes: ImmutablePropTypes.list
+  },
 
   getDefaultProps() {
     return {
-      nodes: [],
+      nodes: Immutable.List(),
       positionOffsetFraction: 0, // TODO: Deprecate?
       zoom: 1
     };
@@ -47,10 +47,6 @@ let GeoLayouter = React.createClass({
     // Invoked once, both on the client and server, immediately before the initial rendering occurs.
     //  If you call setState within this method, render() will see the updated state and will be executed only once despite the state change.
 
-    console.log('componentWillMount');
-
-    // Since this.forceNodes is used in render(), this.forceNodes is initialized here.
-    this.forceNodes = [];
     this.renderNodes = [];
 
     // Since this.force.stop() needs to occur in componentWillUnmount(), this.force is also initialized here.
@@ -74,54 +70,41 @@ let GeoLayouter = React.createClass({
   },
 
   componentWillUnmount() {
-
-    // Invoked immediately before a component is unmounted from the DOM.
-    // Perform any necessary cleanup in this method, such as invalidating timers
-    //  or cleaning up any DOM elements that were created in componentDidMount.
-
-    console.log('componentWillUnmount');
-
     this.force.stop();
   },
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
+    //Before we do anything check to see if there are any meaningful changes
+    if (this.props.nodes === nextProps.nodes)
+      return;
+    let nodes = nextProps.nodes.toJS();
+    nodes.forEach(updateXYUsingLngLat);
+    nodes.forEach(setRadius);
 
-    // Invoked when a component is receiving new props. This method is not called for the initial render.
-    // Use this as an opportunity to react to a prop transition before render() is called by updating the state using this.setState().
-    //  The old props can be accessed via this.props. Calling this.setState() within this function will not trigger an additional render.
-
-    console.log('componentWillReceiveProps');
-
-    // NB: The first time this is invoked, this.props.nodes is [] but not because of getDefaultProps()
-
-    if (this.props.nodes.length > 0) {
-
-      let fixedNodes = _cloneDeep(this.props.nodes); // props should be treated as immutable
-      _each(fixedNodes, updateXYUsingLngLat);
-      _each(fixedNodes, setRadius);
-
-      // Clone needs to be deep, otherwise it will get fixed = true when fixedNodes is mutated later.
-      this.renderNodes = _cloneDeep(fixedNodes);
-      //Assign the fixed node so that the renderNode knows where it came from.
-      _each(_zip(fixedNodes, this.renderNodes), ([fixedNode, renderNode]) =>
-        renderNode.originalNode = fixedNode
-      );
-
-      this.forceLinks = [];
-      for (let i = 0; i < this.props.nodes.length; i++) {
-        this.forceLinks.push({source: i, target: this.props.nodes.length + i});
-        fixedNodes[i].fixed = true;
-        this.renderNodes[i].fixed = false;
+    let fixedNodes = _cloneDeep(nodes);
+    _zip(fixedNodes, nodes).forEach(([fixedNode, renderNode]) => {
+        fixedNode.fixed = true;
+        renderNode.fixed = false;
+        //Assign the fixed node so that the renderNode knows where it came from.
+        renderNode.originalNode = fixedNode;
       }
+    );
 
-      this.forceNodes = fixedNodes.concat(this.renderNodes);
+    //Copy over existing positions
+    let existingRenderNodesByKey = _keyBy(this.renderNodes, 'key');
+    nodes.forEach((node) => {
+      if (existingRenderNodesByKey[node.key])
+        ['x', 'y', 'lat', 'lng'].forEach((val) => node[val] = existingRenderNodesByKey[node.key][val]);
+    });
 
-      this.force.nodes(this.forceNodes);
-      this.force.links(this.forceLinks);
-      this.force.start();
-
+    this.force.nodes(fixedNodes.concat(nodes));
+    let forceLinks = [];
+    for (let i = 0; i < nodes.length; i++) {
+      forceLinks.push({source: i, target: nodes.length + i});
     }
-
+    this.force.links(forceLinks);
+    this.renderNodes = nodes;
+    this.force.start();
   },
 
   collide(node) {
@@ -156,11 +139,9 @@ let GeoLayouter = React.createClass({
   },
 
   onStarted() {
-    console.log('onStarted');
   },
 
   onStopped() {
-    console.log('onStopped');
   },
 
   onTick() {
@@ -169,7 +150,6 @@ let GeoLayouter = React.createClass({
   },
 
   render() {
-    console.log('render');
     // Extract the renderNodes from the forceNodes
     _each(this.renderNodes, updateLngLatUsingXY);
     return this.props.children(this.renderNodes);

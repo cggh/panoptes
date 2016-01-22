@@ -4,7 +4,7 @@ const Constants = require('../constants/Constants');
 const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
-  dataItemPopup(table, primKey) {
+  dataItemPopup({table, primKey}) {
     let dataItemViews = config.tables[table].dataItemViews;
 
     let views = [];
@@ -17,7 +17,7 @@ const PanoptesActions = (config) => ({
         }
       });
 
-      if (this.config.tables[table].hasGeoCoord) {
+      if (config.tables[table].hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
           view: 'ItemMap',
