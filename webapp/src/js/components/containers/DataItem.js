@@ -13,7 +13,7 @@ const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
 
 let dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./views/' + path);
+const dynamicRequire = (path) => dynreq('./item_views/' + path);
 
 let DataItem = React.createClass({
   mixins: [
