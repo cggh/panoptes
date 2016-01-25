@@ -50,7 +50,8 @@ let DataTableView = React.createClass({
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     onColumnResize: React.PropTypes.func,
-    onOrderChange: React.PropTypes.func
+    onOrderChange: React.PropTypes.func,
+    onRowsChange: React.PropTypes.func
   },
 
 
@@ -78,7 +79,7 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, start} = props;
+    let {table, query, columns, order, ascending, start, onRowsChange} = props;
     let {height} = this.state;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
@@ -109,6 +110,7 @@ let DataTableView = React.createClass({
             loadStatus: 'loaded',
             rows: data
           });
+          onRowsChange(data);
         })
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)

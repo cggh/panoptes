@@ -85,9 +85,20 @@ let DataTableWithActions = React.createClass({
     this.props.componentUpdate({order: column, ascending: ascending});
   },
 
+  handleRowsChange(rows) {
+    this.setState({shownRowsCount: rows.length});
+  },
+
+  getInitialState() {
+    return {
+      shownRowsCount: 0
+    };
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
+    let {shownRowsCount} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -132,7 +143,7 @@ let DataTableWithActions = React.createClass({
             <QueryString className="text" prepend="Filter:" table={table} query={query}/>
             <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="text">{columns.size} of {this.config.properties.length} columns shown</span>
-
+            <span className="text">{shownRowsCount} rows shown</span>
           </div>
           <DataTableView className="grow"
                          table={table}
@@ -143,6 +154,7 @@ let DataTableWithActions = React.createClass({
                          columnWidths={columnWidths}
                          onColumnResize={this.handleColumnResize}
                          onOrderChange={this.handleOrderChange}
+                         onRowsChange={this.handleRowsChange}
             />
         </div>
       </Sidebar>
