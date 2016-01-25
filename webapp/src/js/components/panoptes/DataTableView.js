@@ -31,6 +31,7 @@ const DetectResize = require('utils/DetectResize');
 const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
+const SCROLLBAR_HEIGHT = 15;
 
 let DataTableView = React.createClass({
   mixins: [
@@ -85,7 +86,7 @@ let DataTableView = React.createClass({
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       // TODO: Account for horizontal scrollbar
-      let stop = start + Math.floor((height - HEADER_HEIGHT) / ROW_HEIGHT) - 1;
+      let stop = start + Math.floor((height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) - 1;
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
