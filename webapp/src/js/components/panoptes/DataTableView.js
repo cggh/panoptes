@@ -85,7 +85,6 @@ let DataTableView = React.createClass({
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
-      // TODO: Account for horizontal scrollbar
       let stop = start + Math.floor((height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) - 1;
       let APIargs = {
         database: this.config.dataset,
