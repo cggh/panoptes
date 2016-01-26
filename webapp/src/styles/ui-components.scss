@@ -275,6 +275,10 @@
     color: white;
   }
 
+  .disabled {
+    color: $topbar-disabled-color;
+  }
+
 }
 
 .datatable {

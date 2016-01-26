@@ -171,6 +171,20 @@ let DataTableWithActions = React.createClass({
         />
         </span>
       );
+    } else {
+      // Show disabled backwards nav.
+      pageBackwardNav = (
+        <span>
+        <Icon className="pointer icon disabled"
+              name="fast-backward"
+              title={'showing first ' + showableRowsCount + ' rows'}
+        />
+        <Icon className="pointer icon disabled"
+              name="step-backward"
+              title={'showing first ' + showableRowsCount + ' rows'}
+        />
+        </span>
+      );
     }
 
     let shownRowsMessage = null;
@@ -197,6 +211,16 @@ let DataTableWithActions = React.createClass({
               name="step-forward"
               title={'next ' + showableRowsCount + ' rows'}
               onClick={this.handleNextPage}
+        />
+        </span>
+      );
+    } else {
+      // Show disabled forwards nav.
+      pageForwardNav = (
+        <span>
+        <Icon className="pointer icon disabled"
+              name="step-forward"
+              title={'showing last ' + showableRowsCount + ' rows'}
         />
         </span>
       );
