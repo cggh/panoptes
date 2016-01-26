@@ -1,8 +1,9 @@
 const React = require('react');
 const Immutable = require('immutable');
 const ImmutablePropTypes = require('react-immutable-proptypes');
-const Sidebar = require('react-sidebar');
+const Sidebar = require('react-sidebar').default;
 const DropDownMenu = require('material-ui/lib/drop-down-menu');
+const MenuItem = require('material-ui/lib/menus/menu-item');
 
 const Icon = require("ui/Icon");
 const Plot = require("panoptes/Plot");
@@ -66,7 +67,7 @@ let PlotContainer = React.createClass({
           database: this.config.dataset,
           table: tableConfig.fetchTableName,
           columns: columnspec,
-          query: SQL.WhereClause.Trivial(),
+          query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
           transpose: false
         })
         .then((data) => {
@@ -107,6 +108,7 @@ let PlotContainer = React.createClass({
       return {payload:key, text:(<div className="dropdown-option"><Icon fixedWidth={true} name={val.icon}/>{val.tableCapNamePlural}</div>)}
     });
     tables.unshift({payload:'__none__', text:"Pick a table..."});
+    tables = tables.map(({payload, text}) => <MenuItem value={payload} key={payload} primaryText={text}/>);
 
     let propertyGroups = [];
     if (table !== '__none__') {
@@ -116,10 +118,9 @@ let PlotContainer = React.createClass({
     let sidebar_content = (
       <div className="plot-controls vertical stack">
         <DropDownMenu className="dropdown"
-                      menuItems={tables}
                       value={table}
                       autoWidth={false}
-                      onChange={(e, i) => componentUpdate({table: tables[i].payload})}/>
+                      onChange={(e, i, v) => componentUpdate({table: v})}>{tables}</DropDownMenu>
 
         {table !== '__none__' ?
           <div>
