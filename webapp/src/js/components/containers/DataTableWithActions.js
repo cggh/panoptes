@@ -30,7 +30,7 @@ let DataTableWithActions = React.createClass({
     ascending: React.PropTypes.bool,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
-    start: React.PropTypes.number,
+    initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool
   },
 
@@ -42,7 +42,7 @@ let DataTableWithActions = React.createClass({
       order: null,
       ascending: true,
       columnWidths: Immutable.Map(),
-      start: 0,
+      initialStartRowIndex: 0,
       sidebar: true
     };
   },
@@ -89,16 +89,40 @@ let DataTableWithActions = React.createClass({
     this.setState({shownRowsCount: rows.length});
   },
 
+  handleNextPage() {
+    // FIXME: In some cases, this allows us to navigate past the end.
+    // Without a totalRowCount we can only know the end when we've either reached it or gone past it.
+    this.setState({startRowIndex: this.state.startRowIndex + this.state.showableRowsCount});
+  },
+
+  handlePreviousPage() {
+    let rowIndex = this.state.startRowIndex - this.state.showableRowsCount;
+    if (rowIndex < 0) {
+      rowIndex = 0;
+    }
+    this.setState({startRowIndex: rowIndex});
+  },
+
+  handleFirstPage() {
+    this.setState({startRowIndex: 0});
+  },
+
+  handleResize(showableRowsCount) {
+    this.setState({showableRowsCount: showableRowsCount});
+  },
+
   getInitialState() {
     return {
-      shownRowsCount: 0
+      shownRowsCount: 0,
+      startRowIndex: this.props.initialStartRowIndex,
+      showableRowsCount: 0
     };
   },
 
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {shownRowsCount} = this.state;
+    let {shownRowsCount, startRowIndex, showableRowsCount} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -129,6 +153,58 @@ let DataTableWithActions = React.createClass({
 
       </div>
     );
+
+    let pageBackwardNav = null;
+    if (startRowIndex != 0) {
+      // Unless we are showing the first row, provide nav to previous rows.
+      pageBackwardNav = (
+        <span>
+        <Icon className="pointer icon"
+              name="fast-backward"
+              title={'first ' + showableRowsCount + ' rows'}
+              onClick={this.handleFirstPage}
+        />
+        <Icon className="pointer icon"
+              name="step-backward"
+              title={'previous ' + showableRowsCount + ' rows'}
+              onClick={this.handlePreviousPage}
+        />
+        </span>
+      );
+    }
+
+    let shownRowsMessage = null;
+    if (shownRowsCount == 0 && startRowIndex == 0) {
+      // If we're showing nothing, but we're at the beginning, assume there are no rows to show.
+      shownRowsMessage = <span className="text">no rows to show</span>;
+    } else if (shownRowsCount == 0 && startRowIndex != 0) {
+      // If we're showing nothing, and we're not at the beginning, assume we've gone past the last row.
+      shownRowsMessage = <span className="text">gone past the last row</span>;
+    } else if (shownRowsCount != 0 && shownRowsCount < showableRowsCount) {
+      // If we're showing something and it's fewer than possible, assume we're showing the last rows.
+      shownRowsMessage = <span className="text">showing rows {startRowIndex + 1}–{startRowIndex + shownRowsCount} of {startRowIndex + shownRowsCount}</span>;
+    } else if (shownRowsCount != 0 && shownRowsCount == showableRowsCount) {
+      // If we're showing something and it's all we can show, then make no further assumptions (there could be more or we might be showing the last lot).
+      shownRowsMessage = <span className="text">showing rows {startRowIndex + 1}–{startRowIndex + shownRowsCount}</span>;
+    }
+
+    let pageForwardNav = null;
+    if (shownRowsCount != 0 && shownRowsCount == showableRowsCount) {
+      // If we are showing something and it's as many as possible, then provide nav to further rows.
+      pageForwardNav = (
+        <span>
+        <Icon className="pointer icon"
+              name="step-forward"
+              title={'next ' + showableRowsCount + ' rows'}
+              onClick={this.handleNextPage}
+        />
+        </span>
+      );
+    }
+
+
+
+
 //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
@@ -138,12 +214,16 @@ let DataTableWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  name={sidebar ? 'expand' : 'bars'}
+                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  title={sidebar ? 'expand' : 'menu'}
+            />
             <QueryString className="text" prepend="Filter:" table={table} query={query}/>
             <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="text">{columns.size} of {this.config.properties.length} columns shown</span>
-            <span className="text">{shownRowsCount} rows shown</span>
+            {pageBackwardNav}
+            {shownRowsMessage}
+            {pageForwardNav}
           </div>
           <DataTableView className="grow"
                          table={table}
@@ -155,6 +235,8 @@ let DataTableWithActions = React.createClass({
                          onColumnResize={this.handleColumnResize}
                          onOrderChange={this.handleOrderChange}
                          onRowsChange={this.handleRowsChange}
+                         startRowIndex={startRowIndex}
+                         onResize={this.handleResize}
             />
         </div>
       </Sidebar>

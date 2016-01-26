@@ -38,7 +38,7 @@ let DataTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'start')
+    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'startRowIndex')
   ],
 
   propTypes: {
@@ -46,7 +46,7 @@ let DataTableView = React.createClass({
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
-    start: React.PropTypes.number,
+    startRowIndex: React.PropTypes.number,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     onColumnResize: React.PropTypes.func,
@@ -61,7 +61,7 @@ let DataTableView = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       ascending: true,
-      start: 0,
+      startRowIndex: 0,
       columns: Immutable.List(),
       columnWidths: Immutable.Map()
     };
@@ -79,14 +79,14 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, start, onRowsChange} = props;
-    let {height} = this.state;
+    let {table, query, columns, order, ascending, startRowIndex, onRowsChange} = props;
+    let {showableRowsCount} = this.state;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
-      let stop = start + Math.floor((height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) - 1;
+      let stopRowIndex = startRowIndex + showableRowsCount - 1;
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
@@ -94,8 +94,8 @@ let DataTableView = React.createClass({
         order: order,
         ascending: ascending,
         query: query,
-        start: start,
-        stop: stop
+        start: startRowIndex,
+        stop: stopRowIndex
       };
       requestContext.request((componentCancellation) =>
           LRUCache.get(
@@ -156,6 +156,8 @@ let DataTableView = React.createClass({
 
   handleResize(size) {
     this.setState(size);
+    this.setState({showableRowsCount: Math.floor((this.state.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT)});
+    this.props.onResize(this.state.showableRowsCount);
     this.fetchData(this.props, this._requestContext);
   },
 
