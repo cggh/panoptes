@@ -55,7 +55,7 @@ let GeoLayouter = React.createClass({
 
     this.force.gravity(0); // 0 is gravityless
     this.force.friction(0.1); // 1 is frictionless
-    this.force.linkStrength(0.1); // 1 is rigid
+    this.force.linkStrength(0.9); // 1 is rigid
     this.force.linkDistance(0); // Ideally renderNodes should be on top of fixedNodes
     this.force.charge(0); // negative is repulsive
 
@@ -83,11 +83,11 @@ let GeoLayouter = React.createClass({
 
     let fixedNodes = _cloneDeep(nodes);
     _zip(fixedNodes, nodes).forEach(([fixedNode, renderNode]) => {
-        fixedNode.fixed = true;
-        renderNode.fixed = false;
+      fixedNode.fixed = true;
+      renderNode.fixed = false;
         //Assign the fixed node so that the renderNode knows where it came from.
-        renderNode.originalNode = fixedNode;
-      }
+      renderNode.originalNode = fixedNode;
+    }
     );
 
     //Copy over existing positions
@@ -121,8 +121,8 @@ let GeoLayouter = React.createClass({
           r = node.collisionRadius + quad.point.collisionRadius;
         if (l < r) {
           l = (l - r) / l * .5;
-          node.x -= x *= l;
-          node.y -= y *= l;
+          node.x -= x *= l * 0.15;
+          node.y -= y *= l * 0.15;
           quad.point.x += x;
           quad.point.y += y;
         }

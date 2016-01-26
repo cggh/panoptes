@@ -8,6 +8,8 @@ const FluxMixin = require('mixins/FluxMixin');
 // Panoptes components
 const PieChartSector = require('panoptes/PieChartSector');
 
+import 'pie-chart.scss';
+
 // constants in this component
 // TODO: to go in config?
 const DEFAULT_OUTER_RADIUS = 25;
@@ -79,7 +81,10 @@ let PieChart = React.createClass({
         <g transform={'translate(' + translateX + ', ' + translateY + ')'}>
           {sectors}
         </g>
-        <line x1="0" y1="0" x2={originalLocation.x - location.x} y2={originalLocation.y - location.y} style={{stroke: 'red'}}/>
+        <line className="pie-chart-line"
+              style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
+              x1="0" y1="0"
+              x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}/>
       </svg>
     );
 

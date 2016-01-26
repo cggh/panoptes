@@ -1,10 +1,10 @@
 const React = require('react');
 const ImmutablePropTypes = require('react-immutable-proptypes');
+const Immutable = require('immutable');
 const GoogleMap = require('google-map-react');
 const {fitBounds} = require('google-map-react/utils');
 const _minBy = require('lodash/minBy');
 const _maxBy = require('lodash/maxBy');
-const _each = require('lodash/each');
 const shallowEquals = require('shallow-equals');
 
 // Utils
@@ -53,7 +53,8 @@ let PieChartMap = React.createClass({
   getInitialState() {
     return {
       width: 100,
-      height: 100
+      height: 100,
+      bounds: null
     };
   },
 
@@ -70,7 +71,7 @@ let PieChartMap = React.createClass({
   },
 
   handleResize(size) {
-    if(shallowEquals(size, this.state))
+    if (shallowEquals(size, this.state))
       return;
     let {map, maps} = this;
     this._googleMapRef._setViewSize();
@@ -82,26 +83,22 @@ let PieChartMap = React.createClass({
     this.setState(size);
   },
 
-  handleMapChange({center, zoom}) {
+  handleMapChange({center, zoom, bounds}) {
     if (this.props.onPanZoom) {
       this.props.onPanZoom({center, zoom});
     }
+    this.setState({bounds});
   },
 
   render() {
     let {center, zoom, markers} = this.props;
+    let {bounds} = this.state;
     center = center ? center.toObject() : null;
-
     let actions = this.getFlux().actions;
+
     //If no bounds have been set then clip to the pies.
-    if (!center || !zoom) {
-      if (markers && markers.size === 1) {
-        zoom = 1;
-        center = {
-          lat: 0,
-          lng: 0
-        };
-      } else if (markers && markers.size > 1) {
+    if (!bounds) {
+      if (markers) {
         let markersJS = markers.toJS();
         const bounds = {
           nw: {
@@ -123,8 +120,35 @@ let PieChartMap = React.createClass({
       }
     }
 
-    //TODO Proper logic for single pie and radius scaling
-    markers = markers.map((marker) => marker.set('radius',20));
+    if (bounds && markers.size > 0) {
+      //Now we have bounds we can set some sensible radii
+      //Filter pies to those in bounds and work out their area (I know this is in lat/lng, but we only need to be rough.
+      let {nw, se} = bounds;
+      //if the map starts to loop we need to correct the bounds so things don't get clipped
+      if (se.lng < nw.lng)
+        se.lng = 180, nw.lng = -180;
+      let pieAreaSum = markers.filter((marker) =>
+        marker.get('lat') > se.lat &&
+        marker.get('lat') < nw.lat &&
+        marker.get('lng') > nw.lng &&
+        marker.get('lng') < se.lng)
+        .map((marker) => marker.get('radius') * marker.get('radius') * 2 * Math.PI)
+        .reduce((sum, val) => sum + val, 0);
+      if (pieAreaSum > 0) {
+        nw = latlngToMercatorXY(nw);
+        se = latlngToMercatorXY(se);
+        let mapArea = (nw.y - se.y) * (se.x - nw.x);
+        let factor = 75 * Math.sqrt(mapArea / pieAreaSum);
+        this.lastFactor = factor;
+      }
+      if (this.lastFactor)
+        markers = markers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
+      else
+        markers = Immutable.List();
+    } else {
+      markers = Immutable.List();
+    }
+
 
     // TODO: use an API key from config
     // <GoogleMap ...  bootstrapURLKeys={{key: 'AIza...example...1n8'}}
@@ -167,7 +191,6 @@ let PieChartMap = React.createClass({
           }
         </GeoLayouter>
       </DetectResize>
-
     );
 
   }
