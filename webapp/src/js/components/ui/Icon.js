@@ -52,7 +52,7 @@ let Icon = React.createClass({
       classNames += ` fa-stack-${stack}`;
     }
     if (inverse) {
-      className += ' fa-inverse';
+      classNames += ' fa-inverse';
     }
 
     if (className) {
