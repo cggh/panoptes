@@ -85,8 +85,12 @@ let DataTableWithActions = React.createClass({
     this.props.componentUpdate({order: column, ascending: ascending});
   },
 
-  handleRowsChange(rows) {
-    this.setState({shownRowsCount: rows.length});
+  handleFetchedRowsCountChange(fetchedRowsCount) {
+    this.setState({fetchedRowsCount: fetchedRowsCount});
+  },
+
+  handleShowableRowsCountChange(showableRowsCount) {
+    this.setState({showableRowsCount: showableRowsCount});
   },
 
   handleNextPage() {
@@ -107,13 +111,11 @@ let DataTableWithActions = React.createClass({
     this.setState({startRowIndex: 0});
   },
 
-  handleResize(showableRowsCount) {
-    this.setState({showableRowsCount: showableRowsCount});
-  },
+  // TODO: handleLastPage()
 
   getInitialState() {
     return {
-      shownRowsCount: 0,
+      fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0
     };
@@ -122,7 +124,7 @@ let DataTableWithActions = React.createClass({
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {shownRowsCount, startRowIndex, showableRowsCount} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -177,33 +179,33 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon disabled"
               name="fast-backward"
-              title={'showing first ' + showableRowsCount + ' rows'}
+              title={'showing first ' + fetchedRowsCount + ' rows'}
         />
         <Icon className="pointer icon disabled"
               name="step-backward"
-              title={'showing first ' + showableRowsCount + ' rows'}
+              title={'showing first ' + fetchedRowsCount + ' rows'}
         />
         </span>
       );
     }
 
     let shownRowsMessage = null;
-    if (shownRowsCount == 0 && startRowIndex == 0) {
+    if (fetchedRowsCount == 0 && startRowIndex == 0) {
       // If we're showing nothing, but we're at the beginning, assume there are no rows to show.
-      shownRowsMessage = <span className="text">no rows to show</span>;
-    } else if (shownRowsCount == 0 && startRowIndex != 0) {
+      shownRowsMessage = <span className="text">No rows to show</span>;
+    } else if (fetchedRowsCount == 0 && startRowIndex != 0) {
       // If we're showing nothing, and we're not at the beginning, assume we've gone past the last row.
-      shownRowsMessage = <span className="text">gone past the last row</span>;
-    } else if (shownRowsCount != 0 && shownRowsCount < showableRowsCount) {
+      shownRowsMessage = <span className="text">Gone past the last row</span>;
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount < showableRowsCount) {
       // If we're showing something and it's fewer than possible, assume we're showing the last rows.
-      shownRowsMessage = <span className="text">showing rows {startRowIndex + 1}–{startRowIndex + shownRowsCount} of {startRowIndex + shownRowsCount}</span>;
-    } else if (shownRowsCount != 0 && shownRowsCount == showableRowsCount) {
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {startRowIndex + fetchedRowsCount}</span>;
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
       // If we're showing something and it's all we can show, then make no further assumptions (there could be more or we might be showing the last lot).
-      shownRowsMessage = <span className="text">showing rows {startRowIndex + 1}–{startRowIndex + shownRowsCount}</span>;
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount}</span>;
     }
 
     let pageForwardNav = null;
-    if (shownRowsCount != 0 && shownRowsCount == showableRowsCount) {
+    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
       // If we are showing something and it's as many as possible, then provide nav to further rows.
       pageForwardNav = (
         <span>
@@ -220,7 +222,7 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon disabled"
               name="step-forward"
-              title={'showing last ' + showableRowsCount + ' rows'}
+              title={'showing last ' + fetchedRowsCount + ' rows'}
         />
         </span>
       );
@@ -258,9 +260,9 @@ let DataTableWithActions = React.createClass({
                          columnWidths={columnWidths}
                          onColumnResize={this.handleColumnResize}
                          onOrderChange={this.handleOrderChange}
-                         onRowsChange={this.handleRowsChange}
                          startRowIndex={startRowIndex}
-                         onResize={this.handleResize}
+                         onShowableRowsCountChange={this.handleShowableRowsCountChange}
+                         onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
             />
         </div>
       </Sidebar>

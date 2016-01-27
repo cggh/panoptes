@@ -32,6 +32,7 @@ const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const SCROLLBAR_HEIGHT = 15;
+const SPACE_BENEATH_ROWS = 50;
 
 let DataTableView = React.createClass({
   mixins: [
@@ -51,7 +52,8 @@ let DataTableView = React.createClass({
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     onColumnResize: React.PropTypes.func,
     onOrderChange: React.PropTypes.func,
-    onRowsChange: React.PropTypes.func
+    onShowableRowsCountChange: React.PropTypes.func,
+    onFetchedRowsCountChange: React.PropTypes.func
   },
 
 
@@ -72,21 +74,25 @@ let DataTableView = React.createClass({
       rows: [],
       loadStatus: 'loaded',
       width: 0,
-      height: 0
+      height: 0,
+      showableRowsCount: 0
     };
   },
 
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, startRowIndex, onRowsChange} = props;
+    let {table, query, columns, order, ascending, startRowIndex} = props;
     let {showableRowsCount} = this.state;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
-      let stopRowIndex = startRowIndex + showableRowsCount - 1;
+      let stopRowIndex = 0;
+      if (showableRowsCount > 0) {
+        stopRowIndex = startRowIndex + showableRowsCount - 1;
+      }
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
@@ -110,7 +116,6 @@ let DataTableView = React.createClass({
             loadStatus: 'loaded',
             rows: data
           });
-          onRowsChange(data);
         })
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
@@ -118,9 +123,9 @@ let DataTableView = React.createClass({
           ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
           this.setState({loadStatus: 'error'});
         });
-    }
-    else
+    } else {
       this.setState({rows: []});
+    }
   },
 
   handleColumnResize(width, column) {
@@ -156,9 +161,16 @@ let DataTableView = React.createClass({
 
   handleResize(size) {
     this.setState(size);
-    this.setState({showableRowsCount: Math.floor((this.state.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT)});
-    this.props.onResize(this.state.showableRowsCount);
-    this.fetchData(this.props, this._requestContext);
+    let showableRowsCount = 0;
+    if (size.height > 0) {
+      showableRowsCount = Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT - SPACE_BENEATH_ROWS) / ROW_HEIGHT);
+    }
+    this.setState({showableRowsCount: showableRowsCount});
+  },
+
+  componentWillUpdate: function(nextProps, nextState) {
+    this.props.onShowableRowsCountChange(nextState.showableRowsCount);
+    this.props.onFetchedRowsCountChange(nextState.rows.length);
   },
 
   render() {
