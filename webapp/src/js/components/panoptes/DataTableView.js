@@ -27,15 +27,19 @@ const Loading = require('ui/Loading');
 const Icon = require('ui/Icon');
 const DetectResize = require('utils/DetectResize');
 
-
+// Constants in this component
 const MAX_COLOR = Color('#44aafb');
+const ROW_HEIGHT = 30;
+const HEADER_HEIGHT = 50;
+const SCROLLBAR_HEIGHT = 15;
+const SPACE_BENEATH_ROWS = 50;
 
 let DataTableView = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'start')
+    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'startRowIndex')
   ],
 
   propTypes: {
@@ -43,11 +47,13 @@ let DataTableView = React.createClass({
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
-    start: React.PropTypes.number,
+    startRowIndex: React.PropTypes.number,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     onColumnResize: React.PropTypes.func,
-    onOrderChange: React.PropTypes.func
+    onOrderChange: React.PropTypes.func,
+    onShowableRowsCountChange: React.PropTypes.func,
+    onFetchedRowsCountChange: React.PropTypes.func
   },
 
 
@@ -57,7 +63,7 @@ let DataTableView = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       ascending: true,
-      start: 0,
+      startRowIndex: 0,
       columns: Immutable.List(),
       columnWidths: Immutable.Map()
     };
@@ -68,19 +74,25 @@ let DataTableView = React.createClass({
       rows: [],
       loadStatus: 'loaded',
       width: 0,
-      height: 0
+      height: 0,
+      showableRowsCount: 0
     };
   },
 
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending} = props;
+    let {table, query, columns, order, ascending, startRowIndex} = props;
+    let {showableRowsCount} = this.state;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
+      let stopRowIndex = 0;
+      if (showableRowsCount > 0) {
+        stopRowIndex = startRowIndex + showableRowsCount - 1;
+      }
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
@@ -88,7 +100,8 @@ let DataTableView = React.createClass({
         order: order,
         ascending: ascending,
         query: query,
-        stop: 1000
+        start: startRowIndex,
+        stop: stopRowIndex
       };
       requestContext.request((componentCancellation) =>
           LRUCache.get(
@@ -110,9 +123,9 @@ let DataTableView = React.createClass({
           ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
           this.setState({loadStatus: 'error'});
         });
-    }
-    else
+    } else {
       this.setState({rows: []});
+    }
   },
 
   handleColumnResize(width, column) {
@@ -146,6 +159,20 @@ let DataTableView = React.createClass({
     return 110;
   },
 
+  handleResize(size) {
+    this.setState(size);
+    let showableRowsCount = 0;
+    if (size.height > 0) {
+      showableRowsCount = Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT - SPACE_BENEATH_ROWS) / ROW_HEIGHT);
+    }
+    this.setState({showableRowsCount: showableRowsCount});
+  },
+
+  componentWillUpdate: function(nextProps, nextState) {
+    this.props.onShowableRowsCountChange(nextState.showableRowsCount);
+    this.props.onFetchedRowsCountChange(nextState.rows.length);
+  },
+
   render() {
     let {className, columns, columnWidths, order, ascending} = this.props;
     let {loadStatus, rows, width, height} = this.state;
@@ -156,15 +183,15 @@ let DataTableView = React.createClass({
     }
     if (columns.size > 0)
       return (
-        <DetectResize onResize={(size) => this.setState(size)}>
+        <DetectResize onResize={this.handleResize}>
           <div className={classNames('datatable', className)}>
             <Table
-              rowHeight={30}
+              rowHeight={ROW_HEIGHT}
               //rowGetter={(index) => rows[index]}
               rowsCount={rows.length}
               width={width}
               height={height}
-              headerHeight={50}
+              headerHeight={HEADER_HEIGHT}
               //headerDataGetter={this.headerData}
               onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={false}
@@ -234,7 +261,7 @@ let DataTableView = React.createClass({
                                         style={{
                                           textAlign: alignment,
                                           width: width,
-                                          height: '30px',
+                                          height: ROW_HEIGHT + 'px',
                                           background: background
                                         }}>
                           <PropertyCell prop={columnData} value={cellData}/>

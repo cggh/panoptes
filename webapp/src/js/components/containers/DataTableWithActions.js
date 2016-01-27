@@ -30,7 +30,7 @@ let DataTableWithActions = React.createClass({
     ascending: React.PropTypes.bool,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
-    start: React.PropTypes.number,
+    initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool
   },
 
@@ -42,7 +42,7 @@ let DataTableWithActions = React.createClass({
       order: null,
       ascending: true,
       columnWidths: Immutable.Map(),
-      start: 0,
+      initialStartRowIndex: 0,
       sidebar: true
     };
   },
@@ -85,9 +85,46 @@ let DataTableWithActions = React.createClass({
     this.props.componentUpdate({order: column, ascending: ascending});
   },
 
+  handleFetchedRowsCountChange(fetchedRowsCount) {
+    this.setState({fetchedRowsCount: fetchedRowsCount});
+  },
+
+  handleShowableRowsCountChange(showableRowsCount) {
+    this.setState({showableRowsCount: showableRowsCount});
+  },
+
+  handleNextPage() {
+    // FIXME: In some cases, this allows us to navigate past the end.
+    // Without a totalRowCount we can only know the end when we've either reached it or gone past it.
+    this.setState({startRowIndex: this.state.startRowIndex + this.state.showableRowsCount});
+  },
+
+  handlePreviousPage() {
+    let rowIndex = this.state.startRowIndex - this.state.showableRowsCount;
+    if (rowIndex < 0) {
+      rowIndex = 0;
+    }
+    this.setState({startRowIndex: rowIndex});
+  },
+
+  handleFirstPage() {
+    this.setState({startRowIndex: 0});
+  },
+
+  // TODO: handleLastPage()
+
+  getInitialState() {
+    return {
+      fetchedRowsCount: 0,
+      startRowIndex: this.props.initialStartRowIndex,
+      showableRowsCount: 0
+    };
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -118,6 +155,82 @@ let DataTableWithActions = React.createClass({
 
       </div>
     );
+
+    let pageBackwardNav = null;
+    if (startRowIndex != 0) {
+      // Unless we are showing the first row, provide nav to previous rows.
+      pageBackwardNav = (
+        <span>
+        <Icon className="pointer icon"
+              name="fast-backward"
+              title={'First ' + showableRowsCount + ' rows'}
+              onClick={this.handleFirstPage}
+        />
+        <Icon className="pointer icon"
+              name="step-backward"
+              title={'Previous ' + showableRowsCount + ' rows'}
+              onClick={this.handlePreviousPage}
+        />
+        </span>
+      );
+    } else {
+      // Show disabled backwards nav.
+      pageBackwardNav = (
+        <span>
+        <Icon className="pointer icon disabled"
+              name="fast-backward"
+              title={'Showing first ' + fetchedRowsCount + ' rows'}
+        />
+        <Icon className="pointer icon disabled"
+              name="step-backward"
+              title={'Showing first ' + fetchedRowsCount + ' rows'}
+        />
+        </span>
+      );
+    }
+
+    let shownRowsMessage = null;
+    if (fetchedRowsCount == 0 && startRowIndex == 0) {
+      // If we're showing nothing, but we're at the beginning, assume there are no rows to show.
+      shownRowsMessage = <span className="text">No rows to show</span>;
+    } else if (fetchedRowsCount == 0 && startRowIndex != 0) {
+      // If we're showing nothing, and we're not at the beginning, assume we've gone past the last row.
+      shownRowsMessage = <span className="text">Gone past the last row</span>;
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount < showableRowsCount) {
+      // If we're showing something and it's fewer than possible, assume we're showing the last rows.
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {startRowIndex + fetchedRowsCount}</span>;
+    } else if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
+      // If we're showing something and it's all we can show, then make no further assumptions (there could be more or we might be showing the last lot).
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount}</span>;
+    }
+
+    let pageForwardNav = null;
+    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
+      // If we are showing something and it's as many as possible, then provide nav to further rows.
+      pageForwardNav = (
+        <span>
+        <Icon className="pointer icon"
+              name="step-forward"
+              title={'Next ' + showableRowsCount + ' rows'}
+              onClick={this.handleNextPage}
+        />
+        </span>
+      );
+    } else {
+      // Show disabled forwards nav.
+      pageForwardNav = (
+        <span>
+        <Icon className="pointer icon disabled"
+              name="step-forward"
+              title={'Showing last ' + fetchedRowsCount + ' rows'}
+        />
+        </span>
+      );
+    }
+
+
+
+
 //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
@@ -127,12 +240,16 @@ let DataTableWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  name={sidebar ? 'expand' : 'bars'}
+                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  title={sidebar ? 'Expand' : 'Sidebar'}
+            />
             <QueryString className="text" prepend="Filter:" table={table} query={query}/>
             <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="text">{columns.size} of {this.config.properties.length} columns shown</span>
-
+            {pageBackwardNav}
+            {shownRowsMessage}
+            {pageForwardNav}
           </div>
           <DataTableView className="grow"
                          table={table}
@@ -143,6 +260,9 @@ let DataTableWithActions = React.createClass({
                          columnWidths={columnWidths}
                          onColumnResize={this.handleColumnResize}
                          onOrderChange={this.handleOrderChange}
+                         startRowIndex={startRowIndex}
+                         onShowableRowsCountChange={this.handleShowableRowsCountChange}
+                         onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
             />
         </div>
       </Sidebar>
