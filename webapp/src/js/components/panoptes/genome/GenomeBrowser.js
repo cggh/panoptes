@@ -18,7 +18,7 @@ const Background = require('panoptes/genome/Background');
 const DetectResize = require('utils/DetectResize');
 import 'genomebrowser.scss';
 
-let dynreq = require.context('.', true);
+const dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./tracks/' + path);
 
 
@@ -264,7 +264,7 @@ let GenomeBrowser = React.createClass({
                         {components.map((componentSpec, componentId) => {
                           let {component, props} = componentSpec.toJS();
                           return React.createElement(dynamicRequire(component),
-                              _.extend({
+                              Object.assign({
                                 key: componentId,
                                 componentUpdate: (updater) => componentUpdate({
                                   components: {

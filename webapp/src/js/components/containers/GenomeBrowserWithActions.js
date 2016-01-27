@@ -58,7 +58,6 @@ let GenomeBrowserWithActions = React.createClass({
         <FlatButton label="Add Channel"
                     primary={true}
                     onClick={null}/>
-
       </div>
     );
     return (

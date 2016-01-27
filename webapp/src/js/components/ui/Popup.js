@@ -5,6 +5,7 @@ const ImmutablePropTypes = require('react-immutable-proptypes');
 
 const Draggable = require('react-draggable');
 const Resizable = require('react-resizable').Resizable;
+import 'react-resizable/css/styles.css';
 const Icon = require('ui/Icon');
 
 

@@ -1,21 +1,19 @@
 const React = require('react');
+const ImmutablePropTypes = require('react-immutable-proptypes');
+const _isFunction = require('lodash/isFunction');
+
 
 // Mixins
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const FluxMixin = require('mixins/FluxMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
 
-// Containers
-const OverviewTab = require('containers/OverviewTab');
-const PieChartMapTab = require('containers/PieChartMapTab');
-const ItemMapTab = require('containers/ItemMapTab');
-const FieldListTab = require('containers/FieldListTab');
-const PropertyGroupTab = require('containers/PropertyGroupTab');
-const TemplateTab = require('containers/TemplateTab');
-
 // UI components
 const TabbedArea = require('ui/TabbedArea');
 const TabPane = require('ui/TabPane');
+
+let dynreq = require.context('.', true);
+const dynamicRequire = (path) => dynreq('./item_views/' + path);
 
 let DataItem = React.createClass({
   mixins: [
@@ -28,12 +26,17 @@ let DataItem = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
-    activeTab: React.PropTypes.string
+    activeTab: React.PropTypes.string,
+    views: ImmutablePropTypes.listOf(
+      ImmutablePropTypes.contains({
+        view: React.PropTypes.string.isRequired,
+        props: ImmutablePropTypes.map
+      }))
   },
 
   getDefaultProps: function() {
     return {
-      activeTab: 'tab_0'
+      activeTab: 'view_2'
     };
   },
 
@@ -46,106 +49,36 @@ let DataItem = React.createClass({
   },
 
   render() {
-    let {table, primKey, componentUpdate, activeTab} = this.props;
+    let {table, primKey, componentUpdate, activeTab, views} = this.props;
 
-    let dataItemViews = this.config.tables[table].dataItemViews;
-
-    let tabPanes = [];
-
-    if (!dataItemViews) {
-      // If there are no dataItemViews specified, then default to showing an Overview.
-      let overviewTabPane = (
-        <TabPane key="0" compId="tab_0" >
-            <OverviewTab title="Overview" table={table} primKey={primKey} className="table-col" />
-        </TabPane>
-      );
-
-      tabPanes.push(overviewTabPane);
-
-      if (this.config.tables[table].hasGeoCoord) {
-        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
-        let itemMapTabPane = (
-          <TabPane key="1" compId="tab_1" >
-              <ItemMapTab
-                title="Location"
-                locationDataTable={table}
-                locationDataTablePrimKey={primKey}
-              />
-          </TabPane>
-        );
-
-        tabPanes.push(itemMapTabPane);
-      }
-    } else {
-      for (let i = 0; i < dataItemViews.length; i++) {
-        // Compose a tabPane for each of the specified dataItemViews
-
-        let tabPaneCompId = 'tab_' + i;
-        let tabPaneContents = null;
-
-        if (dataItemViews[i].type === 'Overview') {
-          tabPaneContents = (
-            <OverviewTab title="Overview" table={table} primKey={primKey} className="table-col" />
-          );
-        } else if (dataItemViews[i].type === 'PieChartMap') {
-          tabPaneContents = (
-              <PieChartMapTab
-                title={dataItemViews[i].name}
-                center={{lat: dataItemViews[i].mapCenter.lattitude, lng: dataItemViews[i].mapCenter.longitude}}
-                locationDataTable={dataItemViews[i].locationDataTable}
-                properties={dataItemViews[i]}
-                chartDataTable={table}
-                chartDataTablePrimKey={primKey}
-              />
-          );
-        } else if (dataItemViews[i].type === 'ItemMap') {
-          tabPaneContents = (
-              <ItemMapTab
-                title={dataItemViews[i].name}
-                zoom={dataItemViews[i].mapZoom}
-                locationDataTable={table}
-                locationDataTablePrimKey={primKey}
-              />
-          );
-        } else if (dataItemViews[i].type === 'FieldList') {
-          tabPaneContents = (
-            <FieldListTab title={dataItemViews[i].name} fields={dataItemViews[i].fields} table={table} primKey={primKey} className="table-col" />
-          );
-        } else if (dataItemViews[i].type === 'PropertyGroup') {
-          // Determine which title to use for the PropertyGroup tab.
-          let propertyListTitle = null;
-          if (dataItemViews[i].name) {
-            propertyListTitle = dataItemViews[i].name;
-          } else {
-            // Use the PropertyGroup name if there is no DataItemViews name.
-            propertyListTitle = propertyGroupsData[dataItemViews[i].groupId].name;
-          }
-
-          tabPaneContents = (
-            <PropertyGroupTab title={propertyListTitle} propertyGroupId={dataItemViews[i].groupId} table={table} primKey={primKey} className="table-col" />
-          );
-        } else if (dataItemViews[i].type === 'Template') {
-          tabPaneContents = (
-            <TemplateTab title={dataItemViews[i].name} table={table} primKey={primKey} content={dataItemViews[i].content} />
-          );
-        }
-
-        if (tabPaneContents) {
-          let tabPane = (
-            <TabPane key={i} compId={tabPaneCompId} >
-                {tabPaneContents}
-            </TabPane>
-          );
-
-          tabPanes.push(tabPane);
-        }
-
-      }
-    }
 
     return (
-      <TabbedArea activeTab={activeTab} onSwitch={(id) => componentUpdate({activeTab: id})} >
-        {tabPanes}
+      <TabbedArea activeTab={activeTab}
+                  onSwitch={(id) => componentUpdate({activeTab: id})} >
+        {views.map((view, i) => {
+          view = view.toObject();
+          let viewId = `view_${i}`;
+          let props = view.props ? view.props.toObject() : {};
+          return (
+            <TabPane
+              compId={viewId}
+              key={viewId}>
+              {React.createElement(dynamicRequire(view.view),
+                Object.assign(props,
+                  {table, primKey},
+                  {
+                    componentUpdate: (updater) => componentUpdate((props) => {
+                      if (_isFunction(updater))
+                        return props.updateIn(['views', i, 'props'], updater);
+                      else
+                        return props.mergeIn(['views', i, 'props'], updater);
+                    })
+                  })
+              )}
+            </TabPane>
+          );
+        })}
+
       </TabbedArea>
     );
 
