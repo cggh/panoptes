@@ -163,12 +163,12 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon"
               name="fast-backward"
-              title={'first ' + showableRowsCount + ' rows'}
+              title={'First ' + showableRowsCount + ' rows'}
               onClick={this.handleFirstPage}
         />
         <Icon className="pointer icon"
               name="step-backward"
-              title={'previous ' + showableRowsCount + ' rows'}
+              title={'Previous ' + showableRowsCount + ' rows'}
               onClick={this.handlePreviousPage}
         />
         </span>
@@ -179,11 +179,11 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon disabled"
               name="fast-backward"
-              title={'showing first ' + fetchedRowsCount + ' rows'}
+              title={'Showing first ' + fetchedRowsCount + ' rows'}
         />
         <Icon className="pointer icon disabled"
               name="step-backward"
-              title={'showing first ' + fetchedRowsCount + ' rows'}
+              title={'Showing first ' + fetchedRowsCount + ' rows'}
         />
         </span>
       );
@@ -211,7 +211,7 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon"
               name="step-forward"
-              title={'next ' + showableRowsCount + ' rows'}
+              title={'Next ' + showableRowsCount + ' rows'}
               onClick={this.handleNextPage}
         />
         </span>
@@ -222,7 +222,7 @@ let DataTableWithActions = React.createClass({
         <span>
         <Icon className="pointer icon disabled"
               name="step-forward"
-              title={'showing last ' + fetchedRowsCount + ' rows'}
+              title={'Showing last ' + fetchedRowsCount + ' rows'}
         />
         </span>
       );
@@ -242,7 +242,7 @@ let DataTableWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'expand' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}
-                  title={sidebar ? 'expand' : 'menu'}
+                  title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <QueryString className="text" prepend="Filter:" table={table} query={query}/>
             <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
