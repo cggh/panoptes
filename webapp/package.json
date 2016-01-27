@@ -57,6 +57,7 @@
     "fixed-data-table": "^0.6.0",
     "fluxxor": "^1.7.3",
     "google-map-react": "^0.10.5",
+    "html-to-react": "^0.1.2",
     "immutable": "^3.7.6",
     "javascript-detect-element-resize": "git+https://github.com/sdecima/javascript-detect-element-resize.git",
     "keycodes": "^0.2.1",

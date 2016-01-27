@@ -75,10 +75,8 @@ let TemplateTab = React.createClass({
   },
 
   render() {
-    let {table, content} = this.props;
+    let {content} = this.props;
     let {data, loadStatus} = this.state;
-
-    console.log('content: ' + content);
 
     if (!data) return null;
 
@@ -90,9 +88,12 @@ let TemplateTab = React.createClass({
       propertiesData[i].value = data[propertiesData[i].propid];
     }
 
+    let htmlToReactParser = new HtmlToReact.Parser(React);
+    let reactComponent = htmlToReactParser.parse('<div>' + content + '</div>');
+
     return (
         <div>
-          <PropertyList propertiesData={propertiesData} className="table-col" />
+          {reactComponent}
           <Loading status={loadStatus}/>
         </div>
     );
