@@ -13,9 +13,9 @@ let StoreWatchMixin = function() {
 
     componentWillUnmount: function() {
       let flux = this.props.flux || this.context.flux;
-      _each(storeNames, function(store) {
+      _each(storeNames, _bind(function(store) {
         flux.store(store).removeListener('change', this._setStateFromFlux);
-      }, this);
+      }, this));
     },
 
     _setStateFromFlux: function() {
