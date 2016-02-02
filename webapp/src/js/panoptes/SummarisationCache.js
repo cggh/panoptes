@@ -96,7 +96,8 @@ let SummarisationCache = {
       };
     };
 
-    return Promise.all(promises).then((slices) => trimAndConcat(slices));
+    return Promise.all(promises)
+      .then(trimAndConcat);
   }
 
 };
