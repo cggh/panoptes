@@ -1,8 +1,7 @@
 const LRUCache = require('util/LRUCache');
 const API = require('panoptes/API');
-const Q = require('q');
 const {assertRequired} = require('util/Assert');
-const _ = require('lodash');
+const _map = require('lodash/map');
 
 const FETCH_SIZE = 10000;
 
@@ -33,23 +32,36 @@ let intervalsFromRange = (start, end, size) => {
 
 let SummarisationCache = {
   fetch(options) {
-    assertRequired(options, ['columns', 'minBlockSize', 'chromosome', 'start', 'end', 'targetPointCount', 'invalidationID']);
-    let {columns, minBlockSize, chromosome, start, end, targetPointCount, invalidationID} = options;
+    assertRequired(options, [
+      'columns',
+      'minBlockSize',
+      'chromosome',
+      'start',
+      'end',
+      'targetPointCount'
+    ]);
+    let {columns, minBlockSize, chromosome, start, end, targetPointCount, cancellation} = options;
     let optimalBlockSize = findOptimalBlockSize(start, end, targetPointCount, minBlockSize);
     let [blockStart, blockEnd] = blockStartEnd(start, end, optimalBlockSize);
-    let promises = _.map(intervalsFromRange(blockStart, blockEnd, FETCH_SIZE), (sliceStart) =>
-        LRUCache.get('summarisation', [{
-          chromosome: chromosome,
-          columns: columns,
-          blocksize: optimalBlockSize,
-          blockstart: sliceStart,
-          blockcount: FETCH_SIZE
-        }],
-          API.summaryData,
-          invalidationID
-        )
-    );
-    //We can't just return the promise if the data is ready as this will defer execution till after the next tick.
+
+    let promises = _map(intervalsFromRange(blockStart, blockEnd, FETCH_SIZE), (sliceStart) => {
+      let summaryAPIargs = {
+        chromosome: chromosome,
+        columns: columns,
+        blocksize: optimalBlockSize,
+        blockstart: sliceStart,
+        blockcount: FETCH_SIZE
+      };
+      return LRUCache.get(
+        'summarisation' + JSON.stringify(summaryAPIargs),
+        (cacheCancellation) =>
+          API.summaryData({
+            cancellation: cacheCancellation,
+            ...summaryAPIargs
+          }),
+        cancellation
+      );
+    });
     let trimAndConcat = (slices) => {
       if (slices.length > 0) {
         let sliceStart = blockStart - (Math.floor(blockStart / FETCH_SIZE) * FETCH_SIZE);
@@ -84,12 +96,7 @@ let SummarisationCache = {
       };
     };
 
-    if (_.all(promises, (p) => p.isFulfilled())) {
-      return [trimAndConcat(_.map(promises, (p) => p.inspect().value)), null];
-
-    } else {
-      return [null, Q.all(promises).then((slices) => trimAndConcat(slices))];
-    }
+    return Promise.all(promises).then((slices) => trimAndConcat(slices));
   }
 
 };
