@@ -3,7 +3,8 @@ const ReactDOM = require('react-dom');
 const offset = require('bloody-offset');
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const ConfigMixin = require('mixins/ConfigMixin');
-const _ = require('lodash');
+const _has = require('lodash/has');
+const _isFunction = require('lodash/isFunction');
 const d3 = require('d3');
 
 const ImmutablePropTypes = require('react-immutable-proptypes');
@@ -203,7 +204,7 @@ let GenomeBrowser = React.createClass({
     let {settings} = this.config;
     let {componentUpdate, start, end, sideWidth, chromosome, components} = this.props;
     let {loading} = this.state;
-    if (!_.has(this.config.chromosomes, chromosome))
+    if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
@@ -266,12 +267,11 @@ let GenomeBrowser = React.createClass({
                           return React.createElement(dynamicRequire(component),
                               Object.assign({
                                 key: componentId,
-                                componentUpdate: (updater) => componentUpdate({
-                                  components: {
-                                    [componentId]: {
-                                      props: updater
-                                    }
-                                  }
+                                componentUpdate: (updater) => componentUpdate((props) => {
+                                  if (_isFunction(updater))
+                                    return props.updateIn(['components', componentId, 'props'], updater);
+                                  else
+                                    return props.mergeIn(['components', componentId, 'props'], updater);
                                 })
                               }, props, trackProps));
                         }
