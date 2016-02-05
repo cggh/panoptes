@@ -16,7 +16,7 @@ let SessionStore = Fluxxor.createStore({
       this.state = Immutable.Map();
 
 
-/*    this.state = this.state.mergeDeep(Immutable.fromJS({
+    this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
           component: 'containers/DataTableWithActions',
@@ -35,8 +35,9 @@ let SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
-*/
 
+
+    /*
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
@@ -62,6 +63,7 @@ let SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
+    */
 
 
 

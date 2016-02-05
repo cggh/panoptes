@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 
@@ -13,7 +12,7 @@ let Channel = React.createClass({
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
-    sideComponent: React.PropTypes.element,
+    sideComponent: React.PropTypes.element
   },
 
   render() {

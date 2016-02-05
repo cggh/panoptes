@@ -2,6 +2,9 @@ const LRUCache = require('util/LRUCache');
 const API = require('panoptes/API');
 const {assertRequired} = require('util/Assert');
 const _map = require('lodash/map');
+const _transform = require('lodash/transform');
+const _reduce = require('lodash/reduce');
+const _each = require('lodash/each');
 
 const FETCH_SIZE = 10000;
 
@@ -66,8 +69,8 @@ let SummarisationCache = {
       if (slices.length > 0) {
         let sliceStart = blockStart - (Math.floor(blockStart / FETCH_SIZE) * FETCH_SIZE);
         let sliceEnd = blockEnd - (Math.floor(blockEnd / FETCH_SIZE) * FETCH_SIZE);
-        slices = _.map(slices, (slice, i) =>
-          _.transform(slice,
+        slices = slices.map((slice, i) =>
+          _transform(slice,
             (result, data, name) => {
               if (i == 0 || i == slices.length - 1) {
                 result[name] = data.slice(
@@ -80,10 +83,10 @@ let SummarisationCache = {
             }));
       }
       //Concatenate
-      let emptyArrays = _.transform(columns, (result, col, name) => result[name] = []);
-      let data = _.reduce(slices,
+      let emptyArrays = _transform(columns, (result, col, name) => result[name] = []);
+      let data = _reduce(slices,
         (accum, slice) => {
-          _.each(slice, (data, name) => Array.prototype.push.apply(accum[name], data));
+          _each(slice, (data, name) => Array.prototype.push.apply(accum[name], data));
           return accum;
         },
         emptyArrays

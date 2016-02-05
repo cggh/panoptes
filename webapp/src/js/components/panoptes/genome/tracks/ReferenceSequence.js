@@ -68,20 +68,20 @@ let ReferenceSequence = React.createClass({
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
-            columns: {
-              sequence: {
-                folder: `SummaryTracks/${this.config.dataset}/Sequence`,
-                config: 'Summ',
-                name: 'Base_avg'
-              }
-            },
-            minBlockSize: 1,
-            chromosome: chromosome,
-            start: block1Start,
-            end: block1End,
-            targetPointCount: targetPointCount,
-            cancellation: componentCancellation
-          })
+          columns: {
+            sequence: {
+              folder: `SummaryTracks/${this.config.dataset}/Sequence`,
+              config: 'Summ',
+              name: 'Base_avg'
+            }
+          },
+          minBlockSize: 1,
+          chromosome: chromosome,
+          start: block1Start,
+          end: block1End,
+          targetPointCount: targetPointCount,
+          cancellation: componentCancellation
+        })
           .then((data) => {
             this.props.onChangeLoadStatus('DONE');
             this.applyData(data);

@@ -6,25 +6,13 @@ const _max = require('lodash/max');
 const _throttle = require('lodash/throttle');
 const _isFinite = require('lodash/isFinite');
 
-const uid = require('uid');
-
 const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
-const FluxMixin = require('mixins/FluxMixin');
 
 const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
-const ChannelWithConfigDrawer = require('panoptes/genome/tracks/ChannelWithConfigDrawer');
 const LRUCache = require('util/LRUCache');
 const API = require('panoptes/API');
-
-const Checkbox = require('material-ui/lib/checkbox');
-import DropDownMenu from 'material-ui/lib/DropDownMenu';
-import MenuItem from 'material-ui/lib/menus/menu-item';
-const Slider = require('material-ui/lib/slider');
-const {Motion, spring} = require('react-motion');
-
-const findBlocks = require('panoptes/genome/FindBlocks');
 
 let NumericalTrack = React.createClass({
   mixins: [
@@ -50,7 +38,7 @@ let NumericalTrack = React.createClass({
   },
 
   componentWillMount() {
-    this.throttledYScale = _throttle(this.calculateYScale, 500)
+    this.throttledYScale = _throttle(this.calculateYScale, 500);
   },
 
   componentWillReceiveProps(nextProps) {
@@ -79,30 +67,30 @@ let NumericalTrack = React.createClass({
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
-            columns: {
-              avg: {
-                folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
-                config: 'Summ',
-                name: 'Uniqueness_avg'
-              },
-              max: {
-                folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
-                config: 'Summ',
-                name: 'Uniqueness_max'
-              },
-              min: {
-                folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
-                config: 'Summ',
-                name: 'Uniqueness_min'
-              }
+          columns: {
+            avg: {
+              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              config: 'Summ',
+              name: 'Uniqueness_avg'
             },
-            minBlockSize: 80,
-            chromosome: chromosome,
-            start: blockStart,
-            end: blockEnd,
-            targetPointCount: blockPixelWidth,
-            cancellation: componentCancellation
-          })
+            max: {
+              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              config: 'Summ',
+              name: 'Uniqueness_max'
+            },
+            min: {
+              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              config: 'Summ',
+              name: 'Uniqueness_min'
+            }
+          },
+          minBlockSize: 80,
+          chromosome: chromosome,
+          start: blockStart,
+          end: blockEnd,
+          targetPointCount: blockPixelWidth,
+          cancellation: componentCancellation
+        })
           .then((data) => {
             this.props.onChangeLoadStatus('DONE');
             this.data = data;

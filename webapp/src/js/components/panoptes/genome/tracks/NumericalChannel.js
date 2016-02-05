@@ -4,15 +4,12 @@ const PureRenderMixin = require('mixins/PureRenderMixin');
 const d3 = require('d3');
 const _isFinite = require('lodash/isFinite');
 
-const uid = require('uid');
 
 const ConfigMixin = require('mixins/ConfigMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
 const ChannelWithConfigDrawer = require('panoptes/genome/tracks/ChannelWithConfigDrawer');
 const NumericalTrack = require('panoptes/genome/tracks/NumericalTrack');
-const LRUCache = require('util/LRUCache');
-const API = require('panoptes/API');
 
 const Checkbox = require('material-ui/lib/checkbox');
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
@@ -204,10 +201,10 @@ let Controls = React.createClass({
                  type="number"
                  value={yMin}
                  onChange={() => {
-                                  let value = parseFloat(this.refs.yMin.value);
-                                  if(_isFinite(value))
-                                    this.componentUpdate({yMin: value});
-                                }
+                   let value = parseFloat(this.refs.yMin.value);
+                   if (_isFinite(value))
+                     this.componentUpdate({yMin: value});
+                 }
                                 }/>
         </div>
           : null}
@@ -219,10 +216,10 @@ let Controls = React.createClass({
                  value={yMax}
                  onChange={this.handleRangeChange}
                  onChange={() => {
-                                  let value = parseFloat(this.refs.yMax.value);
-                                  if(_isFinite(value))
-                                    this.componentUpdate({yMax: value});
-                                }
+                   let value = parseFloat(this.refs.yMax.value);
+                   if (_isFinite(value))
+                     this.componentUpdate({yMax: value});
+                 }
                                 }/>
         </div>
           : null}
