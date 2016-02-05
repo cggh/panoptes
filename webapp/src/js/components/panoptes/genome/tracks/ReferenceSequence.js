@@ -13,6 +13,8 @@ const API = require('panoptes/API');
 const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
 const Channel = require('panoptes/genome/tracks/Channel');
+const findBlocks = require('panoptes/genome/FindBlocks');
+
 
 const HEIGHT = 25;
 
@@ -52,6 +54,16 @@ let ReferenceSequence = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
+
+    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
+    //If we already have the data for an acceptable block then stop.
+    if ((this.blockEnd === block1End && this.blockStart === block1Start) ||
+      (this.blockEnd === block2End && this.blockStart === block2Start))
+      return;
+
+    this.blockStart = block1Start;
+    this.blockEnd = block1End;
+    let targetPointCount = ((width - sideWidth / 2) / (end - start)) * (block1End - block1Start);
     this.props.onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
@@ -65,9 +77,9 @@ let ReferenceSequence = React.createClass({
             },
             minBlockSize: 1,
             chromosome: chromosome,
-            start: start,
-            end: end,
-            targetPointCount: (width - sideWidth) / 2,
+            start: block1Start,
+            end: block1End,
+            targetPointCount: targetPointCount,
             cancellation: componentCancellation
           })
           .then((data) => {
@@ -95,7 +107,7 @@ let ReferenceSequence = React.createClass({
         height={HEIGHT}
         width={width}
         sideWidth={sideWidth}
-        sideComponents={<div className="side-name">Ref. Seq.</div>}
+        sideComponent={<div className="side-name">Ref. Seq.</div>}
       >
             <SequenceSquares
               width={width - sideWidth}

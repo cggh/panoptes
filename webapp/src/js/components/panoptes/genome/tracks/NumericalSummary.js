@@ -234,8 +234,8 @@ let NumericalSummary = React.createClass({
       width={width}
       sideWidth={sideWidth}
       height={HEIGHT}
-      sideComponents={<div className="side-name"> Uniqueness</div>}
-      configComponents={<Controls {...props} />}
+      sideComponent={<div className="side-name"> Uniqueness</div>}
+      configComponent={<Controls {...props} />}
 
     >
       <svg className="numerical-summary" width={effWidth} height={height}>
@@ -283,7 +283,7 @@ let Controls = React.createClass({
   render() {
     let {width, interpolation, tension, autoYScale, yMin, yMax} = this.props;
     return (
-      <div>
+      <div className="channel-controls">
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
@@ -323,7 +323,7 @@ let Controls = React.createClass({
                  value={yMin}
                  onChange={() => {
                                   let value = parseFloat(this.refs.yMin.value);
-                                  if (_.isFinite(value))
+                                  if(_.isFinite(value))
                                     this.componentUpdate({yMin: value});
                                 }
                                 }/>
@@ -338,7 +338,7 @@ let Controls = React.createClass({
                  onChange={this.handleRangeChange}
                  onChange={() => {
                                   let value = parseFloat(this.refs.yMax.value);
-                                  if (_.isFinite(value))
+                                  if(_.isFinite(value))
                                     this.componentUpdate({yMax: value});
                                 }
                                 }/>

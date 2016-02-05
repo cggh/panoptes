@@ -171,7 +171,7 @@ let GenomeBrowser = React.createClass({
     end = end + shiftGenome;
     if (e.isFinal) {
       if (Math.abs(e.velocityX) > 0.5) {
-        let velGenome = (this.scale.invert(0) - this.scale.invert(e.velocityX));
+        let velGenome = (this.scale.invert(e.velocityX) - this.scale.invert(0));
         start = start - velGenome * 1000;
         end = end - velGenome * 1000;
         this.nextSpringConfig = FLING_SPRING;
@@ -257,7 +257,7 @@ let GenomeBrowser = React.createClass({
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
-                        { settings.refSequenceSumm && false ?
+                        { settings.refSequenceSumm ?
                           <ReferenceSequence {...trackProps} /> :
                           null }
                       </div>

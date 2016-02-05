@@ -15,8 +15,8 @@ let ChannelWithConfigDrawer = React.createClass({
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
-    sideComponents: React.PropTypes.element,
-    configComponents: React.PropTypes.element
+    sideComponent: React.PropTypes.element,
+    configComponent: React.PropTypes.element
   },
 
   getInitialState() {
@@ -50,7 +50,7 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   render() {
-    let {height, width, sideWidth, sideComponents, configComponents} = this.props;
+    let {height, width, sideWidth, sideComponent, configComponent} = this.props;
     let effWidth = width - sideWidth;
 
     return (
@@ -62,7 +62,7 @@ let ChannelWithConfigDrawer = React.createClass({
               <Icon className="close" name="times" onClick={this.handleControlToggle}/>
               <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
             </div>
-            {sideComponents}
+            {sideComponent}
           </div>
 
           <div className="channel-data" style={{width: `${effWidth}px`}}>
@@ -71,8 +71,8 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
 
         <div ref="controlsContainer" className="channel-controls-container">
-          <div ref="controls" className="channel-controls" style={{width: width + 'px'}}>
-            {configComponents}
+          <div ref="controls" style={{width: width + 'px'}}>
+            {configComponent}
           </div>
         </div>
       </div>
