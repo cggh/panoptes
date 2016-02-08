@@ -23,14 +23,14 @@ let ItemMapTab = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'locationDataTablePrimKey')
+    DataFetcherMixin('table', 'primKey')
   ],
 
   propTypes: {
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
-    locationDataTable: React.PropTypes.string,
-    locationDataTablePrimKey: React.PropTypes.string,
+    table: React.PropTypes.string,
+    primKey: React.PropTypes.string,
     center: React.PropTypes.object
   },
 
@@ -48,9 +48,9 @@ let ItemMapTab = React.createClass({
 
 
   fetchData(props, requestContext) {
-    let {locationDataTable, locationDataTablePrimKey} = props;
+    let {table, primKey} = props;
 
-    let locationTableConfig = this.config.tables[locationDataTable];
+    let locationTableConfig = this.config.tables[table];
 
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
@@ -69,9 +69,9 @@ let ItemMapTab = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      table: locationDataTable,
-      primKeyField: this.config.tables[locationDataTable].primkey,
-      primKeyValue: locationDataTablePrimKey
+      table: table,
+      primKeyField: this.config.tables[table].primkey,
+      primKeyValue: primKey
     };
 
     requestContext.request((componentCancellation) =>
@@ -98,7 +98,7 @@ let ItemMapTab = React.createClass({
   },
 
   render() {
-    let {locationDataTable, zoom} = this.props;
+    let {table, zoom} = this.props;
 
     let {locationData, loadStatus} = this.state;
 
@@ -106,7 +106,7 @@ let ItemMapTab = React.createClass({
 
     if (locationData) {
       // Translate the fetched locationData into a marker.
-      let locationTableConfig = this.config.tables[locationDataTable];
+      let locationTableConfig = this.config.tables[table];
 
       marker = {
         lat: Number(locationData[locationTableConfig.propIdGeoCoordLattit]),
