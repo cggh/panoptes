@@ -1,6 +1,8 @@
 var path = require("path");
 var webpack = require("webpack");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var autoprefixer = require('autoprefixer');
+
 module.exports = {
   cache: true,
   entry: {
@@ -25,14 +27,15 @@ module.exports = {
         loaders: ['babel?presets[]=es2015&presets[]=stage-1&presets[]=react']
       },
       // required to write "require('./style.css')"
-      { test: /\.css$/,    loader: "style!css!autoprefixer" },
-      { test: /\.scss$/,    loader: "style!css!autoprefixer!sass" },
+      { test: /\.css$/,    loader: "style!css!postcss" },
+      { test: /\.scss$/,    loader: "style!css!postcss!sass" },
       { test: /\.(png|jpg)$/, loader: 'url?limit=64000'},
       { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,   loader: "url?prefix=font/&limit=5000&mimetype=application/font-woff" },
       { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,    loader: "file?prefix=font/" },
       { test: /\.json$/,    loader: "file" }
     ]
   },
+  postcss: [ autoprefixer({ browsers: ['last 2 versions'] }) ],
   resolve: {
     modulesDirectories: [
       'src/js',

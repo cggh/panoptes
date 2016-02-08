@@ -210,10 +210,14 @@ let GenomeBrowser = React.createClass({
     let {width, height, springConfig} = this.state;
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     let pixelWidth = (end - start) / (width - sideWidth);
-    //Animate middle and with for better experience
-    let endValue = {
-      mid: spring((end + start) / 2, springConfig),
-      halfWidth: spring((end - start) / 2, springConfig)
+    //Animate by middle and width for better experience
+    let initTargetPos = {
+      mid: (end + start) / 2,
+      halfWidth: (end - start) / 2
+    };
+    let targetPos = {
+      mid: spring(initTargetPos.mid, springConfig),
+      halfWidth: spring(initTargetPos.halfWidth, springConfig)
     };
     return (
       <DetectResize onResize={(size) => this.setState(size)}>
@@ -232,8 +236,8 @@ let GenomeBrowser = React.createClass({
           >
             <div className="main-area">
               <Motion ref="spring"
-                      style={endValue}
-                      defaultStyle={endValue}>
+                      style={targetPos}
+                      defaultStyle={initTargetPos}>
                 {(interpolated) => {
                   start = interpolated.mid - interpolated.halfWidth;
                   end = interpolated.mid + interpolated.halfWidth;
@@ -263,7 +267,7 @@ let GenomeBrowser = React.createClass({
                           null }
                       </div>
                       <div className="scrolling grow scroll-within">
-                        {_map(components, (componentSpec, componentId) => {
+                        {components.map((componentSpec, componentId) => {
                           let {component, props} = componentSpec.toJS();
                           return React.createElement(dynamicRequire(component),
                               Object.assign({
