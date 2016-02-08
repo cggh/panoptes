@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import _cloneDeep from 'lodash/cloneDeep';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -85,7 +85,7 @@ let PropertyGroupTab = React.createClass({
     let propertyGroupPropertiesData = [];
 
     // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _.cloneDeep(this.config.tables[table].properties);
+    let propertiesData = _cloneDeep(this.config.tables[table].properties);
 
     for (let i = 0; i < propertiesData.length; i++) {
       if (propertiesData[i].settings.groupId === propertyGroupId) {

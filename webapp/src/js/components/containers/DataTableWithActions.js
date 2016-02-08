@@ -12,9 +12,10 @@ import Icon from 'ui/Icon';
 import DataTableView from 'panoptes/DataTableView';
 import QueryString from 'panoptes/QueryString';
 
-import mui from 'material-ui';
-import _ from 'lodash';
-const {FlatButton} = mui;
+import _clone from 'lodash/clone';
+import _filter from 'lodash/filter';
+import _forEach from 'lodash/forEach';
+import FlatButton from 'material-ui/lib/flat-button';
 
 import SQL from 'panoptes/SQL';
 
@@ -50,10 +51,10 @@ let DataTableWithActions = React.createClass({
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
     this.propertyGroups = {};
-    _.forEach(this.config.propertyGroups, (val, key) => {
-      let filteredProps = _.filter(val.properties, {showInTable: true});
+    _forEach(this.config.propertyGroups, (val, key) => {
+      let filteredProps = _filter(val.properties, {showInTable: true});
       if (filteredProps.length > 0) {
-        this.propertyGroups[key] = _.clone(val);
+        this.propertyGroups[key] = _clone(val);
         this.propertyGroups[key].properties = filteredProps;
       }
     });

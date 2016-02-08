@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _cloneDeep from 'lodash/cloneDeep';
 import Base64 from 'panoptes/Base64';
 
 let SQL = {};
@@ -533,7 +533,7 @@ SQL.WhereClause.None = function() {
 //A class that Encapsulates a compound statement
 SQL.WhereClause.whcClassGenerator['compound'] = function(args) {
   let whc = SQL.WhereClause.Compound(args.type, []);
-  _.each(args.components, (comp, idx) =>
+  args.components.forEach((comp, idx) =>
     whc.addComponent(SQL.WhereClause.whcClassGenerator[comp.whcClass](comp))
   );
   return whc;
@@ -558,20 +558,20 @@ SQL.WhereClause.Compound = function(icompoundtype, components) {
     if (that.getComponentCount() === 1) {
       let parent = that.parent;
       let isRoot = that.isRoot;
-      _.assign(that, that.components[0]);
+      Object.assign(that, that.components[0]);
       that.parent = parent;
       that.isRoot = isRoot;
     }
   };
   that.removeChild = function(child) {
-    _.remove(that.components, (myChild) => myChild === child);
+    that.components = that.components.filter((myChild) => myChild === child);
     that.inlineIfOneChild();
   };
 
   that.toQueryDisplayString = function(queryData, level) {
     if (!level) level = 0;
     let compstrs = [];
-    _.each(that.components, (comp, idx) =>
+    that.components.forEach((comp, idx) =>
       compstrs.push(comp.toQueryDisplayString(queryData, level + 1))
     );
     let joinstr = ' ' + that.type + ' ';
@@ -600,7 +600,7 @@ SQL.WhereClause.OR = function(components) {
 
 //Encodes a whereclause object to an url-friendly string
 SQL.WhereClause.encode = function(whc) {
-  whc = _.cloneDeep(whc);
+  whc = _cloneDeep(whc);
   //Remove to stop cycles before JSONify
   function removeParents(component) {
     delete component.parent;
@@ -608,7 +608,7 @@ SQL.WhereClause.encode = function(whc) {
     component.Components = (component.components === undefined) ? component.Components : component.components;
     component.Tpe = (component.type === undefined) ? component.Tpe : component.type;
     if (component.components)
-      _.each(component.components, removeParents);
+      component.components.forEach(removeParents);
   }
   removeParents(whc);
   let jsonstring = JSON.stringify(whc);
@@ -633,21 +633,21 @@ SQL.WhereClause.decode = function(st) {
     delete component.Tpe;
     delete component.Components;
     if (component.components)
-      _.each(component.components, makeCompatible.bind(this, component));
+      component.components.forEach(makeCompatible.bind(this, component));
   }
   makeCompatible(null, tree);
   let query = SQL.WhereClause.whcClassGenerator[tree.whcClass](tree);
   function assignParents(parent, component) {
     component.parent = parent;
     if (component.components)
-      _.each(component.components, assignParents.bind(this, component));
+      component.components.forEach(assignParents.bind(this, component));
   }
   assignParents(null, query);
   function cleanUp(parent, component) {
     if (component.isCompound)
       component.inlineIfOneChild();
     if (component.components)
-      _.each(component.components, cleanUp.bind(this, component));
+      component.components.forEach(cleanUp.bind(this, component));
   }
   cleanUp(null, query);
   query.isRoot = true;
@@ -691,7 +691,7 @@ SQL.WhereClause.createValueRestriction = function(origQuery0, fieldName, value, 
       compStatement = origQuery;
 
   if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
-    _.each(origQuery.components, (comp, idx) => {
+    origQuery.components.forEach((comp, idx) => {
       if (comp.type == comparisonType)
         if (comp.ColName == fieldName)
           compStatement = comp;
@@ -726,7 +726,7 @@ SQL.WhereClause.createRangeRestriction = function(origQuery0, fieldName, minVal,
       betweenStatement = origQuery;
 
   if ((origQuery.isCompound) && (origQuery.type == 'AND')) {
-    _.each(origQuery.components, (comp, idx) => {
+    origQuery.components.forEach((comp, idx) => {
       if (comp.type == 'between')
         if (comp.ColName == fieldName)
           betweenStatement = comp;

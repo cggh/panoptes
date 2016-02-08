@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import _cloneDeep from 'lodash/cloneDeep';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -83,7 +83,7 @@ let FieldListTab = React.createClass({
     let propertiesDataIndexes = {};
 
     // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _.cloneDeep(this.config.tables[table].properties);
+    let propertiesData = _cloneDeep(this.config.tables[table].properties);
 
     for (let i = 0; i < propertiesData.length; i++) {
       // Augment the array element (an object) with the fetched value of the property.

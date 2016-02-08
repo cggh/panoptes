@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _keys from 'lodash/keys';
+import _isString from 'lodash/isString';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import attrMap from 'util/AttrMap';
@@ -13,20 +14,20 @@ let fetchedConfig = {};
 
 function columnSpec(list) {
   let ret = {};
-  _.each(list, (item) => ret[item] = 'ST');
+  list.forEach((item) => ret[item] = 'ST');
   return ret;
 }
 
 function caseChange(config) {
   let out = {};
-  if (_.isString(config))
+  if (_isString(config))
     return config;
-  _.each(_.keys(config), (key) => {
+  _keys(config).forEach((key) => {
     let destKey = key[0].toLowerCase() + key.slice(1);
     let value = config[key];
     if (Array.isArray(value)) {
       let arr = [];
-      _.forEach(value, (ele) => arr.push(caseChange(ele)));
+      value.forEach((ele) => arr.push(caseChange(ele)));
       value = arr;
     } else if (
       typeof value === 'object' &&
@@ -48,17 +49,17 @@ let parseTableSettings = function(table) {
     //FIXME We need a proper escaping of the json
     table.settings = table.settings.replace(/`/g, '\\"');
     table.settings = table.settings.replace(/\n/g, '\\n');
-    settings = _.extend(settings, JSON.parse(table.settings));
+    Object.assign(settings, JSON.parse(table.settings));
   }
   table.settings = settings;
 };
 
 let parseRelations = function() {
-  _.each(fetchedConfig.tableCatalog, (tableInfo) => {
+  fetchedConfig.tableCatalog.forEach((tableInfo) => {
     tableInfo.relationsChildOf = [];
     tableInfo.relationsParentOf = [];
   });
-  _.each(fetchedConfig.relations, (relationInfo) => {
+  fetchedConfig.relations.forEach((relationInfo) => {
     let childTableInfo = fetchedConfig.mapTableCatalog[relationInfo.childtableid];
 
     //TODO These should error on import
@@ -75,15 +76,15 @@ let parseRelations = function() {
 
 let mapExtraTableSettings = function(tableInfo, customDataCatalog) {
   let tokensList = ['DataItemViews', 'PropertyGroups']; //List of all settings tokens for which this mechanism applies
-  _.each(customDataCatalog, (customData) => {
+  customDataCatalog.forEach((customData) => {
     if (customData.tableid == tableInfo.id) {
       let customSettings = JSON.parse(customData.settings);
-      _.each(tokensList, (token) => {
+      tokensList.forEach((token) => {
         if (customSettings[token]) {
           if (!tableInfo.settings[token]) {
             tableInfo.settings[token] = customSettings[token];
           } else {
-            _.each(customSettings[token], (extraItem) => {
+            customSettings[token].forEach((extraItem) => {
               tableInfo.settings[token].push(extraItem);
             });
           }
@@ -123,7 +124,7 @@ let augmentTableInfo = function(table) {
     table.icon = 'table';
   table.propertyGroups = {};
   if (table.settings.PropertyGroups) {
-    _.each(table.settings.PropertyGroups, (groupInfo) => {
+    table.settings.PropertyGroups.forEach((groupInfo) => {
       groupInfo.properties = [];
       table.propertyGroups[groupInfo.Id] = caseChange(groupInfo);
     });
@@ -154,7 +155,7 @@ let augmentTableInfo = function(table) {
 
 let parseSummaryValues = function() {
   let summaryValueMap = {};
-  _.each(fetchedConfig.summaryValues, (summaryValue) => {
+  fetchedConfig.summaryValues.forEach((summaryValue) => {
     if (summaryValue.minval)
       summaryValue.minval = parseFloat(summaryValue.minval);
     else
@@ -167,7 +168,7 @@ let parseSummaryValues = function() {
     summaryValue.isCustom = true;
     let settings = {channelColor: 'rgb(0,0,180)'};
     if (summaryValue.settings)
-      settings = _.extend(settings, JSON.parse(summaryValue.settings));
+      Object.assign(settings, JSON.parse(summaryValue.settings));
     summaryValue.settings = settings;
     if (summaryValue.tableid === '-') {
       summaryValue.tableid = '__reference__';
@@ -180,7 +181,7 @@ let parseSummaryValues = function() {
 };
 
 let parseCustomProperties = function() {
-  _.each(fetchedConfig.customProperties, (prop) => {
+  fetchedConfig.customProperties.forEach((prop) => {
     let tableInfo = fetchedConfig.mapTableCatalog[prop.tableid];
     prop.isCustom = (prop.source == 'custom');
     if (prop.datatype == 'Text')
@@ -227,7 +228,7 @@ let parseCustomProperties = function() {
       } catch (e) {
         throw Error(`Invalid settings string for ${prop.tableid}.${prop.propid}: ${prop.settings}\n${e}`);
       }
-      settings = _.extend(settings, settingsObj);
+      Object.assign(settings, settingsObj);
     }
     prop.settings = settings;
 
@@ -277,7 +278,7 @@ let parseCustomProperties = function() {
     }
 
     // Determine of datatables have geographic info
-    _.each(fetchedConfig.tableCatalog, (tableInfo) => {
+    fetchedConfig.tableCatalog.forEach((tableInfo) => {
       if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
         tableInfo.hasGeoCoord = true;
     });
@@ -372,7 +373,7 @@ let parseCustomProperties = function() {
   });
 
   let promises = [];
-  _.each(fetchedConfig.customProperties, (prop) => {
+  fetchedConfig.customProperties.forEach((prop) => {
     if (prop.settings.isCategorical) {
       promises.push(API.pageQuery({
         database: dataset,
@@ -383,7 +384,7 @@ let parseCustomProperties = function() {
       })
           .then((data) => {
             prop.propCategories = [];
-            _.each(data, (rec) => {
+            data.forEach((rec) => {
               prop.propCategories.push(rec[prop.propid]);
             });
           })
@@ -445,7 +446,7 @@ let fetchInitialConfig = function() {
         })
           .then((data) => {
             fetchedConfig.generalSettings = {};
-            _.each(data, (sett) => {
+            data.forEach((sett) => {
               if (sett.content == 'False')
                 sett.content = false;
               if (sett.id == 'IntroSections') {
@@ -516,22 +517,22 @@ let fetchInitialConfig = function() {
     ))
     .then(() => {
       fetchedConfig.mapTableCatalog = {};
-      _.each(fetchedConfig.tableCatalog, (table) => {
+      fetchedConfig.tableCatalog.forEach((table) => {
         parseTableSettings(table);
         mapExtraTableSettings(table, fetchedConfig.customDataCatalog);
         augmentTableInfo(table);
         fetchedConfig.mapTableCatalog[table.id] = table;
       });
       fetchedConfig.map2DTableCatalog = {};
-      _.each(fetchedConfig.twoDTableCatalog, (table) => {
+      fetchedConfig.twoDTableCatalog.forEach((table) => {
         //augment2DTableInfo(table);
         fetchedConfig.map2DTableCatalog[table.id] = table;
       });
       //parse graph info
-      _.each(fetchedConfig.tableCatalog, (tableInfo) => {
+      fetchedConfig.tableCatalog.forEach((tableInfo) => {
         tableInfo.trees = [];
       });
-      _.each(fetchedConfig.graphs, (graphInfo) => {
+      fetchedConfig.graphs.forEach((graphInfo) => {
         if (graphInfo.tpe == 'tree') {
           fetchedConfig.mapTableCatalog[graphInfo.tableid].trees.push({
             id: graphInfo.graphid,
@@ -553,7 +554,7 @@ let fetchInitialConfig = function() {
       let defaultQueries = {};
       let subsets = {};
       //Turn empty queries into trivial ones
-      _.each(fetchedConfig.tableCatalog, (table) => {
+      fetchedConfig.tableCatalog.forEach((table) => {
         if (table.defaultQuery != '')
           defaultQueries[table.id] = table.defaultQuery;
         else
@@ -561,11 +562,11 @@ let fetchInitialConfig = function() {
         subsets[table.id] = [];
       });
       //Convert chromosome lengths to integer values
-      fetchedConfig.chromosomes = attrMap(_.map(fetchedConfig.chromosomes, (chrom) =>
+      fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
 
-      return caseChange(_.extend(initialConfig, { //eslint-disable-line no-undef
+      return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef
         user: {
           id: initialConfig.userID, //eslint-disable-line no-undef
           isManager: initialConfig.isManager //eslint-disable-line no-undef

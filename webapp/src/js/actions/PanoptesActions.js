@@ -1,5 +1,3 @@
-import _each from 'lodash/each';
-
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
 
@@ -27,7 +25,7 @@ const PanoptesActions = (config) => ({
         });
       }
     } else {
-      _each(dataItemViews, (dataItemView) => {
+      dataItemViews.forEach((dataItemView) => {
         // Compose a tabPane for each of the specified dataItemViews
         const viewTypes = {
           Overview: () => ({

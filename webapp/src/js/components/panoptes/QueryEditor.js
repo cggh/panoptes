@@ -1,4 +1,7 @@
-import _ from 'lodash';
+import _clone from 'lodash/clone';
+import _find from 'lodash/find';
+import _map from 'lodash/map';
+
 import React from 'react';
 import classNames from 'classnames';
 
@@ -10,7 +13,8 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import SQL from 'panoptes/SQL';
 import Formatter from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
-import {RaisedButton, Paper} from 'material-ui';
+import RaisedButton from 'material-ui/lib/raised-button';
+import Paper from 'material-ui/lib/paper';
 import Icon from 'ui/Icon';
 
 
@@ -31,7 +35,7 @@ let And = React.createClass({
     let {component, ...other} = this.props;
     return (
       <div className="and">
-        {_.map(component.components, (subComponent, key) => <Component {...other} key={key} component={subComponent}/>)}
+        {component.components.map((subComponent, key) => <Component {...other} key={key} component={subComponent}/>)}
       </div>
     );
   }
@@ -44,7 +48,7 @@ let Or = React.createClass({
       <div className="or">
         <div className="startline">OR</div>
         <div className="components">
-          {_.map(component.components, (subComponent, key) =>
+          {component.components.map((subComponent, key) =>
             <div key={key} className="or-criteria-wrapper">
               <Component {...other} component={subComponent}/>
             </div>
@@ -85,7 +89,7 @@ let Criterion = React.createClass({
   handleRemove() {
     let {component, onChange} = this.props;
     if (component.isRoot) {
-      _.assign(component, SQL.WhereClause.Trivial());
+      Object.assign(component, SQL.WhereClause.Trivial());
     } else {
       component.parent.removeChild(component);
     }
@@ -100,13 +104,13 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
     if (component.isRoot || component.parent.type == 'AND') {
       let newOr = SQL.WhereClause.Compound('OR');
-      let child = _.clone(component);
+      let child = _clone(component);
       child.isRoot = false;
       newOr.addComponent(child);
       newOr.addComponent(this.newComponent());
       newOr.parent = component.parent;
       newOr.isRoot = component.isRoot;
-      _.assign(component, newOr);
+      Object.assign(component, newOr);
     } else {
       component.parent.addComponent(this.newComponent());
     }
@@ -117,13 +121,13 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
     if (component.isRoot || component.parent.type == 'OR') {
       let newAnd = SQL.WhereClause.Compound('AND');
-      let child = _.clone(component);
+      let child = _clone(component);
       child.isRoot = false;
       newAnd.addComponent(child);
       newAnd.addComponent(this.newComponent());
       newAnd.parent = component.parent;
       newAnd.isRoot = component.isRoot;
-      _.assign(component, newAnd);
+      Object.assign(component, newAnd);
     } else {
       component.parent.addComponent(this.newComponent());
     }
@@ -133,11 +137,11 @@ let Criterion = React.createClass({
   validateOperatorAndValues() {
     let {component} = this.props;
     let property = this.config.propertiesMap[component.ColName];
-    let newComponent = _.find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
+    let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
     //Copy over the vals so we don't wipe them
     newComponent.ColName = component.ColName || this.config.primkey;
     newComponent.ColName2 = component.ColName2 || this.config.primkey;
-    _.each(['CompValue', 'CompValueMin', 'CompValueMax'], (name) => {
+    ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
       if (this.state[name] !== undefined)
         newComponent[name] = Deformatter(property, this.state[name]);
       else if (component[name] !== undefined)
@@ -149,7 +153,7 @@ let Criterion = React.createClass({
       newComponent.Factor = component.Factor || this.state.Factor;
     if (component.Subset || this.state.subsets[0])
       newComponent.Subset = component.Subset || this.state.subsets[0];
-    _.assign(component, newComponent);
+    Object.assign(component, newComponent);
   },
 
   handlePropertyChange() {
@@ -157,7 +161,7 @@ let Criterion = React.createClass({
     component.ColName = this.refs.property.value;
     let property = this.config.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
-    let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
+    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
       component.type = validOperators[0].ID;
     this.validateOperatorAndValues();
@@ -175,7 +179,7 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
     let property = this.config.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
-    let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
+    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
       throw Error('SQL Critiera operator not valid');
     if (currentOperator.fieldType === 'value') {
@@ -216,7 +220,7 @@ let Criterion = React.createClass({
         </div>
       );
 
-    let groups = _.clone(this.config.propertyGroups);
+    let groups = _clone(this.config.propertyGroups);
     groups.other = {
       id: 'other',
       name: 'Other',
@@ -229,9 +233,9 @@ let Criterion = React.createClass({
 
     let propertySelect = (
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
-        {_.map(groups, (group) =>
+        {_map(groups, (group) =>
           <optgroup key={group.id} label={group.name}>
-            {_.map(group.properties, (property) => {
+            {group.properties.map((property) => {
               let {propid, disabled, name} = property;
               return (
                 <option key={propid}
@@ -255,7 +259,7 @@ let Criterion = React.createClass({
     } else {
       operatorSelect = (
         <select ref="operator" value={component.type} onChange={this.handleOperatorChange}>
-          {_.map(validOperators, (operator) => {
+          {validOperators.map((operator) => {
             let {ID, name} = operator;
             return (
                 <option key={ID}
@@ -271,11 +275,11 @@ let Criterion = React.createClass({
 
     let otherColumnSelect = () =>
       <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
-          {_.map(groups, (group) => {
+          {groups.map((group) => {
             if (group.id === 'other') return null;
             return (
                 <optgroup key={group.id} label={group.name}>
-                  {_.map(group.properties, (property) => {
+                  {group.properties.map((property) => {
                     let {propid, disabled, name} = property;
                     return (
                       <option key={propid}
@@ -293,7 +297,7 @@ let Criterion = React.createClass({
         </select>;
 
     let fields = null;
-    let currentOperator = _.filter(validOperators, (op) => op.ID === component.type)[0];
+    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
       throw Error('SQL Critiera operator not valid');
     if (currentOperator.fieldType === 'value')
@@ -303,7 +307,7 @@ let Criterion = React.createClass({
             <select className="field" ref="value"
                     value={component.CompValue}
                     onChange={this.handleValueChange}>
-              {_.map(property.propCategories, (cat) =>
+              {property.propCategories.map((cat) =>
                 <option key={cat}
                         value={cat}>
                   {cat}
@@ -357,7 +361,7 @@ let Criterion = React.createClass({
       fields = (
         <div className="fields">
           <select className="field" ref="subset" value={component.subset} onChange={this.handleValueChange}>
-            {_.map(this.state.subsets.toArray(), (subset) => {
+            {this.state.subsets.toArray().map((subset) => {
               //TODO CHECK AGAINST ACTUAL SUBSET CONTENT
               let {id, name} = subset;
               return (

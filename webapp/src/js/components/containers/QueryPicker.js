@@ -6,7 +6,12 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 import SQL from 'panoptes/SQL';
 
-import {RaisedButton, IconButton, List, ListItem, Divider} from 'material-ui';
+import RaisedButton from 'material-ui/lib/raised-button';
+import IconButton from 'material-ui/lib/icon-button';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+import Divider from 'material-ui/lib/divider';
+
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
 import Sidebar from 'react-sidebar';

@@ -1,8 +1,6 @@
-import _ from 'lodash';
-
 let Assert = {
   assertRequired(obj, requiredKey) {
-    _.each(requiredKey, (key) => {
+    requiredKey.forEach((key) => {
       if (!(key in obj))
         throw Error(key + 'is a required arg');
     }

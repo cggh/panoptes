@@ -11,8 +11,7 @@ import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
 
-import mui from 'material-ui';
-const {FlatButton} = mui;
+import FlatButton from 'material-ui/lib/flat-button';
 
 
 let GenomeBrowserWithActions = React.createClass({

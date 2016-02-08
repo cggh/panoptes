@@ -4,7 +4,7 @@ import {assertRequired} from 'util/Assert';
 import _map from 'lodash/map';
 import _transform from 'lodash/transform';
 import _reduce from 'lodash/reduce';
-import _each from 'lodash/each';
+import _forEach from 'lodash/forEach';
 
 const FETCH_SIZE = 10000;
 
@@ -86,7 +86,7 @@ let SummarisationCache = {
       let emptyArrays = _transform(columns, (result, col, name) => result[name] = []);
       let data = _reduce(slices,
         (accum, slice) => {
-          _each(slice, (data, name) => Array.prototype.push.apply(accum[name], data));
+          _forEach(slice, (data, name) => Array.prototype.push.apply(accum[name], data));
           return accum;
         },
         emptyArrays

@@ -1,6 +1,5 @@
 import React from  'react';
 import Immutable from 'immutable';
-import _ from 'lodash';
 import NotificationSystem from 'react-notification-system';
 
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,7 +12,7 @@ import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
-import {IconButton} from 'material-ui';
+import IconButton from 'material-ui/lib/icon-button';
 import ThemeManager from  'material-ui/lib/styles/theme-manager';
 import RawTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme';
 
@@ -36,7 +35,7 @@ let Panoptes = React.createClass({
     let store = this.getFlux().store('SessionStore');
     store.on('notify',
       () => this.refs.notificationSystem.addNotification(
-        _.extend(store.getLastNotification(), {position: 'tc'})));
+        Object.assign(store.getLastNotification(), {position: 'tc'})));
     //We don't need this as it will come to us in page load json
     //this.getFlux().actions.api.fetchUser(this.state.panoptes.get('dataset'));
   },

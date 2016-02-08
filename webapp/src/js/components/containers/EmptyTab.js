@@ -1,11 +1,13 @@
-import _ from 'lodash';
+import _keys from 'lodash/keys';
+import _map from 'lodash/map';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import {List, ListItem} from 'material-ui';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
 import Icon from 'ui/Icon';
 
 let EmptyTab = React.createClass({
@@ -47,10 +49,10 @@ let EmptyTab = React.createClass({
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome: _.keys(chromosomes)[0]})} />
+                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome: _keys(chromosomes)[0]})} />
         </List>
         <List subheader="Open a table:" style={{width: '500px'}}>
-          {_.map(tables, (table) => (
+          {_map(tables, (table) => (
             <ListItem key={table.id}
                       primaryText={table.tableCapNamePlural}
                       secondaryText={table.description}

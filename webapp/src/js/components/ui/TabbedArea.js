@@ -1,7 +1,8 @@
 import React from 'react';
 import ValidComponentChildren from '../utils/ValidComponentChildren';
 import classNames from 'classnames';
-import _ from 'lodash';
+import _isEqual from 'lodash/isEqual';
+import _forEach from 'lodash/forEach';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 import Draggable from 'react-draggable';
@@ -31,11 +32,11 @@ let TabbedArea = React.createClass({
   componentDidUpdate() {
     let icons = {};
     let titles = {};
-    _.each(this.refs, (child, id) => {
+    _forEach(this.refs, (child, id) => {
       child.icon ? icons[id] = child.icon() : null;
       child.title ? titles[id] = child.title() : null;
     });
-    if (!(_.isEqual(this.state.icons, icons) && _.isEqual(this.state.titles, titles)))
+    if (!(_isEqual(this.state.icons, icons) && _isEqual(this.state.titles, titles)))
       this.setState({
         icons: icons,
         titles: titles

@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _has from 'lodash/has';
+import _without from 'lodash/without';
 import Q from 'q';
 
 const CANCELLED = {status: '__CANCELLED__'};
@@ -12,13 +13,13 @@ let LRUCache = {
   numberWaitingFor: {},
 
   get(key, method, cancellation = null, fetchIfAbsent = true) {
-    let present = _.has(this.cache, key);
+    let present = _has(this.cache, key);
     if (!present && !fetchIfAbsent)
       return null;
 
     if (present) {
       //Make the key be the most recent used
-      this.lru = _.without(this.lru, key);
+      this.lru = _without(this.lru, key);
       this.lru.push(key);
     } else {
       this.lru.push(key);
@@ -38,7 +39,7 @@ let LRUCache = {
           //If the promise fails we remove it's entry altogether
           delete this.cache[key];
           delete this.cancellers[key];
-          this.lru = _.without(this.lru, key);
+          this.lru = _without(this.lru, key);
           throw err;
         });
     }

@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import uid from 'uid';
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-import _ from 'lodash';
+import _isFunction from 'lodash/isFunction';
 
 const EMPTY_TAB = 'containers/EmptyTab';
 
@@ -122,7 +122,7 @@ let SessionStore = Fluxxor.createStore({
   componentUpdate(payload) {
     let {compId, updater, newComponent} = payload;
     if (newComponent) {
-      if (_.isFunction(updater)) {
+      if (_isFunction(updater)) {
         this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props: {}}));
         this.state = this.state.updateIn(['components', compId, 'props'], updater);
       } else {
@@ -133,7 +133,7 @@ let SessionStore = Fluxxor.createStore({
         this.state = this.state.setIn(['components', compId], component);
       }
     } else {
-      if (_.isFunction(updater)) {
+      if (_isFunction(updater)) {
         this.state = this.state.updateIn(['components', compId, 'props'], updater);
       } else {
         this.state = this.state.mergeDeepIn(['components', compId, 'props'], updater);

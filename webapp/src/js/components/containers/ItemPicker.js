@@ -5,9 +5,12 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Highlight from 'react-highlighter';
-import _ from 'lodash';
 
-import {TextField, RaisedButton, List, ListItem} from 'material-ui';
+import TextField from 'material-ui/lib/text-field';
+import RaisedButton from 'material-ui/lib/raised-button';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+import _map from 'lodash/map';
 
 import Icon from 'ui/Icon';
 
@@ -100,9 +103,9 @@ let ItemPicker = React.createClass({
               </div>
             <List>
               {
-                _.map(groups.toJS(), (group) => {
+                _map(groups.toJS(), (group) => {
                   let {id, name, properties} = group;
-                  let subItems = _.map(properties, (prop) => {
+                  let subItems = properties.map((prop) => {
                     let {name, description, propid} = prop;
                     return (name + '#' + description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
                           <ListItem className={classNames({picked: picked.includes(propid)})}
@@ -114,7 +117,7 @@ let ItemPicker = React.createClass({
                             />) : null;
                   }
                     );
-                  return _.filter(subItems).length > 0 ? (
+                  return subItems.filter((i) => i).length > 0 ? (
                     <ListItem primaryText={name}
                               key={id}
                               initiallyOpen={true}
@@ -133,16 +136,16 @@ let ItemPicker = React.createClass({
               <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
                 <List>
                   {
-                    _.map(groups.toJS(), (group) => {
+                    _map(groups.toJS(), (group) => {
                       let {id, name, properties} = group;
-                      return ( picked.intersect(_.map(properties, (prop) => prop.propid)).size > 0 ?
+                      return ( picked.intersect(properties.map((prop) => prop.propid)).size > 0 ?
                           <ListItem primaryText={name}
                                     key={id}
                                     initiallyOpen={true}
                                     leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
                                     onClick={() => this.handleRemoveAll(id)}
                                     nestedItems={
-                        _.map(properties, (prop) => {
+                        properties.map((prop) => {
                           let {name, description, propid} = prop;
                           return picked.includes(propid) ? (
                               <ListItem key={propid}

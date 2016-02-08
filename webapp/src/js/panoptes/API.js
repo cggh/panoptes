@@ -1,7 +1,7 @@
 import qajax from 'qajax';
-import _ from 'lodash';
+import _keys from 'lodash/keys';
 import LZString from 'lz-string';
-
+import _forEach from 'lodash/forEach';
 import {assertRequired} from 'util/Assert';
 import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
@@ -60,7 +60,7 @@ function _decodeValList(columns) {
   return function(jsonResponse) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
-    _.each(columns, (encoding, id) =>
+    _forEach(columns, (encoding, id) =>
       ret[id] = vallistdecoder.doDecode(jsonResponse[id])
     );
     return ret;
@@ -70,7 +70,7 @@ function _decodeValList(columns) {
 function _decodeSummaryList(columns) {
   return function(jsonResponse) {
     let ret = {};
-    _.each(columns, (column, key) => {
+    _forEach(columns, (column, key) => {
       let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
         //For better or worse we imitate the original behaviour of passing on a lack of data
       if (data)
@@ -99,7 +99,7 @@ function pageQuery(options) {
     ascending, count, start, stop, distinct} = Object.assign(defaults, options);
 
   let collist = '';
-  _.each(columns, (encoding, id) => {
+  _forEach(columns, (encoding, id) => {
     if (collist.length > 0) collist += '~';
     collist += encoding + id;
   });
@@ -122,9 +122,9 @@ function pageQuery(options) {
     //Transpose into rows
     .then((columns) => {
       let rows = [];
-      for (let i = 0; i < columns[_.keys(columns)[0]].length; i++) {
+      for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
         let row = {};
-        _.each(columns, (array, id) => row[id] = array[i]);
+        _forEach(columns, (array, id) => row[id] = array[i]);
         rows.push(row);
       }
       return rows;
@@ -138,7 +138,7 @@ function summaryData(options) {
   let {chromosome, columns, blocksize, blockstart, blockcount} = Object.assign(defaults, options);
 
   let collist = '';
-  _.each(columns, (column) => {
+  _forEach(columns, (column) => {
     if (collist.length > 0) collist += '~';
     collist += `${column.folder}~${column.config}~${column.name}`;
   });

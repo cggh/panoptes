@@ -1,6 +1,5 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _ from 'lodash';
 
 import Formatter from 'panoptes/Formatter';
 import Icon from 'ui/Icon';
@@ -31,7 +30,7 @@ let PropertyCell = React.createClass({
     if (prop.externalUrl) {
       let refs = value.split(';');
       return (<span className="prop">
-        {_.map(refs, (ref, index) => (
+        {refs.map((ref, index) => (
           <span key={index}>
           {index === 0 ? externalLinkIcon : null}
           <a target="_blank" href={prop.externalUrl.replace('{value}', ref)}>

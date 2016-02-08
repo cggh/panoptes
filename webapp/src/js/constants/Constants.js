@@ -1,9 +1,9 @@
 import keyMirror from 'keymirror';
-import _ from 'lodash';
+import _forOwn from 'lodash/forOwn';
 
 function nameSpace(namespace, obj) {
   let res = {};
-  _.forOwn(obj, (key, val) => res[key] = namespace + '_' + val);
+  _forOwn(obj, (key, val) => res[key] = namespace + '_' + val);
   return res;
 }
 

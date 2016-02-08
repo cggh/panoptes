@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _isFinite from 'lodash/isFinite';
+import _map from 'lodash/map';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -48,8 +49,8 @@ let Controls = React.createClass({
     let mid = parseInt(this.refs.midpoint.value);
     let width = parseInt(this.refs.width.value);
     if (
-      _.isFinite(mid) &&
-      _.isFinite(width) &&
+      _isFinite(mid) &&
+      _isFinite(width) &&
       mid >= 0 &&
       mid <= (this.config.chromosomes[this.props.chromosome].len || FALLBACK_MAXIMUM) &&
       width > this.props.minWidth
@@ -70,7 +71,7 @@ let Controls = React.createClass({
         <span> Chromosome: </span>
         <span>
           <select ref="chromosome" value={chromosome} onChange={this.handleChromChange}>
-            {_.map(this.config.chromosomes, (length, name) =>
+            {_map(this.config.chromosomes, (length, name) =>
                 <option key={name}
                         value={name}>
                   {name}

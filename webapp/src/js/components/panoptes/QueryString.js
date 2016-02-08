@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -44,7 +43,7 @@ let QueryString = React.createClass({
       </span>;
 
     let nameMap = {};
-    _.each(this.config.properties, (property) => {
+    this.config.properties.forEach((property) => {
       nameMap[property.propid] = {
         name: property.name,
         toDisplayString: Formatter.bind(this, property)

@@ -1,6 +1,6 @@
 import React from 'react';
 const PropTypes = React.PropTypes;
-import _ from 'lodash';
+import _startsWith from 'lodash/startsWith';
 
 const dynreq = require.context('../../../images', true);
 const dynamicRequire = (path) => dynreq('./' + path);
@@ -27,7 +27,7 @@ let Icon = React.createClass({
     if (!name)
       return;
     let classNames = '';
-    if (_.startsWith(name, 'bitmap:')) {
+    if (_startsWith(name, 'bitmap:')) {
       classNames += 'icon';
     } else {
       classNames += `fa fa-${name} icon`;
@@ -58,7 +58,7 @@ let Icon = React.createClass({
     if (className) {
       classNames += ` ${className}`;
     }
-    if (_.startsWith(name, 'bitmap:'))
+    if (_startsWith(name, 'bitmap:'))
       return <span {...props} className={classNames}><img className="bitmap" src={dynamicRequire(name.substring(7))} /></span>;
     else
       return <span {...props} className={classNames}> { this.props.children} </span>;

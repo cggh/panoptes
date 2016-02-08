@@ -4,6 +4,7 @@ import offset from 'bloody-offset';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
+import _map from 'lodash/map';
 import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
 
@@ -262,7 +263,7 @@ let GenomeBrowser = React.createClass({
                           null }
                       </div>
                       <div className="scrolling grow scroll-within">
-                        {components.map((componentSpec, componentId) => {
+                        {_map(components, (componentSpec, componentId) => {
                           let {component, props} = componentSpec.toJS();
                           return React.createElement(dynamicRequire(component),
                               Object.assign({

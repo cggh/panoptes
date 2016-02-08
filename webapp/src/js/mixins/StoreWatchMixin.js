@@ -1,4 +1,3 @@
-import _each from 'lodash/forEach';
 import _bind from 'lodash/bind';
 
 let StoreWatchMixin = function() {
@@ -6,14 +5,14 @@ let StoreWatchMixin = function() {
   return {
     componentDidMount: function() {
       let flux = this.props.flux || this.context.flux;
-      _each(storeNames, _bind(function(store) {
+      storeNames.forEach(_bind(function(store) {
         flux.store(store).on('change', this._setStateFromFlux);
       }, this));
     },
 
     componentWillUnmount: function() {
       let flux = this.props.flux || this.context.flux;
-      _each(storeNames, _bind(function(store) {
+      storeNames.forEach(_bind(function(store) {
         flux.store(store).removeListener('change', this._setStateFromFlux);
       }, this));
     },

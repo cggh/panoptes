@@ -2,7 +2,6 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import d3 from 'd3';
 import uid from 'uid';
-import _ from 'lodash';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -146,7 +145,7 @@ let SequenceSquares = React.createClass({
     let ctx = canvas.getContext('2d');
     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     let data = imageData.data;
-    _.each(sequence, (base, i) => {
+    sequence.forEach((base, i) => {
       base = base.toLowerCase();
       data[i * 4 + 3] = 255;
       if (base === 'a') {

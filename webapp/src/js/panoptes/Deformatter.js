@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _indexOf from 'lodash/indexOf';
 
 let DateTime2JD = function(date) {
   return date.getTime() / (24.0 * 60 * 60 * 1000) + 2440587.5;
@@ -7,7 +7,7 @@ let DateTime2JD = function(date) {
 
 module.exports = function(property, string) {
   if (property.isBoolean) {
-    return _.indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1;
+    return _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1;
   }
 
   if (property.isDate) {

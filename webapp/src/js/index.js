@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _debounce from 'lodash/debounce';
 
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
@@ -104,7 +104,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       }
 
     };
-    storeState = _.debounce(storeState, 200);
+    storeState = _debounce(storeState, 200);
     stores.SessionStore.on('change', storeState);
     stores.PanoptesStore.on('change', storeState);
 
