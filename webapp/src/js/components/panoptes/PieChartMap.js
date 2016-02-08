@@ -1,23 +1,23 @@
-const React = require('react');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const Immutable = require('immutable');
-const GoogleMap = require('google-map-react');
-const {fitBounds} = require('google-map-react/utils');
-const _minBy = require('lodash/minBy');
-const _maxBy = require('lodash/maxBy');
-const shallowEquals = require('shallow-equals');
+import React from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import Immutable from 'immutable';
+import GoogleMap from 'google-map-react';
+import {fitBounds} from 'google-map-react/utils';
+import _minBy from 'lodash/minBy';
+import _maxBy from 'lodash/maxBy';
+import shallowEquals from 'shallow-equals';
 
 // Utils
-const GeoLayouter = require('utils/GeoLayouter');
-const DetectResize = require('utils/DetectResize');
-const {latlngToMercatorXY} = require('util/WebMercator');
+import GeoLayouter from 'utils/GeoLayouter';
+import DetectResize from 'utils/DetectResize';
+import {latlngToMercatorXY} from 'util/WebMercator';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-const PieChart = require('panoptes/PieChart');
+import PieChart from 'panoptes/PieChart';
 
 function getMapOptions(maps) {
   return {

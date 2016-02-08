@@ -1,22 +1,22 @@
-const React = require('react');
-const _ = require('lodash');
+import React from 'react';
+import _ from 'lodash';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 // Utils
-const LRUCache = require('util/LRUCache');
+import LRUCache from 'util/LRUCache';
 
 // Panoptes components
-const API = require('panoptes/API');
-const PropertyList = require('panoptes/PropertyList');
-const ErrorReport = require('panoptes/ErrorReporter');
+import API from 'panoptes/API';
+import PropertyList from 'panoptes/PropertyList';
+import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
-const Loading = require('ui/Loading');
+import Loading from 'ui/Loading';
 
 let OverviewTab = React.createClass({
 

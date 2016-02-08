@@ -1,24 +1,24 @@
-const React = require('react');
-const _sumBy = require('lodash/sumBy');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
+import React from 'react';
+import _sumBy from 'lodash/sumBy';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 
 // Mixins
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 // Utils
-const LRUCache = require('util/LRUCache');
+import LRUCache from 'util/LRUCache';
 
 // Panoptes components
-const API = require('panoptes/API');
-const PieChartMap = require('panoptes/PieChartMap');
-const ErrorReport = require('panoptes/ErrorReporter');
+import API from 'panoptes/API';
+import PieChartMap from 'panoptes/PieChartMap';
+import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
-const Loading = require('ui/Loading');
+import Loading from 'ui/Loading';
 
 // Constants in this component
 const RESIDUAL_SECTOR_COLOR = 'rgb(191,191,191)';

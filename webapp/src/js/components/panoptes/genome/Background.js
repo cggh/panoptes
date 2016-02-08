@@ -1,8 +1,8 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const tickWidth = require('panoptes/TickWidth.js');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import tickWidth from 'panoptes/TickWidth.js';
 
-const d3 = require('d3');
+import d3 from 'd3';
 
 
 let Background = React.createClass({

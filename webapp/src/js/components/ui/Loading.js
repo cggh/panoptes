@@ -1,5 +1,5 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import 'loading.scss';
 

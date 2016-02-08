@@ -1,18 +1,18 @@
-const React = require('react');
+import React from 'react';
 
-const d3 = require('d3');
-const _min = require('lodash/min');
-const _max = require('lodash/max');
-const _throttle = require('lodash/throttle');
-const _isFinite = require('lodash/isFinite');
+import d3 from 'd3';
+import _min from 'lodash/min';
+import _max from 'lodash/max';
+import _throttle from 'lodash/throttle';
+import _isFinite from 'lodash/isFinite';
 
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-const SummarisationCache = require('panoptes/SummarisationCache');
-const ErrorReport = require('panoptes/ErrorReporter');
-const LRUCache = require('util/LRUCache');
-const API = require('panoptes/API');
+import SummarisationCache from 'panoptes/SummarisationCache';
+import ErrorReport from 'panoptes/ErrorReporter';
+import LRUCache from 'util/LRUCache';
+import API from 'panoptes/API';
 
 let NumericalTrack = React.createClass({
   mixins: [

@@ -1,10 +1,10 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const _ = require('lodash');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import _ from 'lodash';
 
-const Formatter = require('panoptes/Formatter');
-const Icon = require('ui/Icon');
-const FluxMixin = require('mixins/FluxMixin');
+import Formatter from 'panoptes/Formatter';
+import Icon from 'ui/Icon';
+import FluxMixin from 'mixins/FluxMixin';
 
 
 let PropertyCell = React.createClass({

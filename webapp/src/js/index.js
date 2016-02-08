@@ -1,26 +1,26 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
 //Needed for JSX
-const React = require('react'); //eslint-disable-line no-unused-vars
-const ReactDOM = require('react-dom');
-const Fluxxor = require('fluxxor');
-const Immutable = require('immutable');
-const Panoptes = require('components/Panoptes.js');
+import React from 'react'; //eslint-disable-line no-unused-vars
+import ReactDOM from 'react-dom';
+import Fluxxor from 'fluxxor';
+import Immutable from 'immutable';
+import Panoptes from 'components/Panoptes.js';
 
-const SessionStore = require('stores/SessionStore');
-const PanoptesStore = require('stores/PanoptesStore');
+import SessionStore from 'stores/SessionStore';
+import PanoptesStore from 'stores/PanoptesStore';
 
-const SessionActions = require('actions/SessionActions');
-const PanoptesActions = require('actions/PanoptesActions');
-const APIActions = require('actions/APIActions');
+import SessionActions from 'actions/SessionActions';
+import PanoptesActions from 'actions/PanoptesActions';
+import APIActions from 'actions/APIActions';
 
-const API = require('panoptes/API');
+import API from 'panoptes/API';
 
-const InitialConfig = require('panoptes/InitialConfig');
-const injectTapEventPlugin = require('react-tap-event-plugin');
+import InitialConfig from 'panoptes/InitialConfig';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
 
-require('console-polyfill');
+import 'console-polyfill';
 
 import 'normalize.css';
 

@@ -1,9 +1,9 @@
-const Fluxxor = require('fluxxor');
-const Immutable = require('immutable');
-const uid = require('uid');
-const Constants = require('../constants/Constants');
+import Fluxxor from 'fluxxor';
+import Immutable from 'immutable';
+import uid from 'uid';
+import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-const _ = require('lodash');
+import _ from 'lodash';
 
 const EMPTY_TAB = 'containers/EmptyTab';
 

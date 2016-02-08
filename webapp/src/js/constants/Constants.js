@@ -1,5 +1,5 @@
-const keyMirror = require('keymirror');
-const _ = require('lodash');
+import keyMirror from 'keymirror';
+import _ from 'lodash';
 
 function nameSpace(namespace, obj) {
   let res = {};

@@ -1,5 +1,5 @@
-const _each = require('lodash/forEach');
-const _bind = require('lodash/bind');
+import _each from 'lodash/forEach';
+import _bind from 'lodash/bind';
 
 let StoreWatchMixin = function() {
   let storeNames = Array.prototype.slice.call(arguments);

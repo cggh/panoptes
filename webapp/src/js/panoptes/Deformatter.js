@@ -1,4 +1,4 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
 let DateTime2JD = function(date) {
   return date.getTime() / (24.0 * 60 * 60 * 1000) + 2440587.5;

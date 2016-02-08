@@ -1,8 +1,8 @@
-const Constants = require('../constants/Constants');
+import Constants from '../constants/Constants';
 const APICONST = Constants.API;
-const API = require('panoptes/API');
+import API from 'panoptes/API';
 
-const ErrorReport = require('panoptes/ErrorReporter.js');
+import ErrorReport from 'panoptes/ErrorReporter.js';
 
 let APIActions = {
   fetchUser(dataset) {

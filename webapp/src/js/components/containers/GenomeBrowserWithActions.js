@@ -1,17 +1,17 @@
-const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const PureRenderMixin = require('mixins/PureRenderMixin');
+import React from 'react';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
-const Sidebar = require('react-sidebar').default;
-const SidebarHeader = require('ui/SidebarHeader');
-const Icon = require('ui/Icon');
-const GenomeBrowser = require('panoptes/genome/GenomeBrowser');
+import Sidebar from 'react-sidebar';
+import SidebarHeader from 'ui/SidebarHeader';
+import Icon from 'ui/Icon';
+import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
 
-const mui = require('material-ui');
+import mui from 'material-ui';
 const {FlatButton} = mui;
 
 

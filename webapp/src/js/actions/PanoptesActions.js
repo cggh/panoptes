@@ -1,6 +1,6 @@
-const _each = require('lodash/each');
+import _each from 'lodash/each';
 
-const Constants = require('../constants/Constants');
+import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({

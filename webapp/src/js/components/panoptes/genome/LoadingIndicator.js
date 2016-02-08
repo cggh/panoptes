@@ -1,8 +1,8 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const RAF = require('raf');
-const now = require('performance-now');
-const classnames = require('classnames');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import RAF from 'raf';
+import now from 'performance-now';
+import classnames from 'classnames';
 const HEIGHT = 20;
 
 let LoadingIndicator = React.createClass({

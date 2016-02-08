@@ -1,9 +1,9 @@
-const Fluxxor = require('fluxxor');
-const Immutable = require('immutable');
+import Fluxxor from 'fluxxor';
+import Immutable from 'immutable';
 
-const SQL = require('panoptes/SQL');
+import SQL from 'panoptes/SQL';
 
-const Constants = require('../constants/Constants');
+import Constants from '../constants/Constants';
 //Not implemeted yet
 const SESSION = Constants.SESSION; //eslint-disable-line no-unused-vars
 const API = Constants.API;

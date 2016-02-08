@@ -1,14 +1,14 @@
-const React = require('react');
+import React from 'react';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // UI components
-const TooltipEllipsis = require('ui/TooltipEllipsis');
-const Icon = require('ui/Icon');
+import TooltipEllipsis from 'ui/TooltipEllipsis';
+import Icon from 'ui/Icon';
 
-const Tooltip = require('rc-tooltip');
+import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 
 let PropertyHeader = React.createClass({

@@ -1,12 +1,12 @@
-const React = require('react');
-const d3 = require('d3');
+import React from 'react';
+import d3 from 'd3';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-const PieChartSector = require('panoptes/PieChartSector');
+import PieChartSector from 'panoptes/PieChartSector';
 
 import 'pie-chart.scss';
 

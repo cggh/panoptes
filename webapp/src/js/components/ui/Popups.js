@@ -1,6 +1,6 @@
-const React = require('react');
-const ValidComponentChildren = require('../utils/ValidComponentChildren');
-const PureRenderMixin = require('mixins/PureRenderMixin');
+import React from 'react';
+import ValidComponentChildren from '../utils/ValidComponentChildren';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
 let Popups = React.createClass({
   mixins: [PureRenderMixin],

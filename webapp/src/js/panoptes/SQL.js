@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const Base64 = require('panoptes/Base64');
+import _ from 'lodash';
+import Base64 from 'panoptes/Base64';
 
 let SQL = {};
 

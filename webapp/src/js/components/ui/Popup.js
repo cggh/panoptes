@@ -1,12 +1,12 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
-const Draggable = require('react-draggable');
-const Resizable = require('react-resizable').Resizable;
+import Draggable from 'react-draggable';
+import {Resizable} from 'react-resizable';
 import 'react-resizable/css/styles.css';
-const Icon = require('ui/Icon');
+import Icon from 'ui/Icon';
 
 
 let Popup = React.createClass({

@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
+import _ from 'lodash';
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
 const FALLBACK_MAXIMUM = 1000000000;
 

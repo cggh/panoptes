@@ -1,17 +1,17 @@
-const _ = require('lodash');
-const React = require('react');
-const classNames = require('classnames');
+import _ from 'lodash';
+import React from 'react';
+import classNames from 'classnames';
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-const SQL = require('panoptes/SQL');
-const Formatter = require('panoptes/Formatter');
-const Deformatter = require('panoptes/Deformatter');
-const {RaisedButton, Paper} = require('material-ui');
-const Icon = require('ui/Icon');
+import SQL from 'panoptes/SQL';
+import Formatter from 'panoptes/Formatter';
+import Deformatter from 'panoptes/Deformatter';
+import {RaisedButton, Paper} from 'material-ui';
+import Icon from 'ui/Icon';
 
 
 let Component = React.createClass({

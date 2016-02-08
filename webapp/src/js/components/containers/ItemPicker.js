@@ -1,15 +1,15 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const LinkedStateMixin = require('react-addons-linked-state-mixin');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const classNames = require('classnames');
-const Highlight = require('react-highlighter');
-const _ = require('lodash');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import LinkedStateMixin from 'react-addons-linked-state-mixin';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import classNames from 'classnames';
+import Highlight from 'react-highlighter';
+import _ from 'lodash';
 
-const {TextField, RaisedButton, List, ListItem} = require('material-ui');
+import {TextField, RaisedButton, List, ListItem} from 'material-ui';
 
-const Icon = require('ui/Icon');
+import Icon from 'ui/Icon';
 
 
 let ItemPicker = React.createClass({

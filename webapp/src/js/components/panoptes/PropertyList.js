@@ -1,11 +1,11 @@
-const React = require('react');
+import React from 'react';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-const PropertyListItem = require('panoptes/PropertyListItem');
+import PropertyListItem from 'panoptes/PropertyListItem';
 
 let PropertyList = React.createClass({
 

@@ -1,5 +1,5 @@
-const Fluxxor = require('fluxxor');
-const React = require('react');
+import Fluxxor from 'fluxxor';
+import React from 'react';
 let FluxMixin = Fluxxor.FluxMixin(React);
 
 FluxMixin.componentWillMount = function() {

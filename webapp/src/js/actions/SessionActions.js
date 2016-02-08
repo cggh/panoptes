@@ -1,6 +1,6 @@
-const Constants = require('../constants/Constants');
+import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-const memoize = require('utils/Memoize');
+import memoize from 'utils/Memoize';
 
 
 let SessionActions = {

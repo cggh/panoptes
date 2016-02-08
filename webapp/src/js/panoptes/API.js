@@ -1,11 +1,11 @@
-const qajax = require('qajax');
-const _ = require('lodash');
-const LZString = require('lz-string');
+import qajax from 'qajax';
+import _ from 'lodash';
+import LZString from 'lz-string';
 
-const {assertRequired} = require('util/Assert');
-const SQL = require('panoptes/SQL');
-const DataDecoders = require('panoptes/DataDecoders');
-const Base64 = require('panoptes/Base64');
+import {assertRequired} from 'util/Assert';
+import SQL from 'panoptes/SQL';
+import DataDecoders from 'panoptes/DataDecoders';
+import Base64 from 'panoptes/Base64';
 
 //Global for now
 const serverURL = initialConfig.serverURL; //eslint-disable-line no-undef

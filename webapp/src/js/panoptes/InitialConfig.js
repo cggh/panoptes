@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const API = require('panoptes/API');
-const SQL = require('panoptes/SQL');
-const attrMap = require('util/AttrMap');
+import _ from 'lodash';
+import API from 'panoptes/API';
+import SQL from 'panoptes/SQL';
+import attrMap from 'util/AttrMap';
 
 //TODO THIS WHOLE FILE SHOULD'T EXIST AS THIS SHOULD BE COMPILED SERVER SIDE AND SENT DOWN IN INDEX.HTML
 

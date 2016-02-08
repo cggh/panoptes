@@ -1,22 +1,22 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const offset = require('bloody-offset');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const _has = require('lodash/has');
-const _isFunction = require('lodash/isFunction');
-const d3 = require('d3');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import offset from 'bloody-offset';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import _has from 'lodash/has';
+import _isFunction from 'lodash/isFunction';
+import d3 from 'd3';
 
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const Hammer = require('react-hammerjs');
-const {Motion, spring} = require('react-motion');
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import Hammer from 'react-hammerjs';
+import {Motion, spring} from 'react-motion';
 
-const GenomeScale = require('panoptes/genome/tracks/GenomeScale');
-const LoadingIndicator = require('panoptes/genome/LoadingIndicator');
-const Controls = require('panoptes/genome/Controls');
-const ReferenceSequence = require('panoptes/genome/tracks/ReferenceSequence');
-const Background = require('panoptes/genome/Background');
-const DetectResize = require('utils/DetectResize');
+import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
+import LoadingIndicator from 'panoptes/genome/LoadingIndicator';
+import Controls from 'panoptes/genome/Controls';
+import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import Background from 'panoptes/genome/Background';
+import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
 
 const dynreq = require.context('.', true);

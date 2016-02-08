@@ -1,6 +1,6 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const detectResize = require('util/DetectElementResize');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import detectResize from 'util/DetectElementResize';
 
 let DetectResize = React.createClass({
 

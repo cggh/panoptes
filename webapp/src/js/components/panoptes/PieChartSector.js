@@ -1,5 +1,5 @@
-const React = require('react');
-const d3 = require('d3');
+import React from 'react';
+import d3 from 'd3';
 
 let PieChartSector = React.createClass({
 

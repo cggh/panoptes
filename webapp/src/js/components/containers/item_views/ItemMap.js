@@ -1,21 +1,21 @@
-const React = require('react');
+import React from 'react';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 // Utils
-const LRUCache = require('util/LRUCache');
+import LRUCache from 'util/LRUCache';
 
 // Panoptes components
-const API = require('panoptes/API');
-const ItemMap = require('panoptes/ItemMap');
-const ErrorReport = require('panoptes/ErrorReporter');
+import API from 'panoptes/API';
+import ItemMap from 'panoptes/ItemMap';
+import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
-const Loading = require('ui/Loading');
+import Loading from 'ui/Loading';
 
 let ItemMapTab = React.createClass({
 

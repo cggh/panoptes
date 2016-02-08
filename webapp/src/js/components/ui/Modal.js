@@ -1,11 +1,11 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const classNames = require('classnames');
-const Icon = require('ui/Icon');
-const Hotkey = require('react-hotkey');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import classNames from 'classnames';
+import Icon from 'ui/Icon';
+import Hotkey from 'react-hotkey';
 Hotkey.activate();
-const keycodes = require('keycodes');
+import keycodes from 'keycodes';
 
 let Modal = React.createClass({
   mixins: [

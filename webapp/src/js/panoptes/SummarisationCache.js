@@ -1,10 +1,10 @@
-const LRUCache = require('util/LRUCache');
-const API = require('panoptes/API');
-const {assertRequired} = require('util/Assert');
-const _map = require('lodash/map');
-const _transform = require('lodash/transform');
-const _reduce = require('lodash/reduce');
-const _each = require('lodash/each');
+import LRUCache from 'util/LRUCache';
+import API from 'panoptes/API';
+import {assertRequired} from 'util/Assert';
+import _map from 'lodash/map';
+import _transform from 'lodash/transform';
+import _reduce from 'lodash/reduce';
+import _each from 'lodash/each';
 
 const FETCH_SIZE = 10000;
 

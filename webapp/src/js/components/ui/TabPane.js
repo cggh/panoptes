@@ -1,6 +1,6 @@
-const React = require('react');
-const classNames = require('classnames');
-const PureRenderMixin = require('mixins/PureRenderMixin');
+import React from 'react';
+import classNames from 'classnames';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
 let TabPane = React.createClass({
   mixins: [PureRenderMixin],

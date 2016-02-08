@@ -1,16 +1,16 @@
-const React = require('react');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const _isFunction = require('lodash/isFunction');
+import React from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import _isFunction from 'lodash/isFunction';
 
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
 // UI components
-const TabbedArea = require('ui/TabbedArea');
-const TabPane = require('ui/TabPane');
+import TabbedArea from 'ui/TabbedArea';
+import TabPane from 'ui/TabPane';
 
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./item_views/' + path);

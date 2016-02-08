@@ -1,15 +1,15 @@
-const React = require('react');
-const d3 = require('d3');
-const _cloneDeep = require('lodash/cloneDeep');
-const _each = require('lodash/each');
-const _zip = require('lodash/zip');
-const _keyBy = require('lodash/keyBy');
-const {latlngToMercatorXY, mercatorXYtolatlng} = require('util/WebMercator');
+import React from 'react';
+import d3 from 'd3';
+import _cloneDeep from 'lodash/cloneDeep';
+import _each from 'lodash/each';
+import _zip from 'lodash/zip';
+import _keyBy from 'lodash/keyBy';
+import {latlngToMercatorXY, mercatorXYtolatlng} from 'util/WebMercator';
 
 
 // Mixins
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 // TODO: How to best name and place such helper functions?
 function updateXYUsingLngLat(node) {

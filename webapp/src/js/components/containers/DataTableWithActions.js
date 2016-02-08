@@ -1,22 +1,22 @@
-const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const PureRenderMixin = require('mixins/PureRenderMixin');
+import React from 'react';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
-const Sidebar = require('react-sidebar').default;
-const SidebarHeader = require('ui/SidebarHeader');
-const Icon = require('ui/Icon');
-const DataTableView = require('panoptes/DataTableView');
-const QueryString = require('panoptes/QueryString');
+import Sidebar from 'react-sidebar';
+import SidebarHeader from 'ui/SidebarHeader';
+import Icon from 'ui/Icon';
+import DataTableView from 'panoptes/DataTableView';
+import QueryString from 'panoptes/QueryString';
 
-const mui = require('material-ui');
-const _ = require('lodash');
+import mui from 'material-ui';
+import _ from 'lodash';
 const {FlatButton} = mui;
 
-const SQL = require('panoptes/SQL');
+import SQL from 'panoptes/SQL';
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],

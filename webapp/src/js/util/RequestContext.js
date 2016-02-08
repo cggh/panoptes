@@ -1,4 +1,4 @@
-const Q = require('q');
+import Q from 'q';
 
 
 class RequestContext {

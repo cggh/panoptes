@@ -1,4 +1,4 @@
-const RequestContext = require('util/RequestContext');
+import RequestContext from 'util/RequestContext';
 
 let DataFetcherMixin = function() {
   let propsToWatch = Array.prototype.slice.call(arguments);

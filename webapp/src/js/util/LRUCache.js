@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const Q = require('q');
+import _ from 'lodash';
+import Q from 'q';
 
 const CANCELLED = {status: '__CANCELLED__'};
 

@@ -1,13 +1,13 @@
-const _ = require('lodash');
-const React = require('react');
+import _ from 'lodash';
+import React from 'react';
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-const SQL = require('panoptes/SQL');
-const Formatter = require('panoptes/Formatter');
+import SQL from 'panoptes/SQL';
+import Formatter from 'panoptes/Formatter';
 
 
 let QueryString = React.createClass({

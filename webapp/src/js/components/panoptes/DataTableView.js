@@ -1,31 +1,31 @@
-const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const classNames = require('classnames');
-const Color = require('color');
+import React from 'react';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import classNames from 'classnames';
+import Color from 'color';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 
-const {Table, Column} = require('fixed-data-table');
+import {Table, Column} from 'fixed-data-table';
 import 'fixed-data-table/dist/fixed-data-table.css';
 
 // Panoptes components
-const API = require('panoptes/API');
-const LRUCache = require('util/LRUCache');
-const ErrorReport = require('panoptes/ErrorReporter');
-const SQL = require('panoptes/SQL');
-const PropertyCell = require('panoptes/PropertyCell');
-const PropertyHeader = require('panoptes/PropertyHeader');
+import API from 'panoptes/API';
+import LRUCache from 'util/LRUCache';
+import ErrorReport from 'panoptes/ErrorReporter';
+import SQL from 'panoptes/SQL';
+import PropertyCell from 'panoptes/PropertyCell';
+import PropertyHeader from 'panoptes/PropertyHeader';
 
 // UI components
-const Loading = require('ui/Loading');
-const Icon = require('ui/Icon');
-const DetectResize = require('utils/DetectResize');
+import Loading from 'ui/Loading';
+import Icon from 'ui/Icon';
+import DetectResize from 'utils/DetectResize';
 
 // Constants in this component
 const MAX_COLOR = Color('#44aafb');

@@ -1,6 +1,6 @@
-const React = require('react');
+import React from 'react';
 const PropTypes = React.PropTypes;
-const _ = require('lodash');
+import _ from 'lodash';
 
 const dynreq = require.context('../../../images', true);
 const dynamicRequire = (path) => dynreq('./' + path);

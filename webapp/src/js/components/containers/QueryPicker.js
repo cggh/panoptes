@@ -1,15 +1,15 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const StoreWatchMixin = require('mixins/StoreWatchMixin');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-const SQL = require('panoptes/SQL');
+import SQL from 'panoptes/SQL';
 
-const {RaisedButton, IconButton, List, ListItem, Divider} = require('material-ui');
-const QueryString = require('panoptes/QueryString');
-const QueryEditor = require('panoptes/QueryEditor');
-const Sidebar = require('react-sidebar').default;
+import {RaisedButton, IconButton, List, ListItem, Divider} from 'material-ui';
+import QueryString from 'panoptes/QueryString';
+import QueryEditor from 'panoptes/QueryEditor';
+import Sidebar from 'react-sidebar';
 
 
 let QueryPicker = React.createClass({

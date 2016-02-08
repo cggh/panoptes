@@ -1,4 +1,4 @@
-const React = require('react');
+import React from 'react';
 
 function map(children, func, context) {
   return React.Children.map(children, (child) => {

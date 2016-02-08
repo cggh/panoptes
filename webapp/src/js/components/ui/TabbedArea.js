@@ -1,10 +1,10 @@
-const React = require('react');
-const ValidComponentChildren = require('../utils/ValidComponentChildren');
-const classNames = require('classnames');
-const _ = require('lodash');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const Icon = require('ui/Icon');
-const Draggable = require('react-draggable');
+import React from 'react';
+import ValidComponentChildren from '../utils/ValidComponentChildren';
+import classNames from 'classnames';
+import _ from 'lodash';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import Icon from 'ui/Icon';
+import Draggable from 'react-draggable';
 
 let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],

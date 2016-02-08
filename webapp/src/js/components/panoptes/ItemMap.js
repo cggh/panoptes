@@ -1,12 +1,12 @@
-const React = require('react');
-const GoogleMap = require('google-map-react');
+import React from 'react';
+import GoogleMap from 'google-map-react';
 
 // Utils
-const DetectResize = require('utils/DetectResize');
+import DetectResize from 'utils/DetectResize';
 
 // Mixins
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 function getMapOptions(maps) {
   return {

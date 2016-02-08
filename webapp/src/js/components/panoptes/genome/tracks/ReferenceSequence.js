@@ -1,20 +1,19 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const d3 = require('d3');
-const uid = require('uid');
-const _ = require('lodash');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import d3 from 'd3';
+import uid from 'uid';
+import _ from 'lodash';
 
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
-const LRUCache = require('util/LRUCache');
-const API = require('panoptes/API');
-const SummarisationCache = require('panoptes/SummarisationCache');
-const ErrorReport = require('panoptes/ErrorReporter');
-const Channel = require('panoptes/genome/tracks/Channel');
-const findBlocks = require('panoptes/genome/FindBlocks');
-
+import LRUCache from 'util/LRUCache';
+import API from 'panoptes/API';
+import SummarisationCache from 'panoptes/SummarisationCache';
+import ErrorReport from 'panoptes/ErrorReporter';
+import Channel from 'panoptes/genome/tracks/Channel';
+import findBlocks from 'panoptes/genome/FindBlocks';
 
 const HEIGHT = 25;
 

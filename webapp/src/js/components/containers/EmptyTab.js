@@ -1,12 +1,12 @@
-const _ = require('lodash');
-const React = require('react');
+import _ from 'lodash';
+import React from 'react';
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
-const {List, ListItem} = require('material-ui');
-const Icon = require('ui/Icon');
+import {List, ListItem} from 'material-ui';
+import Icon from 'ui/Icon';
 
 let EmptyTab = React.createClass({
   mixins: [

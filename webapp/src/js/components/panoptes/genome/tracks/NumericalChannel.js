@@ -1,23 +1,23 @@
-const React = require('react');
+import React from 'react';
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const d3 = require('d3');
-const _isFinite = require('lodash/isFinite');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import d3 from 'd3';
+import _isFinite from 'lodash/isFinite';
 
 
-const ConfigMixin = require('mixins/ConfigMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
-const ChannelWithConfigDrawer = require('panoptes/genome/tracks/ChannelWithConfigDrawer');
-const NumericalTrack = require('panoptes/genome/tracks/NumericalTrack');
+import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
 
-const Checkbox = require('material-ui/lib/checkbox');
+import Checkbox from 'material-ui/lib/checkbox';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
-const Slider = require('material-ui/lib/slider');
-const {Motion, spring} = require('react-motion');
+import Slider from 'material-ui/lib/slider';
+import {Motion, spring} from 'react-motion';
 
-const findBlocks = require('panoptes/genome/FindBlocks');
+import findBlocks from 'panoptes/genome/FindBlocks';
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [

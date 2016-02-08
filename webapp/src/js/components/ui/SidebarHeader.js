@@ -1,6 +1,6 @@
-const React = require('react');
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const Icon = require('ui/Icon');
+import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import Icon from 'ui/Icon';
 
 let SidebarHeader = React.createClass({
   mixins: [PureRenderMixin],

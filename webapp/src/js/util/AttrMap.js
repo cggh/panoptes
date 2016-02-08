@@ -1,4 +1,4 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
 module.exports = (array, attribute) => {
   let out = {};
