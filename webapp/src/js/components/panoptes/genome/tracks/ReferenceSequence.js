@@ -8,8 +8,12 @@ const ConfigMixin = require('mixins/ConfigMixin');
 const DataFetcherMixin = require('mixins/DataFetcherMixin');
 const FluxMixin = require('mixins/FluxMixin');
 
+const LRUCache = require('util/LRUCache');
+const API = require('panoptes/API');
 const SummarisationCache = require('panoptes/SummarisationCache');
 const ErrorReport = require('panoptes/ErrorReporter');
+const Channel = require('panoptes/genome/tracks/Channel');
+const findBlocks = require('panoptes/genome/FindBlocks');
 
 
 const HEIGHT = 25;
@@ -43,45 +47,53 @@ let ReferenceSequence = React.createClass({
   },
 
   //Called by DataFetcherMixin on prop change
-  fetchData(props) {
+  fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth} = props;
     if (this.state.chromosome && (this.state.chromosome !== chromosome))
       this.setState({columns: null});
     if (width - sideWidth < 1) {
       return;
     }
-    let [data, promise] = SummarisationCache.fetch({
-      columns: {
-        sequence: {
-          folder: `SummaryTracks/${this.config.dataset}/Sequence`,
-          config: 'Summ',
-          name: 'Base_avg'
-        }
-      },
-      minBlockSize: 1,
-      chromosome: chromosome,
-      start: start,
-      end: end,
-      targetPointCount: (width - sideWidth) / 2,
-      invalidationID: this.id
-    });
-    if (data)
-      this.applyData(data);
-    if (promise) {
-      this.props.onChangeLoadStatus('LOADING');
-      promise
-        .then((data) => {
-          this.props.onChangeLoadStatus('DONE');
-          this.applyData(data);
+
+    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
+    //If we already have the data for an acceptable block then stop.
+    if ((this.blockEnd === block1End && this.blockStart === block1Start) ||
+      (this.blockEnd === block2End && this.blockStart === block2Start))
+      return;
+
+    this.blockStart = block1Start;
+    this.blockEnd = block1End;
+    let targetPointCount = ((width - sideWidth / 2) / (end - start)) * (block1End - block1Start);
+    this.props.onChangeLoadStatus('LOADING');
+    requestContext.request(
+      (componentCancellation) =>
+        SummarisationCache.fetch({
+          columns: {
+            sequence: {
+              folder: `SummaryTracks/${this.config.dataset}/Sequence`,
+              config: 'Summ',
+              name: 'Base_avg'
+            }
+          },
+          minBlockSize: 1,
+          chromosome: chromosome,
+          start: block1Start,
+          end: block1End,
+          targetPointCount: targetPointCount,
+          cancellation: componentCancellation
         })
-        .catch((error) => {
-          this.props.onChangeLoadStatus('DONE');
-          if (data !== 'SUPERSEDED') {
+          .then((data) => {
+            this.props.onChangeLoadStatus('DONE');
+            this.applyData(data);
+          })
+          .catch(API.filterAborted)
+          .catch(LRUCache.filterCancelled)
+          .catch((error) => {
+            this.props.onChangeLoadStatus('DONE');
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
             this.setState({loadStatus: 'error'});
-          }
-        });
-    }
+          })
+    );
   },
 
   render() {
@@ -91,14 +103,12 @@ let ReferenceSequence = React.createClass({
     if (width == 0)
       return null;
     return (
-      <div className="channel-container">
-        <div className="channel" style={{height: HEIGHT}}>
-          <div className="channel-side" style={{width: `${sideWidth}px`}}>
-            <div className="side-name">
-              Ref. Seq.
-            </div>
-          </div>
-          <div className="channel-data" style={{width: `${width - sideWidth}px`}} >
+      <Channel
+        height={HEIGHT}
+        width={width}
+        sideWidth={sideWidth}
+        sideComponent={<div className="side-name">Ref. Seq.</div>}
+      >
             <SequenceSquares
               width={width - sideWidth}
               height={HEIGHT}
@@ -107,9 +117,7 @@ let ReferenceSequence = React.createClass({
               dataStart={dataStart}
               dataStep={dataStep}
               sequence={sequence}/>
-          </div>
-        </div>
-      </div>
+        </Channel>
     );
   }
 

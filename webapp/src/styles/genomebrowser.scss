@@ -112,7 +112,7 @@
       .channel-controls-container {
         box-shadow: $z-1-shadow;
         position: relative;
-        transition: height .5s, width .5s;
+        transition: height .5s, width .5s !important;
         background: white;
         height: 0;
         width: 0;
