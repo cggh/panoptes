@@ -95,9 +95,13 @@ let NumericalChannel = React.createClass({
     let stepWidth = scale(1) - scale(0);
     let offset = scale(0) - scale(start - 1 / 2);
 
+    let initYAxisSpring = {
+      yMin: yMin,
+      yMax: yMax
+    };
     let yAxisSpring = {
-      yMin: spring(yMin),
-      yMax: spring(yMax)
+      yMin: spring(initYAxisSpring.yMin),
+      yMax: spring(initYAxisSpring.yMax),
     };
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
@@ -120,7 +124,7 @@ let NumericalChannel = React.createClass({
 
       >
         <svg className="numerical-summary" width={effWidth} height={height}>
-          <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
+          <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
               return <g
