@@ -32,7 +32,8 @@
     "dev": "gulp --type dev",
     "start": "gulp",
     "build": "gulp build",
-    "serveprod": "gulp webpack-prodtest-server"
+    "serveprod": "gulp webpack-prodtest-server",
+    "devhot": "gulp webpack-devhot-server"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
