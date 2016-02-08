@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import tickWidth from 'panoptes/TickWidth.js';
+import tickWidth from 'panoptes/TickWidth';
 
 import d3 from 'd3';
 
@@ -34,14 +34,14 @@ let GenomeScale = React.createClass({
       let x = scale(pos);
       if (pos / smallTickWidth % 5 === 0) {
         largeTicks.push(
-          <g className="major tick" key={pos}>
+          <g className="major x tick" key={pos}>
             <line x1={x} x2={x} y1={26} y2={40}/>
             <text x={pos == 0 && start == 0 ? x + 10 : x} y={10}>{format(pos)}</text>
           </g>
         );
       } else {
         smallTicks.push(
-          <g className="minor tick" key={pos}>
+          <g className="minor x tick" key={pos}>
             <line x1={x} x2={x} y1={34} y2={40}/>
           </g>
         );

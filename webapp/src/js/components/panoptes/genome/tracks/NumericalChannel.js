@@ -10,6 +10,8 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
+import YScale from 'panoptes/genome/tracks/YScale';
+
 
 import Checkbox from 'material-ui/lib/checkbox';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
@@ -127,14 +129,17 @@ let NumericalChannel = React.createClass({
           <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
-              return <g
-                style={{transform: `translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
-                <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                      height={2 * height}/>
-                <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
-                                blockPixelWidth={blockPixelWidth}
-                                onYLimitChange={this.handleYLimitChange} {...this.props}
-                />
+              return <g>
+                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
+                <g
+                  style={{transform: `translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
+                  <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
+                        height={2 * height}/>
+                  <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
+                                  blockPixelWidth={blockPixelWidth}
+                                  onYLimitChange={this.handleYLimitChange} {...this.props}
+                  />
+                </g>
               </g>;
             }}
           </Motion>
