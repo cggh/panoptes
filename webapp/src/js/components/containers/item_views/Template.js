@@ -1,5 +1,9 @@
 import React from 'react';
-import _cloneDeep from 'lodash/cloneDeep';
+import ReactDOM from 'react-dom';
+import _uniq from 'lodash/uniq';
+import _each from 'lodash/each';
+import HtmlToReact from 'html-to-react';
+import Handlebars from 'handlebars';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -12,16 +16,15 @@ import LRUCache from 'util/LRUCache';
 
 // Panoptes components
 import API from 'panoptes/API';
-import PropertyList from 'panoptes/PropertyList';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
 import Loading from 'ui/Loading';
+import HelloWorld from 'ui/HelloWorld';
 
 import 'item_views/template.scss';
 
-// TODO: Where to put this?
-
+// TODO: Where to put Handlebars.tablesUsed?
 Handlebars.tablesUsed = function(template, possibleTables) {
 
   // For the given template, return the list of tables actually used in the template.
@@ -51,10 +54,9 @@ Handlebars.tablesUsed = function(template, possibleTables) {
       context();
   });
 
-  hb.registerHelper('map', function(items, nameField, latField, longField) {
-    if (items) {
-      items()
-    }
+  hb.registerHelper('map', function(tableName, nameField, latField, longField) {
+    // no op.
+    // map 'tableName' 'nameField' 'latField' 'longField'
   });
 
 
@@ -79,8 +81,9 @@ Handlebars.tablesUsed = function(template, possibleTables) {
   compiledTemplate(tracers);
 
   // Return the unique set of tables used in the template.
-  return _.uniq(usedTables);
+  return _uniq(usedTables);
 };
+
 
 let TemplateTab = React.createClass({
 
@@ -120,20 +123,13 @@ let TemplateTab = React.createClass({
     // Compose all the column specs for each table using the config data.
     let columnSpecsByTable = {};
     for (let i = 0, len = usedChildTables.length; i < len; i++) {
-
       let usedChildTable = usedChildTables[i];
-
       columnSpecsByTable[usedChildTable] = {};
-
       for (let property in this.config.tables[usedChildTable].propertiesMap) {
-
         // Don't include the StoredSelection property; otherwise the API call breaks. (TODO: why?)
         if (property === 'StoredSelection') continue;
-
         columnSpecsByTable[usedChildTable][property] = this.config.tables[usedChildTable].propertiesMap[property].defaultDisplayEncoding;
-
       }
-
     }
 
     requestContext.request(
@@ -169,8 +165,6 @@ let TemplateTab = React.createClass({
           )
         );
 
-        console.log('promises: %o', promises);
-
         return Promise.all(promises);
 
       })
@@ -191,27 +185,42 @@ let TemplateTab = React.createClass({
     return this.props.title;
   },
 
+  componentDidUpdate() {
+
+    // If there are template components to render...
+    if (this.templateComponentsToRender) {
+      _each(this.templateComponentsToRender, (component, id) => {
+        ReactDOM.render(component, document.getElementById(id));
+      });
+    }
+
+    // Only render the template components once.
+    this.templateComponentsToRender = null;
+
+  },
+
   render() {
 
     let {content} = this.props;
     let {data, loadStatus} = this.state;
 
+    // Don't continue if there are no data.
     if (!data) return null;
 
-    // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tables[table].properties);
-
-    for (let i = 0; i < propertiesData.length; i++) {
-      // Augment the array element (an object) with the fetched value of the property.
-      propertiesData[i].value = data[propertiesData[i].propid];
-    }
+    let thisReact = this;
 
     Handlebars.registerHelper( 'map', function(table, primKey, latProperty, lngProperty) {
-      return new Handlebars.SafeString('<ul>' + '<li>table: ' + table + '</li><li>primKey: ' + primKey + '</li><li>latProperty: ' + latProperty + '</li><li>lngProperty: ' + lngProperty + '</li></ul>');
+      console.log('map table: %o', table);
+      console.log('map primKey: %o', primKey);
+
+      thisReact.templateComponentsToRender = {'map-container': <HelloWorld msg="hello" />};
+      return new Handlebars.SafeString('<div id="map-container"></div>');
+
     });
 
     Handlebars.registerHelper( 'item_link', function(a, b, c) {
-      return new Handlebars.SafeString('<ul>' + '<li>a: ' + a + '</li><li>b: ' + b + '</li><li>c: ' + c + '</li></ul>');
+      // TODO: what is an item_link?
+      return new Handlebars.SafeString('<a href="' + a + '/' + b + '" alt="' + b + '">' + c + '</a>');
     });
 
     // Compile and evaluate the template.
@@ -219,7 +228,6 @@ let TemplateTab = React.createClass({
     let evaluatedContent = template(data);
 
     // Render the evaluated template HTML.
-    // TODO: Isn't there a more native way?
     let htmlToReactParser = new HtmlToReact.Parser(React);
     let reactContent = htmlToReactParser.parse('<div>' + evaluatedContent + '</div>');
 
