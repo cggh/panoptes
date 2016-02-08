@@ -4,7 +4,6 @@ const SESSION = Constants.SESSION;
 const PanoptesActions = (config) => ({
   dataItemPopup({table, primKey}) {
     let dataItemViews = config.tables[table].dataItemViews;
-
     let views = [];
     if (!dataItemViews) {
       // If there are no dataItemViews specified, then default to showing an Overview.
@@ -65,7 +64,8 @@ const PanoptesActions = (config) => ({
             view: 'Template',
             props: {
               title: dataItemView.name, //TODO This should be name from group config
-              content: dataItemView.content
+              content: dataItemView.content,
+              childTablesAsArrayOfMaps: config.tables[table].relationsParentOf
             }
           })
         };
