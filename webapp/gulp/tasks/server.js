@@ -18,6 +18,9 @@ gulp.task("webpack-dev-server", function(callback) {
       hash: true
     }),
   ];
+  //Make the webpack dev server inline instead of iframe
+  myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
+  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://localhost:8080");
 
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(myConfig), {
