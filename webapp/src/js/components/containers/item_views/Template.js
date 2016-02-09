@@ -4,6 +4,7 @@ import _uniq from 'lodash/uniq';
 import _each from 'lodash/each';
 import HtmlToReact from 'html-to-react';
 import Handlebars from 'handlebars';
+import uid from 'uid';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -17,6 +18,7 @@ import LRUCache from 'util/LRUCache';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
+import ItemLink from 'panoptes/ItemLink';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -37,24 +39,24 @@ Handlebars.tablesUsed = function(template, possibleTables) {
 
   // TODO: Explain what this actually does.
 
-  hb.registerHelper('if', function(conditional, options) {
+  hb.registerHelper('if', (conditional, options) => {
     if (conditional)
       conditional();
     options.fn(this);
     options.inverse(this);
   });
 
-  hb.registerHelper('with', function(context, options) {
+  hb.registerHelper('with', (context, options) => {
     if (context)
       context();
   });
 
-  hb.registerHelper('each', function(context, options) {
+  hb.registerHelper('each', (context, options) => {
     if (context)
       context();
   });
 
-  hb.registerHelper('map', function(tableName, nameField, latField, longField) {
+  hb.registerHelper('map', (tableName, nameField, latField, longField) => {
     // no op.
     // map 'tableName' 'nameField' 'latField' 'longField'
   });
@@ -64,7 +66,7 @@ Handlebars.tablesUsed = function(template, possibleTables) {
   //   and each value is a function to add that table to the usedTables list.
   let tracers = {};
   let usedTables = [];
-  possibleTables.forEach(function(table) {
+  possibleTables.forEach((table) => {
     tracers[table] = function() {
       usedTables.push(table);
     };
@@ -113,7 +115,7 @@ let TemplateTab = React.createClass({
 
     // Extract all the childTableIds from the childTablesAsArrayOfMaps.
     let possibleChildTables = [];
-    childTablesAsArrayOfMaps.forEach(function(map) {
+    childTablesAsArrayOfMaps.forEach((map) => {
       possibleChildTables.push(map.get('childtableid'));
     });
 
@@ -191,12 +193,25 @@ let TemplateTab = React.createClass({
     if (this.templateComponentsToRender) {
       _each(this.templateComponentsToRender, (component, id) => {
         ReactDOM.render(component, document.getElementById(id));
+        this.componentsToUnmountAtNode.push(id);
       });
     }
 
     // Only render the template components once.
     this.templateComponentsToRender = null;
 
+  },
+
+  componentWillMount() {
+    this.templateComponentsToRender = {};
+    this.componentsToUnmountAtNode = [];
+  },
+
+  componentWillUnmount() {
+    // https://facebook.github.io/react/blog/2015/10/01/react-render-and-top-level-api.html
+    _each(this.componentsToUnmountAtNode, (id) => {
+      ReactDOM.unmountComponentAtNode(id);
+    });
   },
 
   render() {
@@ -209,18 +224,17 @@ let TemplateTab = React.createClass({
 
     let thisReact = this;
 
-    Handlebars.registerHelper( 'map', function(table, primKey, latProperty, lngProperty) {
-      console.log('map table: %o', table);
-      console.log('map primKey: %o', primKey);
-
-      thisReact.templateComponentsToRender = {'map-container': <HelloWorld msg="hello" />};
-      return new Handlebars.SafeString('<div id="map-container"></div>');
-
+    Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty) => {
+      let id = uid();
+      thisReact.templateComponentsToRender[id] = <HelloWorld msg={table} />;
+      return new Handlebars.SafeString(`<div id="${id}"></div>`);
     });
 
-    Handlebars.registerHelper( 'item_link', function(a, b, c) {
+    Handlebars.registerHelper( 'item_link', (a, b, c) => {
       // TODO: what is an item_link?
-      return new Handlebars.SafeString('<a href="' + a + '/' + b + '" alt="' + b + '">' + c + '</a>');
+      let id = uid();
+      thisReact.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
+      return new Handlebars.SafeString(`<div id="${id}"></div>`);
     });
 
     // Compile and evaluate the template.
