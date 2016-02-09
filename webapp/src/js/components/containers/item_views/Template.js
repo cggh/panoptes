@@ -62,7 +62,7 @@ Handlebars.tablesUsed = function(template, possibleTables) {
   });
 
 
-  // Compose an tracers object, where each key is the name of a possibleTable
+  // Compose a tracers object, where each key is the name of a possibleTable
   //   and each value is a function to add that table to the usedTables list.
   let tracers = {};
   let usedTables = [];
@@ -193,7 +193,7 @@ let TemplateTab = React.createClass({
     if (this.templateComponentsToRender) {
       _each(this.templateComponentsToRender, (component, id) => {
         ReactDOM.render(component, document.getElementById(id));
-        this.componentsToUnmountAtNode.push(id);
+        this.componentsToUnmountAtNode.push(document.getElementById(id));
       });
     }
 
@@ -209,8 +209,8 @@ let TemplateTab = React.createClass({
 
   componentWillUnmount() {
     // https://facebook.github.io/react/blog/2015/10/01/react-render-and-top-level-api.html
-    _each(this.componentsToUnmountAtNode, (id) => {
-      ReactDOM.unmountComponentAtNode(id);
+    _each(this.componentsToUnmountAtNode, (node) => {
+      ReactDOM.unmountComponentAtNode(node);
     });
   },
 
