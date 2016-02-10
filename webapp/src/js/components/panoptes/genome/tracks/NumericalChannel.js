@@ -1,12 +1,12 @@
 import React from 'react';
 
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException'
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
@@ -36,7 +36,7 @@ const INTERPOLATION_HAS_TENSION = {
 
 let NumericalChannel = React.createClass({
   mixins: [
-    PureRenderMixin,
+    PureRenderWithComponentUpdateException(),
     ConfigMixin,
     FluxMixin
   ],
@@ -73,7 +73,6 @@ let NumericalChannel = React.createClass({
   handleYLimitChange({dataYMin, dataYMax}) {
     this.setState({dataYMin, dataYMax});
   },
-
 
   render() {
     let height = HEIGHT;
@@ -122,7 +121,8 @@ let NumericalChannel = React.createClass({
         sideWidth={sideWidth}
         height={HEIGHT}
         sideComponent={<div className="side-name"> Uniqueness</div>}
-        configComponent={<Controls {...props} />}
+        //Override component update
+        configComponent={<Controls {...props} componentUpdate={this.componentUpdate}/>}
 
       >
         <svg className="numerical-summary" width={effWidth} height={height}>
@@ -150,23 +150,15 @@ let NumericalChannel = React.createClass({
 
 
 let Controls = React.createClass({
-
-  //As component update is an anon func, it looks different on every prop change,
-  //so skip it when checking
-  shouldComponentUpdate(nextProps) {
-    return [
+  mixins: [
+    PureRenderWithComponentUpdateException([
       'interpolation',
       'tension',
       'autoYScale',
       'yMin',
-      'yMax'].some((name) => this.props[name] !== nextProps[name]);
-  },
-
-  //Then we need to redirect componentUpdate so we always use the latest as
-  //render might not have been called if only componentUpdate changed
-  componentUpdate() {
-    this.props.componentUpdate.apply(this, arguments);
-  },
+      'yMax']
+    )
+  ],
 
   render() {
     let {interpolation, tension, autoYScale, yMin, yMax} = this.props;

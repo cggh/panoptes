@@ -1,4 +1,6 @@
 import React from 'react';
+import PureRenderMixin from 'mixins/PureRenderMixin';
+
 const PropTypes = React.PropTypes;
 import _startsWith from 'lodash/startsWith';
 
@@ -7,6 +9,7 @@ const dynamicRequire = (path) => dynreq('./' + path);
 
 
 let Icon = React.createClass({
+  mixins: [PureRenderMixin],
 
   propTypes: {
     name: PropTypes.string.isRequired,

@@ -67,21 +67,14 @@ let Panoptes = React.createClass({
     return (
       <div>
         <div className="page">
-          <div className="header">
-            <div className="title">{config.settings.name}</div>
-            <div className="username">{userID}</div>
-            <img className="logo" src={config.logo}/>
-            <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
-            <IconButton tooltip="Find" iconClassName="fa fa-search"/>
-            <IconButton tooltip="Link" iconClassName="fa fa-link"/>
-          </div>
+          <Header name={config.settings.name} userID={userID} logo={config.logo}/>
           <div className="body">
             <TabbedArea activeTab={tabs.get('selectedTab')}
                         onSwitch={actions.tabSwitch}
                         onClose={actions.tabClose}
                         onAddTab={actions.tabOpen}
                         onDragAway={actions.tabPopOut}
-              >
+            >
               {tabs.get('components').map((compId) => {
                 let tab = components.get(compId).toObject();
                 let props = tab.props ? tab.props.toObject() : {};
@@ -122,6 +115,26 @@ let Panoptes = React.createClass({
           {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
         </Modal>
         <NotificationSystem ref="notificationSystem"/>
+      </div>
+    );
+  }
+});
+
+let Header = React.createClass({
+  mixins: [
+    PureRenderMixin
+  ],
+
+  render() {
+    let {name, userID, logo} = this.props;
+    return (
+      <div className="header">
+        <div className="title">{name}</div>
+        <div className="username">{userID}</div>
+        <img className="logo" src={logo}/>
+        <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
+        <IconButton tooltip="Find" iconClassName="fa fa-search"/>
+        <IconButton tooltip="Link" iconClassName="fa fa-link"/>
       </div>
     );
   }

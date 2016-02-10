@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException'
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
 import _map from 'lodash/map';
@@ -33,7 +33,7 @@ const CONTROLS_HEIGHT = 33;
 
 let GenomeBrowser = React.createClass({
   mixins: [
-    PureRenderMixin,
+    PureRenderWithComponentUpdateException(),
     ConfigMixin
   ],
 
@@ -203,7 +203,7 @@ let GenomeBrowser = React.createClass({
 
   render() {
     let {settings} = this.config;
-    let {componentUpdate, start, end, sideWidth, chromosome, components} = this.props;
+    let {start, end, sideWidth, chromosome, components} = this.props;
     let {loading} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
@@ -272,7 +272,7 @@ let GenomeBrowser = React.createClass({
                           return React.createElement(dynamicRequire(component),
                               Object.assign({
                                 key: componentId,
-                                componentUpdate: (updater) => componentUpdate((props) => {
+                                componentUpdate: (updater) => this.componentUpdate((props) => {
                                   if (_isFunction(updater))
                                     return props.updateIn(['components', componentId, 'props'], updater);
                                   else
