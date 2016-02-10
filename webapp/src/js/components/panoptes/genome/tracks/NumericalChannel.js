@@ -115,7 +115,7 @@ let NumericalChannel = React.createClass({
       this.blockEnd = block1End;
     }
 
-    let blockPixelWidth = ((width - sideWidth / 2) / (end - start)) * (this.blockEnd - this.blockStart);
+    let blockPixelWidth = (((width - sideWidth) / 2) / (end - start)) * (this.blockEnd - this.blockStart);
     return (
       <ChannelWithConfigDrawer
         width={width}
