@@ -171,11 +171,23 @@
     }
   }
 
-  canvas.sequence-canvas {
-    //will-change: transform;
-    image-rendering: optimizeSpeed;
-    image-rendering: pixelated;
-    transform-origin: top left;
+  .sequence {
+    position: relative;
+    canvas {
+      position: absolute;
+      //will-change: transform;
+      image-rendering: optimizeSpeed;
+      image-rendering: pixelated;
+      transform-origin: top left;
+    }
+
+    svg {
+      position: absolute;
+      text {
+        text-anchor: middle;
+        alignment-baseline: central;
+      }
+    }
   }
 
   svg.numerical-summary {
