@@ -132,7 +132,7 @@ let NumericalChannel = React.createClass({
               return <g>
                 <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
                 <g
-                  style={{transform: `translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
+                  transform={`translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})`}>
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
                         height={2 * height}/>
                   <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
