@@ -61,7 +61,7 @@ let ReferenceSequence = React.createClass({
 
     this.blockStart = block1Start;
     this.blockEnd = block1End;
-    let targetPointCount = ((width - sideWidth / 2) / (end - start)) * (block1End - block1Start);
+    let targetPointCount = (((width - sideWidth) / 2) / (end - start)) * (block1End - block1Start);
     this.props.onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
@@ -130,8 +130,10 @@ let SequenceSquares = React.createClass({
     this.paint(this.refs.canvas);
   },
 
-  componentDidUpdate() {
-    this.paint(this.refs.canvas);
+  componentDidUpdate(prevProps) {
+    //We paint the canvas after render as any changes to canvas width and height clear the canvas.
+    if (this.props.sequence !== prevProps.sequence)
+      this.paint(this.refs.canvas);
   },
 
   paint(canvas) {
