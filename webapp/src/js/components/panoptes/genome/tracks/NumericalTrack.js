@@ -97,10 +97,13 @@ let NumericalTrack = React.createClass({
             this.applyData(props);
             this.calculateYScale(props);
           })
+          .catch((err) => {
+            this.props.onChangeLoadStatus('DONE');
+            throw err;
+          })
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            this.props.onChangeLoadStatus('DONE');
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
             this.setState({loadStatus: 'error'});
           })
