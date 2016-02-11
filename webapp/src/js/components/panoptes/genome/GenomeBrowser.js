@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
-import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException'
+import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
-import _map from 'lodash/map';
 import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
 

@@ -66,20 +66,20 @@ let ReferenceSequence = React.createClass({
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
-            columns: {
-              sequence: {
-                folder: `SummaryTracks/${this.config.dataset}/Sequence`,
-                config: 'Summ',
-                name: 'Base_avg'
-              }
-            },
-            minBlockSize: 1,
-            chromosome: chromosome,
-            start: block1Start,
-            end: block1End,
-            targetPointCount: targetPointCount,
-            cancellation: componentCancellation
-          })
+          columns: {
+            sequence: {
+              folder: `SummaryTracks/${this.config.dataset}/Sequence`,
+              config: 'Summ',
+              name: 'Base_avg'
+            }
+          },
+          minBlockSize: 1,
+          chromosome: chromosome,
+          start: block1Start,
+          end: block1End,
+          targetPointCount: targetPointCount,
+          cancellation: componentCancellation
+        })
           .then((data) => {
             this.props.onChangeLoadStatus('DONE');
             this.applyData(data);
@@ -149,7 +149,7 @@ let SequenceText = React.createClass({
     return <svg  viewBox={`0 ${-height / 2} ${width} ${height}`} width={width} height={height}>
       {sequence.slice(startIndex, endIndex).map(
         (char, i) => {
-          let pos = dataStart + ((i + startIndex) * dataStep)+0.5;
+          let pos = dataStart + ((i + startIndex) * dataStep) + 0.5;
           return <text key={pos} x={scale(pos)}>{char}</text>;
         }
       )}

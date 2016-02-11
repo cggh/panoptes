@@ -6,7 +6,7 @@ import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException'
+import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
@@ -102,7 +102,7 @@ let NumericalChannel = React.createClass({
     };
     let yAxisSpring = {
       yMin: spring(initYAxisSpring.yMin),
-      yMax: spring(initYAxisSpring.yMax),
+      yMax: spring(initYAxisSpring.yMax)
     };
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);

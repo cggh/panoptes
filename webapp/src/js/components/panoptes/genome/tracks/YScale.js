@@ -1,9 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-
 import d3 from 'd3';
-
-const HEIGHT = 40;
 
 let YScale = React.createClass({
   mixins: [PureRenderMixin],
