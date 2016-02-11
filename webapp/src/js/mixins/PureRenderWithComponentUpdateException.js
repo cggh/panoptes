@@ -1,4 +1,5 @@
-import shallowEquals from 'shallow-equals';
+import Immutable from 'immutable';
+import { shallowEqualImmutable } from 'react-immutable-render-mixin';
 
 let PureRenderWithComponentUpdateException = function(propsToCheck) {
   return {
@@ -7,13 +8,13 @@ let PureRenderWithComponentUpdateException = function(propsToCheck) {
     shouldComponentUpdate(nextProps, nextState) {
       let propsChanged = true;
       if (propsToCheck)
-        propsChanged = [propsToCheck].some((name) => this.props[name] !== nextProps[name]);
+        propsChanged = [propsToCheck].some((name) => !Immuatable.is(this.props[name], nextProps[name]);
       else
-        propsChanged = !shallowEquals(
+        propsChanged = !shallowEqualImmutable(
           Object.assign({}, this.props, {componentUpdate: false}),
           Object.assign({}, nextProps, {componentUpdate: false})
         );
-      return propsChanged || !shallowEquals(this.state, nextState);
+      return propsChanged || !shallowEqualImmutable(this.state, nextState);
     },
 
     //Then we need to redirect componentUpdate so we always use the latest as
