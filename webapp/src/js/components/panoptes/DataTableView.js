@@ -87,12 +87,9 @@ let DataTableView = React.createClass({
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
-    if (props.columns.size > 0) {
+    if (props.columns.size > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
-      let stopRowIndex = 0;
-      if (showableRowsCount > 0) {
-        stopRowIndex = startRowIndex + showableRowsCount - 1;
-      }
+      let stopRowIndex = startRowIndex + showableRowsCount - 1;
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
@@ -160,17 +157,20 @@ let DataTableView = React.createClass({
   },
 
   handleResize(size) {
-    this.setState(size);
     let showableRowsCount = 0;
     if (size.height > 0) {
       showableRowsCount = Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT - SPACE_BENEATH_ROWS) / ROW_HEIGHT);
     }
-    this.setState({showableRowsCount: showableRowsCount});
+    this.setState({...size, showableRowsCount});
   },
 
-  componentWillUpdate: function(nextProps, nextState) {
-    this.props.onShowableRowsCountChange(nextState.showableRowsCount);
-    this.props.onFetchedRowsCountChange(nextState.rows.length);
+  componentDidUpdate: function(prevProps, prevState) {
+    if (this.props.onShowableRowsCountChange && prevState.showableRowsCount !== this.state.showableRowsCount) {
+      this.forceFetch();
+      this.props.onShowableRowsCountChange(this.state.showableRowsCount);
+    }
+    if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length)
+      this.props.onFetchedRowsCountChange(this.state.rows.length);
   },
 
   render() {

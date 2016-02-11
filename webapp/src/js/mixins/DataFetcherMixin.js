@@ -12,6 +12,10 @@ let DataFetcherMixin = function() {
       this._getDataIfNeeded(this.props, nextProps);
     },
 
+    forceFetch() {
+      this.fetchData(this.props, this._requestContext);
+    },
+
     _getDataIfNeeded(lastProps, nextProps) {
       if (propsToWatch.some((key) => !Immutable.is(lastProps[key], nextProps[key])))
         this.fetchData(nextProps, this._requestContext);
