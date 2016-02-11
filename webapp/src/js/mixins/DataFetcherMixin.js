@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import RequestContext from 'util/RequestContext';
 
 let DataFetcherMixin = function() {
@@ -12,7 +13,7 @@ let DataFetcherMixin = function() {
     },
 
     _getDataIfNeeded(lastProps, nextProps) {
-      if (propsToWatch.some((key) => lastProps[key] !== nextProps[key]))
+      if (propsToWatch.some((key) => !Immutable.is(lastProps[key], nextProps[key])))
         this.fetchData(nextProps, this._requestContext);
     },
     componentWillUnmount() {
