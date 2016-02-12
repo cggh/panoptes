@@ -76,7 +76,7 @@ let NumericalChannel = React.createClass({
 
   render() {
     let height = HEIGHT;
-    let config = this.config.summaryValues.__reference__.uniqueness;
+    let config = this.config.summaryValues.__reference__.Uniqueness;
     let props = Object.assign({
       yMin: config.minval,
       yMax: config.maxval

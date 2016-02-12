@@ -1,5 +1,6 @@
 import _keys from 'lodash/keys';
 import _isString from 'lodash/isString';
+import _forEach from 'lodash/forEach';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import attrMap from 'util/AttrMap';
@@ -30,11 +31,27 @@ function caseChange(config) {
       value.forEach((ele) => arr.push(caseChange(ele)));
       value = arr;
     } else if (
+
       typeof value === 'object' &&
       key !== 'propertiesMap' &&
       key !== 'propertyGroups' &&
-      key !== 'chromosomes') {
+      key !== 'chromosomes' &&
+      key !== 'summaryValues'
+    ) {
       value = caseChange(value);
+    }
+    //Annoyingly we have to have these exceptions for config defined names - shouldn't be a problem when this is made server side.
+    if (
+      typeof value === 'object' &&
+      key === 'summaryValues'
+    ) {
+      let out = {};
+      _forEach(value, (val, key) => {
+        let out2 = {};
+        _forEach(val, (val2, key2) => out2[key2] = caseChange(val2));
+        out[key] = out2;
+      });
+      value = out;
     }
     out[destKey] = value;
   });

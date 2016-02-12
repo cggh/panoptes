@@ -107,12 +107,12 @@ let ItemPicker = React.createClass({
                   let {id, name, properties} = group;
                   let subItems = properties.map((prop) => {
                     let {name, description, propid} = prop;
-                    return (name + '#' + description).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                    return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
                           <ListItem className={classNames({picked: picked.includes(propid)})}
                                     key={propid}
                                     primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
                                     secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                                    leftIcon={<div><Icon fixedWidth={true} name={picked.includes(propid) ? 'minus' : 'plus'} /></div>}
+                                    //leftIcon={<div><Icon fixedWidth={true} name={picked.includes(propid) ? 'minus' : 'plus'} /></div>}
                                     onClick={() => this.handleAdd(propid)}
                             />) : null;
                   }
@@ -121,7 +121,7 @@ let ItemPicker = React.createClass({
                     <ListItem primaryText={name}
                               key={id}
                               initiallyOpen={true}
-                              leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
+                              //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
                               onClick={() => this.handleAddAll(id)}
                               nestedItems={subItems}
                       />
@@ -142,7 +142,7 @@ let ItemPicker = React.createClass({
                           <ListItem primaryText={name}
                                     key={id}
                                     initiallyOpen={true}
-                                    leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
+                                    //leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
                                     onClick={() => this.handleRemoveAll(id)}
                                     nestedItems={
                         properties.map((prop) => {
@@ -151,7 +151,7 @@ let ItemPicker = React.createClass({
                               <ListItem key={propid}
                                         secondaryText={description}
                                         primaryText={name}
-                                        leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
+                                        //leftIcon={<div><Icon fixedWidth={true} name="minus"/></div>}
                                         onClick={() => this.handleRemove(propid)}/>
                             ) : null;
                         }

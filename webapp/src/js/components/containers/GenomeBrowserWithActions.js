@@ -2,6 +2,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import uid from 'uid';
 
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -38,8 +39,6 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
-  },
 
   icon() {
     return 'bitmap:genomebrowser.png';
@@ -49,14 +48,25 @@ let GenomeBrowserWithActions = React.createClass({
     return this.props.title || 'Genome Browser';
   },
 
+  handleChannelAdd(component) {
+    this.getFlux().actions.session.modalClose();
+    this.props.componentUpdate(
+      (props) => props.update('components',
+        (components) => components.set(uid(10), component)));
+  },
+
   render() {
+    let actions = this.getFlux().actions;
     let {sidebar, componentUpdate, ...subProps} = this.props;
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
-        <FlatButton label="Add Channel"
+        <FlatButton label="Add Channels"
                     primary={true}
-                    onClick={null}/>
+                    onClick={() => actions.session.modalOpen('panoptes/genome/AddChannel.js',
+                      {
+                        onPick: this.handleChannelAdd
+                      })}/>
       </div>
     );
     return (
