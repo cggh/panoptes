@@ -2,7 +2,6 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import uid from 'uid';
 
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -48,11 +47,11 @@ let GenomeBrowserWithActions = React.createClass({
     return this.props.title || 'Genome Browser';
   },
 
-  handleChannelAdd(component) {
+  handleChannelAdd(newChannels) {
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate(
-      (props) => props.update('components',
-        (components) => components.set(uid(10), component)));
+      (props) => props.update('channels',
+        (components) => components.merge(newChannels)));
   },
 
   render() {
@@ -80,7 +79,7 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">WTF</span>
           </div>
-          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={100} {...subProps} />
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={200} {...subProps} />
         </div>
       </Sidebar>
     );

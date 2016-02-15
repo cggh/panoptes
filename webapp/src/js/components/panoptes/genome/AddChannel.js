@@ -1,5 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import uid from 'uid';
 import _forEach from 'lodash/forEach';
 import _map from 'lodash/map';
 import _transform from 'lodash/transform';
@@ -44,16 +45,36 @@ let ItemPicker = React.createClass({
 
   componentWillMount() {
     this.channelGroups = Immutable.Map();
-    _forEach(this.config.summaryValues, (properties, key) => {
-      this.channelGroups = this.channelGroups.set(key, {
+    _forEach(this.config.summaryValues, (properties, groupId) => {
+      this.channelGroups = this.channelGroups.set(groupId, {
         channels: _transform(properties, (result, prop) => result[prop.propid] = {
           name: prop.name,
           description: prop.description,
-          icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart'
+          icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
+          channelSpec: prop.settings.isCategorical ? {
+            channel: 'CategoricalChannel',
+            props: {
+              name: prop.name,
+              group: groupId,
+              track: prop.propid
+            }
+          } : {
+            channel: 'NumericalChannel',
+            props: {
+              tracks: [{
+                track: 'NumericalSummaryTrack',
+                name: prop.name,
+                props: {
+                  group: groupId,
+                  track: prop.propid
+                }
+              }]
+            }
+          }
         }, {}),
-        id: key,
-        name: key === '__reference__' ? 'Reference' : this.config.tables[key].tableCapNamePlural,
-        icon: key === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[key].icon
+        id: groupId,
+        name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
+        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon
       });
     });
   },
@@ -83,12 +104,12 @@ let ItemPicker = React.createClass({
     this.setState({picked: Immutable.List()});
   },
   handlePick() {
-    this.props.onPick(Immutable.fromJS({
-      component: 'NumericalChannel',
-      props: {
-        tracks: this.state.picked
-      }
-    }));
+    this.props.onPick(Immutable.fromJS(
+      _transform(this.state.picked.toArray(), (result, groupChannelId) => {
+          let [id, channelId] = groupChannelId.split('\t');
+          result[uid(10)] = this.channelGroups.get(id).channels[channelId].channelSpec;
+        }, {}
+      )));
   },
 
   render() {
@@ -135,7 +156,9 @@ let ItemPicker = React.createClass({
           </div>
           <div className="grow stack vertical">
             <div className="grow scroll-within">
-              <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text="Channel" ord={picked.size}/> to Add</div>
+              <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text="Channel" ord={picked.size}/>
+                to Add
+              </div>
               <List>
                 {
                   picked.map((groupChannelId, index) => {
