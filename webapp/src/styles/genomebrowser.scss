@@ -146,47 +146,68 @@
   div.scale {
     background: white;
   }
-  svg.scale {
-    .tick {
-      text {
-        text-anchor: middle;
-        alignment-baseline: text-before-edge;
-      }
-      line {
-        stroke: darkgrey;
-        stroke-width: 1px;
-      }
+  .tick {
+    line {
+      stroke: darkgrey;
+      stroke-width: 0.25px;
     }
-    .major  {
-      line {
-        stroke-width: 2px;
-      }
+  }
+  .x {
+    text {
+      text-anchor: middle;
+      alignment-baseline: text-before-edge;
+    }
+  }
+  .y {
+    text {
+      text-anchor: end;
+      alignment-baseline: central;
+      font-size: 12px;
+    }
+  }
+  .major  {
+    line {
+      stroke-width: 0.5px;
     }
   }
 
-  canvas.sequence-canvas {
-    //will-change: transform;
-    image-rendering: optimizeSpeed;
-    image-rendering: pixelated;
-    transform-origin: top left;
+  .sequence {
+    position: relative;
+    canvas {
+      position: absolute;
+      //will-change: transform;
+      image-rendering: optimizeSpeed;
+      image-rendering: pixelated;
+      transform-origin: top left;
+    }
+
+    svg {
+      position: absolute;
+      text {
+        text-anchor: middle;
+        alignment-baseline: central;
+      }
+    }
   }
 
   svg.numerical-summary {
-    * {
-      vector-effect: non-scaling-stroke;
+    .origin-shifter {
+      fill: none;
     }
-    fill: none;
-    .line {
-      stroke: $primary-color;
-    }
-    .area {
-      stroke: none;
-      fill: rgba(61,139,213, 0.3);
+    g.numerical-track {
+      * {
+        vector-effect: non-scaling-stroke;
+      }
+      fill: none;
+      .line {
+        stroke: $primary-color;
+      }
+      .area {
+        stroke: none;
+        fill: rgba(61, 139, 213, 0.3);
+      }
     }
   }
-
-
-
 }
 
 

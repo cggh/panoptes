@@ -1,15 +1,17 @@
 import React from 'react';
 
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
+import YScale from 'panoptes/genome/tracks/YScale';
+
 
 import Checkbox from 'material-ui/lib/checkbox';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
@@ -34,7 +36,7 @@ const INTERPOLATION_HAS_TENSION = {
 
 let NumericalChannel = React.createClass({
   mixins: [
-    PureRenderMixin,
+    PureRenderWithComponentUpdateException(),
     ConfigMixin,
     FluxMixin
   ],
@@ -72,7 +74,6 @@ let NumericalChannel = React.createClass({
     this.setState({dataYMin, dataYMax});
   },
 
-
   render() {
     let height = HEIGHT;
     let config = this.config.summaryValues.__reference__.uniqueness;
@@ -95,9 +96,13 @@ let NumericalChannel = React.createClass({
     let stepWidth = scale(1) - scale(0);
     let offset = scale(0) - scale(start - 1 / 2);
 
+    let initYAxisSpring = {
+      yMin: yMin,
+      yMax: yMax
+    };
     let yAxisSpring = {
-      yMin: spring(yMin),
-      yMax: spring(yMax)
+      yMin: spring(initYAxisSpring.yMin),
+      yMax: spring(initYAxisSpring.yMax)
     };
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
@@ -109,28 +114,32 @@ let NumericalChannel = React.createClass({
       this.blockEnd = block1End;
     }
 
-    let blockPixelWidth = ((width - sideWidth / 2) / (end - start)) * (this.blockEnd - this.blockStart);
+    let blockPixelWidth = (((width - sideWidth) / 2) / (end - start)) * (this.blockEnd - this.blockStart);
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
         height={HEIGHT}
         sideComponent={<div className="side-name"> Uniqueness</div>}
-        configComponent={<Controls {...props} />}
+        //Override component update
+        configComponent={<Controls {...props} componentUpdate={this.componentUpdate}/>}
 
       >
         <svg className="numerical-summary" width={effWidth} height={height}>
-          <Motion style={yAxisSpring} defaultStyle={yAxisSpring}>
+          <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
-              return <g
-                style={{transform: `translate(${offset}px, ${height + (yMin * (height / (yMax - yMin)))}px) scale(${stepWidth},${-(height / (yMax - yMin))})`}}>
-                <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                      height={2 * height}/>
-                <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
-                                blockPixelWidth={blockPixelWidth}
-                                onYLimitChange={this.handleYLimitChange} {...this.props}
-                />
+              return <g>
+                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
+                <g
+                  transform={`translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})`}>
+                  <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
+                        height={2 * height}/>
+                  <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
+                                  blockPixelWidth={blockPixelWidth}
+                                  onYLimitChange={this.handleYLimitChange} {...this.props}
+                  />
+                </g>
               </g>;
             }}
           </Motion>
@@ -141,23 +150,15 @@ let NumericalChannel = React.createClass({
 
 
 let Controls = React.createClass({
-
-  //As component update is an anon func, it looks different on every prop change,
-  //so skip it when checking
-  shouldComponentUpdate(nextProps) {
-    return [
+  mixins: [
+    PureRenderWithComponentUpdateException([
       'interpolation',
       'tension',
       'autoYScale',
       'yMin',
-      'yMax'].some((name) => this.props[name] !== nextProps[name]);
-  },
-
-  //Then we need to redirect componentUpdate so we always use the latest as
-  //render might not have been called if only componentUpdate changed
-  componentUpdate() {
-    this.props.componentUpdate.apply(this, arguments);
-  },
+      'yMax']
+    )
+  ],
 
   render() {
     let {interpolation, tension, autoYScale, yMin, yMax} = this.props;

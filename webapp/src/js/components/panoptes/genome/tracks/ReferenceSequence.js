@@ -61,7 +61,7 @@ let ReferenceSequence = React.createClass({
 
     this.blockStart = block1Start;
     this.blockEnd = block1End;
-    let targetPointCount = ((width - sideWidth / 2) / (end - start)) * (block1End - block1Start);
+    let targetPointCount = (((width - sideWidth) / 2) / (end - start)) * (block1End - block1Start);
     this.props.onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
@@ -107,19 +107,56 @@ let ReferenceSequence = React.createClass({
         sideWidth={sideWidth}
         sideComponent={<div className="side-name">Ref. Seq.</div>}
       >
-            <SequenceSquares
-              width={width - sideWidth}
-              height={HEIGHT}
-              start={start}
-              end={end}
-              dataStart={dataStart}
-              dataStep={dataStep}
-              sequence={sequence}/>
-        </Channel>
+        <div className="sequence">
+          <SequenceSquares
+            width={width - sideWidth}
+            height={HEIGHT}
+            start={start}
+            end={end}
+            dataStart={dataStart}
+            dataStep={dataStep}
+            sequence={sequence}/>
+          <SequenceText
+            width={width - sideWidth}
+            height={HEIGHT}
+            start={start}
+            end={end}
+            dataStart={dataStart}
+            dataStep={dataStep}
+            sequence={sequence}/>
+        </div>
+      </Channel>
     );
   }
 
 });
+
+let SequenceText = React.createClass({
+  mixins: [
+    PureRenderMixin
+  ],
+
+  render() {
+    let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
+    if (!sequence)
+      return null;
+    let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+    let endIndex = Math.min(sequence.length - 1, Math.ceil((end - dataStart) / dataStep));
+    let scale = d3.scale.linear().domain([start, end]).range([0, width]);
+    //Don't draw text if no room
+    if (scale(1) - scale(0) < 15)
+      return null;
+    return <svg  viewBox={`0 ${-height / 2} ${width} ${height}`} width={width} height={height}>
+      {sequence.slice(startIndex, endIndex).map(
+        (char, i) => {
+          let pos = dataStart + ((i + startIndex) * dataStep) + 0.5;
+          return <text key={pos} x={scale(pos)}>{char}</text>;
+        }
+      )}
+    </svg>;
+  }
+});
+
 
 let SequenceSquares = React.createClass({
   mixins: [
@@ -130,8 +167,10 @@ let SequenceSquares = React.createClass({
     this.paint(this.refs.canvas);
   },
 
-  componentDidUpdate() {
-    this.paint(this.refs.canvas);
+  componentDidUpdate(prevProps) {
+    //We paint the canvas after render as any changes to canvas width and height clear the canvas.
+    if (this.props.sequence !== prevProps.sequence)
+      this.paint(this.refs.canvas);
   },
 
   paint(canvas) {
@@ -179,7 +218,6 @@ let SequenceSquares = React.createClass({
     let stepWidth = scale(dataStep) - scale(0);
     let offset = scale(dataStart) - scale(start);
     return <canvas ref="canvas"
-                   className="sequence-canvas"
                    style={{transform: `translateX(${offset}px) scale(${stepWidth},${height})`}}
                    width={sequence.length}
                    height={1}/>;

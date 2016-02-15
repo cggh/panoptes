@@ -168,7 +168,7 @@ let NumericalTrack = React.createClass({
   render() {
     let {area, line} = this.state;
     return (
-      <g>
+      <g className="numerical-track">
         <path className="area" d={area}/>
         <path className="line" d={line}/>
       </g>
