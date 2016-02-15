@@ -173,14 +173,17 @@ let augmentTableInfo = function(table) {
 let parseSummaryValues = function() {
   let summaryValueMap = {};
   fetchedConfig.summaryValues.forEach((summaryValue) => {
-    if (summaryValue.minval)
-      summaryValue.minval = parseFloat(summaryValue.minval);
-    else
-      summaryValue.minval = 0;
-    if (summaryValue.maxval)
-      summaryValue.maxval = parseFloat(summaryValue.maxval);
-    else
-      summaryValue.maxval = 0;
+    //I've tried to remove the need for this config, leaving the old here in case we needed it.
+    delete summaryValue.minval;
+    delete summaryValue.maxval;
+    //if (summaryValue.minval)
+    //  summaryValue.minval = parseFloat(summaryValue.minval);
+    //else
+    //  summaryValue.minval = 0;
+    //if (summaryValue.maxval)
+    //  summaryValue.maxval = parseFloat(summaryValue.maxval);
+    //else
+    //  summaryValue.maxval = 0;
     summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
     summaryValue.isCustom = true;
     let settings = {channelColor: 'rgb(0,0,180)'};
