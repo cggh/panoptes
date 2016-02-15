@@ -30,7 +30,6 @@ import 'normalize.css';
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
 
-
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
   let defaultState = {

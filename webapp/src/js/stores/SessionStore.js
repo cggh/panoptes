@@ -16,39 +16,55 @@ let SessionStore = Fluxxor.createStore({
       this.state = Immutable.Map();
 
 
+    //this.state = this.state.mergeDeep(Immutable.fromJS({
+    //  components: {
+    //    'TEST': {
+    //      component: 'containers/DataTableWithActions',
+    //      props: {
+    //        table: 'variants'
+    //      }
+    //    }
+    //  },
+    //  tabs: {
+    //    components: ['TEST'],
+    //    selectedTab: 'TEST'
+    //  },
+    //  popups: {
+    //    components: [],
+    //    state: {}
+    //  },
+    //  modal: {}
+    //}));
+
+
     this.state = this.state.mergeDeep(Immutable.fromJS({
       components: {
         'TEST': {
-          component: 'containers/DataTableWithActions',
-          props: {
-            table: 'variants'
-          }
-        }
-      },
-      tabs: {
-        components: ['TEST'],
-        selectedTab: 'TEST'
-      },
-      popups: {
-        components: [],
-        state: {}
-      },
-      modal: {}
-    }));
-
-
-    /*
-    this.state = this.state.mergeDeep(Immutable.fromJS({
-      components: {
-        'TEST': {
-          component: "containers/GenomeBrowserWithActions",
+          component: 'containers/GenomeBrowserWithActions',
           props: {
             chromosome: 'Pf3D7_01_v3',
-            components: {
+            channels: {
               test: {
-                component: 'NumericalSummary',
-                props: {}
-              },
+                channel: 'NumericalChannel',
+                props: {
+                  tracks: [{
+                    track: 'NumericalSummaryTrack',
+                    props: {
+                      group: '__reference__',
+                      track: 'Uniqueness'
+                    }
+                  },
+                    {
+                      track: 'NumericalSummaryTrack',
+                      props: {
+                        group: 'variants',
+                        track: 'Value_three'
+                      }
+                    }
+
+                  ]
+                }
+              }
             }
           }
         }
@@ -63,7 +79,6 @@ let SessionStore = Fluxxor.createStore({
       },
       modal: {}
     }));
-    */
 
 
 

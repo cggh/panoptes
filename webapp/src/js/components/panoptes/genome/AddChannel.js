@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _forEach from 'lodash/forEach';
 import _map from 'lodash/map';
-import _filter from 'lodash/forEach';
+import _transform from 'lodash/transform';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import Immutable from 'immutable';
 import classNames from 'classnames';
@@ -13,6 +13,7 @@ import Pluralise from 'ui/Pluralise';
 
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
+import FlatButton from 'material-ui/lib/flat-button';
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
 
@@ -36,22 +37,25 @@ let ItemPicker = React.createClass({
 
   getInitialState() {
     return {
-      picked: Immutable.OrderedSet(),
+      picked: Immutable.List(),
       search: ''
     };
   },
 
   componentWillMount() {
-    this.propertyGroups = Immutable.Map();
-    _forEach(this.config.summaryValues, (val, key) => {
-      this.propertyGroups = this.propertyGroups.set(key, {
-        properties: val,
+    this.channelGroups = Immutable.Map();
+    _forEach(this.config.summaryValues, (properties, key) => {
+      this.channelGroups = this.channelGroups.set(key, {
+        channels: _transform(properties, (result, prop) => result[prop.propid] = {
+          name: prop.name,
+          description: prop.description,
+          icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart'
+        }, {}),
         id: key,
         name: key === '__reference__' ? 'Reference' : this.config.tables[key].tableCapNamePlural,
         icon: key === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[key].icon
       });
     });
-
   },
 
   icon() {
@@ -65,24 +69,19 @@ let ItemPicker = React.createClass({
     this.handlePick();
   },
 
-  handleAdd(groupId, propId) {
-    if (this.state.picked.has(`${groupId}\t${propId}`))
-      this.setState({picked: this.state.picked.delete(`${groupId}\t${propId}`)});
-    else
-      this.setState({picked: this.state.picked.add(`${groupId}\t${propId}`)});
+  handleAdd(groupId, channelId) {
+    this.setState({picked: this.state.picked.push(`${groupId}\t${channelId}`)});
   },
   handleAddAll(groupId) {
-    let toAdd = _map(this.propertyGroups.get(groupId).properties, (prop) => `${groupId}\t${prop.propid}`);
-    this.setState({picked: this.state.picked.union(toAdd)});
+    let toAdd = _map(this.channelGroups.get(groupId).channels, (channel, channelId) => `${groupId}\t${channelId}`);
+    this.setState({picked: this.state.picked.push(...toAdd)});
   },
-  handleRemove(groupId, propId) {
-    this.setState({picked: this.state.picked.delete(`${groupId}\t${propId}`)});
+  handleRemove(index) {
+    this.setState({picked: this.state.picked.delete(index)});
   },
-  handleRemoveAll(groupId) {
-    let toRemove = _map(this.propertyGroups.get(groupId).properties, (prop) => `${groupId}\t${prop.propid}`);
-    this.setState({picked: this.state.picked.subtract(toRemove)});
+  handleRemoveAll(index) {
+    this.setState({picked: Immutable.List()});
   },
-
   handlePick() {
     this.props.onPick(Immutable.fromJS({
       component: 'NumericalChannel',
@@ -94,39 +93,37 @@ let ItemPicker = React.createClass({
 
   render() {
     let {picked, search} = this.state;
-    let groups = this.propertyGroups;
-    let count = groups.map((group) => Object.keys(group.properties).length).reduce((sum, v) => sum + v, 0);
+    let groups = this.channelGroups;
+    let count = groups.map((group) => Object.keys(group.channels).length).reduce((sum, v) => sum + v, 0);
     return (
-      <div className='large-modal item-picker'>
+      <div className="large-modal item-picker">
         <div className="horizontal stack">
           <div className="grow scroll-within">
-            <div className="header">{count} <Pluralise text="Track" ord={count}/> Available</div>
+            <div className="header">{count} <Pluralise text="Channel" ord={count}/> Available</div>
             <div className="search">
               <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
             </div>
             <List>
               {
                 groups.map((group) => {
-                  let {id, name, icon, properties} = group;
-                  let subItems = _map(properties, (prop) => {
-                      let {name, description, propid} = prop;
-                      return (name + "#" + (description || '')).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                        <ListItem className={classNames({picked: picked.includes(`${id}\t${propid}`)})}
-                                  key={propid}
-                                  primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-                                  secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                          //leftIcon={<div><Icon fixedWidth={true} name={picked.includes(`${id}\t${propid}`) ? "minus" : "plus"} /></div>}
-                                  onClick={() => this.handleAdd(id, propid)}
-                        />) : null;
-                    }
-                  );
+                  let {id, name, icon, channels} = group;
+                  let subItems = _map(channels, (channel, channelId) => {
+                    let {name, description, icon} = channel;
+                    return (name + '#' + (description || '')).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                      <ListItem key={channelId}
+                                primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
+                                secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
+                                leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+                                onClick={() => this.handleAdd(id, channelId)}
+                      />) : null;
+                  });
                   let numberSubItems = subItems.filter((i) => i).length;
                   return numberSubItems > 0 ? (
                     <ListItem
-                      primaryText={<div> {name} ({numberSubItems} <Pluralise text="Track" ord={numberSubItems}/>)</div>}
+                      primaryText={<div> {name} ({numberSubItems} <Pluralise text="Channel" ord={numberSubItems}/>)</div>}
                       key={id}
                       initiallyOpen={true}
-                      leftIcon={<Icon fixedWidth={true} name={icon}/>}//<div><Icon fixedWidth={true} name="plus"/></div>}
+                      leftIcon={<Icon fixedWidth={true} name={icon}/>}
                       onClick={() => this.handleAddAll(id)}
                       nestedItems={subItems}
                     />
@@ -138,30 +135,28 @@ let ItemPicker = React.createClass({
           </div>
           <div className="grow stack vertical">
             <div className="grow scroll-within">
-              <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text="Track" ord={picked.size}/> to
-                Add
-              </div>
+              <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text="Channel" ord={picked.size}/> to Add</div>
               <List>
                 {
-                  picked.map((trackId) => {
-                    let [id, propid] = trackId.split('\t');
-                    let {icon} = groups.get(id);
+                  picked.map((groupChannelId, index) => {
+                    let [id, channelId] = groupChannelId.split('\t');
                     let groupName = groups.get(id).name;
-                    let {description, name} = groups.get(id).properties[propid];
-                    return <ListItem key={trackId}
+                    let {description, name, icon} = groups.get(id).channels[channelId];
+                    return <ListItem key={index}
                                      secondaryText={description}
                                      primaryText={`${groupName} - ${name}`}
                                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                     onClick={() => this.handleRemove(id, propid)}/>;
+                                     onClick={() => this.handleRemove(index)}/>;
 
                   }).toArray()
                 }
 
               </List>
             </div>
-            <div className='centering-container'>
-              <RaisedButton label="Use" primary={true} onClick={this.handlePick}/>
-
+            <div className="centering-container">
+              <div style={{paddingRight: '10px'}}><FlatButton label="Clear" onClick={this.handleRemoveAll}/></div>
+              <RaisedButton disabled={picked.size === 0} label={`Add ${picked.size} channels`} primary={true}
+                            onClick={this.handlePick}/>
             </div>
           </div>
         </div>

@@ -8,16 +8,18 @@ import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 
-let NumericalTrack = React.createClass({
+let NumericalSummaryTrack = React.createClass({
   mixins: [
+    FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track')
   ],
 
   propTypes: {
@@ -30,7 +32,9 @@ let NumericalTrack = React.createClass({
     interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
-    onYLimitChange: React.PropTypes.func
+    onYLimitChange: React.PropTypes.func,
+    group: React.PropTypes.string.isRequired,
+    track: React.PropTypes.string.isRequired
   },
 
   getInitialState() {
@@ -39,6 +43,9 @@ let NumericalTrack = React.createClass({
 
   componentWillMount() {
     this.throttledYScale = _throttle(this.calculateYScale, 500);
+  },
+  componentWillUnmount() {
+    this.props.onYLimitChange({dataYMin: null, dataYMax: null});
   },
 
   componentWillReceiveProps(nextProps) {
@@ -62,29 +69,32 @@ let NumericalTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-
+    if (!this.config.summaryValues[props.group] || !this.config.summaryValues[props.group][props.track]) {
+      ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid summary track`);
+      return;
+    }
     this.props.onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
           columns: {
             avg: {
-              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
               config: 'Summ',
-              name: 'Uniqueness_avg'
+              name: `${props.track}_avg`
             },
             max: {
-              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
               config: 'Summ',
-              name: 'Uniqueness_max'
+              name: `${props.track}_max`
             },
             min: {
-              folder: `SummaryTracks/${this.config.dataset}/Uniqueness`,
+              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
               config: 'Summ',
-              name: 'Uniqueness_min'
+              name: `${props.track}_min`
             }
           },
-          minBlockSize: 80,
+          minBlockSize: this.config.summaryValues[props.group][props.track].minblocksize,
           chromosome: chromosome,
           start: blockStart,
           end: blockEnd,
@@ -103,10 +113,10 @@ let NumericalTrack = React.createClass({
           })
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
-          .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-            this.setState({loadStatus: 'error'});
-          })
+          //.catch((error) => {
+          //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+          //  this.setState({loadStatus: 'error'});
+          //})
     );
   },
 
@@ -180,6 +190,6 @@ let NumericalTrack = React.createClass({
 
 });
 
-module.exports = NumericalTrack;
+module.exports = NumericalSummaryTrack;
 
 
