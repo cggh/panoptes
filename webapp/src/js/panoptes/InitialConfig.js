@@ -186,15 +186,17 @@ let parseSummaryValues = function() {
     let settings = {channelColor: 'rgb(0,0,180)'};
     if (summaryValue.settings)
       Object.assign(settings, JSON.parse(summaryValue.settings));
+
     summaryValue.settings = settings;
     if (summaryValue.tableid === '-') {
       summaryValue.tableid = '__reference__';
+    } else {
+      summaryValue.description = fetchedConfig.mapTableCatalog[summaryValue.tableid].propertiesMap[summaryValue.propid].description;
     }
     summaryValueMap[summaryValue.tableid] || (summaryValueMap[summaryValue.tableid] = {});
     summaryValueMap[summaryValue.tableid][summaryValue.propid] = summaryValue;
   });
   fetchedConfig.summaryValues = summaryValueMap;
-
 };
 
 let parseCustomProperties = function() {
@@ -251,18 +253,31 @@ let parseCustomProperties = function() {
 
     // Human friendly data type string
     prop.dispDataType = 'Text';
-    if (prop.settings.isCategorical)
+    prop.icon = 'font';
+    if (prop.settings.isCategorical) {
       prop.dispDataType = 'Categorical';
-    if (prop.isFloat)
+      prop.icon = 'bar-chart';
+    }
+    if (prop.isFloat) {
       prop.dispDataType = 'Value';
-    if (prop.isBoolean)
+      prop.icon = 'line-chart';
+    }
+    if (prop.isBoolean) {
       prop.dispDataType = 'Boolean';
-    if (prop.isDate)
+      prop.icon = 'check-square-o';
+    }
+    if (prop.isDate) {
       prop.dispDataType = 'Date';
-    if (prop.datatype == 'GeoLongitude')
+      prop.icon = 'calendar';
+    }
+    if (prop.datatype == 'GeoLongitude') {
       prop.dispDataType = 'Longitude';
-    if (prop.datatype == 'GeoLattitude')
+      prop.icon = 'globe';
+    }
+    if (prop.datatype == 'GeoLattitude') {
       prop.dispDataType = 'Latitude';
+      prop.icon = 'globe';
+    }
 
     //Assign property group
     if (prop.settings.GroupId)
@@ -558,9 +573,9 @@ let fetchInitialConfig = function() {
           });
         }
       });
-      parseSummaryValues();
     })
     .then(parseCustomProperties)
+    .then(parseSummaryValues)
     .then(() => {
     //parse2DProperties();
     //parseTableBasedSummaryValues();
