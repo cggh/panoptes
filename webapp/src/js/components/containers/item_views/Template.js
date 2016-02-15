@@ -22,7 +22,8 @@ import ItemLink from 'panoptes/ItemLink';
 
 // UI components
 import Loading from 'ui/Loading';
-import HelloWorld from 'ui/HelloWorld';
+
+import ItemMapWidget from './ItemMap';
 
 import 'item_views/template.scss';
 
@@ -87,7 +88,7 @@ Handlebars.tablesUsed = function(template, possibleTables) {
 };
 
 
-let TemplateTab = React.createClass({
+let TemplateWidget = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -216,7 +217,7 @@ let TemplateTab = React.createClass({
 
   render() {
 
-    let {content} = this.props;
+    let {content, componentUpdate} = this.props;
     let {data, loadStatus} = this.state;
 
     // Don't continue if there are no data.
@@ -226,7 +227,7 @@ let TemplateTab = React.createClass({
 
     Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty) => {
       let id = uid();
-      thisReact.templateComponentsToRender[id] = <HelloWorld msg={table} />;
+      thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} />;
       return new Handlebars.SafeString(`<div id="${id}"></div>`);
     });
 
@@ -257,4 +258,4 @@ let TemplateTab = React.createClass({
 
 });
 
-module.exports = TemplateTab;
+module.exports = TemplateWidget;
