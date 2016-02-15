@@ -255,7 +255,7 @@ let GenomeBrowser = React.createClass({
                   };
                   return (
                     <div className="tracks vertical stack">
-                      <Background start={start} end={end} width={width} height={height - CONTROLS_HEIGHT}
+                      <Background start={start} end={end} width={width} height={Math.max(0,height - CONTROLS_HEIGHT)}
                                   sideWidth={sideWidth}/>
 
                       <div className="fixed">
