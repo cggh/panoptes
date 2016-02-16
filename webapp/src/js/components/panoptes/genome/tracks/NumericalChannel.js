@@ -113,8 +113,8 @@ let NumericalChannel = React.createClass({
     let offset = scale(0) - scale(start - 1 / 2);
 
     let initYAxisSpring = {
-      yMin: _isFinite(yMin) ? yMin:null,
-      yMax: _isFinite(yMax) ? yMax:null
+      yMin: _isFinite(yMin) ? yMin : null,
+      yMax: _isFinite(yMax) ? yMax : null
     };
     let yAxisSpring = {
       yMin: spring(initYAxisSpring.yMin),
