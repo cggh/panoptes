@@ -97,6 +97,13 @@ let NumericalChannel = React.createClass({
       }
     }
 
+    //If we go to a region with no data then don't move the y axis
+    if (!_isFinite(yMin) && this.lastYMin)
+      yMin = this.lastYMin;
+    if (!_isFinite(yMax) && this.lastYMax)
+      yMax = this.lastYMax;
+    [this.lastYMin, this.lastYMax] = [yMin, yMax];
+
     if (width === 0)
       return null;
 
