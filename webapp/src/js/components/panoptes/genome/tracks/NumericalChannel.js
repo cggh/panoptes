@@ -1,12 +1,16 @@
 import React from 'react';
+import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
+import _transform from 'lodash/transform';
+import _forEach from 'lodash/forEach';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
+import FluxMixin from 'mixins/FluxMixin';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import YScale from 'panoptes/genome/tracks/YScale';
@@ -16,6 +20,7 @@ import Checkbox from 'material-ui/lib/checkbox';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Slider from 'material-ui/lib/slider';
+import FlatButton from 'material-ui/lib/flat-button';
 import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/genome/FindBlocks';
@@ -63,8 +68,7 @@ let NumericalChannel = React.createClass({
   },
 
   getInitialState() {
-    return {
-    };
+    return {};
   },
 
   getDefaultProps() {
@@ -73,6 +77,34 @@ let NumericalChannel = React.createClass({
       autoYScale: true,
       tension: 0.5
     };
+  },
+
+  componentWillMount() {
+    this.trackGroups = Immutable.Map();
+    _forEach(this.config.summaryValues, (properties, groupId) => {
+      this.trackGroups = this.trackGroups.set(groupId, Immutable.fromJS({
+        name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
+        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
+        items: _transform(properties, (result, prop) => {
+          //Only numerical tracks can be added
+          if (!prop.settings.isCategorical)
+            result[prop.propid] = {
+              name: prop.name,
+              description: prop.description,
+              icon: 'line-chart',
+              payload: {
+                track: 'NumericalSummaryTrack',
+                name: prop.name,
+                props: {
+                  group: groupId,
+                  track: prop.propid
+                }
+              }
+            };
+        }, {}
+        )
+      }));
+    });
   },
 
   handleYLimitChange({index, dataYMin, dataYMax}) {
@@ -138,7 +170,10 @@ let NumericalChannel = React.createClass({
         height={HEIGHT}
         sideComponent={<div className="side-name">{tracks.map((track) => track.get('name')).join(',')}</div>}
         //Override component update
-        configComponent={<Controls {...this.props} componentUpdate={this.componentUpdate}/>}
+        configComponent={<Controls trackGroups={this.trackGroups}
+                                   currentTracks={tracks}
+                                   {...this.props}
+                                   componentUpdate={this.componentUpdate}/>}
 
       >
         <svg className="numerical-summary" width={effWidth} height={height}>
@@ -172,19 +207,48 @@ let NumericalChannel = React.createClass({
 
 let Controls = React.createClass({
   mixins: [
+    FluxMixin,
     PureRenderWithComponentUpdateException([
       'interpolation',
       'tension',
       'autoYScale',
       'yMin',
-      'yMax']
+      'yMax',
+      'trackGroups',
+      'currentTracks'
+    ]
     )
   ],
 
+  handleTrackChange(tracks) {
+    this.getFlux().actions.session.modalClose();
+    tracks = tracks.map((track) => track.get('payload'));
+    this.componentUpdate({tracks});
+  },
+
   render() {
-    let {interpolation, tension, autoYScale, yMin, yMax} = this.props;
+    let {interpolation, tension, autoYScale, yMin, yMax, currentTracks, trackGroups} = this.props;
+    let actions = this.getFlux().actions;
+    currentTracks = currentTracks.map((track) => Immutable.Map({
+        groupId: track.getIn(['props', 'group']),
+        itemId: track.getIn(['props', 'track']),
+        payload: track
+      })
+    );
     return (
       <div className="channel-controls">
+        <div className="control">
+          <FlatButton label="Add/Remove Tracks"
+                      primary={true}
+                      onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
+                        {
+                          title: 'Pick channels to be added',
+                          itemName: 'Channel',
+                          groups: trackGroups,
+                          initialSelection: currentTracks,
+                          onPick: this.handleTrackChange
+                        })}/>
+        </div>
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"

@@ -51,7 +51,7 @@ let GenomeBrowserWithActions = React.createClass({
           name: prop.name,
           description: prop.description,
           icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
-          channelSpec: prop.settings.isCategorical ? {
+          payload: prop.settings.isCategorical ? {
             channel: 'CategoricalChannel',
             props: {
               name: prop.name,
@@ -89,9 +89,8 @@ let GenomeBrowserWithActions = React.createClass({
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate(
       (props) => props.mergeIn(['channels'],
-        _reduce(
-          newChannels,
-          (result, {groupId, itemId}) => result.set(uid(10), this.channelGroups.getIn([groupId, 'items', itemId, 'channelSpec'])),
+        newChannels.reduce(
+          (reduction, item) => reduction.set(uid(10), item.get('payload')),
           Immutable.Map()
         )
       ));
