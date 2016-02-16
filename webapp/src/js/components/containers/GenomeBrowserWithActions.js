@@ -38,8 +38,6 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
-  },
 
   icon() {
     return 'bitmap:genomebrowser.png';
@@ -49,14 +47,25 @@ let GenomeBrowserWithActions = React.createClass({
     return this.props.title || 'Genome Browser';
   },
 
+  handleChannelAdd(newChannels) {
+    this.getFlux().actions.session.modalClose();
+    this.props.componentUpdate(
+      (props) => props.update('channels',
+        (components) => components.merge(newChannels)));
+  },
+
   render() {
+    let actions = this.getFlux().actions;
     let {sidebar, componentUpdate, ...subProps} = this.props;
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
-        <FlatButton label="Add Channel"
+        <FlatButton label="Add Channels"
                     primary={true}
-                    onClick={null}/>
+                    onClick={() => actions.session.modalOpen('panoptes/genome/AddChannel.js',
+                      {
+                        onPick: this.handleChannelAdd
+                      })}/>
       </div>
     );
     return (
@@ -70,7 +79,7 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">WTF</span>
           </div>
-          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={100} {...subProps} />
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={200} {...subProps} />
         </div>
       </Sidebar>
     );

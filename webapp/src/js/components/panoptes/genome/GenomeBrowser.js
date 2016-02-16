@@ -202,7 +202,7 @@ let GenomeBrowser = React.createClass({
 
   render() {
     let {settings} = this.config;
-    let {start, end, sideWidth, chromosome, components} = this.props;
+    let {start, end, sideWidth, chromosome, channels} = this.props;
     let {loading} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
@@ -230,7 +230,7 @@ let GenomeBrowser = React.createClass({
             onDoubleTap={this.handleDoubleTap}
             onPan={this.handlePan}
             vertical={true}
-            onPinch={(e) => console.log('2', e)}
+            onPinch={(e) => console.log('Pinch not implemented', e)}
             onWheel={this.handleMouseWheel}
           >
             <div className="main-area">
@@ -255,7 +255,7 @@ let GenomeBrowser = React.createClass({
                   };
                   return (
                     <div className="tracks vertical stack">
-                      <Background start={start} end={end} width={width} height={height - CONTROLS_HEIGHT}
+                      <Background start={start} end={end} width={width} height={Math.max(0,height - CONTROLS_HEIGHT)}
                                   sideWidth={sideWidth}/>
 
                       <div className="fixed">
@@ -266,18 +266,18 @@ let GenomeBrowser = React.createClass({
                           null }
                       </div>
                       <div className="scrolling grow scroll-within">
-                        {components.map((componentSpec, componentId) => {
-                          let {component, props} = componentSpec.toJS();
-                          return React.createElement(dynamicRequire(component),
+                        {channels.map((channel, channelId) => {
+                          let props = channel.get('props');
+                          return React.createElement(dynamicRequire(channel.get('channel')),
                               Object.assign({
-                                key: componentId,
+                                key: channelId,
                                 componentUpdate: (updater) => this.componentUpdate((props) => {
                                   if (_isFunction(updater))
-                                    return props.updateIn(['components', componentId, 'props'], updater);
+                                    return props.updateIn(['channels', channelId, 'props'], updater);
                                   else
-                                    return props.mergeIn(['components', componentId, 'props'], updater);
+                                    return props.mergeIn(['channels', channelId, 'props'], updater);
                                 })
-                              }, props, trackProps));
+                              }, props.toObject(), trackProps));
                         }
                         ).toList()
                         }

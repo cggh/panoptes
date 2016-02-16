@@ -84,10 +84,13 @@ let ReferenceSequence = React.createClass({
             this.props.onChangeLoadStatus('DONE');
             this.applyData(data);
           })
+          .catch((err) => {
+            this.props.onChangeLoadStatus('DONE');
+            throw err;
+          })
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            this.props.onChangeLoadStatus('DONE');
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
             this.setState({loadStatus: 'error'});
           })

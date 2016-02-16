@@ -1,15 +1,14 @@
 import React from 'react';
-
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
+import _map from 'lodash/map';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
-import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import NumericalTrack from 'panoptes/genome/tracks/NumericalTrack';
 import YScale from 'panoptes/genome/tracks/YScale';
 
 
@@ -20,6 +19,10 @@ import Slider from 'material-ui/lib/slider';
 import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/genome/FindBlocks';
+
+let dynreq = require.context('.', true);
+const dynamicRequire = (path) => dynreq('./' + path);
+
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -37,8 +40,7 @@ const INTERPOLATION_HAS_TENSION = {
 let NumericalChannel = React.createClass({
   mixins: [
     PureRenderWithComponentUpdateException(),
-    ConfigMixin,
-    FluxMixin
+    ConfigMixin
   ],
 
   propTypes: {
@@ -52,13 +54,16 @@ let NumericalChannel = React.createClass({
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
     yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number
+    yMax: React.PropTypes.number,
+    tracks: ImmutablePropTypes.listOf(
+      ImmutablePropTypes.contains({
+        track: React.PropTypes.string.isRequired,
+        props: ImmutablePropTypes.map
+      }))
   },
 
   getInitialState() {
     return {
-      dataYMin: null,
-      dataYMax: null
     };
   },
 
@@ -70,23 +75,34 @@ let NumericalChannel = React.createClass({
     };
   },
 
-  handleYLimitChange({dataYMin, dataYMax}) {
-    this.setState({dataYMin, dataYMax});
+  handleYLimitChange({index, dataYMin, dataYMax}) {
+    this.setState({[index]: {dataYMin, dataYMax}});
   },
 
   render() {
     let height = HEIGHT;
-    let config = this.config.summaryValues.__reference__.uniqueness;
-    let props = Object.assign({
-      yMin: config.minval,
-      yMax: config.maxval
-    }, this.props);
-    let {start, end, width, sideWidth, yMin, yMax, autoYScale} = props;
-    let {dataYMin, dataYMax} = this.state;
-    if (autoYScale && _isFinite(dataYMin) && _isFinite(dataYMax) && dataYMin !== 0 && dataYMax !== 0) {
-      yMin = dataYMin;
-      yMax = dataYMax;
+    let {start, end, width, sideWidth, yMin, yMax, autoYScale, tracks} = this.props;
+
+    if (autoYScale) {
+      let [allDataYMin, allDataYMax] = [null, null];
+      _map(this.state, ({dataYMin, dataYMax}) => {
+        if (allDataYMin === null || (dataYMin && dataYMin < allDataYMin))
+          allDataYMin = dataYMin;
+        if (allDataYMax === null || (dataYMax && dataYMax > allDataYMax))
+          allDataYMax = dataYMax;
+      });
+      if (_isFinite(allDataYMin) && _isFinite(allDataYMax)) {
+        yMin = allDataYMin;
+        yMax = allDataYMax;
+      }
     }
+
+    //If we go to a region with no data then don't move the y axis
+    if (!_isFinite(yMin) && this.lastYMin)
+      yMin = this.lastYMin;
+    if (!_isFinite(yMax) && this.lastYMax)
+      yMax = this.lastYMax;
+    [this.lastYMin, this.lastYMax] = [yMin, yMax];
 
     if (width === 0)
       return null;
@@ -97,8 +113,8 @@ let NumericalChannel = React.createClass({
     let offset = scale(0) - scale(start - 1 / 2);
 
     let initYAxisSpring = {
-      yMin: yMin,
-      yMax: yMax
+      yMin: _isFinite(yMin) ? yMin:null,
+      yMax: _isFinite(yMax) ? yMax:null
     };
     let yAxisSpring = {
       yMin: spring(initYAxisSpring.yMin),
@@ -122,7 +138,7 @@ let NumericalChannel = React.createClass({
         height={HEIGHT}
         sideComponent={<div className="side-name"> Uniqueness</div>}
         //Override component update
-        configComponent={<Controls {...props} componentUpdate={this.componentUpdate}/>}
+        configComponent={<Controls {...this.props} componentUpdate={this.componentUpdate}/>}
 
       >
         <svg className="numerical-summary" width={effWidth} height={height}>
@@ -132,12 +148,17 @@ let NumericalChannel = React.createClass({
               return <g>
                 <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
                 <g
-                  transform={`translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})`}>
+                  transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
                         height={2 * height}/>
-                  <NumericalTrack blockStart={this.blockStart} blockEnd={this.blockEnd}
-                                  blockPixelWidth={blockPixelWidth}
-                                  onYLimitChange={this.handleYLimitChange} {...this.props}
+                  {tracks.map((track, index) => React.createElement(dynamicRequire(track.get('track')), Object.assign({
+                    key: index,
+                    blockStart: this.blockStart,
+                    blockEnd: this.blockEnd,
+                    blockPixelWidth: blockPixelWidth,
+                    onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
+                  }, this.props,
+                    track.get('props').toObject())))}
                   />
                 </g>
               </g>;

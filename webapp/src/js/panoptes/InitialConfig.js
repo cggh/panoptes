@@ -1,5 +1,6 @@
 import _keys from 'lodash/keys';
 import _isString from 'lodash/isString';
+import _forEach from 'lodash/forEach';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import attrMap from 'util/AttrMap';
@@ -30,11 +31,27 @@ function caseChange(config) {
       value.forEach((ele) => arr.push(caseChange(ele)));
       value = arr;
     } else if (
+
       typeof value === 'object' &&
       key !== 'propertiesMap' &&
       key !== 'propertyGroups' &&
-      key !== 'chromosomes') {
+      key !== 'chromosomes' &&
+      key !== 'summaryValues'
+    ) {
       value = caseChange(value);
+    }
+    //Annoyingly we have to have these exceptions for config defined names - shouldn't be a problem when this is made server side.
+    if (
+      typeof value === 'object' &&
+      key === 'summaryValues'
+    ) {
+      let out = {};
+      _forEach(value, (val, key) => {
+        let out2 = {};
+        _forEach(val, (val2, key2) => out2[key2] = caseChange(val2));
+        out[key] = out2;
+      });
+      value = out;
     }
     out[destKey] = value;
   });
@@ -156,28 +173,33 @@ let augmentTableInfo = function(table) {
 let parseSummaryValues = function() {
   let summaryValueMap = {};
   fetchedConfig.summaryValues.forEach((summaryValue) => {
-    if (summaryValue.minval)
-      summaryValue.minval = parseFloat(summaryValue.minval);
-    else
-      summaryValue.minval = 0;
-    if (summaryValue.maxval)
-      summaryValue.maxval = parseFloat(summaryValue.maxval);
-    else
-      summaryValue.maxval = 0;
+    //I've tried to remove the need for this config, leaving the old here in case we needed it.
+    delete summaryValue.minval;
+    delete summaryValue.maxval;
+    //if (summaryValue.minval)
+    //  summaryValue.minval = parseFloat(summaryValue.minval);
+    //else
+    //  summaryValue.minval = 0;
+    //if (summaryValue.maxval)
+    //  summaryValue.maxval = parseFloat(summaryValue.maxval);
+    //else
+    //  summaryValue.maxval = 0;
     summaryValue.minblocksize = parseFloat(summaryValue.minblocksize);
     summaryValue.isCustom = true;
     let settings = {channelColor: 'rgb(0,0,180)'};
     if (summaryValue.settings)
       Object.assign(settings, JSON.parse(summaryValue.settings));
+
     summaryValue.settings = settings;
     if (summaryValue.tableid === '-') {
       summaryValue.tableid = '__reference__';
+    } else {
+      summaryValue.description = fetchedConfig.mapTableCatalog[summaryValue.tableid].propertiesMap[summaryValue.propid].description;
     }
     summaryValueMap[summaryValue.tableid] || (summaryValueMap[summaryValue.tableid] = {});
     summaryValueMap[summaryValue.tableid][summaryValue.propid] = summaryValue;
   });
   fetchedConfig.summaryValues = summaryValueMap;
-
 };
 
 let parseCustomProperties = function() {
@@ -234,18 +256,31 @@ let parseCustomProperties = function() {
 
     // Human friendly data type string
     prop.dispDataType = 'Text';
-    if (prop.settings.isCategorical)
+    prop.icon = 'font';
+    if (prop.settings.isCategorical) {
       prop.dispDataType = 'Categorical';
-    if (prop.isFloat)
+      prop.icon = 'bar-chart';
+    }
+    if (prop.isFloat) {
       prop.dispDataType = 'Value';
-    if (prop.isBoolean)
+      prop.icon = 'line-chart';
+    }
+    if (prop.isBoolean) {
       prop.dispDataType = 'Boolean';
-    if (prop.isDate)
+      prop.icon = 'check-square-o';
+    }
+    if (prop.isDate) {
       prop.dispDataType = 'Date';
-    if (prop.datatype == 'GeoLongitude')
+      prop.icon = 'calendar';
+    }
+    if (prop.datatype == 'GeoLongitude') {
       prop.dispDataType = 'Longitude';
-    if (prop.datatype == 'GeoLattitude')
+      prop.icon = 'globe';
+    }
+    if (prop.datatype == 'GeoLattitude') {
       prop.dispDataType = 'Latitude';
+      prop.icon = 'globe';
+    }
 
     //Assign property group
     if (prop.settings.GroupId)
@@ -541,9 +576,9 @@ let fetchInitialConfig = function() {
           });
         }
       });
-      parseSummaryValues();
     })
     .then(parseCustomProperties)
+    .then(parseSummaryValues)
     .then(() => {
     //parse2DProperties();
     //parseTableBasedSummaryValues();

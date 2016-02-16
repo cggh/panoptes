@@ -8,7 +8,7 @@ let PureRenderWithComponentUpdateException = function(propsToCheck) {
     shouldComponentUpdate(nextProps, nextState) {
       let propsChanged = true;
       if (propsToCheck)
-        propsChanged = [propsToCheck].some((name) => !Immutable.is(this.props[name], nextProps[name]));
+        propsChanged = propsToCheck.some((name) => !Immutable.is(this.props[name], nextProps[name]));
       else
         propsChanged = !shallowEqualImmutable(
           Object.assign({}, this.props, {componentUpdate: false}),

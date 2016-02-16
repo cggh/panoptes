@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import 'tooltip-ellipsis.scss';
@@ -11,7 +12,7 @@ let TooltipEllipsis = React.createClass({
   },
 
   componentDidUpdate() {
-    let e = React.findDOMNode(this.refs.element);
+    let e = ReactDOM.findDOMNode(this.refs.element);
     if (e.offsetWidth < e.scrollWidth)
       e.title = this.props.children;
   },
