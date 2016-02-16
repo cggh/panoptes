@@ -15,7 +15,7 @@ import _map from 'lodash/map';
 import Icon from 'ui/Icon';
 
 
-let ItemPicker = React.createClass({
+let GroupedItemPicker = React.createClass({
   mixins: [
     PureRenderMixin,
     LinkedStateMixin
@@ -145,7 +145,6 @@ let ItemPicker = React.createClass({
                                     onClick={() => this.handleRemoveAll(id)}
                                     nestedItems={
                         properties.map((prop) => {
-                          console.log(prop);
                           let {name, description, propid, icon} = prop;
                           return picked.includes(propid) ? (
                               <ListItem key={propid}
@@ -176,4 +175,4 @@ let ItemPicker = React.createClass({
 
 });
 
-module.exports = ItemPicker;
+module.exports = GroupedItemPicker;
