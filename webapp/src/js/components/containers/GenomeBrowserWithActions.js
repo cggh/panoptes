@@ -79,7 +79,7 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">WTF</span>
           </div>
-          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={200} {...subProps} />
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={150} {...subProps} />
         </div>
       </Sidebar>
     );

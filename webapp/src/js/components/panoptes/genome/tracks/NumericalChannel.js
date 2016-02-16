@@ -136,7 +136,7 @@ let NumericalChannel = React.createClass({
         width={width}
         sideWidth={sideWidth}
         height={HEIGHT}
-        sideComponent={<div className="side-name"> Uniqueness</div>}
+        sideComponent={<div className="side-name">{tracks.map((track) => track.get('name')).join(',')}</div>}
         //Override component update
         configComponent={<Controls {...this.props} componentUpdate={this.componentUpdate}/>}
 
