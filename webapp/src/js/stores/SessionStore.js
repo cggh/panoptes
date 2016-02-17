@@ -47,15 +47,10 @@ let SessionStore = Fluxxor.createStore({
               test: {
                 channel: 'NumericalChannel',
                 props: {
-                  tracks: [{
-                    track: 'NumericalSummaryTrack',
-                    props: {
-                      group: '__reference__',
-                      track: 'Uniqueness'
-                    }
-                  },
+                  tracks: [
                     {
                       track: 'NumericalSummaryTrack',
+                      name: 'Bob2',
                       props: {
                         group: 'variants',
                         track: 'Value_three'

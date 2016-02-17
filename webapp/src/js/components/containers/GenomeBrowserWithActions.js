@@ -2,7 +2,10 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-
+import _reduce from 'lodash/reduce';
+import _transform from 'lodash/transform';
+import _forEach from 'lodash/forEach';
+import uid from 'uid';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
@@ -38,6 +41,41 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
+  componentWillMount() {
+    this.channelGroups = Immutable.Map();
+    _forEach(this.config.summaryValues, (properties, groupId) => {
+      this.channelGroups = this.channelGroups.set(groupId, Immutable.fromJS({
+        name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
+        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
+        items: _transform(properties, (result, prop) => result[prop.propid] = {
+          name: prop.name,
+          description: prop.description,
+          icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
+          payload: prop.settings.isCategorical ? {
+            channel: 'CategoricalChannel',
+            props: {
+              name: prop.name,
+              group: groupId,
+              track: prop.propid
+            }
+          } : {
+            channel: 'NumericalChannel',
+            props: {
+              tracks: [{
+                track: 'NumericalSummaryTrack',
+                name: prop.name,
+                props: {
+                  group: groupId,
+                  track: prop.propid
+                }
+              }]
+            }
+          }
+        }, {})
+      }));
+    });
+  },
+
 
   icon() {
     return 'bitmap:genomebrowser.png';
@@ -50,8 +88,12 @@ let GenomeBrowserWithActions = React.createClass({
   handleChannelAdd(newChannels) {
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate(
-      (props) => props.update('channels',
-        (components) => components.merge(newChannels)));
+      (props) => props.mergeIn(['channels'],
+        newChannels.reduce(
+          (reduction, item) => reduction.set(uid(10), item.get('payload')),
+          Immutable.Map()
+        )
+      ));
   },
 
   render() {
@@ -59,11 +101,15 @@ let GenomeBrowserWithActions = React.createClass({
     let {sidebar, componentUpdate, ...subProps} = this.props;
     let sidebarContent = (
       <div className="sidebar">
-        <SidebarHeader icon={this.icon()} description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
+        <SidebarHeader icon={this.icon()}
+                       description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
         <FlatButton label="Add Channels"
                     primary={true}
-                    onClick={() => actions.session.modalOpen('panoptes/genome/AddChannel.js',
+                    onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
                       {
+                        title: 'Pick channels to be added',
+                        itemName: 'Channel',
+                        groups: this.channelGroups,
                         onPick: this.handleChannelAdd
                       })}/>
       </div>
@@ -79,7 +125,7 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">WTF</span>
           </div>
-          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={200} {...subProps} />
+          <GenomeBrowser componentUpdate={componentUpdate} sideWidth={150} {...subProps} />
         </div>
       </Sidebar>
     );

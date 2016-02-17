@@ -146,7 +146,7 @@ let DataTableWithActions = React.createClass({
         <br/>
         <FlatButton label="Add/Remove Columns"
                     primary={true}
-                    onClick={() => actions.session.modalOpen('containers/ItemPicker',
+                    onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
                       {
                         groups: this.propertyGroups,
                         initialPick: columns,
