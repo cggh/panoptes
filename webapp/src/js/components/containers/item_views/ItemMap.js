@@ -1,5 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -30,25 +29,24 @@ let ItemMapWidget = React.createClass({
     zoom: React.PropTypes.number,
     center: React.PropTypes.object,
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string,
+    primKey: React.PropTypes.string, // if not specified then all table records are used
     componentUpdate: React.PropTypes.func.isRequired,
-    lngProperty: React.PropTypes.string,
-    latProperty: React.PropTypes.string
+    lngProperty: React.PropTypes.string, // alternatively derived from the table config
+    latProperty: React.PropTypes.string // alternatively derived from the table config
   },
 
   getInitialState() {
     return {
       loadStatus: 'loaded',
-      markers: Immutable.List()
+      markers: []
     };
   },
 
   fetchData(props, requestContext) {
+
     let {table, primKey, lngProperty, latProperty} = props;
 
-    let locationDataTable = table;
-
-    let locationTableConfig = this.config.tables[locationDataTable];
+    let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -117,9 +115,11 @@ let ItemMapWidget = React.createClass({
 
       })
       .then((data) => {
-        let markers = Immutable.List();
+
+        let markers = [];
+
         // Translate the fetched locationData and chartData into markers.
-        let locationTableConfig = this.config.tables[locationDataTable];
+        let locationTableConfig = this.config.tables[table];
         let locationPrimKeyProperty = locationTableConfig.primkey;
 
         // If a primKey value has been specified then expect data to contain a single record.
@@ -128,49 +128,23 @@ let ItemMapWidget = React.createClass({
 
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
-          // FIXME: handle just 1 marker
-          // FIXME: use proper values (currently error)
-          // FIXME: radius
-
-          markers = markers.push(Immutable.fromJS({
-            key: 0,
+          markers.push({
             lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
             lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            name: locationDataPrimKey,
-            radius: 10,
-            locationTable: locationDataTable,
-            locationPrimKey: locationDataPrimKey
-          }));
-
-          // FIXME: fails if these markers have same lng (impacts multiple-mode, there should only be one marker here)
-
-          markers = markers.push(Immutable.fromJS({
-            key: 1,
-            lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
-            lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]) + 0.1, //-6.01, //parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            name: locationDataPrimKey,
-            radius: 10,
-            locationTable: locationDataTable,
-            locationPrimKey: locationDataPrimKey
-          }));
+            title: locationDataPrimKey
+          });
 
         } else {
 
           for (let i = 0; i < data.length; i++) {
+
             let locationDataPrimKey = data[i][locationPrimKeyProperty];
 
-          // FIXME: fails any two of these markers have the same longitude.
-          // FIXME: radius
-
-            markers = markers.push(Immutable.fromJS({
-              key: i,
+            markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
-              lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]) + i, //parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
-              name: locationDataPrimKey,
-              radius: 10, //data[i][locationSizeProperty],
-              locationTable: locationDataTable,
-              locationPrimKey: locationDataPrimKey
-            }));
+              lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
+              title: locationDataPrimKey
+            });
 
           }
 
@@ -195,9 +169,6 @@ let ItemMapWidget = React.createClass({
     return this.props.title;
   },
 
-  handlePanZoom({center, zoom}) {
-    this.props.componentUpdate({center, zoom});
-  },
 
   render() {
     let {center, zoom} = this.props;
@@ -209,7 +180,6 @@ let ItemMapWidget = React.createClass({
             center={center}
             zoom={zoom}
             markers={markers}
-            onPanZoom={this.handlePanZoom}
           /> :
           <Loading status={loadStatus}/>
         }
