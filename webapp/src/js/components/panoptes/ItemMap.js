@@ -44,9 +44,8 @@ let ItemMap = React.createClass({
 
   getInitialState() {
     return {
-      width: 100,
-      height: 100,
-      bounds: null
+      width: 100, // FIXME: required for fitBounds but arbitrary value?
+      height: 100 // FIXME: required for fitBounds but arbitrary value?
     };
   },
 
@@ -75,21 +74,23 @@ let ItemMap = React.createClass({
     this.setState(size);
   },
 
-  handleMapChange({center, zoom, bounds}) {
-    if (this.props.onPanZoom) {
-      this.props.onPanZoom({center, zoom});
-    }
-    this.setState({bounds});
-  },
-
   render() {
     let {center, zoom, markers} = this.props;
-    let {bounds} = this.state;
     let actions = this.getFlux().actions;
 
-    //If no bounds have been set then clip to the markers.
-    if (!bounds) {
-      if (markers) {
+    if (!center || !zoom) {
+
+      if (markers.length == 1) {
+
+        // If there is only one marker, then set the map's center to the coordinates of that marker.
+        center = {lat: markers[0].lat, lng: markers[0].lng};
+        zoom = 4;
+
+      } else if (markers.length > 1) {
+
+        // If there is more than one marker, then set the map's center and zoom to fit around them.
+
+        // Derive the north-west and south-east boundaries from the coordinates of the markers.
         const bounds = {
           nw: {
             lat: _maxBy(markers, 'lat').lat,
@@ -100,14 +101,11 @@ let ItemMap = React.createClass({
             lng: _maxBy(markers, 'lng').lng
           }
         };
+
+        // Use the fitBounds util to derive the appropriate center and the zoom.
         ({center, zoom} = fitBounds(bounds, this.state));
-      } else {
-        zoom = 1;
-        center = {
-          lat: 0,
-          lng: 0
-        };
       }
+
     }
 
     // TODO: use an API key from config
@@ -122,7 +120,6 @@ let ItemMap = React.createClass({
             onGoogleApiLoaded={this.handleGoogleApiLoaded}
             options={getMapOptions}
             ref={(r) => this._googleMapRef = r}
-            onChange={this.handleMapChange}
           >
           {
             markers.map(
