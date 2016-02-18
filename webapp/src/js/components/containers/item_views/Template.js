@@ -227,8 +227,8 @@ let TemplateWidget = React.createClass({
 
     Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty, width, height) => {
 
-      width = width ? width : '300px';
-      height = height ? height : '300px';
+      width = width && !width instanceof Object ? width : '300px';
+      height = height && !height instanceof Object ? height : '300px';
 
       let id = uid();
       thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
