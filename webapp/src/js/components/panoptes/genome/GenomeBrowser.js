@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import offset from 'bloody-offset';
-import PureRenderWithRedirectedExceptions from 'mixins/PureRenderWithRedirectedExceptions';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
 import _isFunction from 'lodash/isFunction';
@@ -32,7 +32,7 @@ const CONTROLS_HEIGHT = 33;
 
 let GenomeBrowser = React.createClass({
   mixins: [
-    PureRenderWithRedirectedExceptions({redirect: ['componentUpdate']}),
+    PureRenderWithRedirectedProps({redirect: ['componentUpdate']}),
     ConfigMixin
   ],
 

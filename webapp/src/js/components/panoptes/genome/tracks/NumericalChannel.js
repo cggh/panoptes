@@ -9,7 +9,7 @@ import _forEach from 'lodash/forEach';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
-import PureRenderWithRedirectedExceptions from 'mixins/PureRenderWithRedirectedExceptions';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
@@ -44,7 +44,7 @@ const INTERPOLATION_HAS_TENSION = {
 
 let NumericalChannel = React.createClass({
   mixins: [
-    PureRenderWithRedirectedExceptions({redirect: ['componentUpdate']}),
+    PureRenderWithRedirectedProps({redirect: ['componentUpdate']}),
     ConfigMixin
   ],
 
@@ -208,7 +208,7 @@ let NumericalChannel = React.createClass({
 let Controls = React.createClass({
   mixins: [
     FluxMixin,
-    PureRenderWithRedirectedExceptions({
+    PureRenderWithRedirectedProps({
       check: [
         'interpolation',
         'tension',

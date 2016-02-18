@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import _omit from 'lodash/omit';
 import {shallowEqualImmutable} from 'react-immutable-render-mixin';
 
-let PureRenderWithRedirectedExceptions = function({check, redirect}) {
+let PureRenderWithRedirectedProps = function({check, redirect}) {
   return {
     componentWillMount() {
       //We need to redirect these so we always use the latest as
@@ -29,4 +29,4 @@ let PureRenderWithRedirectedExceptions = function({check, redirect}) {
   };
 };
 
-module.exports = PureRenderWithRedirectedExceptions;
+module.exports = PureRenderWithRedirectedProps;
