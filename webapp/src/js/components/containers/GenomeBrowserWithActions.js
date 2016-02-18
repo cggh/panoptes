@@ -108,7 +108,8 @@ let GenomeBrowserWithActions = React.createClass({
                     onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
                       {
                         title: 'Pick channels to be added',
-                        itemName: 'Channel',
+                        itemName: 'channel',
+                        itemVerb: 'add',
                         groups: this.channelGroups,
                         onPick: this.handleChannelAdd
                       })}/>

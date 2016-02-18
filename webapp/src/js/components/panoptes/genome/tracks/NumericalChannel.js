@@ -9,7 +9,7 @@ import _forEach from 'lodash/forEach';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
-import PureRenderWithComponentUpdateException from 'mixins/PureRenderWithComponentUpdateException';
+import PureRenderWithRedirectedExceptions from 'mixins/PureRenderWithRedirectedExceptions';
 import FluxMixin from 'mixins/FluxMixin';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
@@ -44,7 +44,7 @@ const INTERPOLATION_HAS_TENSION = {
 
 let NumericalChannel = React.createClass({
   mixins: [
-    PureRenderWithComponentUpdateException(),
+    PureRenderWithRedirectedExceptions({redirect: ['componentUpdate']}),
     ConfigMixin
   ],
 
@@ -86,22 +86,22 @@ let NumericalChannel = React.createClass({
         name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
         icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
         items: _transform(properties, (result, prop) => {
-          //Only numerical tracks can be added
-          if (!prop.settings.isCategorical)
-            result[prop.propid] = {
-              name: prop.name,
-              description: prop.description,
-              icon: 'line-chart',
-              payload: {
-                track: 'NumericalSummaryTrack',
+            //Only numerical tracks can be added
+            if (!prop.settings.isCategorical)
+              result[prop.propid] = {
                 name: prop.name,
-                props: {
-                  group: groupId,
-                  track: prop.propid
+                description: prop.description,
+                icon: 'line-chart',
+                payload: {
+                  track: 'NumericalSummaryTrack',
+                  name: prop.name,
+                  props: {
+                    group: groupId,
+                    track: prop.propid
+                  }
                 }
-              }
-            };
-        }, {}
+              };
+          }, {}
         )
       }));
     });
@@ -187,12 +187,12 @@ let NumericalChannel = React.createClass({
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
                         height={2 * height}/>
                   {tracks.map((track, index) => React.createElement(dynamicRequire(track.get('track')), Object.assign({
-                    key: index,
-                    blockStart: this.blockStart,
-                    blockEnd: this.blockEnd,
-                    blockPixelWidth: blockPixelWidth,
-                    onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
-                  }, this.props,
+                      key: index,
+                      blockStart: this.blockStart,
+                      blockEnd: this.blockEnd,
+                      blockPixelWidth: blockPixelWidth,
+                      onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
+                    }, this.props,
                     track.get('props').toObject())))}
                   />
                 </g>
@@ -208,16 +208,18 @@ let NumericalChannel = React.createClass({
 let Controls = React.createClass({
   mixins: [
     FluxMixin,
-    PureRenderWithComponentUpdateException([
-      'interpolation',
-      'tension',
-      'autoYScale',
-      'yMin',
-      'yMax',
-      'trackGroups',
-      'currentTracks'
-    ]
-    )
+    PureRenderWithRedirectedExceptions({
+      check: [
+        'interpolation',
+        'tension',
+        'autoYScale',
+        'yMin',
+        'yMax',
+        'trackGroups',
+        'currentTracks'
+      ],
+      redirect: ['componentUpdate']
+    })
   ],
 
   handleTrackChange(tracks) {
@@ -242,8 +244,9 @@ let Controls = React.createClass({
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
                         {
-                          title: 'Pick channels to be added',
-                          itemName: 'Channel',
+                          title: 'Pick tracks to be displayed',
+                          itemName: 'Numerical track',
+                          itemVerb: 'display',
                           groups: trackGroups,
                           initialSelection: currentTracks,
                           onPick: this.handleTrackChange

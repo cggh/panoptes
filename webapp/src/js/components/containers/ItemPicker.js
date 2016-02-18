@@ -104,7 +104,7 @@ let ItemPicker = React.createClass({
       <div className="large-modal item-picker">
         <div className="horizontal stack">
           <div className="grow scroll-within">
-            <div className="header">{count} <Pluralise text={itemName} ord={count}/> Available</div>
+            <div className="header">{count} <Pluralise text={itemName} ord={count}/> available</div>
             <div className="search">
               <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
             </div>
