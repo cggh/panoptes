@@ -195,7 +195,6 @@ let TemplateWidget = React.createClass({
     if (this.templateComponentsToRender) {
       _each(this.templateComponentsToRender, (component, id) => {
         ReactDOM.render(component, document.getElementById(id));
-        this.componentsToUnmountAtNode.push(document.getElementById(id));
       });
     }
 
@@ -206,14 +205,6 @@ let TemplateWidget = React.createClass({
 
   componentWillMount() {
     this.templateComponentsToRender = {};
-    this.componentsToUnmountAtNode = [];
-  },
-
-  componentWillUnmount() {
-    // https://facebook.github.io/react/blog/2015/10/01/react-render-and-top-level-api.html
-    _each(this.componentsToUnmountAtNode, (node) => {
-      ReactDOM.unmountComponentAtNode(node);
-    });
   },
 
   render() {
