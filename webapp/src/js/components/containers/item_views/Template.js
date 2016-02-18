@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _uniq from 'lodash/uniq';
 import _each from 'lodash/each';
+import _isObject from 'lodash/isObject';
 import HtmlToReact from 'html-to-react';
 import Handlebars from 'handlebars';
 import uid from 'uid';
@@ -227,8 +228,8 @@ let TemplateWidget = React.createClass({
 
     Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty, width, height) => {
 
-      width = width && !width instanceof Object ? width : '300px';
-      height = height && !height instanceof Object ? height : '300px';
+      width = width && !_isObject(width) ? width : '300px';
+      height = height && !_isObject(width) ? height : '300px';
 
       let id = uid();
       thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
