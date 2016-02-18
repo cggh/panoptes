@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import offset from 'bloody-offset';
 
 import Icon from 'ui/Icon';
@@ -8,7 +8,9 @@ import Icon from 'ui/Icon';
 
 let ChannelWithConfigDrawer = React.createClass({
   mixins: [
-    PureRenderMixin
+    PureRenderWithRedirectedProps({
+      redirect: ['onClose']
+    })
   ],
 
   propTypes: {
@@ -16,7 +18,8 @@ let ChannelWithConfigDrawer = React.createClass({
     width: React.PropTypes.number.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
     sideComponent: React.PropTypes.element,
-    configComponent: React.PropTypes.element
+    configComponent: React.PropTypes.element,
+    onClose: React.PropTypes.func
   },
 
   getInitialState() {
@@ -49,6 +52,12 @@ let ChannelWithConfigDrawer = React.createClass({
     e.stopPropagation();
   },
 
+  handleClose(e) {
+    e.stopPropagation();
+    if (this.redirectedProps.onClose)
+      this.redirectedProps.onClose();
+  },
+
   render() {
     let {height, width, sideWidth, sideComponent, configComponent} = this.props;
     let effWidth = width - sideWidth;
@@ -59,7 +68,7 @@ let ChannelWithConfigDrawer = React.createClass({
 
           <div className="channel-side" style={{width: `${sideWidth}px`}}>
             <div className="side-controls">
-              <Icon className="close" name="times" onClick={this.handleControlToggle}/>
+              <Icon className="close" name="times" onClick={this.handleClose}/>
               <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
             </div>
             {sideComponent}
