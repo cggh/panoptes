@@ -225,10 +225,14 @@ let TemplateWidget = React.createClass({
 
     let thisReact = this;
 
-    Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty) => {
+    Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty, width, height) => {
+
+      width = width ? width : '300px';
+      height = height ? height : '300px';
+
       let id = uid();
-      thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} />;
-      return new Handlebars.SafeString(`<div id="${id}"></div>`);
+      thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
+      return new Handlebars.SafeString(`<div style="position: relative; width: ${width}; height: ${height};" id="${id}"></div>`);
     });
 
     Handlebars.registerHelper( 'item_link', (a, b, c) => {
