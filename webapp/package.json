@@ -86,6 +86,7 @@
     "react-resizable": "^1.0.1",
     "react-sidebar": "^2.1.1",
     "react-tap-event-plugin": "^0.2.2",
+    "scrollbar-size": "^1.0.4",
     "shallow-equals": "0.0.0",
     "uid": "0.0.2"
   }

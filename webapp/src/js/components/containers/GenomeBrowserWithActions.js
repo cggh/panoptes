@@ -2,7 +2,6 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _reduce from 'lodash/reduce';
 import _transform from 'lodash/transform';
 import _forEach from 'lodash/forEach';
 import uid from 'uid';

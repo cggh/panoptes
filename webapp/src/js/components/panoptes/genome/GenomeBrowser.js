@@ -6,6 +6,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
 import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
+import scrollbarSize from 'scrollbar-size';
 
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Hammer from 'react-hammerjs';
@@ -269,15 +270,18 @@ let GenomeBrowser = React.createClass({
                         {channels.map((channel, channelId) => {
                           let props = channel.get('props');
                           return React.createElement(dynamicRequire(channel.get('channel')),
-                              Object.assign({
-                                key: channelId,
-                                componentUpdate: (updater) => this.componentUpdate((props) => {
-                                  if (_isFunction(updater))
-                                    return props.updateIn(['channels', channelId, 'props'], updater);
+                               Object.assign({
+                                 key: channelId,
+                                 onClose: () =>
+                                   this.redirectedProps.componentUpdate((props) =>
+                                     props.deleteIn(['channels', channelId])),
+                                 componentUpdate: (updater) => this.redirectedProps.componentUpdate((props) => {
+                                   if (_isFunction(updater))
+                                     return props.updateIn(['channels', channelId, 'props'], updater);
                                   else
                                     return props.mergeIn(['channels', channelId, 'props'], updater);
-                                })
-                              }, props.toObject(), trackProps));
+                                 })
+                               }, props.toObject(), trackProps, {width: Math.max(0, trackProps.width - scrollbarSize())}));
                         }
                         ).toList()
                         }

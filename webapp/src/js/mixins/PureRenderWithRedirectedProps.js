@@ -6,11 +6,16 @@ let PureRenderWithRedirectedProps = function({check, redirect}) {
   return {
     componentWillMount() {
       //We need to redirect these so we always use the latest as
-      //render might not have been called as componentUpdate does not check them
-      if (redirect)
-        redirect.forEach((prop) => this[prop] =
-          (function() { return this.props[prop].apply(this, arguments); }).bind(this)
+      //render might not have been called to update them
+      //as componentUpdate does not check them
+      if (redirect) {
+        this.redirectedProps = {};
+        redirect.forEach((prop) => this.redirectedProps[prop] =
+          (function() {
+            return this.props[prop].apply(this, arguments);
+          }).bind(this)
         );
+      }
     },
 
     //As component update is an anon func, it looks different on every prop change,
