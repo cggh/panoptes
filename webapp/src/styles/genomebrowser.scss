@@ -75,25 +75,37 @@
           box-shadow:  inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
       }
+      .channel-container {
+        position: relative;
+      }
+      .side-controls-spacer {
+        padding-left:10px;
+        padding-top:10px;
+        height: 32px;
+      }
+      .side-controls {
+        position: absolute;
+        top:0;
+        left:0;
+        padding-left:10px;
+        padding-top:10px;
+        .close {
+          color: $red;
+        }
+        .icon {
+          opacity: 0.6;
+        }
+        .icon:hover {
+          opacity: 1;
+        }
+      }
       .channel {
         display: flex;
         flex-direction: row;
         .channel-side {
+          border-bottom: 1px solid grey;
           background: white;
           position: relative;
-          .side-controls {
-            padding-left:10px;
-            padding-top:10px;
-            .close {
-              color: $red;
-            }
-            .icon {
-              opacity: 0.6;
-            }
-            .icon:hover {
-              opacity: 1;
-            }
-          }
           .side-name {
             padding-left: 10px;
             padding-top: 5px;
@@ -101,13 +113,17 @@
 
         }
         .channel-data {
-          border-bottom: 1px solid $primary-color;
+          border-bottom: 1px solid grey;
           flex: 1;
           overflow: hidden;
           canvas {
             display: block;
           }
         }
+      }
+      .channel-controls-container > div {
+        //Some padding so that the controls don't overlap the close and config controls
+        padding-left: 50px;
       }
       .channel-controls-container {
         box-shadow: $z-1-shadow;
@@ -137,6 +153,9 @@
             .numeric-input {
               width: 80px;
             }
+          }
+          .control:first-child {
+            padding-left: 0px;
           }
 
         }
