@@ -97,13 +97,13 @@ let NumericalChannel = React.createClass({
               description: prop.description,
               icon: 'line-chart',
               payload: {
-                  track: 'NumericalSummaryTrack',
-                  name: prop.name,
-                  props: {
-                    group: groupId,
-                    track: prop.propid
-                  }
+                track: 'NumericalSummaryTrack',
+                name: prop.name,
+                props: {
+                  group: groupId,
+                  track: prop.propid
                 }
+              }
             };
         }, {}
         )

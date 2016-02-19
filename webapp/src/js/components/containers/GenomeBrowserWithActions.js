@@ -42,13 +42,14 @@ let GenomeBrowserWithActions = React.createClass({
 
   componentWillMount() {
     this.channelGroups = Immutable.Map();
+    //Normal summaries
     _forEach(this.config.summaryValues, (properties, groupId) => {
       this.channelGroups = this.channelGroups.set(groupId, Immutable.fromJS({
         name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
         icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
         items: _transform(properties, (result, prop) => result[prop.propid] = {
           name: prop.name,
-          description: prop.description,
+          description: groupId === '__reference__' ? 'Description needs to be implemented' : prop.description,
           icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
           payload: prop.settings.isCategorical ? {
             channel: 'CategoricalChannel',
@@ -72,6 +73,30 @@ let GenomeBrowserWithActions = React.createClass({
           }
         }, {})
       }));
+    });
+    //Per-row based summaries
+    _forEach(this.config.tables, (table, tableId) => {
+      if (table.tableBasedSummaryValues) {
+        this.channelGroups = this.channelGroups.set(`per_${tableId}`, Immutable.fromJS({
+          name: `Per ${table.tableCapNameSingle}`,
+          icon: table.icon,
+          items: _transform(table.tableBasedSummaryValues, (result, channel) => {
+            result[channel.trackid] = {
+              name: channel.trackname,
+              description: 'Description needs to be implemented',
+              icon: 'line-chart',
+              payload: {
+                channel: 'PerRowNumericalChannel',
+                props: {
+                  name: channel.trackname,
+                  group: tableId,
+                  track: channel.trackid
+                }
+              }
+            };
+          }, {})
+        }));
+      }
     });
   },
 
