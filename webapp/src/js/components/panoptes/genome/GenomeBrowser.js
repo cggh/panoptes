@@ -6,6 +6,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
 import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
+import scrollbarSize from 'scrollbar-size';
 
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Hammer from 'react-hammerjs';
@@ -280,7 +281,7 @@ let GenomeBrowser = React.createClass({
                                   else
                                     return props.mergeIn(['channels', channelId, 'props'], updater);
                                  })
-                               }, props.toObject(), trackProps));
+                               }, props.toObject(), trackProps, {width: Math.max(0, trackProps.width - scrollbarSize())}));
                         }
                         ).toList()
                         }

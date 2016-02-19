@@ -186,7 +186,7 @@ let NumericalChannel = React.createClass({
         onClose={this.handleClose}
 
       >
-        <svg className="numerical-summary" width={effWidth} height={height}>
+        <svg className="numerical-channel" width={effWidth} height={height}>
           <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
@@ -204,7 +204,6 @@ let NumericalChannel = React.createClass({
                     onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
                   }, this.props,
                     track.get('props').toObject())))}
-                  />
                 </g>
               </g>;
             }}

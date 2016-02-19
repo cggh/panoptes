@@ -66,6 +66,7 @@
         }
       }
       .scrolling {
+        overflow-y: scroll;
         .channel-container:last-child .channel .channel-side{
           //Shadow of las side controls
           box-shadow: -1px 2px 4px rgba(0, 0, 0, 0.24);
@@ -209,7 +210,7 @@
     }
   }
 
-  svg.numerical-summary {
+  svg.numerical-channel {
     .origin-shifter {
       fill: none;
     }
