@@ -195,6 +195,7 @@ let TemplateWidget = React.createClass({
     if (this.templateComponentsToRender) {
       _each(this.templateComponentsToRender, (component, id) => {
         ReactDOM.render(component, document.getElementById(id));
+        this.componentsToUnmountById.push(id);
       });
     }
 
@@ -205,6 +206,18 @@ let TemplateWidget = React.createClass({
 
   componentWillMount() {
     this.templateComponentsToRender = {};
+    this.componentsToUnmountById = [];
+  },
+
+  componentWillUnmount() {
+    // The React extension to Chrome dev tools can be used to see components being added and removed.
+    // When a popup is closed, for example, its components ought to be removed,
+    // otherwise memory will leak away as more and more invisible components accumulate.
+
+    // https://facebook.github.io/react/blog/2015/10/01/react-render-and-top-level-api.html
+    _each(this.componentsToUnmountById, (id) => {
+      ReactDOM.unmountComponentAtNode(document.getElementById(id));
+    });
   },
 
   render() {
@@ -215,22 +228,25 @@ let TemplateWidget = React.createClass({
     // Don't continue if there are no data.
     if (!data) return null;
 
-    let thisReact = this;
+    Handlebars.registerHelper( 'map', (options) => {
 
-    Handlebars.registerHelper( 'map', (table, primKey, latProperty, lngProperty, width, height) => {
+      // http://handlebarsjs.com/expressions.html
+      // "Handlebars helpers can also receive an optional sequence of key-value pairs as their final parameter (referred to as hash arguments in the documentation)"
 
-      width = width && !_isObject(width) ? width : '300px';
-      height = height && !_isObject(width) ? height : '300px';
+      let {table, primKeyProp, latProp, lngProp, width, height} = options.hash;
+
+      width = width ? width : '300px';
+      height = height ? height : '300px';
 
       let id = uid();
-      thisReact.templateComponentsToRender[id] = <ItemMapWidget table={table} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
+      this.templateComponentsToRender[id] = <ItemMapWidget table={table} primKey={primKeyProp} lngProperty={lngProp} latProperty={latProp} componentUpdate={componentUpdate} config={this.config} />;
       return new Handlebars.SafeString(`<div style="position: relative; width: ${width}; height: ${height};" id="${id}"></div>`);
     });
 
     Handlebars.registerHelper( 'item_link', (a, b, c) => {
       // TODO: what is an item_link?
       let id = uid();
-      thisReact.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
+      this.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
       return new Handlebars.SafeString(`<div id="${id}"></div>`);
     });
 
