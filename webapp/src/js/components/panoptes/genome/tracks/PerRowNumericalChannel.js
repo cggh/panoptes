@@ -6,13 +6,18 @@ import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
 import _transform from 'lodash/transform';
 import _forEach from 'lodash/forEach';
+import _throttle from 'lodash/throttle';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
+
 
 import SQL from 'panoptes/SQL';
+import API from 'panoptes/API';
+import LRUCache from 'util/LRUCache';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import YScale from 'panoptes/genome/tracks/YScale';
 
@@ -25,10 +30,6 @@ import FlatButton from 'material-ui/lib/flat-button';
 import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/genome/FindBlocks';
-
-let dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./' + path);
-
 
 const HEIGHT = 100;
 const INTERPOLATIONS = [
@@ -83,8 +84,8 @@ let NumericalChannel = React.createClass({
     };
   },
 
-  handleYLimitChange({index, dataYMin, dataYMax}) {
-    this.setState({[index]: {dataYMin, dataYMax}});
+  handleYLimitChange({dataYMin, dataYMax}) {
+    this.setState({dataYMin, dataYMax});
   },
 
   handleClose() {
@@ -95,18 +96,12 @@ let NumericalChannel = React.createClass({
   render() {
     let height = HEIGHT;
     let {start, end, width, sideWidth, yMin, yMax, autoYScale, table, channel} = this.props;
+    let {dataYMin, dataYMax} = this.state;
 
     if (autoYScale) {
-      let [allDataYMin, allDataYMax] = [null, null];
-      _map(this.state, ({dataYMin, dataYMax}) => {
-        if (allDataYMin === null || (dataYMin && dataYMin < allDataYMin))
-          allDataYMin = dataYMin;
-        if (allDataYMax === null || (dataYMax && dataYMax > allDataYMax))
-          allDataYMax = dataYMax;
-      });
-      if (_isFinite(allDataYMin) && _isFinite(allDataYMax)) {
-        yMin = allDataYMin;
-        yMax = allDataYMax;
+      if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
+        yMin = dataYMin;
+        yMax = dataYMax;
       }
     }
 
@@ -154,7 +149,7 @@ let NumericalChannel = React.createClass({
             {this.config.tables[table].tableBasedSummaryValues[channel].trackname}
           </div>
         }
-        //Override component update
+        //Override component update to get latest in case of skipped render
         configComponent={<Controls {...this.props}
                                    componentUpdate={this.redirectedProps.componentUpdate}/>}
         onClose={this.handleClose}
@@ -170,6 +165,13 @@ let NumericalChannel = React.createClass({
                   transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
                         height={2 * height}/>
+                  <PerRowNumericalTrack
+                    {...this.props}
+                    blockStart={this.blockStart}
+                    blockEnd={this.blockEnd}
+                    blockPixelWidth={blockPixelWidth}
+                    onYLimitChange={this.handleYLimitChange}
+                  />
                 </g>
               </g>;
             }}
@@ -178,6 +180,197 @@ let NumericalChannel = React.createClass({
       </ChannelWithConfigDrawer>);
   }
 });
+
+let PerRowNumericalTrack = React.createClass({
+  mixins: [
+    ConfigMixin,
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query')
+  ],
+
+  propTypes: {
+    chromosome: React.PropTypes.string.isRequired,
+    blockStart: React.PropTypes.number.isRequired,
+    blockEnd: React.PropTypes.number.isRequired,
+    blockPixelWidth: React.PropTypes.number.isRequired,
+    start: React.PropTypes.number.isRequired,
+    end: React.PropTypes.number.isRequired,
+    interpolation: React.PropTypes.string,
+    autoYScale: React.PropTypes.bool,
+    tension: React.PropTypes.number,
+    onYLimitChange: React.PropTypes.func,
+    table: React.PropTypes.string.isRequired,
+    channel: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string.isRequired
+  },
+
+  getInitialState() {
+    return {};
+  },
+
+  componentWillMount() {
+    this.throttledYScale = _throttle(this.calculateYScale, 500);
+  },
+  componentWillUnmount() {
+    this.props.onYLimitChange({dataYMin: null, dataYMax: null});
+  },
+
+  componentWillReceiveProps(nextProps) {
+    //We apply data if there is a change in interpolation params to redraw the line
+    if (['interpolation', 'tension'].some((name) => this.props[name] !== nextProps[name]))
+      this.applyData(nextProps);
+    //If there is a change in start or end we need to recalc y limits
+    if (['start', 'end'].some((name) => Math.round(this.props[name]) !== Math.round(nextProps[name])))
+      this.throttledYScale(nextProps);
+  },
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state.area !== nextState.area || this.state.lines !== nextState.lines;
+  },
+
+  //Called by DataFetcherMixin on componentWillReceiveProps
+  fetchData(props, requestContext) {
+    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table, channel, query} = props;
+    let tableConfig = this.config.tables[table];
+
+    if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
+      this.data = {
+        dataStart: 0,
+        dataStep: 0,
+        columns: {}
+      };
+      this.applyData(props);
+    }
+
+    if (width - sideWidth < 1) {
+      return;
+    }
+    if (!this.config.tables[table] || !this.config.tables[table].tableBasedSummaryValues[channel]) {
+      ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid per row summary track`);
+      return;
+    }
+    this.props.onChangeLoadStatus('LOADING');
+
+    if (this.currentQuery !== props.query) {
+      this.currentQuery = props.query;
+      this.data = {
+        dataStart: 0,
+        dataStep: 0,
+        columns: {}
+      };
+      this.applyData(props);
+      let columns = [tableConfig.primkey];
+      let columnspec = {};
+      columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+      let APIargs = {
+        database: this.config.dataset,
+        table: table,
+        columns: columnspec,
+        query: query,
+        transpose: false
+      };
+      requestContext.request((componentCancellation) =>
+        LRUCache.get(
+          'pageQuery' + JSON.stringify(APIargs),
+          (cacheCancellation) =>
+            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+          componentCancellation
+        )
+      ).then((tableData) => {
+        let toFetch = tableData[tableConfig.primkey].map((primkey) => ({
+          primkey: primkey,
+          folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+          config: 'Summ',
+          name: `${channel}_${primkey}_avg`
+        }));
+        console.log(toFetch);
+        this.props.onChangeLoadStatus('DONE');
+      })
+      .catch((err) => {
+        console.log(err);
+        this.props.onChangeLoadStatus('DONE');
+        throw err;
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+
+      //.catch((error) => {
+      //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      //  this.setState({loadStatus: 'error'});
+      //})
+      ;
+    }
+  },
+
+  applyData(props) {
+    if (this.data) {
+      let {dataStart, dataStep, columns} = this.data;
+      let {interpolation, tension} = props;
+
+      let avg = columns ? columns.avg || [] : [];
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
+
+      let line = d3.svg.line()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_isFinite)
+        .x((d, i) => dataStart + (i * dataStep))
+        .y((d) => d)(avg);
+      let area = d3.svg.area()
+        .interpolate(interpolation)
+        .tension(tension)
+        .defined(_isFinite)
+        .x((d, i) => dataStart + (i * dataStep))
+        .y((d) => d)
+        .y0((d, i) => min[i])(max);
+
+      this.setState({
+        area: area,
+        line: line
+      });
+    }
+  },
+
+  calculateYScale(props) {
+    if (props.autoYScale && this.data) {
+      let {start, end} = props;
+      let {dataStart, dataStep, columns} = this.data;
+
+      let max = columns ? columns.max || [] : [];
+      let min = columns ? columns.min || [] : [];
+
+      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+      let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
+      let minVal = _min(min.slice(startIndex, endIndex));
+      let maxVal = _max(max.slice(startIndex, endIndex));
+      if (minVal === maxVal) {
+        minVal = minVal - 0.1 * minVal;
+        maxVal = maxVal + 0.1 * maxVal;
+      } else {
+        let margin = 0.1 * (maxVal - minVal);
+        minVal = minVal - margin;
+        maxVal = maxVal + margin;
+      }
+      this.props.onYLimitChange({
+        dataYMin: minVal,
+        dataYMax: maxVal
+      });
+    }
+  },
+
+
+  render() {
+    let {area, line} = this.state;
+    return (
+      <g className="numerical-track">
+        <path className="area" d={area}/>
+        <path className="line" d={line}/>
+      </g>
+    );
+  }
+
+});
+
 
 
 let Controls = React.createClass({
