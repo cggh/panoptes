@@ -18,6 +18,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import SQL from 'panoptes/SQL';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
+import SummarisationCache from 'panoptes/SummarisationCache';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import YScale from 'panoptes/genome/tracks/YScale';
 
@@ -209,6 +210,12 @@ let PerRowNumericalTrack = React.createClass({
 
   componentWillMount() {
     this.throttledYScale = _throttle(this.calculateYScale, 500);
+    this.data = {
+      dataStart: 0,
+      dataStep: 0,
+      primKeys: [],
+      columns: {}
+    };
   },
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
@@ -233,14 +240,10 @@ let PerRowNumericalTrack = React.createClass({
     let tableConfig = this.config.tables[table];
 
     if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
-      this.data = {
-        dataStart: 0,
-        dataStep: 0,
-        columns: {}
-      };
+      this.data.columns = {};
       this.applyData(props);
     }
-
+    //TODO Clear data on new table, channel or query
     if (width - sideWidth < 1) {
       return;
     }
@@ -249,92 +252,97 @@ let PerRowNumericalTrack = React.createClass({
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
-
-    if (this.currentQuery !== props.query) {
-      this.currentQuery = props.query;
-      this.data = {
-        dataStart: 0,
-        dataStep: 0,
-        columns: {}
-      };
-      this.applyData(props);
-      let columns = [tableConfig.primkey];
-      let columnspec = {};
-      columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
-      let APIargs = {
-        database: this.config.dataset,
-        table: table,
-        columns: columnspec,
-        query: query,
-        transpose: false
-      };
-      requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'pageQuery' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )
+    let columns = [tableConfig.primkey];
+    let columnspec = {};
+    columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+    let APIargs = {
+      database: this.config.dataset,
+      table: table,
+      columns: columnspec,
+      query: query,
+      transpose: false
+    };
+    requestContext.request((componentCancellation) =>
+      LRUCache.get(
+        'pageQuery' + JSON.stringify(APIargs),
+        (cacheCancellation) =>
+          API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+        componentCancellation
       ).then((tableData) => {
-        let toFetch = tableData[tableConfig.primkey].map((primkey) => ({
-          primkey: primkey,
-          folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
-          config: 'Summ',
-          name: `${channel}_${primkey}_avg`
-        }));
-        console.log(toFetch);
-        this.props.onChangeLoadStatus('DONE');
-      })
-      .catch((err) => {
-        console.log(err);
-        this.props.onChangeLoadStatus('DONE');
-        throw err;
-      })
-      .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
+        let primKeys = tableData[tableConfig.primkey];
+        this.data.primKeys = primKeys;
+        return Promise.all(primKeys.map((primkey) =>
+          SummarisationCache.fetch({
+              columns: {
+                [primkey]: {
+                  primkey: primkey,
+                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+                  config: 'Summ',
+                  name: `${channel}_${primkey}_avg`
+                }
+              },
+              minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
+              chromosome: chromosome,
+              start: blockStart,
+              end: blockEnd,
+              targetPointCount: blockPixelWidth,
+              cancellation: componentCancellation
+            })
+            .then(({columns, dataStart, dataStep}) => {
+              this.data.dataStart = dataStart;
+              this.data.dataStep = dataStep;
+              Object.assign(this.data.columns, columns);
+              this.applyData(props);
+            })
+        ));
+      }))
+    .catch((err) => {
+      console.log(err);
+      this.props.onChangeLoadStatus('DONE');
+      throw err;
+    })
+    .catch(API.filterAborted)
+    .catch(LRUCache.filterCancelled);
 
-      //.catch((error) => {
-      //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      //  this.setState({loadStatus: 'error'});
-      //})
-      ;
-    }
+    //.catch((error) => {
+    //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+    //  this.setState({loadStatus: 'error'});
+    //})
   },
 
   applyData(props) {
-    if (this.data) {
-      let {dataStart, dataStep, columns} = this.data;
-      let {interpolation, tension} = props;
+    let {primKeys, dataStart, dataStep, columns} = this.data;
+    let {interpolation, tension} = props;
 
-      let avg = columns ? columns.avg || [] : [];
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
-
-      let line = d3.svg.line()
-        .interpolate(interpolation)
-        .tension(tension)
-        .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep))
-        .y((d) => d)(avg);
-      let area = d3.svg.area()
-        .interpolate(interpolation)
-        .tension(tension)
-        .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep))
-        .y((d) => d)
-        .y0((d, i) => min[i])(max);
-
-      this.setState({
-        area: area,
-        line: line
-      });
-    }
+    let lines = {};
+    primKeys.forEach((primKey) => {
+      if (columns[primKey])
+        lines[primKey] = d3.svg.line()
+          .interpolate(interpolation)
+          .tension(tension)
+          .defined(_isFinite)
+          .x((d, i) => dataStart + (i * dataStep))
+          .y((d) => d)(columns[primKey]);
+    });
+    //let area = d3.svg.area()
+    //  .interpolate(interpolation)
+    //  .tension(tension)
+    //  .defined(_isFinite)
+    //  .x((d, i) => dataStart + (i * dataStep))
+    //  .y((d) => d)
+    //  .y0((d, i) => min[i])(max);
+    //
+    this.setState({
+      //area: area,
+      lines: lines
+    });
   },
 
   calculateYScale(props) {
-    if (props.autoYScale && this.data) {
+    return;
+    if (props.autoYScale) {
       let {start, end} = props;
-      let {dataStart, dataStep, columns} = this.data;
+      let {primKeys, dataStart, dataStep, columns} = this.data;
 
       let max = columns ? columns.max || [] : [];
       let min = columns ? columns.min || [] : [];
@@ -360,11 +368,11 @@ let PerRowNumericalTrack = React.createClass({
 
 
   render() {
-    let {area, line} = this.state;
+    let {area, lines} = this.state;
     return (
       <g className="numerical-track">
         <path className="area" d={area}/>
-        <path className="line" d={line}/>
+        {_map(lines, (line, primKey) => <path key={primKey} className="line" d={line}/>)}
       </g>
     );
   }
