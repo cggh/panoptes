@@ -72,7 +72,10 @@ let NumericalChannel = React.createClass({
   },
 
   getInitialState() {
-    return {};
+    return {
+      dataYMin: 0,
+      dataYMax: 1
+    };
   },
 
   getDefaultProps() {
@@ -91,12 +94,12 @@ let NumericalChannel = React.createClass({
         icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
         items: _transform(properties, (result, prop) => {
             //Only numerical tracks can be added
-            if (!prop.settings.isCategorical)
-              result[prop.propid] = {
-                name: prop.name,
-                description: prop.description,
-                icon: 'line-chart',
-                payload: {
+          if (!prop.settings.isCategorical)
+            result[prop.propid] = {
+              name: prop.name,
+              description: prop.description,
+              icon: 'line-chart',
+              payload: {
                   track: 'NumericalSummaryTrack',
                   name: prop.name,
                   props: {
@@ -104,8 +107,8 @@ let NumericalChannel = React.createClass({
                     track: prop.propid
                   }
                 }
-              };
-          }, {}
+            };
+        }, {}
         )
       }));
     });
@@ -197,12 +200,12 @@ let NumericalChannel = React.createClass({
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
                         height={2 * height}/>
                   {tracks.map((track, index) => React.createElement(dynamicRequire(track.get('track')), Object.assign({
-                      key: index,
-                      blockStart: this.blockStart,
-                      blockEnd: this.blockEnd,
-                      blockPixelWidth: blockPixelWidth,
-                      onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
-                    }, this.props,
+                    key: index,
+                    blockStart: this.blockStart,
+                    blockEnd: this.blockEnd,
+                    blockPixelWidth: blockPixelWidth,
+                    onYLimitChange: (args) => this.handleYLimitChange(({...args, index}))
+                  }, this.props,
                     track.get('props').toObject())))}
                 </g>
               </g>;
@@ -241,10 +244,10 @@ let Controls = React.createClass({
     let {interpolation, tension, autoYScale, yMin, yMax, currentTracks, trackGroups} = this.props;
     let actions = this.getFlux().actions;
     currentTracks = currentTracks.map((track) => Immutable.Map({
-        groupId: track.getIn(['props', 'group']),
-        itemId: track.getIn(['props', 'track']),
-        payload: track
-      })
+      groupId: track.getIn(['props', 'group']),
+      itemId: track.getIn(['props', 'track']),
+      payload: track
+    })
     );
     return (
       <div className="channel-controls">

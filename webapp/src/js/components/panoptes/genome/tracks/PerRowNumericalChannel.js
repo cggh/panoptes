@@ -1,12 +1,10 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
-import _transform from 'lodash/transform';
-import _forEach from 'lodash/forEach';
 import _throttle from 'lodash/throttle';
+import _min from 'lodash/min';
+import _max from 'lodash/max';
 
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -21,6 +19,7 @@ import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import YScale from 'panoptes/genome/tracks/YScale';
+import ErrorReport from 'panoptes/ErrorReporter';
 
 
 import Checkbox from 'material-ui/lib/checkbox';
@@ -73,7 +72,10 @@ let NumericalChannel = React.createClass({
   },
 
   getInitialState() {
-    return {};
+    return {
+      dataYMin: 0,
+      dataYMax: 1
+    };
   },
 
   getDefaultProps() {
@@ -140,6 +142,7 @@ let NumericalChannel = React.createClass({
     }
 
     let blockPixelWidth = (((width - sideWidth) / 2) / (end - start)) * (this.blockEnd - this.blockStart);
+
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -273,41 +276,39 @@ let PerRowNumericalTrack = React.createClass({
         this.data.primKeys = primKeys;
         return Promise.all(primKeys.map((primkey) =>
           SummarisationCache.fetch({
-              columns: {
-                [primkey]: {
-                  primkey: primkey,
-                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
-                  config: 'Summ',
-                  name: `${channel}_${primkey}_avg`
-                }
-              },
-              minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
-              chromosome: chromosome,
-              start: blockStart,
-              end: blockEnd,
-              targetPointCount: blockPixelWidth,
-              cancellation: componentCancellation
-            })
+            columns: {
+              [primkey]: {
+                primkey: primkey,
+                folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+                config: 'Summ',
+                name: `${channel}_${primkey}_avg`
+              }
+            },
+            minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
+            chromosome: chromosome,
+            start: blockStart,
+            end: blockEnd,
+            targetPointCount: blockPixelWidth,
+            cancellation: componentCancellation
+          })
             .then(({columns, dataStart, dataStep}) => {
               this.data.dataStart = dataStart;
               this.data.dataStep = dataStep;
               Object.assign(this.data.columns, columns);
               this.applyData(props);
+              this.calculateYScale(props);
             })
         ));
       }))
     .catch((err) => {
-      console.log(err);
       this.props.onChangeLoadStatus('DONE');
-      throw err;
     })
     .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled);
-
-    //.catch((error) => {
-    //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-    //  this.setState({loadStatus: 'error'});
-    //})
+    .catch(LRUCache.filterCancelled)
+    .catch((error) => {
+      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      this.setState({loadStatus: 'error'});
+    });
   },
 
   applyData(props) {
@@ -339,18 +340,22 @@ let PerRowNumericalTrack = React.createClass({
   },
 
   calculateYScale(props) {
-    return;
     if (props.autoYScale) {
       let {start, end} = props;
       let {primKeys, dataStart, dataStep, columns} = this.data;
 
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
-
-      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
-      let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
-      let minVal = _min(min.slice(startIndex, endIndex));
-      let maxVal = _max(max.slice(startIndex, endIndex));
+      let min = [];
+      let max = [];
+      primKeys.forEach((primKey) => {
+        if (columns[primKey]) {
+          let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+          let endIndex = Math.min(columns[primKey].length - 1, Math.ceil((end - dataStart) / dataStep));
+          min.push(_min(columns[primKey].slice(startIndex, endIndex)));
+          max.push(_max(columns[primKey].slice(startIndex, endIndex)));
+        }
+      });
+      let minVal = _min(min);
+      let maxVal = _max(max);
       if (minVal === maxVal) {
         minVal = minVal - 0.1 * minVal;
         maxVal = maxVal + 0.1 * maxVal;
@@ -412,11 +417,11 @@ let Controls = React.createClass({
           <FlatButton label="Change Filter"
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                      {
-                        table: table,
-                        initialQuery: query,
-                        onPick: this.handleQueryPick
-                      })}/>
+                        {
+                          table: table,
+                          initialQuery: query,
+                          onPick: this.handleQueryPick
+                        })}/>
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>
