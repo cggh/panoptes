@@ -8,7 +8,6 @@ import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-import FluxMixin from 'mixins/FluxMixin';
 
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ErrorReport from 'panoptes/ErrorReporter';
@@ -17,7 +16,6 @@ import API from 'panoptes/API';
 
 let NumericalSummaryTrack = React.createClass({
   mixins: [
-    FluxMixin,
     ConfigMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track')
   ],
@@ -64,8 +62,14 @@ let NumericalSummaryTrack = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth} = props;
-    if (this.state.chromosome && (this.state.chromosome !== chromosome))
-      this.setState({columns: null});
+    if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
+      this.data = {
+        dataStart: 0,
+        dataStep: 0,
+        columns: {}
+      };
+      this.applyData(props);
+    }
     if (width - sideWidth < 1) {
       return;
     }
@@ -113,10 +117,10 @@ let NumericalSummaryTrack = React.createClass({
           })
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
-          //.catch((error) => {
-          //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-          //  this.setState({loadStatus: 'error'});
-          //})
+          .catch((error) => {
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+            this.setState({loadStatus: 'error'});
+          })
     );
   },
 

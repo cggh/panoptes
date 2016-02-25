@@ -93,10 +93,11 @@ function pageQuery(options) {
     count: false,
     start: 0,
     stop: 1000000,
-    distinct: false
+    distinct: false,
+    transpose: true
   };
   let {database, table, columns, query, order,
-    ascending, count, start, stop, distinct} = Object.assign(defaults, options);
+    ascending, count, start, stop, distinct, transpose} = Object.assign(defaults, options);
 
   let collist = '';
   _forEach(columns, (encoding, id) => {
@@ -119,15 +120,19 @@ function pageQuery(options) {
     }
   }))
     .then(_decodeValList(columns))
-    //Transpose into rows
+    //Transpose into rows if needed
     .then((columns) => {
-      let rows = [];
-      for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
-        let row = {};
-        _forEach(columns, (array, id) => row[id] = array[i]);
-        rows.push(row);
+      if (transpose) {
+        let rows = [];
+        for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
+          let row = {};
+          _forEach(columns, (array, id) => row[id] = array[i]);
+          rows.push(row);
+        }
+        return rows;
+      } else {
+        return columns;
       }
-      return rows;
     });
 
 }

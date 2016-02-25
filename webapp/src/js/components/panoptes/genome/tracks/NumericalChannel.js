@@ -72,7 +72,10 @@ let NumericalChannel = React.createClass({
   },
 
   getInitialState() {
-    return {};
+    return {
+      dataYMin: 0,
+      dataYMax: 1
+    };
   },
 
   getDefaultProps() {
@@ -178,7 +181,7 @@ let NumericalChannel = React.createClass({
         sideWidth={sideWidth}
         height={HEIGHT}
         sideComponent={<div className="side-name">{tracks.map((track) => track.get('name')).join(',')}</div>}
-        //Override component update
+        //Override component update to get latest in case of skipped render
         configComponent={<Controls trackGroups={this.trackGroups}
                                    currentTracks={tracks}
                                    {...this.props}

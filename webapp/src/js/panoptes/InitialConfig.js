@@ -36,7 +36,8 @@ function caseChange(config) {
       key !== 'propertiesMap' &&
       key !== 'propertyGroups' &&
       key !== 'chromosomes' &&
-      key !== 'summaryValues'
+      key !== 'summaryValues' &&
+      key !== 'tableBasedSummaryValues'
     ) {
       value = caseChange(value);
     }
@@ -200,6 +201,30 @@ let parseSummaryValues = function() {
     summaryValueMap[summaryValue.tableid][summaryValue.propid] = summaryValue;
   });
   fetchedConfig.summaryValues = summaryValueMap;
+};
+
+let parseTableBasedSummaryValues = function() {
+  fetchedConfig.tableBasedSummaryValues.forEach((tableSummaryValue) => {
+    if (tableSummaryValue.minval)
+      tableSummaryValue.minval = parseFloat(tableSummaryValue.minval);
+      else
+        tableSummaryValue.minval = 0;
+    if (tableSummaryValue.maxval)
+      tableSummaryValue.maxval = parseFloat(tableSummaryValue.maxval);
+      else
+        tableSummaryValue.maxval = 1;
+    tableSummaryValue.minblocksize = parseFloat(tableSummaryValue.minblocksize);
+    let settings = {channelColor: 'rgb(0,0,180)'};
+    if (tableSummaryValue.settings) {
+      settings = Object.assign(settings, JSON.parse(tableSummaryValue.settings));
+    }
+    tableSummaryValue.settings = settings;
+    tableSummaryValue.isVisible = tableSummaryValue.settings.defaultVisible;
+
+    let table = tableSummaryValue.tableid;
+    fetchedConfig.mapTableCatalog[table].tableBasedSummaryValues || (fetchedConfig.mapTableCatalog[table].tableBasedSummaryValues = {});
+    fetchedConfig.mapTableCatalog[table].tableBasedSummaryValues[tableSummaryValue.trackid] = tableSummaryValue;
+  });
 };
 
 let parseCustomProperties = function() {
@@ -579,9 +604,9 @@ let fetchInitialConfig = function() {
     })
     .then(parseCustomProperties)
     .then(parseSummaryValues)
+    .then(parseTableBasedSummaryValues)
     .then(() => {
     //parse2DProperties();
-    //parseTableBasedSummaryValues();
       parseRelations();
     //parseStoredSubsets();
     })
