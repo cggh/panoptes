@@ -7,6 +7,7 @@ import _throttle from 'lodash/throttle';
 import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import SummarisationCache from 'panoptes/SummarisationCache';
@@ -14,17 +15,19 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 
+
 let NumericalSummaryTrack = React.createClass({
   mixins: [
+    FluxMixin,
     ConfigMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number.isRequired,
-    blockEnd: React.PropTypes.number.isRequired,
-    blockPixelWidth: React.PropTypes.number.isRequired,
+    blockStart: React.PropTypes.number, //Provided by NumericalChannel
+    blockEnd: React.PropTypes.number, //Provided by NumericalChannel
+    blockPixelWidth: React.PropTypes.number, //Provided by NumericalChannel
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
@@ -195,5 +198,3 @@ let NumericalSummaryTrack = React.createClass({
 });
 
 module.exports = NumericalSummaryTrack;
-
-

@@ -42,25 +42,25 @@ let SessionStore = Fluxxor.createStore({
         'TEST': {
           component: 'containers/GenomeBrowserWithActions',
           props: {
-            chromosome: 'Pf3D7_01_v3',
-            channels: {
-              test: {
-                channel: 'NumericalChannel',
-                props: {
-                  tracks: [
-                    {
-                      track: 'NumericalSummaryTrack',
-                      name: 'Bob2',
-                      props: {
-                        group: 'variants',
-                        track: 'Value_three'
-                      }
-                    }
-
-                  ]
-                }
-              }
-            }
+            //chromosome: 'Pf3D7_01_v3',
+            //channels: {
+            //  test: {
+            //    channel: 'NumericalTrackGroupChannel',
+            //    props: {
+            //      tracks: [
+            //        {
+            //          track: 'NumericalSummaryTrack',
+            //          name: 'Bob2',
+            //          props: {
+            //            group: 'variants',
+            //            track: 'Value_three'
+            //          }
+            //        }
+            //
+            //      ]
+            //    }
+            //  }
+            //}
           }
         }
       },

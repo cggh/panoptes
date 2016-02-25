@@ -6,19 +6,16 @@ import _throttle from 'lodash/throttle';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
 
-
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-
 import SQL from 'panoptes/SQL';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
-import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import YScale from 'panoptes/genome/tracks/YScale';
+import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
@@ -27,11 +24,8 @@ import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Slider from 'material-ui/lib/slider';
 import FlatButton from 'material-ui/lib/flat-button';
-import {Motion, spring} from 'react-motion';
 
-import findBlocks from 'panoptes/genome/FindBlocks';
 
-const HEIGHT = 100;
 const INTERPOLATIONS = [
   {payload: 'linear', text: 'Linear'},
   {payload: 'step', text: 'Step'},
@@ -44,12 +38,14 @@ const INTERPOLATION_HAS_TENSION = {
   cardinal: true
 };
 
-let NumericalChannel = React.createClass({
+let PerRowNumericalChannel = React.createClass({
   mixins: [
-    PureRenderWithRedirectedProps({redirect: [
-      'componentUpdate',
-      'onClose'
-    ]}),
+    PureRenderWithRedirectedProps({
+      redirect: [
+        'componentUpdate',
+        'onClose'
+      ]
+    }),
     ConfigMixin
   ],
 
@@ -68,6 +64,7 @@ let NumericalChannel = React.createClass({
     query: React.PropTypes.string,
     table: React.PropTypes.string,
     channel: React.PropTypes.string,
+    name: React.PropTypes.string,
     onClose: React.PropTypes.func
   },
 
@@ -91,97 +88,21 @@ let NumericalChannel = React.createClass({
     this.setState({dataYMin, dataYMax});
   },
 
-  handleClose() {
-    if (this.redirectedProps.onClose)
-      this.redirectedProps.onClose();
-  },
-
   render() {
-    let height = HEIGHT;
-    let {start, end, width, sideWidth, yMin, yMax, autoYScale, table, channel} = this.props;
+    let {name} = this.props;
     let {dataYMin, dataYMax} = this.state;
-
-    if (autoYScale) {
-      if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
-        yMin = dataYMin;
-        yMax = dataYMax;
-      }
-    }
-
-    //If we go to a region with no data then don't move the y axis
-    if (!_isFinite(yMin) && this.lastYMin)
-      yMin = this.lastYMin;
-    if (!_isFinite(yMax) && this.lastYMax)
-      yMax = this.lastYMax;
-    [this.lastYMin, this.lastYMax] = [yMin, yMax];
-
-    if (width === 0)
-      return null;
-
-    let effWidth = width - sideWidth;
-    let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
-    let stepWidth = scale(1) - scale(0);
-    let offset = scale(0) - scale(start - 1 / 2);
-
-    let initYAxisSpring = {
-      yMin: _isFinite(yMin) ? yMin : null,
-      yMax: _isFinite(yMax) ? yMax : null
-    };
-    let yAxisSpring = {
-      yMin: spring(initYAxisSpring.yMin),
-      yMax: spring(initYAxisSpring.yMax)
-    };
-
-    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
-    //If we already are at an acceptable block then don't change it!
-    if (!((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start))) {
-      //Current block was acceptable so choose best one
-      this.blockStart = block1Start;
-      this.blockEnd = block1End;
-    }
-
-    let blockPixelWidth = (((width - sideWidth) / 2) / (end - start)) * (this.blockEnd - this.blockStart);
-
     return (
-      <ChannelWithConfigDrawer
-        width={width}
-        sideWidth={sideWidth}
-        height={HEIGHT}
-        sideComponent={
-          <div className="side-name">
-            {this.config.tables[table].tableBasedSummaryValues[channel].trackname}
-          </div>
-        }
-        //Override component update to get latest in case of skipped render
-        configComponent={<Controls {...this.props}
-                                   componentUpdate={this.redirectedProps.componentUpdate}/>}
-        onClose={this.handleClose}
-
+      <NumericalChannel {...this.props}
+        dataYMin={dataYMin}
+        dataYMax={dataYMax}
+        side={<span>{name}</span>}
+        onClose={this.redirectedProps.onClose}
+        controls={<PerRowNumericalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
       >
-        <svg className="numerical-channel" width={effWidth} height={height}>
-          <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
-            {(interpolated) => {
-              let {yMin, yMax} = interpolated;
-              return <g>
-                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
-                <g
-                  transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
-                  <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                        height={2 * height}/>
-                  <PerRowNumericalTrack
-                    {...this.props}
-                    blockStart={this.blockStart}
-                    blockEnd={this.blockEnd}
-                    blockPixelWidth={blockPixelWidth}
-                    onYLimitChange={this.handleYLimitChange}
-                  />
-                </g>
-              </g>;
-            }}
-          </Motion>
-        </svg>
-      </ChannelWithConfigDrawer>);
+        <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
+
+      </NumericalChannel>
+    );
   }
 });
 
@@ -266,49 +187,49 @@ let PerRowNumericalTrack = React.createClass({
       transpose: false
     };
     requestContext.request((componentCancellation) =>
-      LRUCache.get(
-        'pageQuery' + JSON.stringify(APIargs),
-        (cacheCancellation) =>
-          API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-        componentCancellation
-      ).then((tableData) => {
-        let primKeys = tableData[tableConfig.primkey];
-        this.data.primKeys = primKeys;
-        return Promise.all(primKeys.map((primkey) =>
-          SummarisationCache.fetch({
-            columns: {
-              [primkey]: {
-                primkey: primkey,
-                folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
-                config: 'Summ',
-                name: `${channel}_${primkey}_avg`
-              }
-            },
-            minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
-            chromosome: chromosome,
-            start: blockStart,
-            end: blockEnd,
-            targetPointCount: blockPixelWidth,
-            cancellation: componentCancellation
-          })
-            .then(({columns, dataStart, dataStep}) => {
-              this.data.dataStart = dataStart;
-              this.data.dataStep = dataStep;
-              Object.assign(this.data.columns, columns);
-              this.applyData(props);
-              this.calculateYScale(props);
+        LRUCache.get(
+          'pageQuery' + JSON.stringify(APIargs),
+          (cacheCancellation) =>
+            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+          componentCancellation
+        ).then((tableData) => {
+          let primKeys = tableData[tableConfig.primkey];
+          this.data.primKeys = primKeys;
+          return Promise.all(primKeys.map((primkey) =>
+            SummarisationCache.fetch({
+              columns: {
+                [primkey]: {
+                    primkey: primkey,
+                    folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+                    config: 'Summ',
+                    name: `${channel}_${primkey}_avg`
+                  }
+              },
+              minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
+              chromosome: chromosome,
+              start: blockStart,
+              end: blockEnd,
+              targetPointCount: blockPixelWidth,
+              cancellation: componentCancellation
             })
-        ));
-      }))
-    .catch((err) => {
-      this.props.onChangeLoadStatus('DONE');
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      this.setState({loadStatus: 'error'});
-    });
+              .then(({columns, dataStart, dataStep}) => {
+                this.data.dataStart = dataStart;
+                this.data.dataStep = dataStep;
+                Object.assign(this.data.columns, columns);
+                this.applyData(props);
+                this.calculateYScale(props);
+              })
+          ));
+        }))
+      .catch((err) => {
+        this.props.onChangeLoadStatus('DONE');
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   applyData(props) {
@@ -381,12 +302,9 @@ let PerRowNumericalTrack = React.createClass({
       </g>
     );
   }
-
 });
 
-
-
-let Controls = React.createClass({
+let PerRowNumericalTrackControls = React.createClass({
   mixins: [
     FluxMixin,
     PureRenderWithRedirectedProps({
@@ -491,6 +409,6 @@ let Controls = React.createClass({
 });
 
 
-module.exports = NumericalChannel;
+module.exports = PerRowNumericalChannel;
 
 

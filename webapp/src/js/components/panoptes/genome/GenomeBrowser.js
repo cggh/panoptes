@@ -1,14 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import offset from 'bloody-offset';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
+import _head from 'lodash/head';
+import _keys from 'lodash/keys';
 import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
 import scrollbarSize from 'scrollbar-size';
 
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Hammer from 'react-hammerjs';
 import {Motion, spring} from 'react-motion';
 
@@ -42,9 +45,19 @@ let GenomeBrowser = React.createClass({
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
-    components: ImmutablePropTypes.orderedMap.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
-    chromPositions: ImmutablePropTypes.map  //Stores the position on each chrom so you can flick back without losing place
+    chromPositions: ImmutablePropTypes.map,  //Stores the position on each chrom so you can flick back without losing place
+    channels: ImmutablePropTypes.mapOf(
+      ImmutablePropTypes.contains({
+        channel: React.PropTypes.string.isRequired,
+        props: ImmutablePropTypes.map
+      }))
+  },
+
+  getDefaultProps() {
+    return {
+      channels: Immutable.Map()
+    };
   },
 
   getInitialState() {
@@ -58,6 +71,7 @@ let GenomeBrowser = React.createClass({
 
   componentWillMount() {
     this.panStartPixel = null;
+    this.defaultChrom = _head(_keys(this.config.chromosomes)); //Would be done as defaultProp, but config not avaliable then
   },
 
   componentWillReceiveProps(nextProps) {
@@ -77,6 +91,7 @@ let GenomeBrowser = React.createClass({
 
   scaleClamp(start, end, fracPos) {
     let {chromosome} = this.props;
+    chromosome = chromosome || this.defaultChrom;
     let min = 0;
     let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
     let width = end - start;
@@ -204,6 +219,7 @@ let GenomeBrowser = React.createClass({
   render() {
     let {settings} = this.config;
     let {start, end, sideWidth, chromosome, channels} = this.props;
+    chromosome = chromosome || this.defaultChrom;
     let {loading} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
@@ -224,7 +240,7 @@ let GenomeBrowser = React.createClass({
         <div className="genome-browser">
           <div className="control-bar">
             <LoadingIndicator width={sideWidth - 20} animate={loading > 0}/>
-            <Controls {...this.props} minWidth={MIN_WIDTH}/>
+            <Controls {...this.props} chromosome={chromosome} minWidth={MIN_WIDTH}/>
           </div>
           <Hammer
             ref={(c) => this.rootHammer = c}
