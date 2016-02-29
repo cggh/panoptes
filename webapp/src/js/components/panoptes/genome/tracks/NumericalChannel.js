@@ -104,7 +104,6 @@ let NumericalChannel = React.createClass({
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
               return <g>
-                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
                 <g
                   transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
                   <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
@@ -115,6 +114,7 @@ let NumericalChannel = React.createClass({
                     blockPixelWidth: blockPixelWidth
                   }))}
                 </g>
+                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
               </g>;
             }}
           </Motion>

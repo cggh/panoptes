@@ -74,9 +74,12 @@ function _decodeSummaryList(columns) {
       let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
         //For better or worse we imitate the original behaviour of passing on a lack of data
       if (data)
-        ret[key] = DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data);
-        else
-          ret[key] = null;
+        ret[key] = {
+          data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
+          summariser: data.summariser
+        };
+      else
+        ret[key] = null;
     }
     );
     return ret;

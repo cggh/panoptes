@@ -3,7 +3,7 @@ import React from 'react';
 import d3 from 'd3';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
-import _throttle from 'lodash/throttle';
+import _debounce from 'lodash/debounce';
 import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -43,7 +43,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   componentWillMount() {
-    this.throttledYScale = _throttle(this.calculateYScale, 500);
+    this.debouncedYScale = _debounce(this.calculateYScale, 200);
   },
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
@@ -55,7 +55,7 @@ let NumericalSummaryTrack = React.createClass({
       this.applyData(nextProps);
     //If there is a change in start or end we need to recalc y limits
     if (['start', 'end'].some((name) => Math.round(this.props[name]) !== Math.round(nextProps[name])))
-      this.throttledYScale(nextProps);
+      this.debouncedYScale(nextProps);
   },
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -132,9 +132,9 @@ let NumericalSummaryTrack = React.createClass({
       let {dataStart, dataStep, columns} = this.data;
       let {interpolation, tension} = props;
 
-      let avg = columns ? columns.avg || [] : [];
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
+      let avg = columns ? columns.avg.data || [] : [];
+      let max = columns ? columns.max.data || [] : [];
+      let min = columns ? columns.min.data || [] : [];
 
       let line = d3.svg.line()
         .interpolate(interpolation)
@@ -147,7 +147,7 @@ let NumericalSummaryTrack = React.createClass({
         .tension(tension)
         .defined(_isFinite)
         .x((d, i) => dataStart + (i * dataStep))
-        .y((d) => d)
+        .y1((d) => d)
         .y0((d, i) => min[i])(max);
 
       this.setState({
@@ -158,12 +158,12 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   calculateYScale(props) {
-    if (props.autoYScale && this.data) {
+    if (this.data) {
       let {start, end} = props;
       let {dataStart, dataStep, columns} = this.data;
 
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
+      let max = columns ? columns.max.data || [] : [];
+      let min = columns ? columns.min.data || [] : [];
 
       let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
       let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));

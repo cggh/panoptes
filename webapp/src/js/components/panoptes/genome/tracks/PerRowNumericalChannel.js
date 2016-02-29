@@ -2,7 +2,7 @@ import React from 'react';
 import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
-import _throttle from 'lodash/throttle';
+import _debounce from 'lodash/debounce';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
 
@@ -109,14 +109,15 @@ let PerRowNumericalChannel = React.createClass({
 let PerRowNumericalTrack = React.createClass({
   mixins: [
     ConfigMixin,
+    FluxMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number.isRequired,
-    blockEnd: React.PropTypes.number.isRequired,
-    blockPixelWidth: React.PropTypes.number.isRequired,
+    blockStart: React.PropTypes.number,
+    blockEnd: React.PropTypes.number,
+    blockPixelWidth: React.PropTypes.number,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
@@ -133,7 +134,7 @@ let PerRowNumericalTrack = React.createClass({
   },
 
   componentWillMount() {
-    this.throttledYScale = _throttle(this.calculateYScale, 500);
+    this.debouncedYScale = _debounce(this.calculateYScale, 200);
     this.data = {
       dataStart: 0,
       dataStep: 0,
@@ -151,7 +152,7 @@ let PerRowNumericalTrack = React.createClass({
       this.applyData(nextProps);
     //If there is a change in start or end we need to recalc y limits
     if (['start', 'end'].some((name) => Math.round(this.props[name]) !== Math.round(nextProps[name])))
-      this.throttledYScale(nextProps);
+      this.debouncedYScale(nextProps);
   },
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -164,7 +165,11 @@ let PerRowNumericalTrack = React.createClass({
     let tableConfig = this.config.tables[table];
 
     if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
-      this.data.columns = {};
+      this.data = {
+        dataStart: 0,
+        dataStep: 0,
+        columns: {}
+      };
       this.applyData(props);
     }
     //TODO Clear data on new table, channel or query
@@ -193,7 +198,7 @@ let PerRowNumericalTrack = React.createClass({
             API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         ).then((tableData) => {
-          let primKeys = tableData[tableConfig.primkey];
+          let primKeys = tableData[tableConfig.primkey].slice(0, 50);
           this.data.primKeys = primKeys;
           return Promise.all(primKeys.map((primkey) =>
             SummarisationCache.fetch({
@@ -249,7 +254,7 @@ let PerRowNumericalTrack = React.createClass({
           .tension(tension)
           .defined(_isFinite)
           .x((d, i) => dataStart + (i * dataStep))
-          .y((d) => d)(columns[primKey]);
+          .y((d) => d)(columns[primKey].data);
     });
     //let area = d3.svg.area()
     //  .interpolate(interpolation)
@@ -266,35 +271,32 @@ let PerRowNumericalTrack = React.createClass({
   },
 
   calculateYScale(props) {
-    if (props.autoYScale) {
-      let {start, end} = props;
-      let {primKeys, dataStart, dataStep, columns} = this.data;
-
-      let min = [];
-      let max = [];
-      primKeys.forEach((primKey) => {
-        if (columns[primKey]) {
-          let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
-          let endIndex = Math.min(columns[primKey].length - 1, Math.ceil((end - dataStart) / dataStep));
-          min.push(_min(columns[primKey].slice(startIndex, endIndex)));
-          max.push(_max(columns[primKey].slice(startIndex, endIndex)));
-        }
-      });
-      let minVal = _min(min);
-      let maxVal = _max(max);
-      if (minVal === maxVal) {
-        minVal = minVal - 0.1 * minVal;
-        maxVal = maxVal + 0.1 * maxVal;
-      } else {
-        let margin = 0.1 * (maxVal - minVal);
-        minVal = minVal - margin;
-        maxVal = maxVal + margin;
+    let {start, end} = props;
+    let {primKeys, dataStart, dataStep, columns} = this.data;
+    let min = [];
+    let max = [];
+    primKeys.forEach((primKey) => {
+      if (columns[primKey]) {
+        let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
+        let endIndex = Math.min(columns[primKey].data.length - 1, Math.ceil((end - dataStart) / dataStep));
+        min.push(_min(columns[primKey].data.slice(startIndex, endIndex)));
+        max.push(_max(columns[primKey].data.slice(startIndex, endIndex)));
       }
-      this.props.onYLimitChange({
-        dataYMin: minVal,
-        dataYMax: maxVal
-      });
+    });
+    let minVal = _min(min);
+    let maxVal = _max(max);
+    if (minVal === maxVal) {
+      minVal = minVal - 0.1 * minVal;
+      maxVal = maxVal + 0.1 * maxVal;
+    } else {
+      let margin = 0.1 * (maxVal - minVal);
+      minVal = minVal - margin;
+      maxVal = maxVal + margin;
     }
+    this.props.onYLimitChange({
+      dataYMin: minVal,
+      dataYMax: maxVal
+    });
   },
 
 
