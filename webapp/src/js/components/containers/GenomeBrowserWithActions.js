@@ -59,7 +59,7 @@ let GenomeBrowserWithActions = React.createClass({
               track: prop.propid
             }
           } : {
-            channel: 'NumericalChannel',
+            channel: 'NumericalTrackGroupChannel',
             props: {
               tracks: [{
                 track: 'NumericalSummaryTrack',
@@ -88,6 +88,7 @@ let GenomeBrowserWithActions = React.createClass({
               payload: {
                 channel: 'PerRowNumericalChannel',
                 props: {
+                  name: channel.trackname,
                   table: tableId,
                   channel: channel.trackid
                 }
