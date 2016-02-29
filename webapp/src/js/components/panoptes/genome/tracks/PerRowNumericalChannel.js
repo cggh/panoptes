@@ -199,11 +199,11 @@ let PerRowNumericalTrack = React.createClass({
             SummarisationCache.fetch({
               columns: {
                 [primkey]: {
-                    primkey: primkey,
-                    folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
-                    config: 'Summ',
-                    name: `${channel}_${primkey}_avg`
-                  }
+                  primkey: primkey,
+                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+                  config: 'Summ',
+                  name: `${channel}_${primkey}_avg`
+                }
               },
               minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
               chromosome: chromosome,
@@ -220,9 +220,14 @@ let PerRowNumericalTrack = React.createClass({
                 this.calculateYScale(props);
               })
           ));
-        }))
+        }).then((data) => {
+          this.props.onChangeLoadStatus('DONE');
+          return data;
+        })
+      )
       .catch((err) => {
         this.props.onChangeLoadStatus('DONE');
+        throw err;
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
