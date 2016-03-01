@@ -31,13 +31,13 @@ function caseChange(config) {
       value.forEach((ele) => arr.push(caseChange(ele)));
       value = arr;
     } else if (
-
       typeof value === 'object' &&
       key !== 'propertiesMap' &&
       key !== 'propertyGroups' &&
       key !== 'chromosomes' &&
       key !== 'summaryValues' &&
-      key !== 'tableBasedSummaryValues'
+      key !== 'tableBasedSummaryValues' &&
+      destKey !== 'categoryColors'
     ) {
       value = caseChange(value);
     }
@@ -56,7 +56,6 @@ function caseChange(config) {
     }
     out[destKey] = value;
   });
-
   return out;
 }
 
@@ -625,7 +624,6 @@ let fetchInitialConfig = function() {
       fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
-
       return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef
         user: {
           id: initialConfig.userID, //eslint-disable-line no-undef

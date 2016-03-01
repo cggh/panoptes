@@ -140,10 +140,13 @@
           justify-content: flex-start;
           flex-wrap: wrap;
           .control {
-            padding-left: 16px;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: flex-start;
+            .label {
+              padding-left: 16px;
+            }
             .dropdown {
               top: -4px;
             }
@@ -155,10 +158,6 @@
               width: 80px;
             }
           }
-          .control:first-child {
-            padding-left: 0px;
-          }
-
         }
       }
     }
@@ -213,6 +212,10 @@
   svg.numerical-channel {
     .origin-shifter {
       fill: none;
+    }
+    g.categorical-track {
+      stroke: none;
+      opacity: 0.8;
     }
     g.numerical-track {
       * {

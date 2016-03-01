@@ -81,8 +81,8 @@ let ReferenceSequence = React.createClass({
           cancellation: componentCancellation
         })
           .then((data) => {
-            this.props.onChangeLoadStatus('DONE');
             this.applyData(data);
+            this.props.onChangeLoadStatus('DONE');
           })
           .catch((err) => {
             this.props.onChangeLoadStatus('DONE');
@@ -91,7 +91,7 @@ let ReferenceSequence = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+            ErrorReport(this.getFlux(), 'Reference Sequence ' + error.message, () => this.fetchData(props));
             this.setState({loadStatus: 'error'});
           })
     );
@@ -100,7 +100,7 @@ let ReferenceSequence = React.createClass({
   render() {
     let {start, end, width, sideWidth} = this.props;
     let {dataStart, dataStep, columns} = this.state;
-    let sequence = columns ? columns.sequence || [] : [];
+    let sequence = columns ? columns.sequence.data || [] : [];
     if (width == 0)
       return null;
     return (
