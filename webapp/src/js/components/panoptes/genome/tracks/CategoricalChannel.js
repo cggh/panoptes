@@ -277,11 +277,6 @@ let CategoricalTrackControls = React.createClass({
     })
   ],
 
-  handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
-    this.redirectedProps.componentUpdate({query});
-  },
-
   render() {
     let {fractional, autoYScale, yMin, yMax} = this.props;
     return (

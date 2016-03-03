@@ -59,7 +59,7 @@ let GenomeBrowserWithActions = React.createClass({
                 description: `Positions of ${table.tableCapNamePlural}`,
                 icon: 'arrow-down',
                 payload: {
-                  channel: 'PerRowIndicator',
+                  channel: 'PerRowIndicatorChannel',
                   props: {
                     table: tableId
                   }
