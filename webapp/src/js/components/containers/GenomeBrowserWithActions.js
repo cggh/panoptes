@@ -40,13 +40,40 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   componentWillMount() {
-    this.channelGroups = Immutable.Map();
+    let groups = Object.assign(
+      {
+        __reference__: {
+          name: 'Reference',
+          icon: 'bitmap:genomebrowser.png',
+          items: {}
+        }
+      },
+      _transform(this.config.tables, (result, table, tableId) => {
+        if (table.hasGenomePositions)
+          result[tableId] = {
+            name: table.tableCapNamePlural,
+            icon: table.icon,
+            items: {
+              __rows__: {
+                name: table.tableCapNamePlural,
+                description: `Positions of ${table.tableCapNamePlural}`,
+                icon: 'arrow-down',
+                payload: {
+                  channel: 'PerRowIndicator',
+                  props: {
+                    table: tableId
+                  }
+                }
+              }
+            }
+          };
+      })
+    );
+
     //Normal summaries
     _forEach(this.config.summaryValues, (properties, groupId) => {
-      this.channelGroups = this.channelGroups.set(groupId, Immutable.fromJS({
-        name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
-        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
-        items: _transform(properties, (result, prop) => result[prop.propid] = {
+      Object.assign(groups[groupId].items, _transform(properties, (result, prop) =>
+        result[prop.propid] = {
           name: prop.name,
           description: groupId === '__reference__' ? 'Description needs to be implemented' : prop.description,
           icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
@@ -70,13 +97,13 @@ let GenomeBrowserWithActions = React.createClass({
               }]
             }
           }
-        }, {})
-      }));
+        }));
     });
+
     //Per-row based summaries
     _forEach(this.config.tables, (table, tableId) => {
       if (table.tableBasedSummaryValues) {
-        this.channelGroups = this.channelGroups.set(`per_${tableId}`, Immutable.fromJS({
+        groups[`per_${tableId}`] = Immutable.fromJS({
           name: `Per ${table.tableCapNameSingle}`,
           icon: table.icon,
           items: _transform(table.tableBasedSummaryValues, (result, channel) => {
@@ -93,10 +120,12 @@ let GenomeBrowserWithActions = React.createClass({
                 }
               }
             };
-          }, {})
-        }));
+          })
+        });
       }
     });
+
+    this.channelGroups = Immutable.fromJS(groups);
   },
 
 
