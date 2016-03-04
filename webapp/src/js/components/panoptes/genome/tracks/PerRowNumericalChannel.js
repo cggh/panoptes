@@ -238,7 +238,6 @@ let PerRowNumericalTrack = React.createClass({
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
       });
   },
 

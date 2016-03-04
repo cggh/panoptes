@@ -12,8 +12,6 @@ import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/genome/FindBlocks';
 
-const HEIGHT = 100;
-
 let NumericalChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
@@ -28,6 +26,7 @@ let NumericalChannel = React.createClass({
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
@@ -39,14 +38,19 @@ let NumericalChannel = React.createClass({
     //Note that there will be other props specific to each child channel
   },
 
+  getDefaultProps() {
+    return {
+      height: 100
+    };
+  },
+
   handleClose() {
     if (this.redirectedProps.onClose)
       this.redirectedProps.onClose();
   },
 
   render() {
-    let height = HEIGHT;
-    let {start, end, width, sideWidth, yMin, yMax, autoYScale, dataYMin, dataYMax, side, controls} = this.props;
+    let {start, end, width, height, sideWidth, yMin, yMax, autoYScale, dataYMin, dataYMax, side, controls} = this.props;
 
     if (autoYScale) {
       if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
@@ -93,7 +97,7 @@ let NumericalChannel = React.createClass({
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
-        height={HEIGHT}
+        height={height}
         sideComponent={<div className="side-name">{side}</div>}
         //Override component update to get latest in case of skipped render
         configComponent={controls}

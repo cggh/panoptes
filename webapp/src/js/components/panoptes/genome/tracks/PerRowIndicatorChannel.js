@@ -48,8 +48,9 @@ let PerRowIndicatorChannel = React.createClass({
     let {name, table} = this.props;
     return (
       <NumericalChannel {...this.props}
-        dataYMin={0}
-        dataYMax={100}
+        yMin={0}
+        yMax={100}
+        height={50}
         side={<span>{name || this.config.tables[table].tableCapNamePlural}</span>}
         onClose={this.redirectedProps.onClose}
         controls={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
@@ -84,7 +85,7 @@ let PerRowIndicatorTrack = React.createClass({
 
   componentWillMount() {
     this.data = {
-      positions: []
+      columns: {}
     };
   },
 
@@ -104,7 +105,7 @@ let PerRowIndicatorTrack = React.createClass({
     let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table} = props;
     if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
       this.data = {
-        positions: []
+        columns: {}
       };
       this.applyData(props);
     }
@@ -112,15 +113,19 @@ let PerRowIndicatorTrack = React.createClass({
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
-
-    let columns = [this.config.tables[table].primkey];
+    let tableConfig = this.config.tables[table];
+    let columns = [tableConfig.primkey, tableConfig.positionField];
     let columnspec = {};
-    columns.forEach((column) => columnspec[column] = this.config.tables[table].propertiesMap[column].defaultFetchEncoding);
+    columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
     let APIargs = {
       database: this.config.dataset,
       table: table,
       columns: columnspec,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),  //START HERE PARAMETERISE BY BLOCK
+      query: SQL.WhereClause.encode(SQL.WhereClause.AND([
+        SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', blockStart),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', blockEnd)
+      ])),
       transpose: false
     };
 
@@ -130,79 +135,38 @@ let PerRowIndicatorTrack = React.createClass({
         (cacheCancellation) =>
           API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
         componentCancellation
-    )).then((tableData) => {
-        let primKeys = tableData[this.config.tables[table].primkey];
-        console.log(primKeys);
-    });
+    )).then((data) => {
+      this.props.onChangeLoadStatus('DONE');
+      this.data = data;
+      this.applyData(props);
+      })
+      .catch((err) => {
+        this.props.onChangeLoadStatus('DONE');
+        throw err;
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      })
+
   },
 
   applyData(props) {
-    return;
-    let {fractional} = props;
-    if (!(this.data && this.data.columns && this.data.columns.categories))
+    let {table} = this.props;
+    let tableConfig = this.config.tables[table];
+    if (!(this.data && this.data && this.data[tableConfig.positionField]))
       return;
-    let {dataStart, dataStep, columns} = this.data;
-
-    let {summariser, data} = columns.categories;
-    let categories = summariser.categories || summariser.Categories;
-    let catColours = this.config.summaryValues[props.group][props.track].settings.categoryColors;
-    let colours = categories.map((cat) => catColours[cat]);
-    let layers = categories.map((category, i) =>
-      data.map((point, j) => ({
-        x: i,
-        y: point[i]
-      }))
-    );
-    let stack = d3.layout.stack().offset(fractional ? 'expand' : 'zero');
-    layers = stack(layers);
-    let areas = _zip(layers, colours).map(([layer, colour]) => ({
-      colour: colour,
-      area: d3.svg.area()
-        .interpolate('step')
-        .defined((d) => _isFinite(d.y))
-        .x((d, i) => dataStart + (i * dataStep))
-        .y0((d) => d.y0)
-        .y1((d) => (d.y0 + d.y))(layer)
-    }));
-    this.setState({
-      areas: areas
-    });
-
+    this.setState({points: this.data[tableConfig.positionField]});
   },
-
-  calculateYScale(props) {
-    if (this.data && this.data.columns && this.data.columns.categories) {
-      let {start, end, fractional} = props;
-      let {dataStart, dataStep, columns} = this.data;
-      let points = columns.categories.data;
-
-      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
-      let endIndex = Math.min(points.length - 1, Math.ceil((end - dataStart) / dataStep));
-      let minVal = 0;
-      let maxVal = fractional ? 1 : _max(points.slice(startIndex, endIndex).map(_sum));
-      if (minVal === maxVal) {
-        minVal = minVal - 0.1 * minVal;
-        maxVal = maxVal + 0.1 * maxVal;
-      } else {
-        let margin = 0.1 * (maxVal - minVal);
-        minVal = minVal - margin;
-        maxVal = maxVal + margin;
-      }
-      this.props.onYLimitChange({
-        dataYMin: minVal,
-        dataYMax: maxVal
-      });
-    }
-  },
-
 
   render() {
-    let {areas} = this.state;
-    if (areas)
+    let {points} = this.state;
+    if (points)
       return (
-        <g className="categorical-track">
-          {areas.map((area, i) =>
-            <path className="area" key={i} d={area.area} style={{fill: area.colour}}/>
+        <g className="indicator-track">
+          {points.map((point) =>
+            <line key={point} x1={point} x2={point} y1={50} y2={50} />
           )}
         </g>
       );

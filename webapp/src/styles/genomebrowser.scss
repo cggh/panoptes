@@ -213,6 +213,15 @@
     .origin-shifter {
       fill: none;
     }
+    g.indicator-track {
+      line {
+        stroke: black;
+        opacity: 0.5;
+        stroke-width: 10px;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+      }
+    }
     g.categorical-track {
       stroke: none;
       opacity: 0.8;
