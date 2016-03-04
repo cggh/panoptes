@@ -7,7 +7,7 @@ let DateTime2JD = function(date) {
 
 module.exports = function(property, string) {
   if (property.isBoolean) {
-    return _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1;
+    return _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1 ? '1' : '0';
   }
 
   if (property.isDate) {

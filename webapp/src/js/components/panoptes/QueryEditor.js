@@ -316,6 +316,24 @@ let Criterion = React.createClass({
             </select>
           </div>
         );
+      else if (property.isBoolean)
+        fields = (
+          <div className="fields">
+            <select className="field" ref="value"
+                    value={component.CompValue}
+                    onChange={this.handleValueChange}>
+              <option key="true"
+                      value="1">
+                Yes
+              </option>
+              <option key="false"
+                      value="0">
+                No
+              </option>
+            </select>
+          </div>
+
+        );
       else
         fields = (
           <div className="fields">
