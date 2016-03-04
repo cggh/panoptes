@@ -3,10 +3,11 @@ import React from 'react';
 import d3 from 'd3';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
-import _throttle from 'lodash/throttle';
+import _debounce from 'lodash/debounce';
 import _isFinite from 'lodash/isFinite';
 
 import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import SummarisationCache from 'panoptes/SummarisationCache';
@@ -14,17 +15,19 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 
+
 let NumericalSummaryTrack = React.createClass({
   mixins: [
+    FluxMixin,
     ConfigMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number.isRequired,
-    blockEnd: React.PropTypes.number.isRequired,
-    blockPixelWidth: React.PropTypes.number.isRequired,
+    blockStart: React.PropTypes.number, //Provided by NumericalChannel
+    blockEnd: React.PropTypes.number, //Provided by NumericalChannel
+    blockPixelWidth: React.PropTypes.number, //Provided by NumericalChannel
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
@@ -40,7 +43,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   componentWillMount() {
-    this.throttledYScale = _throttle(this.calculateYScale, 500);
+    this.debouncedYScale = _debounce(this.calculateYScale, 200);
   },
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
@@ -52,7 +55,7 @@ let NumericalSummaryTrack = React.createClass({
       this.applyData(nextProps);
     //If there is a change in start or end we need to recalc y limits
     if (['start', 'end'].some((name) => Math.round(this.props[name]) !== Math.round(nextProps[name])))
-      this.throttledYScale(nextProps);
+      this.debouncedYScale(nextProps);
   },
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -129,9 +132,9 @@ let NumericalSummaryTrack = React.createClass({
       let {dataStart, dataStep, columns} = this.data;
       let {interpolation, tension} = props;
 
-      let avg = columns ? columns.avg || [] : [];
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
+      let avg = columns ? columns.avg.data || [] : [];
+      let max = columns ? columns.max.data || [] : [];
+      let min = columns ? columns.min.data || [] : [];
 
       let line = d3.svg.line()
         .interpolate(interpolation)
@@ -144,7 +147,7 @@ let NumericalSummaryTrack = React.createClass({
         .tension(tension)
         .defined(_isFinite)
         .x((d, i) => dataStart + (i * dataStep))
-        .y((d) => d)
+        .y1((d) => d)
         .y0((d, i) => min[i])(max);
 
       this.setState({
@@ -155,12 +158,12 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   calculateYScale(props) {
-    if (props.autoYScale && this.data) {
+    if (this.data) {
       let {start, end} = props;
       let {dataStart, dataStep, columns} = this.data;
 
-      let max = columns ? columns.max || [] : [];
-      let min = columns ? columns.min || [] : [];
+      let max = columns ? columns.max.data || [] : [];
+      let min = columns ? columns.min.data || [] : [];
 
       let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
       let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
@@ -195,5 +198,3 @@ let NumericalSummaryTrack = React.createClass({
 });
 
 module.exports = NumericalSummaryTrack;
-
-

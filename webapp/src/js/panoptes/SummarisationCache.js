@@ -71,26 +71,36 @@ let SummarisationCache = {
         let sliceEnd = blockEnd - (Math.floor(blockEnd / FETCH_SIZE) * FETCH_SIZE);
         slices = slices.map((slice, i) =>
           _transform(slice,
-            (result, data, name) => {
+            (result, {data, summariser}, name) => {
               if (i == 0 || i == slices.length - 1) {
-                result[name] = data.slice(
-                  i == 0 ? sliceStart : 0,
-                  i == slices.length - 1 ? sliceEnd : undefined
-                );
+                result[name] = {
+                  data: data.slice(
+                    i == 0 ? sliceStart : 0,
+                    i == slices.length - 1 ? sliceEnd : undefined
+                  ),
+                  summariser
+                };
               } else {
-                result[name] = data;
+                result[name] = {data, summariser};
               }
             }));
       }
       //Concatenate
-      let emptyArrays = _transform(columns, (result, col, name) => result[name] = []);
+      let emptyArrays = _transform(columns,
+        (result, col, name) =>
+          result[name] = {
+            data: [],
+            summariser: slices[0][name].summariser
+          }
+      );
       let data = _reduce(slices,
         (accum, slice) => {
-          _forEach(slice, (data, name) => Array.prototype.push.apply(accum[name], data));
+          _forEach(slice, ({data}, name) => Array.prototype.push.apply(accum[name].data, data));
           return accum;
         },
         emptyArrays
         );
+
       return {
         columns: data,
         dataStart: blockStart * optimalBlockSize,
