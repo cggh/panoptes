@@ -71,8 +71,8 @@ let NumericalChannel = React.createClass({
 
     let effWidth = width - sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
-    let stepWidth = scale(1) - scale(0);
-    let offset = scale(0) - scale(start - 1 / 2);
+    let stepWidth = (scale(end) - scale(start)) / (end - start);
+    let offset = scale(0) - scale(start + 0.5);
 
     let initYAxisSpring = {
       yMin: _isFinite(yMin) ? yMin : null,

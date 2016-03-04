@@ -139,7 +139,7 @@ let NumericalSummaryTrack = React.createClass({
         .interpolate(interpolation)
         .tension(tension)
         .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep))
+        .x((d, i) => dataStart + (i * dataStep) )
         .y((d) => d)(avg);
       let area = d3.svg.area()
         .interpolate(interpolation)
