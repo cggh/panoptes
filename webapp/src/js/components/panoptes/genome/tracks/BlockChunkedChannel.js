@@ -12,7 +12,7 @@ import {Motion, spring} from 'react-motion';
 
 import findBlocks from 'panoptes/genome/FindBlocks';
 
-let NumericalChannel = React.createClass({
+let BlockChunkedChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -28,10 +28,6 @@ let NumericalChannel = React.createClass({
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
-    yMin: React.PropTypes.number,
-    yMax: React.PropTypes.number,
-    dataYMin: React.PropTypes.number,
-    dataYMax: React.PropTypes.number,
     side: React.PropTypes.element,
     controls: React.PropTypes.element,
     onClose: React.PropTypes.func
@@ -50,38 +46,15 @@ let NumericalChannel = React.createClass({
   },
 
   render() {
-    let {start, end, width, height, sideWidth, yMin, yMax, autoYScale, dataYMin, dataYMax, side, controls} = this.props;
+    let {start, end, width, height, sideWidth, side, controls} = this.props;
 
-    if (autoYScale) {
-      if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
-        yMin = dataYMin;
-        yMax = dataYMax;
-      }
-    }
-
-    //If we go to a region with no data then don't move the y axis
-    if (!_isFinite(yMin) && this.lastYMin)
-      yMin = this.lastYMin;
-    if (!_isFinite(yMax) && this.lastYMax)
-      yMax = this.lastYMax;
-    [this.lastYMin, this.lastYMax] = [yMin, yMax];
-
-    if (width === 0)
+    if (width <= 0)
       return null;
 
     let effWidth = width - sideWidth;
     let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
     let stepWidth = (scale(end) - scale(start)) / (end - start);
     let offset = scale(0) - scale(start + 0.5);
-
-    let initYAxisSpring = {
-      yMin: _isFinite(yMin) ? yMin : null,
-      yMax: _isFinite(yMax) ? yMax : null
-    };
-    let yAxisSpring = {
-      yMin: spring(initYAxisSpring.yMin),
-      yMax: spring(initYAxisSpring.yMax)
-    };
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
@@ -103,31 +76,16 @@ let NumericalChannel = React.createClass({
         configComponent={controls}
         onClose={this.handleClose}
       >
-        <svg className="numerical-channel" width={effWidth} height={height}>
-          <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
-            {(interpolated) => {
-              let {yMin, yMax} = interpolated;
-              return <g>
-                <g
-                  transform={_isFinite(yMin) && _isFinite(yMax) ? `translate(${offset}, ${height + (yMin * (height / (yMax - yMin)))}) scale(${stepWidth},${-(height / (yMax - yMin))})` : ''}>
-                  <rect className="origin-shifter" x={-effWidth} y={-height} width={2 * effWidth}
-                        height={2 * height}/>
-                  {React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-                    blockStart: this.blockStart,
-                    blockEnd: this.blockEnd,
-                    blockPixelWidth: blockPixelWidth
-                  }))}
-                </g>
-                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
-              </g>;
-            }}
-          </Motion>
-        </svg>
+        {React.Children.map(this.props.children, (child) => React.cloneElement(child, {
+          blockStart: this.blockStart,
+          blockEnd: this.blockEnd,
+          blockPixelWidth: blockPixelWidth
+        }))}
       </ChannelWithConfigDrawer>);
   }
 });
 
 
-module.exports = NumericalChannel;
+module.exports = BlockChunkedChannel;
 
 

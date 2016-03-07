@@ -14,7 +14,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
-import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
+import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
@@ -70,7 +70,7 @@ let CategoricalChannel = React.createClass({
     let {name} = this.props;
     let {dataYMin, dataYMax} = this.state;
     return (
-      <NumericalChannel {...this.props}
+      <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
         dataYMax={dataYMax}
         side={<span>{name}</span>}
@@ -78,7 +78,7 @@ let CategoricalChannel = React.createClass({
         controls={<CategoricalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
       >
         <CategoricalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
-      </NumericalChannel>
+      </ScaledSVGChannel>
     );
   }
 });

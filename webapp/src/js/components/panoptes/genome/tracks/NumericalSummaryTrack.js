@@ -25,9 +25,9 @@ let NumericalSummaryTrack = React.createClass({
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number, //Provided by NumericalChannel
-    blockEnd: React.PropTypes.number, //Provided by NumericalChannel
-    blockPixelWidth: React.PropTypes.number, //Provided by NumericalChannel
+    blockStart: React.PropTypes.number, //Provided by ScaledSVGChannel
+    blockEnd: React.PropTypes.number, //Provided by ScaledSVGChannel
+    blockPixelWidth: React.PropTypes.number, //Provided by ScaledSVGChannel
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,

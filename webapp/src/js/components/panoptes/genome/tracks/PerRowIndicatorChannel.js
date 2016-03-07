@@ -15,11 +15,13 @@ import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
-import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
+import BlockChunkedChannel from 'panoptes/genome/tracks/BlockChunkedChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
 import Checkbox from 'material-ui/lib/checkbox';
+
+import 'hidpi-canvas';
 
 let PerRowIndicatorChannel = React.createClass({
   mixins: [
@@ -45,18 +47,16 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   render() {
-    let {name, table} = this.props;
+    let {table} = this.props;
     return (
-      <NumericalChannel {...this.props}
-        yMin={0}
-        yMax={100}
+      <BlockChunkedChannel {...this.props}
         height={50}
         side={<span>{name || this.config.tables[table].tableCapNamePlural}</span>}
         onClose={this.redirectedProps.onClose}
         controls={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
       >
-        <PerRowIndicatorTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
-      </NumericalChannel>
+        <PerRowIndicatorTrack {...this.props} height={50}/>
+      </BlockChunkedChannel>
     );
   }
 });
@@ -65,18 +65,19 @@ let PerRowIndicatorTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table'),
+    PureRenderWithRedirectedProps({})
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
     blockStart: React.PropTypes.number,
     blockEnd: React.PropTypes.number,
-    blockPixelWidth: React.PropTypes.number,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
-    onYLimitChange: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired,
+    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
+    table: React.PropTypes.string.isRequired
   },
 
   getInitialState() {
@@ -89,20 +90,17 @@ let PerRowIndicatorTrack = React.createClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
-    //We apply data if there is a change in presentation parameters
-    if ([].some((name) => this.props[name] !== nextProps[name])) {
-      this.applyData(nextProps);
-    }
+  componentDidMount() {
+    this.draw();
   },
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.points !== nextState.points;
+  componentDidUpdate() {
+    this.draw();
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table} = props;
+    let {chromosome, blockStart, blockEnd, width, sideWidth, table} = props;
     if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
       this.data = {
         columns: {}
@@ -148,31 +146,40 @@ let PerRowIndicatorTrack = React.createClass({
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      })
+      });
 
   },
 
   applyData(props) {
-    let {table} = this.props;
+    let {table} = props;
     let tableConfig = this.config.tables[table];
     if (!(this.data && this.data && this.data[tableConfig.positionField]))
       return;
-    this.setState({points: this.data[tableConfig.positionField]});
+    this.setState({positions: this.data[tableConfig.positionField]});
   },
 
+  draw() {
+    const {width, height, start, end} = this.props;
+    const {positions} = this.state;
+    const ctx = this.refs.canvas.getContext('2d');
+    let psx = width / 2;
+    let psy = height / 2;
+    ctx.fillStyle = 'rgb(255,0,0)';
+    ctx.beginPath();
+    ctx.moveTo(psx, psy);
+    ctx.lineTo(psx + 4, psy + 8);
+    ctx.lineTo(psx - 4, psy + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  },
+
+
   render() {
-    let {points} = this.state;
-    if (points)
-      return (
-        <g className="indicator-track">
-          {points.map((point) =>
-            <line key={point} x1={point} x2={point} y1={50} y2={50} />
-          )}
-        </g>
-      );
-    else
-      return null;
+    const {height, width} = this.props;
+    return <canvas ref="canvas" width={width} height={height}/>;
   }
+
 });
 
 let PerRowIndicatorControls = React.createClass({
