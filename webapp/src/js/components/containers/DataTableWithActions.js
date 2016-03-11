@@ -37,7 +37,6 @@ let DataTableWithActions = React.createClass({
 
   getDefaultProps() {
     return {
-      componentUpdate: null,
       table: null,
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,

@@ -56,7 +56,13 @@ let GenomeBrowser = React.createClass({
 
   getDefaultProps() {
     return {
-      channels: Immutable.Map()
+      channels: Immutable.Map(),
+      chromosome: '',
+      start: 0,
+      end: 10000,
+      sideWidth: 100,
+      width: 500,
+      components: Immutable.OrderedMap()
     };
   },
 
