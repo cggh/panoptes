@@ -87,7 +87,7 @@ let CategoricalTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -185,7 +185,7 @@ let CategoricalTrack = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
           })
     );
   },

@@ -110,7 +110,7 @@ let PerRowNumericalTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -237,7 +237,7 @@ let PerRowNumericalTrack = React.createClass({
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
       });
   },
 

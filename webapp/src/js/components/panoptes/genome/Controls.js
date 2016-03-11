@@ -71,7 +71,7 @@ let Controls = React.createClass({
     this.setState({regionText});
     let match = regionText.trim().match(/^(?:(.+):)?([0-9]+)-([0-9]+)$/);
     if (match) {
-      let [matched, chromosome, start, end] = match;
+      let [chromosome, start, end] = match.slice(1);
       start = parseInt(start);
       end = parseInt(end);
       chromosome = chromosome || this.props.chromosome;

@@ -126,7 +126,7 @@ let ItemPicker = React.createClass({
                   return numberSubItems > 0 ? (
                     <ListItem
                       primaryText={<div> {name} ({numberSubItems} <Pluralise text={itemName} ord={numberSubItems}/>)</div>}
-                      key={groupId+!!search}
+                      key={groupId + !!search}
                       initiallyOpen={!!search}
                       leftIcon={<Icon fixedWidth={true} name={icon}/>}
                       primaryTogglesNestedList={true}

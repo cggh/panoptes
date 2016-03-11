@@ -1,15 +1,6 @@
 import React from 'react';
-import d3 from 'd3';
-import _isFinite from 'lodash/isFinite';
-
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
-
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import YScale from 'panoptes/genome/tracks/YScale';
-
-
-import {Motion, spring} from 'react-motion';
-
 import findBlocks from 'panoptes/genome/FindBlocks';
 
 let BlockChunkedChannel = React.createClass({
@@ -50,11 +41,6 @@ let BlockChunkedChannel = React.createClass({
 
     if (width <= 0)
       return null;
-
-    let effWidth = width - sideWidth;
-    let scale = d3.scale.linear().domain([start, end]).range([0, effWidth]);
-    let stepWidth = (scale(end) - scale(start)) / (end - start);
-    let offset = scale(0) - scale(start + 0.5);
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!

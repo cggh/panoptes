@@ -83,7 +83,7 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
         <div className="side-controls">
           <Icon className="close" name="times" onClick={this.handleClose}/>
-          <Icon className={classnames({"control-toggle":true, open:controlsOpen})}
+          <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
                 name="cog" onClick={this.handleControlToggle}/>
         </div>
       </div>
