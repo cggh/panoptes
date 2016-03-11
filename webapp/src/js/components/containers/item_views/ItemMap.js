@@ -43,9 +43,7 @@ let ItemMapWidget = React.createClass({
   },
 
   fetchData(props, requestContext) {
-
-    let {table, primKey, lngProperty, latProperty} = props;
-
+    let {table, primKey, primKeyProperty, lngProperty, latProperty} = props;
     let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
@@ -57,7 +55,7 @@ let ItemMapWidget = React.createClass({
       loadStatus: 'loading'
     });
 
-    let locationPrimKeyProperty = locationTableConfig.primkey;
+    let locationPrimKeyProperty = primKeyProperty ? primKeyProperty : locationTableConfig.primkey;
 
     // If specified, use the lat lng properties from the props.
     // Otherwise, use the lat lng properties from the config.
@@ -75,15 +73,13 @@ let ItemMapWidget = React.createClass({
         // If a primKey value has been specified, then fetch that single record,
         // Otherwise, do a page query.
         if (primKey) {
-
           // Fetch the single record for the specified primKey value.
           let APIargs = {
             database: this.config.dataset,
             table: table,
-            primKeyField: this.config.tables[table].primkey,
+            primKeyField: locationPrimKeyProperty,
             primKeyValue: primKey
           };
-
           return LRUCache.get(
             'fetchSingleRecord' + JSON.stringify(APIargs), (cacheCancellation) =>
               API.fetchSingleRecord({
@@ -94,14 +90,12 @@ let ItemMapWidget = React.createClass({
           );
 
         } else {
-
           // If no primKey is provided, then get all markers using the specified table.
           let locationAPIargs = {
             database: this.config.dataset,
             table: locationTableConfig.fetchTableName,
             columns: locationColumnsColumnSpec
           };
-
           return LRUCache.get(
             'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
               API.pageQuery({
@@ -116,34 +110,32 @@ let ItemMapWidget = React.createClass({
       })
       .then((data) => {
 
+        // Translate the fetched locationData and chartData into markers.
+
         let markers = [];
 
-        // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tables[table];
-        let locationPrimKeyProperty = locationTableConfig.primkey;
+
+        let locationPrimKeyProperty = primKeyProperty ? primKeyProperty : locationTableConfig.primkey;
 
         // If a primKey value has been specified then expect data to contain a single record.
         // Otherwise data should contain an array of records.
         if (primKey) {
 
-          let locationDataPrimKey = data[locationPrimKeyProperty];
-
           markers.push({
             lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
             lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            title: locationDataPrimKey
+            title: data[locationPrimKeyProperty]
           });
 
         } else {
 
           for (let i = 0; i < data.length; i++) {
 
-            let locationDataPrimKey = data[i][locationPrimKeyProperty];
-
             markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
               lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
-              title: locationDataPrimKey
+              title: data[i][locationPrimKeyProperty]
             });
 
           }
