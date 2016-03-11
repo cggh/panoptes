@@ -132,6 +132,7 @@ let PerRowIndicatorChannel = React.createClass({
     const ctx = canvas.getContext('2d');
     const psy = (HEIGHT / 2) - 4;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.fillStyle = 'rgba(255,0,0,0.6)';
     for (let i = 0, l = positions.length; i < l; ++i) {
       const psx = ((width - sideWidth) / (end - start)) * (positions[i] - start);
