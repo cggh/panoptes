@@ -1,7 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import _uniq from 'lodash/uniq';
-import _each from 'lodash/each';
 import HtmlToReact from 'html-to-react';
 import Handlebars from 'handlebars';
 import uid from 'uid';
@@ -19,6 +17,7 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
 import ItemLink from 'panoptes/ItemLink';
+import ComponentWrapper from 'panoptes/ComponentWrapper';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -192,46 +191,18 @@ let TemplateWidget = React.createClass({
     return this.props.title;
   },
 
-  componentDidUpdate() {
+  componentWillMount: function() {
+      // TODO: set up parser here?
 
-    // Render any template components that need to be rendered.
-    _each(this.templateComponentsToRender, (component, id) => {
-      ReactDOM.render(component, document.getElementById(id));
-      this.componentsToUnmountById.push(id);
-    });
+      //// Register Handlebars Helpers
 
-    // Don't render those components again.
-    this.templateComponentsToRender = {};
+    Handlebars.registerHelper( 'item_link', (a, b, c) =>
+      // TODO: what is an item_link?
+      //this.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
+      //return new Handlebars.SafeString(`<div id="${id}"></div>`);
 
-  },
-
-  componentWillMount() {
-    this.templateComponentsToRender = {};
-    this.componentsToUnmountById = [];
-  },
-
-  componentWillUnmount() {
-
-    // https://facebook.github.io/react/blog/2015/10/01/react-render-and-top-level-api.html
-    // The React extension to Chrome dev tools can be used to see components being added and removed.
-    // When a popup is closed, for example, its components ought to be removed,
-    // otherwise memory will leak away as more and more invisible components accumulate.
-
-    _each(this.componentsToUnmountById, (id) => {
-      ReactDOM.unmountComponentAtNode(document.getElementById(id));
-    });
-
-    // Don't try to unmount those components again.
-    this.componentsToUnmountById = [];
-
-  },
-
-  render() {
-
-    let {content, componentUpdate} = this.props;
-    let {data, loadStatus} = this.state;
-    // Don't continue if there are no data.
-    if (!data) return null;
+      new Handlebars.SafeString(`<ItemLink href="${a}" alt="${b}">${c}</ItemLink>`)
+    );
 
     Handlebars.registerHelper( 'map', (options) => {
 
@@ -239,34 +210,90 @@ let TemplateWidget = React.createClass({
       // "Handlebars helpers can also receive an optional sequence of key-value pairs as their final parameter (referred to as hash arguments in the documentation)"
 
       let {table, primKey, primKeyProperty, latProperty, lngProperty, width, height} = options.hash;
+
       // Only "table" is strictly required.
       // If specified, primKey (a value) will identify a single record and map one marker.
-      // If not specified, the "somethingProperty" fields will be determined by the table config.
+      // If not specified, the {primKeyProperty, latProperty, lngProperty} fields will be determined by the table config.
 
       // If width or height are not specified, use a default.
       width = width ? width : DEFAULT_COMPONENT_WIDTH;
       height = height ? height : DEFAULT_COMPONENT_HEIGHT;
 
-      let id = 'map_' + uid();
       // TODO: debug failing map unmount
-      this.templateComponentsToRender[id] = <ItemMapWidget table={table} primKey={primKey} primKeyProperty={primKeyProperty} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
-      return new Handlebars.SafeString(`<div style="position: relative; width: ${width}; height: ${height};" id="${id}"></div>`);
+      //this.templateComponentsToRender[id] = <ItemMapWidget table={table} primKey={primKey} primKeyProperty={primKeyProperty} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
+      //return new Handlebars.SafeString(`<div style="position: relative; width: ${width}; height: ${height};" id="${id}"></div>`);
+
+
+      let primKeyAttrib = primKey !== undefined ? primKey : '';
+      let primKeyPropertyAttrib = primKeyProperty !== undefined ? primKeyProperty : '';
+      let lngPropertyAttrib = lngProperty !== undefined ? lngProperty : '';
+      let latPropertyAttrib = latProperty !== undefined ? latProperty : '';
+
+      return new Handlebars.SafeString(`<ItemMapWidget width="${width}" height="${height}" table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" />`);
     });
 
-    Handlebars.registerHelper( 'item_link', (a, b, c) => {
-      // TODO: what is an item_link?
-      let id = 'item_link_' + uid();
-      this.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
-      return new Handlebars.SafeString(`<div id="${id}"></div>`);
-    });
+
+
+
+  },
+
+  render() {
+
+    let {content} = this.props;
+    let {data, loadStatus} = this.state;
+    // Don't continue if there are no data.
+    if (!data) return null;
+
+    // NOTE: There is a strong assumption that the template string (content) is static, i.e. it will not change during the life of the webapp.
+    // For example: if we ever have WYSIWYG editors that can change the template, then we might have to take a different or more complicated approach.
 
     // Compile and evaluate the template.
     let template = Handlebars.compile(content);
     let evaluatedContent = template(data);
 
-    // Render the evaluated template HTML.
+
+    //// Prepare the HtmlToReact node processing instructions
+    let processNodeDefinitions = new HtmlToReact.ProcessNodeDefinitions(React);
+    // Note: Instructions are processed in the order in which they are defined.
+    let processingInstructions = [
+      {
+        shouldProcessNode: function(node) {
+          return node.name === 'itemlink';
+        },
+        processNode: function(node, children) {
+          let id = 'item_link_' + uid();
+          return <ComponentWrapper key={id}><ItemLink {...node.attribs}>{children}</ItemLink></ComponentWrapper>;
+        }
+      },
+      {
+        shouldProcessNode: function(node) {
+          return node.name === 'itemmapwidget';
+        },
+        processNode: function(node, children) {
+          let id = 'map_' + uid();
+          return <ComponentWrapper key={id} className="testo"><ItemMapWidget {...node.attribs} /></ComponentWrapper>;
+        }
+      },
+      {
+        shouldProcessNode: function(node) {
+          return true;
+        },
+        processNode: processNodeDefinitions.processDefaultNode
+      }
+    ];
+
+    //// Render the evaluated template HTML.
+
+    // Run the HtmlToReact parser
     let htmlToReactParser = new HtmlToReact.Parser(React);
-    let reactContent = htmlToReactParser.parse('<div>' + evaluatedContent + '</div>');
+
+    // TODO: Keep this as a placeholder?
+    let isValidNode = function() { return true; };
+
+    //let reactContent = htmlToReactParser.parse('<div>' + evaluatedContent + '</div>');
+    let reactContent = htmlToReactParser.parseWithInstructions('<div>' + evaluatedContent + '</div>', isValidNode, processingInstructions);
+
+
 
     return (
         <div className="template-container">

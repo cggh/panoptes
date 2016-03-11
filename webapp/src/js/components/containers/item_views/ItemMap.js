@@ -30,7 +30,7 @@ let ItemMapWidget = React.createClass({
     center: React.PropTypes.object,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string, // if not specified then all table records are used
-    componentUpdate: React.PropTypes.func.isRequired,
+    componentUpdate: React.PropTypes.func,
     lngProperty: React.PropTypes.string, // alternatively derived from the table config
     latProperty: React.PropTypes.string // alternatively derived from the table config
   },
@@ -43,7 +43,9 @@ let ItemMapWidget = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey, primKeyProperty, lngProperty, latProperty} = props;
+
+    let {table, primKey, lngProperty, latProperty} = props;
+
     let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
@@ -55,7 +57,7 @@ let ItemMapWidget = React.createClass({
       loadStatus: 'loading'
     });
 
-    let locationPrimKeyProperty = primKeyProperty ? primKeyProperty : locationTableConfig.primkey;
+    let locationPrimKeyProperty = locationTableConfig.primkey;
 
     // If specified, use the lat lng properties from the props.
     // Otherwise, use the lat lng properties from the config.
@@ -73,13 +75,15 @@ let ItemMapWidget = React.createClass({
         // If a primKey value has been specified, then fetch that single record,
         // Otherwise, do a page query.
         if (primKey) {
+
           // Fetch the single record for the specified primKey value.
           let APIargs = {
             database: this.config.dataset,
             table: table,
-            primKeyField: locationPrimKeyProperty,
+            primKeyField: this.config.tables[table].primkey,
             primKeyValue: primKey
           };
+
           return LRUCache.get(
             'fetchSingleRecord' + JSON.stringify(APIargs), (cacheCancellation) =>
               API.fetchSingleRecord({
@@ -90,12 +94,14 @@ let ItemMapWidget = React.createClass({
           );
 
         } else {
+
           // If no primKey is provided, then get all markers using the specified table.
           let locationAPIargs = {
             database: this.config.dataset,
             table: locationTableConfig.fetchTableName,
             columns: locationColumnsColumnSpec
           };
+
           return LRUCache.get(
             'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
               API.pageQuery({
@@ -110,32 +116,34 @@ let ItemMapWidget = React.createClass({
       })
       .then((data) => {
 
-        // Translate the fetched locationData and chartData into markers.
-
         let markers = [];
 
+        // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tables[table];
-
-        let locationPrimKeyProperty = primKeyProperty ? primKeyProperty : locationTableConfig.primkey;
+        let locationPrimKeyProperty = locationTableConfig.primkey;
 
         // If a primKey value has been specified then expect data to contain a single record.
         // Otherwise data should contain an array of records.
         if (primKey) {
 
+          let locationDataPrimKey = data[locationPrimKeyProperty];
+
           markers.push({
             lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
             lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            title: data[locationPrimKeyProperty]
+            title: locationDataPrimKey
           });
 
         } else {
 
           for (let i = 0; i < data.length; i++) {
 
+            let locationDataPrimKey = data[i][locationPrimKeyProperty];
+
             markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
               lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
-              title: data[i][locationPrimKeyProperty]
+              title: locationDataPrimKey
             });
 
           }
