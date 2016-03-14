@@ -193,14 +193,10 @@ let TemplateWidget = React.createClass({
 
   componentWillMount: function() {
 
-    // TODO: set up parser here?
-
     //// Register Handlebars Helpers
 
     Handlebars.registerHelper( 'item_link', (a, b, c) =>
       // TODO: what is an item_link?
-      //this.templateComponentsToRender[id] = <ItemLink href={a} alt={b}>{c}</ItemLink>;
-      //return new Handlebars.SafeString(`<div id="${id}"></div>`);
 
       new Handlebars.SafeString(`<ItemLink href="${a}" alt="${b}">${c}</ItemLink>`)
     );
@@ -288,7 +284,6 @@ let TemplateWidget = React.createClass({
     // TODO: Keep this as a placeholder?
     let isValidNode = function() { return true; };
 
-    //let reactContent = htmlToReactParser.parse('<div>' + evaluatedContent + '</div>');
     let reactContent = htmlToReactParser.parseWithInstructions('<div>' + evaluatedContent + '</div>', isValidNode, processingInstructions);
 
     return (
