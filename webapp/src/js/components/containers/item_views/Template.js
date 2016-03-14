@@ -192,9 +192,10 @@ let TemplateWidget = React.createClass({
   },
 
   componentWillMount: function() {
-      // TODO: set up parser here?
 
-      //// Register Handlebars Helpers
+    // TODO: set up parser here?
+
+    //// Register Handlebars Helpers
 
     Handlebars.registerHelper( 'item_link', (a, b, c) =>
       // TODO: what is an item_link?
@@ -211,25 +212,22 @@ let TemplateWidget = React.createClass({
 
       let {table, primKey, primKeyProperty, latProperty, lngProperty, width, height} = options.hash;
 
+      console.log('width: ' + width);
+
       // Only "table" is strictly required.
       // If specified, primKey (a value) will identify a single record and map one marker.
       // If not specified, the {primKeyProperty, latProperty, lngProperty} fields will be determined by the table config.
-
-      // If width or height are not specified, use a default.
-      width = width ? width : DEFAULT_COMPONENT_WIDTH;
-      height = height ? height : DEFAULT_COMPONENT_HEIGHT;
-
-      // TODO: debug failing map unmount
-      //this.templateComponentsToRender[id] = <ItemMapWidget table={table} primKey={primKey} primKeyProperty={primKeyProperty} lngProperty={lngProperty} latProperty={latProperty} componentUpdate={componentUpdate} config={this.config} />;
-      //return new Handlebars.SafeString(`<div style="position: relative; width: ${width}; height: ${height};" id="${id}"></div>`);
-
 
       let primKeyAttrib = primKey !== undefined ? primKey : '';
       let primKeyPropertyAttrib = primKeyProperty !== undefined ? primKeyProperty : '';
       let lngPropertyAttrib = lngProperty !== undefined ? lngProperty : '';
       let latPropertyAttrib = latProperty !== undefined ? latProperty : '';
 
-      return new Handlebars.SafeString(`<ItemMapWidget width="${width}" height="${height}" table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" />`);
+      // If width or height are not specified, use a default.
+      width = width ? width : DEFAULT_COMPONENT_WIDTH;
+      height = height ? height : DEFAULT_COMPONENT_HEIGHT;
+
+      return new Handlebars.SafeString(`<ItemMapWidget table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" width="${width}" height="${height}" />`);
     });
 
 
@@ -271,7 +269,7 @@ let TemplateWidget = React.createClass({
         },
         processNode: function(node, children) {
           let id = 'map_' + uid();
-          return <ComponentWrapper key={id} className="testo"><ItemMapWidget {...node.attribs} /></ComponentWrapper>;
+          return <ComponentWrapper key={id}><ItemMapWidget {...node.attribs} /></ComponentWrapper>;
         }
       },
       {
@@ -292,8 +290,6 @@ let TemplateWidget = React.createClass({
 
     //let reactContent = htmlToReactParser.parse('<div>' + evaluatedContent + '</div>');
     let reactContent = htmlToReactParser.parseWithInstructions('<div>' + evaluatedContent + '</div>', isValidNode, processingInstructions);
-
-
 
     return (
         <div className="template-container">

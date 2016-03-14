@@ -42,6 +42,13 @@ let ItemMapWidget = React.createClass({
     };
   },
 
+  getDefaultProps() {
+    return {
+      width: '100%',
+      height: '100%'
+    };
+  },
+
   fetchData(props, requestContext) {
 
     let {table, primKey, lngProperty, latProperty} = props;
@@ -171,10 +178,10 @@ let ItemMapWidget = React.createClass({
 
 
   render() {
-    let {center, zoom} = this.props;
+    let {center, zoom, width, height} = this.props;
     let {loadStatus, markers} = this.state;
     return (
-      <div style={{width: '100%', height: '100%'}}>
+      <div style={{width: width, height: height}}>
         {loadStatus === 'loaded' ?
           <ItemMap
             center={center}
