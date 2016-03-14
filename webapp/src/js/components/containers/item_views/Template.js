@@ -221,7 +221,7 @@ let TemplateWidget = React.createClass({
       width = width ? width : DEFAULT_COMPONENT_WIDTH;
       height = height ? height : DEFAULT_COMPONENT_HEIGHT;
 
-      return new Handlebars.SafeString(`<ItemMapWidget table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" width="${width}" height="${height}" />`);
+      return new Handlebars.SafeString(`<ItemMapWidget table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" width="${width}" height="${height}"></ItemMapWidget>`);
     });
 
 
@@ -243,14 +243,13 @@ let TemplateWidget = React.createClass({
     let template = Handlebars.compile(content);
     let evaluatedContent = template(data);
 
-
     //// Prepare the HtmlToReact node processing instructions
     let processNodeDefinitions = new HtmlToReact.ProcessNodeDefinitions(React);
     // Note: Instructions are processed in the order in which they are defined.
     let processingInstructions = [
       {
         shouldProcessNode: function(node) {
-          return node.name === 'itemlink';
+          return node.name === 'ItemLink';
         },
         processNode: function(node, children) {
           let id = 'item_link_' + uid();
@@ -259,7 +258,7 @@ let TemplateWidget = React.createClass({
       },
       {
         shouldProcessNode: function(node) {
-          return node.name === 'itemmapwidget';
+          return node.name === 'ItemMapWidget';
         },
         processNode: function(node, children) {
           let id = 'map_' + uid();
