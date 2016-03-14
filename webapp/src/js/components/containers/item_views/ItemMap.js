@@ -32,7 +32,9 @@ let ItemMapWidget = React.createClass({
     primKey: React.PropTypes.string, // if not specified then all table records are used
     componentUpdate: React.PropTypes.func,
     lngProperty: React.PropTypes.string, // alternatively derived from the table config
-    latProperty: React.PropTypes.string // alternatively derived from the table config
+    latProperty: React.PropTypes.string, // alternatively derived from the table config
+    width: React.PropTypes.string, // alternatively default
+    height: React.PropTypes.string // alternatively default
   },
 
   getInitialState() {
