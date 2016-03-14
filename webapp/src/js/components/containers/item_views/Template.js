@@ -208,8 +208,6 @@ let TemplateWidget = React.createClass({
 
       let {table, primKey, primKeyProperty, latProperty, lngProperty, width, height} = options.hash;
 
-      console.log('width: ' + width);
-
       // Only "table" is strictly required.
       // If specified, primKey (a value) will identify a single record and map one marker.
       // If not specified, the {primKeyProperty, latProperty, lngProperty} fields will be determined by the table config.
