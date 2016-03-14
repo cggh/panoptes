@@ -64,7 +64,7 @@ let PropertyGroupTab = React.createClass({
     .catch(API.filterAborted)
     .catch(LRUCache.filterCancelled)
     .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
       this.setState({loadStatus: 'error'});
     });
   },
