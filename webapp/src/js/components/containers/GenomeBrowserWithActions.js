@@ -31,7 +31,6 @@ let GenomeBrowserWithActions = React.createClass({
 
   getDefaultProps() {
     return {
-      componentUpdate: null,
       sidebar: true,
       chromosome: '',
       start: 0,
