@@ -19,6 +19,7 @@ import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
 import LoadingIndicator from 'panoptes/genome/LoadingIndicator';
 import Controls from 'panoptes/genome/Controls';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 import Background from 'panoptes/genome/Background';
 import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
@@ -288,6 +289,7 @@ let GenomeBrowser = React.createClass({
                         { settings.refSequenceSumm ?
                           <ReferenceSequence {...trackProps}/> :
                           null }
+                        <AnnotationChannel {...trackProps} />
                       </div>
                       <div className="scrolling grow scroll-within">
                         {channels.map((channel, channelId) => {
