@@ -1,7 +1,6 @@
 import React from 'react';
 
 // Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -17,107 +16,182 @@ import ErrorReport from 'panoptes/ErrorReporter';
 // UI components
 import Loading from 'ui/Loading';
 
-let ItemMapTab = React.createClass({
+let ItemMapWidget = React.createClass({
 
   mixins: [
-    PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'locationDataTablePrimKey')
+    DataFetcherMixin('table', 'primKey')
   ],
 
   propTypes: {
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
-    locationDataTable: React.PropTypes.string,
-    locationDataTablePrimKey: React.PropTypes.string,
-    center: React.PropTypes.object
-  },
-
-  getDefaultProps() {
-    return {
-      zoom: 4
-    };
+    center: React.PropTypes.object,
+    table: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string, // if not specified then all table records are used
+    componentUpdate: React.PropTypes.func,
+    lngProperty: React.PropTypes.string, // alternatively derived from the table config
+    latProperty: React.PropTypes.string, // alternatively derived from the table config
+    width: React.PropTypes.string, // alternatively default
+    height: React.PropTypes.string // alternatively default
   },
 
   getInitialState() {
     return {
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
+      markers: []
     };
   },
 
+  getDefaultProps() {
+    return {
+      width: '100%',
+      height: '100%'
+    };
+  },
 
   fetchData(props, requestContext) {
-    let {locationDataTable, locationDataTablePrimKey} = props;
 
-    let locationTableConfig = this.config.tables[locationDataTable];
+    let {table, primKey, lngProperty, latProperty} = props;
 
+    let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
       return null;
     }
 
-    this.setState({loadStatus: 'loading'});
+    this.setState({
+      loadStatus: 'loading'
+    });
 
     let locationPrimKeyProperty = locationTableConfig.primkey;
 
-    let locationColumns = [locationPrimKeyProperty, locationTableConfig.propIdGeoCoordLongit, locationTableConfig.propIdGeoCoordLattit];
+    // If specified, use the lat lng properties from the props.
+    // Otherwise, use the lat lng properties from the config.
+    let locationLongitudeProperty = lngProperty ? lngProperty : locationTableConfig.propIdGeoCoordLongit;
+    let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.propIdGeoCoordLattit;
+
+    let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
 
-    let APIargs = {
-      database: this.config.dataset,
-      table: locationDataTable,
-      primKeyField: this.config.tables[locationDataTable].primkey,
-      primKeyValue: locationDataTablePrimKey
-    };
+    requestContext.request(
+      (componentCancellation) => {
 
-    requestContext.request((componentCancellation) =>
-      LRUCache.get(
-        'fetchSingleRecord' + JSON.stringify(APIargs),
-        (cacheCancellation) =>
-          API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
-        componentCancellation
-      )
-    )
-    .then((locationData) => {
-      this.setState({loadStatus: 'loaded', locationData: locationData});
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((error) => {
-      ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-      this.setState({loadStatus: 'error'});
-    });
+        // If a primKey value has been specified, then fetch that single record,
+        // Otherwise, do a page query.
+        if (primKey) {
+
+          // Fetch the single record for the specified primKey value.
+          let APIargs = {
+            database: this.config.dataset,
+            table: table,
+            primKeyField: this.config.tables[table].primkey,
+            primKeyValue: primKey
+          };
+
+          return LRUCache.get(
+            'fetchSingleRecord' + JSON.stringify(APIargs), (cacheCancellation) =>
+              API.fetchSingleRecord({
+                cancellation: cacheCancellation,
+                ...APIargs
+              }),
+            componentCancellation
+          );
+
+        } else {
+
+          // If no primKey is provided, then get all markers using the specified table.
+          let locationAPIargs = {
+            database: this.config.dataset,
+            table: locationTableConfig.fetchTableName,
+            columns: locationColumnsColumnSpec
+          };
+
+          return LRUCache.get(
+            'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+              API.pageQuery({
+                cancellation: cacheCancellation,
+                ...locationAPIargs
+              }),
+            componentCancellation
+          );
+
+        }
+
+      })
+      .then((data) => {
+
+        let markers = [];
+
+        // Translate the fetched locationData and chartData into markers.
+        let locationTableConfig = this.config.tables[table];
+        let locationPrimKeyProperty = locationTableConfig.primkey;
+
+        // If a primKey value has been specified then expect data to contain a single record.
+        // Otherwise data should contain an array of records.
+        if (primKey) {
+
+          let locationDataPrimKey = data[locationPrimKeyProperty];
+
+          markers.push({
+            lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
+            lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
+            title: locationDataPrimKey
+          });
+
+        } else {
+
+          for (let i = 0; i < data.length; i++) {
+
+            let locationDataPrimKey = data[i][locationPrimKeyProperty];
+
+            markers.push({
+              lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
+              lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
+              title: locationDataPrimKey
+            });
+
+          }
+
+        }
+
+        this.setState({
+          loadStatus: 'loaded',
+          markers: markers
+        });
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({
+          loadStatus: 'error'
+        });
+      });
   },
 
   title() {
     return this.props.title;
   },
 
+
   render() {
-    let {locationDataTable, zoom} = this.props;
-
-    let {locationData, loadStatus} = this.state;
-
-    let marker = {};
-
-    if (locationData) {
-      // Translate the fetched locationData into a marker.
-      let locationTableConfig = this.config.tables[locationDataTable];
-
-      marker = {
-        lat: Number(locationData[locationTableConfig.propIdGeoCoordLattit]),
-        lng: Number(locationData[locationTableConfig.propIdGeoCoordLongit])
-      };
-    }
-
+    let {center, zoom, width, height} = this.props;
+    let {loadStatus, markers} = this.state;
     return (
-      <div style={{width: '100%', height: '100%'}}>
-        <ItemMap marker={marker} zoom={zoom}/>
-        <Loading status={loadStatus}/>
+      <div style={{width: width, height: height}}>
+        {loadStatus === 'loaded' ?
+          <ItemMap
+            center={center}
+            zoom={zoom}
+            markers={markers}
+          /> :
+          <Loading status={loadStatus}/>
+        }
       </div>
     );
 
@@ -125,4 +199,4 @@ let ItemMapTab = React.createClass({
 
 });
 
-module.exports = ItemMapTab;
+module.exports = ItemMapWidget;
