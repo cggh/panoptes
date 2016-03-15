@@ -77,6 +77,7 @@ let GenomeBrowser = React.createClass({
   },
 
   componentWillMount() {
+    this.loading = 0;
     this.panStartPixel = null;
     this.defaultChrom = _head(_keys(this.config.chromosomes)); //Would be done as defaultProp, but config not avaliable then
   },
@@ -218,9 +219,10 @@ let GenomeBrowser = React.createClass({
 
   handleChangeLoadStatus(status) {
     if (status === 'LOADING')
-      this.setState({loading: this.state.loading + 1});
+      this.loading += 1;
     if (status === 'DONE')
-      this.setState({loading: this.state.loading - 1});
+      this.loading -= 1;
+    this.setState({loading: this.loading});
   },
 
   render() {
