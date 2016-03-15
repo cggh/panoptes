@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import offset from 'bloody-offset';
+import classnames from 'classnames';
 
 import Icon from 'ui/Icon';
 
@@ -60,6 +61,8 @@ let ChannelWithConfigDrawer = React.createClass({
 
   render() {
     let {height, width, sideWidth, sideComponent, configComponent} = this.props;
+    let {controlsOpen} = this.state;
+
     let effWidth = width - sideWidth;
 
     return (
@@ -80,7 +83,8 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
         <div className="side-controls">
           <Icon className="close" name="times" onClick={this.handleClose}/>
-          <Icon className="control-toggle" name="cog" onClick={this.handleControlToggle}/>
+          <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
+                name="cog" onClick={this.handleControlToggle}/>
         </div>
       </div>
     );

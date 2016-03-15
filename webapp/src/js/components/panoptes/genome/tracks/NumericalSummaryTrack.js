@@ -20,14 +20,14 @@ let NumericalSummaryTrack = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track', 'width', 'sideWidth')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number, //Provided by NumericalChannel
-    blockEnd: React.PropTypes.number, //Provided by NumericalChannel
-    blockPixelWidth: React.PropTypes.number, //Provided by NumericalChannel
+    blockStart: React.PropTypes.number, //Provided by ScaledSVGChannel
+    blockEnd: React.PropTypes.number, //Provided by ScaledSVGChannel
+    blockPixelWidth: React.PropTypes.number, //Provided by ScaledSVGChannel
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
@@ -121,8 +121,7 @@ let NumericalSummaryTrack = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-            this.setState({loadStatus: 'error'});
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
           })
     );
   },
@@ -140,7 +139,7 @@ let NumericalSummaryTrack = React.createClass({
         .interpolate(interpolation)
         .tension(tension)
         .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep))
+        .x((d, i) => dataStart + (i * dataStep) )
         .y((d) => d)(avg);
       let area = d3.svg.area()
         .interpolate(interpolation)

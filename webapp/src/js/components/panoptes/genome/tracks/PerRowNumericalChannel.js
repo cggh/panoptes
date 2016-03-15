@@ -15,7 +15,7 @@ import SQL from 'panoptes/SQL';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
-import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
+import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
@@ -38,7 +38,7 @@ const INTERPOLATION_HAS_TENSION = {
   cardinal: true
 };
 
-let PerRowNumericalChannel = React.createClass({
+let PerRowScaledSVGChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
@@ -92,7 +92,7 @@ let PerRowNumericalChannel = React.createClass({
     let {name} = this.props;
     let {dataYMin, dataYMax} = this.state;
     return (
-      <NumericalChannel {...this.props}
+      <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
         dataYMax={dataYMax}
         side={<span>{name}</span>}
@@ -101,7 +101,7 @@ let PerRowNumericalChannel = React.createClass({
       >
         <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
 
-      </NumericalChannel>
+      </ScaledSVGChannel>
     );
   }
 });
@@ -110,7 +110,7 @@ let PerRowNumericalTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -237,8 +237,7 @@ let PerRowNumericalTrack = React.createClass({
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
       });
   },
 
@@ -416,6 +415,6 @@ let PerRowNumericalTrackControls = React.createClass({
 });
 
 
-module.exports = PerRowNumericalChannel;
+module.exports = PerRowScaledSVGChannel;
 
 

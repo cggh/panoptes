@@ -148,7 +148,7 @@ let PieChartMapTab = React.createClass({
             lat: locationData[i][locationTableConfig.propIdGeoCoordLattit],
             lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
             name: locationData[i][locationNameProperty],
-            radius: locationData[i][locationSizeProperty],
+            radius: Math.sqrt(locationData[i][locationSizeProperty]),
             chartData: markerChartData,
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey

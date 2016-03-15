@@ -91,8 +91,7 @@ let ReferenceSequence = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), 'Reference Sequence ' + error.message, () => this.fetchData(props));
-            this.setState({loadStatus: 'error'});
+            ErrorReport(this.getFlux(), 'Reference Sequence ' + error.message, () => this.fetchData(props, requestContext));
           })
     );
   },

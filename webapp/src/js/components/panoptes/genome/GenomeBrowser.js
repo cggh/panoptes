@@ -230,6 +230,7 @@ let GenomeBrowser = React.createClass({
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
     let {width, height, springConfig} = this.state;
+    width = Math.max(0, width - scrollbarSize());
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
     let pixelWidth = (end - start) / (width - sideWidth);
     //Animate by middle and width for better experience
@@ -285,7 +286,7 @@ let GenomeBrowser = React.createClass({
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
                         { settings.refSequenceSumm ?
-                          <ReferenceSequence {...trackProps} /> :
+                          <ReferenceSequence {...trackProps}/> :
                           null }
                       </div>
                       <div className="scrolling grow scroll-within">
@@ -303,7 +304,7 @@ let GenomeBrowser = React.createClass({
                                   else
                                     return props.mergeIn(['channels', channelId, 'props'], updater);
                                  })
-                               }, props.toObject(), trackProps, {width: Math.max(0, trackProps.width - scrollbarSize())}));
+                               }, props.toObject(), trackProps));
                         }
                         ).toList()
                         }

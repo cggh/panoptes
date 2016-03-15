@@ -14,7 +14,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
-import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
+import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
@@ -70,7 +70,7 @@ let CategoricalChannel = React.createClass({
     let {name} = this.props;
     let {dataYMin, dataYMax} = this.state;
     return (
-      <NumericalChannel {...this.props}
+      <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
         dataYMax={dataYMax}
         side={<span>{name}</span>}
@@ -78,7 +78,7 @@ let CategoricalChannel = React.createClass({
         controls={<CategoricalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
       >
         <CategoricalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
-      </NumericalChannel>
+      </ScaledSVGChannel>
     );
   }
 });
@@ -87,7 +87,7 @@ let CategoricalTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -185,8 +185,7 @@ let CategoricalTrack = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-            this.setState({loadStatus: 'error'});
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
           })
     );
   },
@@ -276,11 +275,6 @@ let CategoricalTrackControls = React.createClass({
       redirect: ['componentUpdate']
     })
   ],
-
-  handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
-    this.redirectedProps.componentUpdate({query});
-  },
 
   render() {
     let {fractional, autoYScale, yMin, yMax} = this.props;

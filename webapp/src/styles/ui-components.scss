@@ -492,6 +492,14 @@ input {
   border: none;
   border-bottom: solid 1px #e0e0e0;
 }
+input:focus {
+  outline: none;
+  outline-offset: inherit;
+  border-bottom: solid 2px $primary-color;
+}
+input.invalid {
+  border-bottom: solid 2px $red;
+}
 
 .query-picker {
   .list-string {

@@ -22,6 +22,9 @@
         input {
           width: 80px;
         }
+        .wide {
+          width: 200px
+        }
       }
     }
     .controls > * {
@@ -92,12 +95,16 @@
         padding-top:10px;
         .close {
           color: $red;
+          padding-right: 6px;
         }
         .icon {
           opacity: 0.6;
         }
         .icon:hover {
           opacity: 1;
+        }
+        .control-toggle.open {
+          color: $primary-color;
         }
       }
       .channel {
@@ -124,7 +131,7 @@
       }
       .channel-controls-container > div {
         //Some padding so that the controls don't overlap the close and config controls
-        padding-left: 50px;
+        padding-left: 65px;
       }
       .channel-controls-container {
         box-shadow: $z-1-shadow;

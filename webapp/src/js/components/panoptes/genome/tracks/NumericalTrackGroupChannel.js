@@ -11,7 +11,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
-import NumericalChannel from 'panoptes/genome/tracks/NumericalChannel';
+import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import Checkbox from 'material-ui/lib/checkbox';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
@@ -92,7 +92,7 @@ let NumericalTrackGroupChannel = React.createClass({
     let {dataYMin, dataYMax} = this.state;
 
     return (
-      <NumericalChannel {...this.props}
+      <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
         dataYMax={dataYMax}
         side={
@@ -113,7 +113,7 @@ let NumericalTrackGroupChannel = React.createClass({
           }
           ))
         )}
-      </NumericalChannel>
+      </ScaledSVGChannel>
     );
   }
 });

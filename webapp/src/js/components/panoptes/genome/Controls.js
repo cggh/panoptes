@@ -1,5 +1,7 @@
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
+import _has from 'lodash/has';
+import classnames from 'classnames';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -28,10 +30,12 @@ let Controls = React.createClass({
   },
 
   setFromProps(props) {
-    let {start, end} = props;
+    let {start, end, chromosome} = props;
     this.setState({
       midpoint: (end + start) / 2,
-      width: end - start
+      width: end - start,
+      regionText: `${chromosome}:${Math.round(start)}-${Math.round(end)}`,
+      regionValid: true
     });
   },
 
@@ -62,9 +66,29 @@ let Controls = React.createClass({
     }
   },
 
+  handleRegionChange() {
+    let regionText = this.refs.region.value;
+    this.setState({regionText});
+    let match = regionText.trim().match(/^(?:(.+):)?([0-9]+)-([0-9]+)$/);
+    if (match) {
+      let [chromosome, start, end] = match.slice(1);
+      start = parseInt(start);
+      end = parseInt(end);
+      chromosome = chromosome || this.props.chromosome;
+      if (_has(this.config.chromosomes, chromosome)  && start < end) {
+        this.setState({regionValid: true});
+        this.props.componentUpdate({chromosome, start, end});
+        return;
+      }
+    }
+    this.setState({regionValid: false});
+  },
+
+
+
   render() {
     let {chromosome, minWidth} = this.props;
-    let {midpoint, width} = this.state;
+    let {midpoint, width, regionText, regionValid} = this.state;
     let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
     return (
       <span className="controls">
@@ -97,6 +121,18 @@ let Controls = React.createClass({
                  max={max}
                  onChange={this.handleRangeChange}/>
         </span>
+        <span> Region: </span>
+        <span>
+          <input className={classnames({wide: true, invalid: !regionValid})}
+                 ref="region"
+                 type="text"
+                 spellCheck="false"
+                 value={regionText}
+                 min={minWidth}
+                 max={max}
+                 onChange={this.handleRegionChange}/>
+        </span>
+
       </span>
     );
   }
