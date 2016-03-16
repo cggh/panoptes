@@ -19,6 +19,7 @@ import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
 import LoadingIndicator from 'panoptes/genome/LoadingIndicator';
 import Controls from 'panoptes/genome/Controls';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 import Background from 'panoptes/genome/Background';
 import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
@@ -76,6 +77,7 @@ let GenomeBrowser = React.createClass({
   },
 
   componentWillMount() {
+    this.loading = 0;
     this.panStartPixel = null;
     this.defaultChrom = _head(_keys(this.config.chromosomes)); //Would be done as defaultProp, but config not avaliable then
   },
@@ -217,9 +219,10 @@ let GenomeBrowser = React.createClass({
 
   handleChangeLoadStatus(status) {
     if (status === 'LOADING')
-      this.setState({loading: this.state.loading + 1});
+      this.loading += 1;
     if (status === 'DONE')
-      this.setState({loading: this.state.loading - 1});
+      this.loading -= 1;
+    this.setState({loading: this.loading});
   },
 
   render() {
@@ -288,6 +291,7 @@ let GenomeBrowser = React.createClass({
                         { settings.refSequenceSumm ?
                           <ReferenceSequence {...trackProps}/> :
                           null }
+                        <AnnotationChannel {...trackProps} />
                       </div>
                       <div className="scrolling grow scroll-within">
                         {channels.map((channel, channelId) => {

@@ -67,14 +67,14 @@ let ChannelWithConfigDrawer = React.createClass({
 
     return (
       <div className="channel-container">
-        <div ref="controlsContainer" className="channel-controls-container">
+        {configComponent ? <div ref="controlsContainer" className="channel-controls-container">
           <div ref="controls" style={{width: width + 'px'}}>
             {configComponent}
           </div>
-        </div>
+        </div> : null }
         <div className="channel" style={{height: height}}>
           <div className="channel-side" style={{width: `${sideWidth}px`}}>
-            <div className="side-controls-spacer"></div>
+            { configComponent ? <div className="side-controls-spacer"></div> : null }
             {sideComponent}
           </div>
           <div className="channel-data" style={{width: `${effWidth}px`}}>
@@ -82,9 +82,9 @@ let ChannelWithConfigDrawer = React.createClass({
           </div>
         </div>
         <div className="side-controls">
-          <Icon className="close" name="times" onClick={this.handleClose}/>
-          <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
-                name="cog" onClick={this.handleControlToggle}/>
+          {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
+          {configComponent ? <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
+                name="cog" onClick={this.handleControlToggle}/> : null }
         </div>
       </div>
     );

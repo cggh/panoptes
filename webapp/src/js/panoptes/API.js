@@ -38,8 +38,6 @@ function errorMessage(xhr) {
   return `There was a problem with a request to the server: ${xhr.statusText || xhr.message}`;
 }
 
-
-
 function requestJSON(options) {
   let defaults = {
     url: serverURL,
@@ -108,7 +106,8 @@ function pageQuery(options) {
     collist += encoding + id;
   });
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON(Object.assign(args, {
+  return requestJSON({
+    ...args,
     params: {
       datatype: 'pageqry',
       database: database,
@@ -121,7 +120,7 @@ function pageQuery(options) {
       limit: `${start}~${stop}`,
       distinct: distinct ? '1' : '0'
     }
-  }))
+  })
     .then(_decodeValList(columns))
     //Transpose into rows if needed
     .then((columns) => {
@@ -140,6 +139,49 @@ function pageQuery(options) {
 
 }
 
+function annotationData(options) {
+  //TODO Extra field when needed by region channel?
+  assertRequired(options, [
+    'database', 'chrom', 'start', 'end']);
+  options.stop = options.end; //Rename to harmonise with rest of code
+  //These are the defaannults of the GFF parser on import
+  let defaults = {
+    datatype: 'annot',
+    table: 'annotation',
+    field_start: 'fstart',           //eslint-disable-line camelcase
+    field_stop: 'fstop',             //eslint-disable-line camelcase
+    field_name: 'fname',             //eslint-disable-line camelcase
+    field_id: 'fid',                 //eslint-disable-line camelcase
+    field_chrom: 'chromid',          //eslint-disable-line camelcase
+    ftype: 'gene',
+    fsubtype: 'CDS',
+    subfeatures: '1'
+  };
+  let params = Object.assign(defaults, options);
+  delete params.cancellation;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: params
+  })
+    .then((data) => {
+      let valListDecoder = DataDecoders.ValueListDecoder();
+      ['IDs', 'Names', 'ParentIDs', 'Sizes', 'Starts', 'Types'].forEach((key) =>
+        data[key] = valListDecoder.doDecode(data[key])
+      );
+      //Remap to sensible names
+      data = {
+        ids: data.IDs,
+        names: data.Names,
+        parents: data.ParentIDs,
+        sizes: data.Sizes,
+        starts: data.Starts,
+        types: data.Types
+      };
+      return data;
+    });
+}
+
 function summaryData(options) {
   assertRequired(options, ['chromosome', 'columns', 'blocksize', 'blockstart', 'blockcount']);
   let defaults = {};
@@ -150,8 +192,9 @@ function summaryData(options) {
     if (collist.length > 0) collist += '~';
     collist += `${column.folder}~${column.config}~${column.name}`;
   });
-
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({
+    ...args,
     params: {
       datatype: 'summinfo',
       dataid: chromosome,
@@ -183,7 +226,9 @@ function fetchData(id) {
 function fetchSingleRecord(options) {
   assertRequired(options, ['database', 'table', 'primKeyField', 'primKeyValue']);
   let {database, table, primKeyField, primKeyValue} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({
+    ...args,
     params: {
       datatype: 'recordinfo',
       database: database,
@@ -202,5 +247,6 @@ module.exports = {
   storeData: storeData,
   fetchData: fetchData,
   summaryData: summaryData,
+  annotationData: annotationData,
   fetchSingleRecord: fetchSingleRecord
 };
