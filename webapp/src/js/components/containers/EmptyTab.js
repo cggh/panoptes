@@ -38,7 +38,11 @@ let EmptyTab = React.createClass({
   },
 
   handleTableClick(e, table) {
-    this.handleOpen(e, 'containers/DataTableWithActions', {table: table.id});
+    if (this.config.tables[table.id].settings.listView) {
+      this.handleOpen(e, 'containers/ListWithActions', {table: table.id});
+    } else {
+      this.handleOpen(e, 'containers/DataTableWithActions', {table: table.id});
+    }
   },
 
   render() {
