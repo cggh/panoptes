@@ -13,6 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/genome/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+import FlatButton from 'material-ui/lib/flat-button';
 
 import 'hidpi-canvas';
 
@@ -35,7 +36,7 @@ let PerRowIndicatorChannel = React.createClass({
     }),
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -47,9 +48,15 @@ let PerRowIndicatorChannel = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired
+    table: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string
   },
 
+  getDefaultProps() {
+    return {
+      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+    };
+  },
 
   componentWillMount() {
     this.positions = [];
@@ -61,7 +68,8 @@ let PerRowIndicatorChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table} = props;
+    let {chromosome, start, end, width, sideWidth, table, query} = props;
+    query = SQL.WhereClause.decode(query);
     if (this.props.chromosome && this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
@@ -80,15 +88,18 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [tableConfig.primkey, tableConfig.positionField];
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+      let pos_query = SQL.WhereClause.AND([
+        SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
+      ]);
+      if (!query.isTrivial)
+        query = SQL.WhereClause.AND([pos_query, query]);
       let APIargs = {
         database: this.config.dataset,
         table: table,
         columns: columnspec,
-        query: SQL.WhereClause.encode(SQL.WhereClause.AND([
-          SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
-          SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
-          SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
-        ])),
+        query: SQL.WhereClause.encode(query),
         transpose: false
       };
 
@@ -100,7 +111,7 @@ let PerRowIndicatorChannel = React.createClass({
           componentCancellation
         )).then((data) => {
           this.props.onChangeLoadStatus('DONE');
-          this.applyData(props, data);
+          this.applyData(this.props, data);
         })
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
@@ -109,7 +120,7 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(props, {});
+          this.applyData(this.props, {});
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         });
     }
@@ -175,13 +186,31 @@ let PerRowIndicatorControls = React.createClass({
       check: [
       ],
       redirect: ['componentUpdate']
-    })
+    }),
+    FluxMixin
   ],
 
+  handleQueryPick(query) {
+    this.getFlux().actions.session.modalClose();
+    this.redirectedProps.componentUpdate({query});
+  },
+
   render() {
-    //let {fractional, autoYScale, yMin, yMax} = this.props;
+    let {table, query} = this.props;
+    let actions = this.getFlux().actions;
     return (
       <div className="channel-controls">
+        <div className="control">
+          <FlatButton label="Change Filter"
+                      primary={true}
+                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
+                        {
+                          table: table,
+                          initialQuery: query,
+                          onPick: this.handleQueryPick
+                        })}/>
+        </div>
+
       </div>
     );
   }
