@@ -1,22 +1,33 @@
 import React from 'react';
 import Immutable from 'immutable';
-import PureRenderMixin from 'mixins/PureRenderMixin';
 
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 import Sidebar from 'react-sidebar';
+
+// UI components
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 
+// Material UI components
+import TextField from 'material-ui/lib/text-field';
+
+// lodash functions
 import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _forEach from 'lodash/forEach';
 
+// Panoptes components
 import SQL from 'panoptes/SQL';
+import ListView from 'panoptes/ListView';
+
 
 let ListWithActions = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
+  mixins: [PureRenderMixin, FluxMixin, ConfigMixin, LinkedStateMixin],
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
@@ -32,6 +43,13 @@ let ListWithActions = React.createClass({
       order: null,
       ascending: true,
       sidebar: true
+    };
+  },
+
+  getInitialState() {
+    return {
+      picked: this.props.initialSelection,
+      search: ''
     };
   },
 
@@ -57,16 +75,28 @@ let ListWithActions = React.createClass({
 
 
   render() {
-    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
+    let {table, query, columns, order, ascending, sidebar, componentUpdate} = this.props;
+    let {description} = this.config;
+
+    // If columns have not been set, then use showByDefault && showInTable to determine which to show.
     if (!columns)
       columns = Immutable.List(this.config.properties)
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
-    let {description} = this.config;
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
+        <div className="search">
+          <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+        </div>
+        <ListView
+           table={table}
+           query={query}
+           order={order}
+           ascending={ascending}
+           columns={columns}
+          />
       </div>
     );
 
@@ -82,8 +112,9 @@ let ListWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
+            <span className="text">TODO: label of selected item will go here</span>
           </div>
-          <p>hello</p>
+          <p>TODO: data item view for selected item goes here</p>
         </div>
       </Sidebar>
     );
