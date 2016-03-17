@@ -31,7 +31,7 @@ let DataItem = React.createClass({
       ImmutablePropTypes.contains({
         view: React.PropTypes.string.isRequired,
         props: ImmutablePropTypes.map
-      }))
+      })).isRequired
   },
 
   getDefaultProps: function() {
@@ -50,7 +50,6 @@ let DataItem = React.createClass({
 
   render() {
     let {table, primKey, componentUpdate, activeTab, views} = this.props;
-
 
     return (
       <TabbedArea activeTab={activeTab}
