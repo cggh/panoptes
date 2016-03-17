@@ -16,14 +16,11 @@ import Icon from 'ui/Icon';
 // Material UI components
 import TextField from 'material-ui/lib/text-field';
 
-// lodash functions
-import _clone from 'lodash/clone';
-import _filter from 'lodash/filter';
-import _forEach from 'lodash/forEach';
-
 // Panoptes components
 import SQL from 'panoptes/SQL';
 import ListView from 'panoptes/ListView';
+
+import DataItem from 'containers/DataItem';
 
 
 let ListWithActions = React.createClass({
@@ -42,27 +39,21 @@ let ListWithActions = React.createClass({
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
       ascending: true,
-      sidebar: true
+      sidebar: true,
+      initialSelectedIndex: 0
     };
   },
 
   getInitialState() {
     return {
-      picked: this.props.initialSelection,
+      selectedIndex: this.props.initialSelectedIndex,
+      primKey: null,
       search: ''
     };
   },
 
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
-    this.propertyGroups = {};
-    _forEach(this.config.propertyGroups, (val, key) => {
-      let filteredProps = _filter(val.properties, {showInTable: true});
-      if (filteredProps.length > 0) {
-        this.propertyGroups[key] = _clone(val);
-        this.propertyGroups[key].properties = filteredProps;
-      }
-    });
   },
 
   icon() {
@@ -73,10 +64,18 @@ let ListWithActions = React.createClass({
     return this.props.title || this.config.tableCapNamePlural;
   },
 
+  handleSelect(primKey, selectedIndex) {
+    // TODO: load the appropriate data item view
+    console.log('ListWithActions handleSelect primKey: ' + primKey);
+    console.log('ListWithActions handleSelect selectedIndex: ' + selectedIndex);
+    this.props.componentUpdate({primKey: primKey, selectedIndex});
+    this.setState({primKey: primKey, selectedIndex: selectedIndex});
+  },
 
   render() {
     let {table, query, columns, order, ascending, sidebar, componentUpdate} = this.props;
     let {description} = this.config;
+    let {primKey} = this.state;
 
     // If columns have not been set, then use showByDefault && showInTable to determine which to show.
     if (!columns)
@@ -96,10 +95,87 @@ let ListWithActions = React.createClass({
            order={order}
            ascending={ascending}
            columns={columns}
+           onSelect={(primKey, selectedIndex) => this.handleSelect(primKey, selectedIndex)}
           />
       </div>
     );
 
+
+/////////////// TODO: Adapted from PanoptesActions.js
+
+
+    let dataItemViews = this.config.dataItemViews;
+    let views = Immutable.List();
+    if (!dataItemViews) {
+      // If there are no dataItemViews specified, then default to showing an Overview.
+      views.push({
+        view: 'Overview',
+        props: {
+          title: 'Overview'
+        }
+      });
+
+      if (this.config.hasGeoCoord) {
+        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
+        views.push({
+          view: 'ItemMap',
+          props: {
+            title: 'Location'
+          }
+        });
+      }
+    } else {
+      dataItemViews.forEach((dataItemView) => {
+        // Compose a tabPane for each of the specified dataItemViews
+        const viewTypes = {
+          Overview: () => ({
+            view: 'Overview',
+            props: {
+              title: 'Overview'
+            }
+          }),
+          PieChartMap: () => ({
+            view: 'PieChartMap',
+            props: {
+              title: dataItemView.name,
+              chartConfig: dataItemView
+            }
+          }),
+          ItemMap: () => ({
+            view: 'ItemMap',
+            props: {
+              title: dataItemView.name
+            }
+          }),
+          FieldList: () => ({
+            view: 'FieldList',
+            props: {
+              title: dataItemView.name,
+              fields: dataItemView.fields
+            }
+          }),
+          PropertyGroup: () => ({
+            view: 'PropertyGroup',
+            props: {
+              title: dataItemView.name || dataItemView.groupId, //TODO This should be name from group config
+              propertyGroupId: dataItemView.groupId
+            }
+          }),
+          Template: () => ({
+            view: 'Template',
+            props: {
+              title: dataItemView.name, //TODO This should be name from group config
+              content: dataItemView.content,
+              childTablesAsArrayOfMaps: this.config.relationsParentOf
+            }
+          })
+        };
+        if (viewTypes[dataItemView.type])
+          views.push(viewTypes[dataItemView.type]());
+      });
+    }
+
+///////////////
 
     return (
       <Sidebar
@@ -112,9 +188,9 @@ let ListWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="text">TODO: label of selected item will go here</span>
+            <span className="text">{primKey}</span>
           </div>
-          <p>TODO: data item view for selected item goes here</p>
+          <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />
         </div>
       </Sidebar>
     );

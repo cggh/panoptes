@@ -1,8 +1,6 @@
 import React from 'react';
-import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Highlight from 'react-highlighter';
-import classNames from 'classnames';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -111,8 +109,8 @@ let ListView = React.createClass({
       this.props.onFetchedRowsCountChange(this.state.rows.length);
   },
 
-  handleSelect() {
-    // TODO: load the appropriate data item view
+  handleSelect(primKey, rowIndex) {
+    this.props.onSelect(primKey, rowIndex);
   },
 
   render() {
@@ -131,12 +129,12 @@ let ListView = React.createClass({
 
       rows.map((row, rowIndex) => {
 
-        let primaryText = row[tableConfig.primkey];
+        let primKey = row[tableConfig.primkey];
 
         let listItem = (
             <ListItem key={rowIndex}
-                      primaryText={<div><Highlight search={search}>{primaryText}</Highlight></div>}
-                      onClick={() => this.handleSelect()}
+                      primaryText={<div><Highlight search={search}>{primKey}</Highlight></div>}
+                      onClick={() => this.handleSelect(primKey, rowIndex)}
             />
         );
 
