@@ -65,9 +65,6 @@ let ListWithActions = React.createClass({
   },
 
   handleSelect(primKey, selectedIndex) {
-    // TODO: load the appropriate data item view
-    console.log('ListWithActions handleSelect primKey: ' + primKey);
-    console.log('ListWithActions handleSelect selectedIndex: ' + selectedIndex);
     this.props.componentUpdate({primKey: primKey, selectedIndex});
     this.setState({primKey: primKey, selectedIndex: selectedIndex});
   },
@@ -102,9 +99,10 @@ let ListWithActions = React.createClass({
 
 
 /////////////// TODO: Adapted from PanoptesActions.js
-
+// TODO: Put const viewTypes into constants file?
 
     let dataItemViews = this.config.dataItemViews;
+
     let views = Immutable.List();
     if (!dataItemViews) {
       // If there are no dataItemViews specified, then default to showing an Overview.
@@ -171,7 +169,7 @@ let ListWithActions = React.createClass({
           })
         };
         if (viewTypes[dataItemView.type])
-          views.push(viewTypes[dataItemView.type]());
+          views = views.push(Immutable.fromJS(viewTypes[dataItemView.type]()));
       });
     }
 
@@ -190,7 +188,9 @@ let ListWithActions = React.createClass({
             />
             <span className="text">{primKey}</span>
           </div>
-          <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />
+          <div>
+            <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />
+          </div>
         </div>
       </Sidebar>
     );
