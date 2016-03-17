@@ -70,7 +70,7 @@ let PerRowIndicatorChannel = React.createClass({
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query} = props;
     query = SQL.WhereClause.decode(query);
-    if (this.props.chromosome && this.props.chromosome !== chromosome) {
+    if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
@@ -78,8 +78,10 @@ let PerRowIndicatorChannel = React.createClass({
     }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
-    if (!((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start))) {
+    if (this.props.chromosome !== chromosome ||
+        this.props.query !== query ||
+        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
+          (this.blockEnd === block2End && this.blockStart === block2Start))) {
       //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
