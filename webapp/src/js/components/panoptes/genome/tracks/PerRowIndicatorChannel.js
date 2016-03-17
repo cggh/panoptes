@@ -69,7 +69,6 @@ let PerRowIndicatorChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query} = props;
-    query = SQL.WhereClause.decode(query);
     if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
@@ -90,13 +89,14 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [tableConfig.primkey, tableConfig.positionField];
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
-      let pos_query = SQL.WhereClause.AND([
+      query = SQL.WhereClause.decode(query);
+      let posQuery = SQL.WhereClause.AND([
         SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
         SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
         SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
       ]);
       if (!query.isTrivial)
-        query = SQL.WhereClause.AND([pos_query, query]);
+        query = SQL.WhereClause.AND([posQuery, query]);
       let APIargs = {
         database: this.config.dataset,
         table: table,

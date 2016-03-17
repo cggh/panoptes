@@ -31,21 +31,28 @@ let ChannelWithConfigDrawer = React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.controlsOpen !== this.state.controlsOpen)
-      this.updateControlsHeight();
+      this.updateControlsHeight(true);
+    else if (['width', 'sideWidth','height'].some((name) => prevProps[name] !== this.props[name]))
+      this.updateControlsHeight(false);
   },
 
-  updateControlsHeight() {
+  updateControlsHeight(toggle) {
+    if (!this.refs.controls)
+      return;
     let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
+    console.log(height);
     this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
     this.refs.controlsContainer.style.width = this.state.controlsOpen ?
       '100%' : this.props.sideWidth + 'px';
     //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
-    if (!this.state.controlsOpen) {
-      this.refs.controlsContainer.style.overflow = 'hidden';
-      clearTimeout(this.controlOverFlowTimeout);
+    if (toggle) {
+      if (!this.state.controlsOpen) {
+        this.refs.controlsContainer.style.overflow = 'hidden';
+        clearTimeout(this.controlOverFlowTimeout);
+      }
+      else
+        this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500);
     }
-    else
-      this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500);
   },
 
   handleControlToggle(e) {
@@ -84,7 +91,7 @@ let ChannelWithConfigDrawer = React.createClass({
         <div className="side-controls">
           {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
           {configComponent ? <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
-                name="cog" onClick={this.handleControlToggle}/> : null }
+                                   name="cog" onClick={this.handleControlToggle}/> : null }
         </div>
       </div>
     );
