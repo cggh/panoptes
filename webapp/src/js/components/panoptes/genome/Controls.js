@@ -84,8 +84,6 @@ let Controls = React.createClass({
     this.setState({regionValid: false});
   },
 
-
-
   render() {
     let {chromosome, minWidth} = this.props;
     let {midpoint, width, regionText, regionValid} = this.state;
