@@ -20,6 +20,7 @@ import TextField from 'material-ui/lib/text-field';
 import SQL from 'panoptes/SQL';
 import ListView from 'panoptes/ListView';
 
+// Panoptes widgets
 import DataItem from 'containers/DataItem';
 
 
@@ -30,7 +31,8 @@ let ListWithActions = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
-    sidebar: React.PropTypes.bool
+    sidebar: React.PropTypes.bool,
+    initialSelectedIndex: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -72,7 +74,7 @@ let ListWithActions = React.createClass({
   render() {
     let {table, query, columns, order, ascending, sidebar, componentUpdate} = this.props;
     let {description} = this.config;
-    let {primKey} = this.state;
+    let {primKey, selectedIndex} = this.state;
 
     // If columns have not been set, then use showByDefault && showInTable to determine which to show.
     if (!columns)
@@ -92,7 +94,9 @@ let ListWithActions = React.createClass({
            order={order}
            ascending={ascending}
            columns={columns}
+           initialSelectedIndex={selectedIndex}
            onSelect={(primKey, selectedIndex) => this.handleSelect(primKey, selectedIndex)}
+           icon={this.icon()}
           />
       </div>
     );
@@ -175,6 +179,11 @@ let ListWithActions = React.createClass({
 
 ///////////////
 
+    let dataItem = '';
+    if (primKey) {
+      dataItem = <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />;
+    }
+
     return (
       <Sidebar
         docked={sidebar}
@@ -189,7 +198,7 @@ let ListWithActions = React.createClass({
             <span className="text">{primKey}</span>
           </div>
           <div>
-            <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />
+            {dataItem}
           </div>
         </div>
       </Sidebar>

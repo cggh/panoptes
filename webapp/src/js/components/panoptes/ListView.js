@@ -22,7 +22,7 @@ import ListItem from 'material-ui/lib/lists/list-item';
 
 // UI components
 import Loading from 'ui/Loading';
-
+import Icon from 'ui/Icon';
 
 let ListView = React.createClass({
   mixins: [
@@ -37,7 +37,8 @@ let ListView = React.createClass({
     query: React.PropTypes.string.isRequired,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
-    columns: ImmutablePropTypes.listOf(React.PropTypes.string)
+    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
+    initialSelectedIndex: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -45,7 +46,8 @@ let ListView = React.createClass({
       table: null,
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
       order: null,
-      ascending: true
+      ascending: true,
+      initialSelectedIndex: 0
     };
   },
 
@@ -53,17 +55,20 @@ let ListView = React.createClass({
     return {
       rows: [],
       loadStatus: 'loaded',
-      search: ''
+      search: '',
+      selectedIndex: this.props.initialSelectedIndex,
+      selectedPrimKey: null
     };
   },
 
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending} = props;
+    let {table, query, columns, order, ascending, initialSelectedIndex} = props;
     let tableConfig = this.config.tables[table];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
+
     if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
@@ -86,7 +91,8 @@ let ListView = React.createClass({
         .then((data) => {
           this.setState({
             loadStatus: 'loaded',
-            rows: data
+            rows: data,
+            selectedPrimKey: data[initialSelectedIndex][tableConfig.primkey]
           });
         })
         .catch(API.filterAborted)
@@ -101,12 +107,8 @@ let ListView = React.createClass({
   },
 
   componentDidUpdate: function(prevProps, prevState) {
-    if (this.props.onShowableRowsCountChange && prevState.showableRowsCount !== this.state.showableRowsCount) {
-      this.forceFetch();
-      this.props.onShowableRowsCountChange(this.state.showableRowsCount);
-    }
-    if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length)
-      this.props.onFetchedRowsCountChange(this.state.rows.length);
+    if (this.props.onSelect && prevState.selectedPrimKey !== this.state.selectedPrimKey)
+      this.props.onSelect(this.state.selectedPrimKey, this.state.selectedIndex);
   },
 
   handleSelect(primKey, rowIndex) {
@@ -114,8 +116,8 @@ let ListView = React.createClass({
   },
 
   render() {
-    let {loadStatus, rows} = this.state;
-    let {search} = this.state;
+    let {icon} = this.props;
+    let {loadStatus, rows, search} = this.state;
 
     let tableConfig = this.config.tables[this.props.table];
     if (!tableConfig) {
@@ -135,6 +137,7 @@ let ListView = React.createClass({
             <ListItem key={rowIndex}
                       primaryText={<div><Highlight search={search}>{primKey}</Highlight></div>}
                       onClick={() => this.handleSelect(primKey, rowIndex)}
+                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
             />
         );
 
