@@ -112,16 +112,17 @@ let ListView = React.createClass({
   },
 
   handleSelect(primKey, rowIndex) {
+    this.setState({selectedPrimKey: primKey, selectedIndex: rowIndex});
     this.props.onSelect(primKey, rowIndex);
   },
 
   render() {
-    let {icon} = this.props;
-    let {loadStatus, rows, search} = this.state;
+    let {icon, table} = this.props;
+    let {loadStatus, rows, search, selectedIndex} = this.state;
 
-    let tableConfig = this.config.tables[this.props.table];
+    let tableConfig = this.config.tables[table];
     if (!tableConfig) {
-      console.error(`Error: table ${this.props.table} has no associated config.`);
+      console.error(`Error: table ${table} has no associated config.`);
       return null;
     }
 
@@ -133,8 +134,11 @@ let ListView = React.createClass({
 
         let primKey = row[tableConfig.primkey];
 
+        let className = selectedIndex === rowIndex ? 'picked' : '';
+
         let listItem = (
-            <ListItem key={rowIndex}
+            <ListItem className={className}
+                      key={rowIndex}
                       primaryText={<div><Highlight search={search}>{primKey}</Highlight></div>}
                       onClick={() => this.handleSelect(primKey, rowIndex)}
                       leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
