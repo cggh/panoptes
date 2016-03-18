@@ -177,7 +177,7 @@ let PerRowIndicatorChannel = React.createClass({
         configComponent={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
         onClose={this.redirectedProps.onClose}
       >
-        <canvas ref="canvas" width={width} height={HEIGHT}/>;
+        <canvas ref="canvas" width={width} height={HEIGHT}/>
       </ChannelWithConfigDrawer>);
   }
 });

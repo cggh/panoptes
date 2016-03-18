@@ -21,13 +21,11 @@ let Channel = React.createClass({
 
     return (
       <div className="channel-container">
-        <div className="channel" style={{height: height}}>
-
-          <div className="channel-side" style={{width: `${sideWidth}px`}}>
-            {sideComponent}
-          </div>
-
-          <div className="channel-data" style={{width: `${effWidth}px`}}>
+        <div className="channel-side" style={{width: `${sideWidth}px`}}>
+          {sideComponent}
+        </div>
+        <div className="channel-stack">
+          <div className="channel-data" style={{width: `${effWidth}px`, height: `${height}px`}}>
             {this.props.children}
           </div>
         </div>

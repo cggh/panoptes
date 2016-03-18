@@ -174,7 +174,7 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'gene') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > -4 && x1 < width + 4) {
+        if (x2 > -60 && x1 < width + 4) {
           ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 20, Math.max(1, x2 - x1), 2);   //Gene bar
           if (names[i] && (lastTextAt[rows[i]] + 30 < x1  || typeof lastTextAt[rows[i]] === 'undefined')) {
             lastTextAt[rows[i]] = x1;
@@ -226,7 +226,7 @@ let AnnotationChannel = React.createClass({
         configComponent={null}
         onClose={null}
       >
-        <canvas ref="canvas" width={width} height={height}/>;
+        <canvas ref="canvas" width={width} height={height}/>
       </ChannelWithConfigDrawer>);
   }
 });
