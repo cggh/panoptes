@@ -25,7 +25,13 @@ import DataItem from 'containers/DataItem';
 
 
 let ListWithActions = React.createClass({
-  mixins: [PureRenderMixin, FluxMixin, ConfigMixin, LinkedStateMixin],
+
+  mixins: [
+    PureRenderMixin,
+    FluxMixin,
+    ConfigMixin,
+    LinkedStateMixin
+  ],
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
@@ -67,7 +73,7 @@ let ListWithActions = React.createClass({
   },
 
   handleSelect(primKey, selectedIndex) {
-    this.props.componentUpdate({primKey: primKey, selectedIndex});
+    this.props.componentUpdate({primKey: primKey, selectedIndex: selectedIndex});
     this.setState({primKey: primKey, selectedIndex: selectedIndex});
   },
 
@@ -82,22 +88,26 @@ let ListWithActions = React.createClass({
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
 
+    // TODO: search widget is too wide.
+
     let sidebarContent = (
       <div className="sidebar">
-        <SidebarHeader icon={this.icon()} description={description}/>
-        <div className="search">
-          <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+        <div className="item-picker">
+          <SidebarHeader icon={this.icon()} description={description}/>
+          <div className="search">
+            <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+          </div>
+          <ListView
+             table={table}
+             query={query}
+             order={order}
+             ascending={ascending}
+             columns={columns}
+             initialSelectedIndex={selectedIndex}
+             onSelect={(primKey, selectedIndex) => this.handleSelect(primKey, selectedIndex)}
+             icon={this.icon()}
+            />
         </div>
-        <ListView
-           table={table}
-           query={query}
-           order={order}
-           ascending={ascending}
-           columns={columns}
-           initialSelectedIndex={selectedIndex}
-           onSelect={(primKey, selectedIndex) => this.handleSelect(primKey, selectedIndex)}
-           icon={this.icon()}
-          />
       </div>
     );
 
