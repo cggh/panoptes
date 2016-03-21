@@ -175,6 +175,7 @@ let PerRowIndicatorChannel = React.createClass({
             }
         //Override component update to get latest in case of skipped render
         configComponent={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        legendComponent={<Legend/>}
         onClose={this.redirectedProps.onClose}
       >
         <canvas ref="canvas" width={width} height={HEIGHT}/>
@@ -218,6 +219,27 @@ let PerRowIndicatorControls = React.createClass({
   }
 
 });
+
+let Legend = () =>
+  <div className="legend">
+    {[
+      ['A', 'rgb(255, 50, 50)'],
+      ['T', 'rgb(255, 170, 0)'],
+      ['C', 'rgb(0, 128, 192)'],
+      ['G', 'rgb(0, 192, 120)'],
+      ['N', 'rgb(0,0,0)']
+    ].map(([base, colour]) =>
+      <div className="legend-element" key={base}>
+        <svg width="14" height="26">
+          <rect x="0" y="6" width="14" height="14" style={{fill: colour}} />
+        </svg>
+        <div className="label">
+          {base}
+        </div>
+      </div>
+    )}
+  </div>;
+Legend.shouldComponentUpdate = () => false;
 
 
 module.exports = PerRowIndicatorChannel;

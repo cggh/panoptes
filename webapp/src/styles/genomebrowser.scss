@@ -80,6 +80,12 @@
           box-shadow: inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
       }
+      .config-container {
+        box-shadow: 3px 1px 4px rgba(0, 0, 0, 0.24);
+      }
+      .legend-container {
+        box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.24);
+      }
       .channel-container {
         position: relative;
         display: flex;
@@ -88,6 +94,9 @@
         border-bottom: 1px solid $light-primary-color;
 
         .channel-side {
+          position: relative;
+          overflow: hidden;
+          background-color: white;
           .close {
             color: $red;
             padding-right: 6px;
@@ -98,17 +107,18 @@
           .icon:hover {
             opacity: 1;
           }
-          .control-toggle.open {
-            color: $primary-color;
-          }
+
           .toggle {
-            width: 35px;
-            height: 35px;
-            padding: 5px;
+            width: 25px;
+            height: 25px;
+            line-height: 22px;
+            padding: 3px;
             position: absolute;
             text-align: center;
-            left: 0;
-
+            right: 0;
+            .open {
+              color: $primary-color;
+            }
           }
           .config {
             top: 0;
@@ -118,7 +128,10 @@
             bottom: 0;
           }
           .side-component {
-            padding-left: 35px;
+            position: absolute;
+            right: 0;
+            left: 0;
+            padding: 5px 35px 5px 10px;
             text-overflow: ellipsis;
             overflow: auto;
             height: 100%;
@@ -138,18 +151,30 @@
               display: block;
             }
           }
-          //.channel-controls-container > div {
-          //  //Some padding so that the controls don't overlap the close and config controls
-          //  padding-left: 65px;
-          //}
           .tray-container {
             position: relative;
-            box-shadow: $z-1-shadow;
+            //box-shadow: $z-1-shadow;
             transition: height .5s !important;
             background: white;
             height: 0;
             width: 100%;
             overflow: hidden;
+            .legend {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              flex-wrap: wrap;
+              padding-right: 16px;
+              .legend-element {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                padding-left: 16px;
+                .label {
+                  padding-left: 8px;
+                }
+              }
+            }
             .channel-controls {
               display: flex;
               align-items: center;
@@ -161,7 +186,7 @@
                 align-items: center;
                 justify-content: flex-start;
                 .label {
-                  padding-left: 16px;
+                  padding-left: 10px;
                 }
                 .dropdown {
                   top: -4px;

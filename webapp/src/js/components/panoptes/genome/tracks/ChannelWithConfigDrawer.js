@@ -20,6 +20,7 @@ let ChannelWithConfigDrawer = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     sideComponent: React.PropTypes.element,
     configComponent: React.PropTypes.element,
+    legendComponent: React.PropTypes.element,
     onClose: React.PropTypes.func
   },
 
@@ -80,7 +81,7 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   render() {
-    let {height, width, sideWidth, sideComponent, configComponent} = this.props;
+    let {height, width, sideWidth, sideComponent, configComponent, legendComponent} = this.props;
     let {controlsOpen, legendOpen} = this.state;
 
     let effWidth = width - sideWidth;
@@ -88,36 +89,36 @@ let ChannelWithConfigDrawer = React.createClass({
     return (
       <div className="channel-container">
         <div className="channel-side" style={{width: `${sideWidth}px`}}>
-          {configComponent ?
-            <div className="config toggle">
-              <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
-                    name="cog" onClick={this.handleControlToggle}/>
-            </div>
-            : null }
-          {configComponent ?
-            <div className="legend toggle" ref="legendToggle">
-              <Icon className={classnames({'legend-toggle': true, open: legendOpen})}
-                    name="info" onClick={this.handleLegendToggle}/>
-            </div>
-            : null }
           <div className="side-component">
             {sideComponent}
           </div>
+          {configComponent ?
+            <div className="config toggle">
+              <Icon className={classnames({open: controlsOpen})}
+                    name="cog" onClick={this.handleControlToggle}/>
+            </div>
+            : null }
+          {legendComponent ?
+            <div className="legend toggle" ref="legendToggle">
+              <Icon className={classnames({open: legendOpen})}
+                    name="info" onClick={this.handleLegendToggle}/>
+            </div>
+            : null }
         </div>
         <div className="channel-stack">
           {configComponent ?
-            <div className="tray-container" ref="controlsContainer">
+            <div className="tray-container config-container" ref="controlsContainer">
               <div ref="controls" style={{width: `${effWidth}px`}}>
                 {configComponent}
               </div>
             </div> : null }
-          <div className="channel-data" style={{width: `${effWidth}px`}}>
+          <div className="channel-data" style={{width: `${effWidth}px`, height: `${height}px`}}>
             {this.props.children}
           </div>
-          {configComponent ?
-            <div className="tray-container" ref="legendContainer">
+          {legendComponent ?
+            <div className="tray-container legend-container" ref="legendContainer">
               <div ref="legend" style={{width: `${effWidth}px`}}>
-                {configComponent}
+                {legendComponent}
               </div>
             </div> : null }
 

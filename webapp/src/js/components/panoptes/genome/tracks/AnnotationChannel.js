@@ -155,14 +155,15 @@ let AnnotationChannel = React.createClass({
 
   draw(props) {
     const {width, sideWidth, start, end} = props || this.props;
-    const {names, sizes, starts, types, rows} = this.data;
     const {height} = this.state;
 
     const canvas = this.refs.canvas;
-    if (!canvas || !starts)
+    if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!(this.data && this.data.starts)) return;
+    const {names, sizes, starts, types, rows} = this.data;
     ctx.strokeStyle = '#000';
     ctx.fillStyle = '#000';
     ctx.font = '10px monospace';
@@ -222,8 +223,8 @@ let AnnotationChannel = React.createClass({
             <span>{name || 'Genes'}</span>
             </div>
             }
-        //Override component update to get latest in case of skipped render
         configComponent={null}
+        legendComponent={<Legend/>}
         onClose={null}
       >
         <canvas ref="canvas" width={width} height={height}/>
@@ -249,6 +250,26 @@ let AnnotationChannel = React.createClass({
 //  }
 //});
 
+let Legend = () =>
+    <div className="legend">
+      <div className="legend-element">
+        <svg width="50" height="26">
+          <rect x="0" y="12" width="50" height="2" style={{fill: '#000'}} />
+        </svg>
+        <div className="label">
+          Gene
+        </div>
+      </div>
+      <div className="legend-element">
+        <svg width="50" height="26">
+          <rect x="0" y ="8" width="50" height="10" style={{fill: '#3d8bd5'}} />
+        </svg>
+        <div className="label">
+          Coding Sequence
+        </div>
+      </div>
+    </div>;
+Legend.shouldComponentUpdate = () => false;
 
 module.exports = AnnotationChannel;
 
