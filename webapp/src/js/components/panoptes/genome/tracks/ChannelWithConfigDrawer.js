@@ -81,7 +81,8 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   render() {
-    let {height, width, sideWidth, sideComponent, configComponent, legendComponent} = this.props;
+    let {height, width, sideWidth, onClose,
+      sideComponent, configComponent, legendComponent} = this.props;
     let {controlsOpen, legendOpen} = this.state;
 
     let effWidth = width - sideWidth;
@@ -92,14 +93,20 @@ let ChannelWithConfigDrawer = React.createClass({
           <div className="side-component">
             {sideComponent}
           </div>
+          {onClose ?
+          <div className="close button">
+            <Icon className={classnames({open: controlsOpen})}
+                  name="times" onClick={this.handleClose}/>
+          </div>
+            : null }
           {configComponent ?
-            <div className="config toggle">
+            <div className="config button">
               <Icon className={classnames({open: controlsOpen})}
                     name="cog" onClick={this.handleControlToggle}/>
             </div>
             : null }
           {legendComponent ?
-            <div className="legend toggle" ref="legendToggle">
+            <div className="legend button" ref="legendToggle">
               <Icon className={classnames({open: legendOpen})}
                     name="info" onClick={this.handleLegendToggle}/>
             </div>
