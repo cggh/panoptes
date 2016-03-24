@@ -13,7 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/genome/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import FlatButton from 'material-ui/lib/flat-button';
+import FlatButton from 'material-ui/FlatButton';
 
 import 'hidpi-canvas';
 

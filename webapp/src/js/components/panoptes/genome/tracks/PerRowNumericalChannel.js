@@ -17,7 +17,7 @@ import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
-
+import {propertyColour, categoryColours} from 'util/Colours';
 
 import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -191,7 +191,9 @@ let PerRowNumericalTrack = React.createClass({
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
-    let columns = [tableConfig.primkey, colourProperty];
+    let columns = [tableConfig.primkey];
+    if (colourProperty)
+      columns.push(colourProperty);
     let columnspec = {};
     columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
     let APIargs = {
@@ -210,8 +212,9 @@ let PerRowNumericalTrack = React.createClass({
         ).then((tableData) => {
           let primKeys = tableData[tableConfig.primkey].slice(0, 50);
           this.data.primKeys = primKeys;
-          let colourVals = tableData[colourProperty].slice(0, 50);
-          this.data.colourVals = colourVals;
+          if (colourProperty) {
+            this.data.colourVals = tableData[colourProperty].slice(0, 50);
+          }
           return Promise.all(primKeys.map((primkey) =>
             SummarisationCache.fetch({
               columns: {
@@ -254,19 +257,25 @@ let PerRowNumericalTrack = React.createClass({
   },
 
   applyData(props) {
-    let {primKeys, dataStart, dataStep, columns} = this.data;
-    let {interpolation, tension} = props;
-
+    let {primKeys, dataStart, dataStep, columns, colourVals} = this.data;
+    let {interpolation, tension, table, colourProperty} = props;
+    let colourFunc = categoryColours('__default__');
+    if (table && colourProperty)
+      colourFunc = propertyColour(this.config.tables[table].propertiesMap[colourProperty]);
     let lines = {};
-    primKeys.forEach((primKey) => {
-      if (columns[primKey])
+    let colours = {};
+    primKeys.forEach((primKey, i) => {
+      if (columns[primKey]) {
         lines[primKey] = d3.svg.line()
           .interpolate(interpolation)
           .tension(tension)
           .defined(_isFinite)
           .x((d, i) => dataStart + (i * dataStep))
           .y((d) => d)(columns[primKey].data);
+        colours[primKey] = colourVals ? colourFunc(colourVals[i]) : null;
+      }
     });
+    //Area is turned of for now as this channel often has many tracks on top of each other.
     //let area = d3.svg.area()
     //  .interpolate(interpolation)
     //  .tension(tension)
@@ -277,7 +286,8 @@ let PerRowNumericalTrack = React.createClass({
     //
     this.setState({
       //area: area,
-      lines: lines
+      lines: lines,
+      colours: colours
     });
   },
 
@@ -310,13 +320,12 @@ let PerRowNumericalTrack = React.createClass({
     });
   },
 
-
   render() {
-    let {area, lines} = this.state;
+    let {area, lines, colours} = this.state;
     return (
       <g className="numerical-track">
         <path className="area" d={area}/>
-        {_map(lines, (line, primKey) => <path key={primKey} className="line" d={line}/>)}
+        {_map(lines, (line, primKey) => <path key={primKey} className="line" style={{stroke:colours[primKey]}} d={line} />)}
       </g>
     );
   }
@@ -349,8 +358,6 @@ let PerRowNumericalTrackControls = React.createClass({
   render() {
     let {interpolation, tension, autoYScale, yMin, yMax, query, table, colourProperty} = this.props;
     let actions = this.getFlux().actions;
-    console.log(this.config.tables[table].propertiesMap);
-    console.log(this.config.tables[table].properties);
     return (
       <div className="channel-controls">
         <div className="control">
