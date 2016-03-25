@@ -183,15 +183,13 @@ let PieChartMapTab = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: '100%', height: '100%'}}>
-        {loadStatus === 'loaded' ?
           <PieChartMap
             center={center}
             zoom={zoom}
             markers={markers}
             onPanZoom={this.handlePanZoom}
-          /> :
+          />
           <Loading status={loadStatus}/>
-        }
       </div>
     );
 

@@ -42,8 +42,8 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   Name: Details
   Content: |
       <h4>ID: {{ID}}</h4>
-      <h2>Contributing Entity: {{Name}}<h2>
-      <h3>Contact Person: {{Contact}}<h3>
+      <h2>Contributing Entity: {{Name}}</h2>
+      <h3>Contact Person: {{Contact}}</h3>
       <h4>
       {{#if SomeText}}
               {{{SomeText}}}
@@ -55,13 +55,15 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
       <ul>
       {{#each samplingsites}}
         <li>{{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}</li>
-        {{item_link 'samplingsites' SiteID SiteID}}
+        <ItemLink table='samplingsites' primary-key='{{SiteID}}'/>
       {{else}}
         No sites from this contributor
       {{/each}}
       </ul>
-      {{map samplingsites 'SiteID' 'Latitude' 'Longitude'}}
-            <h4>
+      <div style="width:300px;height:300px">
+        <ItemMap table='samplingsites' highlight='Contributor ID:{{ID}}' />
+      </div>
+      <h4>
         More information on the nature of contribution <a class=\"doclink\" href=\"samples\">here</a>
       </h4>
 

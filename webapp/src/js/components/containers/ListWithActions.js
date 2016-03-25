@@ -178,7 +178,6 @@ let ListWithActions = React.createClass({
             props: {
               title: dataItemView.name, //TODO This should be name from group config
               content: dataItemView.content,
-              childTablesAsArrayOfMaps: this.config.relationsParentOf
             }
           })
         };

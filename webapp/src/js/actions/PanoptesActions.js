@@ -65,7 +65,6 @@ const PanoptesActions = (config) => ({
             props: {
               title: dataItemView.name, //TODO This should be name from group config
               content: dataItemView.content,
-              childTablesAsArrayOfMaps: config.tables[table].relationsParentOf
             }
           })
         };

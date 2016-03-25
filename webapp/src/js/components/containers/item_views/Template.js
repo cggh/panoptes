@@ -1,8 +1,6 @@
 import React from 'react';
 import _uniq from 'lodash/uniq';
-import HtmlToReact from 'html-to-react';
 import Handlebars from 'handlebars/dist/handlebars.js';
-import uid from 'uid';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -16,18 +14,10 @@ import LRUCache from 'util/LRUCache';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import ItemLink from 'panoptes/ItemLink';
-import ComponentWrapper from 'panoptes/ComponentWrapper';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 // UI components
 import Loading from 'ui/Loading';
-
-import ItemMapWidget from './ItemMap';
-
-
-// Constants in this component
-const DEFAULT_COMPONENT_WIDTH = '300px';
-const DEFAULT_COMPONENT_HEIGHT = '300px';
 
 import 'item_views/template.scss';
 
@@ -102,6 +92,7 @@ let TemplateWidget = React.createClass({
 
   propTypes: {
     title: React.PropTypes.string,
+    content: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
   },
@@ -113,14 +104,13 @@ let TemplateWidget = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey, content, childTablesAsArrayOfMaps} = props;
-
+    let {table, primKey, content } = props;
     this.setState({loadStatus: 'loading'});
 
-    // Extract all the childTableIds from the childTablesAsArrayOfMaps.
+    // Extract all the childTableIds
     let possibleChildTables = [];
-    childTablesAsArrayOfMaps.forEach((map) => {
-      possibleChildTables.push(map.get('childtableid'));
+    this.config.tables[table].relationsParentOf.forEach((rel) => {
+      possibleChildTables.push(rel.childtableid);
     });
 
     // Determine which childTables are actually used in the raw template.
@@ -181,118 +171,30 @@ let TemplateWidget = React.createClass({
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
-      .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({loadStatus: 'error'});
-      });
+      // .catch((error) => {
+      //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      //   this.setState({loadStatus: 'error'});
+      // });
   },
 
   title() {
     return this.props.title;
   },
 
-  componentWillMount: function() {
-
-    //// Register Handlebars Helpers
-
-    Handlebars.registerHelper( 'item_link', (a, b, c) =>
-      // TODO: what is an item_link?
-
-      new Handlebars.SafeString(`<ItemLink href="${a}" alt="${b}">${c}</ItemLink>`)
-    );
-
-    Handlebars.registerHelper( 'map', (options) => {
-
-      // http://handlebarsjs.com/expressions.html
-      // "Handlebars helpers can also receive an optional sequence of key-value pairs as their final parameter (referred to as hash arguments in the documentation)"
-
-      let {table, primKey, primKeyProperty, latProperty, lngProperty, width, height} = options.hash;
-
-      // Only "table" is strictly required.
-      // If specified, primKey (a value) will identify a single record and map one marker.
-      // If not specified, the {primKeyProperty, latProperty, lngProperty} fields will be determined by the table config.
-
-      let primKeyAttrib = primKey !== undefined ? primKey : '';
-      let primKeyPropertyAttrib = primKeyProperty !== undefined ? primKeyProperty : '';
-      let lngPropertyAttrib = lngProperty !== undefined ? lngProperty : '';
-      let latPropertyAttrib = latProperty !== undefined ? latProperty : '';
-
-      // If width or height are not specified, use a default.
-      width = width ? width : DEFAULT_COMPONENT_WIDTH;
-      height = height ? height : DEFAULT_COMPONENT_HEIGHT;
-
-      return new Handlebars.SafeString(`<ItemMapWidget table="${table}" primKey="${primKeyAttrib}" primKeyProperty="${primKeyPropertyAttrib}" lngProperty="${lngPropertyAttrib}" latProperty="${latPropertyAttrib}" width="${width}" height="${height}"></ItemMapWidget>`);
-    });
-
-
-
-
-  },
-
   render() {
-
     let {content} = this.props;
     let {data, loadStatus} = this.state;
-    // Don't continue if there are no data.
-    if (!data) return null;
-
-    // NOTE: There is a strong assumption that the template string (content) is static, i.e. it will not change during the life of the webapp.
-    // For example: if we ever have WYSIWYG editors that can change the template, then we might have to take a different or more complicated approach.
-
     // Compile and evaluate the template.
     let template = Handlebars.compile(content);
-    let evaluatedContent = template(data);
-
-    //// Prepare the HtmlToReact node processing instructions
-    let processNodeDefinitions = new HtmlToReact.ProcessNodeDefinitions(React);
-    // Note: Instructions are processed in the order in which they are defined.
-    let processingInstructions = [
-      {
-        shouldProcessNode: function(node) {
-          return node.name === 'ItemLink';
-        },
-        processNode: function(node, children) {
-          let id = 'item_link_' + uid();
-          return <ComponentWrapper key={id}><ItemLink {...node.attribs}>{children}</ItemLink></ComponentWrapper>;
-        }
-      },
-      {
-        shouldProcessNode: function(node) {
-          return node.name === 'ItemMapWidget';
-        },
-        processNode: function(node, children) {
-          let id = 'map_' + uid();
-          return <ComponentWrapper key={id}><ItemMapWidget {...node.attribs} /></ComponentWrapper>;
-        }
-      },
-      {
-        shouldProcessNode: function(node) {
-          return true;
-        },
-        processNode: processNodeDefinitions.processDefaultNode
-      }
-    ];
-
-    //// Render the evaluated template HTML.
-
-    // Run the HtmlToReact parser
-    let htmlToReactParser = new HtmlToReact.Parser(React);
-
-    // TODO: Keep this as a placeholder?
-    let isValidNode = function() { return true; };
-
-    let reactContent = htmlToReactParser.parseWithInstructions('<div>' + evaluatedContent + '</div>', isValidNode, processingInstructions);
-
     return (
         <div className="template-container">
-          {reactContent}
+          <HTMLWithComponents>
+              {template(data)}
+          </HTMLWithComponents>
           <Loading status={loadStatus}/>
         </div>
     );
-
-
   }
-
 });
 
 module.exports = TemplateWidget;

@@ -57,7 +57,7 @@
     "fixed-data-table": "^0.6.0",
     "fluxxor": "^1.7.3",
     "handlebars": "^4.0.5",
-    "html-to-react": "^0.1.2",
+    "html-to-react": "git+https://github.com/benjeffery/html-to-react.git#persistent-keys-and-options",
     "google-map-react": "^0.10.5",
     "hidpi-canvas": "git+https://github.com/benjeffery/hidpi-canvas-polyfill.git",
     "immutable": "^3.7.6",

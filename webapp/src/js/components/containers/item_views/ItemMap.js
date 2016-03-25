@@ -184,14 +184,12 @@ let ItemMapWidget = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: width, height: height}}>
-        {loadStatus === 'loaded' ?
           <ItemMap
             center={center}
             zoom={zoom}
             markers={markers}
-          /> :
+          />
           <Loading status={loadStatus}/>
-        }
       </div>
     );
 
