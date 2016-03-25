@@ -44,6 +44,10 @@ function getAppState(location) {
         components: ['FirstTab'],
         selectedTab: 'FirstTab'
       },
+      popups: {
+        components: [],
+        state: {}
+      },
       modal: {}
     }
   };
@@ -82,7 +86,8 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     //Listen to the stores and update the URL after storing the state, when it changes.
     let getState = () => {
       let state = Immutable.Map();
-      state = state.set('session', stores.SessionStore.getState().delete('modal'));
+      //Clear the modal as we don't want that to be stored
+      state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
       state = state.set('panoptes', stores.PanoptesStore.getState());
       return state;
     };
@@ -109,8 +114,6 @@ Promise.all([InitialConfig(), getAppState(window.location)])
 
     window.addEventListener('popstate', (event) => {
       backbutton = true;
-      //TODO If there is no state we are at the start so use default view
-      stores.SessionStore.state = Immutable.fromJS(event.state.session).set('modal', Immutable.Map());
       stores.SessionStore.emit('change');
     });
 
