@@ -26,7 +26,9 @@ gulp.task("webpack-dev-server", function(callback) {
   new WebpackDevServer(webpack(myConfig), {
     historyApiFallback: true,
     stats: {
-      colors: true
+      colors: true,
+      chunkModules: false, //Reduce logging a bit!
+      assets: false
     }
   }).listen(8080, "localhost", function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
@@ -59,7 +61,9 @@ gulp.task("webpack-devhot-server", function(callback) {
     hot: true,
     historyApiFallback: true,
     stats: {
-      colors: true
+      colors: true,
+      chunkModules: false, //Reduce logging a bit!
+      assets: false
     }
   }).listen(8080, "localhost", function(err) {
     if(err) throw new gutil.PluginError("webpack-dev-server", err);
