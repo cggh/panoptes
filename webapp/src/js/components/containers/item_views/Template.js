@@ -10,6 +10,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 // Utils
 import LRUCache from 'util/LRUCache';
+import SQL from 'panoptes/SQL';
 
 // Panoptes components
 import API from 'panoptes/API';
@@ -106,11 +107,13 @@ let TemplateWidget = React.createClass({
   fetchData(props, requestContext) {
     let {table, primKey, content } = props;
     this.setState({loadStatus: 'loading'});
-
+    let relations = this.config.tables[table].relationsParentOf;
     // Extract all the childTableIds
     let possibleChildTables = [];
-    this.config.tables[table].relationsParentOf.forEach((rel) => {
+    let childField = {};
+    relations.forEach((rel) => {
       possibleChildTables.push(rel.childtableid);
+      childField[rel.childtableid] = rel.childpropid;
     });
 
     // Determine which childTables are actually used in the raw template.
@@ -136,6 +139,9 @@ let TemplateWidget = React.createClass({
           let usedChildTableAPIargs = {
             database: this.config.dataset,
             table: usedChildTableName,
+            query: SQL.WhereClause.encode(
+              SQL.WhereClause.CompareFixed(childField[usedChildTableName], '=', primKey)
+            ),
             columns: columnSpecsByTable[usedChildTableName]
           };
           return LRUCache.get(
@@ -171,10 +177,10 @@ let TemplateWidget = React.createClass({
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
-      // .catch((error) => {
-      //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      //   this.setState({loadStatus: 'error'});
-      // });
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   title() {
