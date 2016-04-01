@@ -56,10 +56,10 @@
     "d3": "^3.5.14",
     "fixed-data-table": "^0.6.0",
     "fluxxor": "^1.7.3",
-    "handlebars": "^4.0.5",
-    "html-to-react": "git+https://github.com/benjeffery/html-to-react.git#persistent-keys-and-options",
     "google-map-react": "^0.10.5",
+    "handlebars": "^4.0.5",
     "hidpi-canvas": "git+https://github.com/benjeffery/hidpi-canvas-polyfill.git",
+    "html-to-react": "git+https://github.com/benjeffery/html-to-react.git#persistent-keys-and-options",
     "immutable": "^3.7.6",
     "javascript-detect-element-resize": "git+https://github.com/sdecima/javascript-detect-element-resize.git",
     "keycodes": "^0.2.1",
@@ -91,6 +91,7 @@
     "react-tap-event-plugin": "^0.2.2",
     "scrollbar-size": "^1.0.4",
     "shallow-equals": "0.0.0",
+    "striptags": "^2.1.1",
     "uid": "0.0.2"
   }
 }

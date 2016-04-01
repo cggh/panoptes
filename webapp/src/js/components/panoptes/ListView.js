@@ -1,7 +1,10 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Highlight from 'react-highlighter';
-
+import _uniq from 'lodash/uniq';
+import _keys from 'lodash/keys';
+import striptags from 'striptags';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -12,9 +15,11 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
+import ItemTemplate from 'panoptes/ItemTemplate';
 
 // Utils
 import LRUCache from 'util/LRUCache';
+import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Material UI components
 import List from 'material-ui/lib/lists/list';
@@ -60,10 +65,15 @@ let ListView = React.createClass({
   fetchData(props, requestContext) {
     let {table, autoSelectIfNoneSelected, onSelect, selectedPrimKey} = props;
     let tableConfig = this.config.tables[table];
-    let columns = [this.config.tables[table].primkey];
+
+    //Get at list of the columns we need to show the list
+    let itemTitle = tableConfig.settings.itemTitle || `{{${tableConfig.primkey}}}`;
+    let columns = templateFieldsUsed(itemTitle, _keys(tableConfig.propertiesMap));
+    columns.push(this.config.tables[table].primkey);
+    columns = _uniq(columns);
+
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
-
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
@@ -106,6 +116,8 @@ let ListView = React.createClass({
     let {loadStatus, rows} = this.state;
 
     let tableConfig = this.config.tables[table];
+    let itemTitle = tableConfig.settings.itemTitle || `{{${tableConfig.primkey}}}`;
+
     if (!tableConfig) {
       console.error(`Error: table ${table} has no associated config.`);
       return null;
@@ -118,19 +130,30 @@ let ListView = React.createClass({
       rows.map((row) => {
 
         let primKey = row[tableConfig.primkey];
+        let className = selectedPrimKey !== primKey ? 'picked' : '';
 
-        let className = selectedPrimKey === primKey ? 'picked' : '';
+        let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(
+          <ItemTemplate config={this.config} table={table} primKey={primKey} data={row}>
+            {itemTitle}
+          </ItemTemplate>
+        )) : '';
 
-        let listItem = (
+        if (search && content.indexOf(search) !== -1 || !search) {
+          listItems.push(
             <ListItem className={className}
                       key={primKey}
-                      primaryText={<div><Highlight search={search}>{primKey}</Highlight></div>}
+                      primaryText={
+                          <Highlight search={search}>
+                            <ItemTemplate table={table} primKey={primKey} data={row}>
+                              {itemTitle}
+                            </ItemTemplate>
+                          </Highlight>
+                      }
                       onClick={() => this.handleSelect(primKey)}
                       leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
             />
-        );
-
-        listItems.push(listItem);
+          );
+        }
 
       });
 

@@ -19,6 +19,7 @@ import TextField from 'material-ui/lib/text-field';
 // Panoptes components
 import SQL from 'panoptes/SQL';
 import ListView from 'panoptes/ListView';
+import ItemTemplate from 'panoptes/ItemTemplate';
 
 // Panoptes widgets
 import DataItem from 'containers/DataItem';
@@ -187,7 +188,9 @@ let ListWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="text">{selectedPrimKey}</span>
+            <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
+              {this.config.settings.itemTitle || `{{${tableConfig.primkey}}}`}
+            </ItemTemplate>
           </div>
           <div>
             {dataItem}

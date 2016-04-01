@@ -16,6 +16,7 @@ const components = {
 let HTMLWithComponents = React.createClass({
 
   propTypes: {
+    className: React.PropTypes.string,
     children: React.PropTypes.string
   },
 
@@ -42,7 +43,7 @@ let HTMLWithComponents = React.createClass({
   },
 
   render() {
-    return this.htmlToReact(`<div>${this.props.children}</div>`);
+    return this.htmlToReact(`<div class="${this.props.className}">${this.props.children}</div>`);
   }
 });
 

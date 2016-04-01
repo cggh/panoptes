@@ -34,6 +34,7 @@ let ItemTemplate = React.createClass({
   ],
 
   propTypes: {
+    className: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
@@ -133,13 +134,13 @@ let ItemTemplate = React.createClass({
     // Compile and evaluate the template.
     let template = Handlebars.compile(children);
     return (
-      <div className="template-container">
-        {data ? <HTMLWithComponents>
+      <span className={this.props.className}>
+        {data ? <HTMLWithComponents className="item-template">
                   {template(data)}
                 </HTMLWithComponents>
           : null}
         <Loading status={loadStatus}/>
-      </div>
+      </span>
     );
   }
 });
