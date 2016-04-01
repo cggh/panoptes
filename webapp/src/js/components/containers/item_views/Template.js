@@ -33,7 +33,7 @@ let TemplateWidget = React.createClass({
   render() {
     let {content, table, primKey} = this.props;
     return (
-        <ItemTemplate table={table} primKey={primKey}>
+        <ItemTemplate className="template-container" table={table} primKey={primKey}>
           {content}
         </ItemTemplate>
     );

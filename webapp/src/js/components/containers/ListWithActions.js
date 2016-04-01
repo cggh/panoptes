@@ -188,9 +188,11 @@ let ListWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
-              {this.config.settings.itemTitle || `{{${tableConfig.primkey}}}`}
-            </ItemTemplate>
+            {selectedPrimKey ?
+              <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
+                {this.config.settings.itemTitle || `{{${this.config.primkey}}}`}
+              </ItemTemplate> :
+            null}
           </div>
           <div>
             {dataItem}
