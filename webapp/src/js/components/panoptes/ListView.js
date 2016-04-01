@@ -29,55 +29,46 @@ let ListView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending')
+    DataFetcherMixin('table')
   ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired,
-    order: React.PropTypes.string,
-    ascending: React.PropTypes.bool,
-    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
-    initialSelectedIndex: React.PropTypes.number
-  },
+    selectedPrimKey: React.PropTypes.string,
+    onSelect: React.PropTypes.func.isRequired,
+    search: React.PropTypes.string,
+    autoSelectIfNoneSelected: React.PropTypes.bool
+},
 
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-      order: null,
-      ascending: true,
-      initialSelectedIndex: 0
+      initialSelectedIndex: 0,
+      search: ''
     };
   },
 
   getInitialState() {
     return {
       rows: [],
-      loadStatus: 'loaded',
-      search: '',
-      selectedIndex: this.props.initialSelectedIndex,
-      selectedPrimKey: null
+      loadStatus: 'loaded'
     };
   },
 
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, initialSelectedIndex} = props;
+    let {table, autoSelectIfNoneSelected, onSelect, selectedPrimKey} = props;
     let tableConfig = this.config.tables[table];
+    let columns = [this.config.tables[table].primkey];
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
 
-    if (props.columns.size > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columnspec,
-        order: order,
-        ascending: ascending,
-        query: query,
         start: 0
       };
       requestContext.request((componentCancellation) =>
@@ -89,11 +80,14 @@ let ListView = React.createClass({
           )
         )
         .then((data) => {
+          if (autoSelectIfNoneSelected && !selectedPrimKey) {
+            onSelect(data[0][tableConfig.primkey]);
+          }
           this.setState({
             loadStatus: 'loaded',
-            rows: data,
-            selectedPrimKey: data[initialSelectedIndex][tableConfig.primkey]
+            rows: data
           });
+
         })
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
@@ -101,24 +95,15 @@ let ListView = React.createClass({
           ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
           this.setState({loadStatus: 'error'});
         });
-    } else {
-      this.setState({rows: []});
-    }
-  },
-
-  componentDidUpdate: function(prevProps, prevState) {
-    if (this.props.onSelect && prevState.selectedPrimKey !== this.state.selectedPrimKey)
-      this.props.onSelect(this.state.selectedPrimKey, this.state.selectedIndex);
   },
 
   handleSelect(primKey, rowIndex) {
-    this.setState({selectedPrimKey: primKey, selectedIndex: rowIndex});
-    this.props.onSelect(primKey, rowIndex);
+    this.props.onSelect(primKey);
   },
 
   render() {
-    let {icon, table} = this.props;
-    let {loadStatus, rows, search, selectedIndex} = this.state;
+    let {icon, table, search, selectedPrimKey} = this.props;
+    let {loadStatus, rows} = this.state;
 
     let tableConfig = this.config.tables[table];
     if (!tableConfig) {
@@ -130,17 +115,17 @@ let ListView = React.createClass({
 
       let listItems = [];
 
-      rows.map((row, rowIndex) => {
+      rows.map((row) => {
 
         let primKey = row[tableConfig.primkey];
 
-        let className = selectedIndex === rowIndex ? 'picked' : '';
+        let className = selectedPrimKey === primKey ? 'picked' : '';
 
         let listItem = (
             <ListItem className={className}
-                      key={rowIndex}
+                      key={primKey}
                       primaryText={<div><Highlight search={search}>{primKey}</Highlight></div>}
-                      onClick={() => this.handleSelect(primKey, rowIndex)}
+                      onClick={() => this.handleSelect(primKey)}
                       leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
             />
         );

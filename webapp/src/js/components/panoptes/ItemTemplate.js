@@ -11,6 +11,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 // Utils
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
+import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Panoptes components
 import API from 'panoptes/API';
@@ -21,65 +22,6 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import Loading from 'ui/Loading';
 
 import 'item_views/template.scss';
-
-// TODO: Where to put Handlebars.tablesUsed?
-Handlebars.tablesUsed = function(template, possibleTables) {
-
-  // For the given template, return the list of tables actually used in the template.
-  // Note: only goes one level deep, i.e. does not process nested logic blocks.
-
-  // Create a separate Handlebars instance.
-  let hb = Handlebars.create();
-
-  // Register helper functions to override the native Handlebar helpers.
-
-  // TODO: Explain what this actually does.
-
-  hb.registerHelper('if', (conditional, options) => {
-    if (conditional)
-      conditional();
-    options.fn(this);
-    options.inverse(this);
-  });
-
-  hb.registerHelper('with', (context, options) => {
-    if (context)
-      context();
-  });
-
-  hb.registerHelper('each', (context, options) => {
-    if (context)
-      context();
-  });
-
-  hb.registerHelper('map', () => {
-    // no op.
-  });
-
-
-  // Compose a tracers object, where each key is the name of a possibleTable
-  //   and each value is a function to add that table to the usedTables list.
-  let tracers = {};
-  let usedTables = [];
-  possibleTables.forEach((table) => {
-    tracers[table] = function() {
-      usedTables.push(table);
-    };
-  });
-
-  // Compile the template.
-  let compiledTemplate = hb.compile(template);
-
-  // Provide the object of tracer functions as data to the compiled template.
-  // Note: We don't need the returned HTML.
-  // This has the effect of calling each tracer if/when it is used,
-  //   thereby adding only used tables to the usedTables array.
-  // Note: the same table might be added more than once.
-  compiledTemplate(tracers);
-
-  // Return the unique set of tables used in the template.
-  return _uniq(usedTables);
-};
 
 
 let ItemTemplate = React.createClass({
@@ -92,7 +34,6 @@ let ItemTemplate = React.createClass({
   ],
 
   propTypes: {
-    title: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired
@@ -105,7 +46,9 @@ let ItemTemplate = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey, children } = props;
+    let {table, primKey, children, data } = props;
+    if (data)
+      return;
     this.setState({loadStatus: 'loading'});
     let relations = this.config.tables[table].relationsParentOf;
     // Extract all the childTableIds
@@ -117,7 +60,7 @@ let ItemTemplate = React.createClass({
     });
 
     // Determine which childTables are actually used in the raw template.
-    let usedChildTables = Handlebars.tablesUsed(children, possibleChildTables);
+    let usedChildTables = templateFieldsUsed(children, possibleChildTables);
 
     // Compose all the column specs for each table using the config data.
     let columnSpecsByTable = {};
@@ -185,14 +128,16 @@ let ItemTemplate = React.createClass({
 
   render() {
     let {children} = this.props;
-    let {data, loadStatus} = this.state;
+    let {loadStatus} = this.state;
+    let data = this.props.data || this.state.data;
     // Compile and evaluate the template.
     let template = Handlebars.compile(children);
     return (
       <div className="template-container">
-        <HTMLWithComponents>
-          {template(data)}
-        </HTMLWithComponents>
+        {data ? <HTMLWithComponents>
+                  {template(data)}
+                </HTMLWithComponents>
+          : null}
         <Loading status={loadStatus}/>
       </div>
     );

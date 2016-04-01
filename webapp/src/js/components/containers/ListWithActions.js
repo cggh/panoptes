@@ -37,25 +37,19 @@ let ListWithActions = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
-    sidebar: React.PropTypes.bool,
-    initialSelectedIndex: React.PropTypes.number
+    selectedPrimKey: React.PropTypes.string,
+    sidebar: React.PropTypes.bool
   },
 
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-      order: null,
-      ascending: true,
-      sidebar: true,
-      initialSelectedIndex: 0
+      sidebar: true
     };
   },
 
   getInitialState() {
     return {
-      selectedIndex: this.props.initialSelectedIndex,
-      primKey: null,
       search: ''
     };
   },
@@ -72,40 +66,29 @@ let ListWithActions = React.createClass({
     return this.props.title || this.config.tableCapNamePlural;
   },
 
-  handleSelect(primKey, selectedIndex) {
-    this.props.componentUpdate({primKey: primKey, selectedIndex: selectedIndex});
-    this.setState({primKey: primKey, selectedIndex: selectedIndex});
+  handleSelect(selectedPrimKey) {
+    this.props.componentUpdate({selectedPrimKey});
   },
 
   render() {
-    let {table, query, columns, order, ascending, sidebar, componentUpdate} = this.props;
+    let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
     let {description} = this.config;
-    let {primKey, selectedIndex} = this.state;
-
-    // If columns have not been set, then use showByDefault && showInTable to determine which to show.
-    if (!columns)
-      columns = Immutable.List(this.config.properties)
-        .filter((prop) => prop.showByDefault && prop.showInTable)
-        .map((prop) => prop.propid);
-
-    // TODO: search widget is too wide.
+    let {search} = this.state;
 
     let sidebarContent = (
       <div className="sidebar">
         <div className="item-picker">
           <SidebarHeader icon={this.icon()} description={description}/>
           <div className="search">
-            <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+            <TextField fullWidth={true} floatingLabelText="Search" valueLink={this.linkState('search')}/>
           </div>
           <ListView
+             search={search}
              table={table}
-             query={query}
-             order={order}
-             ascending={ascending}
-             columns={columns}
-             initialSelectedIndex={selectedIndex}
-             onSelect={(primKey, selectedIndex) => this.handleSelect(primKey, selectedIndex)}
+             selectedPrimKey={selectedPrimKey}
+             onSelect={this.handleSelect}
              icon={this.icon()}
+             autoSelectIfNoneSelected
             />
         </div>
       </div>
@@ -189,8 +172,8 @@ let ListWithActions = React.createClass({
 ///////////////
 
     let dataItem = '';
-    if (primKey) {
-      dataItem = <DataItem table={table} primKey={primKey} componentUpdate={componentUpdate} views={views} />;
+    if (selectedPrimKey) {
+      dataItem = <DataItem views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
     }
 
     return (
@@ -204,7 +187,7 @@ let ListWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="text">{primKey}</span>
+            <span className="text">{selectedPrimKey}</span>
           </div>
           <div>
             {dataItem}

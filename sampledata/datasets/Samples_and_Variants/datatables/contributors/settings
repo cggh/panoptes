@@ -54,8 +54,10 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
       <h3>Sites:</h3>
       <ul>
       {{#each samplingsites}}
-        <li>{{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}</li>
-        <ItemLink table='samplingsites' primary-key='{{SiteID}}'/>
+        <li>
+            {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
+            <ItemLink table='samplingsites' primary-key='{{SiteID}}' />
+        </li>
       {{else}}
         No sites from this contributor
       {{/each}}
