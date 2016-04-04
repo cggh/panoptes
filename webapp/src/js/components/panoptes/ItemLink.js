@@ -6,11 +6,11 @@ let ItemLink = React.createClass({
   mixins: [PureRenderMixin],
 
   render() {
-    let {table, primaryKey} = this.props;
+    let {table, primKey} = this.props;
     // TODO: How is the href meant to be constructed?
     return (
-      <a href={table + '?' + primaryKey}>
-        {primaryKey}
+      <a href={table + '?' + primKey}>
+        {primKey}
       </a>
     );
   }
