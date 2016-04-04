@@ -161,7 +161,7 @@ let ListWithActions = React.createClass({
             view: 'Template',
             props: {
               title: dataItemView.name, //TODO This should be name from group config
-              content: dataItemView.content,
+              content: dataItemView.content
             }
           })
         };
