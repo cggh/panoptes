@@ -56,7 +56,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
       {{#each samplingsites}}
         <li>
             {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
-            <ItemLink table='samplingsites' primary-key='{{SiteID}}' />
+            <ItemLink table='samplingsites' primKey='{{SiteID}}' />
         </li>
       {{else}}
         No sites from this contributor
@@ -66,7 +66,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
         <ItemMap table='samplingsites' highlight='Contributor ID:{{ID}}' />
       </div>
       <h4>
-        More information on the nature of contribution <a class=\"doclink\" href=\"samples\">here</a>
+        More information on the nature of contribution <a class="doclink" href="samples">here</a>
       </h4>
 
 
