@@ -53,7 +53,7 @@ let ItemMapWidget = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {table, primKey, lngProperty, latProperty} = props;
+    let {table, primKey, lngProperty, latProperty, highlight} = props;
 
     let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
@@ -74,6 +74,11 @@ let ItemMapWidget = React.createClass({
     let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.propIdGeoCoordLattit;
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
+
+    let [highlightField, highlightValue] = highlight.split(':');
+    if (highlightField) {
+      locationColumns.push(highlightField);
+    }
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
@@ -147,6 +152,8 @@ let ItemMapWidget = React.createClass({
 
         } else {
 
+          let [highlightField, highlightValue] = highlight.split(':');
+
           for (let i = 0; i < data.length; i++) {
 
             let locationDataPrimKey = data[i][locationPrimKeyProperty];
@@ -156,7 +163,8 @@ let ItemMapWidget = React.createClass({
               lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
               title: locationDataPrimKey,
               table: table,
-              primKey: locationDataPrimKey
+              primKey: locationDataPrimKey,
+              isHighlighted: (data[i][highlightField] === highlightValue ? true : false)
             });
 
           }

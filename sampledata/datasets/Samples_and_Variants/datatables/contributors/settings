@@ -63,7 +63,7 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
       {{/each}}
       </ul>
       <div style="width:300px;height:300px">
-        <ItemMap table='samplingsites' highlight='Contributor ID:{{ID}}' />
+        <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
       </div>
       <h4>
         More information on the nature of contribution <a class="doclink" href="samples">here</a>

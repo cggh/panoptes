@@ -131,6 +131,7 @@ let ItemMap = React.createClass({
                   key={index}
                   title={marker.title}
                   onClick={() => actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey.toString()})}
+                  isHighlighted={marker.isHighlighted}
                 />
             )
           }
