@@ -21,7 +21,7 @@ let ItemMapWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'primKey')
+    DataFetcherMixin('table', 'primKey', 'highlight')
   ],
 
   propTypes: {
@@ -34,7 +34,8 @@ let ItemMapWidget = React.createClass({
     lngProperty: React.PropTypes.string, // alternatively derived from the table config
     latProperty: React.PropTypes.string, // alternatively derived from the table config
     width: React.PropTypes.string, // alternatively default
-    height: React.PropTypes.string // alternatively default
+    height: React.PropTypes.string, // alternatively default
+    highlight: React.PropTypes.string
   },
 
   getInitialState() {
@@ -134,7 +135,7 @@ let ItemMapWidget = React.createClass({
 
         let markers = [];
 
-        // Translate the fetched locationData and chartData into markers.
+        // Translate the fetched locationData into markers.
         let locationTableConfig = this.config.tables[table];
         let locationPrimKeyProperty = locationTableConfig.primkey;
 
@@ -165,9 +166,6 @@ let ItemMapWidget = React.createClass({
 
             let isHighlighted = false;
             if (highlightField !== null && highlightValue !== null) {
-              console.log('highlightField: ' + highlightField);
-              console.log('highlightValue: ' + highlightValue);
-              console.log('data[i][highlightField]: ' + data[i][highlightField]);
               isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
             }
 
