@@ -140,7 +140,9 @@ let ItemMapWidget = React.createClass({
           markers.push({
             lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
             lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            title: locationDataPrimKey
+            title: locationDataPrimKey,
+            table: table,
+            primKey: locationDataPrimKey
           });
 
         } else {
@@ -152,7 +154,9 @@ let ItemMapWidget = React.createClass({
             markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
               lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
-              title: locationDataPrimKey
+              title: locationDataPrimKey,
+              table: table,
+              primKey: locationDataPrimKey
             });
 
           }

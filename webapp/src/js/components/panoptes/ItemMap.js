@@ -130,7 +130,7 @@ let ItemMap = React.createClass({
                   lat={marker.lat}
                   key={index}
                   title={marker.title}
-                  onClick={() => actions.panoptes.dataItemPopup({table: marker.locationTable, primKey: marker.locationPrimKey.toString()})}
+                  onClick={() => actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey.toString()})}
                 />
             )
           }
