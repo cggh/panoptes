@@ -1,7 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import Immutable from 'immutable';
 import Highlight from 'react-highlighter';
 import Pluralise from 'ui/Pluralise';
@@ -19,7 +18,6 @@ import Icon from 'ui/Icon';
 let ItemPicker = React.createClass({
   mixins: [
     PureRenderMixin,
-    LinkedStateMixin
   ],
 
   propTypes: {
@@ -95,6 +93,10 @@ let ItemPicker = React.createClass({
   handlePick() {
     this.props.onPick(this.state.picked);
   },
+  handleSearchChange(event) {
+    this.setState({'search': event.target.value})
+  },
+
 
   render() {
     let {picked, search} = this.state;
@@ -106,7 +108,7 @@ let ItemPicker = React.createClass({
           <div className="grow scroll-within">
             <div className="header">{count} <Pluralise text={itemName} ord={count}/> available</div>
             <div className="search">
-              <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+              <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
             </div>
             <List>
               {

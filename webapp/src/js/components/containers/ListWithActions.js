@@ -3,7 +3,6 @@ import Immutable from 'immutable';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
@@ -31,7 +30,6 @@ let ListWithActions = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    LinkedStateMixin
   ],
 
   propTypes: {
@@ -71,6 +69,10 @@ let ListWithActions = React.createClass({
     this.props.componentUpdate({selectedPrimKey});
   },
 
+  handleSearchChange(event) {
+    this.setState({'search': event.target.value})
+  },
+
   render() {
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
     let {description} = this.config;
@@ -81,7 +83,8 @@ let ListWithActions = React.createClass({
         <div className="item-picker">
           <SidebarHeader icon={this.icon()} description={description}/>
           <div className="search">
-            <TextField fullWidth={true} floatingLabelText="Search" valueLink={this.linkState('search')}/>
+            <TextField fullWidth={true} floatingLabelText="Search"
+                       value={search} onChange={this.handleSearchChange}/>
           </div>
           <ListView
              search={search}

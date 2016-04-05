@@ -11,6 +11,7 @@ import IconButton from 'material-ui/lib/icon-button';
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
 import Divider from 'material-ui/lib/divider';
+import Subheader from 'material-ui/lib/Subheader';
 
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
@@ -107,7 +108,8 @@ let QueryPicker = React.createClass({
                         }/>
               <Divider />
             </List>
-            <List  subheader="Stored Filters">
+            <List>
+              <Subheader>Stored Filters</Subheader>
               <ListItem primaryText="Blue widgets"
                         secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query}/></p>}
                         secondaryTextLines={2}

@@ -8,6 +8,7 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
+import Subheader from 'material-ui/lib/Subheader';
 import Icon from 'ui/Icon';
 
 let EmptyTab = React.createClass({
@@ -49,13 +50,15 @@ let EmptyTab = React.createClass({
     let {tables, chromosomes} = this.config;
     return (
       <div className="horizontal stack start-align wrap">
-        <List subheader="Open a view:" style={{width: '500px'}}>
+        <List style={{width: '500px'}}>
+          <Subheader>Open a view:</Subheader>
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome: _keys(chromosomes)[0]})} />
         </List>
-        <List subheader="Open a table:" style={{width: '500px'}}>
+        <List style={{width: '500px'}}>
+          <Subheader>Open a table:</Subheader>
           {_map(tables, (table) => (
             <ListItem key={table.id}
                       primaryText={table.tableCapNamePlural}
