@@ -16,7 +16,8 @@ let GeoMarker = React.createClass({
   propTypes: {
     title: React.PropTypes.string,
     radius: React.PropTypes.number,
-    onClick: React.PropTypes.func
+    onClick: React.PropTypes.func,
+    isHighlighted: React.PropTypes.bool
   },
 
   getDefaultProps() {
