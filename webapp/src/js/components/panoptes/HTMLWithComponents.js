@@ -7,10 +7,10 @@ import ComponentWrapper from 'panoptes/ComponentWrapper';
 
 const components = {
   ItemMap: (node, children) =>
-  //  <ComponentWrapper key={node.attribs.key}><ItemMap {...node.attribs} key={null} /></ComponentWrapper>,
-  <ItemMap {...node.attribs} />,
+    //<ComponentWrapper key={node.attribs.key}><ItemMap {...node.attribs} key={null} /></ComponentWrapper>,
+    <ItemMap {...node.attribs} />,
   ItemLink: (node, children) =>
-   <ItemLink {...node.attribs} />
+    <ItemLink {...node.attribs} />
 };
 
 

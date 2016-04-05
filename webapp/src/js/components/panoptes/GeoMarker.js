@@ -41,10 +41,10 @@ let GeoMarker = React.createClass({
 
     return (
       <svg style={{overflow: 'visible'}} width={width} height={height}>
-          <g className={classNames} onClick={onClick} transform={'translate(' + translateX + ', ' + translateY + ')'}>
-            <title>{title}</title>
-            <circle cx="0" cy="0" r={radius} />
-          </g>
+        <g className={classNames} onClick={onClick} transform={'translate(' + translateX + ', ' + translateY + ')'}>
+          <title>{title}</title>
+          <circle cx="0" cy="0" r={radius} />
+        </g>
       </svg>
     );
 
