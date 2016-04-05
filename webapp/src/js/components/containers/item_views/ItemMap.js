@@ -75,9 +75,11 @@ let ItemMapWidget = React.createClass({
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
-    let [highlightField, highlightValue] = highlight.split(':');
-    if (highlightField) {
-      locationColumns.push(highlightField);
+    if (highlight) {
+      let [highlightField, highlightValue] = highlight.split(':');
+      if (highlightField) {
+        locationColumns.push(highlightField);
+      }
     }
 
     let locationColumnsColumnSpec = {};
@@ -152,11 +154,22 @@ let ItemMapWidget = React.createClass({
 
         } else {
 
-          let [highlightField, highlightValue] = highlight.split(':');
+          let highlightField, highlightValue = null;
+          if (highlight) {
+            [highlightField, highlightValue] = highlight.split(':');
+          }
 
           for (let i = 0; i < data.length; i++) {
 
             let locationDataPrimKey = data[i][locationPrimKeyProperty];
+
+            let isHighlighted = false;
+            if (highlightField !== null && highlightValue !== null) {
+              console.log('highlightField: ' + highlightField);
+              console.log('highlightValue: ' + highlightValue);
+              console.log('data[i][highlightField]: ' + data[i][highlightField]);
+              isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
+            }
 
             markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
@@ -164,7 +177,7 @@ let ItemMapWidget = React.createClass({
               title: locationDataPrimKey,
               table: table,
               primKey: locationDataPrimKey,
-              isHighlighted: (data[i][highlightField] === highlightValue ? true : false)
+              isHighlighted: isHighlighted
             });
 
           }

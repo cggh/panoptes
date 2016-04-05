@@ -75,7 +75,7 @@ let ItemMap = React.createClass({
   },
 
   render() {
-    let {center, zoom, markers} = this.props;
+    let {center, zoom, markers, highlight} = this.props;
     let actions = this.getFlux().actions;
 
     if (!center || !zoom) {
