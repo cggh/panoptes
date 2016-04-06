@@ -133,7 +133,16 @@ Promise.all([InitialConfig(), getAppState(window.location)])
         <Panoptes flux={flux} config={config}/>
       </div>
       , document.getElementById('main'));
-  }).done();
+  })
+  .catch((err) => {
+    ReactDOM.render(
+      <div>
+        <Loading status="custom"> There was a problem fetching initial configuration: {err} </Loading>
+      </div>
+      , document.getElementById('main'));
+
+  })
+  .done();
 
 
 
