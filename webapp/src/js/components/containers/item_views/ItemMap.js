@@ -77,7 +77,7 @@ let ItemMapWidget = React.createClass({
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
     if (highlight) {
-      let [highlightField, highlightValue] = highlight.split(':');
+      let [highlightField] = highlight.split(':');
       if (highlightField) {
         locationColumns.push(highlightField);
       }
