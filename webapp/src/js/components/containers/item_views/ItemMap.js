@@ -21,7 +21,7 @@ let ItemMapWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'primKey')
+    DataFetcherMixin('table', 'primKey', 'highlight')
   ],
 
   propTypes: {
@@ -34,7 +34,8 @@ let ItemMapWidget = React.createClass({
     lngProperty: React.PropTypes.string, // alternatively derived from the table config
     latProperty: React.PropTypes.string, // alternatively derived from the table config
     width: React.PropTypes.string, // alternatively default
-    height: React.PropTypes.string // alternatively default
+    height: React.PropTypes.string, // alternatively default
+    highlight: React.PropTypes.string
   },
 
   getInitialState() {
@@ -53,7 +54,7 @@ let ItemMapWidget = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {table, primKey, lngProperty, latProperty} = props;
+    let {table, primKey, lngProperty, latProperty, highlight} = props;
 
     let locationTableConfig = this.config.tables[table];
     // Check that the table specified for locations has geographic coordinates.
@@ -74,6 +75,13 @@ let ItemMapWidget = React.createClass({
     let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.propIdGeoCoordLattit;
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
+
+    if (highlight) {
+      let [highlightField] = highlight.split(':');
+      if (highlightField) {
+        locationColumns.push(highlightField);
+      }
+    }
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
@@ -127,7 +135,7 @@ let ItemMapWidget = React.createClass({
 
         let markers = [];
 
-        // Translate the fetched locationData and chartData into markers.
+        // Translate the fetched locationData into markers.
         let locationTableConfig = this.config.tables[table];
         let locationPrimKeyProperty = locationTableConfig.primkey;
 
@@ -140,19 +148,34 @@ let ItemMapWidget = React.createClass({
           markers.push({
             lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
             lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
-            title: locationDataPrimKey
+            title: locationDataPrimKey,
+            table: table,
+            primKey: locationDataPrimKey
           });
 
         } else {
+
+          let highlightField, highlightValue = null;
+          if (highlight) {
+            [highlightField, highlightValue] = highlight.split(':');
+          }
 
           for (let i = 0; i < data.length; i++) {
 
             let locationDataPrimKey = data[i][locationPrimKeyProperty];
 
+            let isHighlighted = false;
+            if (highlightField !== null && highlightValue !== null) {
+              isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
+            }
+
             markers.push({
               lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
               lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
-              title: locationDataPrimKey
+              title: locationDataPrimKey,
+              table: table,
+              primKey: locationDataPrimKey,
+              isHighlighted: isHighlighted
             });
 
           }
@@ -184,14 +207,12 @@ let ItemMapWidget = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: width, height: height}}>
-        {loadStatus === 'loaded' ?
           <ItemMap
             center={center}
             zoom={zoom}
             markers={markers}
-          /> :
+          />
           <Loading status={loadStatus}/>
-        }
       </div>
     );
 

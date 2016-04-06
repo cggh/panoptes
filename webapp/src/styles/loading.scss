@@ -38,5 +38,8 @@
 .loading-container.show {
   visibility: inherit;
   opacity: 1;
-  transition-delay: 0s;
+}
+
+.loading-container.hide-content {
+  background-color: rgb(255, 255, 255);
 }

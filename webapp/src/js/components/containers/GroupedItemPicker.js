@@ -1,6 +1,5 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
@@ -18,7 +17,6 @@ import Icon from 'ui/Icon';
 let GroupedItemPicker = React.createClass({
   mixins: [
     PureRenderMixin,
-    LinkedStateMixin
   ],
 
   propTypes: {
@@ -74,6 +72,9 @@ let GroupedItemPicker = React.createClass({
     let toRemove = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('propid'));
     this.setState({picked: this.state.picked.subtract(toRemove)});
   },
+  handleSearchChange(event) {
+    this.setState({'search': event.target.value})
+  },
 
   handlePick() {
     let result = Immutable.List();
@@ -99,7 +100,7 @@ let GroupedItemPicker = React.createClass({
           <div className="grow scroll-within">
             <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
             <div className="search">
-              <TextField floatingLabelText="Search" valueLink={this.linkState('search')}/>
+              <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
             <List>
               {

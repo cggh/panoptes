@@ -9,7 +9,7 @@
     width: 100%;
     height: calc(100% - #{$tab-height} - #{$tab-border} - #{$tab-padding-top}); /*4px for the border*/
     .tab-pane {
-      visibility: hidden;
+      display: none;
       position: absolute;
       top: 0;
       left: 0;
@@ -20,7 +20,7 @@
     }
     .tab-pane.active {
       overflow: auto;
-      visibility: visible;
+      display: inherit;
     }
   }
   .tabs {

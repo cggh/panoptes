@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 import Panoptes from 'components/Panoptes.js';
+import Loading from 'components/ui/Loading.js';
 
 import SessionStore from 'stores/SessionStore';
 import PanoptesStore from 'stores/PanoptesStore';
@@ -21,7 +22,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 
 
 import 'console-polyfill';
-
 import 'normalize.css';
 
 //Needed for onTouchTap
@@ -29,6 +29,9 @@ import 'normalize.css';
 //Check this repo:
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
+
+//Throw up a loader till we are ready
+ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
@@ -43,6 +46,10 @@ function getAppState(location) {
       tabs: {
         components: ['FirstTab'],
         selectedTab: 'FirstTab'
+      },
+      popups: {
+        components: [],
+        state: {}
       },
       modal: {}
     }
@@ -82,7 +89,8 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     //Listen to the stores and update the URL after storing the state, when it changes.
     let getState = () => {
       let state = Immutable.Map();
-      state = state.set('session', stores.SessionStore.getState().delete('modal'));
+      //Clear the modal as we don't want that to be stored
+      state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
       state = state.set('panoptes', stores.PanoptesStore.getState());
       return state;
     };
@@ -109,8 +117,6 @@ Promise.all([InitialConfig(), getAppState(window.location)])
 
     window.addEventListener('popstate', (event) => {
       backbutton = true;
-      //TODO If there is no state we are at the start so use default view
-      stores.SessionStore.state = Immutable.fromJS(event.state.session).set('modal', Immutable.Map());
       stores.SessionStore.emit('change');
     });
 
@@ -121,7 +127,12 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
-    ReactDOM.render(<Panoptes flux={flux} config={config}/>, document.getElementById('main'));
+    ReactDOM.render(
+      <div>
+        <Loading status="done"/>
+        <Panoptes flux={flux} config={config}/>
+      </div>
+      , document.getElementById('main'));
   }).done();
 
 

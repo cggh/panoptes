@@ -40,8 +40,8 @@ module.exports = {
     modulesDirectories: [
       'src/js',
       'src/js/components',
-      'node_modules',
-      'src/styles'
+      'src/styles',
+      'node_modules'
     ],
     alias: {
     }

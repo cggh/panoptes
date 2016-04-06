@@ -19,6 +19,13 @@ let Loading = React.createClass({
         </div>
       );
 
+    if (status == 'loading-hide')
+      return (
+        <div className="loading-container show hide-content">
+          <div className="spinner" />
+        </div>
+      );
+
     if (status == 'error')
       return (
         <div className="loading-container show">

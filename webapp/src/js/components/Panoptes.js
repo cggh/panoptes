@@ -13,9 +13,12 @@ import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
 import IconButton from 'material-ui/lib/icon-button';
-import ThemeManager from  'material-ui/lib/styles/theme-manager';
-import RawTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme';
-
+import getMuiTheme from  'material-ui/lib/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
+import {
+  blue500, blue700,
+  pinkA200,
+} from 'material-ui/lib/styles/colors';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
@@ -23,6 +26,14 @@ import 'main.scss';
 
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./' + path);
+
+const muiTheme = getMuiTheme({
+  palette: {
+    primary1Color: blue500,
+    primary2Color: blue700,
+    accent1Color: pinkA200
+  }
+});
 
 let Panoptes = React.createClass({
   mixins: [
@@ -47,17 +58,6 @@ let Panoptes = React.createClass({
     };
   },
 
-  childContextTypes: {
-    muiTheme: React.PropTypes.object
-  },
-
-  getChildContext() {
-    return {
-      muiTheme: ThemeManager.getMuiTheme(RawTheme)
-    };
-  },
-
-
   render() {
     let actions = this.getFlux().actions.session;
     let {tabs, popups, modal, components} = this.state.session.toObject();
@@ -65,57 +65,62 @@ let Panoptes = React.createClass({
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.getConfig();
     return (
-      <div>
-        <div className="page">
-          <Header name={config.settings.name} userID={userID} logo={config.logo}/>
-          <div className="body">
-            <TabbedArea activeTab={tabs.get('selectedTab')}
-                        onSwitch={actions.tabSwitch}
-                        onClose={actions.tabClose}
-                        onAddTab={actions.tabOpen}
-                        onDragAway={actions.tabPopOut}
-            >
-              {tabs.get('components').map((compId) => {
-                let tab = components.get(compId).toObject();
-                let props = tab.props ? tab.props.toObject() : {};
-                props.componentUpdate = actions.componentUpdateFor(compId);
-                return (
-                  <TabPane
-                    compId={compId}
-                    key={compId}>
-                    {React.createElement(dynamicRequire(tab.component), props)}
-                  </TabPane>
-                );
-              })}
-            </TabbedArea>
+      <MuiThemeProvider muiTheme={muiTheme}>
+        <div>
+          <div className="loading-container">
+            <div className="spinner" />
           </div>
+          <div className="page">
+            <Header name={config.settings.name} userID={userID} logo={config.logo}/>
+            <div className="body">
+              <TabbedArea activeTab={tabs.get('selectedTab')}
+                          onSwitch={actions.tabSwitch}
+                          onClose={actions.tabClose}
+                          onAddTab={actions.tabOpen}
+                          onDragAway={actions.tabPopOut}
+              >
+                {tabs.get('components').map((compId) => {
+                  let tab = components.get(compId).toObject();
+                  let props = tab.props ? tab.props.toObject() : {};
+                  props.componentUpdate = actions.componentUpdateFor(compId);
+                  return (
+                    <TabPane
+                      compId={compId}
+                      key={compId}>
+                      {React.createElement(dynamicRequire(tab.component), props)}
+                    </TabPane>
+                  );
+                })}
+              </TabbedArea>
+            </div>
+          </div>
+          <Popups>
+            {popups.get('components').map((compId) => {
+              let popup = components.get(compId).toObject();
+              let props = popup.props ? popup.props.toObject() : {};
+              props.componentUpdate = actions.componentUpdateFor(compId);
+              let state = popups.getIn(['state', compId]) || Immutable.Map();
+              return (
+                <Popup
+                  {...state.toObject()}
+                  compId={compId}
+                  key={compId}
+                  onMoveStop={actions.popupMove.bind(this, compId)}
+                  onResizeStop={actions.popupResize.bind(this, compId)}
+                  onClose={actions.popupClose.bind(this, compId)}
+                  onClick={actions.popupFocus.bind(this, compId)}>
+                  {React.createElement(dynamicRequire(popup.component), props)}
+                </Popup>
+              );
+            })}
+          </Popups>
+          <Modal visible={modal.component ? true : false}
+                 onClose={actions.modalClose}>
+            {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
+          </Modal>
+          <NotificationSystem ref="notificationSystem"/>
         </div>
-        <Popups>
-          {popups.get('components').map((compId) => {
-            let popup = components.get(compId).toObject();
-            let props = popup.props ? popup.props.toObject() : {};
-            props.componentUpdate = actions.componentUpdateFor(compId);
-            let state = popups.getIn(['state', compId]) || Immutable.Map();
-            return (
-              <Popup
-                {...state.toObject()}
-                compId={compId}
-                key={compId}
-                onMoveStop={actions.popupMove.bind(this, compId)}
-                onResizeStop={actions.popupResize.bind(this, compId)}
-                onClose={actions.popupClose.bind(this, compId)}
-                onClick={actions.popupFocus.bind(this, compId)}>
-                {React.createElement(dynamicRequire(popup.component), props)}
-              </Popup>
-            );
-          })}
-        </Popups>
-        <Modal visible={modal.component ? true : false}
-               onClose={actions.modalClose}>
-          {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
-        </Modal>
-        <NotificationSystem ref="notificationSystem"/>
-      </div>
+        </MuiThemeProvider>
     );
   }
 });

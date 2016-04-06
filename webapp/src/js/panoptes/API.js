@@ -35,7 +35,7 @@ function filterAborted(xhr) {
 }
 
 function errorMessage(xhr) {
-  return `There was a problem with a request to the server: ${xhr.statusText || xhr.message}`;
+  return `Error: ${xhr.statusText || xhr.message}`;
 }
 
 function requestJSON(options) {
