@@ -31,7 +31,7 @@ const muiTheme = getMuiTheme({
   palette: {
     primary1Color: blue500,
     primary2Color: blue700,
-    accent1Color: pinkA200,
+    accent1Color: pinkA200
   }
 });
 
@@ -67,6 +67,9 @@ let Panoptes = React.createClass({
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div>
+          <div className="loading-container">
+            <div className="spinner" />
+          </div>
           <div className="page">
             <Header name={config.settings.name} userID={userID} logo={config.logo}/>
             <div className="body">

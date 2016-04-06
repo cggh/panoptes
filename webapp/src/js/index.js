@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 import Panoptes from 'components/Panoptes.js';
+import Loading from 'components/ui/Loading.js';
 
 import SessionStore from 'stores/SessionStore';
 import PanoptesStore from 'stores/PanoptesStore';
@@ -21,7 +22,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 
 
 import 'console-polyfill';
-
 import 'normalize.css';
 
 //Needed for onTouchTap
@@ -29,6 +29,9 @@ import 'normalize.css';
 //Check this repo:
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
+
+//Throw up a loader till we are ready
+ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
@@ -124,7 +127,12 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
-    ReactDOM.render(<Panoptes flux={flux} config={config}/>, document.getElementById('main'));
+    ReactDOM.render(
+      <div>
+        <Loading status="done"/>
+        <Panoptes flux={flux} config={config}/>
+      </div>
+      , document.getElementById('main'));
   }).done();
 
 
