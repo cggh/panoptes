@@ -9,9 +9,6 @@ import shallowEquals from 'shallow-equals';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-// Panoptes components
-import GeoMarker from 'panoptes/GeoMarker';
-
 // Utils
 import DetectResize from 'utils/DetectResize';
 
@@ -78,6 +75,14 @@ let ItemMap = React.createClass({
     let {center, zoom, markers} = this.props;
     let actions = this.getFlux().actions;
 
+    // Remove previously rendered markers from the map.
+    if (this.mapMarkers) {
+      for (let i = 0, len = this.mapMarkers.length; i < len; i++) {
+        this.mapMarkers[i].setMap(null);
+      }
+    }
+    this.mapMarkers = [];
+
     if (!center || !zoom) {
 
       if (markers.length == 1) {
@@ -85,6 +90,20 @@ let ItemMap = React.createClass({
         // If there is only one marker, then set the map's center to the coordinates of that marker.
         center = {lat: markers[0].lat, lng: markers[0].lng};
         zoom = 4;
+
+        if (this.maps && this.map) {
+
+          // Create a new marker at the given position.
+          let mapMarker = new this.maps.Marker({
+            position: {lat: markers[0].lat, lng: markers[0].lng},
+            map: this.map,
+            title: markers[0].title
+          });
+
+          mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[0].table, primKey: markers[0].primKey.toString()}));
+
+          this.mapMarkers.push(mapMarker);
+        }
 
       } else if (markers.length > 1) {
 
@@ -104,6 +123,52 @@ let ItemMap = React.createClass({
 
         // Use the fitBounds util to derive the appropriate center and the zoom.
         ({center, zoom} = fitBounds(bounds, this.state));
+
+
+        if (this.maps && this.map) {
+
+          for (let i = 0, len = markers.length; i < len; i++) {
+
+            if (markers[i].isHighlighted) {
+
+              // Create a new marker at the given position.
+              let mapMarker = new this.maps.Marker({
+                position: {lat: markers[i].lat, lng: markers[i].lng},
+                map: this.map,
+                title: markers[i].title
+              });
+
+              mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()}));
+
+              this.mapMarkers.push(mapMarker);
+
+            } else {
+
+              // Create a new marker at the given position.
+              let mapMarker = new this.maps.Marker({
+                position: {lat: markers[i].lat, lng: markers[i].lng},
+                map: this.map,
+                title: markers[i].title,
+                icon: {
+                  path: this.maps.SymbolPath.CIRCLE,
+                  fillColor: '#F26C6C',
+                  fillOpacity: 1,
+                  scale: 4,
+                  strokeColor: '#BC0F0F',
+                  strokeWeight: 1
+                }
+              });
+
+              mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()}));
+
+              this.mapMarkers.push(mapMarker);
+
+            }
+
+          }
+
+        }
+
       }
 
     }
@@ -121,20 +186,6 @@ let ItemMap = React.createClass({
             options={getMapOptions}
             ref={(r) => this._googleMapRef = r}
           >
-          {
-            markers.map(
-              (marker, index) =>
-                <GeoMarker
-                  debounced={false}
-                  lng={marker.lng}
-                  lat={marker.lat}
-                  key={index}
-                  title={marker.title}
-                  onClick={() => actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey.toString()})}
-                  isHighlighted={marker.isHighlighted}
-                />
-            )
-          }
         </GoogleMap>
       </DetectResize>
   );
