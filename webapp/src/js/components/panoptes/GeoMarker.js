@@ -29,19 +29,14 @@ let GeoMarker = React.createClass({
   render() {
     let {title, radius, onClick, isHighlighted} = this.props;
 
-    let height = 50;
-    let width = 50;
-    let translateX = 0;
-    let translateY = 0;
-
     let classNames = 'geo-marker';
     if (isHighlighted) {
       classNames += ' geo-marker-highlighted';
     }
 
     return (
-      <svg style={{overflow: 'visible'}} width={width} height={height}>
-        <g className={classNames} onClick={onClick} transform={'translate(' + translateX + ', ' + translateY + ')'}>
+      <svg style={{overflow: 'visible'}} width="50" height="50">
+        <g className={classNames} onClick={onClick} transform={'translate(0, 0)'}>
           <title>{title}</title>
           <circle cx="0" cy="0" r={radius} />
         </g>
