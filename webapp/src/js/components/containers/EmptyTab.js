@@ -26,7 +26,7 @@ let EmptyTab = React.createClass({
     return 'folder-o';
   },
   title() {
-    return `New tab`;
+    return 'New tab';
   },
 
   handleOpen(e, container, props) {

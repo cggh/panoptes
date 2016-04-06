@@ -305,7 +305,7 @@ let GenomeBrowser = React.createClass({
                                  componentUpdate: (updater) => this.redirectedProps.componentUpdate((props) => {
                                    if (_isFunction(updater))
                                      return props.updateIn(['channels', channelId, 'props'], updater);
-                                  else
+                                   else
                                     return props.mergeIn(['channels', channelId, 'props'], updater);
                                  })
                                }, props.toObject(), trackProps));

@@ -31,14 +31,11 @@ module.exports = {
     'no-spaced-func': 2,
     'no-trailing-spaces': 2,
     'object-curly-spacing': 2,
-    'space-after-keywords': 2,
     'space-before-blocks': 2,
     'space-before-function-paren': [2, 'never'],
-    'space-before-keywords': 2,
     'space-infix-ops': [2, {'int32Hint': true}],
-    'space-return-throw-case': 2,
     'space-unary-ops': 2,
-
+    'keyword-spacing': 2,
     'jsx-quotes': [
       2,
       'prefer-double'
@@ -60,10 +57,13 @@ module.exports = {
     'commonjs': true
   },
   'extends': 'eslint:recommended',
-  'ecmaFeatures': {
-    'modules': true,
-    'jsx': true,
-    'experimentalObjectRestSpread': true
+  'parserOptions': {
+    'ecmaVersion': 6,
+    'sourceType': "module",
+    'ecmaFeatures': {
+      'jsx': true,
+      'experimentalObjectRestSpread': true
+    }
   },
   'plugins': [
     'react'

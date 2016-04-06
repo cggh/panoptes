@@ -73,7 +73,7 @@ let GroupedItemPicker = React.createClass({
     this.setState({picked: this.state.picked.subtract(toRemove)});
   },
   handleSearchChange(event) {
-    this.setState({'search': event.target.value})
+    this.setState({'search': event.target.value});
   },
 
   handlePick() {

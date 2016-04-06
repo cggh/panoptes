@@ -206,11 +206,11 @@ let parseTableBasedSummaryValues = function() {
   fetchedConfig.tableBasedSummaryValues.forEach((tableSummaryValue) => {
     if (tableSummaryValue.minval)
       tableSummaryValue.minval = parseFloat(tableSummaryValue.minval);
-      else
+    else
         tableSummaryValue.minval = 0;
     if (tableSummaryValue.maxval)
       tableSummaryValue.maxval = parseFloat(tableSummaryValue.maxval);
-      else
+    else
         tableSummaryValue.maxval = 1;
     tableSummaryValue.minblocksize = parseFloat(tableSummaryValue.minblocksize);
     let settings = {channelColor: 'rgb(0,0,180)'};

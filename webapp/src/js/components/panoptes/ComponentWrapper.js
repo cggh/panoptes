@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import Immutable from 'immutable'
+import Immutable from 'immutable';
 import _isFunction from 'lodash/isFunction';
 
 // This component wraps a component that has a "componentUpdate" method,

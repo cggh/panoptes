@@ -47,7 +47,7 @@ let ItemTemplate = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey, children, data } = props;
+    let {table, primKey, children, data} = props;
     if (data)
       return;
     this.setState({loadStatus: 'loading'});
@@ -120,7 +120,7 @@ let ItemTemplate = React.createClass({
         this.setState({loadStatus: 'loaded', data: templateData});
       })
       .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
+      .catch(LRUCache.filterCancelled);
       //.catch((error) => {
       //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
       //  this.setState({loadStatus: 'error'});

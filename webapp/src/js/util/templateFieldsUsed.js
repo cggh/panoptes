@@ -50,4 +50,4 @@ export default function(template, possibleTables) {
 
   // Return the unique set of fields used in the template.
   return _uniq(usedFields);
-};
+}

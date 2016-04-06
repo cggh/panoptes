@@ -43,7 +43,7 @@ let ListView = React.createClass({
     onSelect: React.PropTypes.func.isRequired,
     search: React.PropTypes.string,
     autoSelectIfNoneSelected: React.PropTypes.bool
-},
+  },
 
   getDefaultProps() {
     return {
@@ -74,14 +74,14 @@ let ListView = React.createClass({
 
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
-      this.setState({loadStatus: 'loading'});
-      let APIargs = {
-        database: this.config.dataset,
-        table: tableConfig.fetchTableName,
-        columns: columnspec,
-        start: 0
-      };
-      requestContext.request((componentCancellation) =>
+    this.setState({loadStatus: 'loading'});
+    let APIargs = {
+      database: this.config.dataset,
+      table: tableConfig.fetchTableName,
+      columns: columnspec,
+      start: 0
+    };
+    requestContext.request((componentCancellation) =>
           LRUCache.get(
             'pageQuery' + JSON.stringify(APIargs),
             (cacheCancellation) =>

@@ -94,7 +94,7 @@ let ItemPicker = React.createClass({
     this.props.onPick(this.state.picked);
   },
   handleSearchChange(event) {
-    this.setState({'search': event.target.value})
+    this.setState({'search': event.target.value});
   },
 
 
