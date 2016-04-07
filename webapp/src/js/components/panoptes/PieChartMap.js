@@ -98,7 +98,7 @@ let PieChartMap = React.createClass({
 
     //If no bounds have been set then clip to the pies.
     if (!bounds) {
-      if (markers) {
+      if (markers && markers.size > 0) {
         let markersJS = markers.toJS();
         const bounds = {
           nw: {
