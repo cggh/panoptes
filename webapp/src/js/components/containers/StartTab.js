@@ -35,11 +35,7 @@ let EmptyTab = React.createClass({
 
   handleOpen(e, container, props) {
     let actions = this.getFlux().actions.session;
-    if (e.button == 1 || e.metaKey || e.ctrlKey)
-      actions.tabOpen(container, props, false);
-    else {
-      this.props.componentUpdate(props, container);
-    }
+    actions.tabOpen(container, props, true);
   },
 
   handleTableClick(e, table) {
