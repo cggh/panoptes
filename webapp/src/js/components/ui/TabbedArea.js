@@ -67,12 +67,20 @@ let TabbedArea = React.createClass({
   handleDragStop(id) {
     let state = this.refs['drag_' + id].state;
     let dist = Math.sqrt(state.clientY * state.clientY + state.clientX * state.clientX);
-    this.refs['drag_' + id].resetState();
-    if (dist > 100 && state.clientY > 50 && this.props.onDragAway)
+    if (dist > 100 && state.clientY > 50 && this.props.onDragAway) {
       this.props.onDragAway(id, {
-        x: state.clientX + state.offsetX,
-        y: state.clientY + state.offsetY
+        x: state.clientX,
+        y: state.clientY
       });
+      return false;
+    } else {
+      this.refs['drag_' + id].setState({
+        dragging: false,
+        clientX: 0,
+        clientY: 0
+      });
+    }
+
   },
 
   renderTab(tab) {
@@ -103,8 +111,9 @@ let TabbedArea = React.createClass({
         <Draggable
           ref={'drag_' + id}
           key={id}
+          start={{x: 0, y: 0}}
           zIndex={99999}
-          onStop={this.handleDragStop.bind(this, id)}>
+          onStop={() => this.handleDragStop(id)}>
         {tabMarkup}
         </Draggable>
       );

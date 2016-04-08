@@ -95,7 +95,6 @@ let Popup = React.createClass({
     return (
       <Draggable handle=".popup-drag"
                  start={position.toObject()}
-                 moveOnStartChange={true}
                  onStart={this.handleClick}
                  onStop={this.handleMoveStop}>
         <Resizable width={size.get('width')} height={size.get('height')}
