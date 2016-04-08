@@ -74,6 +74,7 @@ let Panoptes = React.createClass({
             <Header name={config.settings.name} userID={userID} logo={config.logo}/>
             <div className="body">
               <TabbedArea activeTab={tabs.get('selectedTab')}
+                          unclosableTab={tabs.get('unclosableTab')}
                           onSwitch={actions.tabSwitch}
                           onClose={actions.tabClose}
                           onAddTab={actions.tabOpen}

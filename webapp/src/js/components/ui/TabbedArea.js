@@ -12,6 +12,7 @@ let TabbedArea = React.createClass({
 
   propTypes: {
     activeTab: React.PropTypes.string,
+    unclosableTab: React.PropTypes.string,
     onSwitch: React.PropTypes.func,
     onClose: React.PropTypes.func,
     onDragAway: React.PropTypes.func
@@ -101,11 +102,13 @@ let TabbedArea = React.createClass({
           <div className={classNames(classes)} onClick={this.handleClick.bind(this, id)}>
             {icons[id] ? <Icon name={icons[id]}/> : null}
             <div className="title">{titles[id]}</div>
-            {closeIcon}
+            {this.props.unclosableTab !== id ?
+              closeIcon
+            : null}
           </div>
     );
 
-    if (this.props.onDragAway) {
+    if (this.props.onDragAway && this.props.unclosableTab !== id) {
       // Wrap tabMarkup in Draggable
       tabMarkup = (
         <Draggable

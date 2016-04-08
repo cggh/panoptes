@@ -45,7 +45,8 @@ function getAppState(location) {
       },
       tabs: {
         components: ['FirstTab'],
-        selectedTab: 'FirstTab'
+        selectedTab: 'FirstTab',
+        unclosableTab: 'FirstTab'
       },
       popups: {
         components: [],
