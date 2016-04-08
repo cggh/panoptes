@@ -1,21 +1,24 @@
-const React = require('react');
-const Immutable = require('immutable');
-const ImmutablePropTypes = require('react-immutable-proptypes');
-const Sidebar = require('react-sidebar').default;
-const DropDownMenu = require('material-ui/lib/drop-down-menu');
-const MenuItem = require('material-ui/lib/menus/menu-item');
+import React from 'react';
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import Sidebar from 'react-sidebar';
+import DropDownMenu from 'material-ui/lib/DropDownMenu';
+import MenuItem from 'material-ui/lib/menus/menu-item';
 
-const Icon = require("ui/Icon");
-const Plot = require("panoptes/Plot");
+import _filter from "lodash/filter";
+import _map from "lodash/map";
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const ConfigMixin = require('mixins/ConfigMixin');
-const DataFetcherMixin = require('mixins/DataFetcherMixin');
-const FluxMixin = require('mixins/FluxMixin');
+import Icon from "ui/Icon";
+import Plot from "panoptes/Plot";
 
-const API = require('panoptes/API');
-const ErrorReport = require('panoptes/ErrorReporter');
-const SQL = require('panoptes/SQL');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
+import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
+
+import API from 'panoptes/API';
+import ErrorReport from 'panoptes/ErrorReporter';
+import SQL from 'panoptes/SQL';
 
 
 import "plot.scss"
@@ -38,7 +41,7 @@ let PlotContainer = React.createClass({
   getDefaultProps() {
     return {
       sidebar: true,
-      table: '__none__',
+      table: 'variants',
       horizontalDimension: '__none__',
       verticalDimension: '__none__',
       depthDimension: '__none__'
@@ -58,9 +61,9 @@ let PlotContainer = React.createClass({
   fetchData(props) {
     let { table, horizontalDimension, verticalDimension, depthDimension } = props;
     let tableConfig = this.config.tables[table];
-    let columns = _.filter([horizontalDimension, verticalDimension, depthDimension], (col) => col !== '__none__');
+    let columns = _filter([horizontalDimension, verticalDimension, depthDimension], (col) => col !== '__none__');
     let columnspec = {};
-    _.map(columns, column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+    _map(columns, column => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       API.pageQuery({
@@ -104,7 +107,7 @@ let PlotContainer = React.createClass({
   render() {
     let { sidebar, style, table, horizontalDimension, verticalDimension, depthDimension, componentUpdate } = this.props;
 
-    let tables = _.map(this.config.tables, (val, key) => {
+    let tables = _map(this.config.tables, (val, key) => {
       return {payload:key, text:(<div className="dropdown-option"><Icon fixedWidth={true} name={val.icon}/>{val.tableCapNamePlural}</div>)}
     });
     tables.unshift({payload:'__none__', text:"Pick a table..."});
@@ -127,10 +130,10 @@ let PlotContainer = React.createClass({
             <div>Horizontal dimension:</div>
             <select ref="horizontalDimension" value={horizontalDimension} onChange={this.handlePropertyChange}>
               <option value="__none__">Pick a column:</option>
-              {_.map(propertyGroups, (group) => {
+              {_map(propertyGroups, (group) => {
                 return (
                   <optgroup key={group.id} label={group.name}>
-                    {_.map(group.properties, (property) => {
+                    {_map(group.properties, (property) => {
                       let {propid, disabled, name} = property;
                       return (
                         <option key={propid}
@@ -149,10 +152,10 @@ let PlotContainer = React.createClass({
             <div>Vertical dimension:</div>
             <select ref="verticalDimension" value={verticalDimension} onChange={this.handlePropertyChange}>
               <option value="__none__">Pick a column:</option>
-              {_.map(propertyGroups, (group) => {
+              {_map(propertyGroups, (group) => {
                   return (
                     <optgroup key={group.id} label={group.name}>
-                      {_.map(group.properties, (property) => {
+                      {_map(group.properties, (property) => {
                         let {propid, disabled, name} = property;
                         return (
                           <option key={propid}
@@ -171,10 +174,10 @@ let PlotContainer = React.createClass({
             <div>Depth dimension:</div>
             <select ref="depthDimension" value={depthDimension} onChange={this.handlePropertyChange}>
               <option value="__none__">Pick a column:</option>
-              {_.map(propertyGroups, (group) => {
+              {_map(propertyGroups, (group) => {
                   return (
                     <optgroup key={group.id} label={group.name}>
-                      {_.map(group.properties, (property) => {
+                      {_map(group.properties, (property) => {
                         let {propid, disabled, name} = property;
                         return (
                           <option key={propid}
