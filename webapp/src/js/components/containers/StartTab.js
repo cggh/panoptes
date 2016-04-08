@@ -52,9 +52,11 @@ let EmptyTab = React.createClass({
     let {tables, chromosomes} = this.config;
     return (
       <div className="horizontal stack start-align wrap">
-        <HTMLWithComponents className="description">
-          {this.config.settings.description}
-        </HTMLWithComponents>
+        <div style={{width: '500px'}}>
+          <HTMLWithComponents className="description">
+            {this.config.settings.description}
+          </HTMLWithComponents>
+        </div>
         <List style={{width: '500px'}}>
           <Subheader>Open a view:</Subheader>
           <ListItem primaryText="Genome Browser"
