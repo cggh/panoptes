@@ -39,13 +39,14 @@ function getAppState(location) {
     session: {
       components: {
         FirstTab: {
-          component: 'containers/EmptyTab',
+          component: 'containers/StartTab',
           props: {}
         }
       },
       tabs: {
         components: ['FirstTab'],
-        selectedTab: 'FirstTab'
+        selectedTab: 'FirstTab',
+        unclosableTab: 'FirstTab'
       },
       popups: {
         components: [],
@@ -143,6 +144,3 @@ Promise.all([InitialConfig(), getAppState(window.location)])
 
   })
   .done();
-
-
-
