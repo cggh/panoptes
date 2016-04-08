@@ -36,8 +36,8 @@ let ItemTemplate = React.createClass({
   propTypes: {
     className: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
-    table: React.PropTypes.string,
-    primKey: React.PropTypes.string
+    table: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string.isRequired
   },
 
   getInitialState() {
@@ -46,16 +46,9 @@ let ItemTemplate = React.createClass({
     };
   },
 
-  getDefaultProps() {
-    return {
-      table: null,
-      primKey: null
-    };
-  },
-
   fetchData(props, requestContext) {
     let {table, primKey, children, data} = props;
-    if (data || !table || !primKey)
+    if (data)
       return;
     this.setState({loadStatus: 'loading'});
     let relations = this.config.tables[table].relationsParentOf;
@@ -137,7 +130,7 @@ let ItemTemplate = React.createClass({
   render() {
     let {children} = this.props;
     let {loadStatus} = this.state;
-    let data = this.props.data || this.state.data || {};
+    let data = this.props.data || this.state.data;
     // Compile and evaluate the template.
     let template = Handlebars.compile(children);
     return (
