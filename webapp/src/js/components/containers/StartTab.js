@@ -29,7 +29,7 @@ let EmptyTab = React.createClass({
   },
 
   icon() {
-    return 'folder-o';
+    return 'home';
   },
   title() {
     return 'Start';
@@ -52,15 +52,15 @@ let EmptyTab = React.createClass({
     let {tables, chromosomes} = this.config;
     return (
       <div className="horizontal stack start-align wrap">
-        <div style={{width: '500px'}}>
-          <HTMLWithComponents className="description">
+
+          <HTMLWithComponents className="grow description">
             {this.config.settings.description}
           </HTMLWithComponents>
-        </div>
-        <List style={{width: '500px'}}>
+        <List style={{width: '400px'}}>
           <Subheader>Open a view:</Subheader>
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
+                    secondaryTextLines={2}
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {chromosome: _keys(chromosomes)[0]})} />
           <Subheader>Open a table:</Subheader>
@@ -68,6 +68,7 @@ let EmptyTab = React.createClass({
             <ListItem key={table.id}
                       primaryText={table.tableCapNamePlural}
                       secondaryText={table.description}
+                      secondaryTextLines={2}
                       leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
                       onClick={(e) => this.handleTableClick(e, table)} />
           ))}
