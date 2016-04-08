@@ -6,6 +6,7 @@ const SESSION = Constants.SESSION;
 import _isFunction from 'lodash/isFunction';
 
 const EMPTY_TAB = 'containers/EmptyTab';
+const START_TAB = 'containers/StartTab';
 
 let SessionStore = Fluxxor.createStore({
 
@@ -110,9 +111,8 @@ let SessionStore = Fluxxor.createStore({
 
   tabClose(payload, force) {
     let {compId} = payload;
-    //Closing the lone empty tab is a no-op
-    if (!force && this.state.getIn(['tabs', 'components']).size == 1 &&
-      this.state.getIn(['components', compId, 'component']) === EMPTY_TAB)
+    //Closing the start tab is a no-op
+    if (!force && this.state.getIn(['components', compId, 'component']) === START_TAB)
       return;
     let pos = this.state.getIn(['tabs', 'components']).indexOf(compId);
     if (pos === -1)
