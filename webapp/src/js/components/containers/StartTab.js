@@ -54,7 +54,7 @@ let EmptyTab = React.createClass({
     let {tables, chromosomes} = this.config;
     return (
       <div className="horizontal stack start-align wrap">
-        <TemplateWidget title="test" content={this.config.settings.description} table={'contributors'} primKey={'C0001'} />
+        <TemplateWidget content={this.config.settings.description} />
         <List style={{width: '500px'}}>
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
