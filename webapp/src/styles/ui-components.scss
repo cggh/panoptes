@@ -256,7 +256,7 @@
     display: inline-block;
     margin-left: 5px;
     white-space: nowrap;
-    .icon:nth-of-type(1) {
+    .icon:first-child {
       margin-left: 0;
     }
   }
