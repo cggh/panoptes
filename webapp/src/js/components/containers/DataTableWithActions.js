@@ -244,12 +244,10 @@ let DataTableWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <QueryString className="text" prepend="Filter:" table={table} query={query}/>
-            <span className="text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
-            <span className="text">{columns.size} of {this.config.properties.length} columns shown</span>
-            {pageBackwardNav}
-            {shownRowsMessage}
-            {pageForwardNav}
+            <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
+            <span className="block text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className="block text">{columns.size} of {this.config.properties.length} columns shown</span>
+            <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>
           <DataTableView className="grow"
                          table={table}
