@@ -187,7 +187,7 @@ let ListWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'expand' : 'bars'}
+                  name={sidebar ? 'arrows-h' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
