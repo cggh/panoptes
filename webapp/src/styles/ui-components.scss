@@ -252,6 +252,7 @@
   box-shadow: $z-1-shadow;
   position: relative;
   z-index: 2;
+  white-space: nowrap;
 
   .btn {
     border: none;
