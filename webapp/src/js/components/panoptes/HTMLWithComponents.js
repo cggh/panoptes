@@ -23,7 +23,6 @@ let HTMLWithComponents = React.createClass({
 
   componentWillMount() {
     let htmlToReactParser = new HtmlToReact.Parser(React, {
-      xmlMode: true,
       lowerCaseAttributeNames: false,
       lowerCaseTags: false
     });
