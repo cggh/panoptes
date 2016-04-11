@@ -36,11 +36,11 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   icon() {
-    return "bar-chart";
+    return 'bar-chart';
   },
 
   title() {
-    return this.props.title || "Plot";
+    return this.props.title || 'Plot';
   },
 
   render() {
@@ -58,10 +58,10 @@ let GenomeBrowserWithActions = React.createClass({
         sidebar={sidebar_content}>
         <div className="vertical stack">
           <div className="top-bar">
-            <Icon className='pointer icon'
+            <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className='text'>Plot</span>
+            <span className="text">Plot</span>
           </div>
           <PlotContainer {...sub_props}
                          style = {{height: 'calc(100% - 40px)',

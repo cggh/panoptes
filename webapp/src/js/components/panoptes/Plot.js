@@ -15,7 +15,7 @@ let PlotTest = React.createClass({
     return {
       width: 0,
       height: 0
-    }
+    };
   },
 
   componentDidMount() {

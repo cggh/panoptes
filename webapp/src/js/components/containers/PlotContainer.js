@@ -5,11 +5,11 @@ import Sidebar from 'react-sidebar';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 
-import _filter from "lodash/filter";
-import _map from "lodash/map";
+import _filter from 'lodash/filter';
+import _map from 'lodash/map';
 
-import Icon from "ui/Icon";
-import Plot from "panoptes/Plot";
+import Icon from 'ui/Icon';
+import Plot from 'panoptes/Plot';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -21,7 +21,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 
 
-import "plot.scss"
+import "plot.scss";
 
 let PlotContainer = React.createClass({
 
@@ -54,12 +54,12 @@ let PlotContainer = React.createClass({
       x: [],
       y: [],
       z: []
-    }
+    };
   },
 
 
   fetchData(props) {
-    let { table, horizontalDimension, verticalDimension, depthDimension } = props;
+    let {table, horizontalDimension, verticalDimension, depthDimension} = props;
     let tableConfig = this.config.tables[table];
     let columns = _filter([horizontalDimension, verticalDimension, depthDimension], (col) => col !== '__none__');
     let columnspec = {};
@@ -67,12 +67,12 @@ let PlotContainer = React.createClass({
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       API.pageQuery({
-          database: this.config.dataset,
-          table: tableConfig.fetchTableName,
-          columns: columnspec,
-          query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-          transpose: false
-        })
+        database: this.config.dataset,
+        table: tableConfig.fetchTableName,
+        columns: columnspec,
+        query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+        transpose: false
+      })
         .then((data) => {
           //Check our data is still relavent
           //if (Immutable.is(props, this.props)) {
@@ -101,16 +101,16 @@ let PlotContainer = React.createClass({
       horizontalDimension: this.refs.horizontalDimension.value,
       verticalDimension: this.refs.verticalDimension.value,
       depthDimension: this.refs.depthDimension.value
-    })
+    });
   },
 
   render() {
-    let { sidebar, style, table, horizontalDimension, verticalDimension, depthDimension, componentUpdate } = this.props;
+    let {sidebar, style, table, horizontalDimension, verticalDimension, depthDimension, componentUpdate} = this.props;
 
     let tables = _map(this.config.tables, (val, key) => {
-      return {payload:key, text:(<div className="dropdown-option"><Icon fixedWidth={true} name={val.icon}/>{val.tableCapNamePlural}</div>)}
+      return {payload:key, text:(<div className="dropdown-option"><Icon fixedWidth={true} name={val.icon}/>{val.tableCapNamePlural}</div>)};
     });
-    tables.unshift({payload:'__none__', text:"Pick a table..."});
+    tables.unshift({payload:'__none__', text:'Pick a table...'});
     tables = tables.map(({payload, text}) => <MenuItem value={payload} key={payload} primaryText={text}/>);
 
     let propertyGroups = [];
@@ -153,7 +153,7 @@ let PlotContainer = React.createClass({
             <select ref="verticalDimension" value={verticalDimension} onChange={this.handlePropertyChange}>
               <option value="__none__">Pick a column:</option>
               {_map(propertyGroups, (group) => {
-                  return (
+                return (
                     <optgroup key={group.id} label={group.name}>
                       {_map(group.properties, (property) => {
                         let {propid, disabled, name} = property;
@@ -168,14 +168,14 @@ let PlotContainer = React.createClass({
                       }
                     </optgroup>
                   );
-                }
+              }
               )}
             </select>
             <div>Depth dimension:</div>
             <select ref="depthDimension" value={depthDimension} onChange={this.handlePropertyChange}>
               <option value="__none__">Pick a column:</option>
               {_map(propertyGroups, (group) => {
-                  return (
+                return (
                     <optgroup key={group.id} label={group.name}>
                       {_map(group.properties, (property) => {
                         let {propid, disabled, name} = property;
@@ -190,7 +190,7 @@ let PlotContainer = React.createClass({
                       }
                     </optgroup>
                   );
-                }
+              }
               )}
             </select>
 
