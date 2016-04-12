@@ -7,7 +7,7 @@ let SidebarHeader = React.createClass({
 
   propTypes: {
     icon: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string.isRequired
+    description: React.PropTypes.string
   },
 
   render() {
@@ -18,7 +18,7 @@ let SidebarHeader = React.createClass({
           <Icon name={icon}/>
         </div>
         <span className="description">
-           {description}
+           {description || <i>No description</i>}
         </span>
         <div style={ {clear: 'both'} }/>
       </div>

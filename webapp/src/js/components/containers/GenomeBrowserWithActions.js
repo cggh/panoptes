@@ -174,8 +174,10 @@ let GenomeBrowserWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  name={sidebar ? 'arrows-h' : 'bars'}
+                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  title={sidebar ? 'Expand' : 'Sidebar'}
+                  />
             <span className="text">WTF</span>
           </div>
           <GenomeBrowser componentUpdate={componentUpdate} sideWidth={150} {...subProps} />
