@@ -1,23 +1,29 @@
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import LZString from 'lz-string';
+import Sidebar from 'react-sidebar';
+import scrollbarSize from 'scrollbar-size';
 
+// Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
-import Sidebar from 'react-sidebar';
+// UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-import DataTableView from 'panoptes/DataTableView';
-import QueryString from 'panoptes/QueryString';
+import FlatButton from 'material-ui/lib/flat-button';
 
+// lodash
 import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _forEach from 'lodash/forEach';
-import FlatButton from 'material-ui/lib/flat-button';
-import scrollbarSize from 'scrollbar-size';
 
+// Panoptes components
+import DataTableView from 'panoptes/DataTableView';
+import QueryString from 'panoptes/QueryString';
+import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
 let DataTableWithActions = React.createClass({
@@ -49,6 +55,7 @@ let DataTableWithActions = React.createClass({
   },
 
   componentWillMount() {
+    this.dataset = this.config.dataset;
     this.config = this.config.tables[this.props.table];
     this.propertyGroups = {};
     _forEach(this.config.propertyGroups, (val, key) => {
@@ -120,6 +127,94 @@ let DataTableWithActions = React.createClass({
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0
     };
+  },
+
+  //A class that encapsulates the creation of an url with query strings
+  Url(iname) {
+    let that = {};
+    that.name = iname;
+    that.queryitems = [];
+
+    //add a query item to the url
+    that.addUrlQueryItem = function(iname, icontent) {
+      this.queryitems.push({name: iname, content: icontent});
+    };
+
+    that.delUrlQueryItem = function(iname) {
+      _forEach(that.queryitems, (idx, it) => {
+        if (it.name == iname)
+          that.queryitems.splice(idx, 1);
+      });
+    };
+
+    that.toString = function() {
+      //TODO
+      let rs = this.name;
+      if (this.queryitems.length > 0) {
+        rs += '?';
+        for (let itemnr in this.queryitems) {
+          if (itemnr > 0) rs += '&';
+          rs += this.queryitems[itemnr].name + '=' + this.queryitems[itemnr].content;
+        }
+      }
+      return rs;
+    };
+
+    return that;
+  },
+
+  createActiveColumnListString() {
+    let {columns} = this.props;
+
+    //FIXME: copied from render()
+    //Set default columns
+    if (!columns)
+      columns = Immutable.List(this.config.properties)
+        .filter((prop) => prop.showByDefault && prop.showInTable)
+        .map((prop) => prop.propid);
+
+    let collist = null;
+    if (columns) {
+      collist = '';
+      columns.map((column) => {
+        if (column === 'StoredSelection') return;
+        let encoding = this.config.propertiesMap[column].defaultFetchEncoding;
+        if (collist.length > 0) collist += '~';
+        collist += encoding + column;
+      });
+    }
+    return collist;
+  },
+
+  //Returns the url that can be used to download the data set this fetcher is currently serving
+  createDownloadUrl() {
+
+    //prepare the url
+    let collist = this.createActiveColumnListString();
+
+    //TODO
+    let thequery = SQL.WhereClause.Trivial();
+    if (this._userQuery1 != null)
+      thequery = this._userQuery1;
+console.log('this.props.query: ' + this.props.query);
+console.log('thequery: ' + thequery);
+
+    let myurl = this.Url(API.serverURL);
+    myurl.addUrlQueryItem('datatype', 'downloadtable');
+    myurl.addUrlQueryItem('database', this.dataset);
+    myurl.addUrlQueryItem('qry', SQL.WhereClause.encode(thequery));
+    myurl.addUrlQueryItem('tbname', this.props.table);
+    myurl.addUrlQueryItem('collist', LZString.compressToEncodedURIComponent(collist));
+    myurl.addUrlQueryItem('posfield', this.config.positionField);
+    myurl.addUrlQueryItem('order', this.config.positionField);
+//FIXME: ascending is true when position field is descending.
+console.log('ascending: ' + this.props.ascending);
+    myurl.addUrlQueryItem('sortreverse', this.props.ascending ? 0 : 1);
+    return myurl.toString();
+  },
+
+  handleDownload() {
+    window.location.href = this.createDownloadUrl();
   },
 
   render() {
@@ -245,6 +340,11 @@ let DataTableWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
+            />
+            <Icon className="pointer icon"
+                  name="download"
+                  onClick={this.handleDownload}
+                  title="Download"
             />
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
             <span className="block text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
