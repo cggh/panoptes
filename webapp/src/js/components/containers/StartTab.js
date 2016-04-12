@@ -33,7 +33,7 @@ let StartTab = React.createClass({
   },
 
   handleClick({container, props, middleClick}) {
-    this.flux.actions.tabOpen(container, props, middleClick);
+    this.flux.actions.session.tabOpen(container, props, true);
   },
 
   render() {

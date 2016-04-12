@@ -30,7 +30,7 @@ let EmptyTab = React.createClass({
 
   handleClick({container, props, middleClick}) {
     if (middleClick)
-      this.flux.actions.tabOpen(container, props, false);
+      this.flux.actions.session.tabOpen(container, props, false);
     else {
       this.props.componentUpdate(props, container);
     }
