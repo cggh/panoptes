@@ -1,9 +1,12 @@
 @import "./variables";
 
-
 .plot {
   height: 100%;
   width: 100%;
+}
+
+.plot-container {
+  height: calc(100% - 40px);
 }
 
 .plot-controls {

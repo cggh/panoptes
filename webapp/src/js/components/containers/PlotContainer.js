@@ -1,14 +1,8 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import Sidebar from 'react-sidebar';
-import DropDownMenu from 'material-ui/lib/DropDownMenu';
-import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 
-import Icon from 'ui/Icon';
 import Plot from 'panoptes/Plot';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -35,12 +29,13 @@ let PlotContainer = React.createClass({
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
     table: React.PropTypes.string,
-    sidebar: React.PropTypes.bool
+    horizontalDimension: React.PropTypes.string,
+    verticalDimension: React.PropTypes.string,
+    depthDimension: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
-      sidebar: true,
       table: 'variants',
       horizontalDimension: '__none__',
       verticalDimension: '__none__',
@@ -95,115 +90,11 @@ let PlotContainer = React.createClass({
       this.setState({x: [], y:[], z:[]});
   },
 
-
-  handlePropertyChange() {
-    this.props.componentUpdate({
-      horizontalDimension: this.refs.horizontalDimension.value,
-      verticalDimension: this.refs.verticalDimension.value,
-      depthDimension: this.refs.depthDimension.value
-    });
-  },
-
   render() {
-    let {sidebar, style, table, horizontalDimension, verticalDimension, depthDimension, componentUpdate} = this.props;
+    let {style, depthDimension} = this.props;
 
-    let tables = _map(this.config.tables, (val, key) => {
-      return {payload:key, text:(<div className="dropdown-option"><Icon fixedWidth={true} name={val.icon}/>{val.tableCapNamePlural}</div>)};
-    });
-    tables.unshift({payload:'__none__', text:'Pick a table...'});
-    tables = tables.map(({payload, text}) => <MenuItem value={payload} key={payload} primaryText={text}/>);
-
-    let propertyGroups = [];
-    if (table !== '__none__') {
-      propertyGroups = this.config.tables[table].propertyGroups;
-    }
-
-    let sidebar_content = (
-      <div className="plot-controls vertical stack">
-        <DropDownMenu className="dropdown"
-                      value={table}
-                      autoWidth={false}
-                      onChange={(e, i, v) => componentUpdate({table: v})}>{tables}</DropDownMenu>
-
-        {table !== '__none__' ?
-          <div>
-            <div>Horizontal dimension:</div>
-            <select ref="horizontalDimension" value={horizontalDimension} onChange={this.handlePropertyChange}>
-              <option value="__none__">Pick a column:</option>
-              {_map(propertyGroups, (group) => {
-                return (
-                  <optgroup key={group.id} label={group.name}>
-                    {_map(group.properties, (property) => {
-                      let {propid, disabled, name} = property;
-                      return (
-                        <option key={propid}
-                                value={propid}
-                                disabled={disabled}>
-                          {name}
-                        </option>
-                      );
-                    })
-                    }
-                  </optgroup>
-                );
-              }
-            )}
-            </select>
-            <div>Vertical dimension:</div>
-            <select ref="verticalDimension" value={verticalDimension} onChange={this.handlePropertyChange}>
-              <option value="__none__">Pick a column:</option>
-              {_map(propertyGroups, (group) => {
-                return (
-                    <optgroup key={group.id} label={group.name}>
-                      {_map(group.properties, (property) => {
-                        let {propid, disabled, name} = property;
-                        return (
-                          <option key={propid}
-                                  value={propid}
-                                  disabled={disabled}>
-                            {name}
-                          </option>
-                        );
-                      })
-                      }
-                    </optgroup>
-                  );
-              }
-              )}
-            </select>
-            <div>Depth dimension:</div>
-            <select ref="depthDimension" value={depthDimension} onChange={this.handlePropertyChange}>
-              <option value="__none__">Pick a column:</option>
-              {_map(propertyGroups, (group) => {
-                return (
-                    <optgroup key={group.id} label={group.name}>
-                      {_map(group.properties, (property) => {
-                        let {propid, disabled, name} = property;
-                        return (
-                          <option key={propid}
-                                  value={propid}
-                                  disabled={disabled}>
-                            {name}
-                          </option>
-                        );
-                      })
-                      }
-                    </optgroup>
-                  );
-              }
-              )}
-            </select>
-
-          </div>
-          : null }
-      </div>
-    );
     return (
-      <div style={Object.assign({position:'absolute'}, style || {})} >
-        <Sidebar
-          docked={sidebar}
-          sidebar={sidebar_content}>
-          <Plot className="plot" traces={[{
+        <Plot className="plot" traces={[{
             x: this.state.x,
             y: this.state.y,
             z: this.state.z,
@@ -211,8 +102,6 @@ let PlotContainer = React.createClass({
             type: depthDimension !== '__none__' ? 'scatter3d' : 'scatter',
             mode: 'markers'
           }]}/>
-        </Sidebar>
-      </div>
       );
   }
 });
