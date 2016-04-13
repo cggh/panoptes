@@ -26,6 +26,9 @@ import QueryString from 'panoptes/QueryString';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
+// Utils
+import URL from 'util/URL';
+
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
@@ -129,44 +132,10 @@ let DataTableWithActions = React.createClass({
     };
   },
 
-  //A class that encapsulates the creation of an url with query strings
-  Url(iname) {
-    let that = {};
-    that.name = iname;
-    that.queryitems = [];
-
-    //add a query item to the url
-    that.addUrlQueryItem = function(iname, icontent) {
-      this.queryitems.push({name: iname, content: icontent});
-    };
-
-    that.delUrlQueryItem = function(iname) {
-      _forEach(that.queryitems, (idx, it) => {
-        if (it.name == iname)
-          that.queryitems.splice(idx, 1);
-      });
-    };
-
-    that.toString = function() {
-      //TODO
-      let rs = this.name;
-      if (this.queryitems.length > 0) {
-        rs += '?';
-        for (let itemnr in this.queryitems) {
-          if (itemnr > 0) rs += '&';
-          rs += this.queryitems[itemnr].name + '=' + this.queryitems[itemnr].content;
-        }
-      }
-      return rs;
-    };
-
-    return that;
-  },
-
   createActiveColumnListString() {
     let {columns} = this.props;
 
-    //FIXME: copied from render()
+    // TODO: copied from render(). Worth centralizing?
     //Set default columns
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -197,19 +166,19 @@ let DataTableWithActions = React.createClass({
     if (this._userQuery1 != null)
       thequery = this._userQuery1;
 console.log('this.props.query: ' + this.props.query);
-console.log('thequery: ' + thequery);
+console.log('thequery: %o', thequery);
 
-    let myurl = this.Url(API.serverURL);
-    myurl.addUrlQueryItem('datatype', 'downloadtable');
-    myurl.addUrlQueryItem('database', this.dataset);
-    myurl.addUrlQueryItem('qry', SQL.WhereClause.encode(thequery));
-    myurl.addUrlQueryItem('tbname', this.props.table);
-    myurl.addUrlQueryItem('collist', LZString.compressToEncodedURIComponent(collist));
-    myurl.addUrlQueryItem('posfield', this.config.positionField);
-    myurl.addUrlQueryItem('order', this.config.positionField);
+    let myurl = new URL(API.serverURL);
+    myurl.addQueryParam('datatype', 'downloadtable');
+    myurl.addQueryParam('database', this.dataset);
+    myurl.addQueryParam('qry', SQL.WhereClause.encode(thequery));
+    myurl.addQueryParam('tbname', this.props.table);
+    myurl.addQueryParam('collist', LZString.compressToEncodedURIComponent(collist));
+    myurl.addQueryParam('posfield', this.config.positionField);
+    myurl.addQueryParam('order', this.config.positionField);
 //FIXME: ascending is true when position field is descending.
 console.log('ascending: ' + this.props.ascending);
-    myurl.addUrlQueryItem('sortreverse', this.props.ascending ? 0 : 1);
+    myurl.addQueryParam('sortreverse', this.props.ascending ? 0 : 1);
     return myurl.toString();
   },
 
