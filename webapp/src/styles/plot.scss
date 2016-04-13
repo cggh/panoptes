@@ -9,13 +9,12 @@
   height: calc(100% - 40px);
 }
 
+.plot-sidebar {
+  width: 280px;
+}
+
 .plot-controls {
-  width: 200px;
-  .dropdown {
-    width: 200px;
-  }
   .dropdown-option {
-    width: 140px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -24,10 +23,16 @@
       padding-right: 7px;
     }
   }
-
   select {
     margin: 5px;
     width: 150px;
   }
+}
 
+//Inside the popover menu we are not inside plot-controls
+.dropdown-option {
+  .icon {
+    color: $light-text-colour;
+    padding-right: 7px;
+  }
 }
