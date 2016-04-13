@@ -136,7 +136,8 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       , document.getElementById('main'));
   })
   .catch((err) => {
-    err = err.responeText || "Could not connect to server";
+    console.error(err);
+    err = err.message || err.responseText || "Could not connect to server";
     ReactDOM.render(
       <div>
         <Loading status="custom"> There was a problem fetching initial configuration: {err} </Loading>

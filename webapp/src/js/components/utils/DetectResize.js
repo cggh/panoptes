@@ -20,7 +20,6 @@ let DetectResize = React.createClass({
 
   _onResize: function() {
     let node = ReactDOM.findDOMNode(this);
-
     if (this.props.onResize)
       this.props.onResize({
         width: node.offsetWidth,
