@@ -136,54 +136,56 @@ let DataTableWithActions = React.createClass({
     let {columns} = this.props;
 
     // TODO: copied from render(). Worth centralizing?
-    //Set default columns
+    // If no columns have been specified, get all of the showable columns.
     if (!columns)
       columns = Immutable.List(this.config.properties)
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
 
-    let collist = null;
-    if (columns) {
-      collist = '';
-      columns.map((column) => {
-        if (column === 'StoredSelection') return;
-        let encoding = this.config.propertiesMap[column].defaultFetchEncoding;
-        if (collist.length > 0) collist += '~';
-        collist += encoding + column;
-      });
-    }
-    return collist;
+    let columnList = '';
+
+    columns.map((column) => {
+      if (column === 'StoredSelection') return;
+      let encoding = this.config.propertiesMap[column].defaultFetchEncoding;
+      if (columnList.length !== 0) columnList += '~';
+      columnList += encoding + column;
+    });
+
+    return columnList;
   },
 
-  //Returns the url that can be used to download the data set this fetcher is currently serving
   createDownloadUrl() {
 
-    //prepare the url
-    let collist = this.createActiveColumnListString();
+    // Returns a URL to download the data currently being served.
+    // Returns false upon error, e.g. no selected columns.
 
-    //TODO
-    let thequery = SQL.WhereClause.Trivial();
-    if (this._userQuery1 != null)
-      thequery = this._userQuery1;
-console.log('this.props.query: ' + this.props.query);
-console.log('thequery: %o', thequery);
+    // Get the list of columns being shown.
+    let columnList = this.createActiveColumnListString();
 
-    let myurl = new URL(API.serverURL);
-    myurl.addQueryParam('datatype', 'downloadtable');
-    myurl.addQueryParam('database', this.dataset);
-    myurl.addQueryParam('qry', SQL.WhereClause.encode(thequery));
-    myurl.addQueryParam('tbname', this.props.table);
-    myurl.addQueryParam('collist', LZString.compressToEncodedURIComponent(collist));
-    myurl.addQueryParam('posfield', this.config.positionField);
-    myurl.addQueryParam('order', this.config.positionField);
+    if (!columnList) {
+      console.error('!columnList');
+      return false;
+    }
+
+    let downloadURL = new URL(API.serverURL);
+    downloadURL.addQueryParam('datatype', 'downloadtable');
+    downloadURL.addQueryParam('database', this.dataset);
+    downloadURL.addQueryParam('qry', this.props.query);
+    downloadURL.addQueryParam('tbname', this.props.table);
+    downloadURL.addQueryParam('collist', LZString.compressToEncodedURIComponent(columnList));
+    downloadURL.addQueryParam('posfield', this.config.positionField);
+    downloadURL.addQueryParam('order', this.config.positionField);
 //FIXME: ascending is true when position field is descending.
-console.log('ascending: ' + this.props.ascending);
-    myurl.addQueryParam('sortreverse', this.props.ascending ? 0 : 1);
-    return myurl.toString();
+console.log('this.props.ascending: ' + this.props.ascending);
+    downloadURL.addQueryParam('sortreverse', this.props.ascending ? 0 : 1);
+    return downloadURL.toString();
   },
 
   handleDownload() {
-    window.location.href = this.createDownloadUrl();
+    let downloadURL = this.createDownloadUrl();
+    if (downloadURL) {
+      window.location.href = downloadURL;
+    }
   },
 
   render() {
@@ -293,7 +295,24 @@ console.log('ascending: ' + this.props.ascending);
       );
     }
 
-
+    let downloadButton = null;
+    if (columns.size !== 0) {  // TODO: && totalRowCount !== 0
+      downloadButton = (
+        <Icon className="pointer icon"
+              name="download"
+              onClick={this.handleDownload}
+              title="Download"
+        />
+      );
+    } else {
+      // Show disabled download button.
+      downloadButton = (
+        <Icon className="pointer icon disabled"
+              name="download"
+              title="Download (no data)"
+        />
+      );
+    }
 
 
 //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
@@ -310,11 +329,7 @@ console.log('ascending: ' + this.props.ascending);
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <Icon className="pointer icon"
-                  name="download"
-                  onClick={this.handleDownload}
-                  title="Download"
-            />
+            {downloadButton}
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
             <span className="block text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.size} of {this.config.properties.length} columns shown</span>
