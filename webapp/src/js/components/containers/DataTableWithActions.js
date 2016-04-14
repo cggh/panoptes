@@ -176,7 +176,6 @@ let DataTableWithActions = React.createClass({
     downloadURL.addQueryParam('posfield', this.config.positionField);
     downloadURL.addQueryParam('order', this.config.positionField);
 //FIXME: ascending is true when position field is descending.
-console.log('this.props.ascending: ' + this.props.ascending);
     downloadURL.addQueryParam('sortreverse', this.props.ascending ? 0 : 1);
     return downloadURL.toString();
   },
