@@ -10,7 +10,7 @@ import ListItem from 'material-ui/lib/lists/list-item';
 
 import Icon from 'ui/Icon';
 
-let Finder = React.createClass({
+let GeneFinder = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -18,8 +18,8 @@ let Finder = React.createClass({
 
   getDefaultProps() {
     return {
-      title: 'Find',
-      icon: 'search'
+      title: 'Find gene',
+      icon: 'bitmap:genomebrowser.png'
     };
   },
 
@@ -38,12 +38,12 @@ let Finder = React.createClass({
   render() {
     return (
       <List>
-        <ListItem primaryText="Find gene"
-                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
+        <ListItem primaryText="Search by name or description"
+                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
                   onClick={this.handleClick}
         />
-        <ListItem primaryText="Find sample"
-                  leftIcon={<div><Icon fixedWidth={true} name="flask"/></div>}
+        <ListItem primaryText="Search by genomic region"
+                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
                   onClick={this.handleClick}
         />
       </List>
@@ -51,4 +51,4 @@ let Finder = React.createClass({
   }
 });
 
-module.exports = Finder;
+module.exports = GeneFinder;
