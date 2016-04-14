@@ -129,18 +129,23 @@ let Panoptes = React.createClass({
 
 let Header = React.createClass({
   mixins: [
-    PureRenderMixin
+    PureRenderMixin,
+    FluxMixin
   ],
 
   render() {
     let {name, userID, logo} = this.props;
+    let actions = this.getFlux().actions;
     return (
       <div className="header">
         <div className="title">{name}</div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
         <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
-        <IconButton tooltip="Find" iconClassName="fa fa-search"/>
+        <IconButton tooltip="Find"
+                    iconClassName="fa fa-search"
+                    onClick={() => actions.session.modalOpen('containers/Finder', {})}
+        />
         <IconButton tooltip="Link" iconClassName="fa fa-link"/>
       </div>
     );
