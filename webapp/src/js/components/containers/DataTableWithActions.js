@@ -26,9 +26,6 @@ import QueryString from 'panoptes/QueryString';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
-// Utils
-import URL from 'util/URL';
-
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
@@ -167,17 +164,17 @@ let DataTableWithActions = React.createClass({
       return false;
     }
 
-    let downloadURL = new URL(API.serverURL);
-    downloadURL.addQueryParam('datatype', 'downloadtable');
-    downloadURL.addQueryParam('database', this.dataset);
-    downloadURL.addQueryParam('qry', this.props.query);
-    downloadURL.addQueryParam('tbname', this.props.table);
-    downloadURL.addQueryParam('collist', LZString.compressToEncodedURIComponent(columnList));
-    downloadURL.addQueryParam('posfield', this.config.positionField);
-    downloadURL.addQueryParam('order', this.config.positionField);
+    let downloadURL = API.serverURL;
+    downloadURL += '?datatype' + '=' + 'downloadtable';
+    downloadURL += '&database' + '=' + this.dataset;
+    downloadURL += '&qry' + '=' + this.props.query;
+    downloadURL += '&tbname' + '=' + this.props.table;
+    downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
+    downloadURL += '&posfield' + '=' + this.config.positionField;
+    downloadURL += '&order' + '=' + this.config.positionField;
 //FIXME: ascending is true when position field is descending.
-    downloadURL.addQueryParam('sortreverse', this.props.ascending ? 0 : 1);
-    return downloadURL.toString();
+    downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
+    return downloadURL;
   },
 
   handleDownload() {
