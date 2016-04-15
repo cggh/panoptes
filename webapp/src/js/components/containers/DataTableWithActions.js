@@ -16,6 +16,7 @@ import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _forEach from 'lodash/forEach';
 import FlatButton from 'material-ui/lib/flat-button';
+import scrollbarSize from 'scrollbar-size';
 
 import SQL from 'panoptes/SQL';
 
@@ -38,7 +39,7 @@ let DataTableWithActions = React.createClass({
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+      query: SQL.NullQuery,
       order: null,
       ascending: true,
       columnWidths: Immutable.Map(),
@@ -235,6 +236,7 @@ let DataTableWithActions = React.createClass({
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
       <Sidebar
+        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">

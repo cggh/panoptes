@@ -16,6 +16,7 @@ import Subheader from 'material-ui/lib/Subheader';
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
 import Sidebar from 'react-sidebar';
+import scrollbarSize from 'scrollbar-size';
 
 
 let QueryPicker = React.createClass({
@@ -81,6 +82,7 @@ let QueryPicker = React.createClass({
     return (
       <div className="large-modal query-picker">
         <Sidebar
+          styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
           docked={true}
           transitions={false}
           touch={false}
