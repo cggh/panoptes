@@ -1,15 +1,22 @@
 const React = require('react');
+const Plotly = require('react-plotlyjs');
+import _reduce from 'lodash/reduce';
+
 const PureRenderMixin = require('mixins/PureRenderMixin');
 const DetectResize = require('utils/DetectResize');
 
-const Plotly = require('react-plotlyjs');
+import { plotTypes, allDimensions } from 'panoptes/plotTypes';
 
-let PlotTest = React.createClass({
+
+let Plot = React.createClass({
   mixins: [
     PureRenderMixin
   ],
 
-  propTypes: {},
+  propTypes: {
+    plotType: React.PropTypes.string,
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.array; return props; }, {})
+  },
 
   getInitialState() {
     return {
@@ -24,7 +31,7 @@ let PlotTest = React.createClass({
 
   render() {
     let {width, height} = this.state;
-    let {traces, ...other} = this.props;
+    let {other, plotType} = this.props;
 
 
     var layout = {
@@ -38,18 +45,18 @@ let PlotTest = React.createClass({
       displayModeBar: true
     };
     return (
-      <DetectResize onResize={(size) => this.setState(size)}>
-        <div {...other}>
-          <Plotly
-            className="plot"
-            data={traces}
-            layout={layout}
-            config={config}/>
-        </div>
+      <DetectResize onResize={(size) => {
+        this.setState(size);
+      }}>
+        <Plotly
+          className="plot"
+          data={plotTypes[plotType].plotlyTraces(this.props)}
+          layout={layout}
+          config={config}/>
       </DetectResize>
     );
   }
 
 });
 
-module.exports = PlotTest;
+module.exports = Plot;

@@ -769,4 +769,6 @@ SQL.TableSort = function(icollist) {
   return that;
 };
 
+SQL.NullQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+
 module.exports = SQL;

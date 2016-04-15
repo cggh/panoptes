@@ -14,6 +14,7 @@ import Icon from 'ui/Icon';
 import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
 
 import FlatButton from 'material-ui/lib/flat-button';
+import scrollbarSize from 'scrollbar-size';
 
 
 let GenomeBrowserWithActions = React.createClass({
@@ -169,6 +170,7 @@ let GenomeBrowserWithActions = React.createClass({
     );
     return (
       <Sidebar
+        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">

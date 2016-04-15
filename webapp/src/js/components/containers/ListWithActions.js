@@ -1,5 +1,6 @@
 import React from 'react';
 import Immutable from 'immutable';
+import scrollbarSize from 'scrollbar-size';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -29,7 +30,7 @@ let ListWithActions = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
+    ConfigMixin
   ],
 
   propTypes: {
@@ -182,6 +183,7 @@ let ListWithActions = React.createClass({
 
     return (
       <Sidebar
+        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">
