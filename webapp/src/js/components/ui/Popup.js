@@ -71,9 +71,9 @@ let Popup = React.createClass({
       this.props.onResizeStop(size);
   },
   handleMoveStop(event, ui) {
-    let {left, top} = ui.position;
+    let {x, y} = ui;
     if (this.props.onMoveStop)
-      this.props.onMoveStop({x: left, y: top});
+      this.props.onMoveStop({x, y});
   },
   handleClose(event) {
     if (this.props.onClose) {
@@ -94,7 +94,7 @@ let Popup = React.createClass({
       return null;
     return (
       <Draggable handle=".popup-drag"
-                 start={position.toObject()}
+                 defaultPosition={position.toObject()}
                  onStart={this.handleClick}
                  onStop={this.handleMoveStop}>
         <Resizable width={size.get('width')} height={size.get('height')}

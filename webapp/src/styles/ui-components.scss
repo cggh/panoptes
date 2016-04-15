@@ -110,12 +110,14 @@
   position: absolute;
   top: 0;
   left: 0;
+  width: 0;
+  height: 0;
 }
 
 .popup {
   display: flex;
   flex-direction: column;
-  position: fixed;
+  position: fixed !important; // Important needed to overrides react-resizable css
   border: 1px solid rgb(110, 110, 110);
   box-shadow: $z-5-shadow;
   background: white;
