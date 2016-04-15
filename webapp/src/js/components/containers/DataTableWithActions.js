@@ -215,7 +215,10 @@ let DataTableWithActions = React.createClass({
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange
                       })}/>
-
+        <FlatButton label="Download data"
+                    disabled={columns.size === 0}
+                    primary={true}
+                    onClick={this.handleDownload}/>
       </div>
     );
 
@@ -291,27 +294,7 @@ let DataTableWithActions = React.createClass({
       );
     }
 
-    let downloadButton = null;
-    if (columns.size !== 0) {  // TODO: && totalRowCount !== 0
-      downloadButton = (
-        <Icon className="pointer icon"
-              name="download"
-              onClick={this.handleDownload}
-              title="Download"
-        />
-      );
-    } else {
-      // Show disabled download button.
-      downloadButton = (
-        <Icon className="pointer icon disabled"
-              name="download"
-              title="Download (no data)"
-        />
-      );
-    }
-
-
-//Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
+    //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
       <Sidebar
@@ -325,7 +308,6 @@ let DataTableWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            {downloadButton}
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
             <span className="block text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.size} of {this.config.properties.length} columns shown</span>
