@@ -1,23 +1,29 @@
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import LZString from 'lz-string';
+import Sidebar from 'react-sidebar';
+import scrollbarSize from 'scrollbar-size';
 
+// Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
-import Sidebar from 'react-sidebar';
+// UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-import DataTableView from 'panoptes/DataTableView';
-import QueryString from 'panoptes/QueryString';
+import FlatButton from 'material-ui/lib/flat-button';
 
+// lodash
 import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _forEach from 'lodash/forEach';
-import FlatButton from 'material-ui/lib/flat-button';
-import scrollbarSize from 'scrollbar-size';
 
+// Panoptes components
+import DataTableView from 'panoptes/DataTableView';
+import QueryString from 'panoptes/QueryString';
+import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
 let DataTableWithActions = React.createClass({
@@ -49,6 +55,7 @@ let DataTableWithActions = React.createClass({
   },
 
   componentWillMount() {
+    this.dataset = this.config.dataset;
     this.config = this.config.tables[this.props.table];
     this.propertyGroups = {};
     _forEach(this.config.propertyGroups, (val, key) => {
@@ -122,6 +129,61 @@ let DataTableWithActions = React.createClass({
     };
   },
 
+  createActiveColumnListString() {
+    let {columns} = this.props;
+
+    // TODO: copied from render(). Worth centralizing?
+    // If no columns have been specified, get all of the showable columns.
+    if (!columns)
+      columns = Immutable.List(this.config.properties)
+        .filter((prop) => prop.showByDefault && prop.showInTable)
+        .map((prop) => prop.propid);
+
+    let columnList = '';
+
+    columns.map((column) => {
+      if (column === 'StoredSelection') return;
+      let encoding = this.config.propertiesMap[column].defaultFetchEncoding;
+      if (columnList.length !== 0) columnList += '~';
+      columnList += encoding + column;
+    });
+
+    return columnList;
+  },
+
+  createDownloadUrl() {
+
+    // Returns a URL to download the data currently being served.
+    // Returns false upon error, e.g. no selected columns.
+
+    // Get the list of columns being shown.
+    let columnList = this.createActiveColumnListString();
+
+    if (!columnList) {
+      console.error('!columnList');
+      return false;
+    }
+
+    let downloadURL = API.serverURL;
+    downloadURL += '?datatype' + '=' + 'downloadtable';
+    downloadURL += '&database' + '=' + this.dataset;
+    downloadURL += '&qry' + '=' + this.props.query;
+    downloadURL += '&tbname' + '=' + this.props.table;
+    downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
+    downloadURL += '&posfield' + '=' + this.config.positionField;
+    downloadURL += '&order' + '=' + this.config.positionField;
+//FIXME: ascending is true when position field is descending.
+    downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
+    return downloadURL;
+  },
+
+  handleDownload() {
+    let downloadURL = this.createDownloadUrl();
+    if (downloadURL) {
+      window.location.href = downloadURL;
+    }
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
@@ -153,7 +215,10 @@ let DataTableWithActions = React.createClass({
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange
                       })}/>
-
+        <FlatButton label="Download data"
+                    disabled={columns.size === 0}
+                    primary={true}
+                    onClick={this.handleDownload}/>
       </div>
     );
 
@@ -229,10 +294,7 @@ let DataTableWithActions = React.createClass({
       );
     }
 
-
-
-
-//Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
+    //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
       <Sidebar

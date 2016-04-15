@@ -9,7 +9,7 @@ import ListItem from 'material-ui/lib/lists/list-item';
 import Subheader from 'material-ui/lib/Subheader';
 import Icon from 'ui/Icon';
 
-let EmptyTab = React.createClass({
+let TableList = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin
@@ -52,4 +52,4 @@ let EmptyTab = React.createClass({
   }
 });
 
-module.exports = EmptyTab;
+module.exports = TableList;
