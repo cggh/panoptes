@@ -14,6 +14,7 @@
 }
 
 .plot-controls {
+  align-items: flex-start;
   .dropdown-option {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -22,10 +23,6 @@
       color: $light-text-colour;
       padding-right: 7px;
     }
-  }
-  select {
-    margin: 5px;
-    width: 150px;
   }
 }
 

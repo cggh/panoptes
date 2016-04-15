@@ -26,7 +26,7 @@ let PlotContainer = React.createClass({
     PureRenderMixin,
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin.apply(this, ['table'].concat(allDimensions))
+    DataFetcherMixin.apply(this, ['table', 'query'].concat(allDimensions))
   ],
 
   propTypes: {
@@ -42,12 +42,12 @@ let PlotContainer = React.createClass({
 
   getInitialState() {
     return {
-      loadStatus: 'loaded',
+      loadStatus: 'loaded'
     };
   },
 
   fetchData(props, requestContext) {
-    const {table, horizontalDimension, verticalDimension, depthDimension} = props;
+    const {table, query} = props;
     const tableConfig = this.config.tables[table];
     const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesMap[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
@@ -59,7 +59,7 @@ let PlotContainer = React.createClass({
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columnspec,
-        query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+        query: query,
         transpose: false
       };
 

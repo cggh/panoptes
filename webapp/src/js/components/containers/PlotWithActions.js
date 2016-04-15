@@ -5,16 +5,22 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import _map from 'lodash/map';
 import _each from 'lodash/map';
+import _reduce from 'lodash/reduce';
 import titleCase from 'title-case';
+import scrollbarSize from 'scrollbar-size';
 
 import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 import Sidebar from 'react-sidebar';
 import SidebarHeader from 'ui/SidebarHeader';
 
 import Icon from 'ui/Icon';
+import SQL from 'panoptes/SQL'
 import PlotContainer from 'containers/PlotContainer';
-import {plotTypes} from 'panoptes/plotTypes';
+import QueryString from 'panoptes/QueryString';
+import {plotTypes, allDimensions} from 'panoptes/plotTypes';
+
 import SelectField from 'material-ui/lib/SelectField';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Divider from 'material-ui/lib/divider';
@@ -27,7 +33,8 @@ import "plot.scss";
 let PlotWithActions = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin
+    ConfigMixin,
+    FluxMixin
   ],
 
   propTypes: {
@@ -36,13 +43,13 @@ let PlotWithActions = React.createClass({
     sidebar: React.PropTypes.bool,
     plotType: React.PropTypes.string,
     table: React.PropTypes.string,
-    horizontal: React.PropTypes.string,
-    vertical: React.PropTypes.string,
-    depth: React.PropTypes.string
+    query: React.PropTypes.string,
+    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
   getDefaultProps() {
     return {
+      query: SQL.NullQuery,
       componentUpdate: null,
       sidebar: true
     };
@@ -67,9 +74,14 @@ let PlotWithActions = React.createClass({
     });
   },
 
+  handleQueryPick(query) {
+    this.getFlux().actions.session.modalClose();
+    this.props.componentUpdate({query: query});
+  },
 
   render() {
-    let {sidebar, table, plotType, componentUpdate} = this.props;
+    let {sidebar, table, query, plotType, componentUpdate} = this.props;
+    const actions = this.getFlux().actions;
 
     let tables = _map(this.config.tables, (val, key) => ({
       payload: key,
@@ -104,6 +116,19 @@ let PlotWithActions = React.createClass({
             {tables.map(({payload, text, icon}) =>
               <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
           </SelectField>
+          {table ? <FlatButton label="Change Filter"
+                      primary={true}
+                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
+                      {
+                        table: table,
+                        initialQuery: query,
+                        onPick: this.handleQueryPick
+                      })}/>
+            : null}
+          {table ? <FlatButton label="Clear Filter"
+                               primary={true}
+                               onClick={() => componentUpdate({query: SQL.NullQuery})}/>
+            : null}
           <SelectField value={plotType}
                        autoWidth={true}
                        floatingLabelText="Plot Type:"
@@ -111,7 +136,6 @@ let PlotWithActions = React.createClass({
             {_map(plotTypes, (plot, key) =>
               <MenuItem value={key} key={key} primaryText={plot.displayName}/>)}
           </SelectField>
-
           {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
               <SelectField value={this.config.tables[table].propertiesMap[this.props[dimension]] ? this.props[dimension] : null}
@@ -129,13 +153,19 @@ let PlotWithActions = React.createClass({
     return (
       <Sidebar
         docked={sidebar}
+        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
         sidebar={sidebarContent}>
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">Plot</span>
+            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} Plot of ${this.config.tables[table].tableCapNamePlural}` : 'Plot'}</span>
+            {plotType && table ?
+              <span className="block text">
+                <QueryString prepend="Filter:" table={table} query={query}/>
+              </span>
+            : null}
           </div>
           <div className="plot-container">
             <PlotContainer {...this.props} />

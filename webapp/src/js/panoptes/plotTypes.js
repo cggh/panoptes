@@ -3,7 +3,7 @@ import _uniq from 'lodash/uniq';
 
 export const plotTypes = {
   bar: {
-    displayName: 'Bar Chart',
+    displayName: 'Bar',
     dimensions: ['horizontal', 'vertical'],
     plotlyTraces: (data) => [{
       x: data.horizontal,
@@ -33,7 +33,7 @@ export const plotTypes = {
   //  dimensions: ['horizontal', 'vertical']
   //},
   box: {
-    displayName: 'Box and Whisker Plot',
+    displayName: 'Box and Whisker',
     dimensions: ['horizontal', 'vertical'],
     plotlyTraces: (data) => [{
       x: data.horizontal,
