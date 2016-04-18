@@ -194,7 +194,7 @@
   background: rgba(0, 0, 0, 0.7);
   transition: visibility 0s linear 0.5s, opacity 0.5s linear;
   .popup {
-    position: static;
+    position: static !important; //Ick - we have an important on popup because of react-resizable so we also need one here...
     transition: none;
     visibility: hidden;
     .popup-header {
