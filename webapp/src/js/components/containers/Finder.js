@@ -6,8 +6,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
-import List from 'material-ui/lib/lists/list';
-import ListItem from 'material-ui/lib/lists/list-item';
+import {List, ListItem} from 'material-ui/List';
 
 import Icon from 'ui/Icon';
 

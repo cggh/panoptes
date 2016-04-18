@@ -5,10 +5,9 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Material UI
-import List from 'material-ui/lib/lists/list';
-import ListItem from 'material-ui/lib/lists/list-item';
-import Subheader from 'material-ui/lib/Subheader';
-import RaisedButton from 'material-ui/lib/raised-button';
+import {List, ListItem} from 'material-ui/List';
+import Subheader from 'material-ui/Subheader';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import Icon from 'ui/Icon';
 
