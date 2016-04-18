@@ -1,13 +1,9 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import _map from 'lodash/map';
 import _each from 'lodash/map';
 import _filter from 'lodash/filter';
-import _reduce from 'lodash/reduce';
-import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -20,7 +16,6 @@ import Icon from 'ui/Icon';
 import SQL from 'panoptes/SQL';
 import ItemMap from 'containers/item_views/ItemMap';
 import QueryString from 'panoptes/QueryString';
-import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -28,6 +23,7 @@ import Divider from 'material-ui/Divider';
 
 import {FlatButton} from 'material-ui';
 
+import 'map.scss';
 
 let MapWithActions = React.createClass({
   mixins: [
@@ -96,9 +92,9 @@ let MapWithActions = React.createClass({
       });
     }
     let sidebarContent = (
-      <div className="sidebar plot-sidebar">
+      <div className="sidebar map-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
-        <div className="plot-controls vertical stack">
+        <div className="map-controls vertical stack">
           <SelectField value={table}
                        autoWidth={true}
                        floatingLabelText="Table:"
