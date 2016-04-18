@@ -5,6 +5,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import _map from 'lodash/map';
 import _each from 'lodash/map';
+import _filter from 'lodash/filter';
 import _reduce from 'lodash/reduce';
 import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
@@ -17,7 +18,7 @@ import SidebarHeader from 'ui/SidebarHeader';
 
 import Icon from 'ui/Icon';
 import SQL from 'panoptes/SQL';
-import PlotContainer from 'containers/PlotContainer';
+import ItemMap from 'containers/item_views/ItemMap';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
@@ -27,10 +28,8 @@ import Divider from 'material-ui/Divider';
 
 import {FlatButton} from 'material-ui';
 
-import "plot.scss";
 
-
-let PlotWithActions = React.createClass({
+let MapWithActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -41,10 +40,9 @@ let PlotWithActions = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
-    plotType: React.PropTypes.string,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
+    column: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -55,15 +53,13 @@ let PlotWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
-  },
-
   icon() {
-    return 'bar-chart';
+    return 'globe';
   },
 
   title() {
-    return this.props.title || 'Plot';
+    return this.props.title || 'Map';
+
   },
 
   handleQueryPick(query) {
@@ -72,14 +68,16 @@ let PlotWithActions = React.createClass({
   },
 
   render() {
-    let {sidebar, table, query, plotType, componentUpdate} = this.props;
+    let {sidebar, table, query, column, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-    let tables = _map(this.config.tables, (val, key) => ({
-      payload: key,
-      icon: <Icon fixedWidth={true} name={val.icon}/>,
-      text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
-    }));
+
+    let tables = _map(_filter(this.config.tables, 'hasGeoCoord'),
+      (val) => ({
+        payload: val.id,
+        icon: <Icon fixedWidth={true} name={val.icon}/>,
+        text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
+      }));
 
     let propertyMenu = [];
     let i = 0;
@@ -109,8 +107,8 @@ let PlotWithActions = React.createClass({
               <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
           </SelectField>
           {table ? <FlatButton label="Change Filter"
-                      primary={true}
-                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
+                               primary={true}
+                               onClick={() => actions.session.modalOpen('containers/QueryPicker',
                       {
                         table: table,
                         initialQuery: query,
@@ -121,23 +119,13 @@ let PlotWithActions = React.createClass({
                                primary={true}
                                onClick={() => componentUpdate({query: SQL.NullQuery})}/>
             : null}
-          <SelectField value={plotType}
-                       autoWidth={true}
-                       floatingLabelText="Plot Type:"
-                       onChange={(e, i, v) => componentUpdate({plotType: v})}>
-            {_map(plotTypes, (plot, key) =>
-              <MenuItem value={key} key={key} primaryText={plot.displayName}/>)}
-          </SelectField>
-          {table && plotType ?
-            _map(plotTypes[plotType].dimensions, (dimension) =>
-              <SelectField value={this.config.tables[table].propertiesMap[this.props[dimension]] ? this.props[dimension] : null}
-                           key={dimension}
+          {table ?
+              <SelectField value={this.config.tables[table].propertiesMap[column] ? column : null}
                            autoWidth={true}
-                           floatingLabelText={titleCase(dimension)}
-                           onChange={(e, i, v) => componentUpdate({[dimension]: v})}>
+                           floatingLabelText="Column"
+                           onChange={(e, i, v) => componentUpdate({column: v})}>
                 {propertyMenu}
               </SelectField>
-            )
             : null }
         </div>
       </div>
@@ -152,20 +140,18 @@ let PlotWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} Plot of ${this.config.tables[table].tableCapNamePlural}` : 'Plot'}</span>
-            {plotType && table ?
+            <span className="text">{table ? `Map of ${this.config.tables[table].tableCapNamePlural}` : 'Map'}</span>
+            {table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>
               </span>
-            : null}
+              : null}
           </div>
-          <div className="plot-container">
-            <PlotContainer {...this.props} />
-          </div>
+          {table ? <ItemMap {...this.props}  /> : 'Pick a table'}
         </div>
       </Sidebar>
     );
   }
 });
 
-module.exports = PlotWithActions;
+module.exports = MapWithActions;

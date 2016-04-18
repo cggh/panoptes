@@ -338,8 +338,7 @@ let parseCustomProperties = function() {
 
     // Determine of datatables have geographic info
     fetchedConfig.tableCatalog.forEach((tableInfo) => {
-      if (tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit)
-        tableInfo.hasGeoCoord = true;
+      tableInfo.hasGeoCoord = !!(tableInfo.propIdGeoCoordLongit && tableInfo.propIdGeoCoordLattit);
     });
 
     //Set a recommended encoder - legacy from 1.X
