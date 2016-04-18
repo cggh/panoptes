@@ -13,7 +13,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 // UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-import FlatButton from 'material-ui/lib/flat-button';
+import FlatButton from 'material-ui/FlatButton';
 
 // lodash
 import _clone from 'lodash/clone';

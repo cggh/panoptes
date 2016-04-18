@@ -12,11 +12,11 @@ import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
-import Checkbox from 'material-ui/lib/checkbox';
-import DropDownMenu from 'material-ui/lib/DropDownMenu';
-import MenuItem from 'material-ui/lib/menus/menu-item';
-import Slider from 'material-ui/lib/slider';
-import FlatButton from 'material-ui/lib/flat-button';
+import Checkbox from 'material-ui/Checkbox';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
+import Slider from 'material-ui/Slider';
+import FlatButton from 'material-ui/FlatButton';
 
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./' + path);

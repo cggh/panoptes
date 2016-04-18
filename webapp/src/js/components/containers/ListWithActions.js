@@ -14,7 +14,7 @@ import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 
 // Material UI components
-import TextField from 'material-ui/lib/text-field';
+import TextField from 'material-ui/TextField';
 
 // Panoptes components
 import SQL from 'panoptes/SQL';

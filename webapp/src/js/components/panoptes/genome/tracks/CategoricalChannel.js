@@ -18,7 +18,7 @@ import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 
-import Checkbox from 'material-ui/lib/checkbox';
+import Checkbox from 'material-ui/Checkbox';
 
 let CategoricalChannel = React.createClass({
   mixins: [

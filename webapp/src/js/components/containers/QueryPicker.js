@@ -6,12 +6,11 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 import SQL from 'panoptes/SQL';
 
-import RaisedButton from 'material-ui/lib/raised-button';
-import IconButton from 'material-ui/lib/icon-button';
-import List from 'material-ui/lib/lists/list';
-import ListItem from 'material-ui/lib/lists/list-item';
-import Divider from 'material-ui/lib/divider';
-import Subheader from 'material-ui/lib/Subheader';
+import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import {List, ListItem} from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import Subheader from 'material-ui/Subheader';
 
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';

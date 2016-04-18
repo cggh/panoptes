@@ -5,10 +5,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Highlight from 'react-highlighter';
 
-import TextField from 'material-ui/lib/text-field';
-import RaisedButton from 'material-ui/lib/raised-button';
-import List from 'material-ui/lib/lists/list';
-import ListItem from 'material-ui/lib/lists/list-item';
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
+import {List, ListItem} from 'material-ui/List';
 import _map from 'lodash/map';
 
 import Icon from 'ui/Icon';

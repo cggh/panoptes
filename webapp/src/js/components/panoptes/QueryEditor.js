@@ -13,8 +13,8 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import SQL from 'panoptes/SQL';
 import Formatter from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Paper from 'material-ui/lib/paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
 
 

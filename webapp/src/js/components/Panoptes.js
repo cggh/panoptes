@@ -12,13 +12,13 @@ import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
-import IconButton from 'material-ui/lib/icon-button';
-import getMuiTheme from  'material-ui/lib/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider';
+import IconButton from 'material-ui/IconButton';
+import getMuiTheme from  'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
   blue500, blue700,
   pinkA200,
-} from 'material-ui/lib/styles/colors';
+} from 'material-ui/styles/colors';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
