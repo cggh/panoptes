@@ -39,6 +39,7 @@ let TableList = React.createClass({
       <List style={this.props.style}>
         <Subheader>Open a table:</Subheader>
         {_map(tables, (table) => (
+          this.config.tables[table.id].settings.isHidden ? null :
           <ListItem key={table.id}
                     primaryText={table.tableCapNamePlural}
                     secondaryText={table.description}
