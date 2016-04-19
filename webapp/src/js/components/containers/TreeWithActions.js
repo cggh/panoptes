@@ -15,6 +15,7 @@ import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import SQL from 'panoptes/SQL';
 import QueryString from 'panoptes/QueryString';
+import Tree from 'panoptes/Tree';
 
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -128,12 +129,10 @@ let TreeWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{table ? `Tree of ${this.config.tables[table].tableCapNamePlural}` : 'Tree'}</span>
-            {table ?
-              <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={query}/>
-              </span>
-              : null}
+            <span className="text">Tree</span>
+          </div>
+          <div className="tree-container">
+            <Tree/>
           </div>
         </div>
       </Sidebar>

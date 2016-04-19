@@ -1,9 +1,9 @@
-const React = require('react');
-const Plotly = require('react-plotlyjs');
+import React from 'react';
+import  Plotly from 'react-plotlyjs';
 import _reduce from 'lodash/reduce';
 
-const PureRenderMixin = require('mixins/PureRenderMixin');
-const DetectResize = require('utils/DetectResize');
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import DetectResize from 'utils/DetectResize';
 
 import { plotTypes, allDimensions } from 'panoptes/plotTypes';
 
@@ -31,7 +31,7 @@ let Plot = React.createClass({
 
   render() {
     let {width, height} = this.state;
-    let {other, plotType} = this.props;
+    let {plotType} = this.props;
 
 
     var layout = {

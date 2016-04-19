@@ -3,6 +3,16 @@
   width: 280px;
 }
 
+.tree-container {
+  height: calc(100% - 40px);
+}
+
+.tree {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 .tree-controls {
   align-items: flex-start;
   .dropdown-option {
