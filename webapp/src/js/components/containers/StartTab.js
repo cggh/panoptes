@@ -42,9 +42,9 @@ let StartTab = React.createClass({
         <HTMLWithComponents className="grow description">
           {this.config.settings.description}
         </HTMLWithComponents>
-        <div className="" >
-          <ViewList style={{width: '400px'}} onClick={this.handleClick} />
-          <TableList style={{width: '400px'}} onClick={this.handleClick} />
+        <div className="">
+          <ViewList style={{width: '410px'}} onClick={this.handleClick} />
+          <TableList style={{width: '410px'}} onClick={this.handleClick} />
         </div>
       </div>
     );

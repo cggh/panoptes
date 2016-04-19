@@ -1,6 +1,9 @@
 import React from 'react';
+import _some from 'lodash/some';
+import _filter from 'lodash/filter';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
@@ -8,7 +11,8 @@ import Icon from 'ui/Icon';
 
 let ViewList = React.createClass({
   mixins: [
-    PureRenderMixin
+    PureRenderMixin,
+    ConfigMixin
   ],
 
   propTypes: {
@@ -24,6 +28,7 @@ let ViewList = React.createClass({
 
 
   render() {
+    const hasGeo = _some(_filter(this.config.tables, {hasGeoCoord: true}));
     return (
         <List style={this.props.style}>
           <Subheader>Open a view:</Subheader>
@@ -33,8 +38,14 @@ let ViewList = React.createClass({
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})} />
           <ListItem primaryText="Plot"
                     secondaryText="View table data graphically"
-                    leftIcon={<div><Icon fixedWidth={true} name="area-chart "/></div>}
+                    leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/PlotWithActions', {})} />
+          <ListItem primaryText="Map"
+                    disabled={!hasGeo}
+                    style={{opacity: hasGeo ? '1' : '0.5'}}
+                    secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
+                    leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
+                    onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null } />
         </List>
     );
   }
