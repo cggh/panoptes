@@ -13,13 +13,10 @@ import Sidebar from 'react-sidebar';
 import SidebarHeader from 'ui/SidebarHeader';
 
 import Icon from 'ui/Icon';
-import SQL from 'panoptes/SQL';
-import QueryString from 'panoptes/QueryString';
-import Tree from 'panoptes/Tree';
+import TreeContainer from 'containers/TreeContainer';
 
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import Divider from 'material-ui/Divider';
 
 import {FlatButton} from 'material-ui';
 
@@ -37,7 +34,7 @@ let TreeWithActions = React.createClass({
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
-    treeId: React.PropTypes.string,
+    treeId: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -55,11 +52,18 @@ let TreeWithActions = React.createClass({
     return this.props.title || 'Tree';
   },
 
+  handleCrossLink() {
+    const {table, treeId} = this.props;
+    const actions = this.getFlux().actions.panoptes;
+    const tree = table && treeId && this.config.tables[table].treesById[treeId];
+    if (tree && tree.crossLink && _has(this.config.tables, tree.crossLink.split('::')[0])) {
+      const [table, primKey] = tree.crossLink.split('::');
+      actions.dataItemPopup({table, primKey});
+    }
+  },
 
   render() {
-    let {sidebar, table, treeId, componentUpdate} = this.props;
-    const actions = this.getFlux().actions;
-
+    const {sidebar, table, treeId, componentUpdate} = this.props;
 
     let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0),
       (table) => ({
@@ -91,7 +95,7 @@ let TreeWithActions = React.createClass({
           {table ?
             <SelectField value={treeId}
                          autoWidth={true}
-                         floatingLabelText="Column"
+                         floatingLabelText="Tree"
                          onChange={(e, i, v) => componentUpdate({treeId: v})}>
               {trees.map(({payload, text}) =>
                 <MenuItem value={payload} key={payload} primaryText={text}/>)}
@@ -117,8 +121,8 @@ let TreeWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">Tree</span>
           </div>
-          <div className="tree-container">
-            <Tree/>
+          <div>
+            <TreeContainer table={table} tree={treeId}/>
           </div>
         </div>
       </Sidebar>

@@ -1,4 +1,5 @@
 function errorNotify(flux, message, retryFunc) {
+  console.error(message);
   let note = {
     title: 'Error',
     level: 'error',
