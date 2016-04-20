@@ -2,7 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 import _map from 'lodash/map';
-import _each from 'lodash/map';
+import _has from 'lodash/has';
 import _filter from 'lodash/filter';
 import scrollbarSize from 'scrollbar-size';
 
@@ -37,6 +37,7 @@ let TreeWithActions = React.createClass({
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
+    treeId: React.PropTypes.string,
   },
 
   getDefaultProps() {
@@ -56,34 +57,26 @@ let TreeWithActions = React.createClass({
 
 
   render() {
-    console.log(this.config);
-    let {sidebar, table, query, column, componentUpdate} = this.props;
+    let {sidebar, table, treeId, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
 
-    let tables = _map(_filter(this.config.tables, 'hasGeoCoord'),
-      (val) => ({
-        payload: val.id,
-        icon: <Icon fixedWidth={true} name={val.icon}/>,
-        text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
+    let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0),
+      (table) => ({
+        payload: table.id,
+        icon: <Icon fixedWidth={true} name={table.icon}/>,
+        text: (<div className="dropdown-option">{table.tableCapNamePlural}</div>)
       }));
 
-    let propertyMenu = [];
-    let i = 0;
+    let trees = [];
     if (table) {
-      const propertyGroups = this.config.tables[table].propertyGroups;
-      _each(propertyGroups, (group) => {
-        if (propertyMenu.length) {
-          propertyMenu.push(<Divider key={i++}/>);
-        }
-        let {id, name} = group;
-        propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
-        _each(group.properties, (property) => {
-          let {propid, name} = property;
-          propertyMenu.push(<MenuItem value={propid} key={propid} primaryText={name}/>);
-        });
-      });
+       trees = _map(this.config.tables[table].trees,
+        (tree) => ({
+          payload: tree.id,
+          text: (<div className="dropdown-option">{tree.id}</div>)
+        }));
     }
+    const tree = table && treeId && this.config.tables[table].treesById[treeId];
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
@@ -95,27 +88,20 @@ let TreeWithActions = React.createClass({
             {tables.map(({payload, text, icon}) =>
               <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
           </SelectField>
-          {table ? <FlatButton label="Change Filter"
-                               primary={true}
-                               onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                      {
-                        table: table,
-                        initialQuery: query,
-                        onPick: this.handleQueryPick
-                      })}/>
-            : null}
-          {table ? <FlatButton label="Clear Filter"
-                               primary={true}
-                               onClick={() => componentUpdate({query: SQL.NullQuery})}/>
-            : null}
           {table ?
-            <SelectField value={this.config.tables[table].propertiesMap[column] ? column : null}
+            <SelectField value={treeId}
                          autoWidth={true}
                          floatingLabelText="Column"
-                         onChange={(e, i, v) => componentUpdate({column: v})}>
-              {propertyMenu}
+                         onChange={(e, i, v) => componentUpdate({treeId: v})}>
+              {trees.map(({payload, text}) =>
+                <MenuItem value={payload} key={payload} primaryText={text}/>)}
             </SelectField>
             : null }
+          {tree && tree.crossLink && _has(this.config.tables, tree.crossLink.split('::')[0])?
+            <FlatButton onClick={this.handleCrossLink}
+                        label={`Show ${this.config.tables[tree.crossLink.split('::')[0]].tableCapNameSingle}`}
+            />
+            : null}
         </div>
       </div>
     );
