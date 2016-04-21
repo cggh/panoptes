@@ -15,6 +15,7 @@
   overflow: hidden;
   canvas {
     display: block;
+    z-index: inherit !important;
   }
 }
 
