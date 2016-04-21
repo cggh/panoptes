@@ -97,7 +97,7 @@ let PlotContainer = React.createClass({
     const { plotType } = this.props;
     const { loadStatus } = this.state;
     return (
-      <div>
+      <div className="plot-container">
         { plotType ?
           <Plot className="plot"
                 plotType={plotType}

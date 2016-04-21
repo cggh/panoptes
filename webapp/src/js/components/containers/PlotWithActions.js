@@ -159,7 +159,7 @@ let PlotWithActions = React.createClass({
               </span>
             : null}
           </div>
-          <div className="plot-container">
+          <div className="grow">
             <PlotContainer {...this.props} />
           </div>
         </div>

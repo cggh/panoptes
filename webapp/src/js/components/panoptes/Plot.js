@@ -33,14 +33,13 @@ let Plot = React.createClass({
     let {width, height} = this.state;
     let {plotType} = this.props;
 
-
-    var layout = {
+    const layout = {
       barmode: 'overlay',
       autosize: false,
       width: width,
       height: height
     };
-    let config = {
+    const config = {
       showLink: false,
       displayModeBar: true
     };
