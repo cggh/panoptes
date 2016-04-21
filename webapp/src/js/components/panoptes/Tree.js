@@ -1,5 +1,7 @@
 import React from 'react';
 import Phylocanvas from 'react-phylocanvas';
+import {treeTypes} from 'phylocanvas';
+import _keys from 'lodash/keys';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
@@ -12,7 +14,8 @@ let Tree = React.createClass({
   ],
 
   propTypes: {
-    data: React.PropTypes.string
+    data: React.PropTypes.string,
+    treeType: React.PropTypes.oneOf(_keys(treeTypes))
   },
 
   handleResize(size) {
@@ -24,10 +27,13 @@ let Tree = React.createClass({
   },
 
   render() {
-    const {data} = this.props;
     return (
       <DetectResize onResize={this.handleResize}>
-        <Phylocanvas ref="phylocanvas" className="tree" data={data} />
+        <Phylocanvas
+          ref="phylocanvas"
+          className="tree"
+          {...this.props}
+        />
       </DetectResize>
     );
   }

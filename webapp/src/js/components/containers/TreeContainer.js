@@ -1,4 +1,7 @@
 import React from 'react';
+import {treeTypes} from 'phylocanvas';
+import _keys from 'lodash/keys';
+
 
 import Tree from 'panoptes/Tree';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -22,7 +25,8 @@ let TreeContainer = React.createClass({
 
   propTypes: {
     table: React.PropTypes.string,
-    tree: React.PropTypes.string
+    tree: React.PropTypes.string,
+    treeType: React.PropTypes.oneOf(_keys(treeTypes))
   },
 
   getInitialState() {
@@ -73,7 +77,10 @@ let TreeContainer = React.createClass({
     return (
       <div className="tree-container">
         {data ?
-          <Tree data={data} />
+          <Tree
+            {...this.props}
+            data={data}
+          />
         : null}
         <Loading status={loadStatus}/>
       </div>);

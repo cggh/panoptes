@@ -5,6 +5,9 @@ import _map from 'lodash/map';
 import _has from 'lodash/has';
 import _filter from 'lodash/filter';
 import scrollbarSize from 'scrollbar-size';
+import {treeTypes} from 'phylocanvas';
+import _keys from 'lodash/keys';
+import titleCase from 'title-case';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -34,13 +37,15 @@ let TreeWithActions = React.createClass({
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
-    treeId: React.PropTypes.string
+    tree: React.PropTypes.string,
+    treeType: React.PropTypes.oneOf(_keys(treeTypes))
   },
 
   getDefaultProps() {
     return {
       componentUpdate: null,
-      sidebar: true
+      sidebar: true,
+      treeType: 'circular'
     };
   },
 
@@ -53,17 +58,17 @@ let TreeWithActions = React.createClass({
   },
 
   handleCrossLink() {
-    const {table, treeId} = this.props;
+    const {table, tree} = this.props;
     const actions = this.getFlux().actions.panoptes;
-    const tree = table && treeId && this.config.tables[table].treesById[treeId];
-    if (tree && tree.crossLink && _has(this.config.tables, tree.crossLink.split('::')[0])) {
-      const [table, primKey] = tree.crossLink.split('::');
+    const treeInfo = table && tree && this.config.tables[table].treesById[tree];
+    if (treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0])) {
+      const [table, primKey] = treeInfo.crossLink.split('::');
       actions.dataItemPopup({table, primKey});
     }
   },
 
   render() {
-    const {sidebar, table, treeId, componentUpdate} = this.props;
+    const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
     let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0),
       (table) => ({
@@ -80,7 +85,7 @@ let TreeWithActions = React.createClass({
           text: (<div className="dropdown-option">{tree.id}</div>)
         }));
     }
-    const tree = table && treeId && this.config.tables[table].treesById[treeId];
+    const treeInfo = table && tree && this.config.tables[table].treesById[tree];
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
@@ -93,19 +98,28 @@ let TreeWithActions = React.createClass({
               <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
           </SelectField>
           {table ?
-            <SelectField value={treeId}
+            <SelectField value={tree}
                          autoWidth={true}
                          floatingLabelText="Tree"
-                         onChange={(e, i, v) => componentUpdate({treeId: v})}>
+                         onChange={(e, i, v) => componentUpdate({tree: v})}>
               {trees.map(({payload, text}) =>
                 <MenuItem value={payload} key={payload} primaryText={text}/>)}
             </SelectField>
             : null }
-          {tree && tree.crossLink && _has(this.config.tables, tree.crossLink.split('::')[0])?
+          {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0])?
             <FlatButton onClick={this.handleCrossLink}
-                        label={`Show ${this.config.tables[tree.crossLink.split('::')[0]].tableCapNameSingle}`}
+                        label={`Show ${this.config.tables[treeInfo.crossLink.split('::')[0]].tableCapNameSingle}`}
             />
             : null}
+          {treeInfo ?
+            <SelectField value={treeType}
+                         autoWidth={true}
+                         floatingLabelText="Tree Layout"
+                         onChange={(e, i, v) => componentUpdate({treeType: v})}>
+              {_keys(treeTypes).map((treeType) =>
+                <MenuItem value={treeType} key={treeType} primaryText={titleCase(treeType)}/>)}
+            </SelectField>
+            : null }
         </div>
       </div>
     );
@@ -122,7 +136,7 @@ let TreeWithActions = React.createClass({
             <span className="text">Tree {table ? `of ${this.config.tables[table].tableCapNamePlural}` : ''} </span>
           </div>
           <div className="grow">
-            <TreeContainer table={table} tree={treeId}/>
+            <TreeContainer {...this.props}/>
           </div>
         </div>
       </Sidebar>
