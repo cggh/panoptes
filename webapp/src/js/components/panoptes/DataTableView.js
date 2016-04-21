@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Color from 'color';
+import _throttle from 'lodash/throttle';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -32,7 +33,6 @@ const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const SCROLLBAR_HEIGHT = 15;
-const SPACE_BENEATH_ROWS = 50;
 
 let DataTableView = React.createClass({
   mixins: [
@@ -77,6 +77,10 @@ let DataTableView = React.createClass({
       height: 0,
       showableRowsCount: 0
     };
+  },
+
+  componentDidMount() {
+    this.setShowableRows = _throttle(this.setShowableRows, 500);
   },
 
 
@@ -157,12 +161,14 @@ let DataTableView = React.createClass({
   },
 
   handleResize(size) {
-    let showableRowsCount = 0;
-    if (size.height > 0) {
-      showableRowsCount = Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT - SPACE_BENEATH_ROWS) / ROW_HEIGHT);
-    }
-    this.setState({...size, showableRowsCount});
+    this.setState(size);
+    this.setShowableRows(size);
   },
+
+  setShowableRows(size) {
+    this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
+  },
+
 
   componentDidUpdate: function(prevProps, prevState) {
     if (this.props.onShowableRowsCountChange && prevState.showableRowsCount !== this.state.showableRowsCount) {
