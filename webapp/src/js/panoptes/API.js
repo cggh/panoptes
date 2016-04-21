@@ -84,7 +84,6 @@ function _decodeSummaryList(columns) {
   };
 }
 
-
 function pageQuery(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
