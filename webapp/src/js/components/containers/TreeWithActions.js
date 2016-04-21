@@ -119,9 +119,9 @@ let TreeWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrow-left' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">Tree</span>
+            <span className="text">Tree {table ? `of ${this.config.tables[table].tableCapNamePlural}` : ''} </span>
           </div>
-          <div>
+          <div className="grow">
             <TreeContainer table={table} tree={treeId}/>
           </div>
         </div>

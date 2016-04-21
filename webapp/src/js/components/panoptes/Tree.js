@@ -15,15 +15,7 @@ let Tree = React.createClass({
     data: React.PropTypes.string
   },
 
-  getInitialState() {
-    return {
-      width: 0,
-      height: 0
-    };
-  },
-
   handleResize(size) {
-    this.setState(size);
     if (this.refs.phylocanvas.tree) {
       this.refs.phylocanvas.tree.resizeToContainer();
       this.refs.phylocanvas.tree.fitInPanel();

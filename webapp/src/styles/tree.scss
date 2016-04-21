@@ -4,13 +4,18 @@
 }
 
 .tree-container {
-  height: calc(100% - 40px);
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .tree {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  canvas {
+    display: block;
+  }
 }
 
 .tree-controls {

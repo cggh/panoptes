@@ -328,6 +328,7 @@
   width: 100%;
   height: 100%;
   div.grow {
+    position: relative;
     flex: 1;
   }
 }
