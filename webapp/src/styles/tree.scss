@@ -1,26 +1,30 @@
 @import "./variables";
-
-.plot {
-  height: 100%;
-  width: 100%;
+.tree-sidebar {
+  width: 280px;
 }
 
-.plot-container {
+.tree-container {
   position: absolute;
   height: 100%;
   width: 100%;
 }
 
-.plot-sidebar {
-  width: 280px;
+.tree {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  canvas {
+    display: block;
+    z-index: inherit !important;
+  }
 }
 
-.plot-controls {
+.tree-controls {
   align-items: flex-start;
   .dropdown-option {
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;a
+    overflow: hidden;
     .icon {
       color: $light-text-colour;
       padding-right: 7px;
@@ -28,7 +32,7 @@
   }
 }
 
-//Inside the popover menu we are not inside plot-controls
+//Inside the popover menu we are not inside tree-controls
 .dropdown-option {
   .icon {
     color: $light-text-colour;

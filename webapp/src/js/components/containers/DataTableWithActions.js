@@ -313,19 +313,20 @@ let DataTableWithActions = React.createClass({
             <span className="block text">{columns.size} of {this.config.properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>
-          <DataTableView className="grow"
-                         table={table}
-                         query={query}
-                         order={order}
-                         ascending={ascending}
-                         columns={columns}
-                         columnWidths={columnWidths}
-                         onColumnResize={this.handleColumnResize}
-                         onOrderChange={this.handleOrderChange}
-                         startRowIndex={startRowIndex}
-                         onShowableRowsCountChange={this.handleShowableRowsCountChange}
-                         onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
-            />
+          <div className="grow">
+            <DataTableView table={table}
+                           query={query}
+                           order={order}
+                           ascending={ascending}
+                           columns={columns}
+                           columnWidths={columnWidths}
+                           onColumnResize={this.handleColumnResize}
+                           onOrderChange={this.handleOrderChange}
+                           startRowIndex={startRowIndex}
+                           onShowableRowsCountChange={this.handleShowableRowsCountChange}
+                           onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
+              />
+            </div>
         </div>
       </Sidebar>
     );

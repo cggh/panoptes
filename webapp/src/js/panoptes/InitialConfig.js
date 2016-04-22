@@ -589,14 +589,17 @@ let fetchInitialConfig = function() {
       //parse graph info
       fetchedConfig.tableCatalog.forEach((tableInfo) => {
         tableInfo.trees = [];
+        tableInfo.treesById = {};
       });
       fetchedConfig.graphs.forEach((graphInfo) => {
         if (graphInfo.tpe == 'tree') {
-          fetchedConfig.mapTableCatalog[graphInfo.tableid].trees.push({
+          const tree = {
             id: graphInfo.graphid,
             name: graphInfo.dispname,
             crossLink: graphInfo.crosslnk
-          });
+          };
+          fetchedConfig.mapTableCatalog[graphInfo.tableid].trees.push(tree);
+          fetchedConfig.mapTableCatalog[graphInfo.tableid].treesById[ graphInfo.graphid] = tree;
         }
       });
     })

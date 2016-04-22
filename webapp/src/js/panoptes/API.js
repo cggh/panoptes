@@ -84,7 +84,6 @@ function _decodeSummaryList(columns) {
   };
 }
 
-
 function pageQuery(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
@@ -206,6 +205,23 @@ function summaryData(options) {
     .then(_decodeSummaryList(columns));
 }
 
+function treeData(options) {
+  assertRequired(options, ['database', 'table', 'tree']);
+  let {database, table, tree} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'getgraph',
+      database: database,
+      tableid: table,
+      graphid: tree
+    }
+  }).then((response) => response);
+}
+
 
 function storeData(data) {
   data = Base64.encode(JSON.stringify(data));
@@ -238,14 +254,15 @@ function fetchSingleRecord(options) {
 }
 
 module.exports = {
-  serverURL: serverURL,
-  filterAborted: filterAborted,
-  errorMessage: errorMessage,
-  requestJSON: requestJSON,
-  pageQuery: pageQuery,
-  storeData: storeData,
-  fetchData: fetchData,
-  summaryData: summaryData,
-  annotationData: annotationData,
-  fetchSingleRecord: fetchSingleRecord
+  serverURL,
+  filterAborted,
+  errorMessage,
+  requestJSON,
+  pageQuery,
+  storeData,
+  fetchData,
+  summaryData,
+  annotationData,
+  fetchSingleRecord,
+  treeData
 };

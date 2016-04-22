@@ -46,6 +46,10 @@ let ViewList = React.createClass({
                     secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
                     onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null } />
+          <ListItem primaryText="Tree"
+                    secondaryText="View a tree"
+                    leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
+                    onClick={(e) => this.handleOpen(e, 'containers/TreeWithActions', {})} />
         </List>
     );
   }

@@ -10,11 +10,10 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import FluxMixin from 'mixins/FluxMixin';
-
+import Loading from 'ui/Loading';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import SQL from 'panoptes/SQL';
 import { plotTypes, allDimensions } from 'panoptes/plotTypes';
 
 import "plot.scss";
@@ -79,7 +78,6 @@ let PlotContainer = React.createClass({
           );
         })
         .catch((error) => {
-          console.log(error);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
           this.setState({loadStatus: 'error'});
         });
@@ -97,14 +95,17 @@ let PlotContainer = React.createClass({
 
   render() {
     const { plotType } = this.props;
+    const { loadStatus } = this.state;
     return (
-      plotType ?
-        <Plot className="plot"
-              plotType={plotType}
-              {...this.state}
-        />
-      : null
-      );
+      <div className="plot-container">
+        { plotType ?
+          <Plot className="plot"
+                plotType={plotType}
+                {...this.state}
+          />
+          : null }
+        <Loading status={loadStatus} />
+      </div>);
   }
 });
 

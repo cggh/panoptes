@@ -44,7 +44,8 @@ module.exports = {
       'src/js',
       'src/js/components',
       'src/styles',
-      'node_modules'
+      'node_modules',
+      '/home/benj/projects/panoptes/webapp/node_modules'
     ],
     alias: {
     }
