@@ -63,17 +63,6 @@ let GeneListView = React.createClass({
 
     let {search, maxMatches} = props;
 
-    // NOTE
-    let queryURL = API.serverURL;
-    queryURL += '?datatype' + '=' + 'findgene';
-    queryURL += '&pattern' + '=' + search;
-    queryURL += '&count' + '=' + maxMatches;
-    queryURL += '&reportall' + '=' + 1;
-    queryURL += '&database' + '=' + this.config.dataset;
-    queryURL += '&table' + '=' + 'annotation';
-console.log('queryURL: ' + queryURL);
-
-
     this.setState({loadStatus: 'loading'});
 
     let APIargs = {
@@ -125,13 +114,10 @@ console.log('queryURL: ' + queryURL);
     let {icon, search, maxMatches} = this.props;
     let {loadStatus, matchData} = this.state;
 
-console.log('matchData: %o', matchData);
-
     if (matchData.ids && matchData.ids.length > 0) {
 
       let subheaderText = null;
 
-      // TODO: "Found over 100 matching genes"
       if (matchData.ids.length === maxMatches) {
 
         let maxMatchesUnderstated = maxMatches - 1;
