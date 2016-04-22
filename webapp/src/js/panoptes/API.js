@@ -253,6 +253,39 @@ function fetchSingleRecord(options) {
   }).then((response) => response.Data);
 }
 
+function findGene(options) {
+  assertRequired(options, ['database', 'pattern', 'count', 'reportall']);
+  let {database, pattern, count, reportall} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'findgene',
+      database: database,
+      table: 'annotation',
+      pattern: pattern,
+      count: count,
+      reportall: reportall
+    }
+  })
+    .then((data) => {
+      let valListDecoder = DataDecoders.ValueListDecoder();
+      ['Chroms', 'Descrs', 'Ends', 'Hits', 'IDs', 'Starts'].forEach((key) =>
+        data[key] = valListDecoder.doDecode(data[key])
+      );
+      // Remap data to lowercase keys
+      data = {
+        chromosomes: data.Chroms,
+        descriptions: data.Descrs,
+        ends: data.Ends,
+        hits: data.Hits,
+        ids: data.IDs,
+        starts: data.Starts
+      };
+      return data;
+    });
+}
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -264,5 +297,6 @@ module.exports = {
   summaryData,
   annotationData,
   fetchSingleRecord,
-  treeData
+  treeData,
+  findGene
 };

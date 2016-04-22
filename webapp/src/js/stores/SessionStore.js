@@ -27,7 +27,8 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_CLOSE, this.emitIfNeeded(this.tabClose),
       SESSION.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
-      SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch)
+      SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
+      SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound)
     );
   },
 
@@ -174,6 +175,11 @@ let SessionStore = Fluxxor.createStore({
 
   getLastNotification() {
     return this.lastNotification;
+  },
+
+  geneFound(payload) {
+    let {geneId} = payload;
+    this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
   }
 
 });

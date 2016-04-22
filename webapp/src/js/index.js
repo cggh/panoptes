@@ -52,7 +52,8 @@ function getAppState(location) {
         components: [],
         state: {}
       },
-      modal: {}
+      modal: {},
+      foundGenes: []
     }
   };
   if (match)

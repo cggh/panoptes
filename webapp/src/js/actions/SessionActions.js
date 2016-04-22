@@ -49,7 +49,7 @@ let SessionActions = {
     this.dispatch(SESSION.POPUP_RESIZE, {compId, size});
   },
   popupToTab(compId) {
-    this.dispatch(SESSION.POPUP_TO_TAB, {compId})
+    this.dispatch(SESSION.POPUP_TO_TAB, {compId});
   },
   tabClose(compId) {
     this.dispatch(SESSION.TAB_CLOSE, {compId});
@@ -65,6 +65,11 @@ let SessionActions = {
   },
   tabSwitch(compId) {
     this.dispatch(SESSION.TAB_SWITCH, {compId});
+  },
+  geneFound(geneId) {
+    this.dispatch(SESSION.GENE_FOUND, {
+      geneId: geneId
+    });
   }
 };
 
