@@ -254,8 +254,8 @@ function fetchSingleRecord(options) {
 }
 
 function findGene(options) {
-  assertRequired(options, ['database', 'pattern', 'count', 'reportall']);
-  let {database, pattern, count, reportall} = options;
+  assertRequired(options, ['database', 'search', 'maxMatches']);
+  let {database, search, maxMatches} = options;
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({
     ...args,
@@ -263,9 +263,9 @@ function findGene(options) {
       datatype: 'findgene',
       database: database,
       table: 'annotation',
-      pattern: pattern,
-      count: count,
-      reportall: reportall
+      pattern: search,
+      count: maxMatches,
+      reportall: 1
     }
   })
     .then((data) => {
@@ -286,6 +286,29 @@ function findGene(options) {
     });
 }
 
+function findGenesInRegion(options) {
+
+  assertRequired(options, ['chromosome', 'start', 'end']);
+  let {chromosome, start, end} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+
+
+  // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+  // order: null,
+  // ascending: false,
+  // count: false,
+  // start: 0,
+  // stop: 1000000,
+  // distinct: false,
+  // transpose: true
+
+// TODO: construct query for chromosome, start and end positions.
+
+  let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
+
+  return pageQuery({database: 'Samples_and_Variants', table: 'annotation', columns: columns});
+}
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -298,5 +321,6 @@ module.exports = {
   annotationData,
   fetchSingleRecord,
   treeData,
-  findGene
+  findGene,
+  findGenesInRegion
 };

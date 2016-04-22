@@ -1,5 +1,8 @@
 import React from 'react';
 
+// Lodash
+import _map from 'lodash/map';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,7 +17,8 @@ import TextField from 'material-ui/TextField';
 import Icon from 'ui/Icon';
 
 // Panoptes
-import GeneListView from 'panoptes/GeneListView';
+import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
+import RegionGenesList from 'panoptes/RegionGenesList';
 import API from 'panoptes/API';
 
 let GeneFinder = React.createClass({
@@ -60,16 +64,27 @@ let GeneFinder = React.createClass({
     this.getFlux().actions.session.modalOpen(container, props);
   },
 
+  handleSelectGene(geneId) {
+    // Add selected geneId to list of recently found genes.
+    this.getFlux().actions.session.geneFound(geneId);
+
+    // Close the modal.
+    this.getFlux().actions.session.modalClose();
+
+    // Open the gene info popup.
+    this.getFlux().actions.session.popupOpen('containers/Gene', {geneId: geneId});
+  },
+
   render() {
 
-    let {pane, search} = this.state;
-
-    // Retrieve the list of recently found genes from the session.
-    let {foundGenes} = this.getFlux().store('SessionStore').getState().toObject();
+    let {pane, search, chromosome, start, end} = this.state;
 
     let geneFinderContent = null;
 
     if (pane === null) {
+
+      // Retrieve the list of recently found genes from the session.
+      let {foundGenes} = this.getFlux().store('SessionStore').getState().toObject();
 
       let foundGenesList = null;
 
@@ -83,7 +98,7 @@ let GeneFinder = React.createClass({
             <ListItem key={foundGene}
                       primaryText={foundGene}
                       leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                      onClick={() => this.handleSwitchModal('containers/Gene', {geneId: foundGene})}
+                      onClick={() => this.handleSelectGene(foundGene)}
             />
           );
 
@@ -136,9 +151,9 @@ let GeneFinder = React.createClass({
       } else {
 
         geneList = (
-          <GeneListView
+          <GeneSearchResultsList
              search={search}
-             onSelect={this.handleSelect}
+             onSelectGene={this.handleSelectGene}
              icon={this.icon()}
             />
         );
@@ -189,11 +204,13 @@ let GeneFinder = React.createClass({
       } else {
 
         geneList = (
-          <GeneListView
-             search={search}
-             onSelect={this.handleSelect}
-             icon={this.icon()}
-            />
+          <RegionGenesList
+            chromosome={chromosome}
+            start={start}
+            end={end}
+            onSelect={this.handleSelect}
+            icon={this.icon()}
+          />
         );
 
       }
@@ -204,7 +221,18 @@ let GeneFinder = React.createClass({
             <p>Search a genomic region.</p>
           </div>
           <div>
-             Chromosome
+            <span>Chromosome</span>
+            <span>: </span>
+            <span>
+              <select>
+                {_map(this.config.chromosomes, (length, name) =>
+                    <option key={name}
+                            value={name}>
+                      {name}
+                    </option>
+                )}
+              </select>
+            </span>
           </div>
           <div>
              Start

@@ -30,7 +30,7 @@ import Subheader from 'material-ui/Subheader';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
-let GeneListView = React.createClass({
+let RegionGenesList = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -40,12 +40,15 @@ let GeneListView = React.createClass({
   ],
 
   propTypes: {
-    search: React.PropTypes.string.isRequired
+    chromosome: React.PropTypes.string.isRequired,
+    onSelectGene: React.PropTypes.func.isRequired
   },
 
   getDefaultProps() {
     return {
-      search: '',
+      chromosome: null,
+      start: 0,
+      end: 100000,
       maxMatches: 51
     };
   },
@@ -61,20 +64,20 @@ let GeneListView = React.createClass({
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
 
-    let {search, maxMatches} = props;
+    let {chromosome, start, end} = props;
 
     this.setState({loadStatus: 'loading'});
 
     let APIargs = {
       database: this.config.dataset,
-      pattern: search,
-      count: maxMatches,
-      reportall: 1
+      chromosome: chromosome,
+      start: start,
+      end: end
     };
 
     requestContext.request((componentCancellation) =>
           LRUCache.get(
-            'findGene' + JSON.stringify(APIargs),
+            'findGenesInRegion' + JSON.stringify(APIargs),
             (cacheCancellation) =>
               API.findGene({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation
@@ -99,39 +102,19 @@ let GeneListView = React.createClass({
   // TODO: open genes in popup, not a modal switch (allow open more than one).
   // But the search dialog is still in modal ?!
 
-  handleSwitchModal(container, props) {
-    this.getFlux().actions.session.modalClose();
-    this.getFlux().actions.session.modalOpen(container, props);
-  },
-
   handleSelectGene(geneId) {
-    // Add selected geneId to list of recently found genes.
-    this.getFlux().actions.session.geneFound(geneId);
-    this.handleSwitchModal('containers/Gene', {geneId: geneId});
+    this.props.onSelectGene(geneId);
   },
 
   render() {
-    let {icon, search, maxMatches} = this.props;
+    let {icon, chromosome, start, end} = this.props;
     let {loadStatus, matchData} = this.state;
 
     if (matchData.ids && matchData.ids.length > 0) {
 
-      let subheaderText = null;
-
-      if (matchData.ids.length === maxMatches) {
-
-        let maxMatchesUnderstated = maxMatches - 1;
-
-        subheaderText = (
-          <span>Found over {maxMatchesUnderstated} matching genes:</span>
-        );
-
-      } else {
-
-        subheaderText = (
-          <span>Found {matchData.ids.length} matching genes:</span>
-        );
-      }
+      let subheaderText = (
+        <span>Found {matchData.ids.length} genes in the region:</span>
+      );
 
       // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
 
@@ -143,18 +126,14 @@ let GeneListView = React.createClass({
           <ListItem key={matchData.ids[i]}
                     primaryText={
                       <div>
-                        <Highlight search={search}>
                             <span>{matchData.ids[i]}</span>
                             <span> on </span>
                             <span>{matchData.chromosomes[i]}</span>
-                        </Highlight>
                       </div>
                     }
                     secondaryText={
                       <div>
-                        <Highlight search={search}>
                             {matchData.descriptions[i]}
-                        </Highlight>
                       </div>
                     }
                     secondaryTextLines={2}
@@ -179,7 +158,7 @@ let GeneListView = React.createClass({
     } else {
       return (
         <div>
-          <p>No match</p>
+          <p>No genes found in this region</p>
         </div>
       );
     }
@@ -187,4 +166,4 @@ let GeneListView = React.createClass({
 
 });
 
-module.exports = GeneListView;
+module.exports = RegionGenesList;
