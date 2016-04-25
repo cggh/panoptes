@@ -288,10 +288,8 @@ function findGene(options) {
 
 function findGenesInRegion(options) {
 
-  assertRequired(options, ['chromosome', 'start', 'end']);
-  let {chromosome, start, end} = options;
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-
+  assertRequired(options, ['chromosome', 'startPosition', 'endPosition']);
+  let {chromosome, startPosition, endPosition} = options;
 
   // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
   // order: null,
@@ -304,9 +302,23 @@ function findGenesInRegion(options) {
 
 // TODO: construct query for chromosome, start and end positions.
 
+  let query = SQL.WhereClause.encode(SQL.WhereClause.AND([
+    SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
+    SQL.WhereClause.CompareFixed('fstop', '>=', startPosition),
+    SQL.WhereClause.CompareFixed('fstart', '<=', endPosition),
+    SQL.WhereClause.CompareFixed('ftype', '=', 'gene')
+  ]));
+
   let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
 
-  return pageQuery({database: 'Samples_and_Variants', table: 'annotation', columns: columns});
+  return pageQuery(
+    {
+      database: 'Samples_and_Variants',
+      table: 'annotation',
+      columns: columns,
+      query: query
+    }
+  );
 }
 
 module.exports = {

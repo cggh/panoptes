@@ -12,6 +12,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
 import Icon from 'ui/Icon';
@@ -21,12 +22,17 @@ import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
 import RegionGenesList from 'panoptes/RegionGenesList';
 import API from 'panoptes/API';
 
+const FALLBACK_MAXIMUM = 1000000000;
+
 let GeneFinder = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin
   ],
+
+  propTypes: {
+  },
 
   getDefaultProps() {
     return {
@@ -39,7 +45,9 @@ let GeneFinder = React.createClass({
   getInitialState() {
     return {
       pane: this.props.initialPane,
-      search: ''
+      search: '',
+      startPosition: 0,
+      endPosition: 100000
     };
   },
 
@@ -57,6 +65,18 @@ let GeneFinder = React.createClass({
 
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
+  },
+
+  handleChromChange(event) {
+    this.setState({'chromosome': event.target.value});
+  },
+
+  handleStartPosChange(event) {
+    this.setState({'startPosition': parseInt(event.target.value)});
+  },
+
+  handleEndPosChange(event) {
+    this.setState({'endPosition': parseInt(event.target.value)});
   },
 
   handleSwitchModal(container, props) {
@@ -77,7 +97,7 @@ let GeneFinder = React.createClass({
 
   render() {
 
-    let {pane, search, chromosome, start, end} = this.state;
+    let {pane, search, chromosome, startPosition, endPosition} = this.state;
 
     let geneFinderContent = null;
 
@@ -129,7 +149,7 @@ let GeneFinder = React.createClass({
           </List>
           {foundGenesList}
           <div className="centering-container">
-            <RaisedButton label={<span>Cancel</span>}
+            <FlatButton label={<span>Cancel</span>}
                           primary={true}
                           onClick={() => this.getFlux().actions.session.modalClose()}
             />
@@ -174,7 +194,7 @@ let GeneFinder = React.createClass({
           </div>
           <div className="centering-container">
             <div style={{paddingRight: '10px'}}>
-              <RaisedButton label={<span>Cancel</span>}
+              <FlatButton label={<span>Cancel</span>}
                             primary={true}
                             onClick={() => this.getFlux().actions.session.modalClose()}
               />
@@ -195,10 +215,14 @@ let GeneFinder = React.createClass({
 
       let geneList = null;
 
-      if (search.length <= 2) {
+console.log('chromosome: ', chromosome);
+console.log('startPosition: ', startPosition);
+console.log('endPosition: ', endPosition);
+
+      if (!chromosome || !startPosition || !endPosition) {
 
         geneList = (
-          <p>Enter a start and end position.</p>
+          <p>Select the chromosome and enter the start and end positions.</p>
         );
 
       } else {
@@ -206,13 +230,18 @@ let GeneFinder = React.createClass({
         geneList = (
           <RegionGenesList
             chromosome={chromosome}
-            start={start}
-            end={end}
-            onSelect={this.handleSelect}
+            startPosition={startPosition}
+            endPosition={endPosition}
+            onSelectGene={this.handleSelectGene}
             icon={this.icon()}
           />
         );
 
+      }
+
+      let max = FALLBACK_MAXIMUM;
+      if (chromosome) {
+        this.config.chromosomes[chromosome].len;
       }
 
       geneFinderContent = (
@@ -224,7 +253,7 @@ let GeneFinder = React.createClass({
             <span>Chromosome</span>
             <span>: </span>
             <span>
-              <select>
+              <select value={chromosome} onChange={this.handleChromChange}>
                 {_map(this.config.chromosomes, (length, name) =>
                     <option key={name}
                             value={name}>
@@ -235,17 +264,37 @@ let GeneFinder = React.createClass({
             </span>
           </div>
           <div>
-             Start
+            <span>Start</span>
+            <span>: </span>
+            <span>
+              <input value={parseInt(startPosition)}
+                     onChange={this.handleStartPosChange}
+                     min={0}
+                     max={max}
+                     type="number"
+              />
+            </span>
+            <span> bp</span>
           </div>
           <div>
-             End
+            <span>End</span>
+            <span>: </span>
+            <span>
+              <input value={parseInt(endPosition)}
+                     onChange={this.handleEndPosChange}
+                     min={startPosition}
+                     max={max}
+                     type="number"
+              />
+            </span>
+            <span> bp</span>
           </div>
           <div>
             {geneList}
           </div>
           <div className="centering-container">
             <div style={{paddingRight: '10px'}}>
-              <RaisedButton label={<span>Cancel</span>}
+              <FlatButton label={<span>Cancel</span>}
                             primary={true}
                             onClick={() => this.getFlux().actions.session.modalClose()}
               />

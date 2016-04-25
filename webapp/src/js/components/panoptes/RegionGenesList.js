@@ -36,26 +36,27 @@ let RegionGenesList = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('search')
+    DataFetcherMixin('chromosome', 'startPosition', 'endPosition')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    onSelectGene: React.PropTypes.func.isRequired
+    onSelectGene: React.PropTypes.func.isRequired,
+    startPosition: React.PropTypes.number.isRequired,
+    endPosition: React.PropTypes.number.isRequired
   },
 
   getDefaultProps() {
     return {
       chromosome: null,
-      start: 0,
-      end: 100000,
-      maxMatches: 51
+      startPosition: 0,
+      endPosition: 100000
     };
   },
 
   getInitialState() {
     return {
-      matchData: [],
+      regionGenesData: [],
       loadStatus: 'loaded'
     };
   },
@@ -64,29 +65,29 @@ let RegionGenesList = React.createClass({
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
 
-    let {chromosome, start, end} = props;
+    let {chromosome, startPosition, endPosition} = props;
 
     this.setState({loadStatus: 'loading'});
 
     let APIargs = {
       database: this.config.dataset,
       chromosome: chromosome,
-      start: start,
-      end: end
+      startPosition: startPosition,
+      endPosition: endPosition
     };
 
     requestContext.request((componentCancellation) =>
           LRUCache.get(
             'findGenesInRegion' + JSON.stringify(APIargs),
             (cacheCancellation) =>
-              API.findGene({cancellation: cacheCancellation, ...APIargs}),
+              API.findGenesInRegion({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation
           )
         )
         .then((data) => {
           this.setState({
             loadStatus: 'loaded',
-            matchData: data
+            regionGenesData: data
           });
 
         })
@@ -107,37 +108,37 @@ let RegionGenesList = React.createClass({
   },
 
   render() {
-    let {icon, chromosome, start, end} = this.props;
-    let {loadStatus, matchData} = this.state;
+    let {icon, chromosome, startPosition, endPosition} = this.props;
+    let {loadStatus, regionGenesData} = this.state;
 
-    if (matchData.ids && matchData.ids.length > 0) {
+    if (regionGenesData && regionGenesData.length > 0) {
 
       let subheaderText = (
-        <span>Found {matchData.ids.length} genes in the region:</span>
+        <span>Found {regionGenesData.length} genes between positions {startPosition} and {endPosition} on chromosome {chromosome}:</span>
       );
 
       // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
 
       let listItems = [];
 
-      for (let i = 0, len = matchData.ids.length; i < len; i++) {
+      for (let i = 0, len = regionGenesData.length; i < len; i++) {
 
         listItems.push(
-          <ListItem key={matchData.ids[i]}
+          <ListItem key={regionGenesData[i].fid}
                     primaryText={
                       <div>
-                            <span>{matchData.ids[i]}</span>
-                            <span> on </span>
-                            <span>{matchData.chromosomes[i]}</span>
+                            <span>{regionGenesData[i].fname}</span>
+                            <span> between </span>
+                            <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
                       </div>
                     }
                     secondaryText={
                       <div>
-                            {matchData.descriptions[i]}
+                            {regionGenesData[i].descr}
                       </div>
                     }
                     secondaryTextLines={2}
-                    onClick={() => this.handleSelectGene(matchData.ids[i])}
+                    onClick={() => this.handleSelectGene(regionGenesData[i].fid)}
                     leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
           />
         );
@@ -158,7 +159,7 @@ let RegionGenesList = React.createClass({
     } else {
       return (
         <div>
-          <p>No genes found in this region</p>
+          <p>No genes found between positions {startPosition} and {endPosition} on chromosome {chromosome}.</p>
         </div>
       );
     }
