@@ -300,16 +300,15 @@ function findGenesInRegion(options) {
   // distinct: false,
   // transpose: true
 
-// TODO: construct query for chromosome, start and end positions.
+  let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
 
+  // Construct query for chromosome, start and end positions.
   let query = SQL.WhereClause.encode(SQL.WhereClause.AND([
     SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
     SQL.WhereClause.CompareFixed('fstop', '>=', startPosition),
     SQL.WhereClause.CompareFixed('fstart', '<=', endPosition),
     SQL.WhereClause.CompareFixed('ftype', '=', 'gene')
   ]));
-
-  let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
 
   return pageQuery(
     {

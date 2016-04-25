@@ -39,6 +39,11 @@ let Finder = React.createClass({
     this.getFlux().actions.session.modalOpen(container, props);
   },
 
+  handleSwitchToPopup(container, props) {
+    this.getFlux().actions.session.modalClose();
+    this.getFlux().actions.session.popupOpen(container, props);
+  },
+
   render() {
 
     // TODO: A vertical list is not entirely scalable (modal dialog would go off screen).
@@ -100,7 +105,7 @@ let Finder = React.createClass({
                     primaryText={tables[table].tableCapNameSingle}
                     secondaryText={secondaryText}
                     leftIcon={<div><Icon fixedWidth={true} name={tables[table].icon} /></div>}
-                    onClick={() => this.handleSwitchModal('containers/DatumFinder', {table: table})}
+                    onClick={() => this.handleSwitchToPopup('containers/ItemFinder', {table: tables[table].id})}
           />
         );
 

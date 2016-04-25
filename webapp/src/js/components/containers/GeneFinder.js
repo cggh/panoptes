@@ -22,7 +22,7 @@ import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
 import RegionGenesList from 'panoptes/RegionGenesList';
 import API from 'panoptes/API';
 
-const FALLBACK_MAXIMUM = 1000000000;
+const DEFAULT_MAX_POSITION = 1000000000;
 
 let GeneFinder = React.createClass({
   mixins: [
@@ -30,9 +30,6 @@ let GeneFinder = React.createClass({
     FluxMixin,
     ConfigMixin
   ],
-
-  propTypes: {
-  },
 
   getDefaultProps() {
     return {
@@ -134,6 +131,9 @@ let GeneFinder = React.createClass({
         );
       }
 
+      // FIXME: The foundGenesList could get too long and cause problems (being modal)
+      // Maybe wrap it in a scrollable.
+
       geneFinderContent = (
         <div>
           <List>
@@ -186,8 +186,11 @@ let GeneFinder = React.createClass({
             <p>Search gene names and descriptions.</p>
           </div>
           <div className="search">
-            <TextField fullWidth={true} floatingLabelText="Search"
-                       value={search} onChange={this.handleSearchChange}/>
+            <TextField fullWidth={true}
+                       floatingLabelText="Search"
+                       value={search}
+                       onChange={this.handleSearchChange}
+            />
           </div>
           <div>
             {geneList}
@@ -239,10 +242,12 @@ console.log('endPosition: ', endPosition);
 
       }
 
-      let max = FALLBACK_MAXIMUM;
+      let maxPosition = DEFAULT_MAX_POSITION;
       if (chromosome) {
-        this.config.chromosomes[chromosome].len;
+        maxPosition = this.config.chromosomes[chromosome].len;
       }
+
+      // TODO: Lay out inputs horizontally and allow collapse; give sensible widths.
 
       geneFinderContent = (
         <div className="stack vertical" style={{padding: '10px'}}>
@@ -270,7 +275,7 @@ console.log('endPosition: ', endPosition);
               <input value={parseInt(startPosition)}
                      onChange={this.handleStartPosChange}
                      min={0}
-                     max={max}
+                     max={maxPosition}
                      type="number"
               />
             </span>
@@ -283,7 +288,7 @@ console.log('endPosition: ', endPosition);
               <input value={parseInt(endPosition)}
                      onChange={this.handleEndPosChange}
                      min={startPosition}
-                     max={max}
+                     max={maxPosition}
                      type="number"
               />
             </span>
