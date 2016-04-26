@@ -14,6 +14,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 
 // lodash
 import _clone from 'lodash/clone';
@@ -125,7 +126,8 @@ let DataTableWithActions = React.createClass({
     return {
       fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
-      showableRowsCount: 0
+      showableRowsCount: 0,
+      search: ''
     };
   },
 
@@ -184,10 +186,15 @@ let DataTableWithActions = React.createClass({
     }
   },
 
+  handleSearchChange(event) {
+console.log('handleSearchChange: ' + event.target.value);
+    this.setState({search: event.target.value});
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, search} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -204,8 +211,8 @@ let DataTableWithActions = React.createClass({
                         table: table,
                         initialQuery: query,
                         onPick: this.handleQueryPick
-                      })}/>
-        <br/>
+                      })}
+        />
         <FlatButton label="Add/Remove Columns"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
@@ -214,11 +221,18 @@ let DataTableWithActions = React.createClass({
                         initialPick: columns,
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange
-                      })}/>
+                      })}
+        />
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
-                    onClick={this.handleDownload}/>
+                    onClick={this.handleDownload}
+        />
+        <TextField fullWidth={true}
+                     floatingLabelText="Search"
+                     value={search}
+                     onChange={this.handleSearchChange}
+        />
       </div>
     );
 

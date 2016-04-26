@@ -39,9 +39,20 @@ let Finder = React.createClass({
     this.getFlux().actions.session.modalOpen(container, props);
   },
 
-  handleSwitchToPopup(container, props) {
+  handleSwitchToTableTab(e, table) {
     this.getFlux().actions.session.modalClose();
-    this.getFlux().actions.session.popupOpen(container, props);
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+
+    let container = 'containers/DataTableWithActions';
+    if (this.config.tables[table.id].settings.listView) {
+      container = 'containers/ListWithActions';
+    }
+
+    if (middleClick)
+      this.getFlux().actions.session.tabOpen(container, {table: table.id}, false);
+    else {
+      this.getFlux().actions.session.tabOpen(container, {table: table.id}, true);
+    }
   },
 
   render() {
@@ -105,7 +116,7 @@ let Finder = React.createClass({
                     primaryText={tables[table].tableCapNameSingle}
                     secondaryText={secondaryText}
                     leftIcon={<div><Icon fixedWidth={true} name={tables[table].icon} /></div>}
-                    onClick={() => this.handleSwitchToPopup('containers/ItemFinder', {table: tables[table].id})}
+                    onClick={(e) => this.handleSwitchToTableTab(e, tables[table])}
           />
         );
 
