@@ -201,6 +201,13 @@ console.log('handleSearchChange: ' + event.target.value);
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
     let {description} = this.config;
+    let quickFindFieldsList = '';
+    for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+      let quickFindField = this.config.quickFindFields[i];
+      if (i != 0) quickFindFieldsList += ', ';
+      quickFindFieldsList += this.config.propertiesMap[quickFindField].name;
+
+    }
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
@@ -212,6 +219,7 @@ console.log('handleSearchChange: ' + event.target.value);
                         initialQuery: query,
                         onPick: this.handleQueryPick
                       })}
+                      icon={<Icon fixedWidth={true} name="filter" />}
         />
         <FlatButton label="Add/Remove Columns"
                     primary={true}
@@ -222,17 +230,26 @@ console.log('handleSearchChange: ' + event.target.value);
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange
                       })}
+                      icon={<Icon fixedWidth={true} name="columns" />}
         />
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
                     onClick={this.handleDownload}
+                    icon={<Icon fixedWidth={true} name="download" />}
+        />
+        <FlatButton label="Search data"
+                    disabled={columns.size === 0}
+                    primary={true}
+                    onClick={this.handleSearch}
+                    icon={<Icon fixedWidth={true} name="search" />}
         />
         <TextField fullWidth={true}
                      floatingLabelText="Search"
                      value={search}
                      onChange={this.handleSearchChange}
         />
+        <div>{quickFindFieldsList}</div>
       </div>
     );
 
