@@ -1,4 +1,5 @@
 import React from 'react';
+import Immutable from 'immutable';
 
 // Lodash
 import _map from 'lodash/map';
@@ -15,8 +16,10 @@ import TextField from 'material-ui/TextField';
 import Icon from 'ui/Icon';
 
 // Panoptes
-import DataTableView from 'panoptes/DataTableView';
+//import DataTableView from 'panoptes/DataTableView';
+import DataTableWithActions from 'containers/DataTableWithActions';
 import API from 'panoptes/API';
+import SQL from 'panoptes/SQL';
 
 let GeneFinder = React.createClass({
   mixins: [
@@ -54,6 +57,10 @@ let GeneFinder = React.createClass({
     this.setState({'search': event.target.value});
   },
 
+  handleShowableRowsCountChange(showableRowsCount) {
+    this.setState({showableRowsCount: showableRowsCount});
+  },
+
   render() {
 
     let {search} = this.state;
@@ -74,17 +81,22 @@ let GeneFinder = React.createClass({
 
     }
 
+    let showablePropertiesMap = {};
+    let tableConfig = this.config.tables[table];
+    Object.keys(tableConfig.propertiesMap).forEach(
+      (key) => {
+        if (tableConfig.propertiesMap[key].showInTable) {
+          showablePropertiesMap[key] = tableConfig.propertiesMap[key];
+        }
+      }
+    );
 
-    //let columns = this.config.tables[table];
-console.log('this.config.tables[table].propertiesMap: %o', this.config.tables[table].propertiesMap);
-console.log('Object.keys(this.config.tables[table].propertiesMap): %o', Object.keys(this.config.tables[table].propertiesMap));
+console.log('showablePropertiesMap: %o', showablePropertiesMap);
 
-    let filteredProps = _filter(this.config.tables[table].propertiesMap, {settings: {ShowInTable: true}});
-console.log('filteredProps: %o', filteredProps);
-console.log('Object.keys(filteredProps): %o', Object.keys(filteredProps));
+    let columns = Immutable.fromJS(Object.keys(showablePropertiesMap));
 
     return (
-      <div>
+      <div className="vertical stack" style={{padding: '10px'}}>
         <div className="search">
           <TextField fullWidth={true}
                      floatingLabelText="Search"
@@ -94,8 +106,17 @@ console.log('Object.keys(filteredProps): %o', Object.keys(filteredProps));
         </div>
         <div>{quickFindFieldsText}</div>
         <div>You searched for {search}</div>
-        <div>
-          <DataTableView table={table} />
+        <div className="grow" style={{height: '200px', width: '400px'}}>
+          <DataTableWithActions table={table}
+                         columns={columns}
+                         query={SQL.NullQuery}
+                         order={null}
+                         ascending={true}
+                         columnWidths={Immutable.Map()}
+                         initialStartRowIndex={0}
+                         sidebar={true}
+                         onShowableRowsCountChange={this.handleShowableRowsCountChange}
+          />
         </div>
       </div>
     );
