@@ -298,7 +298,7 @@ let DataTableWithActions = React.createClass({
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
       <Sidebar
-        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
+        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">
