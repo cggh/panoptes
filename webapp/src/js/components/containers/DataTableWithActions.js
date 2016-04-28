@@ -42,7 +42,8 @@ let DataTableWithActions = React.createClass({
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     initialStartRowIndex: React.PropTypes.number,
-    sidebar: React.PropTypes.bool
+    sidebar: React.PropTypes.bool,
+    initialSearchFocus: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -53,7 +54,18 @@ let DataTableWithActions = React.createClass({
       ascending: true,
       columnWidths: Immutable.Map(),
       initialStartRowIndex: 0,
-      sidebar: true
+      sidebar: true,
+      initialSearchFocus: false
+    };
+  },
+
+  getInitialState() {
+    return {
+      fetchedRowsCount: 0,
+      startRowIndex: this.props.initialStartRowIndex,
+      showableRowsCount: 0,
+      search: '',
+      searchOpen: this.props.initialSearchFocus
     };
   },
 
@@ -130,16 +142,6 @@ let DataTableWithActions = React.createClass({
 
   // TODO: handleLastPage()
 
-  getInitialState() {
-    return {
-      fetchedRowsCount: 0,
-      startRowIndex: this.props.initialStartRowIndex,
-      showableRowsCount: 0,
-      search: '',
-      searchOpen: false
-    };
-  },
-
   createActiveColumnListString() {
     let {columns} = this.props;
 
@@ -201,6 +203,26 @@ let DataTableWithActions = React.createClass({
 
   handleSearchChange(event) {
     this.setState({search: event.target.value});
+
+    let existingQuery = SQL.WhereClause.decode(this.props.query);
+
+console.log('existingQuery: %o', existingQuery);
+
+
+    let newComponents = [];
+    for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+      let quickFindField = this.config.quickFindFields[i];
+
+      let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', event.target.value);
+
+      newComponents.push(newComponent);
+    }
+
+
+
+console.log('newComponents: %o', newComponents);
+
+    //this.props.componentUpdate({query: SQL.WhereClause.encode(newQuery)});
   },
 
   handleSearchBlur(event) {

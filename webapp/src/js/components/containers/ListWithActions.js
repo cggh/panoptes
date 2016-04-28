@@ -38,13 +38,15 @@ let ListWithActions = React.createClass({
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     selectedPrimKey: React.PropTypes.string,
-    sidebar: React.PropTypes.bool
+    sidebar: React.PropTypes.bool,
+    initialSearchFocus: React.PropTypes.bool
   },
 
   getDefaultProps() {
     return {
       table: null,
-      sidebar: true
+      sidebar: true,
+      initialSearchFocus: false
     };
   },
 
@@ -56,6 +58,12 @@ let ListWithActions = React.createClass({
 
   componentWillMount() {
     this.config = this.config.tables[this.props.table];
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.initialSearchFocus) {
+      this.refs.search.focus();
+    }
   },
 
   icon() {
@@ -84,8 +92,12 @@ let ListWithActions = React.createClass({
         <div className="item-picker">
           <SidebarHeader icon={this.icon()} description={description}/>
           <div className="search">
-            <TextField fullWidth={true} floatingLabelText="Search"
-                       value={search} onChange={this.handleSearchChange}/>
+            <TextField ref="search"
+                       fullWidth={true}
+                       floatingLabelText="Search"
+                       value={search}
+                       onChange={this.handleSearchChange}
+            />
           </div>
           <ListView
              search={search}
@@ -183,7 +195,7 @@ let ListWithActions = React.createClass({
 
     return (
       <Sidebar
-        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
+        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">
