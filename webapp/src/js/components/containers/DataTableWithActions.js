@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import LZString from 'lz-string';
@@ -14,6 +15,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 // lodash
@@ -66,6 +68,12 @@ let DataTableWithActions = React.createClass({
         this.propertyGroups[key].properties = filteredProps;
       }
     });
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.searchOpen) {
+      this.refs.search.focus();
+    }
   },
 
   icon() {
@@ -127,7 +135,8 @@ let DataTableWithActions = React.createClass({
       fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
-      search: ''
+      search: '',
+      searchOpen: false
     };
   },
 
@@ -186,15 +195,24 @@ let DataTableWithActions = React.createClass({
     }
   },
 
+  handleSearchOpen() {
+    this.setState({searchOpen: true});
+  },
+
   handleSearchChange(event) {
-console.log('handleSearchChange: ' + event.target.value);
     this.setState({search: event.target.value});
+  },
+
+  handleSearchBlur(event) {
+    if (event.target.value === '') {
+      this.setState({searchOpen: false});
+    }
   },
 
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount, search} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, search, searchOpen} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -208,6 +226,35 @@ console.log('handleSearchChange: ' + event.target.value);
       quickFindFieldsList += this.config.propertiesMap[quickFindField].name;
 
     }
+
+    let searchGUI = (
+      <FlatButton label="Search data"
+                  disabled={columns.size === 0}
+                  primary={true}
+                  onClick={this.handleSearchOpen}
+                  icon={<Icon fixedWidth={true} name="search" />}
+      />
+    );
+    if (searchOpen) {
+      searchGUI = (
+        <div>
+          <RaisedButton label="Search data"
+                      disabled={columns.size === 0}
+                      primary={true}
+                      icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+          />
+          <TextField ref="search"
+                     fullWidth={true}
+                     floatingLabelText="Search"
+                     value={search}
+                     onChange={this.handleSearchChange}
+                     onBlur={this.handleSearchBlur}
+          />
+          <div>{quickFindFieldsList}</div>
+        </div>
+      );
+    }
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
@@ -238,18 +285,7 @@ console.log('handleSearchChange: ' + event.target.value);
                     onClick={this.handleDownload}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
-        <FlatButton label="Search data"
-                    disabled={columns.size === 0}
-                    primary={true}
-                    onClick={this.handleSearch}
-                    icon={<Icon fixedWidth={true} name="search" />}
-        />
-        <TextField fullWidth={true}
-                     floatingLabelText="Search"
-                     value={search}
-                     onChange={this.handleSearchChange}
-        />
-        <div>{quickFindFieldsList}</div>
+        {searchGUI}
       </div>
     );
 
