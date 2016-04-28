@@ -221,15 +221,16 @@ let DataTableWithActions = React.createClass({
 
       let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
 
-      // FIXME: Can't we simply chain the OR criteria together?
       if (i === 0) {
         searchQuery = newComponent;
-      } else {
+      } else if (i === 1) {
         let newOr = SQL.WhereClause.Compound('OR');
         let child = _clone(searchQuery);
         newOr.addComponent(child);
         newOr.addComponent(newComponent);
         Object.assign(searchQuery, newOr);
+      } else {
+        searchQuery.addComponent(newComponent);
       }
 
     }
