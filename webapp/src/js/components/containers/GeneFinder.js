@@ -22,8 +22,6 @@ import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
 import RegionGenesList from 'panoptes/RegionGenesList';
 import API from 'panoptes/API';
 
-const DEFAULT_MAX_POSITION = 1000000000;
-
 let GeneFinder = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -43,8 +41,10 @@ let GeneFinder = React.createClass({
     return {
       pane: this.props.initialPane,
       search: '',
+      chromosome: null,
       startPosition: 0,
-      endPosition: 100000
+      endPosition: null,
+      chromosomeLength: null
     };
   },
 
@@ -56,6 +56,30 @@ let GeneFinder = React.createClass({
     return this.props.title;
   },
 
+  componentWillMount() {
+
+    // Set the default chromosome as the first chromosome in this.config.chromosomes
+    // NB: this.config is undefined in getInitialstate()
+
+    let defaultChromosome = Object.keys(this.config.chromosomes)[0];
+
+    if (this.state.chromosome === null && defaultChromosome !== null) {
+
+      let defaultChromosomeLength = parseInt(this.config.chromosomes[defaultChromosome].len);
+
+      this.setState({
+        'chromosome': defaultChromosome,
+        'chromosomeLength': defaultChromosomeLength
+      });
+
+      // Set the default endPosition as the chromosome length
+      if (this.state.endPosition === null) {
+        this.setState({'endPosition': defaultChromosomeLength});
+      }
+    }
+
+  },
+
   handleSwitchPane(pane) {
     this.setState({pane: pane});
   },
@@ -65,7 +89,12 @@ let GeneFinder = React.createClass({
   },
 
   handleChromChange(event) {
-    this.setState({'chromosome': event.target.value});
+    this.setState({
+      'chromosome': event.target.value,
+      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len),
+      'startPosition': 0,
+      'endPosition': parseInt(this.config.chromosomes[event.target.value].len)
+    });
   },
 
   handleStartPosChange(event) {
@@ -94,7 +123,7 @@ let GeneFinder = React.createClass({
 
   render() {
 
-    let {pane, search, chromosome, startPosition, endPosition} = this.state;
+    let {pane, search, chromosome, startPosition, endPosition, chromosomeLength} = this.state;
 
     let geneFinderContent = null;
 
@@ -218,11 +247,7 @@ let GeneFinder = React.createClass({
 
       let geneList = null;
 
-console.log('chromosome: ', chromosome);
-console.log('startPosition: ', startPosition);
-console.log('endPosition: ', endPosition);
-
-      if (!chromosome || !startPosition || !endPosition) {
+      if (chromosome === null || startPosition === null || endPosition === null) {
 
         geneList = (
           <p>Select the chromosome and enter the start and end positions.</p>
@@ -240,11 +265,6 @@ console.log('endPosition: ', endPosition);
           />
         );
 
-      }
-
-      let maxPosition = DEFAULT_MAX_POSITION;
-      if (chromosome) {
-        maxPosition = this.config.chromosomes[chromosome].len;
       }
 
       // TODO: Lay out inputs horizontally and allow collapse; give sensible widths.
@@ -272,10 +292,10 @@ console.log('endPosition: ', endPosition);
             <span>Start</span>
             <span>: </span>
             <span>
-              <input value={parseInt(startPosition)}
+              <input value={startPosition}
                      onChange={this.handleStartPosChange}
                      min={0}
-                     max={maxPosition}
+                     max={endPosition ? endPosition : chromosomeLength}
                      type="number"
               />
             </span>
@@ -285,10 +305,10 @@ console.log('endPosition: ', endPosition);
             <span>End</span>
             <span>: </span>
             <span>
-              <input value={parseInt(endPosition)}
+              <input value={endPosition}
                      onChange={this.handleEndPosChange}
-                     min={startPosition}
-                     max={maxPosition}
+                     min={startPosition ? startPosition : 0}
+                     max={chromosomeLength}
                      type="number"
               />
             </span>

@@ -288,8 +288,8 @@ function findGene(options) {
 
 function findGenesInRegion(options) {
 
-  assertRequired(options, ['chromosome', 'startPosition', 'endPosition']);
-  let {chromosome, startPosition, endPosition} = options;
+  assertRequired(options, ['database', 'chromosome', 'startPosition', 'endPosition']);
+  let {database, chromosome, startPosition, endPosition} = options;
 
   // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
   // order: null,
@@ -312,7 +312,7 @@ function findGenesInRegion(options) {
 
   return pageQuery(
     {
-      database: 'Samples_and_Variants',
+      database: database,
       table: 'annotation',
       columns: columns,
       query: query

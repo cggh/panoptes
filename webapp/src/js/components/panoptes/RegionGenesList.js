@@ -99,10 +99,6 @@ let RegionGenesList = React.createClass({
         });
   },
 
-
-  // TODO: open genes in popup, not a modal switch (allow open more than one).
-  // But the search dialog is still in modal ?!
-
   handleSelectGene(geneId) {
     this.props.onSelectGene(geneId);
   },
@@ -117,7 +113,7 @@ let RegionGenesList = React.createClass({
         <span>Found {regionGenesData.length} genes between positions {startPosition} and {endPosition} on chromosome {chromosome}:</span>
       );
 
-      // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
+      // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text in all cases)
 
       let listItems = [];
 
