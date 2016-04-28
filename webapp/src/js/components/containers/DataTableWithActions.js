@@ -65,7 +65,8 @@ let DataTableWithActions = React.createClass({
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
       search: '',
-      searchOpen: this.props.initialSearchFocus
+      searchOpen: this.props.initialSearchFocus,
+      filterQuery: SQL.NullQuery
     };
   },
 
@@ -99,6 +100,7 @@ let DataTableWithActions = React.createClass({
   handleQueryPick(query) {
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
+    this.setState({filterQuery: query});
   },
 
   handleColumnChange(columns) {
@@ -202,27 +204,39 @@ let DataTableWithActions = React.createClass({
   },
 
   handleSearchChange(event) {
-    this.setState({search: event.target.value});
 
-    let existingQuery = SQL.WhereClause.decode(this.props.query);
+    let searchText = event.target.value;
 
-console.log('existingQuery: %o', existingQuery);
+    this.setState({search: searchText});
 
+    if (searchText === '') {
+      this.props.componentUpdate({query: this.state.filterQuery});
+      return;
+    }
 
-    let newComponents = [];
+    let searchQuery = null;
+
     for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
       let quickFindField = this.config.quickFindFields[i];
 
-      let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', event.target.value);
+      let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
 
-      newComponents.push(newComponent);
+      // FIXME: Can't we simply chain the OR criteria together?
+      if (i === 0) {
+        searchQuery = newComponent;
+      } else {
+        let newOr = SQL.WhereClause.Compound('OR');
+        let child = _clone(searchQuery);
+        newOr.addComponent(child);
+        newOr.addComponent(newComponent);
+        Object.assign(searchQuery, newOr);
+      }
+
     }
 
-
-
-console.log('newComponents: %o', newComponents);
-
-    //this.props.componentUpdate({query: SQL.WhereClause.encode(newQuery)});
+    if (searchQuery !== null) {
+      this.props.componentUpdate({query: SQL.WhereClause.encode(searchQuery)});
+    }
   },
 
   handleSearchBlur(event) {
