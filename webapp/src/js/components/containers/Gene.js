@@ -13,6 +13,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI
 import Loading from 'ui/Loading';
+import Icon from 'ui/Icon';
+import FlatButton from 'material-ui/FlatButton';
 
 
 let Gene = React.createClass({
@@ -85,6 +87,22 @@ let Gene = React.createClass({
     }
   },
 
+
+  handleOpenGenomeBrowser(e, props) {
+
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+
+    if (!middleClick) {
+      // TODO: How to get compId for this?
+      // this.getFlux().actions.session.popupClose(compId);
+    }
+
+    let container = 'containers/GenomeBrowserWithActions';
+
+    let switchTo = !middleClick;
+    this.getFlux().actions.session.tabOpen(container, props, switchTo);
+  },
+
   render() {
     let {geneData, loadStatus} = this.state;
 
@@ -102,7 +120,12 @@ let Gene = React.createClass({
           </tbody>
         </table>
         <Loading status={loadStatus}/>
-        <p>TODO: open in GenomeBrowser; table query popup/tab; GeneDB</p>
+        <p>TODO: open in table query popup/tab; GeneDB</p>
+        <FlatButton label="Show in Genome Browser"
+                    primary={true}
+                    onClick={(e) => this.handleOpenGenomeBrowser(e, {chromosome: geneData['chromid'], start: parseInt(geneData['fstart']), end: parseInt(geneData['fstop'])})}
+                    icon={<Icon fixedWidth={true} name="bitmap:genomebrowser.png" />}
+        />
       </div>
     );
 
