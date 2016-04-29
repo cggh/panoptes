@@ -10,6 +10,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
+import SQL from 'panoptes/SQL';
 
 // UI
 import Loading from 'ui/Loading';
@@ -103,10 +104,87 @@ let Gene = React.createClass({
     this.getFlux().actions.session.tabOpen(container, props, switchTo);
   },
 
+
+  handleOpenTableTab(e, table, props) {
+
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+
+    if (!middleClick) {
+      // TODO: How to get compId for this?
+      // this.getFlux().actions.session.popupClose(compId);
+    }
+
+    let container = 'containers/DataTableWithActions';
+    if (this.config.tables[table].settings.listView) {
+      container = 'containers/ListWithActions';
+    }
+
+    let switchTo = !middleClick;
+    this.getFlux().actions.session.tabOpen(container, {table: table, ...props}, switchTo);
+  },
+
+  handleOpenExternal(e, url) {
+
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+
+    if (!middleClick) {
+      // TODO: How to get compId for this?
+      // this.getFlux().actions.session.popupClose(compId);
+    }
+
+    window.open(url, '_blank');
+  },
+
   render() {
     let {geneData, loadStatus} = this.state;
 
     if (!geneData) return null;
+
+    let genomePositionTableButtons = [];
+    for (let table in this.config.tables) {
+
+      if (this.config.tables[table].hasGenomePositions || this.config.tables[table].hasGenomeRegions) {
+        let genomePositionTableQuery = null;
+        if (this.config.tables[table].hasGenomePositions) {
+          genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.chromosome, '=', geneData['chromid']),
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.position, '>=', parseInt(geneData['fstart'])),
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.position, '<=', parseInt(geneData['fstop']))
+          ]));
+        } else if (this.config.tables[table].hasGenomeRegions) {
+          genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.chromosome, '=', geneData['chromid']),
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.regionStart, '<=', parseInt(geneData['fstop'])),
+            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.regionStop, '>=', parseInt(geneData['fstart']))
+          ]));
+        }
+
+        let genomePositionTableButton = (
+          <FlatButton key={table}
+                      label={'Show ' + table + ' in ' + geneData['fname']}
+                      primary={true}
+                      onClick={(e) => this.handleOpenTableTab(e, table, {query: genomePositionTableQuery})}
+                      icon={<Icon fixedWidth={true} name={this.config.tables[table].icon} />}
+          />
+        );
+        genomePositionTableButtons.push(genomePositionTableButton);
+      }
+
+    }
+
+    let externalGeneLinks = JSON.parse(this.config.settings.externalGeneLinks);
+    let externalGeneLinkButtons = [];
+    for (let i = 0, len = externalGeneLinks.length; i < len; i++) {
+      let externalGeneLinkButton = (
+        <FlatButton key={'externalGeneLinkButton_' + i}
+                    label={externalGeneLinks[i].Name}
+                    primary={true}
+                    onClick={(e) => this.handleOpenExternal(e, externalGeneLinks[i].Url.replace('{Id}', geneData['fid']))}
+                    icon={<Icon fixedWidth={true} name="external-link" />}
+        />
+      );
+      externalGeneLinkButtons.push(externalGeneLinkButton);
+    }
 
     return (
       <div>
@@ -120,12 +198,15 @@ let Gene = React.createClass({
           </tbody>
         </table>
         <Loading status={loadStatus}/>
-        <p>TODO: open in table query popup/tab; GeneDB</p>
-        <FlatButton label="Show in Genome Browser"
-                    primary={true}
-                    onClick={(e) => this.handleOpenGenomeBrowser(e, {chromosome: geneData['chromid'], start: parseInt(geneData['fstart']), end: parseInt(geneData['fstop'])})}
-                    icon={<Icon fixedWidth={true} name="bitmap:genomebrowser.png" />}
-        />
+        <div className="stack vertical">
+          <FlatButton label="Show in Genome Browser"
+                      primary={true}
+                      onClick={(e) => this.handleOpenGenomeBrowser(e, {chromosome: geneData['chromid'], start: parseInt(geneData['fstart']), end: parseInt(geneData['fstop'])})}
+                      icon={<Icon fixedWidth={true} name="bitmap:genomebrowser.png" />}
+          />
+          {genomePositionTableButtons}
+          {externalGeneLinkButtons}
+        </div>
       </div>
     );
 
