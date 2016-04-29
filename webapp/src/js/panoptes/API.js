@@ -320,6 +320,20 @@ function findGenesInRegion(options) {
   );
 }
 
+function fetchGene(options) {
+  assertRequired(options, ['database', 'geneId']);
+  let {database, geneId} = options;
+  return fetchSingleRecord(
+    {
+      database: database,
+      table: 'annotation',
+      primKeyField: 'fid',
+      primKeyValue: geneId
+    }
+  );
+}
+
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -333,5 +347,6 @@ module.exports = {
   fetchSingleRecord,
   treeData,
   findGene,
-  findGenesInRegion
+  findGenesInRegion,
+  fetchGene
 };
