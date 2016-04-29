@@ -37,7 +37,7 @@ let Gene = React.createClass({
 
   getInitialState() {
     return {
-      geneData: [],
+      geneData: null,
       loadStatus: 'loaded'
     };
   },
@@ -81,7 +81,7 @@ let Gene = React.createClass({
           this.setState({loadStatus: 'error'});
         });
     } else {
-      this.setState({rows: []});
+      this.setState({geneData: null});
     }
   },
 
@@ -96,7 +96,7 @@ let Gene = React.createClass({
           <tbody>
             <tr><th>Id: </th><td>{geneData['fid']}</td></tr>
             <tr><th>Name: </th><td>{geneData['fname']}</td></tr>
-            <tr><th>Alternatives: </th><td>{geneData['fnames']}</td></tr>
+            <tr><th>Alternatives: </th><td>{geneData['fnames'].split(',').join(', ')}</td></tr>
             <tr><th>Description: </th><td>{geneData['descr']}</td></tr>
             <tr><th>Position: </th><td>{geneData['chromid']}:{geneData['fstart']}-{geneData['fstop']}</td></tr>
           </tbody>
