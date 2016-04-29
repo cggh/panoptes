@@ -17,6 +17,7 @@ import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
+import PropertyLegend from 'panoptes/PropertyLegend';
 import {propertyColour, categoryColours} from 'util/Colours';
 
 import Checkbox from 'material-ui/Checkbox';
@@ -89,7 +90,7 @@ let PerRowScaledSVGChannel = React.createClass({
   },
 
   render() {
-    let {name} = this.props;
+    let {name, table, colourProperty} = this.props;
     let {dataYMin, dataYMax} = this.state;
     return (
       <ScaledSVGChannel {...this.props}
@@ -98,6 +99,7 @@ let PerRowScaledSVGChannel = React.createClass({
         side={<span>{name}</span>}
         onClose={this.redirectedProps.onClose}
         controls={<PerRowNumericalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        legend={colourProperty ? <PropertyLegend table={table} property={colourProperty} /> : null}
       >
         <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
 
@@ -373,11 +375,9 @@ let PerRowNumericalTrackControls = React.createClass({
         <div className="control">
           <div className="label">Colour By:</div>
           <DropDownMenu className="dropdown"
-                        value={colourProperty || '__none__'}
-                        onChange={(e, i, v) => {
-                        this.redirectedProps.componentUpdate({colourProperty: v})
-                        }}>
-            <MenuItem key="__none__" value="__none__" primaryText="None"/>
+                        value={colourProperty}
+                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({colourProperty: v})}>
+            <MenuItem key="__none__" value={null} primaryText="None"/>
             {this.config.tables[table].properties.map((property) =>
               <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
           </DropDownMenu>

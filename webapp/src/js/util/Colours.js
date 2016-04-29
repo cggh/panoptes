@@ -36,26 +36,36 @@ export function scaleColour(domain) {
   return d3.scale.linear()
     .domain(domain)  // min/max of data
     .range(['#3d8bd5', '#ff4081'])
-    .interpolate(d3.cie.interpolateLch);
+    .interpolate(d3.interpolateHcl);
 }
 
 export function booleanColours() {
   return (val) => {
-    if (val === '1' || val === true || val === 1 || val.toLower() === 't' || val.toLower() === 'true')
+    if (val === '1' || val === true || val === 1 || (val.toLower && val.toLower() === 't') || (val.toLower && val.toLower() === 'true'))
       return '#388E3C';
     else
       return '#D32F2F';
   };
 }
 
-export function propertyColour(propConfig) {
+export function propertyColour(propConfig, min = null, max = null) {
+  if (!propConfig)
+    return () => 'inherit';
   if (propConfig.categoryColors)
-    return (colour) => propConfig.categoryColors[colour] || propConfig.categoryColors['_other_'] || '#D3D3D3';
+    return (value) => propConfig.categoryColors[value] || propConfig.categoryColors['_other_'] || 'inherit';
   if (propConfig.isBoolean)
-    return booleanColours;
-  if (propConfig.isText || propConfig.isCategorical)
+    return booleanColours();
+  if (propConfig.isCategorical) {
+    const colourFunc = categoryColours(`${propConfig.tableid}_${propConfig.propid}`);
+    //Run thorugh the possibilites so they are enumerated in sort order, not appearance order.
+    if (propConfig.propCategories) {
+      propConfig.propCategories.forEach(colourFunc);
+    }
+    return colourFunc;
+  }
+  if (propConfig.isText)
     return categoryColours(`${propConfig.tableid}_${propConfig.propid}`);
-  return scaleColour([propConfig.minVal, propConfig.maxVal]);
+  return scaleColour([min || propConfig.minVal, max || propConfig.maxVal]);
 }
 
 
