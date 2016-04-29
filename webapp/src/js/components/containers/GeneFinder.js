@@ -80,6 +80,12 @@ let GeneFinder = React.createClass({
 
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.pane === 'search by name or description') {
+      this.refs.search.focus();
+    }
+  },
+
   handleSwitchPane(pane) {
     this.setState({pane: pane});
   },
@@ -215,7 +221,8 @@ let GeneFinder = React.createClass({
             <p>Search gene names and descriptions.</p>
           </div>
           <div className="search">
-            <TextField fullWidth={true}
+            <TextField ref="search"
+                       fullWidth={true}
                        floatingLabelText="Search"
                        value={search}
                        onChange={this.handleSearchChange}

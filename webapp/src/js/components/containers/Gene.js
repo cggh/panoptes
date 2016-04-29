@@ -80,7 +80,7 @@ let Gene = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(props, requestContext));
           this.setState({loadStatus: 'error'});
         });
     } else {
