@@ -86,16 +86,13 @@ let Gene = React.createClass({
   },
 
   render() {
-    let {className} = this.props;
     let {geneData, loadStatus} = this.state;
 
     if (!geneData) return null;
 
-console.log('geneData: %o', geneData);
-
     return (
       <div>
-        <table className={className}>
+        <table>
           <tbody>
             <tr><th>Id: </th><td>{geneData['fid']}</td></tr>
             <tr><th>Name: </th><td>{geneData['fname']}</td></tr>
