@@ -95,8 +95,7 @@ let ChannelWithConfigDrawer = React.createClass({
           </div>
           {onClose ?
           <div className="close button">
-            <Icon className={classnames({open: controlsOpen})}
-                  name="times" onClick={this.handleClose}/>
+            <Icon name="times" onClick={this.handleClose}/>
           </div>
             : null }
           {configComponent ?
