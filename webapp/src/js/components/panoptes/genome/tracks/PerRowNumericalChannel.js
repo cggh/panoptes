@@ -5,6 +5,7 @@ import _map from 'lodash/map';
 import _debounce from 'lodash/debounce';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
+import _uniq from 'lodash/uniq';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -89,9 +90,13 @@ let PerRowScaledSVGChannel = React.createClass({
     this.setState({dataYMin, dataYMax});
   },
 
+  handleKnownLegendValuesChange(legendValues) {
+    this.setState({legendValues})
+  },
+
   render() {
     let {name, table, colourProperty} = this.props;
-    let {dataYMin, dataYMax} = this.state;
+    let {dataYMin, dataYMax, legendValues} = this.state;
     return (
       <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
@@ -99,9 +104,9 @@ let PerRowScaledSVGChannel = React.createClass({
         side={<span>{name}</span>}
         onClose={this.redirectedProps.onClose}
         controls={<PerRowNumericalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
-        legend={colourProperty ? <PropertyLegend table={table} property={colourProperty} /> : null}
+        legend={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={legendValues}/> : null}
       >
-        <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
+        <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} onKnownLegendValuesChange={this.handleKnownLegendValuesChange}/>
 
       </ScaledSVGChannel>
     );
@@ -127,6 +132,7 @@ let PerRowNumericalTrack = React.createClass({
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
     onYLimitChange: React.PropTypes.func,
+    onKnownLegendValuesChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     channel: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
@@ -260,7 +266,7 @@ let PerRowNumericalTrack = React.createClass({
 
   applyData(props) {
     let {primKeys, dataStart, dataStep, columns, colourVals} = this.data;
-    let {interpolation, tension, table, colourProperty} = props;
+    let {interpolation, tension, table, colourProperty, onKnownLegendValuesChange} = props;
     let colourFunc = categoryColours('__default__');
     if (table && colourProperty)
       colourFunc = propertyColour(this.config.tables[table].propertiesMap[colourProperty]);
@@ -286,6 +292,9 @@ let PerRowNumericalTrack = React.createClass({
     //  .y((d) => d)
     //  .y0((d, i) => min[i])(max);
     //
+    if (table && colourProperty && onKnownLegendValuesChange && this.config.tables[table].propertiesMap[colourProperty].isText) {
+      onKnownLegendValuesChange(_uniq(colourVals));
+    }
     this.setState({
       //area: area,
       lines: lines,

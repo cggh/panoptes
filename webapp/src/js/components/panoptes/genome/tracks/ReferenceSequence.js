@@ -11,6 +11,7 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ErrorReport from 'panoptes/ErrorReporter';
+import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import findBlocks from 'panoptes/genome/FindBlocks';
 
@@ -238,16 +239,9 @@ let Legend = () =>
       ['C', 'rgb(0, 128, 192)'],
       ['G', 'rgb(0, 192, 120)'],
       ['N', 'rgb(0,0,0)']
-    ].map(([base, colour]) =>
-     <div className="legend-element" key={base}>
-      <svg width="14" height="26">
-        <rect x="0" y="6" width="14" height="14" style={{fill: colour}} />
-      </svg>
-      <div className="label">
-        {base}
-      </div>
-    </div>
-    )}
+    ].map(([base, colour]) => (
+     <LegendElement key={base} name={base} colour={colour} />
+    ))}
   </div>;
 Legend.shouldComponentUpdate = () => false;
 

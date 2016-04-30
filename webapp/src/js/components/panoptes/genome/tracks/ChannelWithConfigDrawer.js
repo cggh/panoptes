@@ -32,7 +32,7 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (['width', 'sideWidth','height'].some((name) => prevProps[name] !== this.props[name]) ||
+    if (['width', 'sideWidth','height', 'configComponent', 'legendComponent'].some((name) => prevProps[name] !== this.props[name]) ||
       ['controlsOpen', 'legendOpen'].some((name) => prevState[name] !== this.state[name])
     )
       this.updateControlsHeight();

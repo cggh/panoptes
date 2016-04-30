@@ -1,6 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
+import LegendElement from 'panoptes/LegendElement';
 import {propertyColour, scaleColour} from 'util/Colours';
 import _map from 'lodash/map';
 
@@ -25,16 +26,16 @@ let PropertyLegend = React.createClass({
     const colourFunc = propertyColour(propConfig);
     let elements = null;
     if (propConfig.categoryColors) {
-      elements = _map(propConfig.categoryColors, (key, colour) => <div key={key} style={{color: colourFunc(colour)}}> {key} </div>);
+      elements = _map(propConfig.categoryColors, (key, colour) => (
+        <LegendElement key={key} name={key} colour={colour} />));
     } else if (propConfig.isBoolean) {
       elements = [
-        <div key="true" className="legend-element" style={{color: colourFunc(true)}}> True </div>,
-        <div key="false" className="legend-element" style={{color: colourFunc(false)}}> False </div>
+        <LegendElement key="true" name="True" colour={colourFunc(true)} />,
+        <LegendElement key="false" name="False" colour={colourFunc(false)} />
       ];
-    } else if (propConfig.isCategorical) {
-      elements = _map(propConfig.propCategories, (key, colour) => <div key={key} style={{color: colourFunc(colour)}}> {key} </div>);
-    } else if (propConfig.isText) {
-      elements = _map(knownValues || [], (key, colour) => <div key={key} style={{color: colourFunc(colour)}}> {key} </div>);
+    } else if (propConfig.isCategorical || propConfig.isText) {
+      elements = _map(propConfig.propCategories || knownValues || [], (value) => (
+        <LegendElement key={value} name={value} colour={colourFunc(value)} />));
     } else {
       const colour = scaleColour([0,1]);
       let background = `linear-gradient(to right, ${colour(0)} 0%`;
