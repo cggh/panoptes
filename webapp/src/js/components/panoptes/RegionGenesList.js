@@ -61,7 +61,6 @@ let RegionGenesList = React.createClass({
     };
   },
 
-
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
 
@@ -107,58 +106,62 @@ let RegionGenesList = React.createClass({
     let {icon, chromosome, startPosition, endPosition} = this.props;
     let {loadStatus, regionGenesData} = this.state;
 
-    if (regionGenesData && regionGenesData.length > 0) {
-
-      let subheaderText = (
-        <span>Found {regionGenesData.length} genes between positions {startPosition} and {endPosition} on chromosome {chromosome}:</span>
-      );
-
-      // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text in all cases)
-
-      let listItems = [];
-
-      for (let i = 0, len = regionGenesData.length; i < len; i++) {
-
-        listItems.push(
-          <ListItem key={regionGenesData[i].fid}
-                    primaryText={
-                      <div>
-                            <span>{regionGenesData[i].fname}</span>
-                            <span> between </span>
-                            <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
-                      </div>
-                    }
-                    secondaryText={
-                      <div>
-                            {regionGenesData[i].descr}
-                      </div>
-                    }
-                    secondaryTextLines={2}
-                    onClick={() => this.handleSelectGene(regionGenesData[i].fid)}
-                    leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-          />
-        );
-
-      }
-
-
+    if (loadStatus !== 'loaded') {
       return (
-        <div style={{width: '80vw', height: '60vh', overflow: 'auto'}}>
-          <List>
-            <Subheader>{subheaderText}</Subheader>
-            {listItems}
-          </List>
+        <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
           <Loading status={loadStatus}/>
         </div>
       );
+    }
 
-    } else {
-      return (
-        <div>
-          <p>No genes found between positions {startPosition} and {endPosition} on chromosome {chromosome}.</p>
-        </div>
+    let subheaderText = (
+      <span>No genes found between positions {startPosition} and {endPosition} on chromosome {chromosome}.</span>
+    );
+    if (regionGenesData.length > 0) {
+      subheaderText = (
+        <span>Found {regionGenesData.length} genes between positions {startPosition} and {endPosition} on chromosome {chromosome}:</span>
       );
     }
+
+    // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text in all cases)
+
+    let listItems = [];
+
+    for (let i = 0, len = regionGenesData.length; i < len; i++) {
+
+      listItems.push(
+        <ListItem key={regionGenesData[i].fid}
+                  primaryText={
+                    <div>
+                          <span>{regionGenesData[i].fname}</span>
+                          <span> between </span>
+                          <span>{regionGenesData[i].fstart} and {regionGenesData[i].fstop}</span>
+                    </div>
+                  }
+                  secondaryText={
+                    <div>
+                          {regionGenesData[i].descr}
+                    </div>
+                  }
+                  secondaryTextLines={2}
+                  onClick={() => this.handleSelectGene(regionGenesData[i].fid)}
+                  leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+        />
+      );
+
+    }
+
+
+    return (
+      <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+        <List>
+          <Subheader>{subheaderText}</Subheader>
+          {listItems}
+        </List>
+        <Loading status={loadStatus}/>
+      </div>
+    );
+
   }
 
 });

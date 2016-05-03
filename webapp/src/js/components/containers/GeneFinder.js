@@ -2,6 +2,7 @@ import React from 'react';
 
 // Lodash
 import _map from 'lodash/map';
+import _throttle from 'lodash/throttle';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -80,6 +81,12 @@ let GeneFinder = React.createClass({
 
   },
 
+  componentDidMount() {
+    this.handleChromChange = _throttle(this.handleChromChange, 500);
+    this.handleStartPosChange = _throttle(this.handleStartPosChange, 500);
+    this.handleEndPosChange = _throttle(this.handleEndPosChange, 500);
+  },
+
   componentDidUpdate(prevProps, prevState) {
     if (this.state.pane === 'search by name or description') {
       this.refs.search.focus();
@@ -104,11 +111,15 @@ let GeneFinder = React.createClass({
   },
 
   handleStartPosChange(event) {
-    this.setState({'startPosition': parseInt(event.target.value)});
+    if (event.target) {
+      this.setState({'startPosition': event.target.value});
+    }
   },
 
   handleEndPosChange(event) {
-    this.setState({'endPosition': parseInt(event.target.value)});
+    if (event.target) {
+      this.setState({'endPosition': event.target.value});
+    }
   },
 
   handleSwitchModal(container, props) {
@@ -232,16 +243,10 @@ let GeneFinder = React.createClass({
             {geneList}
           </div>
           <div className="centering-container">
-            <div style={{paddingRight: '10px'}}>
-              <FlatButton label={<span>Cancel</span>}
-                            primary={true}
-                            onClick={() => this.getFlux().actions.session.modalClose()}
-              />
-            </div>
             <div>
-              <RaisedButton label={<span>Previous</span>}
+              <FlatButton label={<span>Search by genomic region</span>}
                             primary={true}
-                            onClick={() => this.handleSwitchPane(null)}
+                            onClick={() => this.handleSwitchPane('search by genomic region')}
               />
             </div>
           </div>
@@ -254,7 +259,7 @@ let GeneFinder = React.createClass({
 
       let geneList = null;
 
-      if (chromosome === null || startPosition === null || endPosition === null) {
+      if (chromosome === null || startPosition === null || endPosition === null || startPosition === '' || endPosition === '' ) {
 
         geneList = (
           <p>Select the chromosome and enter the start and end positions.</p>
@@ -265,8 +270,8 @@ let GeneFinder = React.createClass({
         geneList = (
           <RegionGenesList
             chromosome={chromosome}
-            startPosition={startPosition}
-            endPosition={endPosition}
+            startPosition={parseInt(startPosition)}
+            endPosition={parseInt(endPosition)}
             onSelectGene={this.handleSelectGene}
             icon={this.icon()}
           />
@@ -325,16 +330,10 @@ let GeneFinder = React.createClass({
             {geneList}
           </div>
           <div className="centering-container">
-            <div style={{paddingRight: '10px'}}>
-              <FlatButton label={<span>Cancel</span>}
-                            primary={true}
-                            onClick={() => this.getFlux().actions.session.modalClose()}
-              />
-            </div>
             <div>
-              <RaisedButton label={<span>Previous</span>}
+              <FlatButton label={<span>Search by gene name / description</span>}
                             primary={true}
-                            onClick={() => this.handleSwitchPane(null)}
+                            onClick={() => this.handleSwitchPane('search by name or description')}
               />
             </div>
           </div>

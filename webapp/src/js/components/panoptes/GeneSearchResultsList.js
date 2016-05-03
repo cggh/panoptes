@@ -102,86 +102,75 @@ let GeneSearchResultsList = React.createClass({
     let {icon, search, maxMatches} = this.props;
     let {loadStatus, matchData} = this.state;
 
-    if (loadStatus === 'loaded' && matchData.ids.length === 0) {
-
+    if (loadStatus !== 'loaded') {
       return (
-        <div>
-          <p>No match.</p>
+        <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
           <Loading status={loadStatus}/>
         </div>
       );
+    }
 
-    } else if (loadStatus === 'loaded' && matchData.ids.length > 0) {
+    let subheaderText = (
+      <span>No match.</span>
+    );
 
-      let subheaderText = null;
+    let maxMatchesUnderstated = maxMatches - 1;
 
-      if (matchData.ids.length === maxMatches) {
-
-        let maxMatchesUnderstated = maxMatches - 1;
-
-        subheaderText = (
-          <span>Found over {maxMatchesUnderstated} matching genes:</span>
-        );
-
-      } else {
-
-        subheaderText = (
-          <span>Found {matchData.ids.length} matching genes:</span>
-        );
-      }
-
-      // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
-
-      let listItems = [];
-
-      for (let i = 0, len = matchData.ids.length; i < len; i++) {
-
-        listItems.push(
-          <ListItem key={matchData.ids[i]}
-                    primaryText={
-                      <div>
-                        <Highlight search={search}>
-                            <span>{matchData.ids[i]}</span>
-                            <span> on </span>
-                            <span>{matchData.chromosomes[i]}</span>
-                        </Highlight>
-                      </div>
-                    }
-                    secondaryText={
-                      <div>
-                        <Highlight search={search}>
-                            {matchData.descriptions[i]}
-                        </Highlight>
-                      </div>
-                    }
-                    secondaryTextLines={2}
-                    onClick={() => this.handleSelectGene(matchData.ids[i])}
-                    leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-          />
-        );
-
-      }
-
-      return (
-        <div style={{width: '80vw', height: '60vh', overflow: 'auto'}}>
-          <List>
-            <Subheader>{subheaderText}</Subheader>
-            {listItems}
-          </List>
-          <Loading status={loadStatus}/>
-        </div>
+    if (matchData.ids.length === maxMatches) {
+      subheaderText = (
+        <span>Found over {maxMatchesUnderstated} matching genes:</span>
       );
+    } else if (matchData.ids.length > 0) {
+      subheaderText = (
+        <span>Found {matchData.ids.length} matching genes:</span>
+      );
+    }
 
-    } else {
 
-      return (
-        <div>
-          <Loading status={loadStatus}/>
-        </div>
+    // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text)
+
+    let listItems = [];
+
+    for (let i = 0, len = matchData.ids.length; i < len; i++) {
+
+      listItems.push(
+        <ListItem key={matchData.ids[i]}
+                  primaryText={
+                    <div>
+                      <Highlight search={search}>
+                          <span>{matchData.ids[i]}</span>
+                          <span> on </span>
+                          <span>{matchData.chromosomes[i]}</span>
+                      </Highlight>
+                    </div>
+                  }
+                  secondaryText={
+                    <div>
+                      <Highlight search={search}>
+                          {matchData.descriptions[i]}
+                      </Highlight>
+                    </div>
+                  }
+                  secondaryTextLines={2}
+                  onClick={() => this.handleSelectGene(matchData.ids[i])}
+                  leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+        />
       );
 
     }
+
+    return (
+      <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+        <List>
+          <Subheader>{subheaderText}</Subheader>
+          {listItems}
+        </List>
+        <Loading status={loadStatus}/>
+      </div>
+    );
+
   }
+
 
 });
 
