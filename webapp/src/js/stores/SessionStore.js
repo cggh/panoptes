@@ -23,6 +23,7 @@ let SessionStore = Fluxxor.createStore({
       SESSION.POPUP_MOVE, this.emitIfNeeded(this.popupMove),
       SESSION.POPUP_OPEN, this.emitIfNeeded(this.popupOpen),
       SESSION.POPUP_RESIZE, this.emitIfNeeded(this.popupResize),
+      SESSION.POPUP_TO_TAB, this.emitIfNeeded(this.popupToTab),
       SESSION.TAB_CLOSE, this.emitIfNeeded(this.tabClose),
       SESSION.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
@@ -108,6 +109,11 @@ let SessionStore = Fluxxor.createStore({
     let {compId, size} = payload;
     this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], size);
   },
+  
+  popupToTab(payload) {
+    this.tabOpen({switchTo: true, ...payload})
+    this.popupClose(payload);
+  },
 
   tabClose(payload, force) {
     let {compId} = payload;
@@ -132,20 +138,22 @@ let SessionStore = Fluxxor.createStore({
           this.state = this.state.setIn(['tabs', 'selectedTab'], newTabs.last());
     }
   },
+
   tabOpen(payload) {
     let {component, switchTo, compId} = payload;
     if (compId)
-      this.state = this.state.updateIn(['popups', 'components'],
-        (list) => list.filter((popupId) => popupId !== compId).push(compId));
+      this.state = this.state.updateIn(['tabs', 'components'],
+        (list) => list.filter((tabId) => tabId !== compId).push(compId));
     else {
       if (!component.component)
         component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
-      let id = uid(10);
-      this.state = this.state.setIn(['components', id], component);
-      this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(id));
-      if (switchTo)
-        this.state = this.state.setIn(['tabs', 'selectedTab'], id);
+      compId = uid(10);
+      this.state = this.state.setIn(['components', compId], component);
+      this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(compId));
+    }
+    if (switchTo) {
+      this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
     }
   },
   tabPopOut(payload) {

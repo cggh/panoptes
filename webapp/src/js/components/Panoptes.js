@@ -109,6 +109,7 @@ let Panoptes = React.createClass({
                   onMoveStop={actions.popupMove.bind(this, compId)}
                   onResizeStop={actions.popupResize.bind(this, compId)}
                   onClose={actions.popupClose.bind(this, compId)}
+                  onMaximise={actions.popupToTab.bind(this, compId)}
                   onClick={actions.popupFocus.bind(this, compId)}>
                   {React.createElement(dynamicRequire(popup.component), props)}
                 </Popup>

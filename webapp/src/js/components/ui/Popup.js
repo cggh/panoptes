@@ -24,6 +24,7 @@ let Popup = React.createClass({
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
     onClose: React.PropTypes.func,
+    onMaximise: React.PropTypes.func,
     onClick: React.PropTypes.func,
     children: React.PropTypes.element
   },
@@ -82,6 +83,13 @@ let Popup = React.createClass({
       this.props.onClose();
     }
   },
+  handleMaximise(event) {
+    if (this.props.onMaximise) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.onMaximise();
+    }
+  },
   handleClick(event) {
     if (this.props.onClick)
       this.props.onClick(event);
@@ -108,6 +116,7 @@ let Popup = React.createClass({
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>
+              <Icon className="pointer close" name="folder-o" onClick={this.handleMaximise}/>
               <Icon className="pointer close" name="close" onClick={this.handleClose}/>
             </div>
             <div className="popup-body">
