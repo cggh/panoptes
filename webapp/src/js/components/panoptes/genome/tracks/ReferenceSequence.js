@@ -11,10 +11,11 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ErrorReport from 'panoptes/ErrorReporter';
-import Channel from 'panoptes/genome/tracks/Channel';
+import LegendElement from 'panoptes/LegendElement';
+import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import findBlocks from 'panoptes/genome/FindBlocks';
 
-const HEIGHT = 25;
+const HEIGHT = 26;
 
 let ReferenceSequence = React.createClass({
   mixins: [
@@ -103,11 +104,12 @@ let ReferenceSequence = React.createClass({
     if (width == 0)
       return null;
     return (
-      <Channel
+      <ChannelWithConfigDrawer
         height={HEIGHT}
         width={width}
         sideWidth={sideWidth}
         sideComponent={<div className="side-name">Ref. Seq.</div>}
+        legendComponent={<Legend/>}
       >
         <div className="sequence">
           <SequenceSquares
@@ -127,7 +129,7 @@ let ReferenceSequence = React.createClass({
             dataStep={dataStep}
             sequence={sequence}/>
         </div>
-      </Channel>
+      </ChannelWithConfigDrawer>
     );
   }
 
@@ -206,7 +208,9 @@ let SequenceSquares = React.createClass({
         data[i * 4 + 1] = 192;
         data[i * 4 + 2] = 120;
       } else {
-        data[i * 4 + 3] = 0;
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 0;
+        data[i * 4 + 2] = 0;
       }
     });
     ctx.putImageData(imageData, 0, 0);
@@ -225,6 +229,21 @@ let SequenceSquares = React.createClass({
                    height={1}/>;
   }
 });
+
+
+let Legend = () =>
+  <div className="legend">
+    {[
+      ['A', 'rgb(255, 50, 50)'],
+      ['T', 'rgb(255, 170, 0)'],
+      ['C', 'rgb(0, 128, 192)'],
+      ['G', 'rgb(0, 192, 120)'],
+      ['N', 'rgb(0,0,0)']
+    ].map(([base, colour]) => (
+     <LegendElement key={base} name={base} colour={colour} />
+    ))}
+  </div>;
+Legend.shouldComponentUpdate = () => false;
 
 
 module.exports = ReferenceSequence;

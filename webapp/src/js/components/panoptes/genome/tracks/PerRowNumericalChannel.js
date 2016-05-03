@@ -5,6 +5,7 @@ import _map from 'lodash/map';
 import _debounce from 'lodash/debounce';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
+import _uniq from 'lodash/uniq';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -17,7 +18,8 @@ import LRUCache from 'util/LRUCache';
 import SummarisationCache from 'panoptes/SummarisationCache';
 import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
-
+import PropertyLegend from 'panoptes/PropertyLegend';
+import {propertyColour, categoryColours} from 'util/Colours';
 
 import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -88,9 +90,13 @@ let PerRowScaledSVGChannel = React.createClass({
     this.setState({dataYMin, dataYMax});
   },
 
+  handleKnownLegendValuesChange(legendValues) {
+    this.setState({legendValues})
+  },
+
   render() {
-    let {name} = this.props;
-    let {dataYMin, dataYMax} = this.state;
+    let {name, table, colourProperty} = this.props;
+    let {dataYMin, dataYMax, legendValues} = this.state;
     return (
       <ScaledSVGChannel {...this.props}
         dataYMin={dataYMin}
@@ -98,8 +104,9 @@ let PerRowScaledSVGChannel = React.createClass({
         side={<span>{name}</span>}
         onClose={this.redirectedProps.onClose}
         controls={<PerRowNumericalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        legend={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={legendValues}/> : null}
       >
-        <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} />
+        <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} onKnownLegendValuesChange={this.handleKnownLegendValuesChange}/>
 
       </ScaledSVGChannel>
     );
@@ -110,7 +117,8 @@ let PerRowNumericalTrack = React.createClass({
   mixins: [
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'channel', 'query', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table',
+      'channel', 'query', 'width', 'sideWidth', 'colourProperty')
   ],
 
   propTypes: {
@@ -124,9 +132,11 @@ let PerRowNumericalTrack = React.createClass({
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
     onYLimitChange: React.PropTypes.func,
+    onKnownLegendValuesChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     channel: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired
+    query: React.PropTypes.string.isRequired,
+    colourProperty: React.PropTypes.string
   },
 
   getInitialState() {
@@ -139,6 +149,7 @@ let PerRowNumericalTrack = React.createClass({
       dataStart: 0,
       dataStep: 0,
       primKeys: [],
+      colourVals: [],
       columns: {}
     };
   },
@@ -161,18 +172,21 @@ let PerRowNumericalTrack = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table, channel, query} = props;
+    let {chromosome, blockStart, blockEnd, blockPixelWidth,
+      width, sideWidth, table, channel, query, colourProperty} = props;
     let tableConfig = this.config.tables[table];
 
-    if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
+    if (['chromosome', 'table',
+        'channel', 'query',  'colourProperty'].some((prop) => this.props[prop] !== props[prop])) {
       this.data = {
         dataStart: 0,
         dataStep: 0,
+        primKeys: [],
+        colourVals: [],
         columns: {}
       };
       this.applyData(props);
     }
-    //TODO Clear data on new table, channel or query
     if (width - sideWidth < 1) {
       return;
     }
@@ -180,8 +194,14 @@ let PerRowNumericalTrack = React.createClass({
       ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid per row summary track`);
       return;
     }
+    if (colourProperty && !this.config.tables[table].propertiesMap[colourProperty]) {
+      ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
+      return;
+    }
     this.props.onChangeLoadStatus('LOADING');
     let columns = [tableConfig.primkey];
+    if (colourProperty)
+      columns.push(colourProperty);
     let columnspec = {};
     columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
     let APIargs = {
@@ -200,6 +220,9 @@ let PerRowNumericalTrack = React.createClass({
         ).then((tableData) => {
           let primKeys = tableData[tableConfig.primkey].slice(0, 50);
           this.data.primKeys = primKeys;
+          if (colourProperty) {
+            this.data.colourVals = tableData[colourProperty].slice(0, 50);
+          }
           return Promise.all(primKeys.map((primkey) =>
             SummarisationCache.fetch({
               columns: {
@@ -242,19 +265,25 @@ let PerRowNumericalTrack = React.createClass({
   },
 
   applyData(props) {
-    let {primKeys, dataStart, dataStep, columns} = this.data;
-    let {interpolation, tension} = props;
-
+    let {primKeys, dataStart, dataStep, columns, colourVals} = this.data;
+    let {interpolation, tension, table, colourProperty, onKnownLegendValuesChange} = props;
+    let colourFunc = categoryColours('__default__');
+    if (table && colourProperty)
+      colourFunc = propertyColour(this.config.tables[table].propertiesMap[colourProperty]);
     let lines = {};
-    primKeys.forEach((primKey) => {
-      if (columns[primKey])
+    let colours = {};
+    primKeys.forEach((primKey, i) => {
+      if (columns[primKey]) {
         lines[primKey] = d3.svg.line()
           .interpolate(interpolation)
           .tension(tension)
           .defined(_isFinite)
           .x((d, i) => dataStart + (i * dataStep))
           .y((d) => d)(columns[primKey].data);
+        colours[primKey] = colourVals ? colourFunc(colourVals[i]) : null;
+      }
     });
+    //Area is turned of for now as this channel often has many tracks on top of each other.
     //let area = d3.svg.area()
     //  .interpolate(interpolation)
     //  .tension(tension)
@@ -263,9 +292,13 @@ let PerRowNumericalTrack = React.createClass({
     //  .y((d) => d)
     //  .y0((d, i) => min[i])(max);
     //
+    if (table && colourProperty && onKnownLegendValuesChange && this.config.tables[table].propertiesMap[colourProperty].isText) {
+      onKnownLegendValuesChange(_uniq(colourVals));
+    }
     this.setState({
       //area: area,
-      lines: lines
+      lines: lines,
+      colours: colours
     });
   },
 
@@ -298,13 +331,12 @@ let PerRowNumericalTrack = React.createClass({
     });
   },
 
-
   render() {
-    let {area, lines} = this.state;
+    let {area, lines, colours} = this.state;
     return (
       <g className="numerical-track">
         <path className="area" d={area}/>
-        {_map(lines, (line, primKey) => <path key={primKey} className="line" d={line}/>)}
+        {_map(lines, (line, primKey) => <path key={primKey} className="line" style={{stroke:colours[primKey]}} d={line} />)}
       </g>
     );
   }
@@ -313,6 +345,7 @@ let PerRowNumericalTrack = React.createClass({
 let PerRowNumericalTrackControls = React.createClass({
   mixins: [
     FluxMixin,
+    ConfigMixin,
     PureRenderWithRedirectedProps({
       check: [
         'interpolation',
@@ -321,7 +354,8 @@ let PerRowNumericalTrackControls = React.createClass({
         'yMin',
         'yMax',
         'table',
-        'query'
+        'query',
+        'colourProperty'
       ],
       redirect: ['componentUpdate']
     })
@@ -333,7 +367,7 @@ let PerRowNumericalTrackControls = React.createClass({
   },
 
   render() {
-    let {interpolation, tension, autoYScale, yMin, yMax, query, table} = this.props;
+    let {interpolation, tension, autoYScale, yMin, yMax, query, table, colourProperty} = this.props;
     let actions = this.getFlux().actions;
     return (
       <div className="channel-controls">
@@ -346,6 +380,16 @@ let PerRowNumericalTrackControls = React.createClass({
                           initialQuery: query,
                           onPick: this.handleQueryPick
                         })}/>
+        </div>
+        <div className="control">
+          <div className="label">Colour By:</div>
+          <DropDownMenu className="dropdown"
+                        value={colourProperty}
+                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({colourProperty: v})}>
+            <MenuItem key="__none__" value={null} primaryText="None"/>
+            {this.config.tables[table].properties.map((property) =>
+              <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
+          </DropDownMenu>
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>

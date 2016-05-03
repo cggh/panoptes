@@ -13,6 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/genome/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+import FlatButton from 'material-ui/FlatButton';
 
 import 'hidpi-canvas';
 
@@ -35,7 +36,7 @@ let PerRowIndicatorChannel = React.createClass({
     }),
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -47,9 +48,15 @@ let PerRowIndicatorChannel = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
-    table: React.PropTypes.string.isRequired
+    table: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string
   },
 
+  getDefaultProps() {
+    return {
+      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+    };
+  },
 
   componentWillMount() {
     this.positions = [];
@@ -61,8 +68,8 @@ let PerRowIndicatorChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table} = props;
-    if (this.props.chromosome && this.props.chromosome !== chromosome) {
+    let {chromosome, start, end, width, sideWidth, table, query} = props;
+    if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
@@ -70,8 +77,10 @@ let PerRowIndicatorChannel = React.createClass({
     }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
-    if (!((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start))) {
+    if (this.props.chromosome !== chromosome ||
+        this.props.query !== query ||
+        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
+          (this.blockEnd === block2End && this.blockStart === block2Start))) {
       //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
@@ -80,15 +89,19 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [tableConfig.primkey, tableConfig.positionField];
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+      query = SQL.WhereClause.decode(query);
+      let posQuery = SQL.WhereClause.AND([
+        SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
+        SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
+      ]);
+      if (!query.isTrivial)
+        query = SQL.WhereClause.AND([posQuery, query]);
       let APIargs = {
         database: this.config.dataset,
         table: table,
         columns: columnspec,
-        query: SQL.WhereClause.encode(SQL.WhereClause.AND([
-          SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
-          SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
-          SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
-        ])),
+        query: SQL.WhereClause.encode(query),
         transpose: false
       };
 
@@ -100,7 +113,7 @@ let PerRowIndicatorChannel = React.createClass({
           componentCancellation
         )).then((data) => {
           this.props.onChangeLoadStatus('DONE');
-          this.applyData(props, data);
+          this.applyData(this.props, data);
         })
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
@@ -109,7 +122,7 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(props, {});
+          this.applyData(this.props, {});
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         });
     }
@@ -162,9 +175,10 @@ let PerRowIndicatorChannel = React.createClass({
             }
         //Override component update to get latest in case of skipped render
         configComponent={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        legendComponent={<Legend/>}
         onClose={this.redirectedProps.onClose}
       >
-        <canvas ref="canvas" width={width} height={HEIGHT}/>;
+        <canvas ref="canvas" width={width} height={HEIGHT}/>
       </ChannelWithConfigDrawer>);
   }
 });
@@ -175,18 +189,57 @@ let PerRowIndicatorControls = React.createClass({
       check: [
       ],
       redirect: ['componentUpdate']
-    })
+    }),
+    FluxMixin
   ],
 
+  handleQueryPick(query) {
+    this.getFlux().actions.session.modalClose();
+    this.redirectedProps.componentUpdate({query});
+  },
+
   render() {
-    //let {fractional, autoYScale, yMin, yMax} = this.props;
+    let {table, query} = this.props;
+    let actions = this.getFlux().actions;
     return (
       <div className="channel-controls">
+        <div className="control">
+          <FlatButton label="Change Filter"
+                      primary={true}
+                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
+                        {
+                          table: table,
+                          initialQuery: query,
+                          onPick: this.handleQueryPick
+                        })}/>
+        </div>
+
       </div>
     );
   }
 
 });
+
+let Legend = () =>
+  <div className="legend">
+    {[
+      ['A', 'rgb(255, 50, 50)'],
+      ['T', 'rgb(255, 170, 0)'],
+      ['C', 'rgb(0, 128, 192)'],
+      ['G', 'rgb(0, 192, 120)'],
+      ['N', 'rgb(0,0,0)']
+    ].map(([base, colour]) =>
+      <div className="legend-element" key={base}>
+        <svg width="14" height="26">
+          <rect x="0" y="6" width="14" height="14" style={{fill: colour}} />
+        </svg>
+        <div className="label">
+          {base}
+        </div>
+      </div>
+    )}
+  </div>;
+Legend.shouldComponentUpdate = () => false;
 
 
 module.exports = PerRowIndicatorChannel;

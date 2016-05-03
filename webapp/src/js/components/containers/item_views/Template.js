@@ -1,5 +1,4 @@
 import React from 'react';
-
 import ItemTemplate from 'panoptes/ItemTemplate';
 
 // Mixins

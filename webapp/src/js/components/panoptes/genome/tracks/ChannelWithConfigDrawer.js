@@ -20,26 +20,42 @@ let ChannelWithConfigDrawer = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     sideComponent: React.PropTypes.element,
     configComponent: React.PropTypes.element,
+    legendComponent: React.PropTypes.element,
     onClose: React.PropTypes.func
   },
 
   getInitialState() {
     return {
-      controlsOpen: false
+      controlsOpen: false,
+      legendOpen: false
     };
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.controlsOpen !== this.state.controlsOpen)
+    if (['width', 'sideWidth','height', 'configComponent', 'legendComponent'].some((name) => prevProps[name] !== this.props[name]) ||
+      ['controlsOpen', 'legendOpen'].some((name) => prevState[name] !== this.state[name])
+    )
       this.updateControlsHeight();
+    if (prevState.controlsOpen !== this.state.controlsOpen)
+      this.visibilityHack();
+
   },
 
   updateControlsHeight() {
-    let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
-    this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
-    this.refs.controlsContainer.style.width = this.state.controlsOpen ?
-      '100%' : this.props.sideWidth + 'px';
-    //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
+    if (this.refs.controls) {
+      let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
+      this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
+    }
+    if (this.refs.legend) {
+      let height = offset(ReactDOM.findDOMNode(this.refs.legend)).height + 'px';
+      this.refs.legendContainer.style.height = this.state.legendOpen ? height : 0;
+      this.refs.legendToggle.style.bottom = this.state.legendOpen ? height : 0;
+    }
+  },
+
+
+  //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
+  visibilityHack() {
     if (!this.state.controlsOpen) {
       this.refs.controlsContainer.style.overflow = 'hidden';
       clearTimeout(this.controlOverFlowTimeout);
@@ -53,6 +69,11 @@ let ChannelWithConfigDrawer = React.createClass({
     e.stopPropagation();
   },
 
+  handleLegendToggle(e) {
+    this.setState({legendOpen: !this.state.legendOpen});
+    e.stopPropagation();
+  },
+
   handleClose(e) {
     e.stopPropagation();
     if (this.redirectedProps.onClose)
@@ -60,31 +81,53 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   render() {
-    let {height, width, sideWidth, sideComponent, configComponent} = this.props;
-    let {controlsOpen} = this.state;
+    let {height, width, sideWidth, onClose,
+      sideComponent, configComponent, legendComponent} = this.props;
+    let {controlsOpen, legendOpen} = this.state;
 
     let effWidth = width - sideWidth;
 
     return (
       <div className="channel-container">
-        {configComponent ? <div ref="controlsContainer" className="channel-controls-container">
-          <div ref="controls" style={{width: width + 'px'}}>
-            {configComponent}
-          </div>
-        </div> : null }
-        <div className="channel" style={{height: height}}>
-          <div className="channel-side" style={{width: `${sideWidth}px`}}>
-            { configComponent ? <div className="side-controls-spacer"></div> : null }
+        <div className="channel-side" style={{width: `${sideWidth}px`}}>
+          <div className="side-component">
             {sideComponent}
           </div>
-          <div className="channel-data" style={{width: `${effWidth}px`}}>
+          {onClose ?
+          <div className="close button">
+            <Icon name="times" onClick={this.handleClose}/>
+          </div>
+            : null }
+          {configComponent ?
+            <div className="config button">
+              <Icon className={classnames({open: controlsOpen})}
+                    name="cog" onClick={this.handleControlToggle}/>
+            </div>
+            : null }
+          {legendComponent ?
+            <div className="legend button" ref="legendToggle">
+              <Icon className={classnames({open: legendOpen})}
+                    name="info" onClick={this.handleLegendToggle}/>
+            </div>
+            : null }
+        </div>
+        <div className="channel-stack">
+          {configComponent ?
+            <div className="tray-container config-container" ref="controlsContainer">
+              <div ref="controls" style={{width: `${effWidth}px`}}>
+                {configComponent}
+              </div>
+            </div> : null }
+          <div className="channel-data" style={{width: `${effWidth}px`, height: `${height}px`}}>
             {this.props.children}
           </div>
-        </div>
-        <div className="side-controls">
-          {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
-          {configComponent ? <Icon className={classnames({'control-toggle': true, open: controlsOpen})}
-                name="cog" onClick={this.handleControlToggle}/> : null }
+          {legendComponent ?
+            <div className="tray-container legend-container" ref="legendContainer">
+              <div ref="legend" style={{width: `${effWidth}px`}}>
+                {legendComponent}
+              </div>
+            </div> : null }
+
         </div>
       </div>
     );
@@ -92,3 +135,16 @@ let ChannelWithConfigDrawer = React.createClass({
 });
 
 module.exports = ChannelWithConfigDrawer;
+
+//          {this.props.onClose ? <Icon className="close" name="times" onClick={this.handleClose}/> : null}
+
+
+//
+
+//<div className="channel-data" style={{width: `${effWidth}px`}}>
+//  {this.props.children}
+//</div>
+
+
+
+

@@ -34,6 +34,7 @@ let ScaledSVGChannel = React.createClass({
     dataYMax: React.PropTypes.number,
     side: React.PropTypes.element,
     controls: React.PropTypes.element,
+    legend: React.PropTypes.element,
     onClose: React.PropTypes.func
     //Note that there will be other props specific to each child channel
   },
@@ -50,7 +51,7 @@ let ScaledSVGChannel = React.createClass({
   },
 
   render() {
-    let {start, end, width, height, sideWidth, yMin, yMax, autoYScale, dataYMin, dataYMax, side, controls} = this.props;
+    let {start, end, width, height, sideWidth, yMin, yMax, autoYScale, dataYMin, dataYMax, side, controls, legend} = this.props;
 
     if (autoYScale) {
       if (_isFinite(dataYMin) && _isFinite(dataYMax)) {
@@ -101,6 +102,7 @@ let ScaledSVGChannel = React.createClass({
         sideComponent={<div className="side-name">{side}</div>}
         //Override component update to get latest in case of skipped render
         configComponent={controls}
+        legendComponent={legend}
         onClose={this.handleClose}
       >
         <svg className="numerical-channel" width={effWidth} height={height}>

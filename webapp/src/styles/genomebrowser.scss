@@ -1,10 +1,10 @@
 @import "./variables";
 
 .genome-browser {
-  height: calc(100% - 40px);
+  height: calc(100% - 41px);
   width: 100%;
   .control-bar {
-    height: 40px;
+    //height: 40px;
     line-height: 40px;
     .loading-canvas {
       //opacity: 0;
@@ -50,119 +50,160 @@
       .background {
         z-index: -1;
         position: absolute;
-        top:0;
-        left:0;
+        top: 0;
+        left: 0;
       }
       .fixed {
         z-index: 1;
-        .channel-container:first-child .channel .channel-data{
+        .channel-container:first-child .channel-stack .channel-data {
           //Shadow of position control-bar
-          box-shadow:  inset 2px 2px 4px rgba(0, 0, 0, 0.24);
+          box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.24);
         }
-        .channel-container:last-child .channel{
+        .channel-container:last-child {
           //Shadow of fixed tracks
           box-shadow: -1px 1px 4px rgba(0, 0, 0, 0.24);
+          border-bottom: none;
         }
-        .channel .channel-data {
+        .channel-stack .channel-data {
           //Shadow of side onto data
-          box-shadow:  inset 4px 0 4px -2px rgba(0, 0, 0, 0.24);
+          box-shadow: inset 4px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
       }
       .scrolling {
         overflow-y: scroll;
-        .channel-container:last-child .channel .channel-side{
+        .channel-container:last-child .channel-side {
           //Shadow of las side controls
           box-shadow: -1px 2px 4px rgba(0, 0, 0, 0.24);
         }
-        .channel .channel-data {
+        .channel-stack .channel-data {
           //Shadow of side onto data
-          box-shadow:  inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
+          box-shadow: inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
+      }
+      .config-container {
+        box-shadow: 3px 1px 4px rgba(0, 0, 0, 0.24);
+      }
+      .legend-container {
+        box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.24);
       }
       .channel-container {
         position: relative;
-      }
-      .side-controls-spacer {
-        padding-left:10px;
-        padding-top:10px;
-        height: 32px;
-      }
-      .side-controls {
-        position: absolute;
-        top:0;
-        left:0;
-        padding-left:10px;
-        padding-top:10px;
-        .close {
-          color: $red;
-          padding-right: 6px;
-        }
-        .icon {
-          opacity: 0.6;
-        }
-        .icon:hover {
-          opacity: 1;
-        }
-        .control-toggle.open {
-          color: $primary-color;
-        }
-      }
-      .channel {
         display: flex;
         flex-direction: row;
+        align-items: stretch;
+        border-bottom: 1px solid $light-primary-color;
+
         .channel-side {
-          border-bottom: 1px solid grey;
-          background: white;
           position: relative;
-          .side-name {
-            padding-left: 10px;
-            padding-top: 5px;
+          overflow: hidden;
+          background-color: white;
+          .close {
+            color: $red;
+            padding-right: 6px;
+          }
+          .icon {
+            opacity: 0.6;
+          }
+          .icon:hover {
+            opacity: 1;
           }
 
-        }
-        .channel-data {
-          border-bottom: 1px solid grey;
-          flex: 1;
-          overflow: hidden;
-          canvas {
-            display: block;
+          .button {
+            width: 25px;
+            height: 25px;
+            line-height: 19px;
+            padding: 3px;
+            position: absolute;
+            text-align: center;
+            right: 0;
+            .open {
+              color: $primary-color;
+            }
           }
-        }
-      }
-      .channel-controls-container > div {
-        //Some padding so that the controls don't overlap the close and config controls
-        padding-left: 65px;
-      }
-      .channel-controls-container {
-        box-shadow: $z-1-shadow;
-        position: relative;
-        transition: height .5s, width .5s !important;
-        background: white;
-        height: 0;
-        width: 0;
-        overflow: hidden;
-        .channel-controls {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          flex-wrap: wrap;
-          .control {
-            min-height: 50px;
+          .config {
+            top: 0;
+          }
+          .legend {
+            transition: bottom .5s !important;
+            bottom: 0;
+          }
+          .close {
+            top: calc(50% - 15px);
+            left: 0;
+          }
+          .side-component {
+            position: absolute;
+            right: 0;
+            left: 0;
+            padding: 5px 35px 5px 30px;
+            text-overflow: ellipsis;
+            overflow: auto;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            .label {
-              padding-left: 16px;
+          }
+
+        }
+        .channel-stack {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          .channel-data {
+            overflow: hidden;
+            canvas {
+              display: block;
             }
-            .dropdown {
-              top: -4px;
+          }
+          .tray-container {
+            position: relative;
+            //box-shadow: $z-1-shadow;
+            transition: height .5s !important;
+            background: white;
+            height: 0;
+            width: 100%;
+            overflow: hidden;
+            .legend {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              flex-wrap: wrap;
+              padding-right: 16px;
+              .legend-element {
+                min-height: 26px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                padding-left: 16px;
+                .label {
+                  padding-left: 8px;
+                }
+              }
             }
-            .slider {
-              margin-left: 30px;
-              width:100px;
-            }
-            .numeric-input {
-              width: 80px;
+            .channel-controls {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              flex-wrap: wrap;
+              .control {
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                .label {
+                  padding-left: 10px;
+                }
+                .dropdown {
+                  top: -4px;
+                }
+                .slider {
+                  margin-left: 30px;
+                  width: 100px;
+                }
+                .numeric-input {
+                  width: 80px;
+                }
+              }
             }
           }
         }
@@ -191,7 +232,7 @@
       font-size: 12px;
     }
   }
-  .major  {
+  .major {
     line {
       stroke-width: 0.5px;
     }

@@ -65,7 +65,7 @@ let AnnotationChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth} = props;
-    if (this.props.chromosome && this.props.chromosome !== chromosome) {
+    if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
@@ -73,8 +73,9 @@ let AnnotationChannel = React.createClass({
     }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
-    if (!((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start))) {
+    if (this.props.chromosome !== chromosome ||
+        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
+          (this.blockEnd === block2End && this.blockStart === block2Start))) {
       //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
@@ -154,14 +155,15 @@ let AnnotationChannel = React.createClass({
 
   draw(props) {
     const {width, sideWidth, start, end} = props || this.props;
-    const {names, sizes, starts, types, rows} = this.data;
     const {height} = this.state;
 
     const canvas = this.refs.canvas;
-    if (!canvas || !starts)
+    if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!(this.data && this.data.starts)) return;
+    const {names, sizes, starts, types, rows} = this.data;
     ctx.strokeStyle = '#000';
     ctx.fillStyle = '#000';
     ctx.font = '10px monospace';
@@ -173,7 +175,7 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'gene') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > -4 && x1 < width + 4) {
+        if (x2 > -60 && x1 < width + 4) {
           ctx.fillRect(x1, (rows[i] * ROW_HEIGHT) + 20, Math.max(1, x2 - x1), 2);   //Gene bar
           if (names[i] && (lastTextAt[rows[i]] + 30 < x1  || typeof lastTextAt[rows[i]] === 'undefined')) {
             lastTextAt[rows[i]] = x1;
@@ -221,11 +223,11 @@ let AnnotationChannel = React.createClass({
             <span>{name || 'Genes'}</span>
             </div>
             }
-        //Override component update to get latest in case of skipped render
         configComponent={null}
+        legendComponent={<Legend/>}
         onClose={null}
       >
-        <canvas ref="canvas" width={width} height={height}/>;
+        <canvas ref="canvas" width={width} height={height}/>
       </ChannelWithConfigDrawer>);
   }
 });
@@ -248,6 +250,26 @@ let AnnotationChannel = React.createClass({
 //  }
 //});
 
+let Legend = () =>
+    <div className="legend">
+      <div className="legend-element">
+        <svg width="50" height="26">
+          <rect x="0" y="12" width="50" height="2" style={{fill: '#000'}} />
+        </svg>
+        <div className="label">
+          Gene
+        </div>
+      </div>
+      <div className="legend-element">
+        <svg width="50" height="26">
+          <rect x="0" y ="8" width="50" height="10" style={{fill: '#3d8bd5'}} />
+        </svg>
+        <div className="label">
+          Coding Sequence
+        </div>
+      </div>
+    </div>;
+Legend.shouldComponentUpdate = () => false;
 
 module.exports = AnnotationChannel;
 
