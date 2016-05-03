@@ -102,9 +102,16 @@ let GeneSearchResultsList = React.createClass({
     let {icon, search, maxMatches} = this.props;
     let {loadStatus, matchData} = this.state;
 
-    // FIXME: logic fails when API call is still pending (maybe use "Searching..." in that case.)
+    if (loadStatus === 'loaded' && matchData.ids.length === 0) {
 
-    if (matchData.ids && matchData.ids.length > 0) {
+      return (
+        <div>
+          <p>No match.</p>
+          <Loading status={loadStatus}/>
+        </div>
+      );
+
+    } else if (loadStatus === 'loaded' && matchData.ids.length > 0) {
 
       let subheaderText = null;
 
@@ -155,7 +162,6 @@ let GeneSearchResultsList = React.createClass({
 
       }
 
-
       return (
         <div style={{width: '80vw', height: '60vh', overflow: 'auto'}}>
           <List>
@@ -167,11 +173,13 @@ let GeneSearchResultsList = React.createClass({
       );
 
     } else {
+
       return (
         <div>
-          <p>No match</p>
+          <Loading status={loadStatus}/>
         </div>
       );
+
     }
   }
 
