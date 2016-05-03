@@ -17,6 +17,7 @@ let session = keyMirror({
   POPUP_OPEN: null,
   POPUP_FOCUS: null,
   POPUP_RESIZE: null,
+  POPUP_TO_TAB: null,
   TAB_CLOSE: null,
   TAB_OPEN: null,
   TAB_POP_OUT: null,

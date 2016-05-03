@@ -6,9 +6,9 @@ import memoize from 'utils/Memoize';
 let SessionActions = {
   componentUpdate(compId, updater, newComponent = null) {
     this.dispatch(SESSION.COMPONENT_UPDATE, {
-      compId: compId,
-      updater: updater,
-      newComponent: newComponent
+      compId,
+      updater,
+      newComponent
     });
   },
   //We cache these, other wise the prop looks different causing a re-render
@@ -16,9 +16,9 @@ let SessionActions = {
   componentUpdateFor: memoize((compId) =>
     function(updater, newComponent = null) {
       this.dispatch(SESSION.COMPONENT_UPDATE, {
-        compId: compId,
-        updater: updater,
-        newComponent: newComponent
+        compId,
+        updater,
+        newComponent
       });
     }
   ),
@@ -26,69 +26,45 @@ let SessionActions = {
     this.dispatch(SESSION.MODAL_CLOSE);
   },
   modalOpen(component, props) {
-    this.dispatch(SESSION.MODAL_OPEN,
-      {
-        component: component,
-        props: props
-      });
+    this.dispatch(SESSION.MODAL_OPEN, {component, props});
   },
   notify(notification) {
     this.dispatch(SESSION.NOTIFY, notification);
   },
   popupClose(compId) {
-    this.dispatch(SESSION.POPUP_CLOSE, {
-      compId: compId
-    });
+    this.dispatch(SESSION.POPUP_CLOSE, {compId});
   },
   popupOpen(component = null, props = {}) {
     this.dispatch(SESSION.POPUP_OPEN, {
-      component: {
-        component: component,
-        props: props
-      }
+      component: {component, props}
     });
   },
   popupFocus(compId) {
-    this.dispatch(SESSION.POPUP_FOCUS, {
-      compId: compId
-    });
+    this.dispatch(SESSION.POPUP_FOCUS, {compId});
   },
   popupMove(compId, pos) {
-    this.dispatch(SESSION.POPUP_MOVE, {
-      compId: compId,
-      pos: pos
-    });
+    this.dispatch(SESSION.POPUP_MOVE, {compId, pos});
   },
   popupResize(compId, size) {
-    this.dispatch(SESSION.POPUP_RESIZE, {
-      compId: compId,
-      size: size
-    });
+    this.dispatch(SESSION.POPUP_RESIZE, {compId, size});
+  },
+  popupToTab(compId) {
+    this.dispatch(SESSION.POPUP_TO_TAB, {compId})
   },
   tabClose(compId) {
-    this.dispatch(SESSION.TAB_CLOSE, {
-      compId: compId
-    });
+    this.dispatch(SESSION.TAB_CLOSE, {compId});
   },
   tabOpen(component = null, props = {}, switchTo = true) {
     this.dispatch(SESSION.TAB_OPEN, {
-      component: {
-        component: component,
-        props: props
-      },
-      switchTo: switchTo
+      component: {component, props},
+      switchTo
     });
   },
   tabPopOut(compId, pos) {
-    this.dispatch(SESSION.TAB_POP_OUT, {
-      compId: compId,
-      pos: pos
-    });
+    this.dispatch(SESSION.TAB_POP_OUT, {compId, pos});
   },
   tabSwitch(compId) {
-    this.dispatch(SESSION.TAB_SWITCH, {
-      compId: compId
-    });
+    this.dispatch(SESSION.TAB_SWITCH, {compId});
   }
 };
 
