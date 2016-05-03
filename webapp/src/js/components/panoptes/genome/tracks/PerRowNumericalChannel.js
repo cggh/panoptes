@@ -177,7 +177,7 @@ let PerRowNumericalTrack = React.createClass({
     let tableConfig = this.config.tables[table];
 
     if (['chromosome', 'table',
-        'channel', 'query',  'colourProperty'].some((prop) => this.props[prop] !== props[prop])) {
+        'channel', 'query'].some((prop) => this.props[prop] !== props[prop])) {
       this.data = {
         dataStart: 0,
         dataStep: 0,
@@ -246,7 +246,7 @@ let PerRowNumericalTrack = React.createClass({
                 Object.assign(this.data.columns, columns);
                 this.applyData(props);
                 this.calculateYScale(props);
-              })
+              }), 'colourProperty'
           ));
         }).then((data) => {
           this.props.onChangeLoadStatus('DONE');
@@ -268,7 +268,7 @@ let PerRowNumericalTrack = React.createClass({
     let {primKeys, dataStart, dataStep, columns, colourVals} = this.data;
     let {interpolation, tension, table, colourProperty, onKnownLegendValuesChange} = props;
     let colourFunc = categoryColours('__default__');
-    if (table && colourProperty)
+    if (colourProperty)
       colourFunc = propertyColour(this.config.tables[table].propertiesMap[colourProperty]);
     let lines = {};
     let colours = {};
@@ -386,7 +386,7 @@ let PerRowNumericalTrackControls = React.createClass({
           <DropDownMenu className="dropdown"
                         value={colourProperty}
                         onChange={(e, i, v) => this.redirectedProps.componentUpdate({colourProperty: v})}>
-            <MenuItem key="__none__" value={null} primaryText="None"/>
+            <MenuItem key="__none__" value={undefined} primaryText="None"/>
             {this.config.tables[table].properties.map((property) =>
               <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
           </DropDownMenu>

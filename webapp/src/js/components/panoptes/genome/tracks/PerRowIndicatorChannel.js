@@ -14,8 +14,11 @@ import findBlocks from 'panoptes/genome/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FlatButton from 'material-ui/FlatButton';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
 
 import 'hidpi-canvas';
+import {propertyColour, categoryColours} from 'util/Colours';
 
 const HEIGHT = 50;
 
@@ -36,7 +39,7 @@ let PerRowIndicatorChannel = React.createClass({
     }),
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth', 'colourProperty')
   ],
 
   propTypes: {
@@ -49,7 +52,8 @@ let PerRowIndicatorChannel = React.createClass({
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string
+    query: React.PropTypes.string,
+    colourProperty: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -68,11 +72,15 @@ let PerRowIndicatorChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, query} = props;
+    let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
     if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
+      return;
+    }
+    if (colourProperty && !this.config.tables[table].propertiesMap[colourProperty]) {
+      ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
@@ -87,6 +95,8 @@ let PerRowIndicatorChannel = React.createClass({
       this.props.onChangeLoadStatus('LOADING');
       let tableConfig = this.config.tables[table];
       let columns = [tableConfig.primkey, tableConfig.positionField];
+      if (colourProperty)
+        columns.push(colourProperty);
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
@@ -130,15 +140,21 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   applyData(props, data) {
-    let {table} = props;
+    let {table, colourProperty} = props;
     let tableConfig = this.config.tables[table];
     this.positions = data[tableConfig.positionField] || [];
+    if (colourProperty && data[colourProperty]) {
+      this.colourVals = _map(data[colourProperty], propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+    } else {
+      this.colourVals = null;
+    }
     this.draw(props);
   },
 
   draw(props) {
     const {width, sideWidth, start, end} = props || this.props;
     const positions = this.positions;
+    console.log(this.colourVals);
     const canvas = this.refs.canvas;
     if (!canvas)
       return;
@@ -190,7 +206,8 @@ let PerRowIndicatorControls = React.createClass({
       ],
       redirect: ['componentUpdate']
     }),
-    FluxMixin
+    FluxMixin,
+    ConfigMixin,
   ],
 
   handleQueryPick(query) {
@@ -199,7 +216,7 @@ let PerRowIndicatorControls = React.createClass({
   },
 
   render() {
-    let {table, query} = this.props;
+    let {table, query, colourProperty} = this.props;
     let actions = this.getFlux().actions;
     return (
       <div className="channel-controls">
@@ -213,6 +230,17 @@ let PerRowIndicatorControls = React.createClass({
                           onPick: this.handleQueryPick
                         })}/>
         </div>
+        <div className="control">
+          <div className="label">Colour By:</div>
+          <DropDownMenu className="dropdown"
+                        value={colourProperty}
+                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({colourProperty: v})}>
+            <MenuItem key="__none__" value={undefined} primaryText="None"/>
+            {this.config.tables[table].properties.map((property) =>
+              <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
+          </DropDownMenu>
+        </div>
+
 
       </div>
     );
