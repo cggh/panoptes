@@ -26,8 +26,8 @@ let PropertyLegend = React.createClass({
     const colourFunc = propertyColour(propConfig);
     let elements = null;
     if (propConfig.categoryColors) {
-      elements = _map(propConfig.categoryColors, (key, colour) => (
-        <LegendElement key={key} name={key} colour={colour} />));
+      elements = _map(propConfig.categoryColors, (colour, key) => (
+        <LegendElement key={key} name={key === "_other_" ? "Other" : key} colour={colour} />));
     } else if (propConfig.isBoolean) {
       elements = [
         <LegendElement key="true" name="True" colour={colourFunc(true)} />,

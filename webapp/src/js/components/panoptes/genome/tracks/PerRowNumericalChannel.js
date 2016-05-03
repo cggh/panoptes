@@ -19,6 +19,7 @@ import SummarisationCache from 'panoptes/SummarisationCache';
 import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertyLegend from 'panoptes/PropertyLegend';
+import PropertySelector from 'panoptes/PropertySelector';
 import {propertyColour, categoryColours} from 'util/Colours';
 
 import Checkbox from 'material-ui/Checkbox';
@@ -383,13 +384,9 @@ let PerRowNumericalTrackControls = React.createClass({
         </div>
         <div className="control">
           <div className="label">Colour By:</div>
-          <DropDownMenu className="dropdown"
-                        value={colourProperty}
-                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({colourProperty: v})}>
-            <MenuItem key="__none__" value={undefined} primaryText="None"/>
-            {this.config.tables[table].properties.map((property) =>
-              <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
-          </DropDownMenu>
+          <PropertySelector table={table}
+                            value={colourProperty}
+                            onSelect={(colourProperty) => this.redirectedProps.componentUpdate({colourProperty})} />
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>
