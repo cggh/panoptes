@@ -5,17 +5,22 @@ import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps'
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
+import _map from 'lodash/map';
+import _isEqual from 'lodash/isEqual';
 
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/genome/FindBlocks';
+import PropertySelector from 'panoptes/PropertySelector';
+import PropertyLegend from 'panoptes/PropertyLegend';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FlatButton from 'material-ui/FlatButton';
 
 import 'hidpi-canvas';
+import {propertyColour, categoryColours} from 'util/Colours';
 
 const HEIGHT = 50;
 
@@ -31,12 +36,13 @@ let PerRowIndicatorChannel = React.createClass({
         'width',
         'sideWidth',
         'name',
-        'table'
+        'table',
+        'colourProperty'
       ]
     }),
     ConfigMixin,
     FluxMixin,
-    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth', 'colourProperty')
   ],
 
   propTypes: {
@@ -49,13 +55,20 @@ let PerRowIndicatorChannel = React.createClass({
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string
+    query: React.PropTypes.string,
+    colourProperty: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
       query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
     };
+  },
+
+  getInitialState() {
+    return {
+      knownValues: null
+    }
   },
 
   componentWillMount() {
@@ -68,17 +81,22 @@ let PerRowIndicatorChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, query} = props;
+    let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
     if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
       return;
     }
+    if (colourProperty && !this.config.tables[table].propertiesMap[colourProperty]) {
+      ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
+      return;
+    }
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
     //If we already are at an acceptable block then don't change it!
     if (this.props.chromosome !== chromosome ||
         this.props.query !== query ||
+        this.props.colourProperty !== colourProperty ||
         !((this.blockEnd === block1End && this.blockStart === block1Start) ||
           (this.blockEnd === block2End && this.blockStart === block2Start))) {
       //Current block was unacceptable so choose best one
@@ -87,6 +105,8 @@ let PerRowIndicatorChannel = React.createClass({
       this.props.onChangeLoadStatus('LOADING');
       let tableConfig = this.config.tables[table];
       let columns = [tableConfig.primkey, tableConfig.positionField];
+      if (colourProperty)
+        columns.push(colourProperty);
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
@@ -130,15 +150,26 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   applyData(props, data) {
-    let {table} = props;
+    let {table, colourProperty} = props;
     let tableConfig = this.config.tables[table];
     this.positions = data[tableConfig.positionField] || [];
+    if (colourProperty && data[colourProperty]) {
+      this.colourData = data[colourProperty];
+      this.colourVals = _map(data[colourProperty], propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+    } else {
+      this.colourVals = null;
+      this.colourData = null;
+    }
     this.draw(props);
   },
 
   draw(props) {
-    const {width, sideWidth, start, end} = props || this.props;
+    const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
     const positions = this.positions;
+    const colours = this.colourVals;
+    const colourData = this.colourData;
+    let drawnColourVals = new Set();
+    const recordColours = colourProperty && this.config.tables[table].propertiesMap[colourProperty].isText;
     const canvas = this.refs.canvas;
     if (!canvas)
       return;
@@ -150,19 +181,36 @@ let PerRowIndicatorChannel = React.createClass({
     for (let i = 0, l = positions.length; i < l; ++i) {
       const psx = ((width - sideWidth) / (end - start)) * (positions[i] - start);
       if (psx > -4 && psx < width + 4) {
+        if (colours) {
+          ctx.fillStyle = colours[i];
+          if (recordColours) {
+            drawnColourVals.add(colourData[i]);
+          }
+        }
+
         ctx.beginPath();
         ctx.moveTo(psx, psy);
-        ctx.lineTo(psx + 4, psy + 8);
-        ctx.lineTo(psx - 4, psy + 8);
+        ctx.lineTo(psx + 6, psy + 12);
+        ctx.lineTo(psx - 6, psy + 12);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
       }
     }
-  },
+    drawnColourVals = Array.from(drawnColourVals.values());
+    if (recordColours) {
+      if (!_isEqual(this.state.knownValues, drawnColourVals)) {
+        this.setState({knownValues: drawnColourVals});
+      }
+    } else {
+      this.setState({knownValues: null});
+    }
+
+    },
 
   render() {
-    let {width, sideWidth, table} = this.props;
+    let {width, sideWidth, table, colourProperty} = this.props;
+    const {knownValues} = this.state;
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -175,7 +223,7 @@ let PerRowIndicatorChannel = React.createClass({
             }
         //Override component update to get latest in case of skipped render
         configComponent={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
-        legendComponent={<Legend/>}
+        legendComponent={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={knownValues} /> : null}
         onClose={this.redirectedProps.onClose}
       >
         <canvas ref="canvas" width={width} height={HEIGHT}/>
@@ -183,10 +231,11 @@ let PerRowIndicatorChannel = React.createClass({
   }
 });
 
-let PerRowIndicatorControls = React.createClass({
+const PerRowIndicatorControls = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
+        'colourProperty'
       ],
       redirect: ['componentUpdate']
     }),
@@ -199,7 +248,7 @@ let PerRowIndicatorControls = React.createClass({
   },
 
   render() {
-    let {table, query} = this.props;
+    let {table, query, colourProperty} = this.props;
     let actions = this.getFlux().actions;
     return (
       <div className="channel-controls">
@@ -213,34 +262,17 @@ let PerRowIndicatorControls = React.createClass({
                           onPick: this.handleQueryPick
                         })}/>
         </div>
-
+        <div className="control">
+          <div className="label">Colour By:</div>
+          <PropertySelector table={table}
+                            value={colourProperty}
+                            onSelect={(colourProperty) => this.redirectedProps.componentUpdate({colourProperty})} />
+        </div>
       </div>
     );
   }
 
 });
-
-let Legend = () =>
-  <div className="legend">
-    {[
-      ['A', 'rgb(255, 50, 50)'],
-      ['T', 'rgb(255, 170, 0)'],
-      ['C', 'rgb(0, 128, 192)'],
-      ['G', 'rgb(0, 192, 120)'],
-      ['N', 'rgb(0,0,0)']
-    ].map(([base, colour]) =>
-      <div className="legend-element" key={base}>
-        <svg width="14" height="26">
-          <rect x="0" y="6" width="14" height="14" style={{fill: colour}} />
-        </svg>
-        <div className="label">
-          {base}
-        </div>
-      </div>
-    )}
-  </div>;
-Legend.shouldComponentUpdate = () => false;
-
 
 module.exports = PerRowIndicatorChannel;
 
