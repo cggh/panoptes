@@ -58,8 +58,8 @@ let GeneSearchResultsList = React.createClass({
     };
   },
 
-  handleSelectGene(geneId) {
-    this.props.onSelectGene(geneId);
+  handleSelectGene(e, geneId) {
+    this.props.onSelectGene(e, geneId);
   },
 
   //Called by DataFetcherMixin
@@ -104,7 +104,7 @@ let GeneSearchResultsList = React.createClass({
 
     if (loadStatus !== 'loaded') {
       return (
-        <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+        <div>
           <Loading status={loadStatus}/>
         </div>
       );
@@ -147,12 +147,12 @@ let GeneSearchResultsList = React.createClass({
                   secondaryText={
                     <div>
                       <Highlight search={search}>
-                          {matchData.descriptions[i]}
+                          {matchData.descriptions[i].split(',').join(', ')}
                       </Highlight>
                     </div>
                   }
                   secondaryTextLines={2}
-                  onClick={() => this.handleSelectGene(matchData.ids[i])}
+                  onClick={(e) => this.handleSelectGene(e, matchData.ids[i])}
                   leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
@@ -160,7 +160,7 @@ let GeneSearchResultsList = React.createClass({
     }
 
     return (
-      <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+      <div>
         <List>
           <Subheader>{subheaderText}</Subheader>
           {listItems}

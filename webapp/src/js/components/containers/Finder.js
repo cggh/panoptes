@@ -56,8 +56,19 @@ let Finder = React.createClass({
     this.getFlux().actions.session.tabOpen(container, {table: table.id, initialSearchFocus: true}, switchTo);
   },
 
-  render() {
+  handleOpenPopup(e, container, props) {
 
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+
+    if (!middleClick) {
+      this.getFlux().actions.session.modalClose();
+    }
+
+    let switchTo = !middleClick;
+    this.getFlux().actions.session.popupOpen(container, props, switchTo);
+  },
+
+  render() {
     // TODO: A vertical list is not entirely scalable (modal dialog would go off screen).
 
     let listItems = [];
@@ -70,11 +81,11 @@ let Finder = React.createClass({
       let secondaryText = 'Name, Description, Genomic region';
 
       let listItem = (
-        <ListItem key="geneFinderListItem"
+        <ListItem key="findGeneListItem"
                   primaryText="Gene"
                   secondaryText={secondaryText}
                   leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                  onClick={() => this.handleSwitchModal('containers/GeneFinder', {})}
+                  onClick={(e) => this.handleOpenPopup(e, 'containers/FindGene', {})}
         />
       );
 

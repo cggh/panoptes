@@ -1,10 +1,5 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import Highlight from 'react-highlighter';
-import _uniq from 'lodash/uniq';
-import _keys from 'lodash/keys';
-import striptags from 'striptags';
+
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,13 +9,9 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import SQL from 'panoptes/SQL';
-import ItemTemplate from 'panoptes/ItemTemplate';
-import DataDecoders from 'panoptes/DataDecoders';
 
 // Utils
 import LRUCache from 'util/LRUCache';
-import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Material UI components
 import {List, ListItem} from 'material-ui/List';
@@ -98,32 +89,30 @@ let RegionGenesList = React.createClass({
         });
   },
 
-  handleSelectGene(geneId) {
-    this.props.onSelectGene(geneId);
+  handleSelectGene(e, geneId) {
+    this.props.onSelectGene(e, geneId);
   },
 
   render() {
-    let {icon, chromosome, startPosition, endPosition} = this.props;
+    let {icon} = this.props;
     let {loadStatus, regionGenesData} = this.state;
 
     if (loadStatus !== 'loaded') {
       return (
-        <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+        <div>
           <Loading status={loadStatus}/>
         </div>
       );
     }
 
     let subheaderText = (
-      <span>No genes found between positions {startPosition} and {endPosition} on chromosome {chromosome}.</span>
+      <span>No genes found.</span>
     );
     if (regionGenesData.length > 0) {
       subheaderText = (
-        <span>Found {regionGenesData.length} genes between positions {startPosition} and {endPosition} on chromosome {chromosome}:</span>
+        <span>Found {regionGenesData.length} genes:</span>
       );
     }
-
-    // FIXME: secondaryText is not wrapping properly (so isn't showing highlighted matched text in all cases)
 
     let listItems = [];
 
@@ -144,7 +133,7 @@ let RegionGenesList = React.createClass({
                     </div>
                   }
                   secondaryTextLines={2}
-                  onClick={() => this.handleSelectGene(regionGenesData[i].fid)}
+                  onClick={(e) => this.handleSelectGene(e, regionGenesData[i].fid)}
                   leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
         />
       );
@@ -153,7 +142,7 @@ let RegionGenesList = React.createClass({
 
 
     return (
-      <div style={{position: 'relative', width: '80vw', height: '60vh', overflow: 'auto'}}>
+      <div>
         <List>
           <Subheader>{subheaderText}</Subheader>
           {listItems}
