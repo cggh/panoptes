@@ -73,7 +73,7 @@ let FindGeneByNameDesc = React.createClass({
     }
 
     return (
-      <div className="stack vertical" style={{padding: '10px'}}>
+      <div style={{padding: '10px'}}>
         <div className="search">
           <TextField ref="search"
                      fullWidth={true}
@@ -82,7 +82,7 @@ let FindGeneByNameDesc = React.createClass({
                      onChange={this.handleSearchChange}
           />
         </div>
-        <div>
+        <div style={{position: 'relative', width: '100%', height: '200px'}}>
           {geneList}
         </div>
       </div>

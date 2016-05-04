@@ -129,48 +129,49 @@ let FindGeneByRegion = React.createClass({
     // TODO: Lay out inputs horizontally and allow collapse; give sensible widths.
 
     return (
-      <div className="stack vertical" style={{padding: '10px'}}>
-        <div>
-          <span>Chromosome</span>
-          <span>: </span>
-          <span>
-            <select value={chromosome} onChange={this.handleChromChange}>
-              {_map(this.config.chromosomes, (length, name) =>
-                  <option key={name}
-                          value={name}>
-                    {name}
-                  </option>
-              )}
-            </select>
-          </span>
-        </div>
-        <div>
-          <span>Start</span>
-          <span>: </span>
-          <span>
-            <input value={startPosition}
-                   onChange={this.handleStartPosChange}
-                   min={0}
-                   max={endPosition ? endPosition : chromosomeLength}
-                   type="number"
-            />
-          </span>
-          <span> bp</span>
-        </div>
-        <div>
-          <span>End</span>
-          <span>: </span>
-          <span>
-            <input value={endPosition}
-                   onChange={this.handleEndPosChange}
-                   min={startPosition ? startPosition : 0}
-                   max={chromosomeLength}
-                   type="number"
-            />
-          </span>
-          <span> bp</span>
-        </div>
-        <div>
+      <div>
+        <table className="table-col">
+        <tbody>
+          <tr>
+            <th className="table-col-header">Chromosome:</th>
+            <td className="table-col-cell">
+              <select value={chromosome} onChange={this.handleChromChange}>
+                {_map(this.config.chromosomes, (length, name) =>
+                    <option key={name}
+                            value={name}>
+                      {name}
+                    </option>
+                )}
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th className="table-col-header">Start:</th>
+            <td className="table-col-cell">
+              <input value={startPosition}
+                     onChange={this.handleStartPosChange}
+                     min={0}
+                     max={endPosition ? endPosition : chromosomeLength}
+                     type="number"
+              />
+            </td>
+            <td className="table-col-cell">bp</td>
+          </tr>
+          <tr>
+            <th className="table-col-header">End:</th>
+            <td className="table-col-cell">
+              <input value={endPosition}
+                     onChange={this.handleEndPosChange}
+                     min={startPosition ? startPosition : 0}
+                     max={chromosomeLength}
+                     type="number"
+              />
+            </td>
+            <td className="table-col-cell">bp</td>
+          </tr>
+        </tbody>
+        </table>
+        <div style={{position: 'relative', width: '100%', height: '200px'}}>
           {geneList}
         </div>
       </div>
