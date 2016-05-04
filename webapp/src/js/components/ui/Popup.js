@@ -36,8 +36,8 @@ let Popup = React.createClass({
         y: 100
       }),
       size: Immutable.Map({
-        width: 500,
-        height: 400
+        width: 700,
+        height: 500
       })
     };
   },

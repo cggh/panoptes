@@ -45,7 +45,6 @@ let TreeWithActions = React.createClass({
     return {
       componentUpdate: null,
       sidebar: true,
-      treeType: 'circular'
     };
   },
 
