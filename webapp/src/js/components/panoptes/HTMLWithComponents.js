@@ -3,14 +3,22 @@ import HtmlToReact from 'html-to-react';
 import ItemMap from 'containers/item_views/ItemMap';
 import ItemLink from 'panoptes/ItemLink';
 import ComponentWrapper from 'panoptes/ComponentWrapper';
-
+import TreeContainer from 'containers/TreeContainer';
+import PlotContainer from 'containers/PlotContainer';
+import PopupButton from 'panoptes/PopupButton';
 
 const components = {
   ItemMap: (node, children) =>
     //<ComponentWrapper key={node.attribs.key}><ItemMap {...node.attribs} key={null} /></ComponentWrapper>,
-    <ItemMap {...node.attribs} />,
+    <ItemMap key={node.attribs.key} {...node.attribs} />,
   ItemLink: (node, children) =>
-    <ItemLink {...node.attribs} />
+    <ItemLink key={node.attribs.key} {...node.attribs} />,
+  Tree: (node, children) =>
+    <TreeContainer key={node.attribs.key} {...node.attribs} />,
+  Plot: (node, children) =>
+    <PlotContainer key={node.attribs.key} {...node.attribs} />,
+  PopupButton: (node, children) =>
+    <PopupButton key={node.attribs.key} {...node.attribs} />
 };
 
 
@@ -24,7 +32,8 @@ let HTMLWithComponents = React.createClass({
   componentWillMount() {
     let htmlToReactParser = new HtmlToReact.Parser(React, {
       lowerCaseAttributeNames: false,
-      lowerCaseTags: false
+      lowerCaseTags: false,
+      recognizeSelfClosing: true
     });
     let defaultProcess = new HtmlToReact.ProcessNodeDefinitions(React).processDefaultNode;
     let processingInstructions = [

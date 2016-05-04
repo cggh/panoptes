@@ -13,6 +13,7 @@ import FluxMixin from 'mixins/FluxMixin';
 import Loading from 'ui/Loading';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
+import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import { plotTypes, allDimensions } from 'panoptes/plotTypes';
 
@@ -29,13 +30,15 @@ let PlotContainer = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    componentUpdate: React.PropTypes.func,
     table: React.PropTypes.string,
+    query: React.PropTypes.string,
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
   getDefaultProps() {
     return {
+      query: SQL.NullQuery
     };
   },
 
