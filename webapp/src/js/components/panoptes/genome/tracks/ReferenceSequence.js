@@ -30,7 +30,8 @@ let ReferenceSequence = React.createClass({
     start: React.PropTypes.number,
     end: React.PropTypes.number,
     width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number
+    sideWidth: React.PropTypes.number,
+    onChangeLoadStatus: React.PropTypes.func
   },
 
   getInitialState() {
@@ -47,7 +48,7 @@ let ReferenceSequence = React.createClass({
 
   //Called by DataFetcherMixin on prop change
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth} = props;
+    let {chromosome, start, end, width, sideWidth, onChangeLoadStatus} = props;
     if (this.state.chromosome && (this.state.chromosome !== chromosome))
       this.setState({columns: null});
     if (width - sideWidth < 1) {
@@ -63,7 +64,7 @@ let ReferenceSequence = React.createClass({
     this.blockStart = block1Start;
     this.blockEnd = block1End;
     let targetPointCount = (((width - sideWidth) / 2) / (end - start)) * (block1End - block1Start);
-    this.props.onChangeLoadStatus('LOADING');
+    if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
@@ -83,10 +84,10 @@ let ReferenceSequence = React.createClass({
         })
           .then((data) => {
             this.applyData(data);
-            this.props.onChangeLoadStatus('DONE');
+            if (onChangeLoadStatus) onChangeLoadStatus('DONE');
           })
           .catch((err) => {
-            this.props.onChangeLoadStatus('DONE');
+            if (onChangeLoadStatus) onChangeLoadStatus('DONE');
             throw err;
           })
           .catch(API.filterAborted)

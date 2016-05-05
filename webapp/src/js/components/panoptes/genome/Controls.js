@@ -101,24 +101,6 @@ let Controls = React.createClass({
             )}
           </select>
         </span>
-        <span> Midpoint: </span>
-        <span>
-          <input ref="midpoint"
-                 type="number"
-                 min={0}
-                 max={max}
-                 value={parseInt(midpoint)}
-                 onChange={this.handleRangeChange}/>
-        </span>
-        <span> Width: </span>
-        <span>
-          <input ref="width"
-                 type="number"
-                 value={parseInt(width)}
-                 min={minWidth}
-                 max={max}
-                 onChange={this.handleRangeChange}/>
-        </span>
         <span> Region: </span>
         <span>
           <input className={classnames({wide: true, invalid: !regionValid})}
@@ -137,3 +119,23 @@ let Controls = React.createClass({
 });
 
 module.exports = Controls;
+
+//<span> Midpoint: </span>
+//<span>
+//<input ref="midpoint"
+//type="number"
+//min={0}
+//max={max}
+//value={parseInt(midpoint)}
+//onChange={this.handleRangeChange}/>
+//</span>
+//<span> Width: </span>
+//<span>
+//          <input ref="width"
+//                 type="number"
+//                 value={parseInt(width)}
+//                 min={minWidth}
+//                 max={max}
+//                 onChange={this.handleRangeChange}/>
+//  </span>
+//
