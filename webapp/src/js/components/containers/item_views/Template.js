@@ -6,7 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import 'item_views/template.scss';
+import 'template.scss';
 
 
 let TemplateWidget = React.createClass({

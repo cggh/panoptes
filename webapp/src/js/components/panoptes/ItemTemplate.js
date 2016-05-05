@@ -21,7 +21,7 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 // UI components
 import Loading from 'ui/Loading';
 
-import 'item_views/template.scss';
+import 'template.scss';
 
 
 let ItemTemplate = React.createClass({

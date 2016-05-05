@@ -253,6 +253,87 @@ function fetchSingleRecord(options) {
   }).then((response) => response.Data);
 }
 
+function findGene(options) {
+  assertRequired(options, ['database', 'search', 'maxMatches']);
+  let {database, search, maxMatches} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'findgene',
+      database: database,
+      table: 'annotation',
+      pattern: search,
+      count: maxMatches,
+      reportall: 1
+    }
+  })
+    .then((data) => {
+      let valListDecoder = DataDecoders.ValueListDecoder();
+      ['Chroms', 'Descrs', 'Ends', 'Hits', 'IDs', 'Starts'].forEach((key) =>
+        data[key] = valListDecoder.doDecode(data[key])
+      );
+      // Remap data to lowercase keys
+      data = {
+        chromosomes: data.Chroms,
+        descriptions: data.Descrs,
+        ends: data.Ends,
+        hits: data.Hits,
+        ids: data.IDs,
+        starts: data.Starts
+      };
+      return data;
+    });
+}
+
+function findGenesInRegion(options) {
+
+  assertRequired(options, ['database', 'chromosome', 'startPosition', 'endPosition']);
+  let {database, chromosome, startPosition, endPosition} = options;
+
+  // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+  // order: null,
+  // ascending: false,
+  // count: false,
+  // start: 0,
+  // stop: 1000000,
+  // distinct: false,
+  // transpose: true
+
+  let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
+
+  // Construct query for chromosome, start and end positions.
+  let query = SQL.WhereClause.encode(SQL.WhereClause.AND([
+    SQL.WhereClause.CompareFixed('chromid', '=', chromosome),
+    SQL.WhereClause.CompareFixed('fstop', '>=', startPosition),
+    SQL.WhereClause.CompareFixed('fstart', '<=', endPosition),
+    SQL.WhereClause.CompareFixed('ftype', '=', 'gene')
+  ]));
+
+  return pageQuery(
+    {
+      database: database,
+      table: 'annotation',
+      columns: columns,
+      query: query
+    }
+  );
+}
+
+function fetchGene(options) {
+  assertRequired(options, ['database', 'geneId']);
+  let {database, geneId} = options;
+  return fetchSingleRecord(
+    {
+      database: database,
+      table: 'annotation',
+      primKeyField: 'fid',
+      primKeyValue: geneId
+    }
+  );
+}
+
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -264,5 +345,8 @@ module.exports = {
   summaryData,
   annotationData,
   fetchSingleRecord,
-  treeData
+  treeData,
+  findGene,
+  findGenesInRegion,
+  fetchGene
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import LZString from 'lz-string';
@@ -14,6 +15,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 // lodash
 import _clone from 'lodash/clone';
@@ -39,7 +42,8 @@ let DataTableWithActions = React.createClass({
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     initialStartRowIndex: React.PropTypes.number,
-    sidebar: React.PropTypes.bool
+    sidebar: React.PropTypes.bool,
+    initialSearchFocus: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -50,7 +54,19 @@ let DataTableWithActions = React.createClass({
       ascending: true,
       columnWidths: Immutable.Map(),
       initialStartRowIndex: 0,
-      sidebar: true
+      sidebar: true,
+      initialSearchFocus: false
+    };
+  },
+
+  getInitialState() {
+    return {
+      fetchedRowsCount: 0,
+      startRowIndex: this.props.initialStartRowIndex,
+      showableRowsCount: 0,
+      search: '',
+      searchOpen: this.props.initialSearchFocus,
+      filterQuery: SQL.NullQuery
     };
   },
 
@@ -67,6 +83,12 @@ let DataTableWithActions = React.createClass({
     });
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.searchOpen) {
+      this.refs.search.focus();
+    }
+  },
+
   icon() {
     return this.config.icon;
   },
@@ -78,6 +100,7 @@ let DataTableWithActions = React.createClass({
   handleQueryPick(query) {
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
+    this.setState({filterQuery: query});
   },
 
   handleColumnChange(columns) {
@@ -120,14 +143,6 @@ let DataTableWithActions = React.createClass({
   },
 
   // TODO: handleLastPage()
-
-  getInitialState() {
-    return {
-      fetchedRowsCount: 0,
-      startRowIndex: this.props.initialStartRowIndex,
-      showableRowsCount: 0
-    };
-  },
 
   createActiveColumnListString() {
     let {columns} = this.props;
@@ -184,16 +199,99 @@ let DataTableWithActions = React.createClass({
     }
   },
 
+  handleSearchOpen() {
+    this.setState({searchOpen: true});
+  },
+
+  handleSearchChange(event) {
+
+    let searchText = event.target.value;
+
+    this.setState({search: searchText});
+
+    if (searchText === '') {
+      this.props.componentUpdate({query: this.state.filterQuery});
+      return;
+    }
+
+    let searchQuery = null;
+
+    for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+      let quickFindField = this.config.quickFindFields[i];
+
+      let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
+
+      if (i === 0) {
+        searchQuery = newComponent;
+      } else if (i === 1) {
+        let newOr = SQL.WhereClause.Compound('OR');
+        let child = _clone(searchQuery);
+        newOr.addComponent(child);
+        newOr.addComponent(newComponent);
+        Object.assign(searchQuery, newOr);
+      } else {
+        searchQuery.addComponent(newComponent);
+      }
+
+    }
+
+    if (searchQuery !== null) {
+      this.props.componentUpdate({query: SQL.WhereClause.encode(searchQuery)});
+    }
+  },
+
+  handleSearchBlur(event) {
+    if (event.target.value === '') {
+      this.setState({searchOpen: false});
+    }
+  },
+
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, search, searchOpen} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
         .filter((prop) => prop.showByDefault && prop.showInTable)
         .map((prop) => prop.propid);
     let {description} = this.config;
+    let quickFindFieldsList = '';
+    for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+      let quickFindField = this.config.quickFindFields[i];
+      if (i != 0) quickFindFieldsList += ', ';
+      quickFindFieldsList += this.config.propertiesMap[quickFindField].name;
+
+    }
+
+    let searchGUI = (
+      <FlatButton label="Search data"
+                  disabled={columns.size === 0}
+                  primary={true}
+                  onClick={this.handleSearchOpen}
+                  icon={<Icon fixedWidth={true} name="search" />}
+      />
+    );
+    if (searchOpen) {
+      searchGUI = (
+        <div>
+          <RaisedButton label="Search data"
+                      disabled={columns.size === 0}
+                      primary={true}
+                      icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+          />
+          <TextField ref="search"
+                     fullWidth={true}
+                     floatingLabelText="Search"
+                     value={search}
+                     onChange={this.handleSearchChange}
+                     onBlur={this.handleSearchBlur}
+          />
+          <div>{quickFindFieldsList}</div>
+        </div>
+      );
+    }
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
@@ -204,8 +302,9 @@ let DataTableWithActions = React.createClass({
                         table: table,
                         initialQuery: query,
                         onPick: this.handleQueryPick
-                      })}/>
-        <br/>
+                      })}
+                      icon={<Icon fixedWidth={true} name="filter" />}
+        />
         <FlatButton label="Add/Remove Columns"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
@@ -214,11 +313,16 @@ let DataTableWithActions = React.createClass({
                         initialPick: columns,
                         title: `Pick columns for ${this.config.tableCapNamePlural} table`,
                         onPick: this.handleColumnChange
-                      })}/>
+                      })}
+                      icon={<Icon fixedWidth={true} name="columns" />}
+        />
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
-                    onClick={this.handleDownload}/>
+                    onClick={this.handleDownload}
+                    icon={<Icon fixedWidth={true} name="download" />}
+        />
+        {searchGUI}
       </div>
     );
 
@@ -298,7 +402,7 @@ let DataTableWithActions = React.createClass({
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
     return (
       <Sidebar
-        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
+        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">
