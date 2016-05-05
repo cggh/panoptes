@@ -66,7 +66,7 @@ let DataTableWithActions = React.createClass({
       fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
-      searchOpen: this.props.initialSearchFocus
+      searchOpen: this.props.initialSearchFocus || this.props.searchText !== ''
     };
   },
 
@@ -84,7 +84,9 @@ let DataTableWithActions = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.searchOpen) {
+    if (this.state.searchOpen && this.props.searchText) {
+      // Focus the searchField whenever the search is open and there is no searchText,
+      // e.g. when opened from the Finder, or by clicking on the Find Text button.
       this.refs.searchField.focus();
     }
   },
@@ -181,11 +183,15 @@ let DataTableWithActions = React.createClass({
     let downloadURL = API.serverURL;
     downloadURL += '?datatype' + '=' + 'downloadtable';
     downloadURL += '&database' + '=' + this.dataset;
-    downloadURL += '&qry' + '=' + this.props.query;
+    downloadURL += '&qry' + '=' + this.createDataTableQuery();
     downloadURL += '&tbname' + '=' + this.props.table;
     downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
-    downloadURL += '&posfield' + '=' + this.config.positionField;
-    downloadURL += '&order' + '=' + this.config.positionField;
+    if (this.config.positionField) {
+      downloadURL += '&posfield' + '=' + this.config.positionField;
+      downloadURL += '&order' + '=' + this.config.positionField;
+    } else {
+      downloadURL += '&order' + '=' + this.config.primkey;
+    }
 //FIXME: ascending is true when position field is descending.
     downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
     return downloadURL;
@@ -211,6 +217,53 @@ let DataTableWithActions = React.createClass({
     if (event.target.value === '') {
       this.setState({searchOpen: false});
     }
+  },
+
+  createDataTableQuery() {
+
+    let {query, searchText} = this.props;
+
+    // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
+    let dataTableQuery = query;
+    if (searchText !== '') {
+
+      let searchQueryUnencoded = null;
+
+      // Compose a query that looks for the searchText in every quickFindField.
+      for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+        let quickFindField = this.config.quickFindFields[i];
+
+        let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
+
+        if (i === 0) {
+          searchQueryUnencoded = newComponent;
+        } else if (i === 1) {
+          let newOr = SQL.WhereClause.Compound('OR');
+          let child = _clone(searchQueryUnencoded);
+          newOr.addComponent(child);
+          newOr.addComponent(newComponent);
+          Object.assign(searchQueryUnencoded, newOr);
+        } else {
+          searchQueryUnencoded.addComponent(newComponent);
+        }
+
+      }
+
+      // Add the searchQuery to the base query, if the base query is not trivial.
+      let baseQueryDecoded = SQL.WhereClause.decode(query);
+      if (baseQueryDecoded.isTrivial) {
+        dataTableQuery = SQL.WhereClause.encode(searchQueryUnencoded);
+      } else {
+        let newAND = SQL.WhereClause.Compound('AND');
+        let child = _clone(baseQueryDecoded);
+        newAND.addComponent(child);
+        newAND.addComponent(searchQueryUnencoded);
+        dataTableQuery = SQL.WhereClause.encode(newAND);
+      }
+
+    }
+
+    return dataTableQuery;
   },
 
   render() {
@@ -366,45 +419,7 @@ let DataTableWithActions = React.createClass({
       );
     }
 
-    // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
-    let dataTableQuery = query;
-    if (searchText !== '') {
-
-      let searchQueryUnencoded = null;
-
-      // Compose a query that looks for the searchText in every quickFindField.
-      for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
-        let quickFindField = this.config.quickFindFields[i];
-
-        let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
-
-        if (i === 0) {
-          searchQueryUnencoded = newComponent;
-        } else if (i === 1) {
-          let newOr = SQL.WhereClause.Compound('OR');
-          let child = _clone(searchQueryUnencoded);
-          newOr.addComponent(child);
-          newOr.addComponent(newComponent);
-          Object.assign(searchQueryUnencoded, newOr);
-        } else {
-          searchQueryUnencoded.addComponent(newComponent);
-        }
-
-      }
-
-      // Add the searchQuery to the base query, if the base query is not trivial.
-      let baseQueryDecoded = SQL.WhereClause.decode(query);
-      if (baseQueryDecoded.isTrivial) {
-        dataTableQuery = SQL.WhereClause.encode(searchQueryUnencoded);
-      } else {
-        let newAND = SQL.WhereClause.Compound('AND');
-        let child = _clone(baseQueryDecoded);
-        newAND.addComponent(child);
-        newAND.addComponent(searchQueryUnencoded);
-        dataTableQuery = SQL.WhereClause.encode(newAND);
-      }
-
-    }
+    let dataTableQuery = this.createDataTableQuery();
 
     //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
