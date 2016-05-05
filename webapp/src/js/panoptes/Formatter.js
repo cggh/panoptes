@@ -35,5 +35,5 @@ module.exports = function(property, value) {
         return value.toFixed(property.decimDigits).toString();
     }
   }
-  return value.toString();
+  return value === undefined ? '' : value.toString();
 };
