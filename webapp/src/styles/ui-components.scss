@@ -639,3 +639,10 @@ input.invalid {
 .external-link-icon {
   margin-right: 5px;
 }
+
+.inverted-bitmap {
+  filter: #{"invert()"}; /* https://github.com/sass/libsass/issues/151 */
+  img {
+    vertical-align: middle;
+  }
+}
