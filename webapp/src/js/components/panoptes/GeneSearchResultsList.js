@@ -147,7 +147,7 @@ let GeneSearchResultsList = React.createClass({
                   secondaryText={
                     <div>
                       <Highlight search={search}>
-                          {matchData.descriptions[i].split(',').join(', ')}
+                          {matchData.descriptions[i].split(',').join(', ').split(';').join('; ')}
                       </Highlight>
                     </div>
                   }

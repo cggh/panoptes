@@ -129,7 +129,7 @@ let RegionGenesList = React.createClass({
                   }
                   secondaryText={
                     <div>
-                          {regionGenesData[i].descr}
+                          {regionGenesData[i].descr.split(';').join('; ')}
                     </div>
                   }
                   secondaryTextLines={2}
