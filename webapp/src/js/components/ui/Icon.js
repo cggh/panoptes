@@ -56,6 +56,9 @@ let Icon = React.createClass({
     }
     if (inverse) {
       classNames += ' fa-inverse';
+      if (_startsWith(name, 'bitmap:')) {
+        classNames += ' inverted-bitmap';
+      }
     }
 
     if (className) {

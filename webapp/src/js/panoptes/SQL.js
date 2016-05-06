@@ -609,6 +609,8 @@ SQL.WhereClause.encode = function(whc) {
     component.Tpe = (component.type === undefined) ? component.Tpe : component.type;
     if (component.components)
       component.components.forEach(removeParents);
+    delete component.components;
+    delete component.type;
   }
   removeParents(whc);
   let jsonstring = JSON.stringify(whc);

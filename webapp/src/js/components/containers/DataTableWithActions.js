@@ -43,7 +43,8 @@ let DataTableWithActions = React.createClass({
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
     initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool,
-    initialSearchFocus: React.PropTypes.bool
+    initialSearchFocus: React.PropTypes.bool,
+    searchText: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -55,7 +56,8 @@ let DataTableWithActions = React.createClass({
       columnWidths: Immutable.Map(),
       initialStartRowIndex: 0,
       sidebar: true,
-      initialSearchFocus: false
+      initialSearchFocus: false,
+      searchText: ''
     };
   },
 
@@ -64,9 +66,7 @@ let DataTableWithActions = React.createClass({
       fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
-      search: '',
-      searchOpen: this.props.initialSearchFocus,
-      filterQuery: SQL.NullQuery
+      searchOpen: this.props.initialSearchFocus || this.props.searchText !== ''
     };
   },
 
@@ -84,8 +84,10 @@ let DataTableWithActions = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.searchOpen) {
-      this.refs.search.focus();
+    if (this.state.searchOpen && this.props.searchText) {
+      // Focus the searchField whenever the search is open and there is no searchText,
+      // e.g. when opened from the Finder, or by clicking on the Find Text button.
+      this.refs.searchField.focus();
     }
   },
 
@@ -100,7 +102,6 @@ let DataTableWithActions = React.createClass({
   handleQueryPick(query) {
     this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
-    this.setState({filterQuery: query});
   },
 
   handleColumnChange(columns) {
@@ -166,7 +167,7 @@ let DataTableWithActions = React.createClass({
     return columnList;
   },
 
-  createDownloadUrl() {
+  createDownloadUrl(query) {
 
     // Returns a URL to download the data currently being served.
     // Returns false upon error, e.g. no selected columns.
@@ -182,18 +183,22 @@ let DataTableWithActions = React.createClass({
     let downloadURL = API.serverURL;
     downloadURL += '?datatype' + '=' + 'downloadtable';
     downloadURL += '&database' + '=' + this.dataset;
-    downloadURL += '&qry' + '=' + this.props.query;
+    downloadURL += '&qry' + '=' + query;
     downloadURL += '&tbname' + '=' + this.props.table;
     downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
-    downloadURL += '&posfield' + '=' + this.config.positionField;
-    downloadURL += '&order' + '=' + this.config.positionField;
+    if (this.config.positionField) {
+      downloadURL += '&posfield' + '=' + this.config.positionField;
+      downloadURL += '&order' + '=' + this.config.positionField;
+    } else {
+      downloadURL += '&order' + '=' + this.config.primkey;
+    }
 //FIXME: ascending is true when position field is descending.
     downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
     return downloadURL;
   },
 
-  handleDownload() {
-    let downloadURL = this.createDownloadUrl();
+  handleDownload(query) {
+    let downloadURL = this.createDownloadUrl(query);
     if (downloadURL) {
       window.location.href = downloadURL;
     }
@@ -204,52 +209,67 @@ let DataTableWithActions = React.createClass({
   },
 
   handleSearchChange(event) {
-
-    let searchText = event.target.value;
-
-    this.setState({search: searchText});
-
-    if (searchText === '') {
-      this.props.componentUpdate({query: this.state.filterQuery});
-      return;
-    }
-
-    let searchQuery = null;
-
-    for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
-      let quickFindField = this.config.quickFindFields[i];
-
-      let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
-
-      if (i === 0) {
-        searchQuery = newComponent;
-      } else if (i === 1) {
-        let newOr = SQL.WhereClause.Compound('OR');
-        let child = _clone(searchQuery);
-        newOr.addComponent(child);
-        newOr.addComponent(newComponent);
-        Object.assign(searchQuery, newOr);
-      } else {
-        searchQuery.addComponent(newComponent);
-      }
-
-    }
-
-    if (searchQuery !== null) {
-      this.props.componentUpdate({query: SQL.WhereClause.encode(searchQuery)});
-    }
+    this.props.componentUpdate({searchText: event.target.value});
   },
 
   handleSearchBlur(event) {
+    // Only close the search if it's empty.
     if (event.target.value === '') {
       this.setState({searchOpen: false});
     }
   },
 
+  createDataTableQuery() {
+
+    let {query, searchText} = this.props;
+
+    // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
+    let dataTableQuery = query;
+    if (searchText !== '') {
+
+      let searchQueryUnencoded = null;
+
+      // Compose a query that looks for the searchText in every quickFindField.
+      for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
+        let quickFindField = this.config.quickFindFields[i];
+
+        let newComponent = SQL.WhereClause.CompareFixed(this.config.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
+
+        if (i === 0) {
+          searchQueryUnencoded = newComponent;
+        } else if (i === 1) {
+          let newOr = SQL.WhereClause.Compound('OR');
+          let child = _clone(searchQueryUnencoded);
+          newOr.addComponent(child);
+          newOr.addComponent(newComponent);
+          Object.assign(searchQueryUnencoded, newOr);
+        } else {
+          searchQueryUnencoded.addComponent(newComponent);
+        }
+
+      }
+
+      // Add the searchQuery to the base query, if the base query is not trivial.
+      let baseQueryDecoded = SQL.WhereClause.decode(query);
+      if (baseQueryDecoded.isTrivial) {
+        dataTableQuery = SQL.WhereClause.encode(searchQueryUnencoded);
+      } else {
+        let newAND = SQL.WhereClause.Compound('AND');
+        let child = _clone(baseQueryDecoded);
+        newAND.addComponent(child);
+        newAND.addComponent(searchQueryUnencoded);
+        dataTableQuery = SQL.WhereClause.encode(newAND);
+      }
+
+    }
+
+    return dataTableQuery;
+  },
+
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount, search, searchOpen} = this.state;
+    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen} = this.state;
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.config.properties)
@@ -259,13 +279,14 @@ let DataTableWithActions = React.createClass({
     let quickFindFieldsList = '';
     for (let i = 0, len = this.config.quickFindFields.length; i < len; i++) {
       let quickFindField = this.config.quickFindFields[i];
+      if (i == 0) quickFindFieldsList += 'Columns: ';
       if (i != 0) quickFindFieldsList += ', ';
       quickFindFieldsList += this.config.propertiesMap[quickFindField].name;
 
     }
 
     let searchGUI = (
-      <FlatButton label="Search data"
+      <FlatButton label="Find text"
                   disabled={columns.size === 0}
                   primary={true}
                   onClick={this.handleSearchOpen}
@@ -275,15 +296,15 @@ let DataTableWithActions = React.createClass({
     if (searchOpen) {
       searchGUI = (
         <div>
-          <RaisedButton label="Search data"
+          <RaisedButton label="Find text"
                       disabled={columns.size === 0}
                       primary={true}
                       icon={<Icon fixedWidth={true} name="search" inverse={true} />}
           />
-          <TextField ref="search"
+          <TextField ref="searchField"
                      fullWidth={true}
                      floatingLabelText="Search"
-                     value={search}
+                     value={searchText}
                      onChange={this.handleSearchChange}
                      onBlur={this.handleSearchBlur}
           />
@@ -291,6 +312,8 @@ let DataTableWithActions = React.createClass({
         </div>
       );
     }
+
+    let dataTableQuery = this.createDataTableQuery();
 
     let sidebarContent = (
       <div className="sidebar">
@@ -319,7 +342,7 @@ let DataTableWithActions = React.createClass({
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
-                    onClick={this.handleDownload}
+                    onClick={() => this.handleDownload(dataTableQuery)}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
         {searchGUI}
@@ -413,13 +436,14 @@ let DataTableWithActions = React.createClass({
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
+            <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {order ? this.config.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.size} of {this.config.properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>
           <div className="grow">
             <DataTableView table={table}
-                           query={query}
+                           query={dataTableQuery}
                            order={order}
                            ascending={ascending}
                            columns={columns}
