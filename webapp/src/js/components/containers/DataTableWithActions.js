@@ -167,7 +167,7 @@ let DataTableWithActions = React.createClass({
     return columnList;
   },
 
-  createDownloadUrl() {
+  createDownloadUrl(query) {
 
     // Returns a URL to download the data currently being served.
     // Returns false upon error, e.g. no selected columns.
@@ -183,7 +183,7 @@ let DataTableWithActions = React.createClass({
     let downloadURL = API.serverURL;
     downloadURL += '?datatype' + '=' + 'downloadtable';
     downloadURL += '&database' + '=' + this.dataset;
-    downloadURL += '&qry' + '=' + this.createDataTableQuery();
+    downloadURL += '&qry' + '=' + query;
     downloadURL += '&tbname' + '=' + this.props.table;
     downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
     if (this.config.positionField) {
@@ -197,8 +197,8 @@ let DataTableWithActions = React.createClass({
     return downloadURL;
   },
 
-  handleDownload() {
-    let downloadURL = this.createDownloadUrl();
+  handleDownload(query) {
+    let downloadURL = this.createDownloadUrl(query);
     if (downloadURL) {
       window.location.href = downloadURL;
     }
@@ -313,6 +313,8 @@ let DataTableWithActions = React.createClass({
       );
     }
 
+    let dataTableQuery = this.createDataTableQuery();
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
@@ -340,7 +342,7 @@ let DataTableWithActions = React.createClass({
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
-                    onClick={this.handleDownload}
+                    onClick={() => this.handleDownload(dataTableQuery)}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
         {searchGUI}
@@ -418,8 +420,6 @@ let DataTableWithActions = React.createClass({
         </span>
       );
     }
-
-    let dataTableQuery = this.createDataTableQuery();
 
     //Column stuff https://github.com/cggh/panoptes/blob/1518c5d9bfab409a2f2dfbaa574946aa99919334/webapp/scripts/Utils/MiscUtils.js#L37
     //https://github.com/cggh/DQX/blob/efe8de44aa554a17ab82f40c1e421b93855ba83a/DataFetcher/DataFetchers.js#L573
