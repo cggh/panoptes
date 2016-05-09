@@ -53,7 +53,7 @@ let DataItem = React.createClass({
     let {table, primKey, componentUpdate, activeTab, views} = this.props;
 
     return (
-      <div className="vertical stack">
+      <div className="vertical stack" style={{position:'absolute'}}>
         <div className="grow">
           <TabbedArea activeTab={activeTab}
                       onSwitch={(id) => componentUpdate({activeTab: id})} >
@@ -82,7 +82,6 @@ let DataItem = React.createClass({
             })}
 
           </TabbedArea>
-
         </div>
         <div>
           <DataItemActions table={table} primKey={primKey} />

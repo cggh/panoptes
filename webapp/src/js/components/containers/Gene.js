@@ -143,7 +143,7 @@ let Gene = React.createClass({
       let externalGeneLinkButton = (
         <ExternalLinkButton key={'externalGeneLinkButton_' + i}
                             label={externalGeneLinks[i].Name}
-                            url={externalGeneLinks[i].Url.replace('{Id}', geneData['fid'])}
+                            urls={[externalGeneLinks[i].Url.replace('{Id}', geneData['fid'])]}
         />
       );
       externalGeneLinkButtons.push(externalGeneLinkButton);

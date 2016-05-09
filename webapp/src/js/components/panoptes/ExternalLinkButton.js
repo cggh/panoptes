@@ -11,11 +11,11 @@ let ExternalLinkButton = React.createClass({
 
   propTypes: {
     label: React.PropTypes.string,
-    url: React.PropTypes.string
+    urls: React.PropTypes.string
   },
 
   handleClick(e) {
-    window.open(this.props.url, '_blank');
+    this.props.urls.forEach((url) => window.open(url, '_blank'));
   },
 
   render() {

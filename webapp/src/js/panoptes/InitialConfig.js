@@ -131,6 +131,11 @@ let augmentTableInfo = function(table) {
     table.chromosomeField = table.settings.Chromosome || 'chrom';
     table.positionField = table.settings.Position || 'pos';
   }
+  if (table.hasGenomeRegions) {
+    table.chromosomeField = table.settings.Chromosome || 'chrom';
+    table.startPositionField = table.settings.RegionStart || 'start';
+    table.stopPositionField = table.settings.RegionStop || 'stop';
+  }
   table.quickFindFields = [table.primkey];
   if ('QuickFindFields' in table.settings)
     table.quickFindFields = table.settings.QuickFindFields.split(',');

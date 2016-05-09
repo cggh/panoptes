@@ -6,8 +6,10 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
-import RaisedButton from 'material-ui/RaisedButton';
-
+import PopupButton from 'panoptes/PopupButton';
+import ExternalLinkButton from 'panoptes/ExternalLinkButton';
+import Immutable from 'immutable';
+import _forEach from 'lodash/forEach';
 
 let DataItemActions = React.createClass({
   mixins: [
@@ -61,12 +63,75 @@ let DataItemActions = React.createClass({
   render() {
     const {table, primKey} = this.props;
     const {data} = this.state;
-    const config = this.config.tables[table];
+    const tableConfig = this.config.tables[table];
     if (!data)
       return null;
-    console.log(config, data);
+
+    const treeLinks = [];
+    const crossLink = `${table}::${primKey}`;
+    _forEach(this.config.tables, (treeTable) => {
+      treeTable.trees.forEach((tree) => {
+        if (crossLink === tree.crossLink) {
+          treeLinks.push(<PopupButton label={`Show associated ${this.config.tables[treeTable.id].tableCapNameSingle} tree`}
+                                      icon="tree"
+                                      componentPath="containers/TreeWithActions"
+                                      table={treeTable.id}
+                                      tree={tree.id}
+                                      key={tree.id}
+            />
+          );
+        }
+      });
+    });
+
     return (
       <div>
+        {tableConfig.hasGenomePositions ? <PopupButton label="Show in Genome Browser"
+                     icon="bitmap:genomebrowser.png"
+                     componentPath="containers/GenomeBrowserWithActions"
+                     chromosome={data[tableConfig.chromosomeField]}
+                     start={parseInt(data[tableConfig.positionField]) - 50}
+                     end={parseInt(data[tableConfig.positionField]) + 50}
+                     channels={Immutable.fromJS({
+                       [table]: {
+                         channel: 'PerRowIndicatorChannel',
+                         props: {
+                           table: table
+                         }
+                       }
+                     })}
+          />
+        : null}
+        {tableConfig.hasGenomeRegions ? <PopupButton label="Show in Genome Browser"
+                                                  icon="bitmap:genomebrowser.png"
+                                                  componentPath="containers/GenomeBrowserWithActions"
+                                                  chromosome={data[tableConfig.chromosomeField]}
+                                                  start={parseInt(data[tableConfig.startPositionField]) - 50}
+                                                  end={parseInt(data[tableConfig.stopPositionField]) + 50}
+                                                  channels={Immutable.fromJS({
+                       [table]: {
+                         channel: 'RegionChannel',
+                         props: {
+                           table: table
+                         }
+                       }
+                     })}
+        />
+          : null}
+        {tableConfig.properties.map((prop) => {
+          if (prop.externalUrl) {
+            return <ExternalLinkButton key={prop.propid}
+                                       label={prop.name}
+                                       urls={data[prop.propid].split(';').map((value) => prop.externalUrl.replace('{value}', value))}
+            />;
+
+          } else {
+            return null;
+          }
+        })}
+        {treeLinks}
+
+
 
       </div>
     );
