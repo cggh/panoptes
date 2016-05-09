@@ -31,7 +31,8 @@ let FindGene = React.createClass({
 
   getDefaultProps: function() {
     return {
-      activeTab: 'tab_0'
+      activeTab: 'tab_0',
+      startPosition: 0
     };
   },
 
@@ -44,7 +45,31 @@ let FindGene = React.createClass({
   },
 
   render() {
-    let {componentUpdate, activeTab} = this.props;
+    let {componentUpdate, activeTab, search, chromosome, startPosition, endPosition, chromosomeLength} = this.props;
+
+    // Avoid trying to mutate props.
+    let setChromosome = chromosome;
+    let setEndPosition = endPosition;
+    let setChromosomeLength = chromosomeLength;
+
+    // Set the default chromosome as the first chromosome in this.config.chromosomes
+    // NB: this.config is undefined in getInitialstate()
+    let defaultChromosome = Object.keys(this.config.chromosomes)[0];
+
+    if ((setChromosome === null || setChromosome === undefined)  && defaultChromosome !== null) {
+
+      let defaultChromosomeLength = parseInt(this.config.chromosomes[defaultChromosome].len);
+
+      setChromosomeLength = defaultChromosomeLength;
+      setChromosome = defaultChromosome;
+
+      // Set the default endPosition as the chromosome length
+      if (setEndPosition === null || setEndPosition === undefined) {
+        setEndPosition = defaultChromosomeLength;
+      }
+
+    }
+
     return (
       <TabbedArea activeTab={activeTab}
                   onSwitch={(id) => componentUpdate({activeTab: id})}>
@@ -53,6 +78,7 @@ let FindGene = React.createClass({
               key={'tab_0'}>
                 <FindGeneByNameDesc componentUpdate={componentUpdate}
                                     title="Find gene by name / description"
+                                    search={search}
                 />
             </TabPane>
             <TabPane
@@ -60,6 +86,10 @@ let FindGene = React.createClass({
               key={'tab_1'}>
                 <FindGeneByRegion componentUpdate={componentUpdate}
                                   title="Find gene by region"
+                                  chromosome={setChromosome}
+                                  startPosition={startPosition}
+                                  endPosition={setEndPosition}
+                                  chromosomeLength={setChromosomeLength}
                 />
             </TabPane>
             <TabPane

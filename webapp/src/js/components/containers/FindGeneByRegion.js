@@ -18,11 +18,12 @@ let FindGeneByRegion = React.createClass({
     ConfigMixin
   ],
 
-  title() {
-    return this.props.title;
+  propTypes: {
+    componentUpdate: React.PropTypes.func.isRequired,
+    activeTab: React.PropTypes.string
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
       chromosome: null,
       startPosition: 0,
@@ -31,28 +32,8 @@ let FindGeneByRegion = React.createClass({
     };
   },
 
-  componentWillMount() {
-
-    // Set the default chromosome as the first chromosome in this.config.chromosomes
-    // NB: this.config is undefined in getInitialstate()
-
-    let defaultChromosome = Object.keys(this.config.chromosomes)[0];
-
-    if (this.state.chromosome === null && defaultChromosome !== null) {
-
-      let defaultChromosomeLength = parseInt(this.config.chromosomes[defaultChromosome].len);
-
-      this.setState({
-        'chromosome': defaultChromosome,
-        'chromosomeLength': defaultChromosomeLength
-      });
-
-      // Set the default endPosition as the chromosome length
-      if (this.state.endPosition === null) {
-        this.setState({'endPosition': defaultChromosomeLength});
-      }
-    }
-
+  title() {
+    return this.props.title;
   },
 
   componentDidMount() {
@@ -62,23 +43,23 @@ let FindGeneByRegion = React.createClass({
   },
 
   handleChromChange(event) {
-    this.setState({
+    this.props.componentUpdate({
       'chromosome': event.target.value,
-      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len),
       'startPosition': 0,
-      'endPosition': parseInt(this.config.chromosomes[event.target.value].len)
+      'endPosition': parseInt(this.config.chromosomes[event.target.value].len),
+      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len)
     });
   },
 
   handleStartPosChange(event) {
     if (event.target) {
-      this.setState({'startPosition': event.target.value});
+      this.props.componentUpdate({'startPosition': event.target.value});
     }
   },
 
   handleEndPosChange(event) {
     if (event.target) {
-      this.setState({'endPosition': event.target.value});
+      this.props.componentUpdate({'endPosition': event.target.value});
     }
   },
 
@@ -102,14 +83,16 @@ let FindGeneByRegion = React.createClass({
 
   render() {
 
-    let {chromosome, startPosition, endPosition, chromosomeLength} = this.state;
+    let {chromosome, startPosition, endPosition, chromosomeLength} = this.props;
 
     let geneList = null;
 
     if (chromosome === null || startPosition === null || endPosition === null || startPosition === '' || endPosition === '' ) {
 
       geneList = (
-        <p>Select the chromosome and enter the start and end positions.</p>
+        <div style={{padding: '10px'}}>
+          <p>Select the chromosome and enter the start and end positions.</p>
+        </div>
       );
 
     } else {
