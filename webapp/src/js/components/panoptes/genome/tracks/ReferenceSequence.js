@@ -63,7 +63,7 @@ let ReferenceSequence = React.createClass({
 
     this.blockStart = block1Start;
     this.blockEnd = block1End;
-    let targetPointCount = (((width - sideWidth) / 2) / (end - start)) * (block1End - block1Start);
+    let targetPointCount = (((width - sideWidth) / 1) / (end - start)) * (block1End - block1Start);
     if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
@@ -226,6 +226,7 @@ let SequenceSquares = React.createClass({
     let offset = scale(dataStart) - scale(start);
     return <canvas ref="canvas"
                    style={{transform: `translateX(${offset}px) scale(${stepWidth},${height})`}}
+                   className={stepWidth < 1 ? '' : 'blocky'}
                    width={sequence.length}
                    height={1}/>;
   }

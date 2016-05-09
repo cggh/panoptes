@@ -244,9 +244,11 @@ div.scale {
   canvas {
     position: absolute;
     //will-change: transform;
+    transform-origin: top left;
+  }
+  .blocky {
     image-rendering: optimizeSpeed;
     image-rendering: pixelated;
-    transform-origin: top left;
   }
 
   svg {
