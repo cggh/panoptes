@@ -41,10 +41,9 @@ let RecentlyFoundGenes = React.createClass({
 
   },
 
-
   getStateFromFlux() {
     return {
-      foundGenes: this.getFlux().store('SessionStore').getFoundGenes()
+      foundGenes: this.getFlux().store('SessionStore').getState().get('foundGenes')
     };
   },
 
@@ -53,9 +52,7 @@ let RecentlyFoundGenes = React.createClass({
   },
 
   render() {
-
-    // Retrieve the list of recently found genes from the session.
-    let foundGenes = this.getFlux().store('SessionStore').getFoundGenes();
+    let {foundGenes} = this.state;
 
     let foundGenesList = null;
 
@@ -84,16 +81,12 @@ let RecentlyFoundGenes = React.createClass({
       );
 
     } else {
-
       foundGenesList = (
         <List>
           <Subheader>No recently found genes.</Subheader>
         </List>
       );
-
     }
-
-
     return foundGenesList;
   }
 });
