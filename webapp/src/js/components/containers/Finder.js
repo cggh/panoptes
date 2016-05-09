@@ -141,7 +141,7 @@ let Finder = React.createClass({
 
     if (listItems.length > 0) {
       finderContent = (
-        <List>
+        <List className="tall-modal" style={{overflow: 'auto'}}>
           {listItems}
         </List>
       );
