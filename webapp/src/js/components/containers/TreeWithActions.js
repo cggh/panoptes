@@ -130,7 +130,8 @@ let TreeWithActions = React.createClass({
         <div className="vertical stack">
           <div className="top-bar">
             <Icon className="pointer icon"
-                  name={sidebar ? 'arrow-left' : 'bars'}
+                  name={sidebar ? 'arrows-h' : 'bars'}
+                  title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
             <span className="text">Tree {table ? `of ${this.config.tables[table].tableCapNamePlural}` : ''} </span>
           </div>

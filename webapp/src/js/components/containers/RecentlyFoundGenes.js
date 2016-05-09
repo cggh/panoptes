@@ -1,7 +1,9 @@
 import React from 'react';
 
+// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
 import {List, ListItem} from 'material-ui/List';
@@ -13,7 +15,8 @@ import Icon from 'ui/Icon';
 let RecentlyFoundGenes = React.createClass({
   mixins: [
     PureRenderMixin,
-    FluxMixin
+    FluxMixin,
+    StoreWatchMixin('SessionStore')
   ],
 
   title() {
@@ -38,10 +41,18 @@ let RecentlyFoundGenes = React.createClass({
 
   },
 
-  render() {
+  getStateFromFlux() {
+    return {
+      foundGenes: this.getFlux().store('SessionStore').getState().get('foundGenes')
+    };
+  },
 
-    // Retrieve the list of recently found genes from the session.
-    let {foundGenes} = this.getFlux().store('SessionStore').getState().toObject();
+  getInitialState() {
+    return null;
+  },
+
+  render() {
+    let {foundGenes} = this.state;
 
     let foundGenesList = null;
 
@@ -70,16 +81,12 @@ let RecentlyFoundGenes = React.createClass({
       );
 
     } else {
-
       foundGenesList = (
         <List>
           <Subheader>No recently found genes.</Subheader>
         </List>
       );
-
     }
-
-
     return foundGenesList;
   }
 });

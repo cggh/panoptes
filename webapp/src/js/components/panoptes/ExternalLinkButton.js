@@ -11,7 +11,7 @@ let ExternalLinkButton = React.createClass({
 
   propTypes: {
     label: React.PropTypes.string,
-    urls: React.PropTypes.string
+    urls: React.PropTypes.array
   },
 
   handleClick(e) {

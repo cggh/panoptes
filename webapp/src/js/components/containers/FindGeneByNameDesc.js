@@ -16,18 +16,24 @@ let FindGeneByNameDesc = React.createClass({
     FluxMixin
   ],
 
-  title() {
-    return this.props.title;
+  propTypes: {
+    componentUpdate: React.PropTypes.func.isRequired,
+    title: React.PropTypes.string,
+    search: React.PropTypes.string
   },
 
-  getInitialState() {
+  getDefaultProps() {
     return {
       search: ''
     };
   },
 
+  title() {
+    return this.props.title;
+  },
+
   handleSearchChange(event) {
-    this.setState({'search': event.target.value});
+    this.props.componentUpdate({search: event.target.value});
   },
 
   handleSelectGene(e, geneId) {
@@ -50,7 +56,7 @@ let FindGeneByNameDesc = React.createClass({
 
   render() {
 
-    let {search} = this.state;
+    let {search} = this.props;
 
     let geneList = null;
 
@@ -75,8 +81,7 @@ let FindGeneByNameDesc = React.createClass({
     return (
       <div style={{padding: '10px'}}>
         <div className="search">
-          <TextField ref="search"
-                     fullWidth={true}
+          <TextField fullWidth={true}
                      floatingLabelText="Search"
                      value={search}
                      onChange={this.handleSearchChange}

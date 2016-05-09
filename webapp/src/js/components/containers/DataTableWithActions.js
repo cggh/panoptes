@@ -84,7 +84,7 @@ let DataTableWithActions = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.searchOpen && this.props.searchText) {
+    if (this.state.searchOpen && this.props.searchText === '') {
       // Focus the searchField whenever the search is open and there is no searchText,
       // e.g. when opened from the Finder, or by clicking on the Find Text button.
       this.refs.searchField.focus();
@@ -284,7 +284,6 @@ let DataTableWithActions = React.createClass({
       quickFindFieldsList += this.config.propertiesMap[quickFindField].name;
 
     }
-
     let searchGUI = (
       <FlatButton label="Find text"
                   disabled={columns.size === 0}
