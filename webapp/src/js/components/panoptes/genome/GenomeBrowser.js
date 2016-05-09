@@ -61,7 +61,7 @@ let GenomeBrowser = React.createClass({
       chromosome: '',
       start: 0,
       end: 10000,
-      sideWidth: 100,
+      sideWidth: 150,
       width: 500,
       components: Immutable.OrderedMap()
     };

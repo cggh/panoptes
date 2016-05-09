@@ -1,4 +1,4 @@
-import React from 'react';
+  import React from 'react';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -11,11 +11,19 @@ import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
+import PopupButton from 'panoptes/PopupButton';
+import ExternalLinkButton from 'panoptes/ExternalLinkButton';
+import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
+import GenomeBrowser from 'panoptes/genome/GenomeBrowser';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
+import DetectResize from 'utils/DetectResize';
 
 // UI
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
-import RaisedButton from 'material-ui/RaisedButton';
+
+import "genomebrowser.scss";
 
 let Gene = React.createClass({
   mixins: [
@@ -40,7 +48,9 @@ let Gene = React.createClass({
   getInitialState() {
     return {
       geneData: null,
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
+      width: 300,
+      height: 0
     };
   },
 
@@ -87,49 +97,11 @@ let Gene = React.createClass({
     }
   },
 
-
-  handleOpenGenomeBrowser(e, props) {
-
-    let container = 'containers/GenomeBrowserWithActions';
-
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    if (middleClick) {
-      let switchTo = true;
-      this.getFlux().actions.session.tabOpen(container, props, switchTo);
-    } else {
-      this.props.componentUpdate(props, container);
-    }
-
-  },
-
-
-  handleOpenTableTab(e, table, props) {
-
-    let container = 'containers/DataTableWithActions';
-    if (this.config.tables[table].settings.listView) {
-      container = 'containers/ListWithActions';
-    }
-
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    if (middleClick) {
-      let switchTo = true;
-      this.getFlux().actions.session.tabOpen(container, {table: table, ...props}, switchTo);
-    } else {
-      this.props.componentUpdate({table: table, ...props}, container);
-    }
-
-  },
-
-  handleOpenExternal(e, url) {
-    window.open(url, '_blank');
-  },
-
   render() {
-    let {geneData, loadStatus} = this.state;
+    const {componentUpdate} = this.props;
+    const {geneData, loadStatus} = this.state;
 
     if (!geneData) return null;
-
-    let buttonStyle = {marginLeft: '10px', marginBottom: '8px'};
 
     let genomePositionTableButtons = [];
     for (let table in this.config.tables) {
@@ -151,12 +123,13 @@ let Gene = React.createClass({
         }
 
         let genomePositionTableButton = (
-          <RaisedButton style={buttonStyle}
-                        key={table}
-                        label={'Show ' + table + ' in ' + geneData['fname']}
-                        primary={true}
-                        onClick={(e) => this.handleOpenTableTab(e, table, {query: genomePositionTableQuery})}
-                        icon={<Icon fixedWidth={true} name={this.config.tables[table].icon} inverse={true} />}
+          <PopupButton key={table}
+                       label={'Show ' + table + ' in ' + geneData['fname']}
+                       icon={this.config.tables[table].icon}
+                       componentPath={this.config.tables[table].settings.listView ? 'containers/ListWithActions' : 'containers/DataTableWithActions'}
+                       componentUpdate={componentUpdate}
+                       table={table}
+                       query={genomePositionTableQuery}
           />
         );
         genomePositionTableButtons.push(genomePositionTableButton);
@@ -168,40 +141,57 @@ let Gene = React.createClass({
     let externalGeneLinkButtons = [];
     for (let i = 0, len = externalGeneLinks.length; i < len; i++) {
       let externalGeneLinkButton = (
-        <RaisedButton style={buttonStyle}
-                      key={'externalGeneLinkButton_' + i}
-                      label={externalGeneLinks[i].Name}
-                      primary={true}
-                      onClick={(e) => this.handleOpenExternal(e, externalGeneLinks[i].Url.replace('{Id}', geneData['fid']))}
-                      icon={<Icon fixedWidth={true} name="external-link" inverse={true} />}
+        <ExternalLinkButton key={'externalGeneLinkButton_' + i}
+                            label={externalGeneLinks[i].Name}
+                            urls={[externalGeneLinks[i].Url.replace('{Id}', geneData['fid'])]}
         />
       );
       externalGeneLinkButtons.push(externalGeneLinkButton);
     }
 
+    const trackProps = {
+      width: this.state.width,
+      sideWidth: 150,
+      chromosome: geneData['chromid'],
+      start: parseInt(geneData['fstart']),
+      end: parseInt(geneData['fstop'])
+    };
     return (
-      <div>
-        <table className="table-col">
-          <tbody>
-            <tr><th className="table-col-header">Name: </th><td className="table-col-cell">{geneData['fname']}</td></tr>
-            <tr><th className="table-col-header">Alternatives: </th><td className="table-col-cell">{geneData['fnames'].split(',').join(', ')}</td></tr>
-            <tr><th className="table-col-header">Description: </th><td className="table-col-cell">{geneData['descr']}</td></tr>
-            <tr><th className="table-col-header">Position: </th><td className="table-col-cell">{geneData['chromid']}:{geneData['fstart']}-{geneData['fstop']}</td></tr>
-          </tbody>
-        </table>
-        <Loading status={loadStatus}/>
-        <div className="stack wrap">
-          <RaisedButton style={buttonStyle}
-                        label="Show in Genome Browser"
-                        primary={true}
-                        onClick={(e) => this.handleOpenGenomeBrowser(e, {chromosome: geneData['chromid'], start: parseInt(geneData['fstart']), end: parseInt(geneData['fstop'])})}
-                        icon={<Icon fixedWidth={true} name="bitmap:genomebrowser.png" inverse={true} />}
-          />
-          {genomePositionTableButtons}
-          {externalGeneLinkButtons}
+      <DetectResize onResize={(size) => this.setState(size)}>
+        <div>
+          <div className="vertical stack">
+            <GenomeScale {...trackProps}/>
+            { this.config.settings.refSequenceSumm ?
+              <ReferenceSequence {...trackProps}/> :
+              null }
+            <AnnotationChannel name="Structure" {...trackProps} />
+            <div className="grow">
+              <table className="table-col">
+                <tbody>
+                  <tr><th className="table-col-header">Name: </th><td className="table-col-cell">{geneData['fname']}</td></tr>
+                  <tr><th className="table-col-header">Alternatives: </th><td className="table-col-cell">{geneData['fnames'].split(',').join(', ')}</td></tr>
+                  <tr><th className="table-col-header">Description: </th><td className="table-col-cell">{geneData['descr']}</td></tr>
+                  <tr><th className="table-col-header">Position: </th><td className="table-col-cell">{geneData['chromid']}:{geneData['fstart']}-{geneData['fstop']}</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="horizontal stack wrap">
+              <PopupButton  label="Show in Genome Browser"
+                            icon="bitmap:genomebrowser.png"
+                            componentPath="containers/GenomeBrowserWithActions"
+                            componentUpdate={componentUpdate}
+                            chromosome={geneData['chromid']}
+                            start={parseInt(geneData['fstart'])}
+                            end={parseInt(geneData['fstop'])}
+              />
+              {genomePositionTableButtons}
+              {externalGeneLinkButtons}
+            </div>
+          </div>
+          <Loading status={loadStatus}/>
         </div>
-      </div>
-    );
+      </DetectResize>
+  );
 
   }
 

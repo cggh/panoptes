@@ -350,6 +350,11 @@
   flex-direction: row;
 }
 
+.stack.spread {
+  justify-content: space-around;
+  align-content: space-around;
+}
+
 .pointer {
   cursor: pointer;
 }

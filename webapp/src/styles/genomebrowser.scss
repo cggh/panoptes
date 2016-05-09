@@ -80,203 +80,205 @@
           box-shadow: inset 3px 0 4px -2px rgba(0, 0, 0, 0.24);
         }
       }
-      .config-container {
-        box-shadow: 3px 1px 4px rgba(0, 0, 0, 0.24);
+    }
+  }
+}
+.config-container {
+  box-shadow: 3px 1px 4px rgba(0, 0, 0, 0.24);
+}
+.legend-container {
+  box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.24);
+}
+.channel-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-bottom: 1px solid $light-primary-color;
+
+  .channel-side {
+    position: relative;
+    overflow: hidden;
+    background-color: white;
+    .close {
+      color: $red;
+      padding-right: 6px;
+    }
+    .icon {
+      opacity: 0.6;
+    }
+    .icon:hover {
+      opacity: 1;
+    }
+
+    .button {
+      width: 25px;
+      height: 25px;
+      line-height: 19px;
+      padding: 3px;
+      position: absolute;
+      text-align: center;
+      right: 0;
+      .open {
+        color: $primary-color;
       }
-      .legend-container {
-        box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.24);
+    }
+    .config {
+      top: 0;
+    }
+    .legend {
+      transition: bottom .5s !important;
+      bottom: 0;
+    }
+    .close {
+      top: calc(50% - 15px);
+      left: 0;
+    }
+    .side-component {
+      position: absolute;
+      right: 0;
+      left: 0;
+      padding: 5px 35px 5px 30px;
+      text-overflow: ellipsis;
+      overflow: auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+  }
+  .channel-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    .channel-data {
+      overflow: hidden;
+      canvas {
+        display: block;
       }
-      .channel-container {
-        position: relative;
+    }
+    .tray-container {
+      position: relative;
+      //box-shadow: $z-1-shadow;
+      transition: height .5s !important;
+      background: white;
+      height: 0;
+      width: 100%;
+      overflow: hidden;
+      .legend {
         display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        border-bottom: 1px solid $light-primary-color;
-
-        .channel-side {
-          position: relative;
-          overflow: hidden;
-          background-color: white;
-          .close {
-            color: $red;
-            padding-right: 6px;
-          }
-          .icon {
-            opacity: 0.6;
-          }
-          .icon:hover {
-            opacity: 1;
-          }
-
-          .button {
-            width: 25px;
-            height: 25px;
-            line-height: 19px;
-            padding: 3px;
-            position: absolute;
-            text-align: center;
-            right: 0;
-            .open {
-              color: $primary-color;
-            }
-          }
-          .config {
-            top: 0;
-          }
-          .legend {
-            transition: bottom .5s !important;
-            bottom: 0;
-          }
-          .close {
-            top: calc(50% - 15px);
-            left: 0;
-          }
-          .side-component {
-            position: absolute;
-            right: 0;
-            left: 0;
-            padding: 5px 35px 5px 30px;
-            text-overflow: ellipsis;
-            overflow: auto;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-          }
-
-        }
-        .channel-stack {
-          position: relative;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        padding-right: 16px;
+        .legend-element {
+          min-height: 26px;
           display: flex;
-          flex-direction: column;
-          .channel-data {
-            overflow: hidden;
-            canvas {
-              display: block;
-            }
+          align-items: center;
+          justify-content: flex-start;
+          padding-left: 16px;
+          .label {
+            padding-left: 8px;
           }
-          .tray-container {
-            position: relative;
-            //box-shadow: $z-1-shadow;
-            transition: height .5s !important;
-            background: white;
-            height: 0;
-            width: 100%;
-            overflow: hidden;
-            .legend {
-              display: flex;
-              align-items: center;
-              justify-content: flex-start;
-              flex-wrap: wrap;
-              padding-right: 16px;
-              .legend-element {
-                min-height: 26px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                padding-left: 16px;
-                .label {
-                  padding-left: 8px;
-                }
-              }
-            }
-            .channel-controls {
-              display: flex;
-              align-items: center;
-              justify-content: flex-start;
-              flex-wrap: wrap;
-              .control {
-                min-height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                .label {
-                  padding-left: 10px;
-                }
-                .dropdown {
-                  top: -4px;
-                }
-                .slider {
-                  margin-left: 30px;
-                  width: 100px;
-                }
-                .numeric-input {
-                  width: 80px;
-                }
-              }
-            }
+        }
+      }
+      .channel-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        .control {
+          min-height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          .label {
+            padding-left: 10px;
+          }
+          .dropdown {
+            top: -4px;
+          }
+          .slider {
+            margin-left: 30px;
+            width: 100px;
+          }
+          .numeric-input {
+            width: 80px;
           }
         }
       }
     }
   }
-  div.scale {
-    background: white;
+}
+div.scale {
+  background: white;
+}
+.tick {
+  line {
+    stroke: darkgrey;
+    stroke-width: 0.25px;
   }
-  .tick {
-    line {
-      stroke: darkgrey;
-      stroke-width: 0.25px;
-    }
+}
+.x {
+  text {
+    text-anchor: middle;
+    alignment-baseline: text-before-edge;
   }
-  .x {
+}
+.y {
+  text {
+    text-anchor: end;
+    alignment-baseline: central;
+    font-size: 12px;
+  }
+}
+.major {
+  line {
+    stroke-width: 0.5px;
+  }
+}
+
+.sequence {
+  position: relative;
+  canvas {
+    position: absolute;
+    //will-change: transform;
+    transform-origin: top left;
+  }
+  .blocky {
+    image-rendering: optimizeSpeed;
+    image-rendering: pixelated;
+  }
+
+  svg {
+    position: absolute;
     text {
       text-anchor: middle;
-      alignment-baseline: text-before-edge;
-    }
-  }
-  .y {
-    text {
-      text-anchor: end;
       alignment-baseline: central;
-      font-size: 12px;
     }
   }
-  .major {
-    line {
-      stroke-width: 0.5px;
-    }
+}
+
+svg.numerical-channel {
+  .origin-shifter {
+    fill: none;
   }
-
-  .sequence {
-    position: relative;
-    canvas {
-      position: absolute;
-      //will-change: transform;
-      image-rendering: optimizeSpeed;
-      image-rendering: pixelated;
-      transform-origin: top left;
-    }
-
-    svg {
-      position: absolute;
-      text {
-        text-anchor: middle;
-        alignment-baseline: central;
-      }
-    }
+  g.categorical-track {
+    stroke: none;
+    opacity: 0.8;
   }
-
-  svg.numerical-channel {
-    .origin-shifter {
-      fill: none;
+  g.numerical-track {
+    * {
+      vector-effect: non-scaling-stroke;
     }
-    g.categorical-track {
+    fill: none;
+    .line {
+      stroke: $primary-color;
+    }
+    .area {
       stroke: none;
-      opacity: 0.8;
-    }
-    g.numerical-track {
-      * {
-        vector-effect: non-scaling-stroke;
-      }
-      fill: none;
-      .line {
-        stroke: $primary-color;
-      }
-      .area {
-        stroke: none;
-        fill: rgba(61, 139, 213, 0.3);
-      }
+      fill: rgba(61, 139, 213, 0.3);
     }
   }
 }

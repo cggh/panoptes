@@ -64,7 +64,7 @@ let AnnotationChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth} = props;
+    let {chromosome, start, end, width, sideWidth, onChangeLoadStatus} = props;
     if (this.props.chromosome !== chromosome) {
       this.applyData(props, {});
     }
@@ -79,7 +79,7 @@ let AnnotationChannel = React.createClass({
       //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
-      props.onChangeLoadStatus('LOADING');
+      if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
 
       let APIargs = {
         database: this.config.dataset,
@@ -95,11 +95,11 @@ let AnnotationChannel = React.createClass({
             API.annotationData({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         )).then((data) => {
-          this.props.onChangeLoadStatus('DONE');
+          if (onChangeLoadStatus) onChangeLoadStatus('DONE');
           this.applyData(this.props, data);
         })
         .catch((err) => {
-          this.props.onChangeLoadStatus('DONE');
+          if (onChangeLoadStatus) onChangeLoadStatus('DONE');
           throw err;
         })
         .catch(API.filterAborted)
@@ -211,7 +211,7 @@ let AnnotationChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth} = this.props;
+    let {width, sideWidth, name} = this.props;
     let {height} = this.state;
     return (
       <ChannelWithConfigDrawer
