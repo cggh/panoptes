@@ -88,7 +88,7 @@ let ScaledSVGChannel = React.createClass({
     //If we already are at an acceptable block then don't change it!
     if (!((this.blockEnd === block1End && this.blockStart === block1Start) ||
       (this.blockEnd === block2End && this.blockStart === block2Start))) {
-      //Current block was acceptable so choose best one
+      //Current block was unacceptable so choose best one
       this.blockStart = block1Start;
       this.blockEnd = block1End;
     }
