@@ -5,7 +5,6 @@
 .idea
 .DS_Store
 webapp/bower_components/
-webapp/dist/
 webapp/node_modules/
 
 servermodule/panoptesserver/VTTable.py
@@ -24,7 +23,6 @@ panoptes-boxes-master
 # Packages
 *.egg
 *.egg-info
-dist
 build
 eggs
 parts

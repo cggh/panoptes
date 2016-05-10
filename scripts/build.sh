@@ -71,7 +71,7 @@ ln -s $PROJECT_ROOT/servermodule/* .
 
 echo -e "${green}  Linking static content into DQXServer${NC}"
 cd $PROJECT_ROOT/build/DQXServer
-ln -s $PROJECT_ROOT/webapp static
+ln -s $PROJECT_ROOT/webapp/dist static
 
 echo -e "${green}  Copying config.py${NC}"
 cp $PROJECT_ROOT/config.py config.py
