@@ -56,14 +56,17 @@ let ReferenceSequence = React.createClass({
     }
 
     let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
+    let targetPointCount = (((width - sideWidth) / 1) / (end - start)) * (block1End - block1Start);
     //If we already have the data for an acceptable block then stop.
-    if ((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start))
+    if (this.targetPointCount > targetPointCount * 0.5 &&
+      this.targetPointCount < targetPointCount * 2 &&
+      ((this.blockEnd === block1End && this.blockStart === block1Start) ||
+      (this.blockEnd === block2End && this.blockStart === block2Start)))
       return;
 
     this.blockStart = block1Start;
     this.blockEnd = block1End;
-    let targetPointCount = (((width - sideWidth) / 1) / (end - start)) * (block1End - block1Start);
+    this.targetPointCount = targetPointCount;
     if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
