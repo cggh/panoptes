@@ -1,6 +1,7 @@
 import React from  'react';
 import Immutable from 'immutable';
 import NotificationSystem from 'react-notification-system';
+import Popout from 'react-popout';
 
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -23,6 +24,8 @@ import {
 import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
+import "genomebrowser.scss";
+
 
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./' + path);
@@ -59,11 +62,11 @@ let Panoptes = React.createClass({
   },
 
   render() {
-    let actions = this.getFlux().actions.session;
+    let actions = this.flux.actions.session;
     let {tabs, popups, modal, components} = this.state.session.toObject();
     modal = modal.toObject();
     let userID = this.state.panoptes.getIn(['user', 'id']);
-    let config = this.getConfig();
+    let config = this.config;
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div>
@@ -99,20 +102,22 @@ let Panoptes = React.createClass({
             {popups.get('components').map((compId) => {
               let popup = components.get(compId).toObject();
               let props = popup.props ? popup.props.toObject() : {};
+              props.config = this.config;
+              props.flux = this.flux;
               props.componentUpdate = actions.componentUpdateFor(compId);
               let state = popups.getIn(['state', compId]) || Immutable.Map();
               return (
-                <Popup
-                  {...state.toObject()}
-                  compId={compId}
-                  key={compId}
-                  onMoveStop={actions.popupMove.bind(this, compId)}
-                  onResizeStop={actions.popupResize.bind(this, compId)}
-                  onClose={actions.popupClose.bind(this, compId)}
-                  onMaximise={actions.popupToTab.bind(this, compId)}
-                  onClick={actions.popupFocus.bind(this, compId)}>
-                  {React.createElement(dynamicRequire(popup.component), props)}
-                </Popup>
+                <Popout title={`Panoptes ${compId}`}
+                        key={compId}
+                        url="popup.html"
+                        onClosing={actions.popupClose.bind(this, compId)}
+                >
+                  <MuiThemeProvider muiTheme={muiTheme}>
+                    <div>
+                      {React.createElement(dynamicRequire(popup.component), props)}
+                    </div>
+                  </MuiThemeProvider>
+                </Popout>
               );
             })}
           </Popups>

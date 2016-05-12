@@ -56,6 +56,12 @@ module.exports = {
       inject: 'body',
       hash: true
     }),
+    new HtmlWebpackPlugin( {
+      template: path.resolve(__dirname, "../src/popup.html"),
+      filename: 'popup.html',
+      inject: 'body',
+      hash: true
+    }),
     new webpack.DefinePlugin({
       "process.env": {
         // This has effect on the react lib size

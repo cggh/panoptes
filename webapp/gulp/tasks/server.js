@@ -17,6 +17,12 @@ gulp.task("webpack-dev-server", function(callback) {
       inject: 'body',
       hash: true
     }),
+    new HtmlWebpackPlugin( {
+      template: path.resolve(__dirname, "../../src/popup.html"),
+      filename: 'popup.html',
+      inject: 'body',
+      hash: true
+    }),
   ];
   //Make the webpack dev server inline instead of iframe
   myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
@@ -46,6 +52,12 @@ gulp.task("webpack-devhot-server", function(callback) {
   myConfig.plugins = [
     new HtmlWebpackPlugin( {
       template: path.resolve(__dirname, "../../src/index.html"),
+      inject: 'body',
+      hash: true
+    }),
+    new HtmlWebpackPlugin( {
+      template: path.resolve(__dirname, "../../src/popup.html"),
+      filename: 'popup.html',
       inject: 'body',
       hash: true
     }),
