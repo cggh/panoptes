@@ -7,10 +7,11 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
+import _reduce from 'lodash/reduce';
+import _filter from 'lodash/filter';
 
-import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-import LRUCache from 'util/LRUCache';
+import PropertyRegionCache from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/genome/FindBlocks';
 import PropertySelector from 'panoptes/PropertySelector';
@@ -68,11 +69,12 @@ let PerRowIndicatorChannel = React.createClass({
   getInitialState() {
     return {
       knownValues: null
-    }
+    };
   },
 
   componentWillMount() {
     this.positions = [];
+    this.tooBigBlocks = [];
   },
 
   componentDidUpdate() {
@@ -110,60 +112,64 @@ let PerRowIndicatorChannel = React.createClass({
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
-      let posQuery = SQL.WhereClause.AND([
-        SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
-        SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
-        SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
-      ]);
-      if (!query.isTrivial)
-        query = SQL.WhereClause.AND([posQuery, query]);
+      query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+        query]);
       let APIargs = {
         database: this.config.dataset,
         table: table,
         columns: columnspec,
-        query: SQL.WhereClause.encode(query),
-        transpose: false
+        query: query,
+        transpose: false,
+        regionField: tableConfig.positionField,
+        regionStart: this.blockStart,
+        regionEnd: this.blockEnd,
+        blockLimit: 1000
       };
-
       requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'pageQuery' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )).then((data) => {
-          this.props.onChangeLoadStatus('DONE');
-          this.applyData(this.props, data);
-        })
+        PropertyRegionCache(APIargs, componentCancellation)
+          .then((blocks) => {
+            console.log(blocks);
+            this.props.onChangeLoadStatus('DONE');
+            this.applyData(this.props, blocks);
+        }))
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
           throw err;
         })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((error) => {
-          this.applyData(this.props, {});
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-        });
+        // .catch((error) => {
+        //   this.applyData(this.props, {});
+        //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+        // });
     }
     this.draw(props);
   },
 
-  applyData(props, data) {
+  combineBlocks(blocks, property) {
+    return _reduce(blocks, (sum, block) => {
+      Array.prototype.push.apply(sum, block[property] || []);
+      return sum;
+    },
+    []);
+  },
+
+  applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tables[table];
-    this.positions = data[tableConfig.positionField] || [];
-    if (colourProperty && data[colourProperty]) {
-      this.colourData = data[colourProperty];
-      this.colourVals = _map(data[colourProperty], propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+    this.positions = this.combineBlocks(blocks, tableConfig.positionField);
+    if (colourProperty) {
+      this.colourData = this.combineBlocks(blocks, colourProperty);
+      this.colourVals = _map(this.colourData,
+        propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
     } else {
       this.colourVals = null;
       this.colourData = null;
     }
+    this.tooBigBlocks = _filter(blocks, {_tooBig: true});
     this.draw(props);
   },
 
   draw(props) {
+    console.log(this.positions);
     const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
     const positions = this.positions;
     const colours = this.colourVals;
@@ -174,7 +180,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
-    const psy = (HEIGHT / 2) - 4;
+    let psy = (HEIGHT / 2) - 4;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.fillStyle = 'rgba(255,0,0,0.6)';
@@ -197,6 +203,15 @@ let PerRowIndicatorChannel = React.createClass({
         ctx.stroke();
       }
     }
+    psy = psy + 4 ;
+    this.tooBigBlocks.forEach((block) => {
+      const blockStart = ((width - sideWidth) / (end - start)) * (block._blockStart - start);
+      const blockEnd = ((width - sideWidth) / (end - start)) * ((block._blockStart + block._blockSize) - start);
+      ctx.beginPath();
+      ctx.moveTo(blockStart, psy);
+      ctx.lineTo(blockEnd, psy);
+      ctx.stroke();
+    });
     drawnColourVals = Array.from(drawnColourVals.values());
     if (recordColours) {
       if (!_isEqual(this.state.knownValues, drawnColourVals)) {
@@ -206,7 +221,7 @@ let PerRowIndicatorChannel = React.createClass({
       this.setState({knownValues: null});
     }
 
-    },
+  },
 
   render() {
     let {width, sideWidth, table, colourProperty} = this.props;

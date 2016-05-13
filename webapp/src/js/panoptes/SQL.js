@@ -1,5 +1,6 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import Base64 from 'panoptes/Base64';
+import _filter from 'lodash/filter';
 
 let SQL = {};
 
@@ -545,7 +546,7 @@ SQL.WhereClause.Compound = function(icompoundtype, components) {
   that.whcClass = 'compound';
   that.isCompound = true;
   that.type = icompoundtype;
-  that.components = components;
+  that.components = _filter(components, (comp) => !comp.isTrivial);
   if (that.components == null) that.components = [];
   that.addComponent = function(icomp) {
     icomp.parent = that;
