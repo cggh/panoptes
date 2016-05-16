@@ -2,12 +2,15 @@ import unittest
 import os
 from SettingsDataTable import SettingsDataTable
 import simplejson
+import yaml
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
 from SettingsWorkspace import SettingsWorkspace
 from SettingsGraph import SettingsGraph
 from SettingsSummary import SettingsSummary
 from SettingsCustomData import SettingsCustomData
+from SettingsDataset import SettingsDataset
+from __builtin__ import file
 
 ''' Not doing it anymore....
 	def testConvertBoolean(self):
@@ -255,66 +258,112 @@ class ImportSettingsTest(unittest.TestCase):
 		startDir = os.path.abspath(os.path.join('sampledata','datasets'))
 	#startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/samples"
 		for dirName, subdirList, fileList in os.walk(startDir):
-#			print "Checking:" + dirName
+#			print "1Checking:" + dirName
 			if 'settings' in fileList:
 				configType = dirName
+				found = False
 				while True:
-					configType = os.path.abspath(os.path.join(configType, os.pardir))
-					
 #					print "Looking for configType:"+ configType
 					ct = os.path.basename(configType)
-					if method(ct, os.path.join(dirName, 'settings')):
+#					print "Checking:" + ct + ':' + os.path.join(dirName, 'settings')
+					result = method(ct, os.path.join(dirName, 'settings')) 
+					if result is not None:
+						found = True
+#						print "Found:" + ct + ':' + os.path.join(dirName, 'settings')
 						break
+#					else:
+#						print "Not found:" + ct + ':' + os.path.join(dirName, 'settings') + ':' + str(result)
 					if configType == startDir:
+#						print "break!" + startDir
 						break
+					ct = os.path.abspath(os.path.join(configType, os.pardir))
+					configType = ct
 					
+				if not found:
+					self.fail('Did not validate settings file in:' + dirName)
 					
 					
 	def validateSettings(self, settingsType, file):
 		
+		validateTestLoad = None
 		try:
 			if settingsType == "2D_datatables":
-				settingsLoaded = Settings2Dtable()
-				settingsLoaded.loadFile(file, True)
-				return True
+				validateTestLoad = Settings2Dtable()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'customdata':
-				#print "Validating datatable settings:" + file
-				settingsLoaded = SettingsCustomData()
-				settingsLoaded.loadFile(file, True)
-				return True
+				validateTestLoad = SettingsCustomData()
+				validateTestLoad.loadFile(file, True)
+			elif settingsType == 'datasets':
+				validateTestLoad = SettingsDataset()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'datatables':
-				#print "Validating datatable settings:" + file
-				settingsLoaded = SettingsDataTable()
-				settingsLoaded.loadFile(file, True)
-				return True
+				validateTestLoad = SettingsDataTable()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == "workspaces":
-				settingsLoaded = SettingsWorkspace()
-				settingsLoaded.loadFile(file, True)
-				return True
+				validateTestLoad = SettingsWorkspace()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == "refgenome":
-				settingsLoaded = SettingsRefGenome()
-				settingsLoaded.loadFile(file, True)
-				return True
+				validateTestLoad = SettingsRefGenome()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == "graphs":
-				settingsLoaded = SettingsGraph()
-				settingsLoaded.loadFile(file, True)
-				return True
-			elif settingsType == "summaryvalues":
-				parent = os.path.join(file,os.path.pardir)
+				validateTestLoad = SettingsGraph()
+				validateTestLoad.loadFile(file, True)
+			elif settingsType == 'summaryvalues':
+				parent = os.path.dirname(file)
 				if os.path.isfile(os.path.join(parent,'values')):
-					settingsLoaded = SettingsSummary()
+					validateTestLoad = SettingsSummary()
 					propName = os.path.basename(parent)
-					settingsLoaded.loadPropsFile(propName ,file)
-				return True
+					validateTestLoad.loadPropsFile(propName ,file)
+				else:
+					validateTestLoad = SettingsDataTable()
+					validateTestLoad.loadFile(file, True)
+			elif settingsType == 'pre' or settingsType == 'post':
+				validateTestLoad = {}
+#			else:
+#				print "Settings not found:" + settingsType
+				
 		except ValueError as ve:
 			self.fail(settingsType + ':' + file + ':' + str(ve))
 		except KeyError as ve:
 			self.fail(settingsType + ':' + file + ':' + str(ve))
-		return False
+		
+#		print "returning:" + str(validateTestLoad)	
+		return validateTestLoad
 	
-#	@unittest.skip("demonstrating skipping")
 	def testSampleData(self):
 		self.walkSampleData(self.validateSettings)
+	
+#	@unittest.skip("demonstrating skipping")
+	def roundTrip(self, settingsType, file):
 		
+		#Don't want to just load the YAML due to mergeProperties extension in ImportSettings
+		settings1 = self.validateSettings(settingsType, file)
+					
+		if settings1 is None:
+			return settings1
+		
+		try:
+			json1 = simplejson.dumps(settings1._settings, sort_keys=True, indent=4 * ' ')
+		except AttributeError as ae:
+			#Catches plugin settings ({}) - '_settings' in {} just seems to hang
+			print "No _settings for:" + settingsType + ':' + file
+			return settings1
+		
+		#Can't serialize as that excludes fields
+		parsed1 = simplejson.loads(json1, strict=False)
+		
+		jsonyaml = yaml.dump(parsed1, default_flow_style=False)
+		
+		settings2 = yaml.load(jsonyaml)
+		
+		json2 = simplejson.dumps(settings2, sort_keys=True, indent=4 * ' ')
+		
+		if (json1 != json2):
+			self.fail("json1 != json2:" + settingsType + ':' + file + ':\n' + json1 + '\n' + json2 )
+			
+		return settings1
+               
+	def testRoundTrip(self):
+		self.walkSampleData(self.roundTrip)
 if __name__ == '__main__':
 	unittest.main()
