@@ -49,14 +49,14 @@ Properties:
   DataType: Value
   MinVal: -10
   MaxVal: 10
-  BarWidth: 100
+  ShowBar: True
 
 - Id: NumProp2
   Name: Numerical 2
   DataType: Value
   MinVal: -10
   MaxVal: 10
-  BarWidth: 100
+  ShowBar: True
 
 - Id: Filtrd
   Name: Filtered
