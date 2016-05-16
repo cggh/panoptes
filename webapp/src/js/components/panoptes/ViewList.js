@@ -29,13 +29,21 @@ let ViewList = React.createClass({
 
   render() {
     const hasGeo = _some(_filter(this.config.tables, {hasGeoCoord: true}));
+
+    let datasetManagerListItem = null;
+    if (this.config.isManager) {
+      datasetManagerListItem = (
+        <ListItem primaryText="Dataset Manager"
+                  secondaryText="Import and configure datasets"
+                  leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
+                  onClick={(e) => this.handleOpen(e, 'DatasetManager/Actions', {})} />
+      );
+    }
+
     return (
         <List style={this.props.style}>
           <Subheader>Open a view:</Subheader>
-          <ListItem primaryText="Genome Browser"
-                    secondaryText="View table data and sequence data on the genome"
-                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})} />
+          {datasetManagerListItem}
           <ListItem primaryText="Plot"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
