@@ -2,6 +2,12 @@ import unittest
 import os
 from SettingsDataTable import SettingsDataTable
 import simplejson
+from Settings2Dtable import Settings2Dtable
+from SettingsRefGenome import SettingsRefGenome
+from SettingsWorkspace import SettingsWorkspace
+from SettingsGraph import SettingsGraph
+from SettingsSummary import SettingsSummary
+from SettingsCustomData import SettingsCustomData
 
 ''' Not doing it anymore....
 	def testConvertBoolean(self):
@@ -243,6 +249,72 @@ class ImportSettingsTest(unittest.TestCase):
 		propDict = simplejson.loads(prop, strict=False)
 		self.assertNotIn('IsCategorical', propDict, 'propName not working - old value present')
 		self.assertIn('isCategorical', propDict, 'propName not working - new value not present')
+		
+	def walkSampleData(self, method):
+		import config
+		startDir = os.path.abspath(os.path.join('sampledata','datasets'))
+	#startDir = "/vagrant/panoptes/current/sampledata/datasets/Samples_and_Variants/datatables/samples"
+		for dirName, subdirList, fileList in os.walk(startDir):
+#			print "Checking:" + dirName
+			if 'settings' in fileList:
+				configType = dirName
+				while True:
+					configType = os.path.abspath(os.path.join(configType, os.pardir))
+					
+#					print "Looking for configType:"+ configType
+					ct = os.path.basename(configType)
+					if method(ct, os.path.join(dirName, 'settings')):
+						break
+					if configType == startDir:
+						break
+					
+					
+					
+	def validateSettings(self, settingsType, file):
+		
+		try:
+			if settingsType == "2D_datatables":
+				settingsLoaded = Settings2Dtable()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == 'customdata':
+				#print "Validating datatable settings:" + file
+				settingsLoaded = SettingsCustomData()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == 'datatables':
+				#print "Validating datatable settings:" + file
+				settingsLoaded = SettingsDataTable()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == "workspaces":
+				settingsLoaded = SettingsWorkspace()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == "refgenome":
+				settingsLoaded = SettingsRefGenome()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == "graphs":
+				settingsLoaded = SettingsGraph()
+				settingsLoaded.loadFile(file, True)
+				return True
+			elif settingsType == "summaryvalues":
+				parent = os.path.join(file,os.path.pardir)
+				if os.path.isfile(os.path.join(parent,'values')):
+					settingsLoaded = SettingsSummary()
+					propName = os.path.basename(parent)
+					settingsLoaded.loadPropsFile(propName ,file)
+				return True
+		except ValueError as ve:
+			self.fail(settingsType + ':' + file + ':' + str(ve))
+		except KeyError as ve:
+			self.fail(settingsType + ':' + file + ':' + str(ve))
+		return False
+	
+#	@unittest.skip("demonstrating skipping")
+	def testSampleData(self):
+		self.walkSampleData(self.validateSettings)
 		
 if __name__ == '__main__':
 	unittest.main()
