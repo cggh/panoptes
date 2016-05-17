@@ -7,7 +7,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
-import _reduce from 'lodash/reduce';
+import _transform from 'lodash/transform';
 import _filter from 'lodash/filter';
 
 import SQL from 'panoptes/SQL';
@@ -76,6 +76,7 @@ let PerRowIndicatorChannel = React.createClass({
   componentWillMount() {
     this.positions = [];
     this.tooBigBlocks = [];
+    this.blocks = [];
   },
 
   componentDidUpdate() {
@@ -139,27 +140,25 @@ let PerRowIndicatorChannel = React.createClass({
           throw err;
         })
         .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled);
-
-      // .catch((error) => {
-        //   this.applyData(this.props, {});
-        //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-        // });
+        .catch(LRUCache.filterCancelled)
+        .catch((error) => {
+            this.applyData(this.props, {});
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+          });
     }
     this.draw(props);
   },
 
   combineBlocks(blocks, property) {
-    return _reduce(blocks, (sum, block) => {
-      Array.prototype.push.apply(sum, block[property] || []);
-      return sum;
-    },
+    return _transform(blocks, (sum, block) =>
+      Array.prototype.push.apply(sum, block[property] || []),
     []);
   },
 
   applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tables[table];
+    this.blocks = blocks;
     this.positions = this.combineBlocks(blocks, tableConfig.positionField);
     if (colourProperty) {
       this.colourData = this.combineBlocks(blocks, colourProperty);
@@ -169,8 +168,32 @@ let PerRowIndicatorChannel = React.createClass({
       this.colourVals = null;
       this.colourData = null;
     }
-    this.tooBigBlocks = _filter(blocks, {_tooBig: true});
+    //Filter out big blocks and merge neighbouring ones.
+    this.tooBigBlocks = _transform(_filter(blocks, {_tooBig: true}), (merged, block) => {
+      const lastBlock = merged[merged.length-1];
+      //if (lastBlock) console.log(lastBlock._blockStart + lastBlock._blockSize, block._blockStart);
+      if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
+        //Copy to avoid mutating the cache
+        merged[merged.length-1] = {...lastBlock, _blockSize:lastBlock._blockSize + block._blockSize};
+      } else {
+        merged.push(block);
+      }
+    });
     this.draw(props);
+  },
+
+  hatchRect(ctx, x1, y1, dx, dy, delta) {
+    ctx.rect(x1, y1, dx, dy);
+    ctx.save();
+    ctx.clip();
+    let majorAxis = Math.max(dx, dy);
+    ctx.beginPath();
+    for (let n = -1*(majorAxis) ; n < majorAxis; n += delta) {
+      ctx.moveTo(n + x1, y1);
+      ctx.lineTo(dy + n + x1 , y1 + dy);
+    }
+    ctx.stroke();
+    ctx.restore();
   },
 
   draw(props) {
@@ -184,8 +207,30 @@ let PerRowIndicatorChannel = React.createClass({
     if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
-    let psy = (HEIGHT / 2) - 4;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px Roboto';
+    let psy = (HEIGHT / 2) - 12;
+    this.tooBigBlocks.forEach((block) => {
+      const blockStart = ((width - sideWidth) / (end - start)) * (block._blockStart - start);
+      const blockSize = ((width - sideWidth) / (end - start)) * ( block._blockSize);
+      this.hatchRect(ctx, blockStart, psy, blockSize, 24, 5);
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 4;
+      ctx.lineJoin = "miter"; //Prevent letters with tight angles making spikes
+      ctx.miterLimit = 2;
+      ctx.strokeText('Too many points', blockStart + (blockSize/2), psy + 12);
+      ctx.fillText('Too many points', blockStart + (blockSize/2), psy + 12);
+      ctx.restore();
+    });
+    ctx.restore();
+    //Triangles
+    psy = (HEIGHT / 2) - 6;
     ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.fillStyle = 'rgba(255,0,0,0.6)';
     for (let i = 0, l = positions.length; i < l; ++i) {
@@ -206,21 +251,7 @@ let PerRowIndicatorChannel = React.createClass({
         ctx.stroke();
       }
     }
-    psy = psy + 6 ;
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillStyle = 'rgba(255,0,0,0.6)';
-    this.tooBigBlocks.forEach((block) => {
-      const blockStart = ((width - sideWidth) / (end - start)) * (block._blockStart - start);
-      const blockEnd = ((width - sideWidth) / (end - start)) * ((block._blockStart + block._blockSize) - start);
-      ctx.beginPath();
-      ctx.moveTo(blockStart, psy - 4);
-      ctx.lineTo(blockStart, psy + 4);
-      ctx.lineTo(blockEnd, psy + 4);
-      ctx.lineTo(blockEnd, psy - 4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    });
+    //Record drawn values for legend
     drawnColourVals = Array.from(drawnColourVals.values());
     if (recordColours) {
       if (!_isEqual(this.state.knownValues, drawnColourVals)) {
