@@ -1,4 +1,4 @@
-module.exports = (start, end) => {
+export default function findBlocks(start, end) {
   let effStart = Math.max(start, 0);
   //We now work out the boundaries of a larger containing area such that some movement can be made without a refetch.
   //Note that the benfit here comes not from network as there is a caching layer there, but from not having to recaclulate the
@@ -28,5 +28,4 @@ module.exports = (start, end) => {
     return [[block1Start, block1End], [block2Start, block2End]];
   else
     return [[block2Start, block2End], [block1Start, block1End]];
-
-};
+}

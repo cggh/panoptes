@@ -11,11 +11,12 @@ import _reduce from 'lodash/reduce';
 import _filter from 'lodash/filter';
 
 import SQL from 'panoptes/SQL';
-import PropertyRegionCache from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
-import findBlocks from 'panoptes/genome/FindBlocks';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
+import API from 'panoptes/API';
+import LRUCache from 'util/LRUCache';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FlatButton from 'material-ui/FlatButton';
@@ -94,16 +95,18 @@ let PerRowIndicatorChannel = React.createClass({
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
-    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
-    //If we already are at an acceptable block then don't change it!
+    const {blockLevel, blockIndex, needNext} = findBlock({start, end});
+    //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
         this.props.query !== query ||
         this.props.colourProperty !== colourProperty ||
-        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
-          (this.blockEnd === block2End && this.blockStart === block2Start))) {
+        !(this.blockLevel === blockLevel 
+        && this.blockIndex === blockIndex
+        && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
-      this.blockStart = block1Start;
-      this.blockEnd = block1End;
+      this.blockLevel = blockLevel;
+      this.blockIndex = blockIndex;
+      this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
       let tableConfig = this.config.tables[table];
       let columns = [tableConfig.primkey, tableConfig.positionField];
@@ -116,19 +119,18 @@ let PerRowIndicatorChannel = React.createClass({
         query]);
       let APIargs = {
         database: this.config.dataset,
-        table: table,
+        table,
         columns: columnspec,
-        query: query,
+        query,
         transpose: false,
         regionField: tableConfig.positionField,
-        regionStart: this.blockStart,
-        regionEnd: this.blockEnd,
+        start,
+        end,
         blockLimit: 1000
       };
       requestContext.request((componentCancellation) =>
-        PropertyRegionCache(APIargs, componentCancellation)
+        regionCacheGet(APIargs, componentCancellation)
           .then((blocks) => {
-            console.log(blocks);
             this.props.onChangeLoadStatus('DONE');
             this.applyData(this.props, blocks);
         }))
@@ -136,7 +138,10 @@ let PerRowIndicatorChannel = React.createClass({
           this.props.onChangeLoadStatus('DONE');
           throw err;
         })
-        // .catch((error) => {
+        .catch(API.filterAborted)
+        .catch(LRUCache.filterCancelled);
+
+      // .catch((error) => {
         //   this.applyData(this.props, {});
         //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         // });
@@ -169,7 +174,6 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   draw(props) {
-    console.log(this.positions);
     const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
     const positions = this.positions;
     const colours = this.colourVals;
@@ -193,7 +197,6 @@ let PerRowIndicatorChannel = React.createClass({
             drawnColourVals.add(colourData[i]);
           }
         }
-
         ctx.beginPath();
         ctx.moveTo(psx, psy);
         ctx.lineTo(psx + 6, psy + 12);
@@ -203,13 +206,19 @@ let PerRowIndicatorChannel = React.createClass({
         ctx.stroke();
       }
     }
-    psy = psy + 4 ;
+    psy = psy + 6 ;
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillStyle = 'rgba(255,0,0,0.6)';
     this.tooBigBlocks.forEach((block) => {
       const blockStart = ((width - sideWidth) / (end - start)) * (block._blockStart - start);
       const blockEnd = ((width - sideWidth) / (end - start)) * ((block._blockStart + block._blockSize) - start);
       ctx.beginPath();
-      ctx.moveTo(blockStart, psy);
-      ctx.lineTo(blockEnd, psy);
+      ctx.moveTo(blockStart, psy - 4);
+      ctx.lineTo(blockStart, psy + 4);
+      ctx.lineTo(blockEnd, psy + 4);
+      ctx.lineTo(blockEnd, psy - 4);
+      ctx.closePath();
+      ctx.fill();
       ctx.stroke();
     });
     drawnColourVals = Array.from(drawnColourVals.values());
