@@ -112,7 +112,7 @@ let SessionStore = Fluxxor.createStore({
   },
 
   popupToTab(payload) {
-    this.tabOpen({switchTo: true, ...payload})
+    this.tabOpen({switchTo: true, ...payload});
     this.popupClose(payload);
   },
 
@@ -181,7 +181,7 @@ let SessionStore = Fluxxor.createStore({
     let {geneId} = payload;
     this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
   }
-  
+
 });
 
 module.exports = SessionStore;
