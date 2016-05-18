@@ -20,9 +20,9 @@ function _filterError(json) {
   if ('Error' in json) {
     if (json.Error == 'NotAuthenticated') {
       throw Error('Not Authenticated');
-    }
-    else
+    } else {
       throw Error(`Error: ${json.Error}`);
+    }
   }
   return json;
 }
@@ -291,15 +291,6 @@ function findGenesInRegion(options) {
   assertRequired(options, ['database', 'chromosome', 'startPosition', 'endPosition']);
   let {database, chromosome, startPosition, endPosition} = options;
 
-  // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-  // order: null,
-  // ascending: false,
-  // count: false,
-  // start: 0,
-  // stop: 1000000,
-  // distinct: false,
-  // transpose: true
-
   let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
 
   // Construct query for chromosome, start and end positions.
@@ -333,6 +324,38 @@ function fetchGene(options) {
   );
 }
 
+function fetchImportStatusData(options) {
+
+  assertRequired(options, ['database']);
+  let {database} = options;
+console.log('fetchImportStatusData database: ' + database);
+
+  let columns = {'id': 'GN',
+                 'user': 'GN',
+                 'timestamp': 'GN',
+                 'name': 'GN',
+                 'status': 'GN',
+                 'progress': 'IN',
+                 'completed': 'IN',
+                 'failed': 'IN',
+                 'scope': 'GN'
+  };
+
+
+  // fetcher._maxResultCount = 20;
+  // fetcher._sortReverse = true;
+
+  let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+
+  return pageQuery(
+    {
+      database: 'datasetindex',
+      table: 'calculations',
+      columns: columns,
+      query: query
+    }
+  );
+}
 
 module.exports = {
   serverURL,
@@ -348,5 +371,6 @@ module.exports = {
   treeData,
   findGene,
   findGenesInRegion,
-  fetchGene
+  fetchGene,
+  fetchImportStatusData
 };
