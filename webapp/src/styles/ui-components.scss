@@ -346,6 +346,12 @@
 .stack.start-align {
   align-items: flex-start;
   justify-content: center;
+  .description {
+    padding-top: 20px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 .stack.wrap    {
@@ -375,7 +381,7 @@
 }
 
 .tall-modal {
-  height: calc(100vh - 150px);
+  max-height: calc(100vh - 150px);
 }
 
 .centering-container {
