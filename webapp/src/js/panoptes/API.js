@@ -328,6 +328,8 @@ function fetchImportStatusData(options) {
 
   assertRequired(options, ['database']);
   let {database} = options;
+
+// TODO: only get logs for this dataset (database)
 console.log('fetchImportStatusData database: ' + database);
 
   let columns = {'id': 'GN',
@@ -347,14 +349,36 @@ console.log('fetchImportStatusData database: ' + database);
 
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 
+  // FIXME: ascending on the server means descending!?!
+
   return pageQuery(
     {
       database: 'datasetindex',
       table: 'calculations',
       columns: columns,
-      query: query
+      query: query,
+      order: 'timestamp',
+      ascending: true
     }
   );
+}
+
+
+function loadDataset(dataset) {
+  return requestJSON({
+
+//datatype=custom&respmodule=panoptesserver&respid=fileload_dataset&ScopeStr=all&SkipTableTracks=false&datasetid=Samples_and_Variants'
+
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'fileload_dataset',
+      ScopeStr: 'all',
+      SkipTableTracks: 'false',
+      datasetid: dataset
+    }
+
+  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
 module.exports = {
@@ -372,5 +396,6 @@ module.exports = {
   findGene,
   findGenesInRegion,
   fetchGene,
-  fetchImportStatusData
+  fetchImportStatusData,
+  loadDataset
 };

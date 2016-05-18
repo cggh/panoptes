@@ -91,7 +91,7 @@ console.log('handleReimport');
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="block text">Import statuses</span>
+            <span className="block text">Status logs</span>
           </div>
           <div className="grow">
                 <DatasetImportStatusView foo="bar" />
