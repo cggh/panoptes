@@ -83,13 +83,17 @@ console.log('handleClickImportStatus id' + id)
 
               let iconName = null;
               let iconSpin = false;
+              let iconStyle = {};
               if (row.failed) {
                 iconName = 'warning';
+                iconStyle = {color: 'orange'};
               } else if (row.completed) {
                 iconName = 'check';
+                iconStyle = {color: 'green'};
               } else if (row.progress) {
                 iconName = 'cog';
                 iconSpin = true;
+                iconStyle = {color: '#2196f3'};
               } else {
                 console.log('unhandled icon status');
               }
@@ -99,12 +103,11 @@ console.log('handleClickImportStatus id' + id)
               return <ListItem key={row.id}
                         primaryText={<div><span>{row.status}</span></div>}
                         secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
-                        leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} /></div>}
+                        leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
                         onClick={(e) => this.handleClickImportStatus(e, row.id)}
                         secondaryTextLines={2}
               />;
             })}
-
         </List>
         <Loading status={loadStatus}/>
       </div>
