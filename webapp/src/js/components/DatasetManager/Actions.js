@@ -12,13 +12,15 @@ import Sidebar from 'react-sidebar';
 // UI components
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
+import TabbedArea from 'ui/TabbedArea';
+import TabPane from 'ui/TabPane';
+import HelloWorld from 'ui/HelloWorld';
 
 // Material UI components
-// TODO BUTTON import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 
 // Panoptes components
-import SQL from 'panoptes/SQL';
-
+import DatasetImportStatusView from 'DatasetImportStatus/View';
 
 let DatasetManagerActions = React.createClass({
 
@@ -39,19 +41,41 @@ let DatasetManagerActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Dataset Manager';
+    return this.props.title || 'Dataset manager';
+  },
+
+  handleReloadConfig() {
+console.log('handleReloadConfig');
+    this.getFlux().actions.session.modalOpen('ui/HelloWorld', {msg: 'Are you sure?'});
+  },
+
+  handleReimport() {
+console.log('handleReimport');
+    this.getFlux().actions.session.modalOpen('ui/HelloWorld', {msg: 'Are you sure?'});
   },
 
   render() {
     let {sidebar, componentUpdate} = this.props;
-    let description = 'description goes here';
+
+    if (!this.config.isManager) {
+      console.error('!this.config.isManager');
+      return null;
+    }
 
     let sidebarContent = (
       <div className="sidebar">
-        <div className="item-picker">
-          <SidebarHeader icon={this.icon()} description={description}/>
-          <p>hello</p>
-        </div>
+        <SidebarHeader icon={this.icon()} description={'Import and configure the ' + this.config.settings.name + ' dataset'} />
+        <FlatButton label="Reload config only"
+                    primary={true}
+                    onClick={() => this.handleReloadConfig()}
+                      icon={<Icon fixedWidth={true} name={'cogs'} />}
+        />
+        <FlatButton label="Reimport everything"
+                    primary={true}
+                    onClick={() => this.handleReimport()}
+                      icon={<Icon fixedWidth={true} name={'refresh'} />}
+        />
+
       </div>
     );
 
@@ -67,10 +91,10 @@ let DatasetManagerActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <p>hello again</p>
+            <span className="block text">Import statuses</span>
           </div>
-          <div>
-            <p>hello once more</p>
+          <div className="grow">
+                <DatasetImportStatusView foo="bar" />
           </div>
         </div>
       </Sidebar>
