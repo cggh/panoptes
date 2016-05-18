@@ -68,8 +68,11 @@ let LRUCache = {
   },
 
   filterCancelled(err) {
-    if (err !== CANCELLED)
+    if (err !== CANCELLED) {
       throw err;
+    } else {
+      return '__CANCELLED__';
+    }
   }
 };
 

@@ -4,17 +4,20 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import Color from 'color';
 
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
+import _transform from 'lodash/transform';
+import _filter from 'lodash/filter';
 
-import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-import LRUCache from 'util/LRUCache';
+import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
-import findBlocks from 'panoptes/genome/FindBlocks';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
+import API from 'panoptes/API';
+import LRUCache from 'util/LRUCache';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FlatButton from 'material-ui/FlatButton';
@@ -68,11 +71,13 @@ let PerRowIndicatorChannel = React.createClass({
   getInitialState() {
     return {
       knownValues: null
-    }
+    };
   },
 
   componentWillMount() {
     this.positions = [];
+    this.tooBigBlocks = [];
+    this.blocks = [];
   },
 
   componentDidUpdate() {
@@ -92,16 +97,18 @@ let PerRowIndicatorChannel = React.createClass({
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
-    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
-    //If we already are at an acceptable block then don't change it!
+    const {blockLevel, blockIndex, needNext} = findBlock({start, end});
+    //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
         this.props.query !== query ||
         this.props.colourProperty !== colourProperty ||
-        !((this.blockEnd === block1End && this.blockStart === block1Start) ||
-          (this.blockEnd === block2End && this.blockStart === block2Start))) {
+        !(this.blockLevel === blockLevel 
+        && this.blockIndex === blockIndex
+        && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
-      this.blockStart = block1Start;
-      this.blockEnd = block1End;
+      this.blockLevel = blockLevel;
+      this.blockIndex = blockIndex;
+      this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
       let tableConfig = this.config.tables[table];
       let columns = [tableConfig.primkey, tableConfig.positionField];
@@ -110,31 +117,25 @@ let PerRowIndicatorChannel = React.createClass({
       let columnspec = {};
       columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
-      let posQuery = SQL.WhereClause.AND([
-        SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
-        SQL.WhereClause.CompareFixed(tableConfig.positionField, '>=', this.blockStart),
-        SQL.WhereClause.CompareFixed(tableConfig.positionField, '<', this.blockEnd)
-      ]);
-      if (!query.isTrivial)
-        query = SQL.WhereClause.AND([posQuery, query]);
+      query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+        query]);
       let APIargs = {
         database: this.config.dataset,
-        table: table,
+        table,
         columns: columnspec,
-        query: SQL.WhereClause.encode(query),
-        transpose: false
+        query,
+        transpose: false,
+        regionField: tableConfig.positionField,
+        start,
+        end,
+        blockLimit: 1000
       };
-
       requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'pageQuery' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )).then((data) => {
-          this.props.onChangeLoadStatus('DONE');
-          this.applyData(this.props, data);
-        })
+        regionCacheGet(APIargs, componentCancellation)
+          .then((blocks) => {
+            this.props.onChangeLoadStatus('DONE');
+            this.applyData(this.props, blocks);
+        }))
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
           throw err;
@@ -142,31 +143,67 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-        });
+            this.applyData(this.props, {});
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+          });
     }
     this.draw(props);
   },
 
-  applyData(props, data) {
+  combineBlocks(blocks, property) {
+    return _transform(blocks, (sum, block) =>
+      Array.prototype.push.apply(sum, block[property] || []),
+    []);
+  },
+
+  applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tables[table];
-    this.positions = data[tableConfig.positionField] || [];
-    if (colourProperty && data[colourProperty]) {
-      this.colourData = data[colourProperty];
-      this.colourVals = _map(data[colourProperty], propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+    this.blocks = blocks;
+    this.positions = this.combineBlocks(blocks, tableConfig.positionField);
+    if (colourProperty) {
+      this.colourData = this.combineBlocks(blocks, colourProperty);
+      this.colourVals = _map(this.colourData,
+        propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
+      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.4).rgbString());
     } else {
       this.colourVals = null;
       this.colourData = null;
     }
+    //Filter out big blocks and merge neighbouring ones.
+    this.tooBigBlocks = _transform(_filter(blocks, {_tooBig: true}), (merged, block) => {
+      const lastBlock = merged[merged.length-1];
+      //if (lastBlock) console.log(lastBlock._blockStart + lastBlock._blockSize, block._blockStart);
+      if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
+        //Copy to avoid mutating the cache
+        merged[merged.length-1] = {...lastBlock, _blockSize:lastBlock._blockSize + block._blockSize};
+      } else {
+        merged.push(block);
+      }
+    });
     this.draw(props);
+  },
+
+  hatchRect(ctx, x1, y1, dx, dy, delta) {
+    ctx.rect(x1, y1, dx, dy);
+    ctx.save();
+    ctx.clip();
+    let majorAxis = Math.max(dx, dy);
+    ctx.beginPath();
+    for (let n = -1*(majorAxis) ; n < majorAxis; n += delta) {
+      ctx.moveTo(n + x1, y1);
+      ctx.lineTo(dy + n + x1 , y1 + dy);
+    }
+    ctx.stroke();
+    ctx.restore();
   },
 
   draw(props) {
     const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
     const positions = this.positions;
     const colours = this.colourVals;
+    const coloursTranslucent = this.colourValsTranslucent;
     const colourData = this.colourData;
     let drawnColourVals = new Set();
     const recordColours = colourProperty && this.config.tables[table].propertiesMap[colourProperty].isText;
@@ -174,29 +211,66 @@ let PerRowIndicatorChannel = React.createClass({
     if (!canvas)
       return;
     const ctx = canvas.getContext('2d');
-    const psy = (HEIGHT / 2) - 4;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
     ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillStyle = 'rgba(255,0,0,0.6)';
-    for (let i = 0, l = positions.length; i < l; ++i) {
-      const psx = ((width - sideWidth) / (end - start)) * (positions[i] - start);
-      if (psx > -4 && psx < width + 4) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px Roboto';
+    let psy = (HEIGHT / 2) - 12;
+    const scaleFactor = ((width - sideWidth) / (end - start));
+    this.tooBigBlocks.forEach((block) => {
+      const pixelStart = scaleFactor * (block._blockStart - start);
+      const pixelSize = scaleFactor * ( block._blockSize);
+      const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth)/2 : pixelStart + (pixelSize/2);
+      this.hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
+      if (pixelSize > 100) {
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 6;
+        ctx.lineJoin = "miter"; //Prevent letters with tight angles making spikes
+        ctx.miterLimit = 2;
+        ctx.strokeText('Zoom in', textPos, psy + 12);
+        ctx.fillText('Zoom in', textPos, psy + 12);
+        ctx.restore();
+      }
+    });
+    ctx.restore();
+    //Triangles/Lines
+    psy = (HEIGHT / 2) - 6;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
+    const numPositions = positions.length;
+    const triangleMode = numPositions < (width - sideWidth);
+    for (let i = 0, l = numPositions; i < l; ++i) {
+      const psx = scaleFactor * (positions[i] - start);
+      if (psx > -6 && psx < width + 6) {
         if (colours) {
-          ctx.fillStyle = colours[i];
+          if (triangleMode) {
+            ctx.fillStyle = coloursTranslucent[i];
+          } else {
+            ctx.strokeStyle = colours[i];
+          }
           if (recordColours) {
             drawnColourVals.add(colourData[i]);
           }
         }
-
         ctx.beginPath();
         ctx.moveTo(psx, psy);
-        ctx.lineTo(psx + 6, psy + 12);
-        ctx.lineTo(psx - 6, psy + 12);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        if (triangleMode) {
+          ctx.lineTo(psx + 6, psy + 12);
+          ctx.lineTo(psx - 6, psy + 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.lineTo(psx, psy + 12);
+          ctx.stroke();
+        }
       }
     }
+    //Record drawn values for legend
     drawnColourVals = Array.from(drawnColourVals.values());
     if (recordColours) {
       if (!_isEqual(this.state.knownValues, drawnColourVals)) {
@@ -206,7 +280,7 @@ let PerRowIndicatorChannel = React.createClass({
       this.setState({knownValues: null});
     }
 
-    },
+  },
 
   render() {
     let {width, sideWidth, table, colourProperty} = this.props;
