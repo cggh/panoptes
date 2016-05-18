@@ -12,8 +12,6 @@ import Icon from 'ui/Icon';
 
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
-import 'start-tab.scss';
-
 let StartTab = React.createClass({
   mixins: [
     PureRenderMixin,
