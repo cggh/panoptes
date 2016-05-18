@@ -4,6 +4,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import Color from 'color';
 
 import _map from 'lodash/map';
 import _isEqual from 'lodash/isEqual';
@@ -164,6 +165,8 @@ let PerRowIndicatorChannel = React.createClass({
       this.colourData = this.combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+      this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
+      this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.4).rgbString());
     } else {
       this.colourVals = null;
       this.colourData = null;
@@ -200,6 +203,7 @@ let PerRowIndicatorChannel = React.createClass({
     const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
     const positions = this.positions;
     const colours = this.colourVals;
+    const coloursTranslucent = this.colourValsTranslucent;
     const colourData = this.colourData;
     let drawnColourVals = new Set();
     const recordColours = colourProperty && this.config.tables[table].propertiesMap[colourProperty].isText;
@@ -214,41 +218,56 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.textBaseline = 'middle';
     ctx.font = '14px Roboto';
     let psy = (HEIGHT / 2) - 12;
+    const scaleFactor = ((width - sideWidth) / (end - start));
     this.tooBigBlocks.forEach((block) => {
-      const blockStart = ((width - sideWidth) / (end - start)) * (block._blockStart - start);
-      const blockSize = ((width - sideWidth) / (end - start)) * ( block._blockSize);
-      this.hatchRect(ctx, blockStart, psy, blockSize, 24, 5);
-      ctx.save();
-      ctx.fillStyle = 'black';
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 4;
-      ctx.lineJoin = "miter"; //Prevent letters with tight angles making spikes
-      ctx.miterLimit = 2;
-      ctx.strokeText('Too many points', blockStart + (blockSize/2), psy + 12);
-      ctx.fillText('Too many points', blockStart + (blockSize/2), psy + 12);
-      ctx.restore();
+      const pixelStart = scaleFactor * (block._blockStart - start);
+      const pixelSize = scaleFactor * ( block._blockSize);
+      const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth)/2 : pixelStart + (pixelSize/2);
+      this.hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
+      if (pixelSize > 100) {
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 6;
+        ctx.lineJoin = "miter"; //Prevent letters with tight angles making spikes
+        ctx.miterLimit = 2;
+        ctx.strokeText('Zoom in', textPos, psy + 12);
+        ctx.fillText('Zoom in', textPos, psy + 12);
+        ctx.restore();
+      }
     });
     ctx.restore();
-    //Triangles
+    //Triangles/Lines
     psy = (HEIGHT / 2) - 6;
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillStyle = 'rgba(255,0,0,0.6)';
-    for (let i = 0, l = positions.length; i < l; ++i) {
-      const psx = ((width - sideWidth) / (end - start)) * (positions[i] - start);
-      if (psx > -4 && psx < width + 4) {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
+    const numPositions = positions.length;
+    const triangleMode = numPositions < (width - sideWidth);
+    for (let i = 0, l = numPositions; i < l; ++i) {
+      const psx = scaleFactor * (positions[i] - start);
+      if (psx > -6 && psx < width + 6) {
         if (colours) {
-          ctx.fillStyle = colours[i];
+          if (triangleMode) {
+            ctx.fillStyle = coloursTranslucent[i];
+          } else {
+            ctx.strokeStyle = colours[i];
+          }
           if (recordColours) {
             drawnColourVals.add(colourData[i]);
           }
         }
         ctx.beginPath();
         ctx.moveTo(psx, psy);
-        ctx.lineTo(psx + 6, psy + 12);
-        ctx.lineTo(psx - 6, psy + 12);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        if (triangleMode) {
+          ctx.lineTo(psx + 6, psy + 12);
+          ctx.lineTo(psx - 6, psy + 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.lineTo(psx, psy + 12);
+          ctx.stroke();
+        }
       }
     }
     //Record drawn values for legend
