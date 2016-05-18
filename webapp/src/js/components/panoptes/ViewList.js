@@ -44,6 +44,10 @@ let ViewList = React.createClass({
         <List style={this.props.style}>
           <Subheader>Open a view:</Subheader>
           {datasetManagerListItem}
+          <ListItem primaryText="Genome Browser"
+                    secondaryText="View table data and sequence data on the genome"
+                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
+                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})} />
           <ListItem primaryText="Plot"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
