@@ -345,8 +345,6 @@ console.log('fetchImportStatusData database: ' + database);
 
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 
-  // FIXME: ascending on the server means descending!?!
-
   return pageQuery(
     {
       database: 'datasetindex',
