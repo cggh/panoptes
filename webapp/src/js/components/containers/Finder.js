@@ -69,7 +69,6 @@ let Finder = React.createClass({
   },
 
   render() {
-    // TODO: A vertical list is not entirely scalable (modal dialog would go off screen).
 
     let listItems = [];
 
