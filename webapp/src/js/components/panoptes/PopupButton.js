@@ -8,12 +8,12 @@ const componentTranslation = {
   ItemMap: 'containers/MapWithActions',
   Tree: 'containers/TreeWithActions',
   Plot: 'containers/PlotWithActions'
-}
+};
 
 let PopupButton = React.createClass({
   mixins: [
     PureRenderMixin,
-    FluxMixin,
+    FluxMixin
   ],
 
   propTypes: {
