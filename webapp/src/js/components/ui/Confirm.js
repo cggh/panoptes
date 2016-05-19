@@ -24,7 +24,8 @@ let Confirm = React.createClass({
       message: 'Are you sure?',
       cancelButtonLabel: 'Cancel',
       confirmButtonLabel: 'Confirm',
-      onCancel: function() {} // TODO: this.getFlux().actions.session.modalClose();
+      onCancel: function() {},
+      onConfirm: function() {}
     };
   },
 
@@ -36,24 +37,34 @@ let Confirm = React.createClass({
     return 'exclamation-triangle';
   },
 
+  handleCancel() {
+    this.props.onCancel();
+    this.getFlux().actions.session.modalClose();
+  },
+
+  handleConfirm() {
+    this.props.onConfirm();
+    this.getFlux().actions.session.modalClose();
+  },
+
   render() {
-    let {message, cancelButtonLabel, confirmButtonLabel, onCancel, onConfirm} = this.props;
+    let {message, cancelButtonLabel, confirmButtonLabel} = this.props;
     return (
       <div style={{padding: '10px'}}>
-        <div>{message}</div>
-        <div className="centering-container">
+        <div style={{padding: '10px'}}>{message}</div>
+        <div style={{textAlign: 'center'}}>
           <RaisedButton
             style={{marginRight: '10px'}}
             label={confirmButtonLabel}
             primary={true}
             icon={<Icon name="check" inverse={true} />}
-            onClick={onConfirm}
+            onClick={this.handleConfirm}
           />
           <FlatButton
             label={cancelButtonLabel}
             primary={false}
             icon={<Icon name="close" inverse={false} />}
-            onClick={onCancel}
+            onClick={this.handleCancel}
           />
         </div>
       </div>
