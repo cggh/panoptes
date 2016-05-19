@@ -114,7 +114,7 @@ function pageQuery(options) {
       qry: query,
       collist: LZString.compressToEncodedURIComponent(collist),
       order: order,
-      sortreverse: ascending ? '1' : '0',
+      sortreverse: ascending ? '0' : '1',
       needtotalcount: count ? '1' : '0',
       limit: `${start}~${stop}`,
       distinct: distinct ? '1' : '0'
@@ -343,10 +343,6 @@ console.log('fetchImportStatusData database: ' + database);
                  'scope': 'GN'
   };
 
-
-  // fetcher._maxResultCount = 20;
-  // fetcher._sortReverse = true;
-
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 
   // FIXME: ascending on the server means descending!?!
@@ -358,13 +354,13 @@ console.log('fetchImportStatusData database: ' + database);
       columns: columns,
       query: query,
       order: 'timestamp',
-      ascending: true
+      ascending: false
     }
   );
 }
 
 
-function loadDataset(dataset) {
+function importDataset(dataset) {
   return requestJSON({
 
 //datatype=custom&respmodule=panoptesserver&respid=fileload_dataset&ScopeStr=all&SkipTableTracks=false&datasetid=Samples_and_Variants'
@@ -397,5 +393,5 @@ module.exports = {
   findGenesInRegion,
   fetchGene,
   fetchImportStatusData,
-  loadDataset
+  importDataset
 };
