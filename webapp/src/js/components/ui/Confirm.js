@@ -52,7 +52,7 @@ let Confirm = React.createClass({
     return (
       <div style={{padding: '10px'}}>
         <div style={{padding: '10px'}}>{message}</div>
-        <div style={{textAlign: 'center'}}>
+        <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
           <RaisedButton
             style={{marginRight: '10px'}}
             label={confirmButtonLabel}
