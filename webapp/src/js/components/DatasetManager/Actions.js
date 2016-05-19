@@ -22,6 +22,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 // Panoptes components
 import DatasetImportStatusView from 'DatasetImportStatus/View';
+import API from 'panoptes/API';
 
 let DatasetManagerActions = React.createClass({
 
@@ -50,7 +51,7 @@ console.log('handleReloadConfig');
   },
 
   handleReimport() {
-console.log('handleReimport');
+    API.importDataset(this.config.dataset);
   },
 
   render() {

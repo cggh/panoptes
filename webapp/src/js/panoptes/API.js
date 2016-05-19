@@ -361,8 +361,6 @@ console.log('fetchImportStatusData database: ' + database);
 function importDataset(dataset) {
   return requestJSON({
 
-//datatype=custom&respmodule=panoptesserver&respid=fileload_dataset&ScopeStr=all&SkipTableTracks=false&datasetid=Samples_and_Variants'
-
     params: {
       datatype: 'custom',
       respmodule: 'panoptesserver',
