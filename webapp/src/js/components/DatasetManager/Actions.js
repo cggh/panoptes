@@ -14,7 +14,8 @@ import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
-import HelloWorld from 'ui/HelloWorld';
+import ConfirmButton from 'ui/ConfirmButton';
+
 
 // Material UI components
 import FlatButton from 'material-ui/FlatButton';
@@ -46,12 +47,10 @@ let DatasetManagerActions = React.createClass({
 
   handleReloadConfig() {
 console.log('handleReloadConfig');
-    this.getFlux().actions.session.modalOpen('ui/HelloWorld', {msg: 'Are you sure?'});
   },
 
   handleReimport() {
 console.log('handleReimport');
-    this.getFlux().actions.session.modalOpen('ui/HelloWorld', {msg: 'Are you sure?'});
   },
 
   render() {
@@ -65,17 +64,18 @@ console.log('handleReimport');
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={'Import and configure the ' + this.config.settings.name + ' dataset'} />
-        <FlatButton label="Reload config only"
-                    primary={true}
-                    onClick={() => this.handleReloadConfig()}
-                      icon={<Icon fixedWidth={true} name={'cogs'} />}
+        <ConfirmButton label="Reload config only"
+                       primary={true}
+                       icon={<Icon fixedWidth={true} name={'cogs'} />}
+                       message={'Are you sure you want to reload the configuration for the ' + this.config.settings.name + ' dataset?'}
+                       onConfirm={() => this.handleReloadConfig()}
         />
-        <FlatButton label="Reimport everything"
-                    primary={true}
-                    onClick={() => this.handleReimport()}
-                      icon={<Icon fixedWidth={true} name={'refresh'} />}
+        <ConfirmButton label="Reimport everything"
+                       primary={true}
+                       icon={<Icon fixedWidth={true} name={'refresh'} />}
+                       message={'Are you sure you want to reimport everything for the ' + this.config.settings.name + ' dataset?'}
+                       onConfirm={() => this.handleReimport()}
         />
-
       </div>
     );
 
