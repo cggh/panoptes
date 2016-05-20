@@ -1,22 +1,30 @@
 import React from 'react';
+import Sidebar from 'react-sidebar';
+import scrollbarSize from 'scrollbar-size';
+
+// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-import SQL from 'panoptes/SQL';
-
+// Material UI
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
 
+import Icon from 'ui/Icon';
+
+// Panoptes
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
-import Sidebar from 'react-sidebar';
-import scrollbarSize from 'scrollbar-size';
+import SQL from 'panoptes/SQL';
 
+// Containers
+import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
+import StoredTableQueries from 'containers/StoredTableQueries';
 
 let QueryPicker = React.createClass({
   mixins: [
@@ -60,7 +68,7 @@ let QueryPicker = React.createClass({
     return 'filter';
   },
   title() {
-    return `Pick Filter for ${this.config.tableNamePlural}`;
+    return `Pick filter for ${this.config.tableNamePlural}`;
   },
 
   handleEnter() {
@@ -68,11 +76,35 @@ let QueryPicker = React.createClass({
   },
   handlePick() {
     this.props.onPick(this.state.query);
+
+    // Add query to list of recently used queries for this table.
+    this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
+
   },
   handleQueryChange(newQuery) {
     this.setState({
       query: newQuery
     });
+  },
+  handleUseQuery(query) {
+    this.props.onPick(query);
+
+    // Add query to list of recently used queries for this table.
+    this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
+
+  },
+  handleSetQueryAsDefault() {
+    //TODO
+console.log('handleSetAsDefault');
+  },
+  handleStoreQuery() {
+    //TODO
+console.log('handleStore');
+
+    // TODO: transfer this to persistent storage.
+    // Add query to list of stored queries for this table.
+    this.getFlux().actions.session.tableQueryStore(this.props.table, this.state.query);
+
   },
 
   render() {
@@ -81,14 +113,14 @@ let QueryPicker = React.createClass({
     return (
       <div className="large-modal query-picker">
         <Sidebar
-          styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
+          styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
           docked={true}
           transitions={false}
           touch={false}
           sidebar={(
           <div>
             <List>
-              <ListItem primaryText="Default"
+              <ListItem primaryText="Default filter"
                         secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(defaultQuery)}
@@ -98,7 +130,7 @@ let QueryPicker = React.createClass({
                         }
                         }/>
               <Divider />
-              <ListItem primaryText="Previous"
+              <ListItem primaryText="Previous filter"
                         secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={lastQuery}/></p>}
                         secondaryTextLines={2}
                         onClick={() => this.handleQueryChange(lastQuery)}
@@ -107,19 +139,11 @@ let QueryPicker = React.createClass({
                           this.handlePick();
                         }
                         }/>
-              <Divider />
             </List>
-            <List>
-              <Subheader>Stored Filters</Subheader>
-              <ListItem primaryText="Blue widgets"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query}/></p>}
-                        secondaryTextLines={2}
-                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
-              <ListItem primaryText="Yellow birds"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query}/></p>}
-                        secondaryTextLines={2}
-                        rightIconButton={<IconButton tooltip="Replace" iconClassName="fa fa-times"/>}                        />
-            </List>
+            <Divider />
+            <StoredTableQueries table={table} onSelectQuery={this.handleQueryChange} />
+            <Divider />
+            <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleUseQuery} />
           </div>
         )}>
         <div className="vertical stack">
@@ -130,13 +154,23 @@ let QueryPicker = React.createClass({
             <QueryString className="text" prepend="" table={table} query={query}/>
           </div>
           <div className="centering-container">
-            <RaisedButton label="Set as Default"
-                          onClick={this.handlePick}/>
-            <RaisedButton label="Store"
-                          onClick={this.handlePick}/>
-            <RaisedButton label="Use"
-                          primary={true}
-                          onClick={this.handlePick}/>
+            <RaisedButton
+              label="Set as Default"
+              onClick={this.handleSetQueryAsDefault}
+              icon={<Icon fixedWidth={true} name={'anchor'} />}
+              style={{marginRight: '20px'}}
+            />
+            <RaisedButton
+              label="Store"
+              onClick={this.handleStoreQuery}
+              icon={<Icon fixedWidth={true} name={'archive'} />}
+              style={{marginRight: '20px'}}
+            />
+            <RaisedButton
+              label="Use"
+              primary={true}
+              onClick={this.handlePick}
+            />
 
           </div>
         </div>
@@ -150,5 +184,3 @@ let QueryPicker = React.createClass({
 });
 
 module.exports = QueryPicker;
-
-

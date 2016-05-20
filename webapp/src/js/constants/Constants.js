@@ -22,7 +22,9 @@ let session = keyMirror({
   TAB_OPEN: null,
   TAB_POP_OUT: null,
   TAB_SWITCH: null,
-  GENE_FOUND: null
+  GENE_FOUND: null,
+  TABLE_QUERY_USED: null,
+  TABLE_QUERY_STORE: null
 });
 
 let panoptes = keyMirror({

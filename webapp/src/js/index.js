@@ -55,7 +55,9 @@ function getAppState(location) {
         state: {}
       },
       modal: {},
-      foundGenes: []
+      foundGenes: [],
+      usedTableQueries: [],
+      storedTableQueries: [] // TODO: transfer this to persistent storage.
     }
   };
   if (match)
@@ -187,6 +189,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
+
     ReactDOM.render(
       <div>
         <Loading status="done"/>

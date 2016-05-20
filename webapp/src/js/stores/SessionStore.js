@@ -28,7 +28,9 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
-      SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound)
+      SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
+      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed),
+      SESSION.TABLE_QUERY_STORE, this.emitIfNeeded(this.tableQueryStore) // TODO: transfer this to persistent storage.
     );
   },
 
@@ -180,6 +182,17 @@ let SessionStore = Fluxxor.createStore({
   geneFound(payload) {
     let {geneId} = payload;
     this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
+  },
+
+  tableQueryUsed(payload) {
+console.log('tableQueryUsed payload %o', payload);
+    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('tableQueryUsed usedTableQuery %o', usedTableQuery); return (usedTableQuery.table !==  payload.table && usedTableQuery.query !==  payload.query); }).push({table: payload.table, query: payload.query}));
+  },
+
+  // TODO: transfer this to persistent storage.
+  tableQueryStore(payload) {
+    let {table, query} = payload;
+    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.table !== table && storedTableQuery.query !== query)).push({table: table, query: query}));
   }
 
 });
