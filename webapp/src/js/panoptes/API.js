@@ -373,6 +373,22 @@ function importDataset(dataset) {
   }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
+
+function importDatasetConfig(dataset) {
+  return requestJSON({
+
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'fileload_dataset',
+      ScopeStr: 'none',
+      SkipTableTracks: 'true',
+      datasetid: dataset
+    }
+
+  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
+}
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -389,5 +405,6 @@ module.exports = {
   findGenesInRegion,
   fetchGene,
   fetchImportStatusData,
-  importDataset
+  importDataset,
+  importDatasetConfig
 };

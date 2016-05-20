@@ -47,11 +47,11 @@ let DatasetManagerActions = React.createClass({
   },
 
   handleReloadConfig() {
-console.log('handleReloadConfig');
+    //API.importDatasetConfig(this.config.dataset);
   },
 
   handleReimport() {
-    API.importDataset(this.config.dataset);
+    console.log(API.importDataset(this.config.dataset));
   },
 
   render() {
