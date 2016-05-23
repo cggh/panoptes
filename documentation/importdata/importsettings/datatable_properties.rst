@@ -50,25 +50,27 @@ CategoryColors
   Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).
   The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
 
-MaxColumnWidth
-  *Value.* Specifies the maximum width (in pixels) used for the column representing this property in a table view.
-  Longer text will be abbreviated with ellipsis.
+DefaultWidth
+  *Value.* Sets the deafult column width in pixels.(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
-BarWidth
-  *Value.* Draws a bar in the background of the table, indicating the value.
-  Requires *MinVal* & *MaxVal* to be defined(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+ShowBar
+  *Boolean.* Draws a bar in the background of the table, indicating the value.
+  Requires *MinVal* & *MaxVal* to be defined.(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
 MinVal
-  *Value.*  Default:0.  For *Value* types, upper extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+  *Value.* For *Value* types, upper extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
 MaxVal
-  *Value.*  Default:1.0.  For *Value* types, lower extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+  *Value.* For *Value* types, lower extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
 MaxLen
   *Value.*  Default:0.  If present used to specify the maximum size of the database column - otherwise it is calculated.
 
 DecimDigits
   *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+
+MaxDecimDigits
+  *Value.* (Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
 
 Index
   *Boolean.*  Default:False.  If set, instructs Panoptes to create an index for this property in the relational database.
@@ -104,11 +106,14 @@ CanUpdate
   *Boolean.*  Default:False.   If set to true, this property can be modified by the user. (*NOTE: under construction*).
 
 ShowInTable
-  *Boolean.* If set, this property will appear by default in data table grids in the application.
+  *Boolean.*  Default:True.  If set to false this property will not be available to be shown in tables in the application.
 
 ShowInBrowser
   *Boolean.* If set, this property will automatically appear as a track in the genome browser
   (only applies if *IsPositionOnGenome* is specified in database settings).
+
+TableDefaultVisible
+  *Boolean.*  Default:True.  If set to true (default) then this property will appear in tables when they are first shown.
 
 BrowserDefaultVisible
   *Boolean.* Indicates that the track will activated by default in the genome browser (only applies if *ShowInBrowser* is True).

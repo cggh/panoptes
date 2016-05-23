@@ -68,6 +68,9 @@ FetchRecordCount
 QuickFindFields
   *PropertyIDs.* The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s).
 
+ColumnIndexField
+  *Text.* When this table is linked to a 2D data table setting this value to the same as that in the 2D settings provides a performance improvement for large data sets.
+
 DisableSubsets
   *Boolean.* If set, there will be no subsets options for this data table.
 
@@ -91,7 +94,7 @@ PropertyGroups
 AutoScanProperties - deprecated - please use scripts/mksettings.sh to generate a skeleton settings.gen file and use that to create a settings file
 .. _Properties:
 Properties
-  *List.* Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.
+  *List (required).* Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.
   See :ref:`def-settings-datatable-properties` settings for an overview of the keys that can be used for each property in this list.
 
 DataItemViews
