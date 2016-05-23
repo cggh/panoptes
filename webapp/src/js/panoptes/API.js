@@ -326,11 +326,8 @@ function fetchGene(options) {
 
 function fetchImportStatusData(options) {
 
-  assertRequired(options, ['database']);
-  let {database} = options;
-
-// TODO: only get logs for this dataset (database)
-console.log('fetchImportStatusData database: ' + database);
+  assertRequired(options, ['dataset']);
+  let {dataset} = options;
 
   let columns = {'id': 'GN',
                  'user': 'GN',
@@ -342,6 +339,11 @@ console.log('fetchImportStatusData database: ' + database);
                  'failed': 'IN',
                  'scope': 'GN'
   };
+
+
+  // TODO: only get logs for this dataset
+  console.log('fetchImportStatusData dataset: ' + dataset);
+  //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
 
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 

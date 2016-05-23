@@ -23,7 +23,7 @@ import Icon from 'ui/Icon';
 // Material UI
 import {List, ListItem} from 'material-ui/List';
 
-let DatasetImportStatusView = React.createClass({
+let DatasetImportStatusViewList = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -43,7 +43,7 @@ let DatasetImportStatusView = React.createClass({
   fetchData(props, requestContext) {
     this.setState({loadStatus: 'loading'});
     let APIargs = {
-      database: this.config.dataset
+      dataset: this.config.dataset
     };
     requestContext.request((componentCancellation) =>
         LRUCache.get(
@@ -67,11 +67,10 @@ let DatasetImportStatusView = React.createClass({
       });
   },
 
-
-  handleClickImportStatus(e, id) {
-console.log('handleClickImportStatus id' + id)
+  handleClickImportStatus(id, title, icon) {
+    let switchTo = true;
+    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ViewItem', {id, title, icon}, switchTo);
   },
-
 
   render() {
     let {loadStatus, rows} = this.state;
@@ -95,7 +94,7 @@ console.log('handleClickImportStatus id' + id)
                 iconSpin = true;
                 iconStyle = {color: '#2196f3'};
               } else {
-                console.log('unhandled icon status');
+                console.error('unhandled icon status');
               }
 
               // row.scope
@@ -104,7 +103,7 @@ console.log('handleClickImportStatus id' + id)
                         primaryText={<div><span>{row.status}</span></div>}
                         secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
                         leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
-                        onClick={(e) => this.handleClickImportStatus(e, row.id)}
+                        onClick={(e) => this.handleClickImportStatus(row.id, row.name, iconName)}
                         secondaryTextLines={2}
               />;
             })}
@@ -116,4 +115,4 @@ console.log('handleClickImportStatus id' + id)
 
 });
 
-module.exports = DatasetImportStatusView;
+module.exports = DatasetImportStatusViewList;

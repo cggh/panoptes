@@ -21,7 +21,7 @@ import ConfirmButton from 'ui/ConfirmButton';
 import FlatButton from 'material-ui/FlatButton';
 
 // Panoptes components
-import DatasetImportStatusView from 'DatasetImportStatus/View';
+import DatasetImportStatusViewList from 'DatasetImportStatus/ViewList';
 import API from 'panoptes/API';
 
 let DatasetManagerActions = React.createClass({
@@ -80,6 +80,8 @@ let DatasetManagerActions = React.createClass({
       </div>
     );
 
+    // FIXME: foo="bar"
+
     return (
       <Sidebar
         styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
@@ -95,7 +97,7 @@ let DatasetManagerActions = React.createClass({
             <span className="block text">Status logs</span>
           </div>
           <div className="grow">
-                <DatasetImportStatusView foo="bar" />
+                <DatasetImportStatusViewList foo="bar" />
           </div>
         </div>
       </Sidebar>
