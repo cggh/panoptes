@@ -55,6 +55,7 @@
     "console-polyfill": "^0.2.2",
     "d3": "^3.5.17",
     "esprima": "^2.7.2",
+    "datastream": "^1.0.0",
     "fixed-data-table": "^0.6.0",
     "fluxxor": "^1.7.3",
     "google-map-react": "^0.15.1",

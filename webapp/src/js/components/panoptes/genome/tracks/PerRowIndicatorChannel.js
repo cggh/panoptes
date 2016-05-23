@@ -18,6 +18,7 @@ import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
+import {hatchRect} from 'util/CanvasDrawing';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
@@ -124,18 +125,23 @@ let PerRowIndicatorChannel = React.createClass({
         database: this.config.dataset,
         table,
         columns: columnspec,
-        query,
+        query: SQL.WhereClause.encode(query),
         transpose: false,
+      };
+      let cacheArgs = {
+        method: 'pageQuery',
         regionField: tableConfig.position,
+        queryField: 'query',
+        limitField: 'end',
         start,
         end,
         blockLimit: 1000
       };
       requestContext.request((componentCancellation) =>
-        regionCacheGet(APIargs, componentCancellation)
+        regionCacheGet(APIargs, cacheArgs, componentCancellation)
           .then((blocks) => {
             this.props.onChangeLoadStatus('DONE');
-            this.applyData(this.props, blocks);
+            this.applyData(props, blocks);
           }))
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
@@ -144,7 +150,7 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
+          this.applyData(props, {});
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         });
     }
@@ -223,7 +229,7 @@ let PerRowIndicatorChannel = React.createClass({
       const pixelStart = scaleFactor * (block._blockStart - start);
       const pixelSize = scaleFactor * ( block._blockSize);
       const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth) / 2 : pixelStart + (pixelSize / 2);
-      this.hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
+      hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
       if (pixelSize > 100) {
         ctx.save();
         ctx.fillStyle = 'black';

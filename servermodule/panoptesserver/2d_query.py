@@ -216,6 +216,7 @@ def handler(start_response, request_data):
         sort_mode = None
 
 
+
     col_index_field = datatable + '_column_index'
     row_index_field = datatable + '_row_index'
     col_properties.append(col_index_field)
@@ -319,7 +320,9 @@ def handler(start_response, request_data):
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
-                        ('Content-Encoding', 'gzip')]
+                        ('Content-Encoding', 'gzip'),
+                        ('Access-Control-Allow-Origin', '*')
+                        ]
     start_response(status, response_headers)
     yield data
 

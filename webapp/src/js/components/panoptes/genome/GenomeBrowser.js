@@ -20,6 +20,7 @@ import LoadingIndicator from 'panoptes/genome/LoadingIndicator';
 import Controls from 'panoptes/genome/Controls';
 import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
 import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
+import GenotypesChannel from 'panoptes/genome/tracks/GenotypesChannel';
 import Background from 'panoptes/genome/Background';
 import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
@@ -316,6 +317,7 @@ let GenomeBrowser = React.createClass({
                         }
                         ).toList()
                         }
+                        <GenotypesChannel {...trackProps} table="diploid"/>
                       </div>
                     </div>
                   );
