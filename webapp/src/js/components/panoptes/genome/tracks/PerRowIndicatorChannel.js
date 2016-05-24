@@ -40,7 +40,8 @@ let PerRowIndicatorChannel = React.createClass({
         'sideWidth',
         'name',
         'table',
-        'colourProperty'
+        'colourProperty',
+        'query'
       ]
     }),
     ConfigMixin,
@@ -309,7 +310,8 @@ const PerRowIndicatorControls = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
-        'colourProperty'
+        'colourProperty',
+        'query'
       ],
       redirect: ['componentUpdate']
     }),
