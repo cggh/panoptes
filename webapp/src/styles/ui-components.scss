@@ -69,6 +69,9 @@
     .tab.inactive .action {
       visibility: hidden;
     }
+    .tab.dragging {
+      z-index: 9999;
+    }
     .icon {
       line-height: $tab-height;
       margin-left:  5px;

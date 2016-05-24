@@ -91,7 +91,8 @@ let TabbedArea = React.createClass({
     let classes = {
       tab: true,
       active: (id === this.props.activeTab),
-      inactive: (id !== this.props.activeTab)
+      inactive: (id !== this.props.activeTab),
+      dragging: (id === this.state.dragging)
     };
 
     let closeIcon = '';
@@ -117,7 +118,7 @@ let TabbedArea = React.createClass({
           key={id}
           defaultPosition={{x: 0, y: 0}}
           onStop={() => this.handleDragStop(id)}
-          onDrag={() => this.setState({dragging:true})}
+          onDrag={() => this.setState({dragging:id})}
         >
         {tabMarkup}
         </Draggable>
