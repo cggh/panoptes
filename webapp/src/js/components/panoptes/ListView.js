@@ -135,8 +135,7 @@ let ListView = React.createClass({
           <ItemTemplate config={this.config} table={table} primKey={primKey} data={row}>
             {itemTitle}
           </ItemTemplate>
-        )) : '';
-
+        )).toLowerCase() : '';
         if (search && content.indexOf(search) !== -1 || !search) {
           listItems.push(
             <ListItem className={className}
