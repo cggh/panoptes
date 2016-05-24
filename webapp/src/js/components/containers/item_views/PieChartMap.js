@@ -175,7 +175,11 @@ let PieChartMapTab = React.createClass({
   },
 
   handlePanZoom({center, zoom}) {
-    this.props.componentUpdate({center, zoom});
+    if (zoom != this.props.zoom ||
+      this.props.center.get('lat') != center.lat ||
+      this.props.center.get('lng') != center.lng) {
+      this.props.componentUpdate({center, zoom});
+    }
   },
 
   render() {
