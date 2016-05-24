@@ -157,7 +157,7 @@ let SequenceText = React.createClass({
     return <svg  viewBox={`0 ${-height / 2} ${width} ${height}`} width={width} height={height}>
       {sequence.slice(startIndex, endIndex).map(
         (char, i) => {
-          let pos = dataStart + ((i + startIndex) * dataStep) + 0.5;
+          let pos = dataStart + ((i + startIndex) * dataStep) + 1;
           return <text key={pos} x={scale(pos)}>{char}</text>;
         }
       )}
@@ -226,7 +226,7 @@ let SequenceSquares = React.createClass({
     let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
     let scale = d3.scale.linear().domain([start, end]).range([0, width]);
     let stepWidth = scale(dataStep) - scale(0);
-    let offset = scale(dataStart) - scale(start);
+    let offset = scale(dataStart + 0.5) - scale(start);
     return <canvas ref="canvas"
                    style={{transform: `translateX(${offset}px) scale(${stepWidth},${height})`}}
                    className={stepWidth < 1 ? '' : 'blocky'}
