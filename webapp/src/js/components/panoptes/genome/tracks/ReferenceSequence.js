@@ -247,10 +247,9 @@ let Legend = () =>
     ].map(([base, colour]) => (
      <LegendElement key={base} name={base} colour={colour} />
     ))}
+    <div style={{paddingLeft:'10px'}}>(Majority base over window)</div>
   </div>;
 Legend.shouldComponentUpdate = () => false;
 
 
 module.exports = ReferenceSequence;
-
-
