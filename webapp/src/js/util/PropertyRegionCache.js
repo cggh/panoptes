@@ -25,7 +25,7 @@ export function regionCacheGet(options, cancellation=null) {
   if (end < start) {
     throw Error('PropertyRegionCache, end must be >= start');
   }
-  const cacheKey = JSON.stringify({database, table, columns, query, regionField, blockLimit});
+  const cacheKey = JSON.stringify({database, table, columns, query: SQL.WhereClause.encode(query), regionField, blockLimit});
   //Find the 2 blocks that encapsulate us
   const {blockLevel, blockIndex, needNext} = findBlock(options);
   const blockSize = Math.pow(2.0, blockLevel);
@@ -68,7 +68,7 @@ export function regionCacheGet(options, cancellation=null) {
 
 function fetch(options, blockLevel, blockIndex, cancellation) {
   const {database, table, columns, query, regionField, blockLimit} = options;
-  const cacheKey = JSON.stringify({database, table, columns, query, regionField, blockLimit});
+  const cacheKey = JSON.stringify({database, table, columns, query: SQL.WhereClause.encode(query), regionField, blockLimit});
   const blockSize = Math.pow(2.0, blockLevel);
   const blockStart = blockSize * blockIndex;
   const combinedQuery = SQL.WhereClause.AND([query,
