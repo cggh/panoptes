@@ -180,7 +180,7 @@ let SessionStore = Fluxxor.createStore({
   geneFound(payload) {
     let {geneId} = payload;
     this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
-  },
+  }
   
 });
 

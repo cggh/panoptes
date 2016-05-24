@@ -1,4 +1,6 @@
 import _debounce from 'lodash/debounce';
+import { createHistory } from 'history';
+const history = createHistory();
 
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
@@ -97,6 +99,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       return state;
     };
     let lastState = getState();
+    //Store if state change was due to backbutton - if it was then don't store it again.
     let backbutton = null;
     let storeState = () => {
       if (backbutton) {
@@ -108,18 +111,27 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       if (!lastState.equals(newState)) {
         lastState = newState;
         API.storeData(newState.toJS()).then((resp) => {
-          window.history.pushState(newState.toJS(), `Panoptes: ${config.settings.name}`, `/${resp}`);
+          history.push({
+            state: newState.toJS(),
+            pathname: `/${resp}`
+          });
         });
       }
 
     };
-    storeState = _debounce(storeState, 200);
+    storeState = _debounce(storeState, 250);
     stores.SessionStore.on('change', storeState);
     stores.PanoptesStore.on('change', storeState);
 
-    window.addEventListener('popstate', (event) => {
-      backbutton = true;
-      stores.SessionStore.emit('change');
+    history.listen((location) => {
+      if (location.action === 'POP') {
+        let newState = Immutable.fromJS((location.state ? location.state.session : null) || getAppState(location.pathname).session);
+        if (!newState.equals(stores.SessionStore.state)) {
+          stores.SessionStore.state = newState;
+          backbutton = true;
+          stores.SessionStore.emit('change');
+        }
+      }
     });
 
     let actions = {
