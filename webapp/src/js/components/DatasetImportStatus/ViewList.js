@@ -69,6 +69,8 @@ let DatasetImportStatusViewList = React.createClass({
         )
       )
       .then((data) => {
+// FIXME: This data is old.
+console.log('# import statuses: ' + data.length);
         this.setState({
           loadStatus: 'loaded',
           rows: data
@@ -82,9 +84,9 @@ let DatasetImportStatusViewList = React.createClass({
       });
   },
 
-  handleClickImportStatus(id, title, icon) {
+  handleClickImportStatus(logId, title, icon) {
     let switchTo = true;
-    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ViewItem', {id, title, icon}, switchTo);
+    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ViewItem', {logId, title, icon}, switchTo);
   },
 
   render() {
@@ -118,7 +120,7 @@ let DatasetImportStatusViewList = React.createClass({
                         primaryText={<div><span>{row.status}</span></div>}
                         secondaryText={<div><span>{row.name}</span><br/><span>{row.user}</span><span>, </span><span>{row.timestamp}</span></div>}
                         leftIcon={<div><Icon fixedWidth={true} name={iconName} spin={iconSpin} style={iconStyle} /></div>}
-                        onClick={(e) => this.handleClickImportStatus(row.id, row.name, iconName)}
+                        onClick={(e) => this.handleClickImportStatus(row.id, row.name + ' - ' + row.timestamp, iconName)}
                         secondaryTextLines={2}
               />;
             })}

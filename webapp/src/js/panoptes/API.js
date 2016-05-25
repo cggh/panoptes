@@ -360,6 +360,22 @@ function fetchImportStatusData(options) {
 }
 
 
+function fetchImportStatusLog(options) {
+  assertRequired(options, ['logId']);
+  let {logId} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'getcalculationlog',
+      id: logId
+    }
+  })
+    .then((data) => data.Content);
+}
+
 function importDataset(dataset) {
   return requestJSON({
 
@@ -384,6 +400,7 @@ function importDatasetConfig(dataset) {
       respmodule: 'panoptesserver',
       respid: 'fileload_dataset',
       ScopeStr: 'none',
+      SkipTableTracks: 'false',
       datasetid: dataset
     }
 
@@ -406,6 +423,7 @@ module.exports = {
   findGenesInRegion,
   fetchGene,
   fetchImportStatusData,
+  fetchImportStatusLog,
   importDataset,
   importDatasetConfig
 };

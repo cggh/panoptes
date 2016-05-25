@@ -48,11 +48,12 @@ let DatasetManagerActions = React.createClass({
 
   handleReloadConfig() {
     API.importDatasetConfig(this.config.dataset);
+    // The import status logs should refresh every refreshMilliseconds.
   },
 
   handleReimport() {
     API.importDataset(this.config.dataset);
-    // TODO: reload the status logs
+    // The import status logs should refresh every refreshMilliseconds.
   },
 
   render() {
@@ -80,8 +81,6 @@ let DatasetManagerActions = React.createClass({
         />
       </div>
     );
-
-    // FIXME: foo="bar"
 
     return (
       <Sidebar
