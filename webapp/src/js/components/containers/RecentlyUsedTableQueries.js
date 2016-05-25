@@ -42,8 +42,6 @@ let RecentlyUsedTableQueries = React.createClass({
     let {table} = this.props;
     let {usedTableQueries} = this.state;
 
-console.log('render usedTableQueries %o', usedTableQueries);
-
     let usedTableQueriesList = null;
 
     if (usedTableQueries.size > 0) {
@@ -55,14 +53,14 @@ console.log('render usedTableQueries %o', usedTableQueries);
         let usedTableQuery = usedTableQueries.get(i);
 
         // TODO: prefilter these by table
-        if (usedTableQuery.table === table) {
+        if (usedTableQuery.get('table') === table) {
 
           let usedTableQueriesListItem = (
             <ListItem key={'usedTableQueriesListItem' + i}
                       primaryText={'Recent ' + i}
-                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.query}/></p>}
+                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.get('query')}/></p>}
                       secondaryTextLines={2}
-                      onClick={(e) => this.handleClick(e, usedTableQuery.query)}
+                      onClick={(e) => this.handleClick(e, usedTableQuery.get('query'))}
             />
           );
 

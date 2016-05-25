@@ -9,10 +9,15 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
 
 // Panoptes
 import QueryString from 'panoptes/QueryString';
 
+import Icon from 'ui/Icon';
 
 let StoredTableQueries = React.createClass({
   mixins: [
@@ -39,6 +44,12 @@ let StoredTableQueries = React.createClass({
     this.props.onSelectQuery(query);
   },
 
+  handleNameChange(storedQueryIndex) {
+//TODO
+console.log('handleNameChange storedQueryIndex: ' + storedQueryIndex);
+console.log('handleNameChange storedTableQueries.get(storedQueryIndex): %o', this.state.storedTableQueries.get(storedQueryIndex));
+  },
+
   render() {
     let {table} = this.props;
     let {storedTableQueries} = this.state;
@@ -49,23 +60,43 @@ let StoredTableQueries = React.createClass({
 
       let storedTableQueriesListItems = [];
 
+      const iconButtonElement = (
+        <IconButton
+          tooltip="more"
+          tooltipPosition="bottom-left"
+        >
+          <MoreVertIcon />
+        </IconButton>
+      );
+
+      const rightIconMenu = (
+        <IconMenu iconButtonElement={iconButtonElement}>
+          <MenuItem>Reply</MenuItem>
+          <MenuItem>Forward</MenuItem>
+          <MenuItem iconClassName="fa fa-trash-o">Delete</MenuItem>
+        </IconMenu>
+      );
+
       for (let i = 0, len = storedTableQueries.size; i < len; i++) {
 
         let storedTableQuery = storedTableQueries.get(i);
 
-console.log('storedTableQuery.table: ' + storedTableQuery.table);
-console.log('table: ' + table);
-
         // TODO: prefilter these by table
-        if (storedTableQuery.table === table) {
+        if (storedTableQuery.get('table') === table) {
 
           let storedTableQueriesListItem = (
             <ListItem key={'storedTableQueriesListItem' + i}
-                      primaryText={'Stored ' + i}
-                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.query}/></p>}
+                      primaryText={<TextField
+                        id={'storedTableQuery_' + i}
+                        value={'Filter ' + i}
+                        onChange={this.handleNameChange(i)}
+                      />}
+                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')}/></p>}
                       secondaryTextLines={2}
-                      onClick={(e) => this.handleClick(e, storedTableQuery.query)}
-                      rightIconButton={<IconButton tooltip="Delete" iconClassName="fa fa-trash-o"/>}
+                      onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
+                      FArightIconButton={<IconButton tooltip="Delete" iconClassName="fa fa-trash-o"/>}
+                      leftIcon={<Icon fixedWidth={true} name={'save'} />}
+                      rightIconButton={rightIconMenu}
             />
           );
 
@@ -77,7 +108,7 @@ console.log('table: ' + table);
 
       storedTableQueriesList = (
         <List>
-          <Subheader>Stored filters</Subheader>
+          <Subheader>Saved filters</Subheader>
           {storedTableQueriesListItems}
         </List>
       );
@@ -85,7 +116,7 @@ console.log('table: ' + table);
     } else {
       storedTableQueriesList = (
         <List>
-          <Subheader>No stored filters.</Subheader>
+          <Subheader>No saved filters.</Subheader>
         </List>
       );
     }

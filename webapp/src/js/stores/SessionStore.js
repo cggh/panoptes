@@ -186,13 +186,13 @@ let SessionStore = Fluxxor.createStore({
 
   tableQueryUsed(payload) {
 console.log('tableQueryUsed payload %o', payload);
-    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('tableQueryUsed usedTableQuery %o', usedTableQuery); return (usedTableQuery.table !==  payload.table && usedTableQuery.query !==  payload.query); }).push({table: payload.table, query: payload.query}));
+    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('tableQueryUsed usedTableQuery %o', usedTableQuery); return (usedTableQuery.table !==  payload.table && usedTableQuery.query !==  payload.query); }).push(Immutable.fromJS({table: payload.table, query: payload.query})));
   },
 
   // TODO: transfer this to persistent storage.
   tableQueryStore(payload) {
     let {table, query} = payload;
-    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.table !== table && storedTableQuery.query !== query)).push({table: table, query: query}));
+    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.table !== table && storedTableQuery.query !== query)).push(Immutable.fromJS({table: table, query: query})));
   }
 
 });

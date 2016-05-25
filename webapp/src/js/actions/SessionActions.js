@@ -72,6 +72,7 @@ let SessionActions = {
     });
   },
   tableQueryUsed(table, query) {
+console.log('tableQueryUsed');
     this.dispatch(SESSION.TABLE_QUERY_USED, {
       table: table,
       query: query

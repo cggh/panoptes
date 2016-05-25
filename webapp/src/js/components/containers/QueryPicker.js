@@ -75,7 +75,11 @@ let QueryPicker = React.createClass({
     this.handlePick();
   },
   handlePick() {
+console.log('handlePick');
     this.props.onPick(this.state.query);
+
+    // Remember the last query.
+    this.getFlux().store('PanoptesStore').setLastQuery(this.props.table, this.props.initialQuery);
 
     // Add query to list of recently used queries for this table.
     this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
@@ -86,15 +90,15 @@ let QueryPicker = React.createClass({
       query: newQuery
     });
   },
-  handleUseQuery(query) {
-    this.props.onPick(query);
-
-    // Add query to list of recently used queries for this table.
-    this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
-
-  },
   handleSetQueryAsDefault() {
-    //TODO
+    //TODO: The default query comes from the config,
+    // i.e. this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table)
+    // Should this be writing to the config, or does it mean something else?
+
+    // servermodule/panoptesserver/update_default_query.py
+
+    this.getFlux().store('PanoptesStore').setDefaultQuery(this.props.table, this.state.query);
+
 console.log('handleSetAsDefault');
   },
   handleStoreQuery() {
@@ -104,6 +108,8 @@ console.log('handleStore');
     // TODO: transfer this to persistent storage.
     // Add query to list of stored queries for this table.
     this.getFlux().actions.session.tableQueryStore(this.props.table, this.state.query);
+
+    this.getFlux().store('PanoptesStore').setStoredQuery(this.props.table, this.state.query);
 
   },
 
@@ -143,7 +149,7 @@ console.log('handleStore');
             <Divider />
             <StoredTableQueries table={table} onSelectQuery={this.handleQueryChange} />
             <Divider />
-            <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleUseQuery} />
+            <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleQueryChange} />
           </div>
         )}>
         <div className="vertical stack">
@@ -151,7 +157,7 @@ console.log('handleStore');
             <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
           </div>
           <div className="centering-container">
-            <QueryString className="text" prepend="" table={table} query={query}/>
+            <QueryString className="text" prepend="Filter: " table={table} query={query}/>
           </div>
           <div className="centering-container">
             <RaisedButton
@@ -161,15 +167,16 @@ console.log('handleStore');
               style={{marginRight: '20px'}}
             />
             <RaisedButton
-              label="Store"
+              label="Save"
               onClick={this.handleStoreQuery}
-              icon={<Icon fixedWidth={true} name={'archive'} />}
+              icon={<Icon fixedWidth={true} name={'save'} />}
               style={{marginRight: '20px'}}
             />
             <RaisedButton
               label="Use"
               primary={true}
               onClick={this.handlePick}
+              icon={<Icon fixedWidth={true} name={'check'} inverse={true} />}
             />
 
           </div>

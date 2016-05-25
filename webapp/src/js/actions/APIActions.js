@@ -36,7 +36,7 @@ let APIActions = {
             action: {
               label: 'Open admin',
               callback: function() {
-                window.open('admin.html', '_blank');
+                window.open('admin.html', '_blank'); // FIXME: Cannot GET /admin.html
               }
             }
           };
