@@ -38,6 +38,10 @@ let DatasetManagerActions = React.createClass({
     sidebar: React.PropTypes.bool
   },
 
+  getDefaultProps() {
+    return {sidebar: true};
+  },
+
   icon() {
     return 'database';
   },
