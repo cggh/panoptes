@@ -83,7 +83,6 @@ let DatasetImportStatusListView = React.createClass({
 
   render() {
     let {loadStatus, rows} = this.state;
-
     return (
       <div>
         <List>
@@ -103,7 +102,10 @@ let DatasetImportStatusListView = React.createClass({
                 iconSpin = true;
                 iconStyle = {color: '#2196f3'};
               } else {
-                console.error('unhandled icon status');
+                //Unfortunately this state is the way the server communicates "busy" for now...
+                iconName = 'cog';
+                iconSpin = true;
+                iconStyle = {color: '#2196f3'};
               }
 
               // row.scope
