@@ -61,23 +61,15 @@ let DatasetImportStatusListView = React.createClass({
       dataset: this.config.dataset
     };
     requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'fetchImportStatusData' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.fetchImportStatusData({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )
-      )
+      API.fetchImportStatusData({cancellation: componentCancellation, ...APIargs})
+    )
       .then((data) => {
-// FIXME: This data is old.
-console.log('# import statuses: ' + data.length);
-        this.setState({
+      this.setState({
           loadStatus: 'loaded',
           rows: data
         });
       })
       .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
       .catch((xhr) => {
         ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
         this.setState({loadStatus: 'error'});
