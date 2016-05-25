@@ -87,7 +87,9 @@ let DatasetImportStatusListView = React.createClass({
       <div>
         <List>
             {rows.map((row) => {
-
+              if (row.name.indexOf(this.config.dataset) === -1) { //Horrible hack until the server knows what dataset this calculation is on
+                return null;
+              }
               let iconName = null;
               let iconSpin = false;
               let iconStyle = {};

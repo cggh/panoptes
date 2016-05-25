@@ -164,7 +164,6 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       components: ['error'],
       selectedTab: 'error'
     };
-    console.log(appState);
 
     let config = {
       ...initialConfig,
