@@ -47,11 +47,12 @@ let DatasetManagerActions = React.createClass({
   },
 
   handleReloadConfig() {
-    //API.importDatasetConfig(this.config.dataset);
+    API.importDatasetConfig(this.config.dataset);
   },
 
   handleReimport() {
-    console.log(API.importDataset(this.config.dataset));
+    API.importDataset(this.config.dataset);
+    // TODO: reload the status logs
   },
 
   render() {
@@ -97,7 +98,7 @@ let DatasetManagerActions = React.createClass({
             <span className="block text">Status logs</span>
           </div>
           <div className="grow">
-                <DatasetImportStatusViewList foo="bar" />
+                <DatasetImportStatusViewList refreshMilliseconds={2000} />
           </div>
         </div>
       </Sidebar>

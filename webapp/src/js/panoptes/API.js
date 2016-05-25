@@ -384,7 +384,6 @@ function importDatasetConfig(dataset) {
       respmodule: 'panoptesserver',
       respid: 'fileload_dataset',
       ScopeStr: 'none',
-      SkipTableTracks: 'true',
       datasetid: dataset
     }
 

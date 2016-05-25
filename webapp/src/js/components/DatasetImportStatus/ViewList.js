@@ -9,7 +9,6 @@ import _throttle from 'lodash/throttle';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 // Panoptes components
 import API from 'panoptes/API';
@@ -23,13 +22,15 @@ import Icon from 'ui/Icon';
 // Material UI
 import {List, ListItem} from 'material-ui/List';
 
+// Utils
+import RequestContext from 'util/RequestContext';
+
 let DatasetImportStatusViewList = React.createClass({
 
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
-    DataFetcherMixin('foo')
+    ConfigMixin
   ],
 
   getInitialState() {
@@ -39,7 +40,21 @@ let DatasetImportStatusViewList = React.createClass({
     };
   },
 
-  //Called by DataFetcherMixin
+  componentWillMount() {
+    this._requestContext = new RequestContext();
+    this.fetchData(this.props, this._requestContext);
+  },
+
+  componentDidMount() {
+    this.fetchDataInterval = setInterval(() => this.fetchData(this.props, this._requestContext), this.props.refreshMilliseconds);
+  },
+
+  componentWillUnmount() {
+    this._requestContext.destroy();
+    clearInterval(this.fetchDataInterval);
+  },
+
+  // *Not* called by DataFetcherMixin
   fetchData(props, requestContext) {
     this.setState({loadStatus: 'loading'});
     let APIargs = {

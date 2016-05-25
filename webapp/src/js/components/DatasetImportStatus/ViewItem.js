@@ -3,13 +3,15 @@ import React from 'react';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 
 
 let DatasetImportStatusItem = React.createClass({
 
   mixins: [
     PureRenderMixin,
-    FluxMixin
+    FluxMixin,
+    ConfigMixin
   ],
 
   propTypes: {
@@ -26,6 +28,8 @@ let DatasetImportStatusItem = React.createClass({
 
   render: function() {
     let {id} = this.props;
+
+console.log(this.config);
 
     return (
        <div>file: basedir/temp/log_{id}</div>
