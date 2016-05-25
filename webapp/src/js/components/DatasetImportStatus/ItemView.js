@@ -3,7 +3,6 @@ import React from 'react';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
-import ConfigMixin from 'mixins/ConfigMixin';
 
 // Panoptes
 import API from 'panoptes/API';
@@ -20,8 +19,7 @@ let DatasetImportStatusItemView = React.createClass({
 
   mixins: [
     PureRenderMixin,
-    FluxMixin,
-    ConfigMixin
+    FluxMixin
   ],
 
   propTypes: {

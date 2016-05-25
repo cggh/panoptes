@@ -151,9 +151,47 @@ Promise.all([InitialConfig(), getAppState(window.location)])
   .catch((err) => {
     console.error(err);
     err = err.message || err.responseText || "Could not connect to server";
+    let appState = getAppState();
+    appState.session.components = {
+      error: {
+        component: 'containers/ErrorTab',
+        props: {
+          err: err
+        }
+      }
+    };
+    appState.session.tabs = {
+      components: ['error'],
+      selectedTab: 'error'
+    };
+    console.log(appState);
+
+    let config = {
+      ...initialConfig,
+      isManager: true, //Should come from server in html really?
+      settings: {
+      name: initialConfig.dataset
+    }};
+    let stores = {
+      PanoptesStore: new PanoptesStore({
+        user: {
+          id: initialConfig.userID,
+          isManager: true
+        }
+      }),
+      SessionStore: new SessionStore(appState.session)
+    };
+    let actions = {
+      session: SessionActions,
+      panoptes: PanoptesActions(config),
+      api: APIActions
+    };
+
+    let flux = new Fluxxor.Flux(stores, actions);
     ReactDOM.render(
       <div>
-        <Loading status="custom"> There was a problem fetching initial configuration: {err} </Loading>
+        <Loading status="done"/>
+        <Panoptes flux={flux} config={config}/>
       </div>
       , document.getElementById('main'));
 

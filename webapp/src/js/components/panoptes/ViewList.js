@@ -22,7 +22,7 @@ let ViewList = React.createClass({
 
 
   handleOpen(e, container, props) {
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+    const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
     this.props.onClick({container, props, middleClick});
   },
 
@@ -31,33 +31,41 @@ let ViewList = React.createClass({
     const hasGeo = _some(_filter(this.config.tables, {hasGeoCoord: true}));
 
     return (
-        <List style={this.props.style}>
-          <Subheader>Open a view:</Subheader>
-          {this.config.isManager ?
-           <ListItem primaryText="Dataset Manager"
-                     secondaryText="Import and configure datasets"
-                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
-                     onClick={(e) => this.handleOpen(e, 'DatasetManager/Actions', {})} />
-           : null}
+      <List style={this.props.style}>
+        <Subheader>Open a view:</Subheader>
+        {this.config.isManager ?
+          <ListItem primaryText="Dataset Manager"
+                    secondaryText="Import and configure datasets"
+                    leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
+                    onClick={(e) => this.handleOpen(e, 'DatasetManager/Actions', {})}/>
+          : null}
+        {this.config.tables ?
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})} />
+                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})}/>
+          : null}
+        {this.config.tables ?
           <ListItem primaryText="Plot"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/PlotWithActions', {})} />
+                    onClick={(e) => this.handleOpen(e, 'containers/PlotWithActions', {})}/>
+          : null}
+        {this.config.tables ?
           <ListItem primaryText="Map"
                     disabled={!hasGeo}
                     style={{opacity: hasGeo ? '1' : '0.5'}}
                     secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null } />
+                    onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null }/>
+          : null}
+        {this.config.tables ?
           <ListItem primaryText="Tree"
                     secondaryText="View a tree"
                     leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/TreeWithActions', {})} />
-        </List>
+                    onClick={(e) => this.handleOpen(e, 'containers/TreeWithActions', {})}/>
+          : null}
+      </List>
     );
   }
 });

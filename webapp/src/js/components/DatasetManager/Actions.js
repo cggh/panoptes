@@ -1,5 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
 import scrollbarSize from 'scrollbar-size';
 
 // Mixins
@@ -12,13 +11,8 @@ import Sidebar from 'react-sidebar';
 // UI components
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-import TabbedArea from 'ui/TabbedArea';
-import TabPane from 'ui/TabPane';
 import ConfirmButton from 'ui/ConfirmButton';
-
-
-// Material UI components
-import FlatButton from 'material-ui/FlatButton';
+import Loading from 'ui/Loading';
 
 // Panoptes components
 import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
@@ -64,28 +58,27 @@ let DatasetManagerActions = React.createClass({
     let {sidebar, componentUpdate} = this.props;
 
     if (!this.config.isManager) {
-      console.error('!this.config.isManager');
-      return null;
+      return <Loading status="custom">Sorry you do not have management permissions for this dataset</Loading>;
     }
-
+    const name = this.config.settings.name;
+    const dataset = this.config.dataset;
     let sidebarContent = (
       <div className="sidebar">
-        <SidebarHeader icon={this.icon()} description={'Import and configure the ' + this.config.settings.name + ' dataset'} />
+        <SidebarHeader icon={this.icon()} description={`Import and configure the ${name} (${dataset}) dataset`} />
         <ConfirmButton label="Reload config only"
                        primary={true}
                        icon={<Icon fixedWidth={true} name={'cogs'} />}
-                       message={'Are you sure you want to reload the configuration for the ' + this.config.settings.name + ' dataset?'}
+                       message={`Are you sure you want to reload the configuration for the ${name} (${dataset}) dataset?`}
                        onConfirm={() => this.handleReloadConfig()}
         />
         <ConfirmButton label="Reimport everything"
                        primary={true}
                        icon={<Icon fixedWidth={true} name={'refresh'} />}
-                       message={'Are you sure you want to reimport everything for the ' + this.config.settings.name + ' dataset?'}
+                       message={`Are you sure you want to reimport everything for the ${name} (${dataset}) dataset?`}
                        onConfirm={() => this.handleReimport()}
         />
       </div>
     );
-
     return (
       <Sidebar
         styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
