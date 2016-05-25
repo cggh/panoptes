@@ -16,7 +16,7 @@ import LRUCache from 'util/LRUCache';
 // UI components
 import Loading from 'ui/Loading';
 
-let DatasetImportStatusItem = React.createClass({
+let DatasetImportStatusItemView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -95,4 +95,4 @@ let DatasetImportStatusItem = React.createClass({
 
 });
 
-module.exports = DatasetImportStatusItem;
+module.exports = DatasetImportStatusItemView;

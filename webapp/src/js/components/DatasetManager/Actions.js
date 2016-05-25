@@ -21,7 +21,7 @@ import ConfirmButton from 'ui/ConfirmButton';
 import FlatButton from 'material-ui/FlatButton';
 
 // Panoptes components
-import DatasetImportStatusViewList from 'DatasetImportStatus/ViewList';
+import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
 import API from 'panoptes/API';
 
 let DatasetManagerActions = React.createClass({
@@ -97,7 +97,7 @@ let DatasetManagerActions = React.createClass({
             <span className="block text">Status logs</span>
           </div>
           <div className="grow">
-                <DatasetImportStatusViewList refreshMilliseconds={2000} />
+                <DatasetImportStatusListView refreshMilliseconds={2000} />
           </div>
         </div>
       </Sidebar>

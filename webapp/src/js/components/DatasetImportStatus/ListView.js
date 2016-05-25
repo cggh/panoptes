@@ -25,7 +25,7 @@ import {List, ListItem} from 'material-ui/List';
 // Utils
 import RequestContext from 'util/RequestContext';
 
-let DatasetImportStatusViewList = React.createClass({
+let DatasetImportStatusListView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -86,7 +86,7 @@ console.log('# import statuses: ' + data.length);
 
   handleClickImportStatus(logId, title, icon) {
     let switchTo = true;
-    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ViewItem', {logId, title, icon}, switchTo);
+    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ItemView', {logId, title, icon}, switchTo);
   },
 
   render() {
@@ -132,4 +132,4 @@ console.log('# import statuses: ' + data.length);
 
 });
 
-module.exports = DatasetImportStatusViewList;
+module.exports = DatasetImportStatusListView;
