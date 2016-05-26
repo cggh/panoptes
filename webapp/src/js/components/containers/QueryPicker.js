@@ -41,81 +41,60 @@ let QueryPicker = React.createClass({
 
   getStateFromFlux() {
     return {
-      defaultQuery: this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table),
-      lastQuery: this.getFlux().store('PanoptesStore').getLastQueryFor(this.props.table)
+      defaultTableQuery: this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table)
     };
   },
 
   getInitialState() {
     return {
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: this.props.initialQuery || this.state.defaultTableQuery || SQL.WhereClause.encode(SQL.WhereClause.Trivial())
     };
   },
 
   componentWillMount() {
-    this.config = this.config.tables[this.props.table];
-    if (this.props.initialQuery)
-      this.setState({query: this.props.initialQuery});
-    else {
-      let defaultQuery = this.config.defaultQuery;
-      if (defaultQuery && defaultQuery != '') {
-        this.setState({query: defaultQuery});
-      }
-    }
+    this.tableConfig = this.config.tables[this.props.table];
   },
 
   icon() {
     return 'filter';
   },
   title() {
-    return `Pick filter for ${this.config.tableNamePlural}`;
+    return `Pick filter for ${this.tableConfig.tableNamePlural}`;
   },
 
   handleEnter() {
     this.handlePick();
   },
   handlePick() {
-console.log('handlePick');
     this.props.onPick(this.state.query);
-
-    // Remember the last query.
-    this.getFlux().store('PanoptesStore').setLastQuery(this.props.table, this.props.initialQuery);
 
     // Add query to list of recently used queries for this table.
     this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
-
   },
   handleQueryChange(newQuery) {
     this.setState({
       query: newQuery
     });
   },
-  handleSetQueryAsDefault() {
-    //TODO: The default query comes from the config,
-    // i.e. this.getFlux().store('PanoptesStore').getDefaultQueryFor(this.props.table)
-    // Should this be writing to the config, or does it mean something else?
-
-    // servermodule/panoptesserver/update_default_query.py
-
-    this.getFlux().store('PanoptesStore').setDefaultQuery(this.props.table, this.state.query);
-
-console.log('handleSetAsDefault');
+  handleSetTableQueryAsDefault() {
+    this.getFlux().store('PanoptesStore').setDefaultTableQuery(this.props.table, this.state.query);
   },
-  handleStoreQuery() {
-    //TODO
-console.log('handleStore');
+  handleStoreTableQuery() {
 
-    // TODO: transfer this to persistent storage.
-    // Add query to list of stored queries for this table.
+    // TODO: remove this session-based mockup of persistent storage.
     this.getFlux().actions.session.tableQueryStore(this.props.table, this.state.query);
 
-    this.getFlux().store('PanoptesStore').setStoredQuery(this.props.table, this.state.query);
+    // Add query to list of stored queries for this table.
+    this.getFlux().store('PanoptesStore').setStoredTableQuery(this.props.table, this.state.query);
 
   },
 
+// TODO: Only show setting the default query and add stored query if user isManager
+
   render() {
-    let {query, lastQuery, defaultQuery} = this.state;
+    let {query, defaultTableQuery} = this.state;
     let {table} = this.props;
+
     return (
       <div className="large-modal query-picker">
         <Sidebar
@@ -125,27 +104,17 @@ console.log('handleStore');
           touch={false}
           sidebar={(
           <div>
-            <List>
-              <ListItem primaryText="Default filter"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultQuery}/></p>}
+            {this.config.isManager ?
+              <List>
+                <ListItem primaryText="Default"
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={defaultTableQuery}/></p>}
                         secondaryTextLines={2}
-                        onClick={() => this.handleQueryChange(defaultQuery)}
-                        onDoubleClick={() => {
-                          this.handleQueryChange(defaultQuery);
-                          this.handlePick();
-                        }
-                        }/>
-              <Divider />
-              <ListItem primaryText="Previous filter"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={lastQuery}/></p>}
-                        secondaryTextLines={2}
-                        onClick={() => this.handleQueryChange(lastQuery)}
-                        onDoubleClick={() => {
-                          this.handleQueryChange(lastQuery);
-                          this.handlePick();
-                        }
-                        }/>
-            </List>
+                        onClick={() => this.handleQueryChange(defaultTableQuery)}
+                        onDoubleClick={() => { this.handleQueryChange(defaultTableQuery); this.handlePick(); }}
+                        leftIcon={<span><Icon fixedWidth={true} name={'filter'}/><Icon fixedWidth={true} name={'anchor'}/></span>}
+                        />
+                </List>
+              : null}
             <Divider />
             <StoredTableQueries table={table} onSelectQuery={this.handleQueryChange} />
             <Divider />
@@ -160,16 +129,18 @@ console.log('handleStore');
             <QueryString className="text" prepend="Filter: " table={table} query={query}/>
           </div>
           <div className="centering-container">
+            {this.config.isManager ?
+              <RaisedButton
+                label="Set as Default"
+                onClick={this.handleSetTableQueryAsDefault}
+                icon={<Icon fixedWidth={true} name={'anchor'} />}
+                style={{marginRight: '20px'}}
+              />
+              : null}
             <RaisedButton
-              label="Set as Default"
-              onClick={this.handleSetQueryAsDefault}
-              icon={<Icon fixedWidth={true} name={'anchor'} />}
-              style={{marginRight: '20px'}}
-            />
-            <RaisedButton
-              label="Save"
-              onClick={this.handleStoreQuery}
-              icon={<Icon fixedWidth={true} name={'save'} />}
+              label="Store"
+              onClick={this.handleStoreTableQuery}
+              icon={<Icon fixedWidth={true} name={'database'} />}
               style={{marginRight: '20px'}}
             />
             <RaisedButton

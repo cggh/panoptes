@@ -185,14 +185,25 @@ let SessionStore = Fluxxor.createStore({
   },
 
   tableQueryUsed(payload) {
-console.log('tableQueryUsed payload %o', payload);
-    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('tableQueryUsed usedTableQuery %o', usedTableQuery); return (usedTableQuery.table !==  payload.table && usedTableQuery.query !==  payload.query); }).push(Immutable.fromJS({table: payload.table, query: payload.query})));
+    let {table, query} = payload;
+    //this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('table equality: ' + (usedTableQuery.get('table') === table)); console.log('query equality: ' + (usedTableQuery.get('query') === query)); console.log('total equality: ' + (usedTableQuery.get('table') === table && usedTableQuery.get('query') === query)); return ((usedTableQuery.get('table') !== table) && (usedTableQuery.get('query') !== query)); }).push(Immutable.fromJS({table: table, query: query})));
+
+
+    //this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('always true'); return true; }).push(Immutable.fromJS({table: table, query: query})));
+    //this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => { console.log('always false'); return false; }).push(Immutable.fromJS({table: table, query: query})));
+
+    // Remove the query from the list, if it already exists.
+    // Put the query at the top of the list.
+    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table: table, query: query})));
+
+
+
   },
 
   // TODO: transfer this to persistent storage.
   tableQueryStore(payload) {
     let {table, query} = payload;
-    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.table !== table && storedTableQuery.query !== query)).push(Immutable.fromJS({table: table, query: query})));
+    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.get('table') !== table && storedTableQuery.get('query') !== query)).push(Immutable.fromJS({table: table, query: query})));
   }
 
 });

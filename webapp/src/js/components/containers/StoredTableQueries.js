@@ -33,6 +33,8 @@ let StoredTableQueries = React.createClass({
   getStateFromFlux() {
     return {
       storedTableQueries: this.getFlux().store('SessionStore').getState().get('storedTableQueries')
+      // storedTableQueries: this.getFlux().store('SessionStore').getStoredTableQueriesFor(this.props.table)
+      // storedTableQueries: this.getFlux().store('PanoptesStore').getStoredQueriesFor(this.props.table)
     };
   },
 
@@ -95,7 +97,7 @@ console.log('handleNameChange storedTableQueries.get(storedQueryIndex): %o', thi
                       secondaryTextLines={2}
                       onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
                       FArightIconButton={<IconButton tooltip="Delete" iconClassName="fa fa-trash-o"/>}
-                      leftIcon={<Icon fixedWidth={true} name={'save'} />}
+                      leftIcon={<Icon fixedWidth={true} name={'database'}/>}
                       rightIconButton={rightIconMenu}
             />
           );
@@ -108,17 +110,13 @@ console.log('handleNameChange storedTableQueries.get(storedQueryIndex): %o', thi
 
       storedTableQueriesList = (
         <List>
-          <Subheader>Saved filters</Subheader>
+          <Subheader>Stored filters</Subheader>
           {storedTableQueriesListItems}
         </List>
       );
 
     } else {
-      storedTableQueriesList = (
-        <List>
-          <Subheader>No saved filters.</Subheader>
-        </List>
-      );
+      storedTableQueriesList = null;
     }
     return storedTableQueriesList;
   }

@@ -9,6 +9,9 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 
+// UI
+import Icon from 'ui/Icon';
+
 // Panoptes
 import QueryString from 'panoptes/QueryString';
 
@@ -57,10 +60,9 @@ let RecentlyUsedTableQueries = React.createClass({
 
           let usedTableQueriesListItem = (
             <ListItem key={'usedTableQueriesListItem' + i}
-                      primaryText={'Recent ' + i}
-                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.get('query')}/></p>}
-                      secondaryTextLines={2}
+                      primaryText={<span className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.get('query')}/></span>}
                       onClick={(e) => this.handleClick(e, usedTableQuery.get('query'))}
+                      leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
             />
           );
 
@@ -78,11 +80,7 @@ let RecentlyUsedTableQueries = React.createClass({
       );
 
     } else {
-      usedTableQueriesList = (
-        <List>
-          <Subheader>No recently used filters.</Subheader>
-        </List>
-      );
+      usedTableQueriesList = null;
     }
     return usedTableQueriesList;
   }

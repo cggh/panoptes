@@ -29,39 +29,41 @@ let PanoptesStore = Fluxxor.createStore({
   getStoredSubsetsFor(table) {
     return this.state.getIn(['storedSubsets', table]);
   },
-  getDefaultQueryFor(table) {
-    return this.state.getIn(['defaultQueries', table]);
+  getDefaultTableQueryFor(table) {
+    return this.state.getIn(['defaultTableQueries', table]);
   },
-  getLastQueryFor(table) {
-console.log('getLastQueryFor table: ' + table);
-    let last = this.state.getIn(['lastQuery', table]);
-console.log('last: %o', last);
-    return last || SQL.WhereClause.encode(SQL.WhereClause.Trivial());
-  },
-  getStoredQueriesFor(table) {
-    return this.state.getIn(['storedQueries', table]);
-  },
-  getState() {
-    return this.state;
+  getStoredTableQueriesFor(table) {
+    return this.state.getIn(['storedTableQueries', table]);
   },
 
+  setDefaultTableQuery(table, query) {
+console.log('setDefaultTableQuery(table, query) table: ' + table);
 
-  setDefaultQuery(table, query) {
+console.log('setDefaultTableQuery this.config: %o', this.config);
+
+        //TODO: The default query comes from the config, which derives from the database, which was loaded from a file.
+        // i.e. this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table)
+        // Setting the default query writes back to the config settings in the database, so is an isManager feature only.
+
+        // servermodule/panoptesserver/update_default_query.py
+
+
     //servermodule/panoptesserver/update_default_query.py
     //TODO: UPDATE tablecatalog SET defaultQuery="{defaultQuery}" WHERE id="{id}"
-console.log('setDefaultQuery(table, query) table: ' + table);
+
   },
-  setLastQuery(table, query) {
-    this.state.setIn(['lastQuery', table], query);
-console.log('setLastQuery(table, query) table: ' + table);
-console.log('setLastQuery query: %o', query);
-  },
-  setStoredQuery(table, query) {
+  setStoredTableQuery(table, query) {
+console.log('setStoredTableQuery(table, query) table: ' + table);
+
     //TODO: in the storedqueries table for this dataset,
     // create an id and supply the name, tableid (e.g. variants), workspaceid (config.workspace?), and content (encoded query).
-console.log('setStoredQuery(table, query) table: ' + table);
-  }
 
+  },
+
+
+  getState() {
+    return this.state;
+  }
 });
 
 module.exports = PanoptesStore;

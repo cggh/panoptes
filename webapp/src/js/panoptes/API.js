@@ -89,7 +89,7 @@ function pageQuery(options) {
   let defaults = {
     query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
     order: null,
-    ascending: false,
+    ascending: true,
     count: false,
     start: 0,
     stop: 1000000,

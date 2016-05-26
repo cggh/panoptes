@@ -57,9 +57,11 @@ function getAppState(location) {
       modal: {},
       foundGenes: [],
       usedTableQueries: [],
-      storedTableQueries: [] // TODO: transfer this to persistent storage.
+      storedTableQueries: []
     }
   };
+  // TODO: remove this session-based mockup when using persistent storage.
+
   if (match)
     return API.fetchData(match[0]).then((appState) => appState || defaultState
     );
@@ -86,8 +88,8 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       PanoptesStore: new PanoptesStore({
         user: config.user,
         storedSubsets: config.subsets,
-        defaultQueries: config.defaultQueries,
-        storedQueries: config.storedQueries
+        defaultTableQueries: config.defaultTableQueries,
+        storedTableQueries: config.storedTableQueries
       }),
       SessionStore: new SessionStore(appState.session)
     };
@@ -152,7 +154,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
   })
   .catch((err) => {
     console.error(err);
-    err = err.message || err.responseText || "Could not connect to server";
+    err = err.message || err.responseText || 'Could not connect to server';
     let appState = getAppState();
     appState.session.components = {
       error: {
@@ -171,8 +173,9 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       ...initialConfig,
       isManager: true, //Should come from server in html really?
       settings: {
-      name: initialConfig.dataset
-    }};
+        name: initialConfig.dataset
+      }
+    };
     let stores = {
       PanoptesStore: new PanoptesStore({
         user: {
