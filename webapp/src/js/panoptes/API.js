@@ -20,9 +20,9 @@ function _filterError(json) {
   if ('Error' in json) {
     if (json.Error == 'NotAuthenticated') {
       throw Error('Not Authenticated');
-    }
-    else
+    } else {
       throw Error(`Error: ${json.Error}`);
+    }
   }
   return json;
 }
@@ -114,7 +114,7 @@ function pageQuery(options) {
       qry: query,
       collist: LZString.compressToEncodedURIComponent(collist),
       order: order,
-      sortreverse: ascending ? '1' : '0',
+      sortreverse: ascending ? '0' : '1',
       needtotalcount: count ? '1' : '0',
       limit: `${start}~${stop}`,
       distinct: distinct ? '1' : '0'
@@ -291,15 +291,6 @@ function findGenesInRegion(options) {
   assertRequired(options, ['database', 'chromosome', 'startPosition', 'endPosition']);
   let {database, chromosome, startPosition, endPosition} = options;
 
-  // query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-  // order: null,
-  // ascending: false,
-  // count: false,
-  // start: 0,
-  // stop: 1000000,
-  // distinct: false,
-  // transpose: true
-
   let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
 
   // Construct query for chromosome, start and end positions.
@@ -333,6 +324,81 @@ function fetchGene(options) {
   );
 }
 
+function fetchImportStatusData(options) {
+  assertRequired(options, ['dataset']);
+  let {dataset} = options;
+  let columns = {'id': 'GN',
+                 'user': 'GN',
+                 'timestamp': 'GN',
+                 'name': 'GN',
+                 'status': 'GN',
+                 'progress': 'IN',
+                 'completed': 'IN',
+                 'failed': 'IN',
+                 'scope': 'GN'
+  };
+  // TODO: only get logs for this dataset
+  //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
+  let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+  return pageQuery(
+    {
+      database: 'datasetindex',
+      table: 'calculations',
+      columns: columns,
+      query: query,
+      order: 'timestamp',
+      ascending: false
+    }
+  );
+}
+
+
+function fetchImportStatusLog(options) {
+  assertRequired(options, ['logId']);
+  let {logId} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'getcalculationlog',
+      id: logId
+    }
+  })
+    .then((data) => data.Content);
+}
+
+function importDataset(dataset) {
+  return requestJSON({
+
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'fileload_dataset',
+      ScopeStr: 'all',
+      SkipTableTracks: 'false',
+      datasetid: dataset
+    }
+
+  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
+}
+
+
+function importDatasetConfig(dataset) {
+  return requestJSON({
+
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'fileload_dataset',
+      ScopeStr: 'none',
+      SkipTableTracks: 'false',
+      datasetid: dataset
+    }
+
+  }).then((resp) => JSON.parse(Base64.decode(resp.content)));
+}
 
 module.exports = {
   serverURL,
@@ -348,5 +414,9 @@ module.exports = {
   treeData,
   findGene,
   findGenesInRegion,
-  fetchGene
+  fetchGene,
+  fetchImportStatusData,
+  fetchImportStatusLog,
+  importDataset,
+  importDatasetConfig
 };
