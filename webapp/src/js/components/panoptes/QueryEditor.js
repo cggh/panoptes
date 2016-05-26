@@ -69,7 +69,7 @@ let Criterion = React.createClass({
   ],
 
   componentWillMount() {
-    this.config = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tables[this.props.table];
   },
 
   getStateFromFlux() {
@@ -97,7 +97,7 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    return SQL.WhereClause.CompareFixed(this.config.primkey, '=', '');
+    return SQL.WhereClause.CompareFixed(this.tableConfig.primkey, '=', '');
   },
 
   handleAddOr() {
@@ -136,11 +136,11 @@ let Criterion = React.createClass({
 
   validateOperatorAndValues() {
     let {component} = this.props;
-    let property = this.config.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesMap[component.ColName];
     let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
     //Copy over the vals so we don't wipe them
-    newComponent.ColName = component.ColName || this.config.primkey;
-    newComponent.ColName2 = component.ColName2 || this.config.primkey;
+    newComponent.ColName = component.ColName || this.tableConfig.primkey;
+    newComponent.ColName2 = component.ColName2 || this.tableConfig.primkey;
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
       if (this.state[name] !== undefined)
         newComponent[name] = Deformatter(property, this.state[name]);
@@ -159,7 +159,7 @@ let Criterion = React.createClass({
   handlePropertyChange() {
     let {component, onChange} = this.props;
     component.ColName = this.refs.property.value;
-    let property = this.config.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
@@ -177,7 +177,7 @@ let Criterion = React.createClass({
 
   handleValueChange() {
     let {component, onChange} = this.props;
-    let property = this.config.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
@@ -220,7 +220,7 @@ let Criterion = React.createClass({
         </div>
       );
 
-    let groups = _clone(this.config.propertyGroups);
+    let groups = _clone(this.tableConfig.propertyGroups);
     groups.other = {
       id: 'other',
       name: 'Other',
@@ -251,7 +251,7 @@ let Criterion = React.createClass({
       </select>
     );
 
-    let property = this.config.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let operatorSelect = null;
     if (validOperators.length == 1) {
