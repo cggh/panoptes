@@ -582,7 +582,17 @@ let fetchInitialConfig = function() {
           columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
           order: 'name'
         })
-          .then((data) => fetchedConfig.storedTableQueries = data)
+          .then((data) => fetchedConfig.storedTableQueries = data),
+        API.requestJSON({
+          params: {
+            datatype: 'custom',
+            respmodule: 'panoptesserver',
+            respid: 'getconfig',
+            dataset
+          }})
+          .then((config) => {
+            console.log(JSON.stringify(config));
+          })
       ]
     ))
     .then(() => {

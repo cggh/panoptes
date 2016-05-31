@@ -1,6 +1,6 @@
 from os import path, listdir
 from os.path import join
-from simplejson import loads
+from simplejson import loads, dumps
 from Bio import SeqIO
 from PanoptesConfig import PanoptesConfig
 from SettingsGlobal import SettingsGlobal
@@ -21,12 +21,14 @@ def readSetOfSettings(dirPath, loader, wanted_names):
 def readJSONConfig(datasetId):
     datasetFolder = join(baseFolder, datasetId)
     settingsFile = join(datasetFolder, 'settings')
-    globalSettings = loads(SettingsGlobal(settingsFile, validate=True).serialize())
+    settings = loads(SettingsGlobal(settingsFile, validate=True).serialize())
     with open(join(datasetFolder, 'refgenome', 'refsequence.fa')) as fastaFile:
         chromosomes = {fasta.id: len(fasta.seq) for fasta in SeqIO.parse(fastaFile, 'fasta')}
-    tableSettings = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, globalSettings.get('DataTables'))
-    twoDSettings = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, globalSettings.get('2D_DataTables'))
-
-
-readJSONConfig('Genotypes')
-readJSONConfig('Samples_and_Variants')
+    tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
+    twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
+    return {
+        'settings': settings,
+        'chromosomes': chromosomes,
+        'tables': tables,
+        'twoDTables': twoDTables,
+    }
