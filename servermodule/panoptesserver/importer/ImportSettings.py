@@ -20,7 +20,6 @@ class ImportSettings:
                             ('DataType', {
                                    'type': 'Text',
                                    'required': True,
-                                   'serializable': False,
                                    'description': 'Data type of the values in the property',
                                    'values':  OrderedDict(( ('Text', {
                                                      'description': 'text strings'
@@ -48,7 +47,6 @@ class ImportSettings:
                             ('Name', {
                                    'type': 'Text',
                                    'required': True,
-                                   'serializable': False,
                                    'description': 'Display name of the property'
                                    }),
                             ('Description', {
@@ -106,7 +104,6 @@ class ImportSettings:
                             ('MaxLen', {
                                    'type': 'Value',
                                    'required': False,
-                                   'serializable': False,
                                    'default': 0,
                                    'description': 'If present used to specify the maximum size of the database column - otherwise it is calculated'
                                    }),
@@ -245,14 +242,12 @@ class ImportSettings:
                             ('Order', {
                                        'type': 'Value',
                                        'required': False,
-                                       'serializable': False,
                                        'default': -1,
                                        'description': 'Only used for reference genome tracks'
                                        }),
                             ('SummaryValues', {
                                    'type': 'Block',
                                    'required': False,
-                                   'serializable': True,
                                    'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True},
                                    
@@ -626,26 +621,22 @@ class ImportSettings:
         
         tosave = copy.deepcopy(settings)
         for key in defn:
-            if not defn[key].get('serializable', True):
-                if key in tosave:
+            if 'propName' in defn[key]:
+                propName = defn[key]['propName']
+                if key in settings:
+                    tosave[propName] = settings[key]
                     del tosave[key]
             else:
-                if 'propName' in defn[key]:
-                    propName = defn[key]['propName']
-                    if key in settings:
-                        tosave[propName] = settings[key]
-                        del tosave[key]
-                else:
-                    propName = key
-                if 'default' in defn[key]:
-                    includeDefault = True
-                    
-                    if 'siblingOptional' in defn[key]:
-                        if not self._hasOptionalSibling(settings, key, defn[key]):
-                            includeDefault = False
-                    
-                    if includeDefault:
-                        tosave[propName] = settings.get(key, defn[key]['default'])
+                propName = key
+            if 'default' in defn[key]:
+                includeDefault = True
+
+                if 'siblingOptional' in defn[key]:
+                    if not self._hasOptionalSibling(settings, key, defn[key]):
+                        includeDefault = False
+
+                if includeDefault:
+                    tosave[propName] = settings.get(key, defn[key]['default'])
 
                 
         return simplejson.dumps(self.ConvertStringsToSafeSQL(tosave))

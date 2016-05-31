@@ -37,7 +37,6 @@ class SettingsDataTable(ImportSettings):
                          ('PrimKey', {
                                    'type': 'PropertyID',
                                    'required': True,
-                                   'serializable': False,
                                    'description': "The primary key *property ID* for this table.\n  A data item *property* is a column in the TAB-delimited source file ``data``, and the *ID* corresponds to the column header.\n  The primary key should refer to a column containing a unique value for each record in the table.\n  Optionally, this parameter can be set to '``AutoKey``' to instruct the software to automatically generate a primary key"
                                 }),
                          ('ItemTitle', {
@@ -125,7 +124,6 @@ class SettingsDataTable(ImportSettings):
                          ('Properties', {
                                    'type': 'List',
                                    'required': True,
-                                   'serializable': False,
                                    'description': 'Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.\n  See :ref:`def-settings-datatable-properties` settings for an overview of the keys that can be used for each property in this list',
                                    'children': {} #Is self._propertiesDefault - set in constructor
                                 }),
@@ -439,7 +437,6 @@ containing the relative size of that specific pie'''
                                                 ('Id', {
                                                        'type': 'Text',
                                                        'required': True,
-                                                       'serializable': False,
                                                        'description': 'Identifier of this set of per-data-item genomic values - name of subdirectory or Identifier of this set of per-data-item genomic values - name of the column in the matching files'
                                                        }),
                                                 ('FilePattern', {
@@ -450,33 +447,28 @@ containing the relative size of that specific pie'''
                                                 ('Name', {
                                                          'type': 'Text',
                                                          'required': True,
-                                                         'serializable': False,
                                                          'description': 'Display name of the property'
                                                          }),
                                                 ('MinVal', {
                                                            'type': 'Value',
                                                            'required': True,
-                                                           'serializable': False,
                                                            'default': 0,
                                                            'description': 'Value used for lower extent of scales'
                                                            }),
                                                 ('MaxVal', {
                                                            'type': 'Value',
                                                            'required': True,
-                                                           'serializable': False,
                                                            'description': 'Value used for upper extent of scales'
                                                            }),
                                                 ('BlockSizeMin', {
                                                              'type': 'Value',
                                                              'required': True,
-                                                             'serializable': False,
                                                              'default': 1,
                                                              'description': 'Minimum block size used by the multiresolution summariser (in bp)'
                                                              }),
                                                 ('BlockSizeMax', {
                                                                 'type': 'Value',
                                                                 'required': True,
-                                                                'serializable': False,
                                                                 'description': 'Maximum block size used by the multiresolution summariser (in bp)'
                                                                 }),
                                                 ('ChannelColor', {

@@ -26,13 +26,11 @@ class Settings2Dtable(ImportSettings):
                     ('ColumnDataTable', {
                          'type': 'Text',
                          'required': True,
-                         'serializable': False,
                          'description': 'Identifier of the (1D) data table defining the columns of the matrix\n  (In case of genotype data: the variants). This links the 2D data table to the 1D data table containing the column information'
                          }),
                     ('ColumnIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'serializable': False,
                          'description': 'The property ID in the ``ColumnDataTable`` data table that maps into the ``ColumnIndexArray``\n  array in the HDF5 source file. ``ColumnIndexField`` and ``ColumnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.\n  Alternatively ``ColumnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``ColumnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
                     ('ColumnIndexArray', {
@@ -43,13 +41,11 @@ class Settings2Dtable(ImportSettings):
                     ('RowDataTable', {
                          'type': 'Text',
                          'required': True,
-                         'serializable': False,
                          'description': 'Identifier of the (1D) data table defining the rows of the matrix\n  (in case of genotype data: the samples). This links the 2D data table to the 1D data table containing the row information'
                          }),
                     ('RowIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'serializable': False,
                          'description': 'The property ID in the ``RowDataTable`` data table that maps into ``RowIndexArray``\n  array in the HDF5 source file. ``RowIndexField`` and ``RowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.\n  Alternatively ``RowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``RowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
                     ('RowIndexArray', {
@@ -106,19 +102,16 @@ class Settings2Dtable(ImportSettings):
                     ('Properties', {
                          'type': 'List',
                          'required': True,
-                         'serializable': False,
                          'description': 'Contains a list of all properties defined for each cell of the 2D data table',
                          'children': OrderedDict((
                                       ('Id', {
                                              'type': 'Text',
                                              'required': True,
-                                             'serializable': False,
                                              'description': 'Identifier of the property, and name of the dataset in the HDF5 source file'
                                              }),
                                       ('Name', {
                                                 'type': 'Text',
                                                 'required': False,
-                                                'serializable': False,
                                                 'description': 'Display name of the property'
                                                 }),
                                       ('Description', {
