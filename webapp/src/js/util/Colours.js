@@ -56,7 +56,7 @@ export function propertyColour(propConfig, min = null, max = null) {
   if (propConfig.isBoolean)
     return booleanColours();
   if (propConfig.isCategorical) {
-    const colourFunc = categoryColours(`${propConfig.tableid}_${propConfig.propid}`);
+    const colourFunc = categoryColours(`${propConfig.tableId}_${propConfig.id}`);
     //Run thorugh the possibilites so they are enumerated in sort order, not appearance order.
     if (propConfig.propCategories) {
       propConfig.propCategories.forEach(colourFunc);
@@ -64,7 +64,7 @@ export function propertyColour(propConfig, min = null, max = null) {
     return colourFunc;
   }
   if (propConfig.isText)
-    return categoryColours(`${propConfig.tableid}_${propConfig.propid}`);
+    return categoryColours(`${propConfig.tableId}_${propConfig.id}`);
   return scaleColour([min || propConfig.minVal, max || propConfig.maxVal]);
 }
 

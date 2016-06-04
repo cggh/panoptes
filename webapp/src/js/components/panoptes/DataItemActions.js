@@ -38,7 +38,7 @@ let DataItemActions = React.createClass({
     let APIargs = {
       database: this.config.dataset,
       table: table,
-      primKeyField: this.config.tables[table].primkey,
+      primKeyField: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 
@@ -64,17 +64,16 @@ let DataItemActions = React.createClass({
   render() {
     const {table, primKey} = this.props;
     const {data} = this.state;
-    const tableConfig = this.config.tables[table];
+    const tableConfig = this.config.tablesById[table];
     if (!data)
       return null;
 
     const treeLinks = [];
     const crossLink = `${table}::${primKey}`;
-    _forEach(this.config.tables, (treeTable) => {
-      if (!treeTable.settings.isHidden) {
+    _forEach(this.config.visibleTables, (treeTable) => {
         treeTable.trees.forEach((tree) => {
           if (crossLink === tree.crossLink) {
-            treeLinks.push(<PopupButton label={`Show associated ${this.config.tables[treeTable.id].tableCapNameSingle} tree`}
+            treeLinks.push(<PopupButton label={`Show associated ${this.config.tablesById[treeTable.id].capNameSingle} tree`}
                                         icon="tree"
                                         componentPath="containers/TreeWithActions"
                                         table={treeTable.id}
@@ -84,7 +83,6 @@ let DataItemActions = React.createClass({
             );
           }
         });
-      }
     });
 
     return (
@@ -92,9 +90,9 @@ let DataItemActions = React.createClass({
         {tableConfig.hasGenomePositions ? <PopupButton label="Show in Genome Browser"
                      icon="bitmap:genomebrowser.png"
                      componentPath="containers/GenomeBrowserWithActions"
-                     chromosome={data[tableConfig.chromosomeField]}
-                     start={parseInt(data[tableConfig.positionField]) - 50}
-                     end={parseInt(data[tableConfig.positionField]) + 50}
+                     chromosome={data[tableConfig.chromosome]}
+                     start={parseInt(data[tableConfig.position]) - 50}
+                     end={parseInt(data[tableConfig.position]) + 50}
                      channels={Immutable.fromJS({
                        [table]: {
                          channel: 'PerRowIndicatorChannel',
@@ -105,12 +103,12 @@ let DataItemActions = React.createClass({
                      })}
           />
         : null}
-        {tableConfig.hasGenomeRegions ? <PopupButton label="Show in Genome Browser"
+        {tableConfig.isRegionOnGenome ? <PopupButton label="Show in Genome Browser"
                                                   icon="bitmap:genomebrowser.png"
                                                   componentPath="containers/GenomeBrowserWithActions"
-                                                  chromosome={data[tableConfig.chromosomeField]}
-                                                  start={parseInt(data[tableConfig.startPositionField]) - 50}
-                                                  end={parseInt(data[tableConfig.stopPositionField]) + 50}
+                                                  chromosome={data[tableConfig.chromosome]}
+                                                  start={parseInt(data[tableConfig.regionStart]) - 50}
+                                                  end={parseInt(data[tableConfig.regionStop]) + 50}
                                                   channels={Immutable.fromJS({
                                                     [table]: {
                                                       channel: 'RegionChannel',
@@ -123,9 +121,9 @@ let DataItemActions = React.createClass({
           : null}
         {tableConfig.properties.map((prop) => {
           if (prop.externalUrl) {
-            return <ExternalLinkButton key={prop.propid}
+            return <ExternalLinkButton key={prop.id}
                                        label={prop.name}
-                                       urls={data[prop.propid].split(';').map((value) => prop.externalUrl.replace('{value}', value))}
+                                       urls={data[prop.id].split(';').map((value) => prop.externalUrl.replace('{value}', value))}
             />;
 
           } else {

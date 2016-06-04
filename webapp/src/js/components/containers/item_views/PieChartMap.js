@@ -61,7 +61,7 @@ let PieChartMapTab = React.createClass({
     let {locationDataTable, locationNameProperty, locationSizeProperty,
       residualFractionName, componentColumns} = chartConfig;
 
-    let locationTableConfig = this.config.tables[locationDataTable];
+    let locationTableConfig = this.config.tablesById[locationDataTable];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -72,9 +72,9 @@ let PieChartMapTab = React.createClass({
       loadStatus: 'loading'
     });
 
-    let locationPrimKeyProperty = locationTableConfig.primkey;
+    let locationPrimKeyProperty = locationTableConfig.primKey;
 
-    let locationColumns = [locationPrimKeyProperty, locationTableConfig.propIdGeoCoordLongit, locationTableConfig.propIdGeoCoordLattit];
+    let locationColumns = [locationPrimKeyProperty, locationTableConfig.longitude, locationTableConfig.latitude];
 
     if (chartConfig.locationNameProperty) {
       locationColumns.push(chartConfig.locationNameProperty);
@@ -85,7 +85,7 @@ let PieChartMapTab = React.createClass({
     }
 
     let locationColumnsColumnSpec = {};
-    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
+    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
 
     let locationAPIargs = {
       database: this.config.dataset,
@@ -96,7 +96,7 @@ let PieChartMapTab = React.createClass({
     let chartAPIargs = {
       database: this.config.dataset,
       table: table,
-      primKeyField: this.config.tables[table].primkey,
+      primKeyField: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 
@@ -124,8 +124,8 @@ let PieChartMapTab = React.createClass({
       .then(([locationData, chartData]) => {
         let markers = Immutable.List();
         // Translate the fetched locationData and chartData into markers.
-        let locationTableConfig = this.config.tables[locationDataTable];
-        let locationPrimKeyProperty = locationTableConfig.primkey;
+        let locationTableConfig = this.config.tablesById[locationDataTable];
+        let locationPrimKeyProperty = locationTableConfig.primKey;
 
         for (let i = 0; i < locationData.length; i++) {
           let markerChartData = [];
@@ -150,8 +150,8 @@ let PieChartMapTab = React.createClass({
 
           markers = markers.push(Immutable.fromJS({
             key: i,
-            lat: locationData[i][locationTableConfig.propIdGeoCoordLattit],
-            lng: locationData[i][locationTableConfig.propIdGeoCoordLongit],
+            lat: locationData[i][locationTableConfig.latitude],
+            lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],
             radius: Math.sqrt(locationData[i][locationSizeProperty]),
             chartData: markerChartData,

@@ -61,14 +61,14 @@ let GroupedItemPicker = React.createClass({
       this.setState({picked: this.state.picked.add(propId)});
   },
   handleAddAll(groupId) {
-    let toAdd = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('propid'));
+    let toAdd = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('id'));
     this.setState({picked: this.state.picked.union(toAdd)});
   },
   handleRemove(propId) {
     this.setState({picked: this.state.picked.delete(propId)});
   },
   handleRemoveAll(groupId) {
-    let toRemove = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('propid'));
+    let toRemove = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('id'));
     this.setState({picked: this.state.picked.subtract(toRemove)});
   },
   handleSearchChange(event) {
@@ -79,8 +79,8 @@ let GroupedItemPicker = React.createClass({
     let result = Immutable.List();
     this.props.groups.forEach((group) => {
       group.get('properties').forEach((prop) => {
-        if (this.state.picked.has(prop.get('propid'))) {
-          result = result.push(prop.get('propid'));
+        if (this.state.picked.has(prop.get('id'))) {
+          result = result.push(prop.get('id'));
         }
       });
     }
@@ -106,14 +106,14 @@ let GroupedItemPicker = React.createClass({
                 _map(groups.toJS(), (group) => {
                   let {id, name, properties} = group;
                   let subItems = properties.map((prop) => {
-                    let {name, description, propid,  icon} = prop;
+                    let {name, description, id,  icon} = prop;
                     return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                          <ListItem className={classNames({picked: !picked.includes(propid)})}
-                                    key={propid}
+                          <ListItem className={classNames({picked: !picked.includes(id)})}
+                                    key={id}
                                     primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
                                     secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
                                     leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
-                                    onClick={() => this.handleAdd(propid)}
+                                    onClick={() => this.handleAdd(id)}
                             />) : null;
                   }
                     );
@@ -138,20 +138,20 @@ let GroupedItemPicker = React.createClass({
                   {
                     _map(groups.toJS(), (group) => {
                       let {id, name, properties} = group;
-                      return ( picked.intersect(properties.map((prop) => prop.propid)).size > 0 ?
+                      return ( picked.intersect(properties.map((prop) => prop.id)).size > 0 ?
                           <ListItem primaryText={name}
                                     key={id}
                                     initiallyOpen={true}
                                     onClick={() => this.handleRemoveAll(id)}
                                     nestedItems={
                         properties.map((prop) => {
-                          let {name, description, propid, icon} = prop;
-                          return picked.includes(propid) ? (
-                              <ListItem key={propid}
+                          let {name, description, id, icon} = prop;
+                          return picked.includes(id) ? (
+                              <ListItem key={id}
                                         secondaryText={description}
                                         primaryText={name}
                                         leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                        onClick={() => this.handleRemove(propid)}/>
+                                        onClick={() => this.handleRemove(id)}/>
                             ) : null;
                         }
                         )

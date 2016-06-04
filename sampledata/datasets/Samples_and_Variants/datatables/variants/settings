@@ -86,7 +86,6 @@ Properties:
   DataType: HighPrecisionValue
   Description: The first numerical value
   ShowBar: True                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
-  ChannelName: Channel A          # Name of the channel this property will be displayed in. Properties sharing the same channel name will be displayed in overlay
   ChannelColor: "rgb(0,80,200)"  # Colour used to display this property
   ConnectLines: True              # Indicate that the points will be connected with lines
   BrowserDefaultVisible: true
@@ -95,7 +94,6 @@ Properties:
   Name: Value 2
   DataType: Value
   Description: The second numerical value
-  ChannelName: Channel A
   ChannelColor: "rgb(200,80,0)"
   ConnectLines: True
 

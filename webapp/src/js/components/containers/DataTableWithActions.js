@@ -74,7 +74,8 @@ let DataTableWithActions = React.createClass({
   },
 
   componentWillMount() {
-    this.tableConfig = this.config.tables[this.props.table];
+    this.dataset = this.config.dataset;
+    this.tableConfig = this.config.tablesById[this.props.table];
     this.propertyGroups = {};
     _forEach(this.tableConfig.propertyGroups, (val, key) => {
       let filteredProps = _filter(val.properties, {showInTable: true});
@@ -98,7 +99,7 @@ let DataTableWithActions = React.createClass({
   },
 
   title() {
-    return this.props.title || this.tableConfig.tableCapNamePlural;
+    return this.props.title || this.tableConfig.capNamePlural;
   },
 
   handleQueryPick(query) {
@@ -201,7 +202,7 @@ let DataTableWithActions = React.createClass({
       for (let i = 0, len = this.tableConfig.quickFindFields.length; i < len; i++) {
         let quickFindField = this.tableConfig.quickFindFields[i];
 
-        let newComponent = SQL.WhereClause.CompareFixed(this.tableConfig.propertiesMap[quickFindField].propid, 'CONTAINS', searchText);
+        let newComponent = SQL.WhereClause.CompareFixed(this.tableConfig.propertiesById[quickFindField].id, 'CONTAINS', searchText);
 
         if (i === 0) {
           searchQueryUnencoded = newComponent;
@@ -243,14 +244,14 @@ let DataTableWithActions = React.createClass({
     if (!columns)
       columns = Immutable.List(this.tableConfig.properties)
         .filter((prop) => prop.showByDefault && prop.showInTable)
-        .map((prop) => prop.propid);
+        .map((prop) => prop.id);
     let {description} = this.tableConfig;
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig.quickFindFields.length; i < len; i++) {
       let quickFindField = this.tableConfig.quickFindFields[i];
       if (i == 0) quickFindFieldsList += 'Columns: ';
       if (i != 0) quickFindFieldsList += ', ';
-      quickFindFieldsList += this.tableConfig.propertiesMap[quickFindField].name;
+      quickFindFieldsList += this.tableConfig.propertiesById[quickFindField].name;
 
     }
     let searchGUI = (
@@ -306,7 +307,7 @@ let DataTableWithActions = React.createClass({
                       {
                         groups: this.propertyGroups,
                         initialPick: columns,
-                        title: `Pick columns for ${this.tableConfig.tableCapNamePlural} table`,
+                        title: `Pick columns for ${this.tableConfig.capNamePlural} table`,
                         onPick: this.handleColumnChange
                       })}
                       icon={<Icon fixedWidth={true} name="columns" />}
@@ -418,7 +419,7 @@ let DataTableWithActions = React.createClass({
             />
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
-            <span className="block text">Sort: {order ? this.tableConfig.propertiesMap[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className="block text">Sort: {order ? this.tableConfig.propertiesById[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.size} of {this.tableConfig.properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>

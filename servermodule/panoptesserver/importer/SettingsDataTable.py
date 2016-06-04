@@ -100,6 +100,7 @@ class SettingsDataTable(ImportSettings):
                          ('PropertyGroups', {
                                    'type': 'List',
                                    'required': False,
+                                   'default': [],
                                    'description': 'Each item in the list specifies a group of properties.\n  Property groups are used to combine sets of related properties into logical sections in the app',
                                    'children': { 'Id': {
                                                              'type': 'Text',
@@ -362,23 +363,27 @@ containing the relative size of that specific pie'''
                          ('Chromosome', {
                                    'type': 'PropertyID',
                                    'required': False,
+                                   'default': 'chrom',
                                    'settingRequired': [{ 'name': 'IsPositionOnGenome', 'value': True}, { 'name': 'IsRegionOnGenome', 'value': True}],
                                    'description': 'Specifies the table column ID that contains the chromosome\n  (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).\n  Note that the values in this column should correspond to the content of the ``chromosomes`` source file\n  (see :ref:`def-source-referencegenome`)'
                                 }),
                          ('Position', {
                                    'type': 'PropertyID',
                                    'required': False,
+                                   'default': 'pos',
                                    'settingRequired': [{ 'name': 'IsPositionOnGenome', 'value': True} ],
                                    'description': 'Specifies the table column ID that contains the position on the chromosome\n  (only to be used if *IsPositionOnGenome* is set)'
                                 }),
                          ('RegionStart', {
                                    'type': 'PropertyID',
                                    'required': False,
+                                   'default': 'start',
                                    'settingRequired': { 'name': 'IsRegionOnGenome', 'value': True},
                                    'description': 'Specifies the table column ID that contains the start position of the region\n  (only to be used if *IsRegionOnGenome* is set)'
                                 }),
                          ('RegionStop', {
                                    'type': 'PropertyID',
+                                   'default': 'stop',
                                    'required': False,
                                    'settingRequired': { 'name': 'IsRegionOnGenome', 'value': True},
                                    'description': 'Specifies the table column ID that contains the end position of the region\n  (only to be used if *IsRegionOnGenome* is set)'

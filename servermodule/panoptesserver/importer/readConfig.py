@@ -29,6 +29,6 @@ def readJSONConfig(datasetId):
     return {
         'settings': settings,
         'chromosomes': chromosomes,
-        'tables': tables,
-        'twoDTables': twoDTables,
+        'tablesById': tables,
+        'twoDTablesById': twoDTables,
     }

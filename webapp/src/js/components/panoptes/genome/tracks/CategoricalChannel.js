@@ -198,7 +198,7 @@ let CategoricalTrack = React.createClass({
 
     let {summariser, data} = columns.categories;
     let categories = summariser.categories || summariser.Categories;
-    let catColours = this.config.summaryValues[props.group][props.track].settings.categoryColors;
+    let catColours = this.config.summaryValues[props.group][props.track].categoryColors;
     let colours = categories.map((cat) => catColours[cat]);
     let layers = categories.map((category, i) =>
       data.map((point, j) => ({

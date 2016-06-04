@@ -50,11 +50,11 @@ let PlotContainer = React.createClass({
 
   fetchData(props, requestContext) {
     const {table, query} = props;
-    const tableConfig = this.config.tables[table];
-    const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesMap[props[dim]]);
+    const tableConfig = this.config.tablesById[table];
+    const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
     let columnspec = {};
-    _map(columns, (column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+    _map(columns, (column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {

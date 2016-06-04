@@ -3,7 +3,7 @@ const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
   dataItemPopup({table, primKey, switchTo = true}) {
-    let dataItemViews = config.tables[table].dataItemViews;
+    let dataItemViews = config.tablesById[table].dataItemViews;
     let views = [];
     if (!dataItemViews) {
       // If there are no dataItemViews specified, then default to showing an Overview.
@@ -14,7 +14,7 @@ const PanoptesActions = (config) => ({
         }
       });
 
-      if (config.tables[table].hasGeoCoord) {
+      if (config.tablesById[table].hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
           view: 'ItemMap',

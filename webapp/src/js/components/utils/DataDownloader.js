@@ -18,7 +18,7 @@ function downloadTableData(payload) {
   if (!columns)
     columns = Immutable.List(tableConfig.properties)
       .filter((prop) => prop.showByDefault && prop.showInTable)
-      .map((prop) => prop.propid);
+      .map((prop) => prop.id);
 
   let totalDataPoints = rowsCount * columns.size;
   if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
@@ -30,13 +30,13 @@ function downloadTableData(payload) {
   if (!columns)
     columns = Immutable.List(this.tableConfig.properties)
       .filter((prop) => prop.showByDefault && prop.showInTable)
-      .map((prop) => prop.propid);
+      .map((prop) => prop.id);
 
   // Get the list of columns being shown.
   let columnList = '';
   columns.map((column) => {
     if (column === 'StoredSelection') return;
-    let encoding = tableConfig.propertiesMap[column].defaultFetchEncoding;
+    let encoding = tableConfig.propertiesById[column].defaultFetchEncoding;
     if (columnList.length !== 0) columnList += '~';
     columnList += encoding + column;
   });

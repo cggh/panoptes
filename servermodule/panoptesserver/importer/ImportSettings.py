@@ -191,6 +191,7 @@ class ImportSettings:
                                    'type': 'Boolean',
                                    'required': False,
                                    'propName': 'showInBrowser',
+                                   'default': False,
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
                                    }),
                             ('TableDefaultVisible', {
@@ -212,23 +213,18 @@ class ImportSettings:
                                    'description': 'Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.\n  In this case, it will always be visible ',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
                                    }),
-                            ('ChannelName', {
-                                   'type': 'Text',
-                                   'required': False,
-                                   'propName': 'channelName',
-                                   'description': 'Name of the genome browser track this property will be displayed in.\n   Properties sharing the same track name will be displayed in overlay\n   ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
-                                   }),
                             ('ChannelColor', {
                                    'type': 'Text',
                                    'required': False,
                                    'propName': 'channelColor',
+                                   'default': 'rgb(0,0,0)',
                                    'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
                                    }),
                             ('ConnectLines', {
                                    'type': 'Boolean',
                                    'required': False,
+                                   'default': False,
                                    'propName': 'connectLines',
                                    'description': 'Indicate that the points will be connected with lines in the genome browser\n  ',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
@@ -267,6 +263,7 @@ class ImportSettings:
                                                                 'type': 'Text',
                                                                 'required': False,
                                                                 'propName': 'channelColor',
+                                                                'default': 'rgb(0,0,180)',
                                                                 'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
                                                                 }),
                                                 ('MaxDensity', {
@@ -608,15 +605,6 @@ class ImportSettings:
         if len(self._errors) > 0:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
-    #Not at all sure about this...
-    def ConvertStringsToSafeSQL(self, settings):
-
-        for key in settings:
-            val = settings[key]
-            if type(val) is str:
-                settings[key] = val.replace('"', '`').replace("'", '`')
-        return settings
-
     def _prepareSerialization(self, settings, defn):
         
         tosave = copy.deepcopy(settings)
@@ -639,7 +627,7 @@ class ImportSettings:
                     tosave[propName] = settings.get(key, defn[key]['default'])
 
                 
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(tosave))
+        return simplejson.dumps(tosave)
         
     #For insertion into tablecatalog, graphs
     def serialize(self):
@@ -686,7 +674,7 @@ class ImportSettings:
             if val in saved:
                 del saved[val]
 
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
+        return simplejson.dumps(saved)
 
      
     def __getitem__(self, key):

@@ -32,8 +32,8 @@ const PropertySelector = React.createClass({
                   value={value}
                   onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>
         <MenuItem key="__none__" value={undefined} primaryText="None"/>
-        {this.config.tables[table].properties.map((property) =>
-          <MenuItem key={property.propid} value={property.propid} primaryText={property.name}/>)}
+        {this.config.tablesById[table].properties.map((property) =>
+          <MenuItem key={property.id} value={property.id} primaryText={property.name}/>)}
       </DropDownMenu>
     );
   }

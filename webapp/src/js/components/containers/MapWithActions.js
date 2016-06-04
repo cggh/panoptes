@@ -76,18 +76,18 @@ let MapWithActions = React.createClass({
     let {sidebar, table, query, column, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-    let tableOptions = _map(_filter(this.config.tables, (table) => table.hasGeoCoord && !table.settings.isHidden),
+    let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
         value: table.id,
         leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
-        label: table.tableCapNamePlural
+        label: table.capNamePlural
       })
     );
 
     let propertyMenu = [];
     let i = 0;
     if (table) {
-      const propertyGroups = this.config.tables[table].propertyGroups;
+      const propertyGroups = this.config.tablesById[table].propertyGroups;
       _each(propertyGroups, (group) => {
         if (propertyMenu.length) {
           propertyMenu.push(<Divider key={i++}/>);
@@ -95,8 +95,8 @@ let MapWithActions = React.createClass({
         let {id, name} = group;
         propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
         _each(group.properties, (property) => {
-          let {propid, name} = property;
-          propertyMenu.push(<MenuItem value={propid} key={propid} primaryText={name}/>);
+          let {id, name} = property;
+          propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
         });
       });
     }
@@ -136,7 +136,7 @@ let MapWithActions = React.createClass({
             : null}
           {clearFilterButton}
           {table ?
-              <SelectField value={this.config.tables[table].propertiesMap[column] ? column : null}
+              <SelectField value={this.config.tablesById[table].propertiesById[column] ? column : null}
                            autoWidth={true}
                            floatingLabelText="Column"
                            onChange={(e, i, v) => componentUpdate({column: v})}>
@@ -157,7 +157,7 @@ let MapWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{table ? `Map of ${this.config.tables[table].tableCapNamePlural}` : 'Map'}</span>
+            <span className="text">{table ? `Map of ${this.config.tablesById[table].capNamePlural}` : 'Map'}</span>
             {table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>
