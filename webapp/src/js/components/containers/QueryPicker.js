@@ -88,7 +88,7 @@ let QueryPicker = React.createClass({
           transitions={false}
           touch={false}
           sidebar={(
-          <div>
+          <div style={{width: '35vw'}}>
             <List>
               <ListItem primaryText="Default filter"
                         secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={defaultTableQuery}/></p>}
