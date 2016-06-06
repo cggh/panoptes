@@ -30,7 +30,8 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
       SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
       SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed),
-      SESSION.TABLE_QUERY_STORE, this.emitIfNeeded(this.tableQueryStore) // TODO: transfer this to persistent storage.
+      SESSION.TABLE_QUERY_STORE, this.emitIfNeeded(this.tableQueryStore), // TODO: transfer this to persistent storage.
+      SESSION.TABLE_QUERY_TMP_GET, this.emitIfNeeded(this.getStoredTableQueriesFor) // TODO: transfer this to persistent storage.
     );
   },
 
@@ -200,10 +201,20 @@ let SessionStore = Fluxxor.createStore({
 
   },
 
+
   // TODO: transfer this to persistent storage.
   tableQueryStore(payload) {
+console.log('SessionStore tableQueryStore. Storing query for table: ' + payload.table);
     let {table, query} = payload;
-    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.filter((storedTableQuery) => (storedTableQuery.get('table') !== table && storedTableQuery.get('query') !== query)).push(Immutable.fromJS({table: table, query: query})));
+    this.state = this.state.updateIn(['storedTableQueries'], (list) => list.push(Immutable.fromJS({table: table, query: query})));
+  },
+
+  // TODO: transfer this to persistent storage.
+  getStoredTableQueriesFor(table) {
+console.log('SessionStore getStoredTableQueriesFor. Only getting stored queries for table: ' + table);
+console.log('SessionStore getStoredTableQueriesFor. Returning: %o', this.state.getIn(['storedTableQueries'], (list) => list.find((storedTableQuery) => (storedTableQuery.table === table))));
+console.log('SessionStore getStoredTableQueriesFor. this.state.get(storedTableQueries): ' + JSON.stringify(this.state.get('storedTableQueries')));
+    return this.state.getIn(['storedTableQueries'], (list) => list.find((storedTableQuery) => (storedTableQuery.table === table)));
   }
 
 });

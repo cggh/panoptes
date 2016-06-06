@@ -76,9 +76,6 @@ let QueryPicker = React.createClass({
       query: newQuery
     });
   },
-  handleSetTableQueryAsDefault() {
-    this.getFlux().store('PanoptesStore').setDefaultTableQuery(this.props.table, this.state.query);
-  },
   handleStoreTableQuery() {
 
     // TODO: remove this session-based mockup of persistent storage.
@@ -89,10 +86,8 @@ let QueryPicker = React.createClass({
 
   },
 
-// TODO: Only show setting the default query and add stored query if user isManager
-
   render() {
-    let {query, defaultTableQuery} = this.state;
+    let {query} = this.state;
     let {table} = this.props;
 
     return (
@@ -104,18 +99,6 @@ let QueryPicker = React.createClass({
           touch={false}
           sidebar={(
           <div>
-            {this.config.isManager ?
-              <List>
-                <ListItem primaryText="Default"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={defaultTableQuery}/></p>}
-                        secondaryTextLines={2}
-                        onClick={() => this.handleQueryChange(defaultTableQuery)}
-                        onDoubleClick={() => { this.handleQueryChange(defaultTableQuery); this.handlePick(); }}
-                        leftIcon={<span><Icon fixedWidth={true} name={'filter'}/><Icon fixedWidth={true} name={'anchor'}/></span>}
-                        />
-                </List>
-              : null}
-            <Divider />
             <StoredTableQueries table={table} onSelectQuery={this.handleQueryChange} />
             <Divider />
             <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleQueryChange} />
@@ -131,18 +114,12 @@ let QueryPicker = React.createClass({
           <div className="centering-container">
             {this.config.isManager ?
               <RaisedButton
-                label="Set as Default"
-                onClick={this.handleSetTableQueryAsDefault}
-                icon={<Icon fixedWidth={true} name={'anchor'} />}
+                label="Store"
+                onClick={this.handleStoreTableQuery}
+                icon={<Icon fixedWidth={true} name={'database'} />}
                 style={{marginRight: '20px'}}
               />
-              : null}
-            <RaisedButton
-              label="Store"
-              onClick={this.handleStoreTableQuery}
-              icon={<Icon fixedWidth={true} name={'database'} />}
-              style={{marginRight: '20px'}}
-            />
+            : null}
             <RaisedButton
               label="Use"
               primary={true}
