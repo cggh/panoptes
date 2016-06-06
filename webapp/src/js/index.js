@@ -86,8 +86,7 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       PanoptesStore: new PanoptesStore({
         user: config.user,
         storedSubsets: config.subsets,
-        defaultTableQueries: config.defaultTableQueries,
-        storedTableQueries: config.storedTableQueries
+        defaultTableQueries: config.defaultTableQueries
       }),
       SessionStore: new SessionStore(appState.session)
     };

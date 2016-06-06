@@ -575,14 +575,7 @@ let fetchInitialConfig = function() {
           columns: columnSpec(['linktype', 'linkname', 'linkurl']),
           order: 'linkname'
         })
-          .then((data) => fetchedConfig.externalLinks = data),
-        API.pageQuery({
-          database: dataset,
-          table: 'storedqueries',
-          columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
-          order: 'id'
-        })
-          .then((data) => fetchedConfig.storedTableQueries = data)
+          .then((data) => fetchedConfig.externalLinks = data)
       ]
     ))
     .then(() => {
@@ -650,7 +643,6 @@ let fetchInitialConfig = function() {
         summaryValues: fetchedConfig.summaryValues,
         tableRelations: fetchedConfig.tableRelations,
         defaultTableQueries: defaultTableQueries,
-        storedTableQueries: fetchedConfig.storedTableQueries,
         subsets: subsets
       }));
     });
