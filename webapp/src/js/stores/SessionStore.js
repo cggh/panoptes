@@ -29,9 +29,7 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
       SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
-      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed),
-      SESSION.TABLE_QUERY_STORE, this.emitIfNeeded(this.tableQueryStore), // TODO: transfer this to persistent storage.
-      SESSION.TABLE_QUERY_TMP_GET, this.emitIfNeeded(this.getStoredTableQueriesFor) // TODO: transfer this to persistent storage.
+      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed)
     );
   },
 
