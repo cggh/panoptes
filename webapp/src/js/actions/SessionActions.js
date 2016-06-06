@@ -70,7 +70,14 @@ let SessionActions = {
     this.dispatch(SESSION.GENE_FOUND, {
       geneId: geneId
     });
+  },
+  tableQueryUsed(table, query) {
+    this.dispatch(SESSION.TABLE_QUERY_USED, {
+      table: table,
+      query: query
+    });
   }
+
 };
 
 module.exports = SessionActions;

@@ -25,9 +25,6 @@ let RecentlyFoundGenes = React.createClass({
 
   handleSelectGene(e, geneId) {
 
-    // Add selected geneId to list of recently found genes.
-    this.getFlux().actions.session.geneFound(geneId);
-
     let container = 'containers/Gene';
     let props = {geneId: geneId};
 

@@ -24,7 +24,7 @@ let QueryString = React.createClass({
   },
 
   componentWillMount() {
-    this.config = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tables[this.props.table];
   },
 
   getStateFromFlux() {
@@ -43,7 +43,7 @@ let QueryString = React.createClass({
       </span>;
 
     let nameMap = {};
-    this.config.properties.forEach((property) => {
+    this.tableConfig.properties.forEach((property) => {
       nameMap[property.propid] = {
         name: property.name,
         toDisplayString: Formatter.bind(this, property)

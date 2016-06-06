@@ -57,7 +57,7 @@ let ListWithActions = React.createClass({
   },
 
   componentWillMount() {
-    this.config = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tables[this.props.table];
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -67,11 +67,11 @@ let ListWithActions = React.createClass({
   },
 
   icon() {
-    return this.config.icon;
+    return this.tableConfig.icon;
   },
 
   title() {
-    return this.props.title || this.config.tableCapNamePlural;
+    return this.props.title || this.tableConfig.tableCapNamePlural;
   },
 
   handleSelect(selectedPrimKey) {
@@ -84,7 +84,7 @@ let ListWithActions = React.createClass({
 
   render() {
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
-    let {description} = this.config;
+    let {description} = this.tableConfig;
     let {search} = this.state;
 
     let sidebarContent = (
@@ -115,7 +115,7 @@ let ListWithActions = React.createClass({
 /////////////// TODO: Adapted from PanoptesActions.js
 // TODO: Put const viewTypes into constants file?
 
-    let dataItemViews = this.config.dataItemViews;
+    let dataItemViews = this.tableConfig.dataItemViews;
 
     let views = Immutable.List();
     if (!dataItemViews) {
@@ -127,7 +127,7 @@ let ListWithActions = React.createClass({
         }
       });
 
-      if (this.config.hasGeoCoord) {
+      if (this.tableConfig.hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
           view: 'ItemMap',
@@ -207,7 +207,7 @@ let ListWithActions = React.createClass({
             />
             {selectedPrimKey ?
               <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
-                {this.config.settings.itemTitle || `{{${this.config.primkey}}}`}
+                {this.tableConfig.settings.itemTitle || `{{${this.tableConfig.primkey}}}`}
               </ItemTemplate> :
             null}
           </div>

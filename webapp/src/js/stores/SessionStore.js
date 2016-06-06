@@ -28,7 +28,8 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_OPEN, this.emitIfNeeded(this.tabOpen),
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
-      SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound)
+      SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
+      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed)
     );
   },
 
@@ -180,6 +181,15 @@ let SessionStore = Fluxxor.createStore({
   geneFound(payload) {
     let {geneId} = payload;
     this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
+  },
+
+  tableQueryUsed(payload) {
+    let {table, query} = payload;
+
+    // Remove the query from the list, if it already exists.
+    // Put the query at the top of the list.
+    this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table: table, query: query})));
+
   }
 
 });

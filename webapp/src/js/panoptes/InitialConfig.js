@@ -617,14 +617,14 @@ let fetchInitialConfig = function() {
     //parseStoredSubsets();
     })
     .then(() => {
-      let defaultQueries = {};
+      let defaultTableQueries = {};
       let subsets = {};
       //Turn empty queries into trivial ones
       fetchedConfig.tableCatalog.forEach((table) => {
         if (table.defaultQuery != '')
-          defaultQueries[table.id] = table.defaultQuery;
+          defaultTableQueries[table.id] = table.defaultQuery;
         else
-          defaultQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+          defaultTableQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
         subsets[table.id] = [];
       });
       //Convert chromosome lengths to integer values
@@ -642,7 +642,7 @@ let fetchInitialConfig = function() {
         settings: fetchedConfig.generalSettings,
         summaryValues: fetchedConfig.summaryValues,
         tableRelations: fetchedConfig.tableRelations,
-        defaultQueries: defaultQueries,
+        defaultTableQueries: defaultTableQueries,
         subsets: subsets
       }));
     });

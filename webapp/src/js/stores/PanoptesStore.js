@@ -1,8 +1,6 @@
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 
-import SQL from 'panoptes/SQL';
-
 import Constants from '../constants/Constants';
 //Not implemeted yet
 const SESSION = Constants.SESSION; //eslint-disable-line no-unused-vars
@@ -29,15 +27,8 @@ let PanoptesStore = Fluxxor.createStore({
   getStoredSubsetsFor(table) {
     return this.state.getIn(['storedSubsets', table]);
   },
-  getDefaultQueryFor(table) {
-    return this.state.getIn(['defaultQueries', table]);
-  },
-  getLastQueryFor(table) {
-    let last = this.state.getIn(['lastQuery', table]);
-    return last || SQL.WhereClause.encode(SQL.WhereClause.Trivial());
-  },
-  getStoredQueriesFor(table) {
-    return this.state.getIn(['storedQueries', table]);
+  getDefaultTableQueryFor(table) {
+    return this.state.getIn(['defaultTableQueries', table]);
   },
 
   getState() {
