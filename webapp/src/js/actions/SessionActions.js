@@ -76,25 +76,7 @@ let SessionActions = {
       table: table,
       query: query
     });
-  },
-
-  // TODO: transfer this to persistent storage.
-  tableQueryStore(table, query) {
-console.log('SessionActions tableQueryStore');
-    this.dispatch(SESSION.TABLE_QUERY_STORE, {
-      table: table,
-      query: query
-    });
-  },
-
-  // TODO: transfer this to persistent storage.
-  getStoredTableQueriesFor(table) {
-console.log('SessionActions getStoredTableQueriesFor');
-    this.dispatch(SESSION.TABLE_QUERY_TMP_GET, {
-      table: table
-    });
   }
-
 
 };
 

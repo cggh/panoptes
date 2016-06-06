@@ -24,7 +24,6 @@ import SQL from 'panoptes/SQL';
 
 // Containers
 import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
-import StoredTableQueries from 'containers/StoredTableQueries';
 
 let QueryPicker = React.createClass({
   mixins: [
@@ -76,18 +75,9 @@ let QueryPicker = React.createClass({
       query: newQuery
     });
   },
-  handleStoreTableQuery() {
-
-    // TODO: remove this session-based mockup of persistent storage.
-    this.getFlux().actions.session.tableQueryStore(this.props.table, this.state.query);
-
-    // Add query to list of stored queries for this table.
-    this.getFlux().store('PanoptesStore').setStoredTableQuery(this.props.table, this.state.query);
-
-  },
 
   render() {
-    let {query} = this.state;
+    let {query, defaultTableQuery} = this.state;
     let {table} = this.props;
 
     return (
@@ -99,8 +89,16 @@ let QueryPicker = React.createClass({
           touch={false}
           sidebar={(
           <div>
-            <StoredTableQueries table={table} onSelectQuery={this.handleQueryChange} />
-            <Divider />
+            <List>
+              <ListItem primaryText="Default filter"
+                        secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={defaultTableQuery}/></p>}
+                        secondaryTextLines={2}
+                        onClick={() => this.handleQueryChange(defaultTableQuery)}
+                        onDoubleClick={() => { this.handleQueryChange(defaultTableQuery); this.handlePick(); }}
+                        leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
+                        />
+            </List>
+            <Divider/>
             <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleQueryChange} />
           </div>
         )}>
@@ -112,14 +110,6 @@ let QueryPicker = React.createClass({
             <QueryString className="text" prepend="Filter: " table={table} query={query}/>
           </div>
           <div className="centering-container">
-            {this.config.isManager ?
-              <RaisedButton
-                label="Store"
-                onClick={this.handleStoreTableQuery}
-                icon={<Icon fixedWidth={true} name={'database'} />}
-                style={{marginRight: '20px'}}
-              />
-            : null}
             <RaisedButton
               label="Use"
               primary={true}

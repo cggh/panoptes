@@ -56,11 +56,9 @@ function getAppState(location) {
       },
       modal: {},
       foundGenes: [],
-      usedTableQueries: [],
-      storedTableQueries: []
+      usedTableQueries: []
     }
   };
-  // TODO: remove this session-based mockup when using persistent storage.
 
   if (match)
     return API.fetchData(match[0]).then((appState) => appState || defaultState
