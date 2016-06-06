@@ -170,7 +170,7 @@ let GenomeBrowserWithActions = React.createClass({
     );
     return (
       <Sidebar
-        styles={{sidebar:{paddingRight: `${scrollbarSize()}px`}}}
+        styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
         docked={sidebar}
         sidebar={sidebarContent}>
         <div className="vertical stack">
@@ -180,7 +180,6 @@ let GenomeBrowserWithActions = React.createClass({
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   />
-            <span className="text">WTF</span>
           </div>
           <GenomeBrowser componentUpdate={componentUpdate} sideWidth={150} {...subProps} />
         </div>
