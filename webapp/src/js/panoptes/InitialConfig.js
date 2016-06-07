@@ -575,7 +575,14 @@ let fetchInitialConfig = function() {
           columns: columnSpec(['linktype', 'linkname', 'linkurl']),
           order: 'linkname'
         })
-          .then((data) => fetchedConfig.externalLinks = data)
+          .then((data) => fetchedConfig.externalLinks = data),
+        API.pageQuery({
+          database: dataset,
+          table: 'storedqueries',
+          columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
+          order: 'id'
+        })
+          .then((data) => fetchedConfig.storedTableQueries = data)
       ]
     ))
     .then(() => {
@@ -607,6 +614,10 @@ let fetchInitialConfig = function() {
           fetchedConfig.mapTableCatalog[graphInfo.tableid].treesById[ graphInfo.graphid] = tree;
         }
       });
+      fetchedConfig.storedTableQueries.forEach((table) => {
+console.log(table);
+        fetchedConfig.storedTableQueries[table.id] = table;
+      });
     })
     .then(parseCustomProperties)
     .then(parseSummaryValues)
@@ -618,6 +629,7 @@ let fetchInitialConfig = function() {
     })
     .then(() => {
       let defaultTableQueries = {};
+      let storedTableQueries = {};
       let subsets = {};
       //Turn empty queries into trivial ones
       fetchedConfig.tableCatalog.forEach((table) => {
@@ -643,6 +655,7 @@ let fetchInitialConfig = function() {
         summaryValues: fetchedConfig.summaryValues,
         tableRelations: fetchedConfig.tableRelations,
         defaultTableQueries: defaultTableQueries,
+        storedTableQueries: storedTableQueries,
         subsets: subsets
       }));
     });

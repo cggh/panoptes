@@ -191,7 +191,6 @@ let DataTableWithActions = React.createClass({
     } else {
       downloadURL += '&order' + '=' + this.tableConfig.primkey;
     }
-//FIXME: ascending is true when position field is descending.
     downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
     return downloadURL;
   },
@@ -266,6 +265,7 @@ let DataTableWithActions = React.createClass({
   },
 
   render() {
+    console.log('this config: ', this.config);
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen} = this.state;

@@ -15,6 +15,8 @@ import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
 
+// UI
+import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 
 // Panoptes
@@ -24,18 +26,27 @@ import SQL from 'panoptes/SQL';
 
 // Containers
 import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
+import StoredTableQueries from 'containers/StoredTableQueries';
 
 let QueryPicker = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    StoreWatchMixin('PanoptesStore')],
+    StoreWatchMixin('PanoptesStore')
+  ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
     onPick: React.PropTypes.func.isRequired,
-    initialQuery: React.PropTypes.string
+    initialQuery: React.PropTypes.string,
+    hasSidebar: React.PropTypes.bool
+  },
+
+  getDefaultProps() {
+    return {
+      hasSidebar: true
+    };
   },
 
   getStateFromFlux() {
@@ -77,32 +88,33 @@ let QueryPicker = React.createClass({
   },
 
   render() {
-    let {query, defaultTableQuery} = this.state;
-    let {table} = this.props;
+    let {query} = this.state;
+    let {table, hasSidebar} = this.props;
 
     return (
       <div className="large-modal query-picker">
         <Sidebar
           styles={{sidebar: {paddingRight: `${scrollbarSize()}px`}}}
-          docked={true}
+          docked={hasSidebar}
           transitions={false}
           touch={false}
           sidebar={(
-          <div style={{width: '35vw'}}>
-            <List>
-              <ListItem primaryText="Default filter"
-                        secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={defaultTableQuery}/></p>}
-                        secondaryTextLines={2}
-                        onClick={() => this.handleQueryChange(defaultTableQuery)}
-                        onDoubleClick={() => { this.handleQueryChange(defaultTableQuery); this.handlePick(); }}
-                        leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
-                        />
-            </List>
+          <div className="sidebar" style={{width: '35vw'}}>
+            <SidebarHeader icon={this.icon()} description={'Filters'}/>
+            <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
             <Divider/>
-            <RecentlyUsedTableQueries table={table} onSelectQuery={this.handleQueryChange} />
+            <RecentlyUsedTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
           </div>
         )}>
         <div className="vertical stack">
+          <div className="top-bar">
+            <Icon className="pointer icon"
+                  name={hasSidebar ? 'arrows-h' : 'bars'}
+                  onClick={() => componentUpdate({hasSidebar: !hasSidebar})}
+                  title={hasSidebar ? 'Expand' : 'Sidebar'}
+            />
+            <span className="block text">Filter editor</span>
+          </div>
           <div className="grow scroll-within query-editor-container">
             <QueryEditor table={table} query={query} onChange={this.handleQueryChange}/>
           </div>
@@ -116,12 +128,9 @@ let QueryPicker = React.createClass({
               onClick={this.handlePick}
               icon={<Icon fixedWidth={true} name={'check'} inverse={true} />}
             />
-
           </div>
         </div>
         </Sidebar>
-
-
       </div>
     );
   }

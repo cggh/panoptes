@@ -30,6 +30,9 @@ let PanoptesStore = Fluxxor.createStore({
   getDefaultTableQueryFor(table) {
     return this.state.getIn(['defaultTableQueries', table]);
   },
+  getStoredTableQueriesFor(table) {
+    return this.state.getIn(['storedTableQueries', table]);
+  },
 
   getState() {
     return this.state;
