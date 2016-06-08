@@ -111,11 +111,11 @@ let PlotWithActions = React.createClass({
           {table ? <FlatButton label="Change Filter"
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                      {
-                        table: table,
-                        initialQuery: query,
-                        onPick: this.handleQueryPick
-                      })}/>
+                        {
+                          table: table,
+                          initialQuery: query,
+                          onPick: this.handleQueryPick
+                        })}/>
             : null}
           {table ? <FlatButton label="Clear Filter"
                                primary={true}
