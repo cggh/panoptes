@@ -39,7 +39,7 @@ let QueryString = React.createClass({
 
     if ((!qry) || (qry.isTrivial))
       return <span {...other}>
-        {`${prepend} All`}
+        {`${prepend} No filter`}
       </span>;
 
     let nameMap = {};

@@ -41,7 +41,7 @@ let PanoptesStore = Fluxxor.createStore({
   storeTableQuery(payload) {
     let {table, query} = payload;
 
-    // TODO: actually update the database
+    // TODO: Update the database
 
     // Put the query at the top of the list of store queries for this table.
     let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);

@@ -61,6 +61,11 @@ let APIActions = {
         this.dispatch(APICONST.FETCH_USER_FAIL);
         ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
       });
+  },
+  storeTableQuery(table, query) {
+    this.dispatch(APICONST.STORE_TABLE_QUERY);
+
+console.log('query: ' + query);
   }
 };
 
