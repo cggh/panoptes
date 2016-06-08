@@ -631,13 +631,15 @@ console.log(table);
       let defaultTableQueries = {};
       let storedTableQueries = {};
       let subsets = {};
-      //Turn empty queries into trivial ones
       fetchedConfig.tableCatalog.forEach((table) => {
-        if (table.defaultQuery != '')
+        if (table.defaultQuery != '') {
           defaultTableQueries[table.id] = table.defaultQuery;
-        else
+        } else {
+          //Turn empty queries into trivial ones
           defaultTableQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+        }
         subsets[table.id] = [];
+        storedTableQueries[table.id] = [];
       });
       //Convert chromosome lengths to integer values
       fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>

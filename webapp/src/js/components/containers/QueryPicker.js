@@ -89,7 +89,7 @@ let QueryPicker = React.createClass({
   },
   handleStore() {
     // Add this query to the list of stored queries for this table.
-    this.getFlux().store('PanoptesStore').setStoredTableQuery({table: this.props.table, query: this.state.query});
+    this.getFlux().store('PanoptesStore').storeTableQuery({table: this.props.table, query: this.state.query});
   },
 
   render() {
@@ -105,7 +105,7 @@ let QueryPicker = React.createClass({
           touch={false}
           sidebar={(
           <div className="sidebar" style={{width: '35vw'}}>
-            <SidebarHeader icon={this.icon()} description={'Filters'}/>
+            <SidebarHeader icon={this.icon()} description={'Filters can be used to show rows that only match specified criteria.'}/>
             <StoredTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>
             <Divider/>
             <RecentlyUsedTableQueries table={table} onClick={this.handleQueryChange} onDoubleClick={this.handlePick}/>

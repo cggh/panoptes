@@ -15,7 +15,8 @@ let PanoptesStore = Fluxxor.createStore({
     );
 
     this.bindActions(
-      API.FETCH_USER_SUCCESS, this.fetchUserSuccess
+      API.FETCH_USER_SUCCESS, this.fetchUserSuccess,
+      API.STORE_TABLE_QUERY, this.storeTableQuery
     );
   },
 
@@ -37,15 +38,18 @@ let PanoptesStore = Fluxxor.createStore({
     return this.state.getIn(['storedTableQueries', table]);
   },
 
-  setStoredTableQuery(payload) {
+  storeTableQuery(payload) {
     let {table, query} = payload;
-
-console.log('payload: %o', payload);
 
     // TODO: actually update the database
 
-    // Put the query at the top of the list.
-    this.state = this.state.setIn(['storedTableQueries'], Immutable.fromJS({table: table, query: query}));
+    // Put the query at the top of the list of store queries for this table.
+    let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
+    let storedTableQueryNumber = storedTableQueriesForTable.size + 1;
+    storedTableQueriesForTable = storedTableQueriesForTable.push(Immutable.fromJS({table: table, query: query, name: 'Stored filter ' + storedTableQueryNumber}));
+    this.state = this.state.setIn(['storedTableQueries', table], storedTableQueriesForTable);
+
+console.log('storeTableQuery getStoredTableQueriesFor: %o', this.state.getIn(['storedTableQueries', table]));
   }
 
 });

@@ -69,9 +69,11 @@ let StoredTableQueries = React.createClass({
           let storedTableQueriesListItem = (
             <ListItem key={'storedTableQueriesListItem' + i}
                       primaryText={storedTableQuery.get('name')}
-                      secondaryText={<span className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')}/></span>}
+                      secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')}/></p>}
+                      secondaryTextLines={2}
                       onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
-                      leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
+                      onDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
+                      leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'}/><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'}/></span></div>}
             />
           );
 
@@ -92,15 +94,15 @@ let StoredTableQueries = React.createClass({
                   secondaryTextLines={2}
                   onClick={(e) => this.handleClick(e, defaultTableQuery)}
                   onDoubleClick={(e) => this.handleDoubleClick(e, defaultTableQuery)}
-                  leftIcon={<span><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'}/><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true}/></span></span>}
-                  />
+                  leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'}/><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true}/></span></div>}
+        />
         <ListItem primaryText="No filter"
                   secondaryText={<p className="list-string"><QueryString className="text" prepend="Filter: " table={table} query={trivialTableQuery}/></p>}
                   secondaryTextLines={2}
                   onClick={(e) => this.handleClick(e, trivialTableQuery)}
                   onDoubleClick={(e) => this.handleDoubleClick(e, trivialTableQuery)}
-                  leftIcon={<span><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'}/><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'}/></span></span>}
-                  />
+                  leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'}/><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'}/></span></div>}
+        />
         {storedTableQueriesListItems}
       </List>
     );
