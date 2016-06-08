@@ -37,6 +37,7 @@ let QueryPicker = React.createClass({
   ],
 
   propTypes: {
+    componentUpdate: React.PropTypes.func.isRequired,
     table: React.PropTypes.string.isRequired,
     onPick: React.PropTypes.func.isRequired,
     initialQuery: React.PropTypes.string,
@@ -78,7 +79,7 @@ let QueryPicker = React.createClass({
   handlePick() {
     this.props.onPick(this.state.query);
 
-    // Add query to list of recently used queries for this table.
+    // Add this query to the list of recently used queries for this table.
     this.getFlux().actions.session.tableQueryUsed(this.props.table, this.state.query);
   },
   handleQueryChange(newQuery) {
@@ -86,10 +87,14 @@ let QueryPicker = React.createClass({
       query: newQuery
     });
   },
+  handleStore() {
+    // Add this query to the list of stored queries for this table.
+    this.getFlux().store('PanoptesStore').setStoredTableQuery({table: this.props.table, query: this.state.query});
+  },
 
   render() {
     let {query} = this.state;
-    let {table, hasSidebar} = this.props;
+    let {table, hasSidebar, componentUpdate} = this.props;
 
     return (
       <div className="large-modal query-picker">
@@ -122,6 +127,17 @@ let QueryPicker = React.createClass({
             <QueryString className="text" prepend="Filter: " table={table} query={query}/>
           </div>
           <div className="centering-container">
+            {
+              this.config.isManager ?
+              <RaisedButton
+                style={{marginRight: '10px'}}
+                label="Store"
+                primary={false}
+                onClick={this.handleStore}
+                icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+              />
+              : null
+            }
             <RaisedButton
               label="Use"
               primary={true}
