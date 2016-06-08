@@ -457,5 +457,3 @@ let PerRowNumericalTrackControls = React.createClass({
 
 
 module.exports = PerRowScaledSVGChannel;
-
-
