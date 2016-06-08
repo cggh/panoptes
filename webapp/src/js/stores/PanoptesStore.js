@@ -24,6 +24,9 @@ let PanoptesStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  getState() {
+    return this.state;
+  },
   getStoredSubsetsFor(table) {
     return this.state.getIn(['storedSubsets', table]);
   },
@@ -34,9 +37,17 @@ let PanoptesStore = Fluxxor.createStore({
     return this.state.getIn(['storedTableQueries', table]);
   },
 
-  getState() {
-    return this.state;
+  setStoredTableQuery(payload) {
+    let {table, query} = payload;
+
+console.log('payload: %o', payload);
+
+    // TODO: actually update the database
+
+    // Put the query at the top of the list.
+    this.state = this.state.setIn(['storedTableQueries'], Immutable.fromJS({table: table, query: query}));
   }
+
 });
 
 module.exports = PanoptesStore;
