@@ -91,7 +91,10 @@ let QueryPicker = React.createClass({
 
   handleStore() {
 
-    if (!this.config.isManager) return null;
+    if (!this.config.isManager) {
+      console.error('handleStore requires isManager');
+      return null;
+    }
 
     // TODO: Store the current query in the db, and then refresh the list, rather than separating these actions.
 

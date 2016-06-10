@@ -644,7 +644,15 @@ let fetchInitialConfig = function() {
 
       // Key storedTableQueries by table.id
       fetchedConfig.storedTableQueries.forEach((storedTableQuery) => {
-        storedTableQueries[storedTableQuery.tableid].push(storedTableQuery);
+
+        const remappedStoredTableQuery = {
+          name: storedTableQuery.name,
+          table: storedTableQuery.tableid,
+          workspace: storedTableQuery.workspaceid,
+          query: storedTableQuery.content
+        };
+
+        storedTableQueries[storedTableQuery.tableid].push(remappedStoredTableQuery);
       });
 
       return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef

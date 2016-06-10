@@ -51,8 +51,6 @@ let PanoptesStore = Fluxxor.createStore({
 
     // Update the list of stored table queries.
     this.emit('change');
-
-console.log('storeTableQuery getStoredTableQueriesFor: %o', this.state.getIn(['storedTableQueries', table]));
   }
 
 });
