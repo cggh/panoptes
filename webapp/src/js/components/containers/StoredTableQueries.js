@@ -30,8 +30,8 @@ let StoredTableQueries = React.createClass({
 
   getStateFromFlux() {
     return {
-      storedTableQueries: this.getFlux().store('PanoptesStore').getStoredTableQueriesFor(this.props.table),
-      defaultTableQuery: this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table)
+      defaultTableQuery: this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table),
+      storedTableQueries: this.getFlux().store('PanoptesStore').getStoredTableQueriesFor(this.props.table)
     };
   },
 

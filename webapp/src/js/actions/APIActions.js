@@ -62,10 +62,43 @@ let APIActions = {
         ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
       });
   },
-  storeTableQuery(table, query) {
-    this.dispatch(APICONST.STORE_TABLE_QUERY);
+  storeTableQuery(payload) {
+    //this.dispatch(APICONST.STORE_TABLE_QUERY);
 
-console.log('query: ' + query);
+    let {dataset, table, query, name, workspace} = payload;
+
+    // Store the current query in the db via the API.
+    API.storeTableQuery(
+      {
+        dataset: dataset,
+        table: table,
+        query: query,
+        name: name,
+        workspace: workspace
+      }
+    )
+    .then((resp) => {
+
+      if ('issue' in resp) {
+        throw Error(resp.issue);
+      }
+
+      this.dispatch(
+        APICONST.STORE_TABLE_QUERY_SUCCESS,
+        {
+          id: resp.id,
+          table: resp.tableid,
+          query: resp.content,
+          name: resp.name
+        }
+      );
+    })
+    .catch((error) => {
+      this.dispatch(APICONST.STORE_TABLE_QUERY_FAIL);
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.storeTableQuery(table, query, name));
+    });
+
+
   }
 };
 

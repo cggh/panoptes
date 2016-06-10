@@ -33,7 +33,9 @@ let api = keyMirror({
   FETCH_USER: null,
   FETCH_USER_FAIL: null,
   FETCH_USER_SUCCESS: null,
-  STORE_TABLE_QUERY: null
+  STORE_TABLE_QUERY: null,
+  STORE_TABLE_QUERY_FAIL: null,
+  STORE_TABLE_QUERY_SUCCESS: null
 });
 
 
