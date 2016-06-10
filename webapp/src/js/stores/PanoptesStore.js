@@ -49,6 +49,9 @@ let PanoptesStore = Fluxxor.createStore({
     storedTableQueriesForTable = storedTableQueriesForTable.push(Immutable.fromJS({table: table, query: query, name: 'Stored filter ' + storedTableQueryNumber}));
     this.state = this.state.setIn(['storedTableQueries', table], storedTableQueriesForTable);
 
+    // Update the list of stored table queries.
+    this.emit('change');
+
 console.log('storeTableQuery getStoredTableQueriesFor: %o', this.state.getIn(['storedTableQueries', table]));
   }
 
