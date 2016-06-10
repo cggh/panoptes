@@ -579,8 +579,8 @@ let fetchInitialConfig = function() {
         API.pageQuery({
           database: dataset,
           table: 'storedqueries',
-          columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
-          order: 'id'
+          columns: columnSpec(['name', 'tableid', 'workspaceid', 'content']),
+          order: 'name'
         })
           .then((data) => fetchedConfig.storedTableQueries = data)
       ]
@@ -614,10 +614,6 @@ let fetchInitialConfig = function() {
           fetchedConfig.mapTableCatalog[graphInfo.tableid].treesById[ graphInfo.graphid] = tree;
         }
       });
-      fetchedConfig.storedTableQueries.forEach((table) => {
-console.log(table);
-        fetchedConfig.storedTableQueries[table.id] = table;
-      });
     })
     .then(parseCustomProperties)
     .then(parseSummaryValues)
@@ -645,6 +641,12 @@ console.log(table);
       fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
+
+      // Key storedTableQueries by table.id
+      fetchedConfig.storedTableQueries.forEach((storedTableQuery) => {
+        storedTableQueries[storedTableQuery.tableid].push(storedTableQuery);
+      });
+
       return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef
         user: {
           id: initialConfig.userID, //eslint-disable-line no-undef

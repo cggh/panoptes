@@ -91,6 +91,11 @@ let QueryPicker = React.createClass({
 
   handleStore() {
 
+    if (!this.config.isManager) return null;
+
+    // TODO: Store the current query in the db, and then refresh the list, rather than separating these actions.
+
+    // Store the current query in the db via the API.
     API.storeTableQuery(
       {
         dataset: this.config.dataset,
@@ -101,7 +106,7 @@ let QueryPicker = React.createClass({
       }
     );
 
-    // Add this query to the list of stored queries for this table.
+    // Add the current query to the list of stored queries for this table.
     this.getFlux().store('PanoptesStore').storeTableQuery({table: this.props.table, query: this.state.query});
   },
 
