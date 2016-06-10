@@ -265,7 +265,6 @@ let DataTableWithActions = React.createClass({
   },
 
   render() {
-    console.log('this config: ', this.config);
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen} = this.state;

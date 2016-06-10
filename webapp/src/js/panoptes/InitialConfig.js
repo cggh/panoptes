@@ -579,7 +579,7 @@ let fetchInitialConfig = function() {
         API.pageQuery({
           database: dataset,
           table: 'storedqueries',
-          columns: columnSpec(['name', 'tableid', 'workspaceid', 'content']),
+          columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
           order: 'name'
         })
           .then((data) => fetchedConfig.storedTableQueries = data)
@@ -646,6 +646,7 @@ let fetchInitialConfig = function() {
       fetchedConfig.storedTableQueries.forEach((storedTableQuery) => {
 
         const remappedStoredTableQuery = {
+          id: storedTableQuery.id,
           name: storedTableQuery.name,
           table: storedTableQuery.tableid,
           workspace: storedTableQuery.workspaceid,

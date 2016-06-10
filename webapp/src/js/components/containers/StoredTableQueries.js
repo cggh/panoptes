@@ -3,11 +3,16 @@ import React from 'react';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import ConfigMixin from 'mixins/ConfigMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
 
 // UI
 import Icon from 'ui/Icon';
@@ -21,6 +26,7 @@ let StoredTableQueries = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
+    ConfigMixin,
     StoreWatchMixin('PanoptesStore')
   ],
 
@@ -63,14 +69,33 @@ let StoredTableQueries = React.createClass({
 
         let storedTableQuery = storedTableQueries.get(i);
 
+        const iconButtonElement = (
+          <IconButton
+            touch={true}
+            tooltip="more"
+            tooltipPosition="bottom-left"
+          >
+            <MoreVertIcon />
+          </IconButton>
+        );
+
+        const rightIconMenu = (
+          <IconMenu iconButtonElement={iconButtonElement}>
+            <MenuItem>Rename</MenuItem>
+            <MenuItem>Overwrite default filter</MenuItem>
+            <MenuItem>Delete</MenuItem>
+          </IconMenu>
+        );
+
         let storedTableQueriesListItem = (
-          <ListItem key={'storedTableQueriesListItem' + i}
+          <ListItem key={storedTableQuery.get('id')}
                     primaryText={storedTableQuery.get('name')}
                     secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')}/></p>}
                     secondaryTextLines={2}
                     onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
                     onDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
                     leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'}/><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'}/></span></div>}
+                    rightIconButton={this.config.isManager ? rightIconMenu : null}
           />
         );
 
