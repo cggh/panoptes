@@ -69,20 +69,20 @@ let StoredTableQueries = React.createClass({
 
         let storedTableQuery = storedTableQueries.get(i);
 
-        const iconButtonElement = (
-          <IconButton
-            touch={true}
-            tooltip="more"
-            tooltipPosition="bottom-left"
-          >
+        let iconButtonElement = (
+          <IconButton tooltip="admin" tooltipPosition="top-center">
             <MoreVertIcon />
           </IconButton>
         );
 
-        const rightIconMenu = (
-          <IconMenu iconButtonElement={iconButtonElement}>
+        let rightIconMenu = (
+          <IconMenu
+            iconButtonElement={iconButtonElement}
+            anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+          >
             <MenuItem>Rename</MenuItem>
-            <MenuItem>Overwrite default filter</MenuItem>
+            <MenuItem>Overwrite default</MenuItem>
             <MenuItem>Delete</MenuItem>
           </IconMenu>
         );
