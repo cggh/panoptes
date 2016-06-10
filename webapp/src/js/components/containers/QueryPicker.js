@@ -23,6 +23,7 @@ import Icon from 'ui/Icon';
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
 import SQL from 'panoptes/SQL';
+import API from 'panoptes/API';
 
 // Containers
 import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
@@ -87,10 +88,21 @@ let QueryPicker = React.createClass({
       query: newQuery
     });
   },
+
   handleStore() {
+
+    API.storeTableQuery(
+      {
+        dataset: this.config.dataset,
+        table: this.props.table,
+        query: this.state.query,
+        name: 'Stored filter',
+        workspace: this.config.workspace
+      }
+    );
+
     // Add this query to the list of stored queries for this table.
     this.getFlux().store('PanoptesStore').storeTableQuery({table: this.props.table, query: this.state.query});
-    //this.getFlux().actions.api.storeTableQuery(this.props.table, this.state.query);
   },
 
   render() {

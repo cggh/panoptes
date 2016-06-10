@@ -401,6 +401,29 @@ function importDatasetConfig(dataset) {
   }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
+
+function storeTableQuery(options) {
+  assertRequired(options, ['dataset', 'table', 'query', 'name', 'workspace']);
+  let {dataset, table, query, name, workspace} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'addstoredentity',
+      database: dataset,
+      tablename: 'storedqueries',
+      tableid: table,
+      name: name,
+      content: query,
+      workspaceid: workspace
+    }
+  }).then((response) => response);
+
+}
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -408,6 +431,7 @@ module.exports = {
   requestJSON,
   pageQuery,
   storeData,
+  storeTableQuery,
   fetchData,
   summaryData,
   annotationData,
