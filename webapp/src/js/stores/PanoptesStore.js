@@ -16,7 +16,8 @@ let PanoptesStore = Fluxxor.createStore({
 
     this.bindActions(
       API.FETCH_USER_SUCCESS, this.fetchUserSuccess,
-      API.STORE_TABLE_QUERY_SUCCESS, this.storeTableQuerySuccess
+      API.STORE_TABLE_QUERY_SUCCESS, this.storeTableQuerySuccess,
+      API.DELETE_STORED_TABLE_QUERY_SUCCESS, this.deleteStoredTableQuerySuccess
     );
   },
 
@@ -29,6 +30,13 @@ let PanoptesStore = Fluxxor.createStore({
     let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
     storedTableQueriesForTable = storedTableQueriesForTable.push(Immutable.fromJS({id: id, table: table, query: query, name: name}));
     this.state = this.state.setIn(['storedTableQueries', table], storedTableQueriesForTable);
+    this.emit('change');
+  },
+  deleteStoredTableQuerySuccess(payload) {
+    let {table, storedTableQueryId} = payload;
+    let pos = this.state.getIn(['storedTableQueries', table]).indexOf(storedTableQueryId);
+    let newStoredTableQueriesForTable = this.state.getIn(['storedTableQueries', table]).delete(pos);
+    this.state = this.state.setIn(['storedTableQueries', table], newStoredTableQueriesForTable);
     this.emit('change');
   },
 

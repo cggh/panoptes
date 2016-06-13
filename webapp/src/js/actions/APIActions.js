@@ -62,6 +62,7 @@ let APIActions = {
         ErrorReport(this.flux, error.message, () => this.flux.actions.api.fetchUser(dataset));
       });
   },
+
   storeTableQuery(payload) {
     //this.dispatch(APICONST.STORE_TABLE_QUERY);
 
@@ -97,9 +98,42 @@ let APIActions = {
       this.dispatch(APICONST.STORE_TABLE_QUERY_FAIL);
       ErrorReport(this.flux, error.message, () => this.flux.actions.api.storeTableQuery(table, query, name));
     });
+  },
 
+  deleteStoredTableQuery(payload) {
+    //this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY);
 
+    let {dataset, id} = payload;
+
+    // Store the current query in the db via the API.
+    API.deleteStoredTableQuery(
+      {
+        dataset: dataset,
+        id: id
+      }
+    )
+    .then((resp) => {
+
+      if ('issue' in resp) {
+        throw Error(resp.issue);
+      }
+
+      this.dispatch(
+        APICONST.DELETE_STORED_TABLE_QUERY_SUCCESS,
+        {
+          id: resp.id,
+          table: resp.tableid,
+          query: resp.content,
+          name: resp.name
+        }
+      );
+    })
+    .catch((error) => {
+      this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY_FAIL);
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.deleteStoredTableQuery(dataset, id));
+    });
   }
+
 };
 
 module.exports = APIActions;

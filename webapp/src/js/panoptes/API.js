@@ -424,6 +424,27 @@ function storeTableQuery(options) {
 
 }
 
+
+function deleteStoredTableQuery(options) {
+  assertRequired(options, ['dataset', 'id']);
+  let {dataset, id} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'delstoredentity',
+      database: dataset,
+      tablename: 'storedqueries',
+      id: id
+    }
+  }).then((response) => response);
+}
+
+// TODO: Maintain an order to this list?
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -443,5 +464,6 @@ module.exports = {
   fetchImportStatusData,
   fetchImportStatusLog,
   importDataset,
-  importDatasetConfig
+  importDatasetConfig,
+  deleteStoredTableQuery
 };
