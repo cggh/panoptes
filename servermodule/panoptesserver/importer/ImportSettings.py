@@ -833,6 +833,88 @@ the *Properties* block of the data table settings.
 
         print (self._getDocFooter(), file = f)
         f.close()
+    
+    def _printPropertySchemaDef(self, key, detail, f, indent = '', last = False):
+             
+        jsonIndent = '    '
+        print(indent + '"' + key + '": {', file = f)
+        line = ''
+        if 'values' in detail:
+            line = line + indent + jsonIndent + '"enum": ['
+            line = line + ', '.join(map(lambda x: '"' + x + '"', detail['values']))
+            line = line + '],'
+            print(line, file = f)
+        else:
+            line = indent + jsonIndent + '"type": "'
+            if detail['type'] == 'Boolean':
+                line = line + 'boolean'
+            elif detail['type'] == 'Text':
+                line = line + 'string'
+            elif detail['type'] == 'Value':
+                line = line + 'integer'
+            elif detail['type'] == 'List':
+                line = line + 'array'
+            elif detail['type'] == 'Block':
+                line = line + 'object'
+            else:
+                line = line + 'string'
+            line = line + '",'
+            print(line, file = f)
+        
+        if 'children' in detail:
+            print(indent + jsonIndent + ' "items": ', file = f)
+            print(indent + jsonIndent + jsonIndent + ' {', file = f)
+            print(indent + jsonIndent + jsonIndent + jsonIndent + '"type": "object",', file = f)
+            print(indent + jsonIndent + jsonIndent + jsonIndent + '"properties": {', file = f)
+            lastChild = None
+            for val in detail['children']:
+                lastChild = val
+            for val in detail['children']:
+                self._printPropertySchemaDef(val, detail['children'][val], f, indent + jsonIndent + jsonIndent + jsonIndent + jsonIndent, val == lastChild)
+                
+            print(indent + jsonIndent + jsonIndent + jsonIndent + '}', file = f)
+            print(indent + jsonIndent + jsonIndent + ' }', file = f)
+            print(indent + jsonIndent + ',', file = f)
+        line = indent + jsonIndent + '"description": "' + detail['description'].replace('\n', ' ').replace('\r', '').replace('"','').replace('`','').replace('\'','') + '"' 
+        print(line, file = f)
+
+        line = indent + '}'
+        if not last:
+            line = line + ','
+        print(line, file = f)
+            
+    def generateJsonSchema(self):
+        
+        indent = '        '
+        #This will be done several times but I don't think that really matters....
+        f = open('jsonschema/datatable_properties.json', 'w')
+        print('''{
+        ''', file = f)
+        print('''    "type": "object", 
+    "properties": {''', file = f)
+        settings = self.getSettings()
+        last = ''
+        for key in settings:
+            last = key
+        for key in settings:
+            detail = settings[key]
+            self._printPropertySchemaDef(key, detail, f, indent, key == last)
+        print('''    }
+}''', file = f)
+        f.close()
+          
+        '''
+        #This does the work 
+        f = open(self._getSchemaFilename(), 'w')
+        print (self._getSchemaHeader(), file = f)
+        settings = self._getSchemaSettings()
+        for key in settings:
+            detail = settings[key]
+            self._printPropertySchemaDef(key, detail, f)
+
+        print (self._getSchemaFooter(), file = f)
+        f.close()
+        '''
         
 if __name__ == '__main__':
 
@@ -852,7 +934,8 @@ if __name__ == '__main__':
     
     settings = SettingsDataTable()
     settings.generateDocs()
-
+    settings.generateJsonSchema()
+    
     settings = SettingsDataset()
     settings.generateDocs()
     
