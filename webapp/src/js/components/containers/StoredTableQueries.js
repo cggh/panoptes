@@ -137,8 +137,8 @@ let StoredTableQueries = React.createClass({
             primaryText={storedTableQuery.get('name')}
             secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')} /></p>}
             secondaryTextLines={2}
-            TMPonClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
-            TMPonDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
+            onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
+            onDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
             leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
             rightIconButton={rightIconButtons}
           />
