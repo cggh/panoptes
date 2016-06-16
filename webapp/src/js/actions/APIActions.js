@@ -64,7 +64,6 @@ let APIActions = {
   },
 
   storeTableQuery(payload) {
-    //this.dispatch(APICONST.STORE_TABLE_QUERY);
 
     let {dataset, table, query, name, workspace} = payload;
 
@@ -96,12 +95,11 @@ let APIActions = {
     })
     .catch((error) => {
       this.dispatch(APICONST.STORE_TABLE_QUERY_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.storeTableQuery(table, query, name));
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.storeTableQuery({dataset, table, query, name, workspace}));
     });
   },
 
   deleteStoredTableQuery(payload) {
-    //this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY);
 
     let {dataset, table, id} = payload;
 
@@ -128,7 +126,42 @@ let APIActions = {
     })
     .catch((error) => {
       this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.deleteStoredTableQuery(dataset, id));
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.deleteStoredTableQuery({dataset, table, id}));
+    });
+  },
+
+  setDefaultTableQuery(payload) {
+
+    let {dataset, table, query} = payload;
+
+    // TODO: Get the query from the stored table queries.
+
+
+    // Overwrite the default query in the db via the API.
+    API.setDefaultTableQuery(
+      {
+        dataset: dataset,
+        table: table,
+        query: query
+      }
+    )
+    .then((resp) => {
+
+      if ('issue' in resp) {
+        throw Error(resp.issue);
+      }
+
+      this.dispatch(
+        APICONST.SET_DEFAULT_TABLE_QUERY_SUCCESS,
+        {
+          table: resp.id,
+          query: resp.defaultQuery
+        }
+      );
+    })
+    .catch((error) => {
+      this.dispatch(APICONST.SET_DEFAULT_TABLE_QUERY_FAIL);
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.setDefaultTableQuery({dataset, table, query}));
     });
   }
 

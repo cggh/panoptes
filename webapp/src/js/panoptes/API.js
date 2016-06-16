@@ -443,6 +443,24 @@ function deleteStoredTableQuery(options) {
   }).then((response) => response);
 }
 
+function setDefaultTableQuery(options) {
+  assertRequired(options, ['dataset', 'table', 'query']);
+  let {dataset, table, query} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'update_default_query',
+      database: dataset,
+      id: table,
+      defaultQuery: query
+    }
+  }).then((response) => response);
+}
+
 // TODO: Maintain an order to this list?
 
 module.exports = {
@@ -465,5 +483,6 @@ module.exports = {
   fetchImportStatusLog,
   importDataset,
   importDatasetConfig,
-  deleteStoredTableQuery
+  deleteStoredTableQuery,
+  setDefaultTableQuery
 };

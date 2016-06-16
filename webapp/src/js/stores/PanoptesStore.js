@@ -20,7 +20,9 @@ let PanoptesStore = Fluxxor.createStore({
       API.STORE_TABLE_QUERY_SUCCESS, this.storeTableQuerySuccess,
       API.STORE_TABLE_QUERY_FAIL, this.storeTableQueryFail,
       API.DELETE_STORED_TABLE_QUERY_SUCCESS, this.deleteStoredTableQuerySuccess,
-      API.DELETE_STORED_TABLE_QUERY_FAIL, this.deleteStoredTableQueryFail
+      API.DELETE_STORED_TABLE_QUERY_FAIL, this.deleteStoredTableQueryFail,
+      API.SET_DEFAULT_TABLE_QUERY_SUCCESS, this.setDefaultTableQuerySuccess,
+      API.SET_DEFAULT_TABLE_QUERY_FAIL, this.setDefaultTableQueryFail
     );
   },
 
@@ -55,6 +57,15 @@ let PanoptesStore = Fluxxor.createStore({
   },
   deleteStoredTableQueryFail(payload) {
     console.error('deleteStoredTableQueryFail: %o', payload);
+  },
+
+  setDefaultTableQuerySuccess(payload) {
+    let {table, query} = payload;
+    this.state = this.state.setIn(['defaultTableQueries', table], query);
+    this.emit('change');
+  },
+  setDefaultTableQueryFail(payload) {
+    console.error('setDefaultTableQueryFail: %o', payload);
   },
 
   getState() {

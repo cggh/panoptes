@@ -74,11 +74,23 @@ console.log('handleOverwrite storedTableQueryId:' + storedTableQueryId);
 
   },
 
-  handleOverwriteDefault(e, storedTableQueryId) {
-console.log('handleOverwriteDefault storedTableQueryId:' + storedTableQueryId);
+  handleOverwriteDefault(e, query) {
+
+    if (!this.config.isManager) {
+      console.error('handleOverwriteDefault requires isManager');
+      return null;
+    }
 
     // TODO: Use Confirm, but we are already in a modal!
 
+    // Overwrite the default query in the db with the specified stored query and then update the state.
+    this.getFlux().actions.api.setDefaultTableQuery(
+      {
+        dataset: this.config.dataset,
+        table: this.props.table,
+        query: query
+      }
+    );
 
   },
 
@@ -91,7 +103,7 @@ console.log('handleOverwriteDefault storedTableQueryId:' + storedTableQueryId);
 
     // TODO: Use Confirm, but we are already in a modal!
 
-    // Delete the specified query in the db and update the state.
+    // Delete the specified query in the db and then update the state.
     this.getFlux().actions.api.deleteStoredTableQuery(
       {
         dataset: this.config.dataset,
@@ -129,7 +141,7 @@ console.log('handleOverwriteDefault storedTableQueryId:' + storedTableQueryId);
               <IconMenu iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}>
                 <MenuItem key="1" rightIcon={<Icon name={'pencil'}/>} primaryText="Rename" onClick={(e) => this.handleRename(e, storedTableQuery.get('id'))} />
                 <MenuItem key="2" rightIcon={<Icon name={'arrow-circle-o-left'}/>} primaryText="Overwrite" onClick={(e) => this.handleOverwrite(e, storedTableQuery.get('id'))} />
-                <MenuItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('id'))} />
+                <MenuItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Set as default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))} />
                 <MenuItem key="4" rightIcon={<Icon name={'trash-o'}/>} primaryText="Delete" onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))} />
               </IconMenu>
               : null
@@ -138,7 +150,7 @@ console.log('handleOverwriteDefault storedTableQueryId:' + storedTableQueryId);
             <List>
               <ListItem key="1" rightIcon={<Icon name={'pencil'}/>} primaryText="Rename" onClick={(e) => this.handleRename(e, storedTableQuery.get('id'))} />
               <ListItem key="2" rightIcon={<Icon name={'arrow-circle-o-left'}/>} primaryText="Overwrite" onClick={(e) => this.handleOverwrite(e, storedTableQuery.get('id'))} />
-              <ListItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('id'))} />
+              <ListItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Set as default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))} />
               <ListItem key="4" rightIcon={<Icon name={'trash-o'}/>} primaryText="Delete" onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))} />
             </List>
           </ListItem>
