@@ -83,7 +83,6 @@ console.log('handleOverwriteDefault storedTableQueryId:' + storedTableQueryId);
   },
 
   handleDelete(e, storedTableQueryId) {
-console.log('handleDelete storedTableQueryId:' + storedTableQueryId);
 
     if (!this.config.isManager) {
       console.error('handleDelete requires isManager');
@@ -96,6 +95,7 @@ console.log('handleDelete storedTableQueryId:' + storedTableQueryId);
     this.getFlux().actions.api.deleteStoredTableQuery(
       {
         dataset: this.config.dataset,
+        table: this.props.table,
         id: storedTableQueryId
       }
     );
@@ -111,9 +111,7 @@ console.log('handleDelete storedTableQueryId:' + storedTableQueryId);
     // TODO: remove storedTableQueries (assume defined)
     if (storedTableQueries && storedTableQueries.size > 0) {
 
-      for (let i = 0, len = storedTableQueries.size; i < len; i++) {
-
-        let storedTableQuery = storedTableQueries.get(i);
+      storedTableQueries.forEach((storedTableQuery) => {
 
         // FIXME: IconMenu isn't showing (meantime developing using List instead).
 
@@ -148,7 +146,7 @@ console.log('handleDelete storedTableQueryId:' + storedTableQueryId);
 
         storedTableQueriesListItems.push(storedTableQueriesListItem);
 
-      }
+      });
 
     }
 

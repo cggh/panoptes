@@ -16,8 +16,11 @@ let PanoptesStore = Fluxxor.createStore({
 
     this.bindActions(
       API.FETCH_USER_SUCCESS, this.fetchUserSuccess,
+      API.FETCH_USER_FAIL, this.fetchUserFail,
       API.STORE_TABLE_QUERY_SUCCESS, this.storeTableQuerySuccess,
-      API.DELETE_STORED_TABLE_QUERY_SUCCESS, this.deleteStoredTableQuerySuccess
+      API.STORE_TABLE_QUERY_FAIL, this.storeTableQueryFail,
+      API.DELETE_STORED_TABLE_QUERY_SUCCESS, this.deleteStoredTableQuerySuccess,
+      API.DELETE_STORED_TABLE_QUERY_FAIL, this.deleteStoredTableQueryFail
     );
   },
 
@@ -25,19 +28,33 @@ let PanoptesStore = Fluxxor.createStore({
     this.state = this.state.set('user', payload);
     this.emit('change');
   },
+  fetchUserFail(payload) {
+    console.error('fetchUserFail: %o', payload);
+  },
+
   storeTableQuerySuccess(payload) {
     let {id, table, query, name} = payload;
     let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
-    storedTableQueriesForTable = storedTableQueriesForTable.push(Immutable.fromJS({id: id, table: table, query: query, name: name}));
-    this.state = this.state.setIn(['storedTableQueries', table], storedTableQueriesForTable);
-    this.emit('change');
-  },
-  deleteStoredTableQuerySuccess(payload) {
-    let {table, storedTableQueryId} = payload;
-    let pos = this.state.getIn(['storedTableQueries', table]).indexOf(storedTableQueryId);
-    let newStoredTableQueriesForTable = this.state.getIn(['storedTableQueries', table]).delete(pos);
+    const newStoredTableQuery = Immutable.fromJS({id: id, table: table, query: query, name: name});
+    // FIXME: id_ prefix being used to workaround lowercasing of config keys.
+    const newStoredTableQueriesForTable = storedTableQueriesForTable.set('id_' + id, newStoredTableQuery);
     this.state = this.state.setIn(['storedTableQueries', table], newStoredTableQueriesForTable);
     this.emit('change');
+  },
+  storeTableQueryFail(payload) {
+    console.error('storeTableQueryFail: %o', payload);
+  },
+
+  deleteStoredTableQuerySuccess(payload) {
+    let {table, id} = payload;
+    let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
+    // FIXME: id_ prefix being used to workaround lowercasing of config keys.
+    const newStoredTableQueriesForTable = storedTableQueriesForTable.delete('id_' + id);
+    this.state = this.state.setIn(['storedTableQueries', table], newStoredTableQueriesForTable);
+    this.emit('change');
+  },
+  deleteStoredTableQueryFail(payload) {
+    console.error('deleteStoredTableQueryFail: %o', payload);
   },
 
   getState() {

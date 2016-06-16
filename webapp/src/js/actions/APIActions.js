@@ -103,7 +103,7 @@ let APIActions = {
   deleteStoredTableQuery(payload) {
     //this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY);
 
-    let {dataset, id} = payload;
+    let {dataset, table, id} = payload;
 
     // Store the current query in the db via the API.
     API.deleteStoredTableQuery(
@@ -121,10 +121,8 @@ let APIActions = {
       this.dispatch(
         APICONST.DELETE_STORED_TABLE_QUERY_SUCCESS,
         {
-          id: resp.id,
-          table: resp.tableid,
-          query: resp.content,
-          name: resp.name
+          table: table,
+          id: resp.id
         }
       );
     })

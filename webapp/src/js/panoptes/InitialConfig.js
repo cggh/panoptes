@@ -635,14 +635,14 @@ let fetchInitialConfig = function() {
           defaultTableQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
         }
         subsets[table.id] = [];
-        storedTableQueries[table.id] = [];
+        storedTableQueries[table.id] = {};
       });
       //Convert chromosome lengths to integer values
       fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
 
-      // Key storedTableQueries by table.id
+      // Key storedTableQueries by table.id and query id
       fetchedConfig.storedTableQueries.forEach((storedTableQuery) => {
 
         const remappedStoredTableQuery = {
@@ -653,7 +653,9 @@ let fetchInitialConfig = function() {
           query: storedTableQuery.content
         };
 
-        storedTableQueries[storedTableQuery.tableid].push(remappedStoredTableQuery);
+        // FIXME: workaround all keys in config being converted to lower case
+        storedTableQueries[storedTableQuery.tableid]['id_' + storedTableQuery.id] = remappedStoredTableQuery;
+
       });
 
       return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef
