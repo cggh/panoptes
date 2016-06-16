@@ -9,10 +9,7 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 // Material UI
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import MenuItem from 'material-ui/MenuItem';
 
 // UI
 import Icon from 'ui/Icon';
@@ -56,22 +53,6 @@ let StoredTableQueries = React.createClass({
 
   handleDoubleClick(e, query) {
     this.props.onDoubleClick(query);
-  },
-
-  handleRename(e, storedTableQueryId) {
-console.log('handleRename storedTableQueryId:' + storedTableQueryId);
-
-    // TODO: Use Confirm, but we are already in a modal!
-
-
-  },
-
-  handleOverwrite(e, storedTableQueryId) {
-console.log('handleOverwrite storedTableQueryId:' + storedTableQueryId);
-
-    // TODO: Use Confirm, but we are already in a modal!
-
-
   },
 
   handleOverwriteDefault(e, query) {
@@ -127,7 +108,30 @@ console.log('handleOverwrite storedTableQueryId:' + storedTableQueryId);
 
         // FIXME: IconMenu isn't showing (meantime developing using List instead).
 
+        let rightIconButtons = null;
+        if (this.config.isManager) {
+          rightIconButtons = (
+            <div>
+              <IconButton
+                tooltip="Set as default"
+                tooltipPosition="top-left"
+                onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))}
+              >
+                <Icon name={'thumb-tack'} inverse={false} />
+              </IconButton>
+              <IconButton
+                tooltip="Delete"
+                tooltipPosition="top-left"
+                onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))}
+              >
+                <Icon name={'trash-o'} inverse={false} />
+              </IconButton>
+            </div>
+          );
+        }
+
         let storedTableQueriesListItem = (
+          <div>
           <ListItem
             key={storedTableQuery.get('id')}
             primaryText={storedTableQuery.get('name')}
@@ -136,24 +140,9 @@ console.log('handleOverwrite storedTableQueryId:' + storedTableQueryId);
             TMPonClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
             TMPonDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
             leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
-            rightIconButton={
-              this.config.isManager ?
-              <IconMenu iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}>
-                <MenuItem key="1" rightIcon={<Icon name={'pencil'}/>} primaryText="Rename" onClick={(e) => this.handleRename(e, storedTableQuery.get('id'))} />
-                <MenuItem key="2" rightIcon={<Icon name={'arrow-circle-o-left'}/>} primaryText="Overwrite" onClick={(e) => this.handleOverwrite(e, storedTableQuery.get('id'))} />
-                <MenuItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Set as default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))} />
-                <MenuItem key="4" rightIcon={<Icon name={'trash-o'}/>} primaryText="Delete" onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))} />
-              </IconMenu>
-              : null
-            }
-          >
-            <List>
-              <ListItem key="1" rightIcon={<Icon name={'pencil'}/>} primaryText="Rename" onClick={(e) => this.handleRename(e, storedTableQuery.get('id'))} />
-              <ListItem key="2" rightIcon={<Icon name={'arrow-circle-o-left'}/>} primaryText="Overwrite" onClick={(e) => this.handleOverwrite(e, storedTableQuery.get('id'))} />
-              <ListItem key="3" rightIcon={<Icon name={'thumb-tack'}/>} primaryText="Set as default" onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))} />
-              <ListItem key="4" rightIcon={<Icon name={'trash-o'}/>} primaryText="Delete" onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))} />
-            </List>
-          </ListItem>
+            rightIconButton={rightIconButtons}
+          />
+          </div>
         );
 
         storedTableQueriesListItems.push(storedTableQueriesListItem);

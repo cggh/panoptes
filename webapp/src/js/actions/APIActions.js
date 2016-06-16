@@ -134,9 +134,6 @@ let APIActions = {
 
     let {dataset, table, query} = payload;
 
-    // TODO: Get the query from the stored table queries.
-
-
     // Overwrite the default query in the db via the API.
     API.setDefaultTableQuery(
       {
