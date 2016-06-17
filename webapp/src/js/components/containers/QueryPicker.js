@@ -129,7 +129,6 @@ let QueryPicker = React.createClass({
 
     if (this.state.storedFilterName === '') {
       // TODO: error message to user
-      console.log('this.state.storedFilterName is blank');
       return null;
     }
 
