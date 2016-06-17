@@ -14,6 +14,7 @@ import IconButton from 'material-ui/IconButton';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
+import TextField from 'material-ui/TextField';
 
 // UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -38,16 +39,15 @@ let QueryPicker = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
     table: React.PropTypes.string.isRequired,
     onPick: React.PropTypes.func.isRequired,
     initialQuery: React.PropTypes.string,
-    hasSidebar: React.PropTypes.bool
+    initialStoredFilterNameFocus: React.PropTypes.bool
   },
 
   getDefaultProps() {
     return {
-      hasSidebar: true
+      initialStoredFilterNameFocus: false
     };
   },
 
@@ -57,14 +57,24 @@ let QueryPicker = React.createClass({
     };
   },
 
+  // TODO: Can we move stuff out of state and into props, maybe using the componentUpdate prop?
   getInitialState() {
     return {
-      query: this.props.initialQuery || this.state.defaultTableQuery || SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: this.props.initialQuery || this.state.defaultTableQuery || SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+      storedFilterNameOpen: this.props.initialStoredFilterNameFocus,
+      hasSidebar: true,
+      storedFilterName: ''
     };
   },
 
   componentWillMount() {
     this.tableConfig = this.config.tables[this.props.table];
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.storedFilterNameOpen) {
+      this.refs.storedFilterNameField.focus();
+    }
   },
 
   icon() {
@@ -89,10 +99,37 @@ let QueryPicker = React.createClass({
     });
   },
 
+  handleStoredFilterNameOpen() {
+
+    if (!this.config.isManager) {
+      console.error('handleStoredFilterNameOpen requires isManager');
+      return null;
+    }
+
+    this.setState({storedFilterNameOpen: true});
+  },
+
+  handleStoredFilterNameChange(event) {
+    this.setState({storedFilterName: event.target.value});
+  },
+
+  handleStoredFilterNameBlur(event) {
+    if (this.state.storedFilterName === '') {
+      // NB: If this runs when storedFilterName !== '', handleStore() will not run, because the event gets quashed, apparently.
+      this.setState({storedFilterNameOpen: false});
+    }
+  },
+
   handleStore() {
 
     if (!this.config.isManager) {
       console.error('handleStore requires isManager');
+      return null;
+    }
+
+    if (this.state.storedFilterName === '') {
+      // TODO: error message to user
+      console.log('this.state.storedFilterName is blank');
       return null;
     }
 
@@ -102,16 +139,22 @@ let QueryPicker = React.createClass({
         dataset: this.config.dataset,
         table: this.props.table,
         query: this.state.query,
-        name: 'Stored filter',
+        name: this.state.storedFilterName,
         workspace: this.config.workspace
       }
     );
+
+    this.setState({storedFilterNameOpen: false});
+
+  },
+
+  handleToggleSidebar() {
+    this.setState({hasSidebar: !this.state.hasSidebar});
   },
 
   render() {
-    let {query} = this.state;
-    let {table, hasSidebar, componentUpdate} = this.props;
-
+    let {query, storedFilterNameOpen, hasSidebar, storedFilterName} = this.state;
+    let {table} = this.props;
     return (
       <div className="large-modal query-picker">
         <Sidebar
@@ -131,7 +174,7 @@ let QueryPicker = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={hasSidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => componentUpdate({hasSidebar: !hasSidebar})}
+                  onClick={this.handleToggleSidebar}
                   title={hasSidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text">Filter editor</span>
@@ -144,14 +187,37 @@ let QueryPicker = React.createClass({
           </div>
           <div className="centering-container">
             {
-              this.config.isManager ?
-              <RaisedButton
-                style={{marginRight: '10px'}}
-                label="Store"
-                primary={false}
-                onClick={this.handleStore}
-                icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
-              />
+              this.config.isManager && storedFilterNameOpen ?
+              <div>
+                <TextField
+                  ref="storedFilterNameField"
+                  hintText="Stored filter name"
+                  value={storedFilterName}
+                  onChange={this.handleStoredFilterNameChange}
+                  onBlur={this.handleStoredFilterNameBlur}
+                  style={{width: '10em', marginRight: '10px'}}
+                />
+                <RaisedButton
+                  style={{marginRight: '10px'}}
+                  label="Store"
+                  primary={false}
+                  onClick={this.handleStore}
+                  icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                />
+              </div>
+              : null
+            }
+            {
+              this.config.isManager && !storedFilterNameOpen ?
+              <div>
+                <RaisedButton
+                  style={{marginRight: '10px'}}
+                  label="Store as..."
+                  primary={false}
+                  onClick={this.handleStoredFilterNameOpen}
+                  icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                />
+              </div>
               : null
             }
             <RaisedButton
