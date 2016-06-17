@@ -103,7 +103,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (this.props.chromosome !== chromosome ||
         this.props.query !== query ||
         this.props.colourProperty !== colourProperty ||
-        !(this.blockLevel === blockLevel 
+        !(this.blockLevel === blockLevel
         && this.blockIndex === blockIndex
         && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
@@ -136,7 +136,7 @@ let PerRowIndicatorChannel = React.createClass({
           .then((blocks) => {
             this.props.onChangeLoadStatus('DONE');
             this.applyData(this.props, blocks);
-        }))
+          }))
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
           throw err;
@@ -144,9 +144,9 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-            this.applyData(this.props, {});
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-          });
+          this.applyData(this.props, {});
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+        });
     }
     this.draw(props);
   },
@@ -174,11 +174,11 @@ let PerRowIndicatorChannel = React.createClass({
     }
     //Filter out big blocks and merge neighbouring ones.
     this.tooBigBlocks = _transform(_filter(blocks, {_tooBig: true}), (merged, block) => {
-      const lastBlock = merged[merged.length-1];
+      const lastBlock = merged[merged.length - 1];
       //if (lastBlock) console.log(lastBlock._blockStart + lastBlock._blockSize, block._blockStart);
       if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
         //Copy to avoid mutating the cache
-        merged[merged.length-1] = {...lastBlock, _blockSize:lastBlock._blockSize + block._blockSize};
+        merged[merged.length - 1] = {...lastBlock, _blockSize: lastBlock._blockSize + block._blockSize};
       } else {
         merged.push(block);
       }
@@ -192,9 +192,9 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.clip();
     let majorAxis = Math.max(dx, dy);
     ctx.beginPath();
-    for (let n = -1*(majorAxis) ; n < majorAxis; n += delta) {
+    for (let n = -1 * (majorAxis) ; n < majorAxis; n += delta) {
       ctx.moveTo(n + x1, y1);
-      ctx.lineTo(dy + n + x1 , y1 + dy);
+      ctx.lineTo(dy + n + x1, y1 + dy);
     }
     ctx.stroke();
     ctx.restore();
@@ -223,14 +223,14 @@ let PerRowIndicatorChannel = React.createClass({
     this.tooBigBlocks.forEach((block) => {
       const pixelStart = scaleFactor * (block._blockStart - start);
       const pixelSize = scaleFactor * ( block._blockSize);
-      const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth)/2 : pixelStart + (pixelSize/2);
+      const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth) / 2 : pixelStart + (pixelSize / 2);
       this.hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
       if (pixelSize > 100) {
         ctx.save();
         ctx.fillStyle = 'black';
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 6;
-        ctx.lineJoin = "miter"; //Prevent letters with tight angles making spikes
+        ctx.lineJoin = 'miter'; //Prevent letters with tight angles making spikes
         ctx.miterLimit = 2;
         ctx.strokeText('Zoom in', textPos, psy + 12);
         ctx.fillText('Zoom in', textPos, psy + 12);
@@ -351,5 +351,3 @@ const PerRowIndicatorControls = React.createClass({
 });
 
 module.exports = PerRowIndicatorChannel;
-
-

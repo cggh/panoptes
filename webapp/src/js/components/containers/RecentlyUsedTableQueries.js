@@ -30,6 +30,7 @@ let RecentlyUsedTableQueries = React.createClass({
   getStateFromFlux() {
     return {
       usedTableQueries: this.getFlux().store('SessionStore').getState().get('usedTableQueries')
+      // TODO: usedTableQueries: this.getFlux().store('SessionStore').getUsedTableQueriesFor({table: this.props.table})
     };
   },
 
@@ -38,7 +39,11 @@ let RecentlyUsedTableQueries = React.createClass({
   },
 
   handleClick(e, query) {
-    this.props.onSelectQuery(query);
+    this.props.onClick(query);
+  },
+
+  handleDoubleClick(e, query) {
+    this.props.onDoubleClick(query);
   },
 
   render() {
@@ -62,6 +67,7 @@ let RecentlyUsedTableQueries = React.createClass({
             <ListItem key={'usedTableQueriesListItem' + i}
                       primaryText={<span className="list-string"><QueryString className="text" prepend="" table={table} query={usedTableQuery.get('query')}/></span>}
                       onClick={(e) => this.handleClick(e, usedTableQuery.get('query'))}
+                      onDoubleClick={(e) => this.handleDoubleClick(e, usedTableQuery.get('query'))}
                       leftIcon={<Icon fixedWidth={true} name={'filter'}/>}
             />
           );
@@ -74,13 +80,17 @@ let RecentlyUsedTableQueries = React.createClass({
 
       usedTableQueriesList = (
         <List>
-          <Subheader>Recently used filters</Subheader>
+          <Subheader>Recently used filters:</Subheader>
           {usedTableQueriesListItems}
         </List>
       );
 
     } else {
-      usedTableQueriesList = null;
+      usedTableQueriesList = (
+        <List>
+          <Subheader>No recently used filters.</Subheader>
+        </List>
+      );
     }
     return usedTableQueriesList;
   }

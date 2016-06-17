@@ -339,6 +339,7 @@ function fetchImportStatusData(options) {
   };
   // TODO: only get logs for this dataset
   //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
+  // FIXME: the relevant database is not always called 'datasetindex'. It's sometimes called 'panoptes'.
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
   return pageQuery(
     {
@@ -400,6 +401,69 @@ function importDatasetConfig(dataset) {
   }).then((resp) => JSON.parse(Base64.decode(resp.content)));
 }
 
+
+function storeTableQuery(options) {
+  assertRequired(options, ['dataset', 'table', 'query', 'name', 'workspace']);
+  let {dataset, table, query, name, workspace} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'addstoredentity',
+      database: dataset,
+      tablename: 'storedqueries',
+      tableid: table,
+      name: name,
+      content: query,
+      workspaceid: workspace
+    }
+  }).then((response) => response);
+
+}
+
+
+function deleteStoredTableQuery(options) {
+  assertRequired(options, ['dataset', 'id']);
+  let {dataset, id} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'delstoredentity',
+      database: dataset,
+      tablename: 'storedqueries',
+      id: id
+    }
+  }).then((response) => response);
+}
+
+function setDefaultTableQuery(options) {
+  assertRequired(options, ['dataset', 'table', 'query']);
+  let {dataset, table, query} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'update_default_query',
+      database: dataset,
+      id: table,
+      defaultQuery: query
+    }
+  }).then((response) => response);
+}
+
+
+// TODO: Maintain an order to this list?
+
 module.exports = {
   serverURL,
   filterAborted,
@@ -407,6 +471,7 @@ module.exports = {
   requestJSON,
   pageQuery,
   storeData,
+  storeTableQuery,
   fetchData,
   summaryData,
   annotationData,
@@ -418,5 +483,7 @@ module.exports = {
   fetchImportStatusData,
   fetchImportStatusLog,
   importDataset,
-  importDatasetConfig
+  importDatasetConfig,
+  deleteStoredTableQuery,
+  setDefaultTableQuery
 };

@@ -191,7 +191,6 @@ let DataTableWithActions = React.createClass({
     } else {
       downloadURL += '&order' + '=' + this.tableConfig.primkey;
     }
-//FIXME: ascending is true when position field is descending.
     downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
     return downloadURL;
   },

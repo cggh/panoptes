@@ -575,7 +575,14 @@ let fetchInitialConfig = function() {
           columns: columnSpec(['linktype', 'linkname', 'linkurl']),
           order: 'linkname'
         })
-          .then((data) => fetchedConfig.externalLinks = data)
+          .then((data) => fetchedConfig.externalLinks = data),
+        API.pageQuery({
+          database: dataset,
+          table: 'storedqueries',
+          columns: columnSpec(['id', 'name', 'tableid', 'workspaceid', 'content']),
+          order: 'name'
+        })
+          .then((data) => fetchedConfig.storedTableQueries = data)
       ]
     ))
     .then(() => {
@@ -618,19 +625,39 @@ let fetchInitialConfig = function() {
     })
     .then(() => {
       let defaultTableQueries = {};
+      let storedTableQueries = {};
       let subsets = {};
-      //Turn empty queries into trivial ones
       fetchedConfig.tableCatalog.forEach((table) => {
-        if (table.defaultQuery != '')
+        if (table.defaultQuery != '') {
           defaultTableQueries[table.id] = table.defaultQuery;
-        else
+        } else {
+          //Turn empty queries into trivial ones
           defaultTableQueries[table.id] = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+        }
         subsets[table.id] = [];
+        storedTableQueries[table.id] = {};
       });
       //Convert chromosome lengths to integer values
       fetchedConfig.chromosomes = attrMap(fetchedConfig.chromosomes.map((chrom) =>
         ({id: chrom.id, len: parseFloat(chrom.len) * 1000000})
       ), 'id');
+
+      // Key storedTableQueries by table.id and query id
+      fetchedConfig.storedTableQueries.forEach((storedTableQuery) => {
+
+        const remappedStoredTableQuery = {
+          id: storedTableQuery.id,
+          name: storedTableQuery.name,
+          table: storedTableQuery.tableid,
+          workspace: storedTableQuery.workspaceid,
+          query: storedTableQuery.content
+        };
+
+        // FIXME: workaround all keys in config being converted to lower case
+        storedTableQueries[storedTableQuery.tableid]['id_' + storedTableQuery.id] = remappedStoredTableQuery;
+
+      });
+
       return caseChange(Object.assign(initialConfig, { //eslint-disable-line no-undef
         user: {
           id: initialConfig.userID, //eslint-disable-line no-undef
@@ -643,6 +670,7 @@ let fetchInitialConfig = function() {
         summaryValues: fetchedConfig.summaryValues,
         tableRelations: fetchedConfig.tableRelations,
         defaultTableQueries: defaultTableQueries,
+        storedTableQueries: storedTableQueries,
         subsets: subsets
       }));
     });
