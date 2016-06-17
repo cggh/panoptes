@@ -339,11 +339,11 @@ function fetchImportStatusData(options) {
   };
   // TODO: only get logs for this dataset
   //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
-  // FIXME: the relevant database is not always called 'datasetindex'. It's sometimes called 'panoptes'.
+
   let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
   return pageQuery(
     {
-      database: 'datasetindex',
+      database: '', // Falls back to default DB in DQXServer config
       table: 'calculations',
       columns: columns,
       query: query,
