@@ -26,8 +26,8 @@ let Popup = React.createClass({
       y: React.PropTypes.number
     }),
     initialSize: ImmutablePropTypes.shape({
-      w: React.PropTypes.number,
-      h: React.PropTypes.number
+      width: React.PropTypes.number,
+      height: React.PropTypes.number
     }),
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
@@ -61,15 +61,13 @@ let Popup = React.createClass({
 
   getStateFromFlux() {
     return {
-      popups: this.getFlux().store('SessionStore').getState().get('popups')
+      numberOfPopups: this.getFlux().store('SessionStore').getState().get('popups').getIn(['components']).size
     };
   },
 
   componentWillMount() {
 
-    let numberOfPopups = this.state.popups.getIn(['components']).size;
-
-    let positionOffset = (numberOfPopups - 1) * 10;
+    let positionOffset = (this.state.numberOfPopups - 1) * 10;
 
     this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffset, y: this.props.initialPosition.get('y') + positionOffset})});
 
