@@ -34,9 +34,10 @@ let SessionActions = {
   popupClose(compId) {
     this.dispatch(SESSION.POPUP_CLOSE, {compId});
   },
-  popupOpen(component = null, props = {}) {
+  popupOpen(component = null, props = {}, switchTo = true) {
     this.dispatch(SESSION.POPUP_OPEN, {
-      component: {component, props}
+      component: {component, props},
+      switchTo
     });
   },
   popupFocus(compId) {

@@ -93,18 +93,24 @@ let SessionStore = Fluxxor.createStore({
   },
 
   popupOpen(payload) {
-    let {component, compId} = payload;
-    if (compId)
+    let {component, compId, switchTo} = payload;
+
+    if (compId) {
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
-    else {
+    } else {
       if (!component.component)
         component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
       let id = uid(10);
       this.state = this.state.setIn(['components', id], component);
       this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(id));
+
+      if (switchTo) {
+        this.popupFocus({compId: id});
+      }
     }
+
   },
 
   popupResize(payload) {

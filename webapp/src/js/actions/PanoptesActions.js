@@ -77,7 +77,8 @@ const PanoptesActions = (config) => ({
       component: {
         component: 'containers/DataItem',
         props: {table, primKey, views}
-      }
+      },
+      switchTo: true
     });
   }
 });
