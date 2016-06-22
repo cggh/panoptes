@@ -461,6 +461,23 @@ function setDefaultTableQuery(options) {
   }).then((response) => response);
 }
 
+function recordCount(options) {
+  assertRequired(options, ['database', 'table']);
+
+  let {database, table, query, maxRecordCount} = options;
+
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    params: {
+      datatype: 'getrecordcount',
+      database: database,
+      tbname: table,
+      qry: query,
+      maxrecordcount: maxRecordCount
+    }
+  }).then((response) => response.TotalRecordCount);
+}
 
 // TODO: Maintain an order to this list?
 
@@ -485,5 +502,6 @@ module.exports = {
   importDataset,
   importDatasetConfig,
   deleteStoredTableQuery,
-  setDefaultTableQuery
+  setDefaultTableQuery,
+  recordCount
 };

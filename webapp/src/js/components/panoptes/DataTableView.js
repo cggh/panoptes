@@ -77,7 +77,8 @@ let DataTableView = React.createClass({
       loadStatus: 'loaded',
       width: 0,
       height: 0,
-      showableRowsCount: 0
+      showableRowsCount: 0,
+      totalRowsCount: 0
     };
   },
 
@@ -96,7 +97,8 @@ let DataTableView = React.createClass({
     if (props.columns.size > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
-      let APIargs = {
+
+      let pageQueryAPIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columnspec,
@@ -106,26 +108,42 @@ let DataTableView = React.createClass({
         start: startRowIndex,
         stop: stopRowIndex
       };
+
+      let recordCountAPIargs = {
+        database: this.config.dataset,
+        table: tableConfig.fetchTableName,
+        query: query
+      };
+
       requestContext.request((componentCancellation) =>
+        Promise.all([
           LRUCache.get(
-            'pageQuery' + JSON.stringify(APIargs),
+            'pageQuery' + JSON.stringify(pageQueryAPIargs),
             (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+              API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
+            componentCancellation
+          ),
+          LRUCache.get(
+            'recordCount' + JSON.stringify(recordCountAPIargs),
+            (cacheCancellation) =>
+              API.recordCount({cancellation: cacheCancellation, ...recordCountAPIargs}),
             componentCancellation
           )
-        )
-        .then((data) => {
-          this.setState({
-            loadStatus: 'loaded',
-            rows: data
-          });
-        })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-          this.setState({loadStatus: 'error'});
+        ])
+      )
+      .then(([rows, rowsCount]) => {
+        this.setState({
+          loadStatus: 'loaded',
+          rows: rows,
+          totalRowsCount: rowsCount
         });
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error'});
+      });
     } else {
       this.setState({rows: []});
     }
@@ -177,8 +195,12 @@ let DataTableView = React.createClass({
       this.forceFetch();
       this.props.onShowableRowsCountChange(this.state.showableRowsCount);
     }
-    if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length)
+    if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length) {
       this.props.onFetchedRowsCountChange(this.state.rows.length);
+    }
+    if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
+      this.props.onTotalRowsCountChange(this.state.totalRowsCount);
+    }
   },
 
   render() {

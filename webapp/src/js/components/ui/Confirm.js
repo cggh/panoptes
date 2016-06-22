@@ -49,8 +49,9 @@ let Confirm = React.createClass({
 
   render() {
     let {message, cancelButtonLabel, confirmButtonLabel} = this.props;
+
     return (
-      <div style={{padding: '10px'}}>
+      <div style={{padding: '10px', maxWidth: '80vw'}}>
         <div style={{padding: '10px'}}>{message}</div>
         <div style={{padding: '5px 0 0 0', textAlign: 'center'}}>
           <RaisedButton
