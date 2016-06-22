@@ -1,15 +1,22 @@
 import React from 'react';
 
+// Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-// lodash
-import _throttle from 'lodash/throttle';
+// Lodash
 import _map from 'lodash/map';
 
 // Panoptes
 import RegionGenesList from 'panoptes/RegionGenesList';
+
+// Panoptes UI
+import Icon from 'ui/Icon';
+
+// Material UI
+import RaisedButton from 'material-ui/RaisedButton';
+
 
 let FindGeneByRegion = React.createClass({
   mixins: [
@@ -26,9 +33,20 @@ let FindGeneByRegion = React.createClass({
   getDefaultProps() {
     return {
       chromosome: null,
+      chromosomeLength: null,
       startPosition: 0,
       endPosition: null,
-      chromosomeLength: null
+      findChromosome: null,
+      findStartPosition: null,
+      findEndPosition: null
+    };
+  },
+
+  getInitialState() {
+    return {
+      findChromosome: null,
+      findStartPosition: null,
+      findEndPosition: null
     };
   },
 
@@ -36,18 +54,16 @@ let FindGeneByRegion = React.createClass({
     return this.props.title;
   },
 
-  componentDidMount() {
-    this.handleChromChange = _throttle(this.handleChromChange, 500);
-    this.handleStartPosChange = _throttle(this.handleStartPosChange, 500);
-    this.handleEndPosChange = _throttle(this.handleEndPosChange, 500);
+  componentWillMount() {
+    this.props.componentUpdate({'endPosition': parseInt(this.config.chromosomes[this.props.chromosome].len)});
   },
 
   handleChromChange(event) {
     this.props.componentUpdate({
       'chromosome': event.target.value,
+      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len),
       'startPosition': 0,
-      'endPosition': parseInt(this.config.chromosomes[event.target.value].len),
-      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len)
+      'endPosition': parseInt(this.config.chromosomes[event.target.value].len)
     });
   },
 
@@ -61,6 +77,16 @@ let FindGeneByRegion = React.createClass({
     if (event.target) {
       this.props.componentUpdate({'endPosition': event.target.value});
     }
+  },
+
+  handleFind() {
+    this.setState(
+      {
+        'findChromosome': this.props.chromosome,
+        'findStartPosition': this.props.startPosition,
+        'findEndPosition': this.props.endPosition
+      }
+    );
   },
 
   handleSelectGene(e, geneId) {
@@ -83,15 +109,16 @@ let FindGeneByRegion = React.createClass({
 
   render() {
 
-    let {chromosome, startPosition, endPosition, chromosomeLength} = this.props;
+    let {chromosome, chromosomeLength, startPosition, endPosition} = this.props;
+    let {findChromosome, findStartPosition, findEndPosition} = this.state;
 
     let geneList = null;
 
-    if (chromosome === null || startPosition === null || endPosition === null || startPosition === '' || endPosition === '' ) {
+    if (findChromosome === null || findStartPosition === null || findEndPosition === null || findStartPosition === '' || findEndPosition === '' ) {
 
       geneList = (
         <div style={{padding: '10px'}}>
-          <p>Select the chromosome and enter the start and end positions.</p>
+          <p>Select the relevant chromosome and enter the start and end positions.</p>
         </div>
       );
 
@@ -99,9 +126,9 @@ let FindGeneByRegion = React.createClass({
 
       geneList = (
         <RegionGenesList
-          chromosome={chromosome}
-          startPosition={parseInt(startPosition)}
-          endPosition={parseInt(endPosition)}
+          chromosome={findChromosome}
+          startPosition={parseInt(findStartPosition)}
+          endPosition={parseInt(findEndPosition)}
           onSelectGene={this.handleSelectGene}
           icon="bitmap:genomebrowser.png"
         />
@@ -131,11 +158,13 @@ let FindGeneByRegion = React.createClass({
           <tr>
             <th className="table-col-header">Start:</th>
             <td className="table-col-cell">
-              <input value={startPosition}
-                     onChange={this.handleStartPosChange}
-                     min={0}
-                     max={endPosition ? endPosition : chromosomeLength}
-                     type="number"
+              <input
+                ref="startPosition"
+                value={startPosition}
+                onChange={this.handleStartPosChange}
+                min={0}
+                max={endPosition ? endPosition : chromosomeLength}
+                type="number"
               />
             </td>
             <td className="table-col-cell">bp</td>
@@ -143,15 +172,31 @@ let FindGeneByRegion = React.createClass({
           <tr>
             <th className="table-col-header">End:</th>
             <td className="table-col-cell">
-              <input value={endPosition}
-                     onChange={this.handleEndPosChange}
-                     min={startPosition ? startPosition : 0}
-                     max={chromosomeLength}
-                     type="number"
+              <input
+                ref="endPosition"
+                value={endPosition}
+                onChange={this.handleEndPosChange}
+                min={startPosition ? startPosition : 0}
+                max={chromosomeLength}
+                type="number"
               />
             </td>
             <td className="table-col-cell">bp</td>
           </tr>
+          <tr>
+            <th className="table-col-header"></th>
+            <td className="table-col-cell">
+              <RaisedButton
+                label="Find"
+                disabled={startPosition < 0 || endPosition > chromosomeLength}
+                primary={true}
+                icon={<Icon fixedWidth={true} name="search" inverse={true} />}
+                onClick={this.handleFind}
+              />
+            </td>
+            <td className="table-col-cell"></td>
+          </tr>
+
         </tbody>
         </table>
         <div style={{position: 'relative', width: '100%', height: '200px'}}>

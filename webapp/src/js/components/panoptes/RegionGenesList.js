@@ -94,7 +94,7 @@ let RegionGenesList = React.createClass({
   },
 
   render() {
-    let {icon} = this.props;
+    let {icon, chromosome, startPosition, endPosition} = this.props;
     let {loadStatus, regionGenesData} = this.state;
 
     if (loadStatus !== 'loaded') {
@@ -110,7 +110,7 @@ let RegionGenesList = React.createClass({
     );
     if (regionGenesData.length > 0) {
       subheaderText = (
-        <span>Found {regionGenesData.length} genes:</span>
+        <span>Found {regionGenesData.length} genes on chromosome {chromosome} between positions {startPosition} and {endPosition}:</span>
       );
     }
 
