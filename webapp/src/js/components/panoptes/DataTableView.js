@@ -240,16 +240,21 @@ let DataTableView = React.createClass({
                   }
                   cell={({rowIndex}) => {
 
-                    let background = 'rgba(0,0,0,0)';
+                    let background = 'inherit';
                     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
                     let cellData = rows[rowIndex][propid];
+
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
                       let percent = 100 * (cellData - minVal) / (maxVal - minVal);
                       background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
+
                       let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
+
                       background = MAX_COLOR.clone().lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
+
+
                     }
                     if (categoryColors) {
                       let col = categoryColors[cellData] || categoryColors['_other_'];
@@ -261,9 +266,6 @@ let DataTableView = React.createClass({
                         background = col.rgbString();
                       }
                     }
-
-                    // FIXME: TMP fix; background would otherwise remain black for value fields.
-                    background = 'inherit';
 
                     return (
                         <div className="table-row-cell"
