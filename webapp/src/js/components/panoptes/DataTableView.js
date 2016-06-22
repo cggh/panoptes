@@ -262,6 +262,9 @@ let DataTableView = React.createClass({
                       }
                     }
 
+                    // FIXME: TMP fix; background would otherwise remain black for value fields.
+                    background = 'inherit';
+
                     return (
                         <div className="table-row-cell"
                                         style={{
