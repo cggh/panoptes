@@ -1,7 +1,11 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
+import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 import Draggable from 'react-draggable';
 import {Resizable} from 'react-resizable';
@@ -10,16 +14,20 @@ import Icon from 'ui/Icon';
 
 
 let Popup = React.createClass({
-  mixins: [PureRenderMixin],
+  mixins: [
+    PureRenderMixin,
+    FluxMixin,
+    StoreWatchMixin('SessionStore')
+  ],
 
   propTypes: {
-    position: ImmutablePropTypes.shape({
+    initialPosition: ImmutablePropTypes.shape({
       x: React.PropTypes.number,
       y: React.PropTypes.number
     }),
-    size: ImmutablePropTypes.shape({
-      w: React.PropTypes.number,
-      h: React.PropTypes.number
+    initialSize: ImmutablePropTypes.shape({
+      width: React.PropTypes.number,
+      height: React.PropTypes.number
     }),
     onMoveStop: React.PropTypes.func,
     onResizeStop: React.PropTypes.func,
@@ -31,11 +39,11 @@ let Popup = React.createClass({
 
   getDefaultProps() {
     return {
-      position: Immutable.Map({
+      initialPosition: Immutable.Map({
         x: 100,
         y: 100
       }),
-      size: Immutable.Map({
+      initialSize: Immutable.Map({
         width: 700,
         height: 500
       })
@@ -44,10 +52,25 @@ let Popup = React.createClass({
 
   getInitialState() {
     return {
-      size: this.props.size,
+      position: this.props.initialPosition,
+      size: this.props.initialSize,
       icon: null,
       title: null
     };
+  },
+
+  getStateFromFlux() {
+    return {
+      numberOfPopups: this.getFlux().store('SessionStore').getState().get('popups').getIn(['components']).size
+    };
+  },
+
+  componentWillMount() {
+
+    let positionOffset = (this.state.numberOfPopups - 1) * 10;
+
+    this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffset, y: this.props.initialPosition.get('y') + positionOffset})});
+
   },
 
   componentDidMount() {
@@ -96,8 +119,9 @@ let Popup = React.createClass({
   },
 
   render() {
-    let {position, size, children, ...other} = this.props;
-    let {icon, title} = this.state;
+    let {children, ...other} = this.props;
+    let {icon, title, position, size} = this.state;
+
     if (!children)
       return null;
     return (
@@ -111,7 +135,7 @@ let Popup = React.createClass({
                    onResize={this.handleResize}
                    onResizeStop={this.handleResizeStop}>
           <div className="popup"
-               style={this.state.size.toObject()}
+               style={size.toObject()}
                {...other}>
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}

@@ -4,7 +4,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import Formatter from 'panoptes/Formatter';
 import Icon from 'ui/Icon';
 import FluxMixin from 'mixins/FluxMixin';
-
+import ItemLink from 'panoptes/ItemLink';
 
 let PropertyCell = React.createClass({
   mixins: [
@@ -15,12 +15,6 @@ let PropertyCell = React.createClass({
   propTypes: {
     prop: React.PropTypes.object,
     value: React.PropTypes.any
-  },
-
-  handleClick() {
-    let actions = this.getFlux().actions.panoptes;
-    let {prop, value} = this.props;
-    actions.dataItemPopup({table: prop.tableid, primKey: value.toString()});
   },
 
   render() {
@@ -44,12 +38,9 @@ let PropertyCell = React.createClass({
       let val = (value == '1');
       return <Icon className={(val ? 'prop bool true' : 'prop bool false')}
                    fixedWidth={false}
-                   name={val ? 'check' : 'times'}/>;
+                   name={val ? 'check' : 'times'} />;
     } else if (prop.isPrimKey) {
-      return <span className="prop internal-link"
-            onClick={this.handleClick}>
-      {text}
-    </span>;
+      return <ItemLink table={prop.tableid} primKey={value} />;
     }
     return <span className="prop">
       {text}
