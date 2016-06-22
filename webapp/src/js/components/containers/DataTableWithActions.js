@@ -31,7 +31,7 @@ import SQL from 'panoptes/SQL';
 
 // Constants for this component
 // TODO: move to app config?
-const DOWNLOAD_MAX_DATA_POINTS = 10000000;
+const DOWNLOAD_MAX_DATA_POINTS = 1000000;
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
