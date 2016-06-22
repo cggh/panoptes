@@ -29,6 +29,10 @@ import QueryString from 'panoptes/QueryString';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
+// Constants for this component
+// TODO: move to app config?
+const DOWNLOAD_MAX_DATA_POINTS = 10000000;
+
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
@@ -66,7 +70,8 @@ let DataTableWithActions = React.createClass({
       fetchedRowsCount: 0,
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
-      searchOpen: this.props.initialSearchFocus || this.props.searchText !== ''
+      searchOpen: this.props.initialSearchFocus || this.props.searchText !== '',
+      totalRowsCount: 0
     };
   },
 
@@ -124,9 +129,11 @@ let DataTableWithActions = React.createClass({
     this.setState({showableRowsCount: showableRowsCount});
   },
 
+  handleTotalRowsCountChange(totalRowsCount) {
+    this.setState({totalRowsCount: totalRowsCount});
+  },
+
   handleNextPage() {
-    // FIXME: In some cases, this allows us to navigate past the end.
-    // Without a totalRowCount we can only know the end when we've either reached it or gone past it.
     this.setState({startRowIndex: this.state.startRowIndex + this.state.showableRowsCount});
   },
 
@@ -142,7 +149,9 @@ let DataTableWithActions = React.createClass({
     this.setState({startRowIndex: 0});
   },
 
-  // TODO: handleLastPage()
+  handleLastPage() {
+    this.setState({startRowIndex: this.state.totalRowsCount - this.state.showableRowsCount});
+  },
 
   createActiveColumnListString() {
     let {columns} = this.props;
@@ -196,10 +205,34 @@ let DataTableWithActions = React.createClass({
   },
 
   handleDownload(query) {
-    let downloadURL = this.createDownloadUrl(query);
-    if (downloadURL) {
-      window.location.href = downloadURL;
+
+    let cancelDownload = () => { null; };
+
+    let doDownload = () => {
+      let downloadURL = this.createDownloadUrl(query);
+      if (downloadURL) {
+        window.location.href = downloadURL;
+      }
+    };
+
+    let {columns} = this.props;
+    if (!columns)
+      columns = Immutable.List(this.tableConfig.properties)
+        .filter((prop) => prop.showByDefault && prop.showInTable)
+        .map((prop) => prop.propid);
+
+    let totalDataPoints = this.state.totalRowsCount * columns.size;
+
+    if (totalDataPoints > DOWNLOAD_MAX_DATA_POINTS) {
+
+      let message = `You have asked to download ${totalDataPoints} data points, which is more than our recommended limit of ${DOWNLOAD_MAX_DATA_POINTS}. Please use a stricter filter or fewer columns, or contact us directly.`;
+      this.getFlux().actions.session.modalOpen('ui/Confirm', {title: 'Warning', message: message, confirmButtonLabel: 'Download', onCancel: cancelDownload, onConfirm: doDownload});
+
+    } else {
+      doDownload();
     }
+
+
   },
 
   handleSearchOpen() {
@@ -267,7 +300,8 @@ let DataTableWithActions = React.createClass({
   render() {
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
+
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns)
       columns = Immutable.List(this.tableConfig.properties)
@@ -391,11 +425,11 @@ let DataTableWithActions = React.createClass({
       shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {startRowIndex + fetchedRowsCount}</span>;
     } else if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
       // If we're showing something and it's all we can show, then make no further assumptions (there could be more or we might be showing the last lot).
-      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount}</span>;
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {totalRowsCount}</span>;
     }
 
     let pageForwardNav = null;
-    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
+    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount && (startRowIndex + showableRowsCount < totalRowsCount)) {
       // If we are showing something and it's as many as possible, then provide nav to further rows.
       pageForwardNav = (
         <span>
@@ -403,6 +437,11 @@ let DataTableWithActions = React.createClass({
               name="step-forward"
               title={'Next ' + showableRowsCount + ' rows'}
               onClick={this.handleNextPage}
+        />
+        <Icon className="pointer icon"
+              name="fast-forward"
+              title={'Last ' + showableRowsCount + ' rows'}
+              onClick={this.handleLastPage}
         />
         </span>
       );
@@ -413,6 +452,10 @@ let DataTableWithActions = React.createClass({
         <Icon className="pointer icon disabled"
               name="step-forward"
               title={'Showing last ' + fetchedRowsCount + ' rows'}
+        />
+        <Icon className="pointer icon disabled"
+              name="fast-forward"
+              title={'Showing last ' + showableRowsCount + ' rows'}
         />
         </span>
       );
@@ -450,6 +493,7 @@ let DataTableWithActions = React.createClass({
                            startRowIndex={startRowIndex}
                            onShowableRowsCountChange={this.handleShowableRowsCountChange}
                            onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
+                           onTotalRowsCountChange={this.handleTotalRowsCountChange}
               />
             </div>
         </div>
