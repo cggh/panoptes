@@ -3,14 +3,16 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Color from 'color';
+
+// Lodash
 import _throttle from 'lodash/throttle';
+import _cloneDeep from 'lodash/cloneDeep';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-
 
 import {Table, Column} from 'fixed-data-table';
 import 'fixed-data-table/dist/fixed-data-table.css';
@@ -240,16 +242,17 @@ let DataTableView = React.createClass({
                   }
                   cell={({rowIndex}) => {
 
-                    let background = 'rgba(0,0,0,0)';
+                    let background = 'inherit';
                     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
                     let cellData = rows[rowIndex][propid];
+
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
                       let percent = 100 * (cellData - minVal) / (maxVal - minVal);
                       background = `linear-gradient(to right, ${rowIndex % 2 ? 'rgb(115, 190, 252)' : 'rgb(150, 207, 253)'} ${percent}%, rgba(0,0,0,0) ${percent}%`;
                     } else if (cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
-                      background = MAX_COLOR.clone().lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
+                      background = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
                     }
                     if (categoryColors) {
                       let col = categoryColors[cellData] || categoryColors['_other_'];
