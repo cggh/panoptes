@@ -88,7 +88,7 @@
     "react-notification-system": "^0.2.7",
     "react-phylocanvas": "0.0.2",
     "react-plotlyjs": "^0.3.2",
-    "react-resizable": "git+https://github.com/benjeffery/react-resizable.git",
+    "react-resizable": "^1.4.1",
     "react-sidebar": "^2.1.1",
     "react-tap-event-plugin": "^1.0.0",
     "scrollbar-size": "^1.0.4",
