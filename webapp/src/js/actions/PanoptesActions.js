@@ -3,7 +3,6 @@ const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
   dataItemPopup({table, primKey, switchTo = true}) {
-console.log('dataItemPopup switchTo: ' + switchTo);
     let dataItemViews = config.tables[table].dataItemViews;
     let views = [];
     if (!dataItemViews) {
