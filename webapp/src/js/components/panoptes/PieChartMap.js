@@ -50,6 +50,16 @@ let PieChartMap = React.createClass({
     onPanZoom: React.PropTypes.func
   },
 
+  getDefaultProps() {
+    return {
+      zoom: 1,
+      center: Immutable.fromJS({
+        lat: 0,
+        lng: 0
+      })
+    };
+  },
+
   getInitialState() {
     return {
       width: 100,
@@ -90,11 +100,18 @@ let PieChartMap = React.createClass({
     this.setState({bounds});
   },
 
+  handleClickPieChart(e, marker) {
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+    if (!middleClick) {
+      e.stopPropagation();
+    }
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.locationTable, primKey: marker.locationPrimKey.toString(), switchTo: !middleClick});
+  },
+
   render() {
     let {center, zoom, markers} = this.props;
     let {bounds} = this.state;
     center = center ? center.toObject() : null;
-    let actions = this.getFlux().actions;
 
     //If no bounds have been set then clip to the pies.
     if (!bounds) {
@@ -181,8 +198,7 @@ let PieChartMap = React.createClass({
                         name={marker.name}
                         radius={marker.radius}
                         chartData={marker.chartData}
-                        onClick={() => actions.panoptes.dataItemPopup({table: marker.locationTable,
-                                primKey: marker.locationPrimKey.toString()})}
+                        onClick={(e) => this.handleClickPieChart(e, marker)}
                       />
                   )
                 }

@@ -2,7 +2,7 @@ import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
-  dataItemPopup({table, primKey}) {
+  dataItemPopup({table, primKey, switchTo = true}) {
     let dataItemViews = config.tables[table].dataItemViews;
     let views = [];
     if (!dataItemViews) {
@@ -78,7 +78,7 @@ const PanoptesActions = (config) => ({
         component: 'containers/DataItem',
         props: {table, primKey, views}
       },
-      switchTo: true
+      switchTo: switchTo
     });
   }
 });

@@ -42,6 +42,12 @@ let PieChartMapTab = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired
   },
 
+  getDefaultProps() {
+    return {
+      defaultResidualFractionName: 'Other'
+    };
+  },
+
   getInitialState() {
     return {
       loadStatus: 'loaded',
@@ -50,7 +56,7 @@ let PieChartMapTab = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {chartConfig, table, primKey} = props;
+    let {chartConfig, table, primKey, defaultResidualFractionName} = props;
     chartConfig = chartConfig.toJS();
     let {locationDataTable, locationNameProperty, locationSizeProperty,
       residualFractionName, componentColumns} = chartConfig;
@@ -129,19 +135,18 @@ let PieChartMapTab = React.createClass({
             let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
             markerChartData.push({
               name: componentColumns[j].name,
-              value: chartData[chartDataColumnIndex],
+              value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
               color: componentColumns[j].color
             });
           }
-          if (residualFractionName || residualFractionName === '') {
-            let sum = _sumBy(markerChartData, 'value');
-            if (sum < 1)
-              markerChartData.push({
-                name: residualFractionName,
-                value: 1 - sum,
-                color: RESIDUAL_SECTOR_COLOR
-              });
-          }
+
+          let sum = _sumBy(markerChartData, 'value');
+          if (sum < 1)
+            markerChartData.push({
+              name: residualFractionName !== null ? residualFractionName : defaultResidualFractionName,
+              value: (1 - sum).toFixed(2),
+              color: RESIDUAL_SECTOR_COLOR
+            });
 
           markers = markers.push(Immutable.fromJS({
             key: i,

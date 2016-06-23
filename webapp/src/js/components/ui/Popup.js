@@ -34,7 +34,11 @@ let Popup = React.createClass({
     onClose: React.PropTypes.func,
     onMaximise: React.PropTypes.func,
     onClick: React.PropTypes.func,
-    children: React.PropTypes.element
+    children: React.PropTypes.element,
+    cascadePositionOffset: ImmutablePropTypes.shape({
+      x: React.PropTypes.number,
+      y: React.PropTypes.number
+    })
   },
 
   getDefaultProps() {
@@ -46,6 +50,10 @@ let Popup = React.createClass({
       initialSize: Immutable.Map({
         width: 700,
         height: 500
+      }),
+      cascadePositionOffset: Immutable.Map({
+        x: 10,
+        y: 20
       })
     };
   },
@@ -67,9 +75,10 @@ let Popup = React.createClass({
 
   componentWillMount() {
 
-    let positionOffset = (this.state.numberOfPopups - 1) * 10;
+    let positionOffsetX = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('x');
+    let positionOffsetY = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('y');
 
-    this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffset, y: this.props.initialPosition.get('y') + positionOffset})});
+    this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffsetX, y: this.props.initialPosition.get('y') + positionOffsetY})});
 
   },
 

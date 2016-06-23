@@ -44,8 +44,8 @@ let PieChart = React.createClass({
     let sectorsData = [];
     let pieData = [];
 
-    for (let i = 0; i < chartData.length; i++) {
-      sectorsData.push({value: chartData[i].value, color: chartData[i].color, title: name + '\n' + chartData[i].name + ': ' + chartData[i].value});
+    for (let i = 0, len = chartData.length; i < len; i++) {
+      sectorsData.push({color: chartData[i].color, title: name + '\n' + chartData[i].name + ': ' + chartData[i].value});
       pieData.push(chartData[i].value);
     }
 
