@@ -136,11 +136,14 @@ let Criterion = React.createClass({
 
   validateOperatorAndValues() {
     let {component} = this.props;
-    let property = this.tableConfig.propertiesMap[component.ColName];
     let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
     //Copy over the vals so we don't wipe them
     newComponent.ColName = component.ColName || this.tableConfig.primkey;
     newComponent.ColName2 = component.ColName2 || this.tableConfig.primkey;
+    let property = this.tableConfig.propertiesMap[newComponent.ColName];
+
+console.log('validateOperatorAndValues property %o', property);
+
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
       if (this.state[name] !== undefined)
         newComponent[name] = Deformatter(property, this.state[name]);
@@ -158,7 +161,7 @@ let Criterion = React.createClass({
 
   handlePropertyChange() {
     let {component, onChange} = this.props;
-    component.ColName = this.refs.property.value;
+    component.ColName = this.refs.property.value; // mutating props?
     let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -180,8 +183,9 @@ let Criterion = React.createClass({
     let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
-    if (!currentOperator)
+    if (!currentOperator) {
       throw Error('SQL Critiera operator not valid');
+    }
     if (currentOperator.fieldType === 'value') {
       component.CompValue = Deformatter(property, this.refs.value.value);
       this.setState({CompValue: this.refs.value.value});
@@ -192,10 +196,9 @@ let Criterion = React.createClass({
         CompValueMin: this.refs.min.value,
         CompValueMax: this.refs.max.value
       });
-    }
-    else if (currentOperator.fieldType === 'otherColumn')
+    } else if (currentOperator.fieldType === 'otherColumn') {
       component.ColName2 = this.refs.otherColumn.value;
-    else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
+    } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
       component.ColName2 = this.refs.otherColumn.value;
       component.Factor = this.refs.scale.value;
       component.Offset = this.refs.offset.value;
@@ -203,8 +206,7 @@ let Criterion = React.createClass({
         Factor: this.refs.min.value,
         Offset: this.refs.max.value
       });
-    }
-    else if (currentOperator.fieldType === 'subset')
+    } else if (currentOperator.fieldType === 'subset')
       component.Subset = this.refs.subset.value;
     onChange();
   },
@@ -300,8 +302,8 @@ let Criterion = React.createClass({
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
       throw Error('SQL Critiera operator not valid');
-    if (currentOperator.fieldType === 'value')
-      if (property.propCategories)
+    if (currentOperator.fieldType === 'value') {
+      if (property.propCategories) {
         fields = (
           <div className="fields">
             <select className="field" ref="value"
@@ -316,7 +318,7 @@ let Criterion = React.createClass({
             </select>
           </div>
         );
-      else if (property.isBoolean)
+      } else if (property.isBoolean) {
         fields = (
           <div className="fields">
             <select className="field" ref="value"
@@ -334,7 +336,7 @@ let Criterion = React.createClass({
           </div>
 
         );
-      else
+      } else {
         fields = (
           <div className="fields">
             <input className="field" ref="value"
@@ -342,7 +344,8 @@ let Criterion = React.createClass({
                    onChange={this.handleValueChange}/>
           </div>
         );
-    else if (currentOperator.fieldType === 'minMax')
+      }
+    } else if (currentOperator.fieldType === 'minMax') {
       fields = (
         <div className="fields">
           <input className="field" ref="min"
@@ -355,13 +358,13 @@ let Criterion = React.createClass({
                  onChange={this.handleValueChange}/>
         </div>
       );
-    else if (currentOperator.fieldType === 'otherColumn')
+    } else if (currentOperator.fieldType === 'otherColumn') {
       fields = (
         <div className="fields">
           {otherColumnSelect()}
         </div>
       );
-    else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset')
+    } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
     //TODO Number validation for these fields
       fields = (
         <div className="fields">
@@ -375,7 +378,7 @@ let Criterion = React.createClass({
                  onChange={this.handleValueChange}/>
         </div>
       );
-    else if (currentOperator.fieldType === 'subset')
+    } else if (currentOperator.fieldType === 'subset') {
       fields = (
         <div className="fields">
           <select className="field" ref="subset" value={component.subset} onChange={this.handleValueChange}>
@@ -394,6 +397,7 @@ let Criterion = React.createClass({
 
         </div>
       );
+    }
 
     return (
       <Paper zDepth={1} className="criterion">

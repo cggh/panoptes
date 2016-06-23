@@ -97,6 +97,7 @@ let QueryPicker = React.createClass({
     this.setState({
       query: newQuery
     });
+console.log(this.state);
   },
 
   handleStoredFilterNameOpen() {
