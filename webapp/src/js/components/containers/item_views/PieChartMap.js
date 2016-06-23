@@ -138,7 +138,7 @@ let PieChartMapTab = React.createClass({
             if (sum < 1)
               markerChartData.push({
                 name: residualFractionName,
-                value: 1 - sum,
+                value: (1 - sum).toFixed(2),
                 color: RESIDUAL_SECTOR_COLOR
               });
           }
