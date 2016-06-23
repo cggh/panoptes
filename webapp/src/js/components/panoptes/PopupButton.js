@@ -30,11 +30,11 @@ let PopupButton = React.createClass({
   handleClick(e) {
     const {component,  componentPath, componentUpdate, ...others} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    e.stopPropagation();
     if (middleClick) {
       let switchTo = false;
       this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo);
     } else if (!componentUpdate) {
+      e.stopPropagation();
       let switchTo = true;
       this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo);
     } else {
