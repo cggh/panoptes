@@ -50,6 +50,16 @@ let PieChartMap = React.createClass({
     onPanZoom: React.PropTypes.func
   },
 
+  getDefaultProps() {
+    return {
+      zoom: 1,
+      center: Immutable.fromJS({
+        lat: 0,
+        lng: 0
+      })
+    };
+  },
+
   getInitialState() {
     return {
       width: 100,
