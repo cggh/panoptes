@@ -129,7 +129,7 @@ let PieChartMapTab = React.createClass({
             let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
             markerChartData.push({
               name: componentColumns[j].name,
-              value: chartData[chartDataColumnIndex],
+              value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
               color: componentColumns[j].color
             });
           }
