@@ -171,12 +171,12 @@ let Criterion = React.createClass({
     // Get the property info for the new component's primary column.
     let property = this.tableConfig.propertiesMap[newComponent.ColName];
 
-    // Copy over the computed value properties, either from the state or the current component, to the new component, to preserve them.
+    // Copy over the comparison(?) value properties, either from the the current component or otherwise the state, to the new component, to preserve them.
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
-      if (this.state[name] !== undefined) {
-        newComponent[name] = Deformatter(property, this.state[name]);
-      } else if (component[name] !== undefined) {
+      if (component[name] !== undefined) {
         newComponent[name] = Deformatter(property, Formatter(property, component[name]));
+      } else if (this.state[name] !== undefined) {
+        newComponent[name] = Deformatter(property, this.state[name]);
       }
     });
 
@@ -186,17 +186,48 @@ let Criterion = React.createClass({
       newComponent.Factor = component.Factor || this.state.Factor;
     if (component.Subset || this.state.subsets[0])
       newComponent.Subset = component.Subset || this.state.subsets[0];
+
     Object.assign(component, newComponent);
   },
 
   handlePropertyChange() {
     let {component, onChange} = this.props;
-    component.ColName = this.refs.property.value; // mutating props?
+    component.ColName = this.refs.property.value;
     let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+
+    // If the currentOperator is one of the validOperators for the new property,
+    // then continue to use it.
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
+    // Otherwise use the first of the validOperators for the new property.
     if (!currentOperator)
       component.type = validOperators[0].ID;
+
+    // If there is still no operator, then throw a wobbly.
+    if (!currentOperator)
+      throw Error('SQL criterion operator not valid');
+
+    //// Update the comparison values to suit the new property type.
+
+    // TODO: Implement peristent values for compatible properties?
+
+    component.CompValue = undefined;
+    component.CompValue2 = undefined;
+    component.CompValueMin = undefined;
+    component.CompValueMax = undefined;
+    component.Factor = undefined;
+    component.Offset = undefined;
+    component.subset = undefined;
+
+    // TODO: This logic is essentially replicated from render(). Possible to abstract?
+    if (currentOperator.fieldType === 'value') {
+      if (property.propCategories) {
+        component.CompValue = property.propCategories[0];
+      } else if (property.isBoolean) {
+        component.CompValue = 1;
+      }
+    }
+
     this.validateOperatorAndValues();
     onChange();
   },
@@ -212,10 +243,12 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
     let property = this.tableConfig.propertiesMap[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator) {
-      throw Error('SQL Critiera operator not valid');
+      throw Error('SQL criterion operator not valid');
     }
+
     if (currentOperator.fieldType === 'value') {
       component.CompValue = Deformatter(property, this.refs.value.value);
       this.setState({CompValue: this.refs.value.value});
@@ -236,8 +269,10 @@ let Criterion = React.createClass({
         Factor: this.refs.min.value,
         Offset: this.refs.max.value
       });
-    } else if (currentOperator.fieldType === 'subset')
+    } else if (currentOperator.fieldType === 'subset') {
       component.Subset = this.refs.subset.value;
+    }
+
     onChange();
   },
 
@@ -331,7 +366,7 @@ let Criterion = React.createClass({
     let fields = null;
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
     if (!currentOperator)
-      throw Error('SQL Critiera operator not valid');
+      throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
       if (property.propCategories) {
         fields = (
@@ -370,7 +405,7 @@ let Criterion = React.createClass({
         fields = (
           <div className="fields">
             <input className="field" ref="value"
-                   value={this.state.CompValue || Formatter(property, component.CompValue)}
+                   value={component.CompValue ? Formatter(property, component.CompValue) : this.state.CompValue}
                    onChange={this.handleValueChange}/>
           </div>
         );
@@ -379,12 +414,12 @@ let Criterion = React.createClass({
       fields = (
         <div className="fields">
           <input className="field" ref="min"
-                 value={this.state.CompValueMin || Formatter(property, component.CompValueMin)}
+                 value={component.CompValueMin ? Formatter(property, component.CompValueMin) : this.state.CompValueMin}
                  onChange={this.handleValueChange}/>
 
           <div>and</div>
           <input className="field" ref="max"
-                 value={this.state.CompValueMax || Formatter(property, component.CompValueMax)}
+                 value={component.CompValueMax ? Formatter(property, component.CompValueMax) : this.state.CompValueMax}
                  onChange={this.handleValueChange}/>
         </div>
       );
@@ -400,11 +435,11 @@ let Criterion = React.createClass({
         <div className="fields">
           {otherColumnSelect()}
           <div>x</div>
-          <input className="field" ref="scale" value={this.state.Factor || component.Factor}
+          <input className="field" ref="scale" value={component.Factor || this.state.Factor}
                  onChange={this.handleValueChange}/>
 
           <div>+</div>
-          <input className="field" ref="offset" value={this.state.Offset || component.Offset}
+          <input className="field" ref="offset" value={component.Offset || this.state.Offset}
                  onChange={this.handleValueChange}/>
         </div>
       );
