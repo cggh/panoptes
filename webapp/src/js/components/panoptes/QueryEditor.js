@@ -80,9 +80,30 @@ let Criterion = React.createClass({
 
   handleReplaceTrivial() {
     let {component, onChange} = this.props;
-    component.isTrivial = false;
-    component.type = '=';
-    this.validateOperatorAndValues();
+
+    // Get the property info for this table's primary key.
+    let property = this.tableConfig.propertiesMap[this.tableConfig.primkey];
+
+    // Get the valid operators for this table's primary key.
+    let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
+
+    // Create a new clean component, based on the first valid operator for this table's primary key.
+    let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: validOperators[0].ID}).Create();
+
+    // Set the new component's primary column name to this table's primary key.
+    newComponent.ColName = this.tableConfig.primkey;
+
+    // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
+    newComponent.isTrivial = false;
+
+    // Wipe the state clean.
+    ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
+      this.setState({[name]: undefined});
+    });
+
+    // Swap the specified component for the new component.
+    Object.assign(component, newComponent);
+
     onChange();
   },
 
@@ -136,20 +157,29 @@ let Criterion = React.createClass({
 
   validateOperatorAndValues() {
     let {component} = this.props;
+
+    // Create a new clean component, based on the current component's type.
     let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: component.type}).Create();
-    //Copy over the vals so we don't wipe them
-    newComponent.ColName = component.ColName || this.tableConfig.primkey;
-    newComponent.ColName2 = component.ColName2 || this.tableConfig.primkey;
+
+    // Copy over the current component's column name properties to the new component, to preserve them.
+    ['ColName', 'ColName2'].forEach((name) => {
+      if (component[name] !== undefined) {
+        newComponent[name] = component[name];
+      }
+    });
+
+    // Get the property info for the new component's primary column.
     let property = this.tableConfig.propertiesMap[newComponent.ColName];
 
-console.log('validateOperatorAndValues property %o', property);
-
+    // Copy over the computed value properties, either from the state or the current component, to the new component, to preserve them.
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
-      if (this.state[name] !== undefined)
+      if (this.state[name] !== undefined) {
         newComponent[name] = Deformatter(property, this.state[name]);
-      else if (component[name] !== undefined)
+      } else if (component[name] !== undefined) {
         newComponent[name] = Deformatter(property, Formatter(property, component[name]));
+      }
     });
+
     if (component.Offset || this.state.Offset)
       newComponent.Offset = component.Offset || this.state.Offset;
     if (component.Factor || this.state.Factor)
