@@ -23,6 +23,9 @@ import MenuItem from 'material-ui/MenuItem';
 
 import {FlatButton} from 'material-ui';
 
+
+import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+
 import 'tree.scss';
 
 let TreeWithActions = React.createClass({
@@ -80,8 +83,8 @@ let TreeWithActions = React.createClass({
     if (table) {
       trees = _map(this.config.tables[table].trees,
         (tree) => ({
-          payload: tree.id,
-          text: (<div className="dropdown-option">{tree.id}</div>)
+          value: tree.id,
+          label: tree.id
         })
       );
     }
@@ -98,13 +101,13 @@ let TreeWithActions = React.createClass({
               <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
           </SelectField>
           {table ?
-            <SelectField value={tree}
-                         autoWidth={true}
-                         floatingLabelText="Tree"
-                         onChange={(e, i, v) => componentUpdate({tree: v})}>
-              {trees.map(({payload, text}) =>
-                <MenuItem value={payload} key={payload} primaryText={text}/>)}
-            </SelectField>
+            <SelectFieldWithNativeFallback
+              value={tree}
+              autoWidth={true}
+              floatingLabelText="Tree"
+              onChange={(e, i, v) => componentUpdate({tree: v})}
+              options={trees}
+            />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
             <FlatButton onClick={this.handleCrossLink}
