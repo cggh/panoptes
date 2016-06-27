@@ -69,48 +69,65 @@ let TreeWithActions = React.createClass({
     }
   },
 
+  handleChangeTable(table) {
+    this.props.componentUpdate({table});
+  },
+
   handleChangeTree(tree) {
-    this.props.componentUpdate({tree: tree});
+    this.props.componentUpdate({tree});
+  },
+
+  handleChangeTreeType(treeType) {
+    this.props.componentUpdate({treeType});
   },
 
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
-    let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
+    let tableOptions = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
       (table) => ({
-        payload: table.id,
-        icon: <Icon fixedWidth={true} name={table.icon}/>,
-        text: (<div className="dropdown-option">{table.tableCapNamePlural}</div>)
-      }));
+        value: table.id,
+        leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
+        label: table.tableCapNamePlural
+      })
+    );
 
-    let trees = [];
+    let treeOptions = [];
     if (table) {
-      trees = _map(this.config.tables[table].trees,
+      treeOptions = _map(this.config.tables[table].trees,
         (tree) => ({
           value: tree.id,
           label: tree.id
         })
       );
     }
+
+    let treeTypeOptions = _map(_keys(treeTypes),
+      (treeType) => ({
+        value: treeType,
+        label: titleCase(treeType)
+      })
+    );
+
     const treeInfo = table && tree && this.config.tables[table].treesById[tree];
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
         <div className="tree-controls vertical stack">
-          <SelectField value={table}
-                       autoWidth={true}
-                       floatingLabelText="Table:"
-                       onChange={(e, i, v) => componentUpdate({table: v})}>
-            {tables.map(({payload, text, icon}) =>
-              <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
-          </SelectField>
+          <SelectFieldWithNativeFallback
+            value={table}
+            autoWidth={true}
+            floatingLabelText="Table"
+            onChange={this.handleChangeTable}
+            options={tableOptions}
+          />
           {table ?
             <SelectFieldWithNativeFallback
               value={tree}
               autoWidth={true}
               floatingLabelText="Tree"
               onChange={this.handleChangeTree}
-              options={trees}
+              options={treeOptions}
             />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
@@ -119,13 +136,13 @@ let TreeWithActions = React.createClass({
             />
             : null}
           {treeInfo ?
-            <SelectField value={treeType}
-                         autoWidth={true}
-                         floatingLabelText="Tree Layout"
-                         onChange={(e, i, v) => componentUpdate({treeType: v})}>
-              {_keys(treeTypes).map((treeType) =>
-                <MenuItem value={treeType} key={treeType} primaryText={titleCase(treeType)}/>)}
-            </SelectField>
+            <SelectFieldWithNativeFallback
+              value={treeType}
+              autoWidth={true}
+              floatingLabelText="Tree Layout"
+              onChange={this.handleChangeTreeType}
+              options={treeTypeOptions}
+            />
             : null }
         </div>
       </div>
