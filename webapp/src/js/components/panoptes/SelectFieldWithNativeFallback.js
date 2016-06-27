@@ -30,7 +30,11 @@ let ItemLink = React.createClass({
         >
          <option value=""></option>
           {options.map(({value, label}) =>
-            <option value={value} key={value} label={label || value} />
+            <option
+              key={value}
+              value={value}
+              label={label || value}
+            />
           )}
         </select>
       );
@@ -42,8 +46,15 @@ let ItemLink = React.createClass({
           floatingLabelText={floatingLabelText}
           onChange={(e, i, v) => onChange(v)}
         >
-          {options.map(({value, label, leftIcon, rightIcon}) =>
-            <MenuItem leftIcon={leftIcon} rightIcon={rightIcon} value={value} key={value} primaryText={<div className="dropdown-option">{label || value}</div>}/>
+          {options.map(({value, label, leftIcon, rightIcon, disabled}) =>
+            <MenuItem
+              key={value}
+              value={value}
+              primaryText={<div className="dropdown-option">{label || value}</div>}
+              leftIcon={leftIcon}
+              rightIcon={rightIcon}
+              disabled={disabled}
+            />
           )}
         </SelectField>
       );
