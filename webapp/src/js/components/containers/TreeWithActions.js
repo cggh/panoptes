@@ -69,6 +69,10 @@ let TreeWithActions = React.createClass({
     }
   },
 
+  handleChangeTree(tree) {
+    this.props.componentUpdate({tree: tree});
+  },
+
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
@@ -105,7 +109,7 @@ let TreeWithActions = React.createClass({
               value={tree}
               autoWidth={true}
               floatingLabelText="Tree"
-              onChange={(e, i, v) => componentUpdate({tree: v})}
+              onChange={this.handleChangeTree}
               options={trees}
             />
             : null }

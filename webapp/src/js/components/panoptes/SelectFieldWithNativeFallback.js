@@ -10,7 +10,7 @@ import MenuItem from 'material-ui/MenuItem';
 
 // Constants for this component
 // TODO: move to app config?
-const MAX_SELECTFIELD_OPTIONS = 1;
+const MAX_SELECTFIELD_OPTIONS = 100;
 
 let ItemLink = React.createClass({
 
@@ -21,14 +21,14 @@ let ItemLink = React.createClass({
 
   render() {
     let {value, autoWidth, floatingLabelText, onChange, options} = this.props;
-console.log('options.length: %o', options.length);
 
     if (options.length > MAX_SELECTFIELD_OPTIONS) {
       return (
         <select
           value={value}
-          onChange={onChange}
+          onChange={(e) => onChange(e.target.value)}
         >
+         <option value=""></option>
           {options.map(({value, label}) =>
             <option value={value} key={value} label={label} />
           )}
@@ -40,7 +40,7 @@ console.log('options.length: %o', options.length);
           value={value}
           autoWidth={autoWidth}
           floatingLabelText={floatingLabelText}
-          onChange={onChange}
+          onChange={(e, i, v) => onChange(v)}
         >
           {options.map(({value, label}) =>
             <MenuItem value={value} key={value} primaryText={<div className="dropdown-option">{label}</div>}/>
