@@ -206,8 +206,6 @@ let DataTableWithActions = React.createClass({
 
   handleDownload(query) {
 
-    let cancelDownload = () => { null; };
-
     let doDownload = () => {
       let downloadURL = this.createDownloadUrl(query);
       if (downloadURL) {
@@ -225,8 +223,8 @@ let DataTableWithActions = React.createClass({
 
     if (totalDataPoints > DOWNLOAD_MAX_DATA_POINTS) {
 
-      let message = `You have asked to download ${totalDataPoints} data points, which is more than our recommended limit of ${DOWNLOAD_MAX_DATA_POINTS}. Please use a stricter filter or fewer columns, or contact us directly.`;
-      this.getFlux().actions.session.modalOpen('ui/Confirm', {title: 'Warning', message: message, confirmButtonLabel: 'Download', onCancel: cancelDownload, onConfirm: doDownload});
+      let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${DOWNLOAD_MAX_DATA_POINTS}. Please use a stricter filter or fewer columns, or contact us directly.`;
+      this.getFlux().actions.session.modalOpen('ui/Alert', {title: 'Warning', message: message});
 
     } else {
       doDownload();
