@@ -97,8 +97,9 @@ let Criterion = React.createClass({
     newComponent.isTrivial = false;
 
     // Wipe the state clean.
+    // NB: setting to undefined causes warning "changing an uncontrolled input of type undefined to be controlled"
     ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
-      this.setState({[name]: undefined});
+      this.setState({[name]: ''});
     });
 
     // Swap the specified component for the new component.
