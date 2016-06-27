@@ -1,29 +1,29 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import scrollbarSize from 'scrollbar-size';
+import {treeTypes} from 'phylocanvas';
+import titleCase from 'title-case';
+import Sidebar from 'react-sidebar';
 
+// Lodash
 import _map from 'lodash/map';
 import _has from 'lodash/has';
 import _filter from 'lodash/filter';
-import scrollbarSize from 'scrollbar-size';
-import {treeTypes} from 'phylocanvas';
 import _keys from 'lodash/keys';
-import titleCase from 'title-case';
 
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import Sidebar from 'react-sidebar';
-import SidebarHeader from 'ui/SidebarHeader';
-
-import Icon from 'ui/Icon';
-import TreeContainer from 'containers/TreeContainer';
-
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-
+// Material U(I
 import {FlatButton} from 'material-ui';
 
+// Panoptes UI
+import SidebarHeader from 'ui/SidebarHeader';
+import Icon from 'ui/Icon';
 
+// Panoptes
+import TreeContainer from 'containers/TreeContainer';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'tree.scss';
