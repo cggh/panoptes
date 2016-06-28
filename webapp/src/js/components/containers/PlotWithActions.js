@@ -75,6 +75,7 @@ let PlotWithActions = React.createClass({
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
+    // TODO: && table.settings.isHidden
     let tables = _map(this.config.tables, (val, key) => ({
       payload: key,
       icon: <Icon fixedWidth={true} name={val.icon}/>,

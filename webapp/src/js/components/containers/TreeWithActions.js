@@ -69,6 +69,7 @@ let TreeWithActions = React.createClass({
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
+    // TODO: && table.settings.isHidden
     let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0),
       (table) => ({
         payload: table.id,

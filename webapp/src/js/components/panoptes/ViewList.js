@@ -30,6 +30,8 @@ let ViewList = React.createClass({
   render() {
     const hasGeo = _some(_filter(this.config.tables, {hasGeoCoord: true}));
 
+    // TODO: && table.settings.isHidden
+
     return (
       <List style={this.props.style}>
         <Subheader>Open a view:</Subheader>

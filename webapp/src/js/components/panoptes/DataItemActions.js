@@ -67,6 +67,7 @@ let DataItemActions = React.createClass({
     if (!data)
       return null;
 
+    // TODO: && table.settings.isHidden
     const treeLinks = [];
     const crossLink = `${table}::${primKey}`;
     _forEach(this.config.tables, (treeTable) => {

@@ -106,6 +106,9 @@ let Gene = React.createClass({
     let genomePositionTableButtons = [];
     for (let table in this.config.tables) {
 
+      // Only list tables that are not hidden.
+      if (this.config.tables[table].settings.isHidden) continue;
+
       if (this.config.tables[table].hasGenomePositions || this.config.tables[table].hasGenomeRegions) {
         let genomePositionTableQuery = null;
         if (this.config.tables[table].hasGenomePositions) {
