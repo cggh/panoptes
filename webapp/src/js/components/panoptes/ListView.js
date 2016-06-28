@@ -41,7 +41,8 @@ let ListView = React.createClass({
     selectedPrimKey: React.PropTypes.string,
     onSelect: React.PropTypes.func.isRequired,
     search: React.PropTypes.string,
-    autoSelectIfNoneSelected: React.PropTypes.bool
+    autoSelectIfNoneSelected: React.PropTypes.bool,
+    onRowsCountChange: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -55,7 +56,8 @@ let ListView = React.createClass({
   getInitialState() {
     return {
       rows: [],
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
+      rowsCount: 0
     };
   },
 
@@ -74,40 +76,61 @@ let ListView = React.createClass({
     let columnspec = {};
     columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
     this.setState({loadStatus: 'loading'});
-    let APIargs = {
+
+    let pageQueryAPIargs = {
       database: this.config.dataset,
       table: tableConfig.fetchTableName,
       columns: columnspec,
       start: 0
     };
-    requestContext.request((componentCancellation) =>
-          LRUCache.get(
-            'pageQuery' + JSON.stringify(APIargs),
-            (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
-            componentCancellation
-          )
-        )
-        .then((data) => {
-          if (autoSelectIfNoneSelected && !selectedPrimKey) {
-            onSelect(data[0][tableConfig.primkey]);
-          }
-          this.setState({
-            loadStatus: 'loaded',
-            rows: data
-          });
 
-        })
-        .catch(API.filterAborted)
-        .catch(LRUCache.filterCancelled)
-        .catch((xhr) => {
-          ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-          this.setState({loadStatus: 'error'});
-        });
+    let recordCountAPIargs = {
+      database: this.config.dataset,
+      table: tableConfig.fetchTableName
+    };
+
+    requestContext.request((componentCancellation) =>
+      Promise.all([
+        LRUCache.get(
+          'pageQuery' + JSON.stringify(pageQueryAPIargs),
+          (cacheCancellation) =>
+            API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
+          componentCancellation
+        ),
+        LRUCache.get(
+          'recordCount' + JSON.stringify(recordCountAPIargs),
+          (cacheCancellation) =>
+            API.recordCount({cancellation: cacheCancellation, ...recordCountAPIargs}),
+          componentCancellation
+        )
+      ])
+    )
+    .then(([data, rowsCount]) => {
+      if (autoSelectIfNoneSelected && !selectedPrimKey) {
+        onSelect(data[0][tableConfig.primkey]);
+      }
+      this.setState({
+        loadStatus: 'loaded',
+        rows: data,
+        rowsCount
+      });
+    })
+    .catch(API.filterAborted)
+    .catch(LRUCache.filterCancelled)
+    .catch((xhr) => {
+      ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+      this.setState({loadStatus: 'error'});
+    });
   },
 
   handleSelect(primKey, rowIndex) {
     this.props.onSelect(primKey);
+  },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    if (this.props.onRowsCountChange && prevState.rowsCount !== this.state.rowsCount) {
+      this.props.onRowsCountChange(this.state.rowsCount);
+    }
   },
 
   render() {

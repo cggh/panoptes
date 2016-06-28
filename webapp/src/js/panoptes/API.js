@@ -464,7 +464,11 @@ function setDefaultTableQuery(options) {
 function recordCount(options) {
   assertRequired(options, ['database', 'table']);
 
-  let {database, table, query, maxRecordCount} = options;
+  let defaults = {
+    query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+  };
+
+  let {database, table, query, maxRecordCount} = {...defaults, ...options};
 
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({

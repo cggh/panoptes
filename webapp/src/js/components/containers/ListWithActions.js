@@ -1,28 +1,27 @@
 import React from 'react';
 import Immutable from 'immutable';
 import scrollbarSize from 'scrollbar-size';
+import Sidebar from 'react-sidebar';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
-import Sidebar from 'react-sidebar';
+// Material UI
+import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 
-// UI components
+// Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 
-// Material UI components
-import TextField from 'material-ui/TextField';
-
-// Panoptes components
+// Panoptes
 import SQL from 'panoptes/SQL';
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
-
-// Panoptes widgets
 import DataItem from 'containers/DataItem';
+import DataDownloader from 'utils/DataDownloader';
 
 
 let ListWithActions = React.createClass({
@@ -82,6 +81,28 @@ let ListWithActions = React.createClass({
     this.setState({'search': event.target.value});
   },
 
+  handleRowsCountChange(rowsCount) {
+    this.setState({rowsCount: rowsCount});
+  },
+
+  handleDownload() {
+    DataDownloader.downloadTableData(
+      {
+        dataset: this.config.dataset,
+        table: this.props.table,
+        tableConfig: this.tableConfig,
+        rowsCount: this.state.rowsCount,
+        onLimitBreach: this.handleDownloadLimitBreach
+      }
+    );
+  },
+
+  handleDownloadLimitBreach(payload) {
+    let {totalDataPoints, maxDataPoints} = payload;
+    let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
+    this.getFlux().actions.session.modalOpen('ui/Alert', {title: 'Warning', message: message});
+  },
+
   render() {
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
     let {description} = this.tableConfig;
@@ -91,6 +112,11 @@ let ListWithActions = React.createClass({
       <div className="sidebar">
         <div className="item-picker">
           <SidebarHeader icon={this.icon()} description={description}/>
+          <FlatButton label="Download data"
+                      primary={true}
+                      onClick={() => this.handleDownload()}
+                      icon={<Icon fixedWidth={true} name="download" />}
+          />
           <div className="search">
             <TextField ref="search"
                        fullWidth={true}
@@ -106,6 +132,7 @@ let ListWithActions = React.createClass({
              onSelect={this.handleSelect}
              icon={this.icon()}
              autoSelectIfNoneSelected
+             onRowsCountChange={this.handleRowsCountChange}
             />
         </div>
       </div>

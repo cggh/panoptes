@@ -6,32 +6,30 @@ import LZString from 'lz-string';
 import Sidebar from 'react-sidebar';
 import scrollbarSize from 'scrollbar-size';
 
+// Lodash
+import _clone from 'lodash/clone';
+import _filter from 'lodash/filter';
+import _forEach from 'lodash/forEach';
+
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-// UI
-import SidebarHeader from 'ui/SidebarHeader';
-import Icon from 'ui/Icon';
+// Material UI
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
-// lodash
-import _clone from 'lodash/clone';
-import _filter from 'lodash/filter';
-import _forEach from 'lodash/forEach';
+// Panoptes UI
+import SidebarHeader from 'ui/SidebarHeader';
+import Icon from 'ui/Icon';
 
-// Panoptes components
+// Panoptes
 import DataTableView from 'panoptes/DataTableView';
 import QueryString from 'panoptes/QueryString';
-import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
-
-// Constants for this component
-// TODO: move to app config?
-const DOWNLOAD_MAX_DATA_POINTS = 1000000;
+import DataDownloader from 'utils/DataDownloader';
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -153,86 +151,25 @@ let DataTableWithActions = React.createClass({
     this.setState({startRowIndex: this.state.totalRowsCount - this.state.showableRowsCount});
   },
 
-  createActiveColumnListString() {
-    let {columns} = this.props;
-
-    // TODO: copied from render(). Worth centralizing?
-    // If no columns have been specified, get all of the showable columns.
-    if (!columns)
-      columns = Immutable.List(this.tableConfig.properties)
-        .filter((prop) => prop.showByDefault && prop.showInTable)
-        .map((prop) => prop.propid);
-
-    let columnList = '';
-
-    columns.map((column) => {
-      if (column === 'StoredSelection') return;
-      let encoding = this.tableConfig.propertiesMap[column].defaultFetchEncoding;
-      if (columnList.length !== 0) columnList += '~';
-      columnList += encoding + column;
-    });
-
-    return columnList;
-  },
-
-  createDownloadUrl(query) {
-
-    // Returns a URL to download the data currently being served.
-    // Returns false upon error, e.g. no selected columns.
-
-    // Get the list of columns being shown.
-    let columnList = this.createActiveColumnListString();
-
-    if (!columnList) {
-      console.error('!columnList');
-      return false;
-    }
-
-    let downloadURL = API.serverURL;
-    downloadURL += '?datatype' + '=' + 'downloadtable';
-    downloadURL += '&database' + '=' + this.config.dataset;
-    downloadURL += '&qry' + '=' + query;
-    downloadURL += '&tbname' + '=' + this.props.table;
-    downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
-    if (this.tableConfig.positionField) {
-      downloadURL += '&posfield' + '=' + this.tableConfig.positionField;
-      downloadURL += '&order' + '=' + this.tableConfig.positionField;
-    } else {
-      downloadURL += '&order' + '=' + this.tableConfig.primkey;
-    }
-    downloadURL += '&sortreverse' + '=' + (this.props.ascending ? '0' : '1');
-    return downloadURL;
-  },
-
-  handleDownload(query) {
-
-    let cancelDownload = () => { null; };
-
-    let doDownload = () => {
-      let downloadURL = this.createDownloadUrl(query);
-      if (downloadURL) {
-        window.location.href = downloadURL;
+  handleDownload() {
+    DataDownloader.downloadTableData(
+      {
+        dataset: this.config.dataset,
+        table: this.props.table,
+        tableConfig: this.tableConfig,
+        rowsCount: this.state.totalRowsCount,
+        onLimitBreach: this.handleDownloadLimitBreach,
+        query: this.props.query,
+        columns: this.props.columns,
+        ascending: this.props.ascending
       }
-    };
+    );
+  },
 
-    let {columns} = this.props;
-    if (!columns)
-      columns = Immutable.List(this.tableConfig.properties)
-        .filter((prop) => prop.showByDefault && prop.showInTable)
-        .map((prop) => prop.propid);
-
-    let totalDataPoints = this.state.totalRowsCount * columns.size;
-
-    if (totalDataPoints > DOWNLOAD_MAX_DATA_POINTS) {
-
-      let message = `You have asked to download ${totalDataPoints} data points, which is more than our recommended limit of ${DOWNLOAD_MAX_DATA_POINTS}. Please use a stricter filter or fewer columns, or contact us directly.`;
-      this.getFlux().actions.session.modalOpen('ui/Confirm', {title: 'Warning', message: message, confirmButtonLabel: 'Download', onCancel: cancelDownload, onConfirm: doDownload});
-
-    } else {
-      doDownload();
-    }
-
-
+  handleDownloadLimitBreach(payload) {
+    let {totalDataPoints, maxDataPoints} = payload;
+    let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
+    this.getFlux().actions.session.modalOpen('ui/Alert', {title: 'Warning', message: message});
   },
 
   handleSearchOpen() {
@@ -373,7 +310,7 @@ let DataTableWithActions = React.createClass({
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
-                    onClick={() => this.handleDownload(dataTableQuery)}
+                    onClick={() => this.handleDownload()}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
         {searchGUI}
