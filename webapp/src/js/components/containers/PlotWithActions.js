@@ -6,6 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import _map from 'lodash/map';
 import _each from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _filter from 'lodash/filter';
 import titleCase from 'title-case';
 import scrollbarSize from 'scrollbar-size';
 
@@ -75,8 +76,7 @@ let PlotWithActions = React.createClass({
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-    // TODO: && table.settings.isHidden
-    let tables = _map(this.config.tables, (val, key) => ({
+    let tables = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (val, key) => ({
       payload: key,
       icon: <Icon fixedWidth={true} name={val.icon}/>,
       text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
