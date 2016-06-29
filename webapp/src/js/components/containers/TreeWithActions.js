@@ -69,8 +69,7 @@ let TreeWithActions = React.createClass({
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
-    // TODO: && table.settings.isHidden
-    let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0),
+    let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
       (table) => ({
         payload: table.id,
         icon: <Icon fixedWidth={true} name={table.icon}/>,
@@ -79,11 +78,12 @@ let TreeWithActions = React.createClass({
 
     let trees = [];
     if (table) {
-       trees = _map(this.config.tables[table].trees,
+      trees = _map(this.config.tables[table].trees,
         (tree) => ({
           payload: tree.id,
           text: (<div className="dropdown-option">{tree.id}</div>)
-        }));
+        })
+      );
     }
     const treeInfo = table && tree && this.config.tables[table].treesById[tree];
     let sidebarContent = (
@@ -106,7 +106,7 @@ let TreeWithActions = React.createClass({
                 <MenuItem value={payload} key={payload} primaryText={text}/>)}
             </SelectField>
             : null }
-          {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0])?
+          {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
             <FlatButton onClick={this.handleCrossLink}
                         label={`Show ${this.config.tables[treeInfo.crossLink.split('::')[0]].tableCapNameSingle}`}
             />
