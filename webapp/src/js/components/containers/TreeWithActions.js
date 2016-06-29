@@ -44,7 +44,7 @@ let TreeWithActions = React.createClass({
   getDefaultProps() {
     return {
       componentUpdate: null,
-      sidebar: true,
+      sidebar: true
     };
   },
 
