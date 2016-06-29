@@ -50,8 +50,7 @@ let GenomeBrowserWithActions = React.createClass({
         }
       },
       _transform(this.config.tables, (result, table, tableId) => {
-        // TODO: && table.settings.isHidden
-        if (table.hasGenomePositions)
+        if (table.hasGenomePositions && !table.settings.isHidden)
           result[tableId] = {
             name: table.tableCapNamePlural,
             icon: table.icon,
@@ -104,8 +103,7 @@ let GenomeBrowserWithActions = React.createClass({
 
     //Per-row based summaries
     _forEach(this.config.tables, (table, tableId) => {
-      // TODO: && table.settings.isHidden
-      if (table.tableBasedSummaryValues) {
+      if (table.tableBasedSummaryValues && !table.settings.isHidden) {
         groups[`per_${tableId}`] = Immutable.fromJS({
           name: `Per ${table.tableCapNameSingle}`,
           icon: table.icon,
