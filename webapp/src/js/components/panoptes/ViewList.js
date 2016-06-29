@@ -40,19 +40,19 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
                     onClick={(e) => this.handleOpen(e, 'DatasetManager/Actions', {})}/>
           : null}
-        {this.config.tables && hasShowableTables ?
+        {hasShowableTables ?
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})}/>
           : null}
-        {this.config.tables && hasShowableTables ?
+        {hasShowableTables ?
           <ListItem primaryText="Plot"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
                     onClick={(e) => this.handleOpen(e, 'containers/PlotWithActions', {})}/>
           : null}
-        {this.config.tables && hasShowableTables ?
+        {hasShowableTables ?
           <ListItem primaryText="Map"
                     disabled={!hasGeo}
                     style={{opacity: hasGeo ? '1' : '0.5'}}
@@ -60,7 +60,7 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
                     onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null }/>
           : null}
-        {this.config.tables && hasShowableTables ?
+        {hasShowableTables ?
           <ListItem primaryText="Tree"
                     secondaryText="View a tree"
                     leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
