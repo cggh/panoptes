@@ -71,7 +71,7 @@ let DataItemActions = React.createClass({
     const treeLinks = [];
     const crossLink = `${table}::${primKey}`;
     _forEach(this.config.tables, (treeTable) => {
-      if (treeTable.settings.isHidden === undefined || !treeTable.settings.isHidden) {
+      if (!treeTable.settings.isHidden) {
         treeTable.trees.forEach((tree) => {
           if (crossLink === tree.crossLink) {
             treeLinks.push(<PopupButton label={`Show associated ${this.config.tables[treeTable.id].tableCapNameSingle} tree`}
