@@ -75,11 +75,10 @@ let PlotWithActions = React.createClass({
   render() {
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
-
-    let tables = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (val, key) => ({
-      payload: key,
-      icon: <Icon fixedWidth={true} name={val.icon}/>,
-      text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
+    let tables = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (table) => ({
+      payload: table.id,
+      icon: <Icon fixedWidth={true} name={table.icon}/>,
+      text: (<div className="dropdown-option">{table.tableCapNamePlural}</div>)
     }));
 
     let propertyMenu = [];
