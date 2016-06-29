@@ -67,8 +67,7 @@ let MapWithActions = React.createClass({
     let {sidebar, table, query, column, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-
-    let tables = _map(_filter(this.config.tables, 'hasGeoCoord'),
+    let tables = _map(_filter(this.config.tables, (table) => table.hasGeoCoord && !table.settings.isHidden),
       (val) => ({
         payload: val.id,
         icon: <Icon fixedWidth={true} name={val.icon}/>,

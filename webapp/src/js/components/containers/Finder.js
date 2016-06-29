@@ -95,24 +95,17 @@ let Finder = React.createClass({
 
       let tables = this.config.tables;
 
-      // TODO: Only show tables / fields that should be shown here. Determined by what?
-
-      // http://panoptes.readthedocs.org/en/pn1.6.2/importdata/importsettings/datatable.html?highlight=quickfindfields
-      // e.g. this.config.tables['populations'].quickFindFields[0] === "ID"
-      // "The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s)."
-
+      // TODO:
       // http://panoptes.readthedocs.org/en/pn1.6.2/importdata/importsettings/datatable_properties.html?highlight=search
       // e.g. this.config.tables['variants'].propertiesMap['chromosome'].settings['Search'] === "None"
       // "Indicates that this field can be used for text search in the find data item wizard."
 
-      // http://panoptes.readthedocs.org/en/pn1.6.2/importdata/importsettings/datatable.html?highlight=ishidden
-      // e.g. this.config.tables['populations'].settings.isHidden === true
-      // "If set to true, the data table will not be displayed as a standalone entity (i.e. not mentioned on the intro page and no tab)."
-
       for (let table in tables) {
 
+        // Only list tables that are not hidden.
         if (this.config.tables[table].settings.isHidden) continue;
 
+        // Only list fields that are specified in quickFindFields.
         let secondaryText = '';
         for (let i = 0, len = this.config.tables[table].quickFindFields.length; i < len; i++) {
 

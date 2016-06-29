@@ -10,6 +10,7 @@ import PopupButton from 'panoptes/PopupButton';
 import ExternalLinkButton from 'panoptes/ExternalLinkButton';
 import Immutable from 'immutable';
 import _forEach from 'lodash/forEach';
+import ErrorReport from 'panoptes/ErrorReporter';
 
 let DataItemActions = React.createClass({
   mixins: [
@@ -21,7 +22,7 @@ let DataItemActions = React.createClass({
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string.isRequired
   },
 
   getInitialState() {
@@ -70,18 +71,20 @@ let DataItemActions = React.createClass({
     const treeLinks = [];
     const crossLink = `${table}::${primKey}`;
     _forEach(this.config.tables, (treeTable) => {
-      treeTable.trees.forEach((tree) => {
-        if (crossLink === tree.crossLink) {
-          treeLinks.push(<PopupButton label={`Show associated ${this.config.tables[treeTable.id].tableCapNameSingle} tree`}
-                                      icon="tree"
-                                      componentPath="containers/TreeWithActions"
-                                      table={treeTable.id}
-                                      tree={tree.id}
-                                      key={tree.id}
-            />
-          );
-        }
-      });
+      if (!treeTable.settings.isHidden) {
+        treeTable.trees.forEach((tree) => {
+          if (crossLink === tree.crossLink) {
+            treeLinks.push(<PopupButton label={`Show associated ${this.config.tables[treeTable.id].tableCapNameSingle} tree`}
+                                        icon="tree"
+                                        componentPath="containers/TreeWithActions"
+                                        table={treeTable.id}
+                                        tree={tree.id}
+                                        key={tree.id}
+              />
+            );
+          }
+        });
+      }
     });
 
     return (
@@ -109,13 +112,13 @@ let DataItemActions = React.createClass({
                                                   start={parseInt(data[tableConfig.startPositionField]) - 50}
                                                   end={parseInt(data[tableConfig.stopPositionField]) + 50}
                                                   channels={Immutable.fromJS({
-                       [table]: {
-                         channel: 'RegionChannel',
-                         props: {
-                           table: table
-                         }
-                       }
-                     })}
+                                                    [table]: {
+                                                      channel: 'RegionChannel',
+                                                      props: {
+                                                        table: table
+                                                      }
+                                                    }
+                                                  })}
         />
           : null}
         {tableConfig.properties.map((prop) => {
