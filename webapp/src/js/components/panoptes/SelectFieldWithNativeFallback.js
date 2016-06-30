@@ -92,6 +92,11 @@ let ItemLink = React.createClass({
               > </div>
               <select
                 style={{
+                  width: '100%',
+                  appearance: 'none',
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: 'none',
                   display: 'block',
                   color: 'rgba(0, 0, 0, 0.870588)',
                   lineHeight: '56px',
@@ -104,7 +109,10 @@ let ItemLink = React.createClass({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
               >
-               <option className="dropdown-option" value=""></option>
+               <option
+                className="dropdown-option"
+                value=""
+               ></option>
                 {options.map(({value, label}) =>
                   <option
                     className="dropdown-option"
@@ -114,6 +122,21 @@ let ItemLink = React.createClass({
                   />
                 )}
               </select>
+              <svg
+                viewBox="0 0 24 24"
+                style={{
+                  display: 'inline-block',
+                  fill: 'rgb(224, 224, 224)',
+                  height: '24px',
+                  width: '24px',
+                  transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+                  position: 'absolute',
+                  right: '0px',
+                  top: '22px'
+                }}
+              >
+                <path d="M7 10l5 5 5-5z"></path>
+              </svg>
               <div
                 style={{
                   borderTopStyle: 'none',
@@ -132,6 +155,34 @@ let ItemLink = React.createClass({
                 }}
               > </div>
             </div>
+          </div>
+          <div>
+            <hr
+              style={{
+                borderBottomWidth: '1px',
+                borderStyle: 'none none solid',
+                borderColor: 'rgb(224, 224, 224)',
+                bottom: '8px',
+                boxSizing: 'content-box',
+                margin: '0px',
+                position: 'absolute',
+                width: '100%'
+              }}
+            />
+            <hr
+              style={{
+                borderBottomWidth: '2px',
+                borderStyle: 'none none solid',
+                borderColor: 'rgb(33, 150, 243)',
+                bottom: '8px',
+                boxSizing: 'content-box',
+                margin: '0px',
+                position: 'absolute',
+                width: '100%',
+                transform: 'scaleX(0)',
+                transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms'
+              }}
+            />
           </div>
         </div>
       );
