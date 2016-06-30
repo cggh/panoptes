@@ -24,19 +24,116 @@ let ItemLink = React.createClass({
 
     if (options.length > MAX_SELECTFIELD_OPTIONS) {
       return (
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+        <div
+          style={{
+            fontSize: '16px',
+            lineHeight: '24px',
+            width: '256px',
+            height: '72px',
+            display: 'inline-block',
+            position: 'relative',
+            fontFamily: 'Roboto, sans-serif',
+            transition: 'height 200ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+            backgroundColor: 'transparent'
+          }}
         >
-         <option value=""></option>
-          {options.map(({value, label}) =>
-            <option
-              key={value}
-              value={value}
-              label={label || value}
-            />
-          )}
-        </select>
+          <label
+            style={{
+              position: 'absolute',
+              lineHeight: '22px',
+              top: '38px',
+              transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+              zIndex: '1',
+              cursor: 'text',
+              transform: 'perspective(1px) scale(0.75) translate3d(0px, -28px, 0px)',
+              transformOrigin: 'left top 0px',
+              pointerEvents: 'none',
+              color: 'rgba(0, 0, 0, 0.498039)'
+            }}
+          >
+            {floatingLabelText}
+          </label>
+          <div
+            style={{
+              display: 'block',
+              fontSize: 'inherit',
+              height: '100%',
+              fontFamily: 'inherit',
+              outline: 'none',
+              position: 'relative',
+              transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+              padding: '0px',
+              width: '100%',
+              border: 'none',
+              color: 'rgba(0, 0, 0, 0.870588)',
+              fontStyle: 'inherit',
+              fontVariant: 'inherit',
+              fontWeight: 'inherit',
+              fontStretch: 'inherit',
+              lineHeight: 'inherit',
+              boxSizing: 'border-box',
+              marginTop: '14px',
+              backgroundColor: 'rgba(0, 0, 0, 0)'
+            }}
+          >
+            <div
+              style={{
+                cursor: 'pointer',
+                height: '100%',
+                position: 'relative',
+                width: '100%'
+              }}
+            >
+              <div
+                style={{
+                  boxSizing: 'border-box',
+                  display: 'table'
+                }}
+              > </div>
+              <select
+                style={{
+                  display: 'block',
+                  color: 'rgba(0, 0, 0, 0.870588)',
+                  lineHeight: '56px',
+                  opacity: '1',
+                  position: 'relative',
+                  paddingLeft: '0px',
+                  paddingRight: '48px',
+                  top: '6px'
+                }}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+              >
+               <option className="dropdown-option" value=""></option>
+                {options.map(({value, label}) =>
+                  <option
+                    className="dropdown-option"
+                    key={value}
+                    value={value}
+                    label={label || value}
+                  />
+                )}
+              </select>
+              <div
+                style={{
+                  borderTopStyle: 'none',
+                  bottom: '1px',
+                  left: '0px',
+                  margin: '-1px 24px',
+                  right: '0px',
+                  position: 'absolute'
+                }}
+              ></div>
+              <div
+                style={{
+                  boxSizing: 'borderBox',
+                  clear: 'both',
+                  display: 'table'
+                }}
+              > </div>
+            </div>
+          </div>
+        </div>
       );
     } else {
       return (
