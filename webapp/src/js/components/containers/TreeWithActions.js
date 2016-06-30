@@ -16,7 +16,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Material U(I
-import {FlatButton} from 'material-ui';
+import {RaisedButton} from 'material-ui';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -110,6 +110,7 @@ let TreeWithActions = React.createClass({
     );
 
     const treeInfo = table && tree && this.config.tables[table].treesById[tree];
+
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
@@ -131,8 +132,9 @@ let TreeWithActions = React.createClass({
             />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
-            <FlatButton onClick={this.handleCrossLink}
+            <RaisedButton onClick={this.handleCrossLink}
                         label={`Show ${this.config.tables[treeInfo.crossLink.split('::')[0]].tableCapNameSingle}`}
+                        icon={<Icon fixedWidth={true} name={this.config.tables[treeInfo.crossLink.split('::')[0]].icon} />}
             />
             : null}
           {treeInfo ?
