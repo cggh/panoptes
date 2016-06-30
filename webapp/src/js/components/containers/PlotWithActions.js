@@ -1,35 +1,39 @@
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import titleCase from 'title-case';
+import scrollbarSize from 'scrollbar-size';
+import Sidebar from 'react-sidebar';
 
+// Lodash
 import _map from 'lodash/map';
 import _each from 'lodash/map';
 import _reduce from 'lodash/reduce';
 import _filter from 'lodash/filter';
-import titleCase from 'title-case';
-import scrollbarSize from 'scrollbar-size';
 
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import Sidebar from 'react-sidebar';
-import SidebarHeader from 'ui/SidebarHeader';
+// Material UI
+import Divider from 'material-ui/Divider';
+import {FlatButton} from 'material-ui';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
+// Panoptes UI
+import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
+
+// Panoptes
 import SQL from 'panoptes/SQL';
 import PlotContainer from 'containers/PlotContainer';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
-
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import Divider from 'material-ui/Divider';
-
-import {FlatButton} from 'material-ui';
+import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import "plot.scss";
-
 
 let PlotWithActions = React.createClass({
   mixins: [
@@ -72,13 +76,18 @@ let PlotWithActions = React.createClass({
     this.props.componentUpdate({query: query});
   },
 
+  handleChangeTable(table) {
+    this.props.componentUpdate({table});
+  },
+
   render() {
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
-    let tables = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (table) => ({
-      payload: table.id,
-      icon: <Icon fixedWidth={true} name={table.icon}/>,
-      text: (<div className="dropdown-option">{table.tableCapNamePlural}</div>)
+
+    let tableOptions = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (table) => ({
+      value: table.id,
+      leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
+      label: table.tableCapNamePlural
     }));
 
     let propertyMenu = [];
@@ -101,13 +110,13 @@ let PlotWithActions = React.createClass({
       <div className="sidebar plot-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
         <div className="plot-controls vertical stack">
-          <SelectField value={table}
-                       autoWidth={true}
-                       floatingLabelText="Table:"
-                       onChange={(e, i, v) => componentUpdate({table: v})}>
-            {tables.map(({payload, text, icon}) =>
-              <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
-          </SelectField>
+          <SelectFieldWithNativeFallback
+            value={table}
+            autoWidth={true}
+            floatingLabelText="Table"
+            onChange={this.handleChangeTable}
+            options={tableOptions}
+          />
           {table ? <FlatButton label="Change Filter"
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/QueryPicker',

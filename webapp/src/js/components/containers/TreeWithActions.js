@@ -1,27 +1,30 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import scrollbarSize from 'scrollbar-size';
+import {treeTypes} from 'phylocanvas';
+import titleCase from 'title-case';
+import Sidebar from 'react-sidebar';
 
+// Lodash
 import _map from 'lodash/map';
 import _has from 'lodash/has';
 import _filter from 'lodash/filter';
-import scrollbarSize from 'scrollbar-size';
-import {treeTypes} from 'phylocanvas';
 import _keys from 'lodash/keys';
-import titleCase from 'title-case';
 
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import Sidebar from 'react-sidebar';
+// Material U(I
+import {RaisedButton} from 'material-ui';
+
+// Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
-
 import Icon from 'ui/Icon';
+
+// Panoptes
 import TreeContainer from 'containers/TreeContainer';
-
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-
-import {FlatButton} from 'material-ui';
+import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'tree.scss';
 
@@ -66,59 +69,82 @@ let TreeWithActions = React.createClass({
     }
   },
 
+  handleChangeTable(table) {
+    this.props.componentUpdate({table});
+  },
+
+  handleChangeTree(tree) {
+    this.props.componentUpdate({tree});
+  },
+
+  handleChangeTreeType(treeType) {
+    this.props.componentUpdate({treeType});
+  },
+
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
-    let tables = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
+    let tableOptions = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
       (table) => ({
-        payload: table.id,
-        icon: <Icon fixedWidth={true} name={table.icon}/>,
-        text: (<div className="dropdown-option">{table.tableCapNamePlural}</div>)
-      }));
+        value: table.id,
+        leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
+        label: table.tableCapNamePlural
+      })
+    );
 
-    let trees = [];
+    let treeOptions = [];
     if (table) {
-      trees = _map(this.config.tables[table].trees,
+      treeOptions = _map(this.config.tables[table].trees,
         (tree) => ({
-          payload: tree.id,
-          text: (<div className="dropdown-option">{tree.id}</div>)
+          value: tree.id,
+          label: tree.id
         })
       );
     }
+
+    let treeTypeOptions = _map(_keys(treeTypes),
+      (treeType) => ({
+        value: treeType,
+        label: titleCase(treeType)
+      })
+    );
+
     const treeInfo = table && tree && this.config.tables[table].treesById[tree];
+
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
         <div className="tree-controls vertical stack">
-          <SelectField value={table}
-                       autoWidth={true}
-                       floatingLabelText="Table:"
-                       onChange={(e, i, v) => componentUpdate({table: v})}>
-            {tables.map(({payload, text, icon}) =>
-              <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
-          </SelectField>
+          <SelectFieldWithNativeFallback
+            value={table}
+            autoWidth={true}
+            floatingLabelText="Table"
+            onChange={this.handleChangeTable}
+            options={tableOptions}
+          />
           {table ?
-            <SelectField value={tree}
-                         autoWidth={true}
-                         floatingLabelText="Tree"
-                         onChange={(e, i, v) => componentUpdate({tree: v})}>
-              {trees.map(({payload, text}) =>
-                <MenuItem value={payload} key={payload} primaryText={text}/>)}
-            </SelectField>
+            <SelectFieldWithNativeFallback
+              value={tree}
+              autoWidth={true}
+              floatingLabelText="Tree"
+              onChange={this.handleChangeTree}
+              options={treeOptions}
+            />
             : null }
           {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
-            <FlatButton onClick={this.handleCrossLink}
+            <RaisedButton onClick={this.handleCrossLink}
                         label={`Show ${this.config.tables[treeInfo.crossLink.split('::')[0]].tableCapNameSingle}`}
+                        icon={<Icon fixedWidth={true} name={this.config.tables[treeInfo.crossLink.split('::')[0]].icon} />}
             />
             : null}
           {treeInfo ?
-            <SelectField value={treeType}
-                         autoWidth={true}
-                         floatingLabelText="Tree Layout"
-                         onChange={(e, i, v) => componentUpdate({treeType: v})}>
-              {_keys(treeTypes).map((treeType) =>
-                <MenuItem value={treeType} key={treeType} primaryText={titleCase(treeType)}/>)}
-            </SelectField>
+            <SelectFieldWithNativeFallback
+              value={treeType}
+              autoWidth={true}
+              floatingLabelText="Tree Layout"
+              onChange={this.handleChangeTreeType}
+              options={treeTypeOptions}
+            />
             : null }
         </div>
       </div>

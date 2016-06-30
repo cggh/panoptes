@@ -1,27 +1,32 @@
 import React from 'react';
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import scrollbarSize from 'scrollbar-size';
+import Sidebar from 'react-sidebar';
 
+// Lodash
 import _map from 'lodash/map';
 import _each from 'lodash/map';
 import _filter from 'lodash/filter';
-import scrollbarSize from 'scrollbar-size';
 
+// Mixins
+import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import Sidebar from 'react-sidebar';
-import SidebarHeader from 'ui/SidebarHeader';
-
-import Icon from 'ui/Icon';
-import SQL from 'panoptes/SQL';
-import ItemMap from 'containers/item_views/ItemMap';
-import QueryString from 'panoptes/QueryString';
-
+// Material UI
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-
 import {FlatButton} from 'material-ui';
+
+// Panoptes UI
+import SidebarHeader from 'ui/SidebarHeader';
+import Icon from 'ui/Icon';
+
+// Panoptes
+import SQL from 'panoptes/SQL';
+import ItemMap from 'containers/item_views/ItemMap';
+import QueryString from 'panoptes/QueryString';
+import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'map.scss';
 
@@ -63,16 +68,21 @@ let MapWithActions = React.createClass({
     this.props.componentUpdate({query: query});
   },
 
+  handleChangeTable(table) {
+    this.props.componentUpdate({table});
+  },
+
   render() {
     let {sidebar, table, query, column, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-    let tables = _map(_filter(this.config.tables, (table) => table.hasGeoCoord && !table.settings.isHidden),
-      (val) => ({
-        payload: val.id,
-        icon: <Icon fixedWidth={true} name={val.icon}/>,
-        text: (<div className="dropdown-option">{val.tableCapNamePlural}</div>)
-      }));
+    let tableOptions = _map(_filter(this.config.tables, (table) => table.hasGeoCoord && !table.settings.isHidden),
+      (table) => ({
+        value: table.id,
+        leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
+        label: table.tableCapNamePlural
+      })
+    );
 
     let propertyMenu = [];
     let i = 0;
@@ -94,13 +104,13 @@ let MapWithActions = React.createClass({
       <div className="sidebar map-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
         <div className="map-controls vertical stack">
-          <SelectField value={table}
-                       autoWidth={true}
-                       floatingLabelText="Table:"
-                       onChange={(e, i, v) => componentUpdate({table: v})}>
-            {tables.map(({payload, text, icon}) =>
-              <MenuItem value={payload} key={payload} leftIcon={icon} primaryText={text}/>)}
-          </SelectField>
+          <SelectFieldWithNativeFallback
+            value={table}
+            autoWidth={true}
+            floatingLabelText="Table:"
+            onChange={this.handleChangeTable}
+            options={tableOptions}
+          />
           {table ? <FlatButton label="Change Filter"
                                primary={true}
                                onClick={() => actions.session.modalOpen('containers/QueryPicker',
