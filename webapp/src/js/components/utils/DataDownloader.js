@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 
-const MAX_DOWNLOAD_DATA_POINTS = 1000000;
+const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
 function downloadTableData(payload) {
 
