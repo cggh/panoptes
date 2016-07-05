@@ -106,6 +106,20 @@ let PlotWithActions = React.createClass({
         });
       });
     }
+
+    let filterButtonLabel = 'Change Filter';
+    let decodedQuery = SQL.WhereClause.decode(query);
+    let clearFilterButton = null;
+    if (!query || decodedQuery.isTrivial) {
+      filterButtonLabel = 'Add Filter';
+    } else if (table) {
+      clearFilterButton = <FlatButton
+                                label="Clear Filter"
+                                primary={true}
+                                onClick={() => componentUpdate({query: SQL.NullQuery})}
+                              />;
+    }
+
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
@@ -117,7 +131,7 @@ let PlotWithActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FlatButton label="Change Filter"
+          {table ? <FlatButton label={filterButtonLabel}
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/QueryPicker',
                         {
@@ -126,10 +140,7 @@ let PlotWithActions = React.createClass({
                           onPick: this.handleQueryPick
                         })}/>
             : null}
-          {table ? <FlatButton label="Clear Filter"
-                               primary={true}
-                               onClick={() => componentUpdate({query: SQL.NullQuery})}/>
-            : null}
+          {clearFilterButton}
           <SelectField value={plotType}
                        autoWidth={true}
                        floatingLabelText="Plot Type:"
