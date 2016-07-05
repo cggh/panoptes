@@ -479,7 +479,6 @@ containing the relative size of that specific pie'''
                                                 ('ChannelColor', {
                                                                 'type': 'Text',
                                                                 'required': False,
-                                                                'propName': 'channelColor',
                                                                 'description': 'Colour used to display these tracks as a genome browser track. Formatted as ``"rgb(r,g,b)"``'
                                                                 })
                                                 )

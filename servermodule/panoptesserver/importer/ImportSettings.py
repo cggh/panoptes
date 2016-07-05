@@ -69,7 +69,6 @@ class ImportSettings:
                             ('IsCategorical', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'isCategorical',
                                    'description': 'Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n  Categorical properties are automatically indexed'
                                    }),
                             ('CategoryColors', {
@@ -184,13 +183,11 @@ class ImportSettings:
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': True,
-                                   'propName': 'ShowInTable',
                                    'description': 'If set to false this property will not be available to be shown in tables in the application'
                                    }),
                             ('ShowInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'showInBrowser',
                                    'default': False,
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
                                    }),
@@ -198,7 +195,6 @@ class ImportSettings:
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': True,
-                                   'propName': 'showInBrowser',
                                    'description': 'If set to true (default) then this property will appear in tables when they are first shown'
                                    }),
                             ('BrowserDefaultVisible', {
@@ -216,7 +212,6 @@ class ImportSettings:
                             ('ChannelColor', {
                                    'type': 'Text',
                                    'required': False,
-                                   'propName': 'channelColor',
                                    'default': 'rgb(0,0,0)',
                                    'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
@@ -225,7 +220,6 @@ class ImportSettings:
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': False,
-                                   'propName': 'connectLines',
                                    'description': 'Indicate that the points will be connected with lines in the genome browser\n  ',
                                    'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
                                    }),
@@ -262,7 +256,6 @@ class ImportSettings:
                                                 ('ChannelColor', {
                                                                 'type': 'Text',
                                                                 'required': False,
-                                                                'propName': 'channelColor',
                                                                 'default': 'rgb(0,0,180)',
                                                                 'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
                                                                 }),
@@ -606,16 +599,8 @@ class ImportSettings:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
     def _prepareSerialization(self, settings, defn):
-        
         tosave = copy.deepcopy(settings)
         for key in defn:
-            if 'propName' in defn[key]:
-                propName = defn[key]['propName']
-                if key in settings:
-                    tosave[propName] = settings[key]
-                    del tosave[key]
-            else:
-                propName = key
             if 'default' in defn[key]:
                 includeDefault = True
 
@@ -624,7 +609,8 @@ class ImportSettings:
                         includeDefault = False
 
                 if includeDefault:
-                    tosave[propName] = settings.get(key, defn[key]['default'])
+                    tosave[key] = settings.get(key, defn[key]['default'])
+
 
                 
         return simplejson.dumps(tosave)
