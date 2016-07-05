@@ -9,16 +9,16 @@ nano config.py #Edit config for DB, paths
 #Install all the things (dev mode largely irrelevant for react dev so far, but we'll use that anyway)
 ./scripts/build.sh DEV
 
-
-#The old build system has not been fully adapted to the react world yet. So you have to run the backend server AND the dev html/js server.
-#First run the backend server
+#Then you can run panoptes:
 ./scripts/run.sh
 
-#In another terminal
-#Then import one of the sample datasets
+#Navigate to http://localhost:8000/index.html and you should see an ugly error as we have no datasets and the mechanism for dealing with this is not complete in 2.0
+#So we manually import one of the sample datasets - not that the dataset is chosen manually in webapp/src/index.html for now
 curl 'http://localhost:8000/api?datatype=custom&respmodule=panoptesserver&respid=fileload_dataset&ScopeStr=all&SkipTableTracks=false&datasetid=Samples_and_Variants'
 
-#Now we need to setup the JS build env
+#Wait for a few mins and then http://localhost:8000/index.html should show the dataset!
+
+#Now if you want to edit the JS we need to setup the JS build env
 sudo apt-get install nodejs npm
 #Update npm
 sudo npm install -g npm
@@ -34,8 +34,8 @@ npm install
 #Now run the dev html/js server
 npm run dev          #(options are dev, build, serveprod)
 
-#Navigate to http://localhost:8080/webpack-dev-server/index.html
-#Any changes you save to files will now be detected and applied (sometimes you have to hit refresh, but most things are hotloaded)
+#Navigate to (NOTE DIFFERENT PORT) http://localhost:8080/webpack-dev-server/index.html
+#Any changes you save to files will now be detected and applied on refresh, experimental hot loading is via "npm run devhot"
 
 
 
