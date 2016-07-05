@@ -258,7 +258,9 @@ SQL.WhereClause.CompareFixed = function(icolname, icomptype, ivalue) {
   that.CompValue = ivalue;
 
   that.toQueryDisplayString = function(queryData) {
-    return queryData.fieldInfoMap[that.ColName].name + ' ' + that.type + ' ' + queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValue);
+    let displayValue = queryData.fieldInfoMap[that.ColName].toDisplayString(that.CompValue);
+    if (displayValue === '') displayValue = '""';
+    return queryData.fieldInfoMap[that.ColName].name + ' ' + that.type + ' ' + displayValue;
   };
 
   return that;
