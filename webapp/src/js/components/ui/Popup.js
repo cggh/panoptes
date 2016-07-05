@@ -52,7 +52,7 @@ let Popup = React.createClass({
         height: 500
       }),
       cascadePositionOffset: Immutable.Map({
-        x: 10,
+        x: 20,
         y: 20
       })
     };
@@ -78,7 +78,31 @@ let Popup = React.createClass({
     let positionOffsetX = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('x');
     let positionOffsetY = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('y');
 
-    this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffsetX, y: this.props.initialPosition.get('y') + positionOffsetY})});
+
+    let maxPopupsDown = Math.floor((window.innerHeight - this.props.initialPosition.get('y') - this.props.initialSize.get('height')) / this.props.cascadePositionOffset.get('y'));
+    let maxPopupsRight = Math.floor((window.innerWidth - this.props.initialPosition.get('x') - this.props.initialSize.get('width')) / this.props.cascadePositionOffset.get('x'));
+
+    if (maxPopupsDown > 0) {
+
+      let cascadeRow = Math.floor(this.state.numberOfPopups / maxPopupsDown);
+      if (this.state.numberOfPopups % maxPopupsDown === 0) {
+        cascadeRow = cascadeRow - 1;
+      }
+
+      positionOffsetX = positionOffsetX - (cascadeRow * (maxPopupsDown - 1) * this.props.cascadePositionOffset.get('x'));
+      positionOffsetY = positionOffsetY - (cascadeRow * maxPopupsDown * this.props.cascadePositionOffset.get('y'));
+
+console.log('max num popups down: ' + maxPopupsDown);
+console.log('max num popups right: ' + maxPopupsRight);
+console.log('this.state.numberOfPopups: ' + this.state.numberOfPopups);
+console.log('cascadeRow: ' + cascadeRow);
+
+    }
+
+    let positionX = this.props.initialPosition.get('x') + positionOffsetX;
+    let positionY = this.props.initialPosition.get('y') + positionOffsetY;
+
+    this.setState({position: Immutable.Map({x: positionX, y: positionY})});
 
   },
 
