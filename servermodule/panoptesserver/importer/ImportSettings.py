@@ -600,16 +600,22 @@ class ImportSettings:
 
     def _prepareSerialization(self, settings, defn):
         tosave = copy.deepcopy(settings)
-        for key in defn:
-            if 'default' in defn[key]:
-                includeDefault = True
-
-                if 'siblingOptional' in defn[key]:
-                    if not self._hasOptionalSibling(settings, key, defn[key]):
-                        includeDefault = False
-
-                if includeDefault:
-                    tosave[key] = settings.get(key, defn[key]['default'])
+        def setDefaults(subSettings, subDefn):
+            for key, value in subDefn.items():
+                if 'default' in value:
+                    includeDefault = True
+                    if 'siblingOptional' in value:
+                        if not self._hasOptionalSibling(subSettings, key, value):
+                            includeDefault = False
+                    if includeDefault:
+                        subSettings[key] = subSettings.get(key, value['default'])
+                if 'children' in value and key in subSettings:
+                    if value['type'] == 'List':
+                        for child in subSettings[key]:
+                            setDefaults(child, value['children'])
+                    elif value['type'] == 'Block':
+                        setDefaults(subSettings[key], value['children'])
+        setDefaults(tosave, defn)
 
 
                 
