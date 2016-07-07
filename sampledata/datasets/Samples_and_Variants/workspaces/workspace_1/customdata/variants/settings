@@ -1,4 +1,3 @@
-
 # Optionally, an explicit list of custom data can be specified to control the order of import
-CustomData:
+customData:
 - custom1

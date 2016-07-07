@@ -7,7 +7,6 @@ import json
 from importer import readConfig
 
 def response(returndata):
-    path = returndata['path']
     try:
         length = int(returndata['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:

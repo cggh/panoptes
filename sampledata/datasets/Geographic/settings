@@ -1,8 +1,9 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/dataset.html
 
-Name: Geographic
-Description: A fictitious dataset, used to illustrate the geographic & time visualisation functionality of Panoptes
+name: Geographic
+description: A fictitious dataset, used to illustrate the geographic & time visualisation
+  functionality of Panoptes
 
-DataTables:
+dataTables:
 - samples
 

@@ -1,100 +1,99 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: sample    # Display name referring to a table item (single, no capital)
-NamePlural: samples    # Display name referring to a table item (plural, no capital)
+nameSingle: sample    # Display name referring to a table item (single, no capital)
+namePlural: samples    # Display name referring to a table item (plural, no capital)
 
-Description: >
-  A table containing a number of samples. <a class="doclink" href="samples">More information...</a>.
+description: 'A table containing a number of samples. <a class="doclink" href="samples">More
+  information...</a>.
 
-Icon: fa-flask
+  '
+icon: fa-flask
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
-PrimKey: key
+primKey: key
 
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
-QuickFindFields: key,Site_ID,SampleTypeID
+quickFindFields: key,Site_ID,SampleTypeID
 
 
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all data table columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties
-Properties:
+properties:
+- id: key                          # Identifier of the property, corresponding to the column header in the [data] file
+  name: Sample key                 # Display name of the property
+  description: Sample identifier   # Description of the property
+  dataType: Text                   # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
+  search: StartPattern             # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
-- Id: key                          # Identifier of the property, corresponding to the column header in the [data] file
-  Name: Sample key                 # Display name of the property
-  Description: Sample identifier   # Description of the property
-  DataType: Text                   # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  Search: StartPattern             # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
+- id: Site_ID
+  name: Site ID
+  description: Identifier of the site the sample was collected from
+  dataType: Text
+  index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  relation:                         # This block defines a many-to-one foreign relation to a parent table
+    tableId: samplingsites          # Datatable id of the parent table
+    forwardName: is sampled from    # Display name of the relation from child to parent
+    reverseName: contains           # Display name of the relation from parent to child
 
-- Id: Site_ID
-  Name: Site ID
-  Description: Identifier of the site the sample was collected from
-  DataType: Text
-  Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
-  Relation:                         # This block defines a many-to-one foreign relation to a parent table
-    TableId: samplingsites          # Datatable id of the parent table
-    ForwardName: is sampled from    # Display name of the relation from child to parent
-    ReverseName: contains           # Display name of the relation from parent to child
+- id: Contributor_ID
+  name: Contributor_ID
+  description: Identifier of the contributing entity
+  dataType: Text
+  index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  relation:                         # This block defines a many-to-one foreign relation to a parent table
+    tableId: contributors           # Data table id of the parent table
+    forwardName: is contributed by  # Display name of the relation from child to parent
+    reverseName: contributed        # Display name of the relation from parent to child
 
-- Id: Contributor_ID
-  Name: Contributor_ID
-  Description: Identifier of the contributing entity
-  DataType: Text
-  Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
-  Relation:                         # This block defines a many-to-one foreign relation to a parent table
-    TableId: contributors           # Data table id of the parent table
-    ForwardName: is contributed by  # Display name of the relation from child to parent
-    ReverseName: contributed        # Display name of the relation from parent to child
+- id: SampleDate
+  dataType: Date
 
-- Id: SampleDate
-  DataType: Date
+- id: Value1
+  name: Value 1
+  description: An example of a numerical value
+  dataType: Value
+  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
+  maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
+  decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
 
-- Id: Value1
-  Name: Value 1
-  Description: An example of a numerical value
-  DataType: Value
-  MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
-  MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
-  DecimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
+- id: InUse
+  name: Used
+  description: Flag determining if sample is used for analysis
+  dataType: Boolean
 
-- Id: InUse
-  Name: Used
-  Description: Flag determining if sample is used for analysis
-  DataType: Boolean
+- id: SampleTypeID
+  name: Sample type ID
+  dataType: Text
+  relation:
+    tableId: sampletypes
+    forwardName: is
+    reverseName: contains
 
-- Id: SampleTypeID
-  Name: Sample type ID
-  DataType: Text
-  Relation:
-    TableId: sampletypes
-    ForwardName: is
-    ReverseName: contains
+- id: Comment
+  name: Comment
+  description: An example of a comment string
+  dataType: Text
+  search: Pattern
 
-- Id: Comment
-  Name: Comment
-  Description: An example of a comment string
-  DataType: Text
-  Search: Pattern
+- id: ExternalRef
+  name: External Reference
+  description: Reference on some other site with a link
+  dataType: Text
+  externalUrl: http://en.wikipedia.org/wiki/{value}
 
-- Id: ExternalRef
-  Name: External Reference
-  Description: Reference on some other site with a link
-  DataType: Text
-  ExternalUrl: http://en.wikipedia.org/wiki/{value}
 
-  
 # The following block declares that this data table contains genome values for each item in the table
 # Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser
 # There should be a subfolder with the identifier of this track in the data table source data folder. For each data item, this folder should contain a data file with the name equal to the primary key
-TableBasedSummaryValues:            
-- Id: SampleSummary1                # Identifier of this per-dataitem genomic value.
-  Name: Sample summary 1            # Display name
-  MinVal: 0                         # Minimum this value can reach
-  MaxVal: 100                       # Maximum this value can reach
-  BlockSizeMin: 20                  # Minimum block size used by the multiresolution summariser (in bp)
-  BlockSizeMax: 50000               # Maximum block size used by the multiresolution summariser (in bp)
-  ChannelColor: "rgb(0,100,0)"      # Colour used to display this genome browser track
-  
+tableBasedSummaryValues:
+- id: SampleSummary1                # Identifier of this per-dataitem genomic value.
+  name: Sample summary 1            # Display name
+  minVal: 0                         # Minimum this value can reach
+  maxVal: 100                       # Maximum this value can reach
+  blockSizeMin: 20                  # Minimum block size used by the multiresolution summariser (in bp)
+  blockSizeMax: 50000               # Maximum block size used by the multiresolution summariser (in bp)
+  channelColor: rgb(0,100,0)        # Colour used to display this genome browser track

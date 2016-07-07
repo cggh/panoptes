@@ -139,7 +139,7 @@ let addPropertyConfig = function (config) {
       prop.tableId = table.id;
       if (prop.dataType == 'Text')
         prop.isText = true;
-      if ((prop.dataType == 'Value') || (prop.dataType == 'LowPrecisionValue') || (prop.dataType == 'HighPrecisionValue') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLattitude') || (prop.dataType == 'Date'))
+      if ((prop.dataType == 'Value') || (prop.dataType == 'LowPrecisionValue') || (prop.dataType == 'HighPrecisionValue') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude') || (prop.dataType == 'Date'))
         prop.isFloat = true;
       if (prop.dataType == 'Boolean')
         prop.isBoolean = true;
@@ -157,7 +157,7 @@ let addPropertyConfig = function (config) {
         prop.decimDigits = prop.decimDigits || 5;
         table.longitude = prop.id;
       }
-      if (prop.dataType == 'GeoLattitude') {
+      if (prop.dataType == 'GeoLatitude') {
         prop.minVal = prop.minVal || -90;
         prop.maxVal = prop.maxVal || 90;
         prop.decimDigits = prop.decimDigits || 5;
@@ -190,7 +190,7 @@ let addPropertyConfig = function (config) {
         prop.dispDataType = 'Longitude';
         prop.icon = 'globe';
       }
-      if (prop.dataType == 'GeoLattitude') {
+      if (prop.dataType == 'GeoLatitude') {
         prop.dispDataType = 'Latitude';
         prop.icon = 'globe';
       }
@@ -237,7 +237,7 @@ let addPropertyConfig = function (config) {
         encoding = 'Int';
       if (prop.dataType == 'Boolean')
         encoding = 'Int';
-      if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLattitude'))
+      if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude'))
         encoding = 'Float4';
       if ((prop.dataType == 'Date'))
         encoding = 'Float4';
@@ -284,7 +284,7 @@ let addPropertyConfig = function (config) {
         HighPrecisionValue: 'right',
         Boolean: 'center',
         GeoLongitude: 'right',
-        GeoLattitude: 'right',
+        GeoLatitude: 'right',
         Date: 'center'
       };
       prop.alignment = alignment[prop.dataType] || 'left';

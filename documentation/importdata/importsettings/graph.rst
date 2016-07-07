@@ -1,17 +1,17 @@
 
-Name
+name
   *Text (required).* .
 
-Format
+format
   *Text (required).* .
   Possible values:
 
   - ``newick``: .
 
-Description
+description
   *Text (required).* .
 
-CrossLink
+crossLink
   *Text.*  Default:.  .
 
 

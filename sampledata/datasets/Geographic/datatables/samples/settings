@@ -1,83 +1,84 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: sample
-NamePlural: samples
-Description: A synthetic set of samples collected from a large area of Africa. The data table contains GPS coordinates, collection dates, and some fictitious properties.
-PrimKey: ID
-QuickFindFields: ID,CatId,RegionId
+nameSingle: sample
+namePlural: samples
+description: A synthetic set of samples collected from a large area of Africa. The
+  data table contains GPS coordinates, collection dates, and some fictitious properties.
+primKey: ID
+quickFindFields: ID,CatId,RegionId
 
-MaxCountQueryRecords: 250000
-MaxCountQueryAggregated: 500000
-AllowSubSampling: Yes
-CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large data tables than the standard option, based on a JOIN statement
+maxCountQueryRecords: 250000
+maxCountQueryAggregated: 500000
+allowSubSampling: Yes
+cacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large data tables than the standard option, based on a JOIN statement
 
 #DisableNotes: Yes
 #DisableSubsets: Yes
 #DisablePlots: Yes
 
-Properties:
+properties:
+- id: ID
+  name: Sample ID
+  dataType: Text
+  search: StartPattern
 
-- Id: ID
-  Name: Sample ID
-  DataType: Text
-  Search: StartPattern
+- id: CatId
+  name: Category ID
+  dataType: Text
+  isCategorical: true
 
-- Id: CatId
-  Name: Category ID
-  DataType: Text
-  IsCategorical: true
+- id: RegionId
+  name: Region ID
+  dataType: Text
+  isCategorical: true
 
-- Id: RegionId
-  Name: Region ID
-  DataType: Text
-  IsCategorical: true
+- id: CollectionDate
+  name: Collection date
+  dataType: Date
 
-- Id: CollectionDate
-  Name: Collection date
-  DataType: Date
+- id: Longitude
+  name: Longitude
+  dataType: GeoLongitude
 
-- Id: Longitude
-  Name: Longitude
-  DataType: GeoLongitude
+- id: Latitude
+  name: Latitude
+  dataType: GeoLatitude
 
-- Id: Lattitude
-  Name: Lattitude
-  DataType: GeoLattitude
+- id: NumProp1
+  name: Numerical 1
+  dataType: Value
+  minVal: -10
+  maxVal: 10
+  showBar: true
 
-- Id: NumProp1
-  Name: Numerical 1
-  DataType: Value
-  MinVal: -10
-  MaxVal: 10
-  ShowBar: True
+- id: NumProp2
+  name: Numerical 2
+  dataType: Value
+  minVal: -10
+  maxVal: 10
+  showBar: true
 
-- Id: NumProp2
-  Name: Numerical 2
-  DataType: Value
-  MinVal: -10
-  MaxVal: 10
-  ShowBar: True
-
-- Id: Filtrd
-  Name: Filtered
-  DataType: Boolean
-  ReadData: false
-  CanUpdate: true
-  CategoryColors:
-    "No": rgb(255,128,60)
-    "Yes": rgb(0,180,0)
+- id: Filtrd
+  name: Filtered
+  dataType: Boolean
+  readData: false
+  canUpdate: true
+  categoryColors:
+    No: rgb(255,128,60)
+    Yes: rgb(0,180,0)
     _other_: rgb(128, 128, 128)
 
 
 
-ExternalLinks:
-- Url: http://maps.google.com/maps?q={Lattitude},{Longitude}
-  Name: Show on Google Maps
+externalLinks:
+- url: http://maps.google.com/maps?q={Latitude},{Longitude}
+  name: Show on Google Maps
 
 
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual data table item
+dataItemViews:
+-              # Lists all the custom views that should appear in the popup for an individual data table item
 
-- Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
-  Name: Location                                       # Name of the view
-  MapZoom: 5                                           # Start zoom factor of the map
+  type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
+  name: Location                                       # Name of the view
+  mapZoom: 5                                           # Start zoom factor of the map
 

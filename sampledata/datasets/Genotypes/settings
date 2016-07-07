@@ -1,12 +1,12 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/dataset.html
 
-Name: Genotypes Example
+name: Genotypes Example
 
-DataTables:
-    - variants
-    - samples
+dataTables:
+- variants
+- samples
 
 #List the 2D data tables that should be exposed in the app.
-2D_DataTables:
-    - diploid
-    - haploid
+twoD_DataTables:
+- diploid
+- haploid

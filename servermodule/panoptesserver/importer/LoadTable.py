@@ -69,18 +69,18 @@ class LoadTable(threading.Thread):
             return
         
         if allowSubSampling == None:
-            self._allowSubSampling = loadSettings['AllowSubSampling']
+            self._allowSubSampling = loadSettings['allowSubSampling']
       
-        if  loadSettings['IsPositionOnGenome']:
+        if  loadSettings['isPositionOnGenome']:
             self._isPositionOnGenome = True
                      
-            self._chrom = loadSettings['Chromosome']
-            self._pos = loadSettings['Position']
+            self._chrom = loadSettings['chromosome']
+            self._pos = loadSettings['position']
             
         #Settings connected to 2D data tables - add columns if present ColumnIndexField
-        self._columnIndexField = loadSettings['ColumnIndexField'] 
+        self._columnIndexField = loadSettings['columnIndexField']
             
-        self._rowIndexField = loadSettings['RowIndexField']
+        self._rowIndexField = loadSettings['rowIndexField']
         
         self._dao = SettingsDAO(responder, self._datasetId, None, logCache = self._logMessages)
             
@@ -100,20 +100,20 @@ class LoadTable(threading.Thread):
         self._fileColNames = [colname.replace(' ', '_') for colname in header.rstrip('\n\r').split(self._separator)]
         self._log('File columns: ' + str(self._fileColNames))
         self._fileColIndex = {self._fileColNames[i]: i for i in range(len(self._fileColNames))}
-        if not(self._loadSettings["PrimKey"] == "AutoKey") and (self._loadSettings["PrimKey"] not in self._fileColIndex):
-            raise Exception('File is missing primary key '+self._loadSettings["PrimKey"])
+        if not(self._loadSettings["primKey"] == "AutoKey") and (self._loadSettings["primKey"] not in self._fileColIndex):
+            raise Exception('File is missing primary key '+self._loadSettings["primKey"])
         for col in self._loadSettings.getPropertyNames():
             # if 'ReadData' not in col:
             #     print('==========' + str(col))
-            colname = self._loadSettings.getPropertyValue(col,"Id")
-            if (self._loadSettings.getPropertyValue(col,'ReadData') and (colname not in self._fileColIndex)):
+            colname = self._loadSettings.getPropertyValue(col,"id")
+            if (self._loadSettings.getPropertyValue(col,'readData') and (colname not in self._fileColIndex)):
                 if not colname == "AutoKey":
                     raise Exception('File is missing column '+colname)
     
     #Used if not bulk loading to encode the data for an insert statement
     def _encodeCell(self, icontent, col):
         content = icontent
-        if col['DataType'] == 'Text':
+        if col['dataType'] == 'Text':
             if len(icontent) == 0:
                 content = "''"
             else:
@@ -131,11 +131,11 @@ class LoadTable(threading.Thread):
                 content = content.replace('\n\r', '\\n')
                 content = '\'' + content + '\''
 
-        if ImpUtils.IsValueDataTypeIdenfifier(col['DataType']):
+        if ImpUtils.IsValueDataTypeIdenfifier(col['dataType']):
             if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-' or content == 'nan'):
                 content = 'NULL'
 
-        if ImpUtils.IsDateDataTypeIdenfifier(col['DataType']):
+        if ImpUtils.IsDateDataTypeIdenfifier(col['dataType']):
             if len(content)>=5:
                 try:
                     dt = dateutil.parser.parse(content)
@@ -148,7 +148,7 @@ class LoadTable(threading.Thread):
             else:
                 content = 'NULL'
 
-        if col['DataType'] == 'Boolean':
+        if col['dataType'] == 'Boolean':
             vl = content
             content = 'NULL'
             if (vl.lower() == 'true') or (vl.lower() == 'yes') or (vl.lower() == 'y') or (vl == '1'):
@@ -167,16 +167,16 @@ class LoadTable(threading.Thread):
         for col in self._loadSettings.getPropertyNames():
 
             content = 'NULL'
-            name = self._loadSettings.getPropertyValue(col,'Id') 
+            name = self._loadSettings.getPropertyValue(col,'id')
             if name in self._fileColIndex:
                 content = sourceCells[self._fileColIndex[name]]
 #                content = self._encodeCell(content, col)
                 
             
-            if self._loadSettings.getPropertyValue(col,'DataType') == 'Text':
-                maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
+            if self._loadSettings.getPropertyValue(col,'dataType') == 'Text':
+                maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
                 #self._log("{} {}".format(content, len(content)))
-                self._loadSettings.setPropertyValue(col,'MaxLen',max(maxlen, len(content)))
+                self._loadSettings.setPropertyValue(col,'maxLen',max(maxlen, len(content)))
                 
             writeCells.append(content)
             
@@ -203,8 +203,8 @@ class LoadTable(threading.Thread):
     def _createTable(self, tableid):
         sql = 'CREATE TABLE {0} (\n'.format(DBTBESC(tableid))
         colTokens = []
-        if self._loadSettings["PrimKey"] == "AutoKey":
-            colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(DBCOLESC(self._loadSettings["PrimKey"])))
+        if self._loadSettings["primKey"] == "AutoKey":
+            colTokens.append("{0} int AUTO_INCREMENT PRIMARY KEY".format(DBCOLESC(self._loadSettings["primKey"])))
         if self._allowSubSampling:
             colTokens.append("_randomval_ double")
         
@@ -219,9 +219,9 @@ class LoadTable(threading.Thread):
         for col in self._loadSettings.getPropertyNames():
             if col == "AutoKey":
                 continue
-            name = self._loadSettings.getPropertyValue(col,'Id')
-            typedefn = self._loadSettings.getPropertyValue(col,'DataType')
-            maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
+            name = self._loadSettings.getPropertyValue(col,'id')
+            typedefn = self._loadSettings.getPropertyValue(col,'dataType')
+            maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
             st = DBCOLESC(name)
             typestr = ''
             if typedefn == 'Text':
@@ -252,7 +252,7 @@ class LoadTable(threading.Thread):
                 self._log('Not loading column: ' + col)
                 colTokens.append('@dummy')
             else:
-                dt = colDescrip['DataType']
+                dt = colDescrip['dataType']
                 if dt == 'Text':
                     colTokens.append(DBCOLESC(col))
                 elif dt == 'Boolean':
@@ -271,7 +271,7 @@ class LoadTable(threading.Thread):
                     ts += " WHEN '1' THEN 1 WHEN '0' THEN 0 "
                     ts += " END"
                     transform.append(ts)
-                elif dt == 'Value' or dt == 'HighPrecisionValue' or dt == 'GeoLongitude' or dt == 'GeoLattitude':
+                elif dt == 'Value' or dt == 'HighPrecisionValue' or dt == 'GeoLongitude' or dt == 'GeoLatitude':
                     var = '@' + col
                     colTokens.append(var)
                     ts = DBCOLESC(col) + " = CASE " + var
@@ -325,12 +325,12 @@ class LoadTable(threading.Thread):
         tableid = self._tableId
         
         
-        if not (self._loadSettings["AutoKey"] == self._loadSettings["PrimKey"]):
-            self._dao.createIndex(tableid + '_' + self._loadSettings["PrimKey"], tableid, self._loadSettings["PrimKey"], unique = True)
+        if not (self._loadSettings["autoKey"] == self._loadSettings["primKey"]):
+            self._dao.createIndex(tableid + '_' + self._loadSettings["primKey"], tableid, self._loadSettings["primKey"], unique = True)
             
         for col in self._loadSettings.getPropertyNames():
-            name = self._loadSettings.getPropertyValue(col, 'Id')
-            if self._loadSettings.getPropertyValue(col, 'Index') and col != self._loadSettings["PrimKey"]:
+            name = self._loadSettings.getPropertyValue(col, 'id')
+            if self._loadSettings.getPropertyValue(col, 'index') and col != self._loadSettings["primKey"]:
                 self._dao.createIndex(tableid + '_' + name, tableid, name)
                 
         if self._isPositionOnGenome:
@@ -352,7 +352,7 @@ class LoadTable(threading.Thread):
         
         if self._allowSubSampling:
             with self._responder.LogHeader('Create subsampling table'):
-                self._dao.createSubSampleTable(tableid, self._loadSettings["PrimKey"], self._bulkLoad)
+                self._dao.createSubSampleTable(tableid, self._loadSettings["primKey"], self._bulkLoad)
 
 
     def _preprocessFile(self, sourceFileName, tableid):
@@ -377,8 +377,8 @@ class LoadTable(threading.Thread):
                     skipParse = True
                     
                     for col in self._loadSettings.getPropertyNames():
-                        if self._loadSettings.getPropertyValue(col,'MaxLen') == 0:
-                            self._log('MaxLen not set for column:' + col)
+                        if self._loadSettings.getPropertyValue(col,'maxLen') == 0:
+                            self._log('maxLen not set for column:' + col)
                             skipParse = False
                             
                           
@@ -451,7 +451,7 @@ class LoadTable(threading.Thread):
         
             sourceFileName = self._preprocessFile(sourceFileName, tableid)
                           
-            self._log('Column sizes: '+str({col: self._loadSettings.getPropertyValue(col, 'MaxLen') for col in self._loadSettings.getPropertyNames()}))
+            self._log('Column sizes: '+str({col: self._loadSettings.getPropertyValue(col, 'maxLen') for col in self._loadSettings.getPropertyNames()}))
         
             self._log('Creating schema')
             try:
@@ -498,11 +498,11 @@ class LoadTable(threading.Thread):
             
             self._dao._execSql('CREATE TABLE {subsettable} AS SELECT {primkey} FROM {table} limit 0'.format(
                 subsettable=DBTBESC(subsetTableName),
-                primkey=DBCOLESC(self._loadSettings["PrimKey"]),
+                primkey=DBCOLESC(self._loadSettings["primKey"]),
                 table=DBTBESC(tableid)
             ))
             self._dao._execSql('ALTER TABLE {0} ADD COLUMN (subsetid INT)'.format(DBTBESC(subsetTableName)))
-            self._dao.createIndex('primkey',subsetTableName, self._loadSettings["PrimKey"])
+            self._dao.createIndex('primkey',subsetTableName, self._loadSettings["primKey"])
             self._dao.createIndex('subsetid',subsetTableName, 'subsetid')
             
 

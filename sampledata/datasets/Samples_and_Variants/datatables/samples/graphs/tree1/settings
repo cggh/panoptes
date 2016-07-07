@@ -1,4 +1,4 @@
-Name: Sample tree 1
-Format: newick
-Description: This is the first example tree
-CrossLink: repeats::R01
+name: Sample tree 1
+format: newick
+description: This is the first example tree
+crossLink: repeats::R01

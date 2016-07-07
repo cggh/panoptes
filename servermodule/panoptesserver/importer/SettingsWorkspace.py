@@ -7,12 +7,12 @@ class SettingsWorkspace(ImportSettings):
     
     def getSettings(self):
         graphSettings = OrderedDict((
-                              ('Name', {
+                              ('name', {
                                         'type': 'Text',
                                         'required': True,
                                         'description': ''
                                         }),
-                              ('CustomData', {
+                              ('customData', {
                                         'type': 'Text',
                                         'required': False,
                                         'description': ''

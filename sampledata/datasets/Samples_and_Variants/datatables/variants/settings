@@ -1,161 +1,161 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: variant     # Display name referring to a table item (single, no capital)
-NamePlural: variants    # Display name referring to a table item (plural, no capital)
-Description: A table containing a number of genomic variants     # A description of this data table
+nameSingle: variant     # Display name referring to a table item (single, no capital)
+namePlural: variants    # Display name referring to a table item (plural, no capital)
+description: A table containing a number of genomic variants     # A description of this data table
 
-CacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
+cacheWorkspaceData: Yes   # If Set, a materialised table will be created for this data in each workspace. This is faster for large datasets than the standard option, based on a JOIN statement
 
-Icon: fa-bookmark
+icon: fa-bookmark
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
-PrimKey: SnpName
+primKey: SnpName
 
-SortDefault: Value1               # Specify this property as the default sort field
+sortDefault: Value1               # Specify this property as the default sort field
 
 
 # The following tags set limits on the data volumes that can be queried
-MaxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)
-MaxCountQueryAggregated: 1000000  # Defines the maximum number of records that will be queried on the server for aggregation (e.g. for creating histograms)
+maxCountQueryRecords: 250000      # Defines the maximum number of records that will be downloaded to the client (e.g. for creating scatterplots)
+maxCountQueryAggregated: 1000000  # Defines the maximum number of records that will be queried on the server for aggregation (e.g. for creating histograms)
 
 
 # The following set of tags is used to define the items in this data table as positions on the genome
-IsPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
-Chromosome: chromosome            # Speficies the table column ID that contains the chromosome
-Position: position                # Specifies the table column ID that contains the position on the chromosome
-BrowserTrackHeightFactor: 0.75    # Specifies a relative size factor for the genome browser track height
-GenomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
+isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
+chromosome: chromosome            # Speficies the table column ID that contains the chromosome
+position: position                # Specifies the table column ID that contains the position on the chromosome
+browserTrackHeightFactor: 0.75    # Specifies a relative size factor for the genome browser track height
+genomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
 
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
-QuickFindFields: SnpName
+quickFindFields: SnpName
 
 
-PropertyGroups:
-- Id: Info
-  Name: Variant Info
-- Id: AlleleFreq
-  Name: Allele freqs.
+propertyGroups:
+- id: Info
+  name: Variant Info
+- id: AlleleFreq
+  name: Allele freqs.
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties
-Properties:
+properties:
+- id: chromosome                 # Identifier of the property, corresponding to the column header in the [data] file
+  name: Chromosome               # Display name of the property
+  groupId: Info
+  description: Chromosome name   # Description of the property
+  dataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
 
-- Id: chromosome                 # Identifier of the property, corresponding to the column header in the [data] file
-  Name: Chromosome               # Display name of the property
-  GroupId: Info
-  Description: Chromosome name   # Description of the property
-  DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+- id: position
+  name: Position
+  groupId: Info
+  description: Genomic position of the variant on the chromosome (1-based)
+  dataType: Value
+  decimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
 
-- Id: position
-  Name: Position
-  GroupId: Info
-  Description: Genomic position of the variant on the chromosome (1-based)
-  DataType: Value
-  DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+- id: SnpName
+  name: Variant name
+  groupId: Info
+  description: Unique name of the variant
+  dataType: Text
+  search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
-- Id: SnpName
-  Name: Variant name
-  GroupId: Info
-  Description: Unique name of the variant
-  DataType: Text
-  Search: StartPattern          # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
-
-- Id: HighQuality
-  Name: High Quality
-  GroupId: Info
-  Description: Variant Quality filter
-  DataType: Boolean
-  TableDefaultVisible: false
-  ShowInBrowser: true
+- id: HighQuality
+  name: High Quality
+  groupId: Info
+  description: Variant Quality filter
+  dataType: Boolean
+  tableDefaultVisible: false
+  showInBrowser: true
   #BrowserDefaultVisible: true   # Indicates that the channel will activated by default in the genome browser
-  BrowserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
+  browserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
-- Id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
-  GroupId: Info
-  Index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
-  ShowInBrowser: true           # If true, this property will be displayed in the genome browser
-  MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
-  MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
-  DecimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
+- id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
+  groupId: Info
+  index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
+  showInBrowser: true           # If true, this property will be displayed in the genome browser
+  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
+  maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
+  decimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
 
-- Id: Value1
-  Name: Value 1
-  DataType: HighPrecisionValue
-  Description: The first numerical value
-  ShowBar: True                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
-  ChannelColor: "rgb(0,80,200)"  # Colour used to display this property
-  ConnectLines: True              # Indicate that the points will be connected with lines
-  BrowserDefaultVisible: true
+- id: Value1
+  name: Value 1
+  dataType: HighPrecisionValue
+  description: The first numerical value
+  showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
+  channelColor: rgb(0,80,200)    # Colour used to display this property
+  connectLines: true              # Indicate that the points will be connected with lines
+  browserDefaultVisible: true
 
-- Id: Value2
-  Name: Value 2
-  DataType: Value
-  Description: The second numerical value
-  ChannelColor: "rgb(200,80,0)"
-  ConnectLines: True
+- id: Value2
+  name: Value 2
+  dataType: Value
+  description: The second numerical value
+  channelColor: rgb(200,80,0)
+  connectLines: true
 
-- Id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
-  Name: Value 3
-  DataType: Value
-  Description: The third numerical value
-  BrowserDefaultVisible: true
-  SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-     BlockSizeMin: 20               # Minimum summary block size (in bp)
-     BlockSizeMax: 50000            # Maximum summary block size (in bp)
-     ChannelColor: "rgb(0,100,0)"   # Colour of the channel
+- id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
+  name: Value 3
+  dataType: Value
+  description: The third numerical value
+  browserDefaultVisible: true
+  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
+    blockSizeMin: 20                # Minimum summary block size (in bp)
+    blockSizeMax: 50000             # Maximum summary block size (in bp)
+    channelColor: rgb(0,100,0)      # Colour of the channel
 
-- Id: Extra_1
-  Name: Extra 1
-  GroupId: Info
-  Description: An example categorical property
-  DataType: Text
-  ShowInBrowser: true
-  IsCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  CategoryColors:                   # Specifies display colours for the categorical states of this property
-    A: rgb(255,128,60)
-    B: rgb(0,180,0)
+- id: Extra_1
+  name: Extra 1
+  groupId: Info
+  description: An example categorical property
+  dataType: Text
+  showInBrowser: true
+  isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  categoryColors:                   # Specifies display colours for the categorical states of this property
+    a: rgb(255,128,60)
+    b: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  SummaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level 
-     BlockSizeMin: 20
-     BlockSizeMax: 50000
-     MaxDensity: 0.2
-  BrowserDefaultVisible: true
-  
-- Id: NRAF_WAF, NRAF_EAF, NRAF_SAF
-  DataType: Value
-  GroupId: AlleleFreq
-  MinVal: 0
-  MaxVal: 1
-  
-- Id: NRAF_WAF
-  Description: Non-reference allele frequency in West Africa
+  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
+    blockSizeMin: 20
+    blockSizeMax: 50000
+    maxDensity: 0.2
+  browserDefaultVisible: true
 
-- Id: NRAF_EAF
-  Description: Non-reference allele frequency in East Africa
+- id: NRAF_WAF, NRAF_EAF, NRAF_SAF
+  dataType: Value
+  groupId: AlleleFreq
+  minVal: 0
+  maxVal: 1
 
-- Id: NRAF_SAF
-  Description: Non-reference allele frequency in South Africa
+- id: NRAF_WAF
+  description: Non-reference allele frequency in West Africa
 
+- id: NRAF_EAF
+  description: Non-reference allele frequency in East Africa
 
+- id: NRAF_SAF
+  description: Non-reference allele frequency in South Africa
 
 
 
-ExternalLinks:
-- Url: https://www.google.co.uk/search?q={SnpName}
-  Name: Google search
 
-- Url: http://en.wikipedia.org/wiki/{SnpName}
-  Name: Wikipedia
-  
-DataItemViews: # Lists the custom views that should appear in the popup for an individual datatable item
 
-- Type: FieldList                                      # Specifies a list of properties to be shown
-  Name: Variant properties                             # Name of the view
-  Fields:                                              # List of the fields to be included
-  - chromosome
+externalLinks:
+- url: https://www.google.co.uk/search?q={SnpName}
+  name: Google search
+
+- url: http://en.wikipedia.org/wiki/{SnpName}
+  name: Wikipedia
+
+dataItemViews:
+               # Lists the custom views that should appear in the popup for an individual datatable item
+
+- type: FieldList                                      # Specifies a list of properties to be shown
+  name: Variant properties                             # Name of the view
+  fields:
+  - chromosome                                         # List of the fields to be included
   - position
   - SnpName
   - HighQuality
@@ -164,24 +164,26 @@ DataItemViews: # Lists the custom views that should appear in the popup for an i
   - Value_three
   - Extra_1
 
-- Type: PropertyGroup
-  Name: Allele Frequencies
-  GroupId: AlleleFreq
+- type: PropertyGroup
+  name: Allele Frequencies
+  groupId: AlleleFreq
 
-- Type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
-  Name: Map                                            # Name of the view
-  PieChartSize: 1000                                   # Size of the largest pie chart
-  MapCenter: { Longitude: 10, Lattitude: 0 }           # Start location of the map
-  DataType: Fraction                                   # Type of values used to create the pie chart
-  PositionOffsetFraction: 0.5                          # An offset between the pie chart location and the actual chart, used to achieve a nice (nonoverlapping) view
-  LocationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
-  LocationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
-  LocationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
-  ComponentColumns:                                    # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
-  - Pattern: NRAF_{locid}                              # Column name providing the data ({locid} will be replaced by the location primary key values)
-    Name: Non-reference allele frequency               # Name of the pie
-    Color: rgb(128,28,0)                               # Color of the pie
-  ResidualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
+- type: PieChartMap                                    # Defines a view that shows a set of pie charts on a geographic map
+  name: Map                                            # Name of the view
+  pieChartSize: 1000                                   # Size of the largest pie chart
+  mapCenter: {longitude: 10, latitude: 0}             # Start location of the map
+  dataType: Fraction                                   # Type of values used to create the pie chart
+  positionOffsetFraction: 0.5                          # An offset between the pie chart location and the actual chart, used to achieve a nice (nonoverlapping) view
+  locationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
+  locationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
+  locationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
+  componentColumns:
+  
+                                                       # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
+  - pattern: NRAF_{locid}                              # Column name providing the data ({locid} will be replaced by the location primary key values)
+    name: Non-reference allele frequency               # Name of the pie
+    color: rgb(128,28,0)                               # Color of the pie
+  residualFractionName: Reference allele frequency     # Name of the residual fraction (if any)
 
-- Type: Overview                                       # Specifies the default view of all fields
-  Name: Overview
+- type: Overview                                       # Specifies the default view of all fields
+  name: Overview

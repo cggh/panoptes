@@ -1,4 +1,4 @@
-Name: Second sample tree
-Format: newick
-Description: This is the second example tree
-CrossLink: repeats::R02
+name: Second sample tree
+format: newick
+description: This is the second example tree
+crossLink: repeats::R02

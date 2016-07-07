@@ -1,4 +1,4 @@
-ID	Name	Longitude	Lattitude	SampleCount
+ID	Name	Longitude	Latitude	SampleCount
 WAF	West Africa	-5	20	1200
 EAF	East Africa	33	5	1400
 SAF	South Africa	25	-20	900

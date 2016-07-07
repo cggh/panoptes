@@ -1,64 +1,61 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: variant
-NamePlural: variants
-Description: A table containing a number of genomic variants
-PrimKey: SnpName
+nameSingle: variant
+namePlural: variants
+description: A table containing a number of genomic variants
+primKey: SnpName
 
-IsPositionOnGenome: true         #Requires that chrom and pos exist
-Chromosome: chrom
-Position: pos
+isPositionOnGenome: true         #Requires that chrom and pos exist
+chromosome: chrom
+position: pos
 
-QuickFindFields: SnpName
+quickFindFields: SnpName
 
 
 
-Properties:
+properties:
+- id: chrom
+  name: Chromosome
+  description: Chromosome name
+  dataType: Text
 
-- Id: chrom
-  Name: Chromosome
-  Description: Chromosome name
-  DataType: Text
+- id: pos
+  name: Position
+  description: Genomic position of the variant on the chromosome (1-based)
+  dataType: Value
+  decimDigits: 0
 
-- Id: pos
-  Name: Position
-  Description: Genomic position of the variant on the chromosome (1-based)
-  DataType: Value
-  DecimDigits: 0
+- id: SnpName
+  name: Variant name
+  description: Unique name of the variant
+  dataType: Text
 
-- Id: SnpName
-  Name: Variant name
-  Description: Unique name of the variant
-  DataType: Text
+- id: Value1, Value2, Value3
+  dataType: Value
+  index: true
+  showInBrowser: true
+  minVal: 0
+  maxVal: 2
+  decimDigits: 2
+  summaryValues:
+    blockSizeMin: 20
+    blockSizeMax: 50000
+    channelColor: rgb(0,100,0)
+- id: Value1
+  name: Value 1
+  description: The first numerical value
 
-- Id: Value1, Value2, Value3
-  DataType: Value
-  Index: true
-  ShowInBrowser: true
-  MinVal: 0
-  MaxVal: 2
-  DecimDigits: 2
-  SummaryValues:
-     BlockSizeMin: 20
-     BlockSizeMax: 50000
-     ChannelColor: "rgb(0,100,0)"
+- id: Value2
+  name: Value 2
+  description: The second numerical value
 
-- Id: Value1
-  Name: Value 1
-  Description: The first numerical value
+- id: Value3
+  name: Value 3
+  description: The third numerical value
 
-- Id: Value2
-  Name: Value 2
-  Description: The second numerical value
-
-- Id: Value3
-  Name: Value 3
-  Description: The third numerical value
-
-- Id: Extra1
-  Name: Extra 1
-  Description: An example categorical property
-  DataType: Text
-  ShowInBrowser: true
-  CategoryColors: {"A":"rgb(255,255,200)", "B":"rgb(0,100,0)" }
-
+- id: Extra1
+  name: Extra 1
+  description: An example categorical property
+  dataType: Text
+  showInBrowser: true
+  categoryColors: {A: 'rgb(255,255,200)', B: 'rgb(0,100,0)'}

@@ -7,15 +7,15 @@ class SettingsDataset(ImportSettings):
     
     def getSettings(self):
             datasetSettings = OrderedDict((
-                                    ('Name', {
+                                    ('name', {
                                           'type': 'Text',
                                           'required': True,
                                           'description': 'The visible name of the dataset, as it appears on the intro page'}),
-                                    ('NameBanner', {
+                                    ('nameBanner', {
                                           'type': 'Text',
                                           'required': False,
                                           'description': 'Visible name of the dataset, as it appears on the top banner of the app.\n  Note: this text may contain html markup'}),
-                                    ('Description', {
+                                    ('description', {
                                           'type': 'Text',
                                           'required': False,
                                           'description': '''A description of the dataset that appears on the start page.
@@ -26,19 +26,19 @@ class SettingsDataset(ImportSettings):
      Description: >
         This web application provides an interactive view
         on the data ..'''}),
-                                    ('DataTables', {
+                                    ('dataTables', {
                                           'type': 'List',
                                           'required': False,
                                           'description': '''A list of the data table identifiers in the dataset.
   These names should correspond to directory names in the *datatables* source directory (see :ref:`def-source-datatable`).
   This can be included in the settings in order to provide an explicit ordering of the data tables in the app.
   If this key is not provided, a default ordering wil be used'''}),
-                                    ('2D_DataTables', {
+                                    ('twoD_DataTables', {
                                                        'type': 'List',
                                                        'required': False,
                                                        'description': 'List the 2D data tables that should be exposed in the app'
                                                        }),
-                                    ('GoogleAnalyticsId', {
+                                    ('googleAnalyticsId', {
                                                             'type': 'Text',
                                                             'required': False,
                                                             'description': ''

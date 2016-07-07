@@ -19,55 +19,55 @@ from __builtin__ import file
 		valuesf = [ "false", "no", "n", "0", 0 ]
 		
 		testProps = self._testProps
-		testProps['Properties'][0]['IsCategorical'] = False
+		testProps['properties'][0]['isCategorical'] = False
 		for val in valuest:
 			settingsLoaded = SettingsDataTable()
-			testProps['Properties'][0]['IsCategorical'] = val
+			testProps['properties'][0]['isCategorical'] = val
 			settingsLoaded.loadProps(testProps)
-			loaded = settingsLoaded.getPropertyValue('Test',"IsCategorical")
+			loaded = settingsLoaded.getPropertyValue('Test',"isCategorical")
 			self.assertIs(type(loaded), bool)
 			self.assertTrue(loaded)
 
 			
 		for val in valuesf:
 			settingsLoaded = SettingsDataTable()
-			testProps['Properties'][0]['IsCategorical'] = val
+			testProps['properties'][0]['isCategorical'] = val
 			settingsLoaded.loadProps(testProps)
-			self.assertIs(type(settingsLoaded.getPropertyValue('Test',"IsCategorical")), bool)
-			self.assertFalse(settingsLoaded.getPropertyValue('Test',"IsCategorical"))
+			self.assertIs(type(settingsLoaded.getPropertyValue('Test',"isCategorical")), bool)
+			self.assertFalse(settingsLoaded.getPropertyValue('Test',"isCategorical"))
 '''
 
 class ImportSettingsTest(unittest.TestCase):
 
 	def setUp(self):
-		self._testProps = { 'NameSingle': '',
-						'NamePlural': '',
-						'PrimKey': 'Test',
-						'SortDefault': 'Test',
-						'Description': '',
-						'Properties': [{"Id": "Test",
-										"Name": "Test",
-										"DataType": "Text"
+		self._testProps = { 'nameSingle': '',
+						'namePlural': '',
+						'primKey': 'Test',
+						'sortDefault': 'Test',
+						'description': '',
+						'properties': [{"id": "Test",
+										"name": "Test",
+										"dataType": "Text"
 										},
-										{"Id": "TestA",
-										"Name": "TestA",
-										"DataType": "Value"
+										{"id": "TestA",
+										"name": "TestA",
+										"dataType": "Value"
 										}]}
 	
 	def testMergeProperties(self):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		testProps['Properties'].append({ "Id": "Test1",
-									"Name": "Test1"})
-		testProps['Properties'].append({ "Id": "Test2",
-									"Name": "Test2"})
-		testProps['Properties'].append({ "Id": "Test1,Test2",
-									"DataType": "Text",
-									"GroupId": "AlleleFreq"})
+		testProps['properties'].append({ "id": "Test1",
+									"name": "Test1"})
+		testProps['properties'].append({ "id": "Test2",
+									"name": "Test2"})
+		testProps['properties'].append({ "id": "Test1,Test2",
+									"dataType": "Text",
+									"groupId": "alleleFreq"})
 		settingsLoaded.loadProps(testProps)
 
 		
-		self.assertEqual('AlleleFreq', settingsLoaded.getPropertyValue('Test1',"GroupId"))
+		self.assertEqual('alleleFreq', settingsLoaded.getPropertyValue('Test1',"groupId"))
 		
 	
 	#DefineKnownTokens seems to convert the case of properties
@@ -75,7 +75,7 @@ class ImportSettingsTest(unittest.TestCase):
 	
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		testProps['Properties'][0]['NotAProp'] = False
+		testProps['properties'][0]['notAProp'] = False
 		
 		#settingsLoaded.loadProps(testProps)
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
@@ -86,15 +86,15 @@ class ImportSettingsTest(unittest.TestCase):
 		testProps = self._testProps
 		
 		settingsLoaded.loadProps(testProps)
-		self.assertNotIn("Search",testProps["Properties"][0])
-		self.assertEqual(settingsLoaded.getPropertyValue('Test',"Search"), 'None')
+		self.assertNotIn("search",testProps["properties"][0])
+		self.assertEqual(settingsLoaded.getPropertyValue('Test',"search"), 'None')
 
 	def testPropertyEnum(self):
 		
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["Properties"][0]["Search"] = 'NotAVal'
+		testProps["properties"][0]["search"] = 'NotAVal'
 		
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 
@@ -103,7 +103,7 @@ class ImportSettingsTest(unittest.TestCase):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["Properties"][0]["MinVal"] = 'NotAnInt'
+		testProps["properties"][0]["minVal"] = 'NotAnInt'
 		
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		
@@ -112,15 +112,15 @@ class ImportSettingsTest(unittest.TestCase):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["PrimKey"] = 'Test'
+		testProps["primKey"] = 'Test'
 		settingsLoaded.loadProps(testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["PrimKey"] = 'AutoKey'
+		testProps["primKey"] = 'AutoKey'
 		settingsLoaded.loadProps(testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["PrimKey"] = 'NotAProp'
+		testProps["primKey"] = 'NotAProp'
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 
 	def testPropertyIds(self):
@@ -128,11 +128,11 @@ class ImportSettingsTest(unittest.TestCase):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["QuickFindFields"] = 'Test,TestA'
+		testProps["quickFindFields"] = 'Test,TestA'
 		settingsLoaded.loadProps(testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["QuickFindFields"] = 'Test,NotAProp'
+		testProps["quickFindFields"] = 'Test,NotAProp'
 		
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		
@@ -141,18 +141,18 @@ class ImportSettingsTest(unittest.TestCase):
 		
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		del testProps["Properties"][0]["DataType"]
+		del testProps["properties"][0]["dataType"]
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		
 	def testRequiredChildProperty(self):
 		
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		testProps["Properties"][0]["Relation"] = 'NotAVal'
+		testProps["properties"][0]["Relation"] = 'NotAVal'
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["Properties"][0]["Relation"] = {}
+		testProps["properties"][0]["Relation"] = {}
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 
 	def testGetSetting(self):
@@ -161,7 +161,7 @@ class ImportSettingsTest(unittest.TestCase):
 		
 		settingsLoaded.loadProps(testProps)
 		
-		self.assertEquals(testProps['NamePlural'],settingsLoaded['NamePlural'])
+		self.assertEquals(testProps['namePlural'],settingsLoaded['namePlural'])
 
 	def testGetDefaultSetting(self):
 		settingsLoaded = SettingsDataTable()
@@ -169,22 +169,22 @@ class ImportSettingsTest(unittest.TestCase):
 		
 		settingsLoaded.loadProps(testProps)
 		
-		self.assertEquals(200000,settingsLoaded['MaxCountQueryRecords'])
+		self.assertEquals(200000,settingsLoaded['maxCountQueryRecords'])
 		
 		
 	def testSiblingOptional(self):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["DataItemViews"] = [ { 'Type': 'FieldList', 'Name': 'TestGroup', 'Introduction': 'Intro text', 'Fields': [ 'Test' ]} ]
+		testProps["dataItemViews"] = [ { 'type': 'FieldList', 'name': 'TestGroup', 'introduction': 'Intro text', 'fields': [ 'Test' ]} ]
 		settingsLoaded.loadProps(testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["DataItemViews"] = [ { 'Type': 'FieldList', 'Name': 'TestGroup', 'Fields': [ 'Test' ] } ]
+		testProps["dataItemViews"] = [ { 'type': 'FieldList', 'name': 'TestGroup', 'fields': [ 'Test' ] } ]
 		settingsLoaded.loadProps(testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["DataItemViews"] = [ { 'Type': 'PropertyGroup', 'Name': 'TestGroup', 'Introduction': 'Intro text', 'Fields': [ 'Test' ] } ]
+		testProps["dataItemViews"] = [ { 'type': 'PropertyGroup', 'name': 'TestGroup', 'introduction': 'Intro text', 'fields': [ 'Test' ] } ]
 		#Should raise an error for extra field 'Fields'
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 
@@ -192,10 +192,10 @@ class ImportSettingsTest(unittest.TestCase):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps['Properties'].append({ "Id": "TestSV",
-									"Name": "TestSV",
-									"DataType": "Value",
-									"ShowBar": True})
+		testProps['properties'].append({ "id": "TestSV",
+									"name": "TestSV",
+									"dataType": "Value",
+									"showBar": True})
 		
 		settingsLoaded.loadProps(testProps)
 		
@@ -206,15 +206,15 @@ class ImportSettingsTest(unittest.TestCase):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
 		
-		testProps["DataItemViews"] = [ { 'Type': 'PropertyGroup', 'Name': 'TestGroup', 'GroupId': 'TestGroupId'} ]
+		testProps["dataItemViews"] = [ { 'type': 'PropertyGroup', 'name': 'TestGroup', 'groupId': 'TestGroupId'} ]
 		settingsLoaded.loadProps(testProps)
 				
 		settingsLoaded = SettingsDataTable()
-		testProps["DataItemViews"] = [ { 'Type': 'PropertyGroup', 'Name': 'TestGroup', 'GroupId': 'TestGroupId', 'MapZoom': 2} ]
+		testProps["dataItemViews"] = [ { 'type': 'PropertyGroup', 'name': 'TestGroup', 'groupId': 'TestGroupId', 'mapZoom': 2} ]
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		
 		settingsLoaded = SettingsDataTable()
-		testProps["DataItemViews"] = [ { 'Type': 'PropertyGroup', 'Name': 'TestGroup' } ]
+		testProps["dataItemViews"] = [ { 'type': 'PropertyGroup', 'name': 'TestGroup' } ]
 		#Should raise an error for no GroupId
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 
@@ -222,37 +222,34 @@ class ImportSettingsTest(unittest.TestCase):
 	def testSettingRequired(self):
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		testProps['IsPositionOnGenome'] = True
+		testProps['isPositionOnGenome'] = True
 		#Should raise an error because no Chromosome or Position
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		settingsLoaded = SettingsDataTable()
-		testProps['Chromosome'] = 'TestA'
+		testProps['chromosome'] = 'TestA'
 		self.assertRaises(ValueError, settingsLoaded.loadProps, testProps)
 		settingsLoaded = SettingsDataTable()
-		testProps['Position'] = 'Test'
+		testProps['position'] = 'Test'
 		settingsLoaded.loadProps(testProps)
 	
 	def testSerialize(self):
 
 		settingsLoaded = SettingsDataTable()
 		testProps = self._testProps
-		testProps['Properties'].append({ "Id": "Test1",
-									"Name": "Test1",
-									"DataType": "Value"})
-		testProps['Properties'].append({ "Id": "Test2",
-									"Name": "Test2",
-									"DataType": "Text",
-									"IsCategorical": True})
+		testProps['properties'].append({ "id": "Test1",
+									"name": "Test1",
+									"dataType": "Value"})
+		testProps['properties'].append({ "id": "Test2",
+									"name": "Test2",
+									"dataType": "Text",
+									"isCategorical": True})
 		settingsLoaded.loadProps(testProps)
 		prop = settingsLoaded.serializeProperty("Test1")
 		propDict = simplejson.loads(prop, strict=False)
-		self.assertIn('Search', propDict, 'Search default value should be set')
-		self.assertNotIn('Name', propDict, 'Name should not be serialized')
+		self.assertIn('search', propDict, 'Search default value should be set')
 		prop = settingsLoaded.serializeProperty("Test2")
 		propDict = simplejson.loads(prop, strict=False)
-		self.assertNotIn('IsCategorical', propDict, 'propName not working - old value present')
-		self.assertIn('isCategorical', propDict, 'propName not working - new value not present')
-		
+
 	def walkSampleData(self, method):
 		import config
 		startDir = os.path.abspath(os.path.join('sampledata','datasets'))

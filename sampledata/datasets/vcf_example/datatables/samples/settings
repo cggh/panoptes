@@ -1,11 +1,11 @@
-NameSingle: Sample
-NamePlural: Samples
+nameSingle: Sample
+namePlural: Samples
 
-PrimKey: sample_id
+primKey: sample_id
 
 
-Properties:
-- DataType: Text
-  Id: sample_id
-  MaxLen: 7
-  Name: sample_id
+properties:
+- dataType: Text
+  id: sample_id
+  maxLen: 7
+  name: sample_id

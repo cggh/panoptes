@@ -7,53 +7,53 @@ class Settings2Dtable(ImportSettings):
     
     def getSettings(self):
         twoDtableSettings = OrderedDict((
-                    ('NameSingle', {
+                    ('nameSingle', {
                                'type': 'Text',
                                'required': True,
                                'description': 'Display name referring to data of an individual cell (single, without starting capital)'
                             }),
-                    ('NamePlural', {
+                    ('namePlural', {
                                'type': 'Text',
                                'required': True,
                                'description': 'Display name referring to data of several cells (plural, without starting capital)'
                             }),
-                    ('Description', {
+                    ('description', {
                                'type': 'Text',
                                'required': False,
                                'default': '',
                                'description': 'A short description of this 2D data table.\n  Note: this text may contain documentation links (see :ref:`def-source-docs`)'
                             }),
-                    ('ColumnDataTable', {
+                    ('columnDataTable', {
                          'type': 'Text',
                          'required': True,
                          'description': 'Identifier of the (1D) data table defining the columns of the matrix\n  (In case of genotype data: the variants). This links the 2D data table to the 1D data table containing the column information'
                          }),
-                    ('ColumnIndexField', {
+                    ('columnIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'description': 'The property ID in the ``ColumnDataTable`` data table that maps into the ``ColumnIndexArray``\n  array in the HDF5 source file. ``ColumnIndexField`` and ``ColumnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.\n  Alternatively ``ColumnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``ColumnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
+                         'description': 'The property ID in the ``columnDataTable`` data table that maps into the ``columnIndexArray``\n  array in the HDF5 source file. ``columnIndexField`` and ``columnIndexArray`` together establish the link between the column data table values, and the data present in the HDF5 source file.\n  Alternatively ``columnIndexArray`` can be omitted implying that the columns in HDF5 are in the same order as ``columnIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
-                    ('ColumnIndexArray', {
+                    ('columnIndexArray', {
                          'type': 'Text',
                          'required': False,
-                         'description': '1D Array in the HDF5 source file that gives the value of ``ColumnIndexField`` for each column.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``ColumnDataTable`` data table, sorted by the ``ColumnIndexField`` property'
+                         'description': '1D Array in the HDF5 source file that gives the value of ``columnIndexField`` for each column.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``columnDataTable`` data table, sorted by the ``columnIndexField`` property'
                          }),
-                    ('RowDataTable', {
+                    ('rowDataTable', {
                          'type': 'Text',
                          'required': True,
                          'description': 'Identifier of the (1D) data table defining the rows of the matrix\n  (in case of genotype data: the samples). This links the 2D data table to the 1D data table containing the row information'
                          }),
-                    ('RowIndexField', {
+                    ('rowIndexField', {
                          'type': 'Text',
                          'required': True,
-                         'description': 'The property ID in the ``RowDataTable`` data table that maps into ``RowIndexArray``\n  array in the HDF5 source file. ``RowIndexField`` and ``RowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.\n  Alternatively ``RowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``RowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
+                         'description': 'The property ID in the ``rowDataTable`` data table that maps into ``rowIndexArray``\n  array in the HDF5 source file. ``rowIndexField`` and ``rowIndexArray`` together establish the link between the row data table values, and the data present in the HDF5 source file.\n  Alternatively ``rowIndexArray`` can be omitted implying that the rows in HDF5 are in the same order as ``rowIndexField`` sorted.\n  Note that "AutoKey" can be used if your rows do not have Unique IDs'
                          }),
-                    ('RowIndexArray', {
+                    ('rowIndexArray', {
                          'type': 'Text',
                          'required': False,
-                         'description': '1D Array in the HDF5 source file that gives the value of ``RowIndexField`` for each row.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``RowDataTable`` data table, sorted by the ``RowIndexField property``'
+                         'description': '1D Array in the HDF5 source file that gives the value of ``rowIndexField`` for each row.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``'
                          }),
-                    ('FirstArrayDimension', {
+                    ('firstArrayDimension', {
                          'type': 'Text',
                          'required': False,
                          'description': "Either 'row' or 'column' to indicate the first dimension in the HDF5 array.\n  'column' will generally perform better",
@@ -66,65 +66,65 @@ class Settings2Dtable(ImportSettings):
                                                  })
                                      ))
                          }),
-                    ('SymlinkData', {
+                    ('symlinkData', {
                          'type': 'Boolean',
                          'required': False,
                          'default': False,
                          'description': 'If true then the HDF5 source file will not be copied but only symlinked. Note that if your HDF5 doesn’t have small enough chunking (max few MB per chunk) then performance will suffer. The default of False copies and rechunks the HDF5'
                          }),
-                    ('ShowInGenomeBrowser', {
+                    ('showInGenomeBrowser', {
                          'type': 'Block',
                          'required': False,
-                         'description': "If this key is present, the data will be visualised as a channel in the genome browser.\n  This requires that data table used as ``ColumnDataTable`` is defined as " + '"IsPositionOnGenome"' + " (see :ref:`def-settings-datatable`)\n  This key contains the following subkeys, Either 'Call' or 'AlleleDepth' or both must be present",
+                         'description': "If this key is present, the data will be visualised as a channel in the genome browser.\n  This requires that data table used as ``columnDataTable`` is defined as " + '"IsPositionOnGenome"' + " (see :ref:`def-settings-datatable`)\n  This key contains the following subkeys, Either 'Call' or 'AlleleDepth' or both must be present",
                          'children': OrderedDict((
-                                      ('Call', {
+                                      ('call', {
                                                'type': 'PropertyID',
                                                'required': False,
                                                'description': 'Reference to the 2D data table property that contains call information'
                                                }),
-                                      ('AlleleDepth', {
+                                      ('alleleDepth', {
                                                'type': 'PropertyID',
                                                'required': False,
                                                'description': 'Reference to the 2D data table property that contains depth information'
                                                }),
-                                      ('ExtraProperties', {
+                                      ('extraProperties', {
                                                'type': 'PropertyIDList',
                                                'required': False,
                                                'description': 'A list of the extra 2D data table properties that are displayed in the genotype channel. This will populate options for alpha and height control'
                                                })
                                       ))
                          }),
-                    ('GenomeMaxViewportSizeX', {
+                    ('genomeMaxViewportSizeX', {
                          'type': 'Value',
                          'required': False,
                          'description': 'Maximum size of the genome browser viewport (in bp) for which genotype calls will be displayed'
                          }),
-                    ('Properties', {
+                    ('properties', {
                          'type': 'List',
                          'required': True,
                          'description': 'Contains a list of all properties defined for each cell of the 2D data table',
                          'children': OrderedDict((
-                                      ('Id', {
+                                      ('id', {
                                              'type': 'Text',
                                              'required': True,
                                              'description': 'Identifier of the property, and name of the dataset in the HDF5 source file'
                                              }),
-                                      ('Name', {
+                                      ('name', {
                                                 'type': 'Text',
                                                 'required': False,
                                                 'description': 'Display name of the property'
                                                 }),
-                                      ('Description', {
+                                      ('description', {
                                                        'type': 'Text',
                                                        'required': False,
                                                        'description': 'Short description of this property'
                                                        }),
-                                      ('MinVal', {
+                                      ('minVal', {
                                                  'type': 'Value',
                                                  'required': False,
                                                  'description': 'For continuous properties the lower level at which values will be clipped on display'
                                                  }),
-                                      ('MaxVal', {
+                                      ('maxVal', {
                                                  'type': 'Value',
                                                  'required': False,
                                                  'description': 'For continuous properties the upper level at which values will be clipped on display'

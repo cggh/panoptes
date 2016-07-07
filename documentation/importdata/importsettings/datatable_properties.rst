@@ -5,10 +5,10 @@ Datatable property settings
 An overview of the possible keys than can be defined for an individual property in
 the *Properties* block of the data table settings.
 
-Id
+id
   *Text (required).* Identifier of the property, equal to the corresponding column header in the TAB-delimited source file ``data``.
 
-DataType
+dataType
   *Text (required).* Data type of the values in the property.
   Possible values:
 
@@ -20,63 +20,63 @@ DataType
     Absent values are coded by an empty string.
   - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
     Absent values are coded by an empty string.
-  - ``GeoLattitude``: latitude part of a geographical coordinates (in decimal degrees).
+  - ``GeoLatitude``: latitude part of a geographical coordinates (in decimal degrees).
     Absent values are coded by an empty string.
   - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
     Absent values are coded by an empty string.
 
-Name
+name
   *Text (required).* Display name of the property.
 
-Description
+description
   *Text.* Brief description of the property.
   This will appear in hover tool tips and in the popup box if a user clicks a property info button.
 
-GroupId
+groupId
   *Text.* Id of the Property group this property belongs to.
 
-ExternalUrl
+externalUrl
   *Text.* A url that should be opened when the user clicks on a value of this property. The url should
   be formatted as a template, with ``{value}`` interpolated to the property value.
   For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``.
 
-IsCategorical
+isCategorical
   *Boolean.* Instructs Panoptes to treat the property as a categorical variable.
   For example, a combo box with the possible states is automatically shown in queries for this property.
   Categorical properties are automatically indexed.
 
-CategoryColors
+categoryColors
   *Block.* Specifies display colours for the categorical states of this property.
   Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).
   The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
 
-DefaultWidth
-  *Value.* Sets the deafult column width in pixels.(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+defaultWidth
+  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-ShowBar
+showBar
   *Boolean.* Draws a bar in the background of the table, indicating the value.
-  Requires *MinVal* & *MaxVal* to be defined.(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+  Requires *minVal* & *maxVal* to be defined.(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-MinVal
-  *Value.* For *Value* types, upper extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+minVal
+  *Value.* For *Value* types, upper extent of scale(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-MaxVal
-  *Value.* For *Value* types, lower extent of scale(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+maxVal
+  *Value.* For *Value* types, lower extent of scale(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-MaxLen
+maxLen
   *Value.*  Default:0.  If present used to specify the maximum size of the database column - otherwise it is calculated.
 
-DecimDigits
-  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+decimDigits
+  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-MaxDecimDigits
-  *Value.* (Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database(only applies if *DataType* is ['Value', 'HighPrecisionValue']).
+maxDecimDigits
+  *Value.* (Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
 
-Index
+index
   *Boolean.*  Default:False.  If set, instructs Panoptes to create an index for this property in the relational database.
   For large datasets, this massively speeds up queries and sort commands based on this property.
 
-Search
+search
   *Text.*  Default:None.  Indicates that this field can be used for text search in the find data item wizard.
   Possible values:
 
@@ -85,76 +85,71 @@ Search
   - ``StartPattern``: searches all text that starts with the string typed by the user.
   - ``Pattern``: searches all text that contains the string typed by the user.
 
-Relation
+relation
   *Block.* Defines a many-to-one foreign relation to a parent data table.
   The parent table should contain a property with the same name as the primary key property in the child table.
   The block can contain the following keys:
-    TableId
+    tableId
       *DatatableID (required).* Data table ID of the relation parent table.
 
-    ForwardName
+    forwardName
       *Text (required).*  Default:belongs to.  Display name of the relation from child to parent.
 
-    ReverseName
+    reverseName
       *Text (required).*  Default:has.  Display name of the relation from parent to child.
 
 
-ReadData
+readData
   *Boolean.*  Default:True.  If set to false, this property will not be imported from the TAB-delimited source file.
 
-CanUpdate
+canUpdate
   *Boolean.*  Default:False.   If set to true, this property can be modified by the user. (*NOTE: under construction*).
 
-ShowInTable
+showInTable
   *Boolean.*  Default:True.  If set to false this property will not be available to be shown in tables in the application.
 
-ShowInBrowser
-  *Boolean.* If set, this property will automatically appear as a track in the genome browser
+showInBrowser
+  *Boolean.*  Default:False.  If set, this property will automatically appear as a track in the genome browser
   (only applies if *IsPositionOnGenome* is specified in database settings).
 
-TableDefaultVisible
+tableDefaultVisible
   *Boolean.*  Default:True.  If set to true (default) then this property will appear in tables when they are first shown.
 
-BrowserDefaultVisible
-  *Boolean.* Indicates that the track will activated by default in the genome browser (only applies if *ShowInBrowser* is True).
+browserDefaultVisible
+  *Boolean.* Indicates that the track will activated by default in the genome browser (only applies if *showInBrowser* is True).
 
-BrowserShowOnTop
+browserShowOnTop
   *Boolean.* Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.
-  In this case, it will always be visible (only applies if *ShowInBrowser* is True).
+  In this case, it will always be visible (only applies if *showInBrowser* is True).
 
-ChannelName
-  *Text.* Name of the genome browser track this property will be displayed in.
-   Properties sharing the same track name will be displayed in overlay
-   (only applies if *ShowInBrowser* is True).
+channelColor
+  *Text.*  Default:rgb(0,0,0).  Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
+  (only applies if *showInBrowser* is True).
 
-ChannelColor
-  *Text.* Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
-  (only applies if *ShowInBrowser* is True).
+connectLines
+  *Boolean.*  Default:False.  Indicate that the points will be connected with lines in the genome browser
+  (only applies if *showInBrowser* is True).
 
-ConnectLines
-  *Boolean.* Indicate that the points will be connected with lines in the genome browser
-  (only applies if *ShowInBrowser* is True).
-
-DefaultVisible
+defaultVisible
   *Boolean.*  Default:True.  .
 
-Order
+order
   *Value.*  Default:-1.  Only used for reference genome tracks.
 
-SummaryValues
+summaryValues
   *Block.* Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property
-  in the genome browser at any zoom level(only applies if *ShowInBrowser* is True).
+  in the genome browser at any zoom level(only applies if *showInBrowser* is True).
   The block can contain the following keys:
-    BlockSizeMin
+    blockSizeMin
       *Value.*  Default:1.  Minimum summary block size (in bp).
 
-    BlockSizeMax
+    blockSizeMax
       *Value (required).* Maximum summary block size (in bp).
 
-    ChannelColor
-      *Text.* Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``.
+    channelColor
+      *Text.*  Default:rgb(0,0,180).  Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``.
 
-    MaxDensity
+    maxDensity
       *Value.* For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp.
 
 
