@@ -17,8 +17,8 @@ class ImportDataTable(BaseImport):
     def getSettings(self, tableid):
         tableSettings = self._fetchSettings(tableid)    
         
-        if tableSettings['MaxTableSize'] is not None:
-            self._log('WARNING: table size limited to '+str(tableSettings['MaxTableSize']))
+        if tableSettings['maxTableSize'] is not None:
+            self._log('WARNING: table size limited to '+str(tableSettings['maxTableSize']))
                    
         return tableSettings
 
@@ -38,7 +38,7 @@ class ImportDataTable(BaseImport):
             ranknr = 0
             for propid in tableSettings.getPropertyNames():
                 
-                if not tableSettings.getPropertyValue(propid,'ReadData'):
+                if not tableSettings.getPropertyValue(propid,'readData'):
                     continue
                 
                 self._dao.insertTableProperty(tableid, tableSettings, propid)

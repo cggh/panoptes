@@ -49,15 +49,15 @@ let GenomeBrowserWithActions = React.createClass({
           items: {}
         }
       },
-      _transform(this.config.tables, (result, table, tableId) => {
+      _transform(this.config.tablesById, (result, table, tableId) => {
         if (table.hasGenomePositions && !table.settings.isHidden)
           result[tableId] = {
-            name: table.tableCapNamePlural,
+            name: table.capNamePlural,
             icon: table.icon,
             items: {
               __rows__: {
-                name: table.tableCapNamePlural,
-                description: `Positions of ${table.tableCapNamePlural}`,
+                name: table.capNamePlural,
+                description: `Positions of ${table.capNamePlural}`,
                 icon: 'arrow-down',
                 payload: {
                   channel: 'PerRowIndicatorChannel',
@@ -74,16 +74,16 @@ let GenomeBrowserWithActions = React.createClass({
     //Normal summaries
     _forEach(this.config.summaryValues, (properties, groupId) => {
       Object.assign(groups[groupId].items, _transform(properties, (result, prop) =>
-        result[prop.propid] = {
+        result[prop.id] = {
           name: prop.name,
           description: groupId === '__reference__' ? 'Description needs to be implemented' : prop.description,
-          icon: prop.settings.isCategorical ? 'bar-chart' : 'line-chart',
-          payload: prop.settings.isCategorical ? {
+          icon: prop.isCategorical ? 'bar-chart' : 'line-chart',
+          payload: prop.isCategorical ? {
             channel: 'CategoricalChannel',
             props: {
               name: prop.name,
               group: groupId,
-              track: prop.propid
+              track: prop.id
             }
           } : {
             channel: 'NumericalTrackGroupChannel',
@@ -93,7 +93,7 @@ let GenomeBrowserWithActions = React.createClass({
                 name: prop.name,
                 props: {
                   group: groupId,
-                  track: prop.propid
+                  track: prop.id
                 }
               }]
             }
@@ -102,10 +102,10 @@ let GenomeBrowserWithActions = React.createClass({
     });
 
     //Per-row based summaries
-    _forEach(this.config.tables, (table, tableId) => {
-      if (table.tableBasedSummaryValues && !table.settings.isHidden) {
-        groups[`per_${tableId}`] = Immutable.fromJS({
-          name: `Per ${table.tableCapNameSingle}`,
+    _forEach(this.config.visibleTables, (table) => {
+      if (table.tableBasedSummaryValues) {
+        groups[`per_${table.id}`] = Immutable.fromJS({
+          name: `Per ${table.capNameSingle}`,
           icon: table.icon,
           items: _transform(table.tableBasedSummaryValues, (result, channel) => {
             result[channel.trackid] = {
@@ -116,7 +116,7 @@ let GenomeBrowserWithActions = React.createClass({
                 channel: 'PerRowNumericalChannel',
                 props: {
                   name: channel.trackname,
-                  table: tableId,
+                  table: table.id,
                   channel: channel.trackid
                 }
               }

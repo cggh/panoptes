@@ -229,7 +229,7 @@ class ProcessFilterBank(BaseImport):
 
 
     def _getTrackDest(self, propid):
-        destFolder = os.path.join(self._config.getBaseDir(), 'SummaryTracks', self._datasetId, propid)
+        destFolder = os.path.join(self._config.getBaseDir(), 'summaryTracks', self._datasetId, propid)
         if not os.path.exists(destFolder):
             os.makedirs(destFolder)
         dataFileName = os.path.join(destFolder, propid)
@@ -240,7 +240,7 @@ class ProcessFilterBank(BaseImport):
     def _defineSettings(self, tableid, tableSettings, propid, sourceFileName, columns, sourceid = 'fixed', useDB = False):
         
         settings = tableSettings.getProperty(propid)
-        summSettings = tableSettings.getPropertyValue(propid,'SummaryValues')
+        summSettings = tableSettings.getPropertyValue(propid,'summaryValues')
 
         destFolder, dataFileName = self._getTrackDest(propid)
         values = {
@@ -249,23 +249,23 @@ class ProcessFilterBank(BaseImport):
             'columns': columns, 
             'propId':propid, 
             'blockSizeIncrFactor':int(2), 
-            'blockSizeStart':int(summSettings["BlockSizeMin"]), 
-            'blockSizeMax':int(summSettings["BlockSizeMax"]), 
+            'blockSizeStart':int(summSettings["blockSizeMin"]),
+            'blockSizeMax':int(summSettings["blockSizeMax"]),
             'inputFile':sourceFileName,
             'useDB': useDB}
         updateDb = True
         
         
-        if tableSettings.getPropertyValue(propid, 'IsCategorical'): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
+        if tableSettings.getPropertyValue(propid, 'isCategorical'): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
-            values.update({'Categories': tableSettings.getPropertyValue(propid,'Categories')})
-        elif ImpUtils.IsValueDataTypeIdenfifier(settings['DataType']):
+            values.update({'Categories': tableSettings.getPropertyValue(propid,'categories')})
+        elif ImpUtils.IsValueDataTypeIdenfifier(settings['dataType']):
     #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
-            values.update({'minval':float(tableSettings.getPropertyValue(propid,"MinVal")), 'maxval':float(tableSettings.getPropertyValue(propid,"MaxVal"))})
+            values.update({'minval':float(tableSettings.getPropertyValue(propid,"minVal")), 'maxval':float(tableSettings.getPropertyValue(propid,"maxVal"))})
         else:
             updateDb = False
-            self._log("Not creating summary values for:" + settings["Name"] + str(settings))
+            self._log("Not creating summary values for:" + settings["name"] + str(settings))
         
         if updateDb:
             self._replaceSummaryValuesDB(tableid, tableSettings, propid, sourceid)
@@ -277,10 +277,10 @@ class ProcessFilterBank(BaseImport):
         
         for propid in tableSettings.getPropertyNames():
             
-            if not tableSettings.getPropertyValue(propid,'SummaryValues'):
+            if not tableSettings.getPropertyValue(propid,'summaryValues'):
                 continue
             
-            values = self._defineSettings(tableid, tableSettings, propid, sourceFileName, [tableSettings['Chromosome'], tableSettings['Position'], propid])
+            values = self._defineSettings(tableid, tableSettings, propid, sourceFileName, [tableSettings['chromosome'], tableSettings['position'], propid])
             if values != None:
                 outputs.append(values)
                 
@@ -328,7 +328,7 @@ class ProcessFilterBank(BaseImport):
                 readHeader = True
                 copyFile = False
                 cols = ['chrom', 'pos', summaryid]
-                pattern = os.path.join(self._datatablesFolder, tableid) + os.sep + tableSettings.getTableBasedSummaryValue(summaryid)["FilePattern"]
+                pattern = os.path.join(self._datatablesFolder, tableid) + os.sep + tableSettings.getTableBasedSummaryValue(summaryid)["filePattern"]
                 files = glob.glob(pattern)
                 #Replace the .* with (.*) so we can pick it out to use as the id
                 regex = fnmatch.translate(pattern).replace('.*','(.*)')
@@ -357,11 +357,11 @@ class ProcessFilterBank(BaseImport):
                           'outputFile' : None, 
                           'columns': cols , 
                           'propId': summaryid + '_' + fileid,
-                          'minval': float(tableSettings.getTableBasedSummaryValue(summaryid)["MinVal"]),
-                          'maxval': float(tableSettings.getTableBasedSummaryValue(summaryid)["MaxVal"]),
+                          'minval': float(tableSettings.getTableBasedSummaryValue(summaryid)["minVal"]),
+                          'maxval': float(tableSettings.getTableBasedSummaryValue(summaryid)["maxVal"]),
                           'blockSizeIncrFactor': int(2),
-                          'blockSizeStart': int(tableSettings.getTableBasedSummaryValue(summaryid)["BlockSizeMin"]),
-                          'blockSizeMax': int(tableSettings.getTableBasedSummaryValue(summaryid)["BlockSizeMax"]),
+                          'blockSizeStart': int(tableSettings.getTableBasedSummaryValue(summaryid)["blockSizeMin"]),
+                          'blockSizeMax': int(tableSettings.getTableBasedSummaryValue(summaryid)["blockSizeMax"]),
                           'readHeader': readHeader,
                           'inputFile': fileName,
                           'useDB': False
@@ -379,12 +379,12 @@ class ProcessFilterBank(BaseImport):
             sql = self._dao.deleteTableBasedSummaryValuesForTable(tableid)
             
         output = []
-        if tableSettings['TableBasedSummaryValues']:
+        if tableSettings['tableBasedSummaryValues']:
             #self._log('Processing table-based summary values')
-            if not type(tableSettings['TableBasedSummaryValues']) is list:
+            if not type(tableSettings['tableBasedSummaryValues']) is list:
                 raise Exception('TableBasedSummaryValues token should be a list')
-            for stt in tableSettings['TableBasedSummaryValues']:
-                summaryid = stt['Id']
+            for stt in tableSettings['tableBasedSummaryValues']:
+                summaryid = stt['id']
                 #with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
                 
                 if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
@@ -418,15 +418,15 @@ class ProcessFilterBank(BaseImport):
         tableSettings = tables[0]["settings"]
         
         isPositionOnGenome = False
-        if tableSettings['IsPositionOnGenome']:
+        if tableSettings['isPositionOnGenome']:
             isPositionOnGenome = True
-            chromField = tableSettings['Chromosome']
-            posField = tableSettings['Position']
+            chromField = tableSettings['chromosome']
+            posField = tableSettings['position']
                 
         self._log('Creating custom summary values')
         outputs = []
         for propid in settings.getPropertyNames():
-            if settings.getPropertyValue(propid,'SummaryValues'):
+            if settings.getPropertyValue(propid,'summaryValues'):
                 with self._logHeader('Creating summary values for custom data {0}'.format(tableid)):
                     
                     columns = [DBCOLESC(chromField), DBCOLESC(posField), propid ]
@@ -500,7 +500,7 @@ class ProcessFilterBank(BaseImport):
     def createAllSummaryValues(self):
         self._log('Creating summary values')
         
-        datatables = self._getGlobalSettingList('DataTables')
+        datatables = self._getGlobalSettingList('dataTables')
         
         datatables = self._getDatasetFolders(datatables)
                 

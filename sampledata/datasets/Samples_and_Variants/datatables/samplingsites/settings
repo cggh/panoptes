@@ -1,81 +1,81 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: sampling site     # Display name referring to a table item (single, no capital)
-NamePlural: sampling sites    # Display name referring to a table item (plural, no capital)
-Description: Information about the sites where samples were collected     # A description of this data table
+nameSingle: sampling site     # Display name referring to a table item (single, no capital)
+namePlural: sampling sites    # Display name referring to a table item (plural, no capital)
+description: Information about the sites where samples were collected     # A description of this data table
 
-Icon: fa-map-marker
+icon: fa-map-marker
 
 # The primary key column ID for this table. This should correspond to a column in data containing a unique value for each record
 # Optionally, this parameter can be set to 'AutoKey' to instruct the software to automatically generate a primary key
-PrimKey: SiteID
-IsPositionOnGenome: false
+primKey: SiteID
+isPositionOnGenome: false
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
-QuickFindFields: SiteID,Country
+quickFindFields: SiteID,Country
 
 # Defines the default property to sort the table
-SortDefault: Country
+sortDefault: Country
 
-ListView: true
-DisableNotes: true
+listView: true
+disableNotes: true
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all data table columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties
-Properties:
+properties:
+- id: SiteID                                         # Identifier of the property, corresponding to the column header in the [data] file
+  name: Site ID                                      # Display name of the property
+  description: Unique identifier of a sampling site  # Description of the property
+  dataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
+  search: StartPattern
 
-- Id: SiteID                                         # Identifier of the property, corresponding to the column header in the [data] file
-  Name: Site ID                                      # Display name of the property
-  Description: Unique identifier of a sampling site  # Description of the property
-  DataType: Text                                     # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
-  Search: StartPattern
+- id: Country
+  name: Country Code
+  dataType: Text
+  isCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+  index: true                # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  search: Pattern
 
-- Id: Country
-  Name: Country Code
-  DataType: Text
-  IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  Index: true                # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
-  Search: Pattern
+- id: Longitude
+  name: Longitude
+  dataType: GeoLongitude     # Specifies a geographic longitude property
 
-- Id: Longitude
-  Name: Longitude
-  DataType: GeoLongitude     # Specifies a geographic longitude property
+- id: Latitude
+  name: Latitude
+  dataType: GeoLatitude     # Specifies a geographic latitude property
 
-- Id: Latitude
-  Name: Latitude
-  DataType: GeoLattitude     # Specifies a geographic latitude property
-
-- Id: Contributor_ID
-  Name: Contributor_ID
-  Description: Identifier of the contributing entity
-  DataType: Text
-  Index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
-  Relation:                         # This block defines a many-to-one foreign relation to a parent table
-    TableId: contributors           # Data table id of the parent table
-    ForwardName: is contributed by  # Display name of the relation from child to parent
-    ReverseName: contributed from   # Display name of the relation from parent to child
-
-
-
-ExternalLinks:
-- Url: http://maps.google.com/maps?q={Lattitude},{Longitude}
-  Name: Show on Google Maps
+- id: Contributor_ID
+  name: Contributor_ID
+  description: Identifier of the contributing entity
+  dataType: Text
+  index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  relation:                         # This block defines a many-to-one foreign relation to a parent table
+    tableId: contributors           # Data table id of the parent table
+    forwardName: is contributed by  # Display name of the relation from child to parent
+    reverseName: contributed from   # Display name of the relation from parent to child
 
 
 
-DataItemViews: # Lists all the custom views that should appear in the popup for an individual data table item
+externalLinks:
+- url: http://maps.google.com/maps?q={Latitude},{Longitude}
+  name: Show on Google Maps
 
-- Type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
-  Name: Location                                       # Name of the view
-  MapZoom: 7                                           # Start zoom factor of the map
 
-- Type: Overview                                       # Specifies the default view of all fields
-  Name: Overview
 
-- Type: FieldList                                      # Specifies a list of properties to be shown
-  Name: Selected Properies                             # Name of the view
-  Fields:                                              # List of the fields to be included
-  - SiteID
+dataItemViews:
+-              # Lists all the custom views that should appear in the popup for an individual data table item
+
+  type: ItemMap                                        # Defines a view that shows the location of the item on a geographic map
+  name: Location                                       # Name of the view
+  mapZoom: 7                                           # Start zoom factor of the map
+
+- type: Overview                                       # Specifies the default view of all fields
+  name: Overview
+
+- type: FieldList                                      # Specifies a list of properties to be shown
+  name: Selected Properies                             # Name of the view
+  fields:
+  - SiteID                                             # List of the fields to be included
   - Country
   - Name@contributors

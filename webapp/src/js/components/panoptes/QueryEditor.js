@@ -69,7 +69,7 @@ let Criterion = React.createClass({
   ],
 
   componentWillMount() {
-    this.tableConfig = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tablesById[this.props.table];
   },
 
   getStateFromFlux() {
@@ -82,7 +82,7 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
 
     // Get the property info for this table's primary key.
-    let property = this.tableConfig.propertiesMap[this.tableConfig.primkey];
+    let property = this.tableConfig.propertiesById[this.tableConfig.primKey];
 
     // Get the valid operators for this table's primary key.
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
@@ -91,7 +91,7 @@ let Criterion = React.createClass({
     let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: validOperators[0].ID}).Create();
 
     // Set the new component's primary column name to this table's primary key.
-    newComponent.ColName = this.tableConfig.primkey;
+    newComponent.ColName = this.tableConfig.primKey;
 
     // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
     newComponent.isTrivial = false;
@@ -119,7 +119,7 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    return SQL.WhereClause.CompareFixed(this.tableConfig.primkey, '=', '');
+    return SQL.WhereClause.CompareFixed(this.tableConfig.primKey, '=', '');
   },
 
   handleAddOr() {
@@ -170,7 +170,7 @@ let Criterion = React.createClass({
     });
 
     // Get the property info for the new component's primary column.
-    let property = this.tableConfig.propertiesMap[newComponent.ColName];
+    let property = this.tableConfig.propertiesById[newComponent.ColName];
 
     // Copy over the comparison(?) value properties, either from the the current component or otherwise the state, to the new component, to preserve them.
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
@@ -194,7 +194,7 @@ let Criterion = React.createClass({
   handlePropertyChange() {
     let {component, onChange} = this.props;
     component.ColName = this.refs.property.value;
-    let property = this.tableConfig.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
     // If the currentOperator is one of the validOperators for the new property,
@@ -242,7 +242,7 @@ let Criterion = React.createClass({
 
   handleValueChange() {
     let {component, onChange} = this.props;
-    let property = this.tableConfig.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -293,7 +293,7 @@ let Criterion = React.createClass({
       id: 'other',
       name: 'Other',
       properties: [{
-        propid: '_subset_',
+        id: '_subset_',
         name: 'In subset',
         disabled: (this.state.subsets.size === 0)
       }]
@@ -304,10 +304,10 @@ let Criterion = React.createClass({
         {_map(groups, (group) =>
           <optgroup key={group.id} label={group.name}>
             {group.properties.map((property) => {
-              let {propid, disabled, name} = property;
+              let {id, disabled, name} = property;
               return (
-                <option key={propid}
-                        value={propid}
+                <option key={id}
+                        value={id}
                         disabled={disabled}>
                   {name}
                 </option>
@@ -319,7 +319,7 @@ let Criterion = React.createClass({
       </select>
     );
 
-    let property = this.tableConfig.propertiesMap[component.ColName];
+    let property = this.tableConfig.propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let operatorSelect = null;
     if (validOperators.length == 1) {
@@ -348,10 +348,10 @@ let Criterion = React.createClass({
             return (
                 <optgroup key={group.id} label={group.name}>
                   {group.properties.map((property) => {
-                    let {propid, disabled, name} = property;
+                    let {id, disabled, name} = property;
                     return (
-                      <option key={propid}
-                              value={propid}
+                      <option key={id}
+                              value={id}
                               disabled={disabled}>
                         {name}
                       </option>

@@ -91,9 +91,9 @@ let DataTableView = React.createClass({
   fetchData(props, requestContext) {
     let {table, query, columns, order, ascending, startRowIndex} = props;
     let {showableRowsCount} = this.state;
-    let tableConfig = this.config.tables[table];
+    let tableConfig = this.config.tablesById[table];
     let columnspec = {};
-    columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
+    columns.map((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
     if (props.columns.size > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
@@ -206,7 +206,7 @@ let DataTableView = React.createClass({
   render() {
     let {className, columns, columnWidths, order, ascending} = this.props;
     let {loadStatus, rows, width, height} = this.state;
-    let tableConfig = this.config.tables[this.props.table];
+    let tableConfig = this.config.tablesById[this.props.table];
     if (!tableConfig) {
       console.log(`Table ${this.props.table} doesn't exist'`);
       return null;
@@ -227,19 +227,19 @@ let DataTableView = React.createClass({
               isColumnResizing={false}
             >
               {columns.map((column) => {
-                if (!tableConfig.propertiesMap[column]) {
+                if (!tableConfig.propertiesById[column]) {
                   console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
                   return;
                 }
-                let columnData = tableConfig.propertiesMap[column];
-                let {propid, isPrimKey, description, name} = columnData;
+                let columnData = tableConfig.propertiesById[column];
+                let {id, isPrimKey, description, name} = columnData;
                 let asc = order == column && ascending;
                 let desc = order == column && !ascending;
                 let width = columnWidths.get(column, this.defaultWidth(columnData));
                 return <Column
                   //TODO Better default column widths
                   width={width}
-                  key={propid}
+                  key={id}
                   fixed={isPrimKey}
                   allowCellsRecycling={true}
                   isResizable={true}
@@ -253,7 +253,7 @@ let DataTableView = React.createClass({
                         'sort-column-descending': desc
                       })}
                       style={{width: width}}
-                      onClick={() => this.handleOrderChange(propid)}
+                      onClick={() => this.handleOrderChange(id)}
                       prefix={(asc || desc) ?
                         <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> :
                         null}
@@ -266,8 +266,7 @@ let DataTableView = React.createClass({
 
                     let background = 'inherit';
                     let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
-                    let cellData = rows[rowIndex][propid];
-
+                    let cellData = rows[rowIndex][id];
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
                       let percent = 100 * (cellData - minVal) / (maxVal - minVal);

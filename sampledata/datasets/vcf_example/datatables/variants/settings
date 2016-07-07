@@ -1,56 +1,56 @@
-NameSingle: Variant
-NamePlural: Variants
+nameSingle: Variant
+namePlural: Variants
 
-PrimKey: AutoKey
+primKey: AutoKey
 
-IsPositionOnGenome: true      
-Chromosome: CHROM
-Position: POS
+isPositionOnGenome: true
+chromosome: CHROM
+position: POS
 
-AllowSubSampling: true
+allowSubSampling: true
 
 
-Properties:
-- DataType: Text
-  Id: CHROM
-  Name: CHROM
-- DataType: Value
-  DecimDigits: 0
-  Id: POS
-  Name: POS
-- DataType: Text
-  Id: ID
-  Name: ID
-- DataType: Text
-  Id: REF
-  Name: REF
-- DataType: Text
-  Id: ALT
-  Name: ALT
-- DataType: Value
-  Id: QUAL
-  Name: QUAL
-- DataType: Boolean
-  Id: FILTER_PASS
-  Name: FILTER_PASS
-- DataType: Value
-  Id: num_alleles
-  Name: num_alleles
-- DataType: Boolean
-  Id: is_snp
-  Name: is_snp
-- DataType: Text
-  Id: svlen
-  Name: svlen
-- DataType: Text
-  Id: AA
-  Name: AA
-- DataType: Value
-  Id: DP
-  Name: DP
-- DataType: Boolean
-  Id: HM2
-  Name: HM2
-- DataType: Boolean
-  Id: HM3
-  Name: HM3
+properties:
+- dataType: Text
+  id: CHROM
+  name: CHROM
+- dataType: Value
+  decimDigits: 0
+  id: POS
+  name: POS
+- dataType: Text
+  id: ID
+  name: ID
+- dataType: Text
+  id: REF
+  name: REF
+- dataType: Text
+  id: ALT
+  name: ALT
+- dataType: Value
+  id: QUAL
+  name: QUAL
+- dataType: Boolean
+  id: FILTER_PASS
+  name: FILTER_PASS
+- dataType: Value
+  id: num_alleles
+  name: num_alleles
+- dataType: Boolean
+  id: is_snp
+  name: is_snp
+- dataType: Text
+  id: svlen
+  name: svlen
+- dataType: Text
+  id: AA
+  name: AA
+- dataType: Value
+  id: DP
+  name: DP
+- dataType: Boolean
+  id: HM2
+  name: HM2
+- dataType: Boolean
+  id: HM3
+  name: HM3

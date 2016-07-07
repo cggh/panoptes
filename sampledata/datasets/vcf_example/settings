@@ -1,8 +1,8 @@
-Name: SRP32_v4.0.vcf
+name: SRP32_v4.0.vcf
 
-DataTables:
-  - variants
-  - samples
+dataTables:
+- variants
+- samples
 
-2D_DataTables:
-  - genotypes
+twoD_DataTables:
+- genotypes

@@ -68,7 +68,7 @@ let QueryPicker = React.createClass({
   },
 
   componentWillMount() {
-    this.tableConfig = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tablesById[this.props.table];
   },
 
   componentDidUpdate(prevProps, prevState) {

@@ -38,8 +38,7 @@ let PanoptesStore = Fluxxor.createStore({
     let {id, table, query, name} = payload;
     let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
     const newStoredTableQuery = Immutable.fromJS({id: id, table: table, query: query, name: name});
-    // FIXME: id_ prefix being used to workaround lowercasing of config keys.
-    const newStoredTableQueriesForTable = storedTableQueriesForTable.set('id_' + id, newStoredTableQuery);
+    const newStoredTableQueriesForTable = storedTableQueriesForTable.set(id, newStoredTableQuery);
     this.state = this.state.setIn(['storedTableQueries', table], newStoredTableQueriesForTable);
     this.emit('change');
   },
@@ -50,8 +49,7 @@ let PanoptesStore = Fluxxor.createStore({
   deleteStoredTableQuerySuccess(payload) {
     let {table, id} = payload;
     let storedTableQueriesForTable = this.state.getIn(['storedTableQueries', table]);
-    // FIXME: id_ prefix being used to workaround lowercasing of config keys.
-    const newStoredTableQueriesForTable = storedTableQueriesForTable.delete('id_' + id);
+    const newStoredTableQueriesForTable = storedTableQueriesForTable.delete(id);
     this.state = this.state.setIn(['storedTableQueries', table], newStoredTableQueriesForTable);
     this.emit('change');
   },

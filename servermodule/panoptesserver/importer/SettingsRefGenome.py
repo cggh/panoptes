@@ -7,27 +7,27 @@ class SettingsRefGenome(ImportSettings):
     
     def getSettings(self):
         refGenomeSettings = OrderedDict((
-                         ('GenomeBrowserDescr', {
+                         ('genomeBrowserDescr', {
                               'type': 'Text',
                               'required': False,
                               'description': 'Descriptive text that will be displayed in the genome browser section of the main page'
                               }),
-                         ('AnnotMaxViewPortSize', {
+                         ('annotMaxViewPortSize', {
                                                   'type': 'Value',
                                                   'required': False,
                                                   'description': 'Maximum viewport (in bp) the genome browser can have in order to show the genome annotation track'
                                                   }),
-                         ('RefSequenceSumm', {
+                         ('refSequenceSumm', {
                                                   'type': 'Boolean',
                                                   'required': False,
                                                   'description': 'If set, a summary track displaying the reference sequence with be included in the genome browser'
                                                   }),
-                         ('Annotation', {
+                         ('annotation', {
                                         'type': 'Block',
                                         'required': False,
                                         'description': 'Directives for parsing the annotation file (annotation.gff)',
                                         'children': OrderedDict((
-                                                     ('Format', {
+                                                     ('format', {
                                                                 'type': 'Text',
                                                                 'description': '''File format. Possible values
         GFF = Version 3 GFF file
@@ -35,43 +35,43 @@ class SettingsRefGenome(ImportSettings):
 
 '''
                                                                 }),
-                                                     ('GeneFeature', {
+                                                     ('geneFeature', {
                                                                      'type': 'Text or List',
                                                                      'description': 'Feature id(s) used to identify genes.\n  Example: [gene, pseudogene]'
                                                                      }),
-                                                     ('ExonFeature', {
+                                                     ('exonFeature', {
                                                                      'type': 'Text or List',
                                                                      'description': 'Feature id(s) used to identify exons'
                                                                      }),
-                                                     ('GeneNameAttribute', {
+                                                     ('geneNameAttribute', {
                                                                      'type': 'Text',
                                                                      'description': 'Attribute id used to identify gene names'
                                                                      }),
-                                                     ('GeneNameSetAttribute', {
+                                                     ('geneNameSetAttribute', {
                                                                      'type': 'Text or List',
                                                                      'description': 'Attribute id(s) used to identify gene name sets.\n  Example: [Name,Alias]'
                                                                      }),
-                                                     ('GeneDescriptionAttribute', {
+                                                     ('geneDescriptionAttribute', {
                                                                      'type': 'Text or List',
                                                                      'description': 'Attribute id(s) used to identify gene descriptions'
                                                                      })
                                                      
                                                      ))
                                         }),
-                          ('ExternalGeneLinks' , {
+                          ('externalGeneLinks' , {
                                    'type': 'List',
                                    'required': False,
                                    'description': '''Each item in the list specifies a link for a gene to an external url.
   These links will show up as buttons in the gene popup window''',
                                    'children': OrderedDict((
-                                                ('Url', {
+                                                ('url', {
                                                         'type': 'Text',
                                                         'required': True,
                                                         'description': '''Url for this link.
       This may include a token ``{Id}`` to refer to the unique gene identifier.
       Example: ``https://www.google.co.uk/search?q={Id}``'''
                                                         }),
-                                                ('Name', {
+                                                ('name', {
                                                         'type': 'Text',
                                                         'required': True,
                                                         'description': 'Display name for this external link'

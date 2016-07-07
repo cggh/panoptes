@@ -94,7 +94,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (colourProperty && !this.config.tables[table].propertiesMap[colourProperty]) {
+    if (colourProperty && !this.config.tablesById[table].propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
@@ -111,14 +111,14 @@ let PerRowIndicatorChannel = React.createClass({
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let tableConfig = this.config.tables[table];
-      let columns = [tableConfig.primkey, tableConfig.positionField];
+      let tableConfig = this.config.tablesById[table];
+      let columns = [tableConfig.primKey, tableConfig.position];
       if (colourProperty)
         columns.push(colourProperty);
       let columnspec = {};
-      columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+      columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
-      query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosomeField, '=', chromosome),
+      query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome),
         query]);
       let APIargs = {
         database: this.config.dataset,
@@ -126,7 +126,7 @@ let PerRowIndicatorChannel = React.createClass({
         columns: columnspec,
         query,
         transpose: false,
-        regionField: tableConfig.positionField,
+        regionField: tableConfig.position,
         start,
         end,
         blockLimit: 1000
@@ -159,13 +159,13 @@ let PerRowIndicatorChannel = React.createClass({
 
   applyData(props, blocks) {
     let {table, colourProperty} = props;
-    let tableConfig = this.config.tables[table];
+    let tableConfig = this.config.tablesById[table];
     this.blocks = blocks;
-    this.positions = this.combineBlocks(blocks, tableConfig.positionField);
+    this.positions = this.combineBlocks(blocks, tableConfig.position);
     if (colourProperty) {
       this.colourData = this.combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
-        propertyColour(this.config.tables[table].propertiesMap[colourProperty]));
+        propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
       this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
       this.colourValsTranslucent = _map(this.colourVals, (colour) => Color(colour).clearer(0.4).rgbString());
     } else {
@@ -207,7 +207,7 @@ let PerRowIndicatorChannel = React.createClass({
     const coloursTranslucent = this.colourValsTranslucent;
     const colourData = this.colourData;
     let drawnColourVals = new Set();
-    const recordColours = colourProperty && this.config.tables[table].propertiesMap[colourProperty].isText;
+    const recordColours = colourProperty && this.config.tablesById[table].propertiesById[colourProperty].isText;
     const canvas = this.refs.canvas;
     if (!canvas)
       return;
@@ -293,7 +293,7 @@ let PerRowIndicatorChannel = React.createClass({
         height={HEIGHT}
         sideComponent={
           <div className="side-name">
-            <span>{name || this.config.tables[table].tableCapNamePlural}</span>
+            <span>{name || this.config.tablesById[table].capNamePlural}</span>
             </div>
             }
         //Override component update to get latest in case of skipped render

@@ -12,15 +12,14 @@ class ImportSettings:
     __metaclass__ = ABCMeta
     
     _propertiesDefault = OrderedDict((
-                            ('Id', {
+                            ('id', {
                                    'type': 'Text',
                                    'required': True,
                                    'description': 'Identifier of the property, equal to the corresponding column header in the TAB-delimited source file ``data``'
                                    }),
-                            ('DataType', {
+                            ('dataType', {
                                    'type': 'Text',
                                    'required': True,
-                                   'serializable': False,
                                    'description': 'Data type of the values in the property',
                                    'values':  OrderedDict(( ('Text', {
                                                      'description': 'text strings'
@@ -37,7 +36,7 @@ class ImportSettings:
                                                ('GeoLongitude', {
                                                      'description': 'longitude part of a geographical coordinates (in decimal degrees).\n    Absent values are coded by an empty string'
                                                      }),
-                                               ('GeoLattitude', {
+                                               ('GeoLatitude', {
                                                      'description': 'latitude part of a geographical coordinates (in decimal degrees).\n    Absent values are coded by an empty string'
                                                      }),
                                                ('Date', {
@@ -45,90 +44,87 @@ class ImportSettings:
                                                      })
                                                 ))
                                           }),
-                            ('Name', {
+                            ('name', {
                                    'type': 'Text',
                                    'required': True,
-                                   'serializable': False,
                                    'description': 'Display name of the property'
                                    }),
-                            ('Description', {
+                            ('description', {
                                    'type': 'Text',
                                    'required': False,
                                    'description': 'Brief description of the property.\n  This will appear in hover tool tips and in the popup box if a user clicks a property info button'
                                    }),
-                            ('GroupId', {
+                            ('groupId', {
                                    'type': 'Text',
                                    'required': False,
                                    'description': 'Id of the Property group this property belongs to'
                                    }),
-                            ('ExternalUrl', {
+                            ('externalUrl', {
                                              'type': 'Text',
                                              'required': False,
                                              'description': '''A url that should be opened when the user clicks on a value of this property. The url should
   be formatted as a template, with ``{value}`` interpolated to the property value.
   For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``'''
                                              }),
-                            ('IsCategorical', {
+                            ('isCategorical', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'isCategorical',
                                    'description': 'Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n  Categorical properties are automatically indexed'
                                    }),
-                            ('CategoryColors', {
+                            ('categoryColors', {
                                    'type': 'Block',
                                    'required': False,
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
-                            ('DefaultWidth', {
+                            ('defaultWidth', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'Sets the deafult column width in pixels.',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('ShowBar', {
+                            ('showBar', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *MinVal* & *MaxVal* to be defined.',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *minVal* & *maxVal* to be defined.',
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('MinVal', {
+                            ('minVal', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, upper extent of scale',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('MaxVal', {
+                            ('maxVal', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, lower extent of scale',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('MaxLen', {
+                            ('maxLen', {
                                    'type': 'Value',
                                    'required': False,
-                                   'serializable': False,
                                    'default': 0,
                                    'description': 'If present used to specify the maximum size of the database column - otherwise it is calculated'
                                    }),
-                            ('DecimDigits', {
+                            ('decimDigits', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('MaxDecimDigits', {
+                            ('maxDecimDigits', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': '(Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database',
-                                   'siblingOptional': { 'name': 'DataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
                                    }),
-                            ('Index', {
+                            ('index', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': False,
                                    'description': 'If set, instructs Panoptes to create an index for this property in the relational database.\n  For large datasets, this massively speeds up queries and sort commands based on this property'
                                    }),
-                            ('Search', {
+                            ('search', {
                                    'type': 'Text',
                                    'required': False,
                                    'default': 'None',
@@ -147,22 +143,22 @@ class ImportSettings:
                                                      })
                                                ))
                                       }),
-                            ('Relation', {
+                            ('relation', {
                                    'type': 'Block',
                                    'required': False,
                                    'description': 'Defines a many-to-one foreign relation to a parent data table.\n  The parent table should contain a property with the same name as the primary key property in the child table',
-                                   'children': OrderedDict((( 'TableId', {
+                                   'children': OrderedDict((( 'tableId', {
                                                              'type': 'DatatableID',
                                                              'required': True,
                                                              'description': 'Data table ID of the relation parent table'
                                                              }),
-                                                ('ForwardName', {
+                                                ('forwardName', {
                                                                 'type': 'Text',
                                                                 'required': True,
                                                                 'default': 'belongs to',
                                                                 'description': 'Display name of the relation from child to parent'
                                                                 }),
-                                                ('ReverseName', {
+                                                ('reverseName', {
                                                                 'type': 'Text',
                                                                 'required': True,
                                                                 'default': 'has',
@@ -171,110 +167,99 @@ class ImportSettings:
                                                 ))
                                    }),
                           
-                            ('ReadData', {
+                            ('readData', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': True,
                                    'description': 'If set to false, this property will not be imported from the TAB-delimited source file'
                                    }),
-                            ('CanUpdate', {
+                            ('canUpdate', {
                                    'type': 'Boolean',
                                    'default': False,
                                    'required': False,
                                    'description': ' If set to true, this property can be modified by the user. (*NOTE: under construction*)'
                                    }),
-                            ('ShowInTable', {
+                            ('showInTable', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': True,
-                                   'propName': 'ShowInTable',
                                    'description': 'If set to false this property will not be available to be shown in tables in the application'
                                    }),
-                            ('ShowInBrowser', {
+                            ('showInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'showInBrowser',
+                                   'default': False,
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
                                    }),
-                            ('TableDefaultVisible', {
+                            ('tableDefaultVisible', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'default': True,
-                                   'propName': 'showInBrowser',
                                    'description': 'If set to true (default) then this property will appear in tables when they are first shown'
                                    }),
-                            ('BrowserDefaultVisible', {
+                            ('browserDefaultVisible', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'description': 'Indicates that the track will activated by default in the genome browser ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
+                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('BrowserShowOnTop', {
+                            ('browserShowOnTop', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'description': 'Indicates that the track will be shown in the top (non-scrolling) area of the genome browser.\n  In this case, it will always be visible ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
+                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('ChannelName', {
+                            ('channelColor', {
                                    'type': 'Text',
                                    'required': False,
-                                   'propName': 'channelName',
-                                   'description': 'Name of the genome browser track this property will be displayed in.\n   Properties sharing the same track name will be displayed in overlay\n   ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
-                                   }),
-                            ('ChannelColor', {
-                                   'type': 'Text',
-                                   'required': False,
-                                   'propName': 'channelColor',
+                                   'default': 'rgb(0,0,0)',
                                    'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
+                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('ConnectLines', {
+                            ('connectLines', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'propName': 'connectLines',
+                                   'default': False,
                                    'description': 'Indicate that the points will be connected with lines in the genome browser\n  ',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True}
+                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('DefaultVisible', {
+                            ('defaultVisible', {
                                                 'type': 'Boolean',
                                                 'required': False,
                                                 'default': True,
                                                 'description': ''
                                                 }),
-                            ('Order', {
+                            ('order', {
                                        'type': 'Value',
                                        'required': False,
-                                       'serializable': False,
                                        'default': -1,
                                        'description': 'Only used for reference genome tracks'
                                        }),
-                            ('SummaryValues', {
+                            ('summaryValues', {
                                    'type': 'Block',
                                    'required': False,
-                                   'serializable': True,
                                    'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
-                                   'siblingOptional': { 'name': 'ShowInBrowser', 'value': True},
+                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True},
                                    
                                    'children': OrderedDict(( 
-                                                ('BlockSizeMin', {
+                                                ('blockSizeMin', {
                                                              'type': 'Value',
                                                              'required': False,
                                                              'default': 1,
                                                              'description': 'Minimum summary block size (in bp)'
                                                              }),
-                                                ('BlockSizeMax', {
+                                                ('blockSizeMax', {
                                                                 'type': 'Value',
                                                                 'required': True,
                                                                 'description': 'Maximum summary block size (in bp)'
                                                                 }),
-                                                ('ChannelColor', {
+                                                ('channelColor', {
                                                                 'type': 'Text',
                                                                 'required': False,
-                                                                'propName': 'channelColor',
+                                                                'default': 'rgb(0,0,180)',
                                                                 'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
                                                                 }),
-                                                ('MaxDensity', {
+                                                ('maxDensity', {
                                                                 'type': 'Value',
                                                                 'required': False,
                                                                 'description': 'For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp'
@@ -331,30 +316,30 @@ class ImportSettings:
             
     def _addDefaultProperties(self):
         
-        if ('PrimKey' in self._settings and (self._settings['PrimKey'] == 'AutoKey')):
+        if ('primKey' in self._settings and (self._settings['primKey'] == 'AutoKey')):
             propid = 'AutoKey'
             self._propidMap[propid] = {
-                                          'Id': propid,
-                                          'Name': propid,
-                                          'DataType': 'Value',
-                                          'DecimDigits': 0
+                                          'id': propid,
+                                          'name': propid,
+                                          'dataType': 'Value',
+                                          'decimDigits': 0
                                           }
         
     def _setDefaultValues(self):
 
         for key in self._propidMap:
             values = self._propidMap[key]
-            if 'IsCategorical' in values and values['IsCategorical']:
-                self._propidMap[key]['Index'] = True
-            if 'Relation' in values and values['Relation']:
-                self._propidMap[key]['Index'] = True
-            if 'Search' in values and values['Search'] in ['StartPattern', 'Pattern', 'Match']:
-                self._propidMap[key]['Index'] = True # Use index to speed up search
+            if 'isCategorical' in values and values['isCategorical']:
+                self._propidMap[key]['index'] = True
+            if 'relation' in values and values['relation']:
+                self._propidMap[key]['index'] = True
+            if 'search' in values and values['search'] in ['StartPattern', 'Pattern', 'Match']:
+                self._propidMap[key]['index'] = True # Use index to speed up search
         
-        if 'SortDefault' in self._settings:
-            sd = self._settings['SortDefault']
+        if 'sortDefault' in self._settings:
+            sd = self._settings['sortDefault']
             if sd in self._propidMap:
-                self._propidMap[sd]['Index'] = True    
+                self._propidMap[sd]['index'] = True
 
 
     def _checkSiblingRequired(self, testDict, pkey, srdef, siblings):
@@ -363,7 +348,6 @@ class ImportSettings:
         
         siblingValue = srdef['value']
         siblingName = srdef['name']
-               
         if testDict[siblingName] != siblingValue:
             if pkey in testDict:
                 message = "{} Wrong value for {} (expected {} got {}) for {}".format(pkey, siblingName, siblingValue, testDict[siblingName], str(testDict))
@@ -409,8 +393,8 @@ class ImportSettings:
         if 'required' in pdef and pdef['required']:
             if not pkey in testDict:
                 #This is so common it's fudged...
-                if pkey == 'Name' and 'Id' in testDict:
-                    testDict['Name'] = testDict['Id']
+                if pkey == 'name' and 'id' in testDict:
+                    testDict['name'] = testDict['id']
                 else:
                     self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
                 #print "Missing failed - Checking {} for {} using {}".format(str(testDict),pkey,str(pdef))
@@ -453,7 +437,7 @@ class ImportSettings:
                 if not (type(value) is str or type(value) is list):
                     self._errors.append("{} must be Text or List is {}".format(pkey, value))
             elif pdef['type'] == 'PropertyID':
-                if not (value in self._propidMap or (pkey == 'PrimKey' and value == 'AutoKey') or value == 'None' or ('AutoScanProperties' in self._settings and self._settings["AutoScanProperties"])):
+                if not (value in self._propidMap or (pkey == 'primKey' and value == 'AutoKey') or value == 'None' or ('autoScanProperties' in self._settings and self._settings["autoScanProperties"])):
                     self._errors.append("{} must be a valid PropertyId is {}".format(pkey, value))
             elif pdef['type'] == 'PropertyIDs':
                 pass
@@ -543,13 +527,13 @@ class ImportSettings:
                 
 
     def _mergeProperties(self):
-        if 'Properties' in self._settings:
-            if not type(self._settings['Properties']) is list:
+        if 'properties' in self._settings:
+            if not type(self._settings['properties']) is list:
                 raise Exception('Properties token should be a list')
-            for propSource in self._settings['Properties']:
-                if 'Id' not in propSource:
+            for propSource in self._settings['properties']:
+                if 'id' not in propSource:
                     raise Exception('Property is missing Id field')
-                propids = propSource['Id']
+                propids = propSource['id']
                 if not (isinstance(propids, basestring)):
                     raise Exception('Property has invalid Id field: ' + str(propids)) #Merge sections with the same Id
                 for propid in propids.split(','):
@@ -559,28 +543,28 @@ class ImportSettings:
                             properties = {}
                             self._propidMap[propid] = properties
                         self._propidMap[propid].update(copy.deepcopy(propSource))
-                        self._propidMap[propid]['Id'] = propid
+                        self._propidMap[propid]['id'] = propid
                     except Exception as e:
                         raise Exception('Invalid property "{0}": {1}'.format(propid, str(e)))
             
             #Now we need to update the original so it can be validated
-            propsList = copy.deepcopy(self._settings["Properties"])
+            propsList = copy.deepcopy(self._settings["properties"])
             #Do it backwards so can deleted without changing the index
             for i, propDetails in reversed(list(enumerate(propsList))):
-                propid = propDetails['Id']
+                propid = propDetails['id']
                 if propid in self._propidMap:
-                    self._settings['Properties'][i] = copy.deepcopy(self._propidMap[propid])
+                    self._settings['properties'][i] = copy.deepcopy(self._propidMap[propid])
                 else:
-                    del self._settings['Properties'][i]
+                    del self._settings['properties'][i]
 
     #Set any implied values here
     def _postProcess(self):
         
         for propid in self.getPropertyNames():
-            cc = self.getPropertyValue(propid, 'CategoryColors')
+            cc = self.getPropertyValue(propid, 'categoryColors')
             if cc:
                 categories = [x for x in cc]
-                self._propidMap[propid]['Categories'] = categories
+                self._propidMap[propid]['categories'] = categories
                 print ("Set Categories for {}".format(propid))
 
 
@@ -613,42 +597,28 @@ class ImportSettings:
         if len(self._errors) > 0:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
-    #Not at all sure about this...
-    def ConvertStringsToSafeSQL(self, settings):
-
-        for key in settings:
-            val = settings[key]
-            if type(val) is str:
-                settings[key] = val.replace('"', '`').replace("'", '`')
-        return settings
-
     def _prepareSerialization(self, settings, defn):
-        
         tosave = copy.deepcopy(settings)
-        for key in defn:
-            if not defn[key].get('serializable', True):
-                if key in tosave:
-                    del tosave[key]
-            else:
-                if 'propName' in defn[key]:
-                    propName = defn[key]['propName']
-                    if key in settings:
-                        tosave[propName] = settings[key]
-                        del tosave[key]
-                else:
-                    propName = key
-                if 'default' in defn[key]:
+        def setDefaults(subSettings, subDefn):
+            for key, value in subDefn.items():
+                if 'default' in value:
                     includeDefault = True
-                    
-                    if 'siblingOptional' in defn[key]:
-                        if not self._hasOptionalSibling(settings, key, defn[key]):
+                    if 'siblingOptional' in value:
+                        if not self._hasOptionalSibling(subSettings, key, value):
                             includeDefault = False
-                    
                     if includeDefault:
-                        tosave[propName] = settings.get(key, defn[key]['default'])
+                        subSettings[key] = subSettings.get(key, value['default'])
+                if 'children' in value and key in subSettings:
+                    if value['type'] == 'List':
+                        for child in subSettings[key]:
+                            setDefaults(child, value['children'])
+                    elif value['type'] == 'Block':
+                        setDefaults(subSettings[key], value['children'])
+        setDefaults(tosave, defn)
+
 
                 
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(tosave))
+        return simplejson.dumps(tosave)
         
     #For insertion into tablecatalog, graphs
     def serialize(self):
@@ -668,22 +638,22 @@ class ImportSettings:
        
     #For insertion into propertycatalog              
     def serializeProperty(self, key):    
-        return self._prepareSerialization(self.getProperty(key), self._settingsDef["Properties"]["children"])
+        return self._prepareSerialization(self.getProperty(key), self._settingsDef["properties"]["children"])
 
     
     def serializeSummaryValues(self, key):
         props = self.getProperty(key)
-        saved = copy.deepcopy(props['SummaryValues'])
+        saved = copy.deepcopy(props['summaryValues'])
         
-        for val in props['SummaryValues']:
-            defn = self._propertiesDefault['SummaryValues']['children']
+        for val in props['summaryValues']:
+            defn = self._propertiesDefault['summaryValues']['children']
             if val in defn and 'propName' in defn[val]:
                 name =  defn[val]['propName']
                 saved[name] = saved[val]
                 del saved[val] 
 
         
-        for val in ['CategoryColors', 'DefaultVisible', 'IsCategorical', 'Categories', 'ChannelColor']:
+        for val in ['categoryColors', 'defaultVisible', 'isCategorical', 'categories', 'channelColor']:
             if val in props:
                 if val in self._propertiesDefault and 'propName' in self._propertiesDefault[val]:
                     name =  self._propertiesDefault[val]['propName']
@@ -691,11 +661,11 @@ class ImportSettings:
                     name = val
                 saved[name] = props[val]
 
-        for val in ['MinVal', 'MaxVal', 'BlockSizeMin', 'BlockSizeMax', 'Order', 'Name']:
+        for val in ['minVal', 'maxVal', 'blockSizeMin', 'blockSizeMax', 'order', 'name']:
             if val in saved:
                 del saved[val]
 
-        return simplejson.dumps(self.ConvertStringsToSafeSQL(saved))
+        return simplejson.dumps(saved)
 
      
     def __getitem__(self, key):
@@ -731,12 +701,12 @@ class ImportSettings:
     def getPropertyValue(self, propid, key):
         
         prop = self.getProperty(propid)
-        if key == 'Name':
+        if key == 'name':
             if key not in prop:
-                key = 'Id'
+                key = 'id'
                 
-        if key in self._settingsDef["Properties"]["children"] and 'default' in self._settingsDef["Properties"]["children"][key]:
-            return prop.get(key, self._settingsDef["Properties"]["children"][key]['default'])
+        if key in self._settingsDef["properties"]["children"] and 'default' in self._settingsDef["properties"]["children"][key]:
+            return prop.get(key, self._settingsDef["properties"]["children"][key]['default'])
         else:
             if key in prop:
                 return (prop[key])
@@ -747,8 +717,8 @@ class ImportSettings:
         self._propidMap[propid][key] = value
         
     def getTableBasedSummaryValue(self, key):
-        for defn in self._settings['TableBasedSummaryValues']:
-            if defn['Id'] == key:
+        for defn in self._settings['tableBasedSummaryValues']:
+            if defn['id'] == key:
                 return defn
         return None
     

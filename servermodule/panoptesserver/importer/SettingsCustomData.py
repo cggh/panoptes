@@ -9,17 +9,17 @@ class SettingsCustomData(SettingsDataTable):
     def getSettings(self):
         parentSettings = SettingsDataTable.getSettings(self)
         #copy is used for settings that will be modified
-        customDataSettings = OrderedDict([('PropertyGroups', parentSettings['PropertyGroups']), 
-                                          ('Properties', copy.deepcopy(parentSettings['Properties'])), 
-                                          ('DataItemViews', copy.deepcopy(parentSettings['DataItemViews'])),
-                                         ('CustomData', {
+        customDataSettings = OrderedDict([('propertyGroups', parentSettings['propertyGroups']),
+                                          ('properties', copy.deepcopy(parentSettings['properties'])),
+                                          ('dataItemViews', copy.deepcopy(parentSettings['dataItemViews'])),
+                                         ('customData', {
                                                       'type': 'List',
                                                       'required': False,
                                                       'description': 'Optionally, an explicit list of custom data can be specified to control the order of import'
                                                       })])
-        customDataSettings["Properties"]["required"] = False
+        customDataSettings["properties"]["required"] = False
         #Is a list of property Ids in the parent table but since we don't have this info
-        customDataSettings["DataItemViews"]["children"]["Fields"]["type"] = 'List'
+        customDataSettings["dataItemViews"]["children"]["fields"]["type"] = 'List'
 
         return customDataSettings
         

@@ -45,7 +45,7 @@ class ImportCustomData(BaseImport):
             tableSettings = tables[0]["settings"]
             primkey = tables[0]["primkey"]
     
-            allowSubSampling = tableSettings['AllowSubSampling']
+            allowSubSampling = tableSettings['allowSubSampling']
     
             settings = self.getSettings(sourceid, tableid)
     
@@ -102,10 +102,10 @@ class ImportCustomData(BaseImport):
                     importer._sourceId = self._sourceId
             
                     tableSettings = SettingsCustomData()
-                    props = settings['Properties']
+                    props = settings['properties']
                     if primkey not in settings.getPropertyNames():
-                        props.append({ 'Id': primkey, 'Name': primkey, 'DataType':'Text', 'Index': False, 'ReadData': True, 'MaxLen': 0})
-                    tableSettings.loadProps({'PrimKey': primkey, 'Properties' : props}, False)
+                        props.append({ 'id': primkey, 'name': primkey, 'dataType':'Text', 'index': False, 'readData': True, 'maxLen': 0})
+                    tableSettings.loadProps({'primKey': primkey, 'properties' : props}, False)
                     importer.importData(tableid = tmptable, inputFile = os.path.join(folder,'data'), loadSettings = tableSettings)
                     
                     importer.cleanUp()
@@ -132,7 +132,7 @@ class ImportCustomData(BaseImport):
                     for propid in propidList:
                         if not frst:
                             sql += " ,"
-                        sqldatatype = ImpUtils.GetSQLDataType(settings.getPropertyValue(propid,'DataType'))
+                        sqldatatype = ImpUtils.GetSQLDataType(settings.getPropertyValue(propid,'dataType'))
                         sql += "ADD COLUMN {0} {1}".format(DBCOLESC(propid), sqldatatype)
                         frst = False
                         self._calculationObject.LogSQLCommand(sql)

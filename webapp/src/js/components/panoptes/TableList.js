@@ -26,7 +26,7 @@ let TableList = React.createClass({
   },
 
   handleTableClick(e, table) {
-    if (this.config.tables[table.id].settings.listView) {
+    if (this.config.tablesById[table.id].listView) {
       this.handleOpen(e, 'containers/ListWithActions', {table: table.id});
     } else {
       this.handleOpen(e, 'containers/DataTableWithActions', {table: table.id});
@@ -39,9 +39,9 @@ let TableList = React.createClass({
       <List style={this.props.style}>
         <Subheader>Open a table:</Subheader>
         {_map(tables, (table) => (
-          this.config.tables[table.id].settings.isHidden ? null :
+          this.config.tablesById[table.id].isHidden ? null :
           <ListItem key={table.id}
-                    primaryText={table.tableCapNamePlural}
+                    primaryText={table.capNamePlural}
                     secondaryText={table.description}
                     leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
                     onClick={(e) => this.handleTableClick(e, table)} />

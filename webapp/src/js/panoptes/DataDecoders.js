@@ -242,11 +242,11 @@ DataDecoders.Encoder.FloatList2B64 = function(info) {
     let reclen = that.count + 4;
     let rs = [];
     for (let offset = 0; offset < strlen; offset += reclen) {
-      let minval = _b64codec.B642IntFixed(datastr, offset + 0, 2) * that.rangeSlope + that.rangeOffset;
-      let maxval = _b64codec.B642IntFixed(datastr, offset + 2, 2) * that.rangeSlope + that.rangeOffset;
+      let minVal = _b64codec.B642IntFixed(datastr, offset + 0, 2) * that.rangeSlope + that.rangeOffset;
+      let maxVal = _b64codec.B642IntFixed(datastr, offset + 2, 2) * that.rangeSlope + that.rangeOffset;
       let subrs = [];
       for (let i = 0; i < this.count; i++)
-        subrs.push(minval + _b64codec.B642IntFixed(datastr, offset + 4 + i, 1) / 63.0 * (maxval - minval));
+        subrs.push(minVal + _b64codec.B642IntFixed(datastr, offset + 4 + i, 1) / 63.0 * (maxVal - minVal));
       rs.push(subrs);
     }
     return rs;

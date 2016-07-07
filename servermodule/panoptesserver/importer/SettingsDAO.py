@@ -229,9 +229,9 @@ class SettingsDAO(object):
         sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         
         self._execSql(sql, tableid, 
-            tableSettings['NamePlural'], 
-            tableSettings['PrimKey'], 
-            tableSettings['IsPositionOnGenome'], 
+            tableSettings['namePlural'],
+            tableSettings['primKey'],
+            tableSettings['isPositionOnGenome'],
             tableSettings.serialize(), 
             "", #defaultQuery
             tableOrder)
@@ -247,10 +247,10 @@ class SettingsDAO(object):
         
         sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', %s, %s, %s, %s, %s, %s)"
         
-        self._execSql(sql, tableSettings.getPropertyValue(propid, 'DataType'), 
+        self._execSql(sql, tableSettings.getPropertyValue(propid, 'dataType'),
             propid, 
             tableid, 
-            tableSettings.getPropertyValue(propid, 'Name'), 
+            tableSettings.getPropertyValue(propid, 'name'),
             0, 
             tableSettings.serializeProperty(propid))
 
@@ -262,26 +262,26 @@ class SettingsDAO(object):
     def insertTableRelation(self, tableid, tableSettings, propid):
         self._checkPermissions('relations', tableid)
         
-        if 'Relation' in tableSettings.getProperty(propid):
-            relationSettings = tableSettings.getPropertyValue(propid, 'Relation')
-            self._log('Creating relation: {} {} {}'.format(relationSettings['TableId'], relationSettings['ForwardName'], relationSettings['ReverseName']))
+        if 'relation' in tableSettings.getProperty(propid):
+            relationSettings = tableSettings.getPropertyValue(propid, 'relation')
+            self._log('Creating relation: {} {} {}'.format(relationSettings['tableId'], relationSettings['forwardName'], relationSettings['reverseName']))
             self._execSql("INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES (%s, %s, %s, %s, %s, %s)",
                           tableid, 
                           propid, 
-                          relationSettings['TableId'], 
+                          relationSettings['tableId'],
                           '', 
-                          relationSettings['ForwardName'], 
-                          relationSettings['ReverseName'])
+                          relationSettings['forwardName'],
+                          relationSettings['reverseName'])
             
             
     def insertGraphForTable(self, tableid, graphid, graphSettings):
         self._checkPermissions('graphs', tableid)
-        crosslink = graphSettings['CrossLink']
+        crosslink = graphSettings['crossLink']
 
         self._execSql("INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, 0)", graphid, 
             tableid, 
             'tree', 
-            graphSettings['Name'], 
+            graphSettings['name'],
             graphSettings.serialize(), 
             crosslink)
 
@@ -323,10 +323,10 @@ class SettingsDAO(object):
         self._checkPermissions('propertycatalog', tableid)
         
         self._execSql("INSERT INTO propertycatalog VALUES (%s, 'custom', %s, %s, %s, %s, %s, %s)",self._workspaceId, 
-            settings.getPropertyValue(propid, 'DataType'), 
+            settings.getPropertyValue(propid, 'dataType'),
             propid, 
             tableid, 
-            settings.getPropertyValue(propid, 'Name'), 
+            settings.getPropertyValue(propid, 'name'),
             0, 
             settings.serializeProperty(propid))
 
@@ -338,8 +338,8 @@ class SettingsDAO(object):
             
     def insertSummaryValues(self, tableid, tableSettings, propid, sourceid):
         self._checkPermissions('summaryvalues', tableid)
-        summSettings = tableSettings.getPropertyValue(propid, 'SummaryValues')
-        name = tableSettings.getPropertyValue(propid, 'Name')
+        summSettings = tableSettings.getPropertyValue(propid, 'summaryValues')
+        name = tableSettings.getPropertyValue(propid, 'name')
 
         self._execSql("DELETE FROM summaryvalues WHERE (propid=%s) and (tableid=%s) and (source=%s) and (workspaceid=%s)",propid, tableid, sourceid, self._workspaceId)
 
@@ -348,11 +348,11 @@ class SettingsDAO(object):
             propid, 
             tableid, 
             name, 
-            tableSettings.getPropertyValue(propid, 'Order'), 
+            tableSettings.getPropertyValue(propid, 'order'),
             tableSettings.serializeSummaryValues(propid), 
-            tableSettings.getPropertyValue(propid, 'MinVal'), 
-            tableSettings.getPropertyValue(propid, 'MaxVal'), 
-            summSettings['BlockSizeMin'])
+            tableSettings.getPropertyValue(propid, 'minVal'),
+            tableSettings.getPropertyValue(propid, 'maxVal'),
+            summSettings['blockSizeMin'])
 
     def deleteTableBasedSummaryValuesForTable(self, tableid):
         self._checkPermissions('tablebasedsummaryvalues', tableid)
@@ -363,11 +363,11 @@ class SettingsDAO(object):
         self._checkPermissions('tablebasedsummaryvalues', tableid)
         
         self._execSql("INSERT INTO tablebasedsummaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, 0)", tableid, summaryid, 
-            tableSettings.getTableBasedSummaryValue(summaryid)['Name'], 
+            tableSettings.getTableBasedSummaryValue(summaryid)['name'],
             tableSettings.serializeTableBasedValue(summaryid), 
-            tableSettings.getTableBasedSummaryValue(summaryid)['MinVal'], 
-            tableSettings.getTableBasedSummaryValue(summaryid)['MaxVal'], 
-            tableSettings.getTableBasedSummaryValue(summaryid)['BlockSizeMin'])
+            tableSettings.getTableBasedSummaryValue(summaryid)['minVal'],
+            tableSettings.getTableBasedSummaryValue(summaryid)['maxVal'],
+            tableSettings.getTableBasedSummaryValue(summaryid)['blockSizeMin'])
 
 
     def materializeView(self, tableSettings, indexedColumns, wstable):
@@ -377,9 +377,9 @@ class SettingsDAO(object):
         for indexedColumn in indexedColumns:
             self.createIndex(indexedColumn, tmptable, indexedColumn)
         
-        if tableSettings['IsPositionOnGenome']:
+        if tableSettings['isPositionOnGenome']:
             self._log('Indexing chromosome,position on materialised view')
-            self.createIndex('mt1_chrompos', tmptable, DBCOLESC(tableSettings['Chromosome']) + "," + DBCOLESC(tableSettings['Position']))
+            self.createIndex('mt1_chrompos', tmptable, DBCOLESC(tableSettings['chromosome']) + "," + DBCOLESC(tableSettings['position']))
         self.dropView(wstable)
         self._execSql('RENAME TABLE {} TO {}'.format(tmptable, DBTBESC(wstable)))
         
@@ -422,15 +422,15 @@ class SettingsDAO(object):
         DQXUtils.CheckValidTableIdentifier(tableid)
 
         if dimension == "row":
-            indexArray = 'RowIndexArray'
-            indexField = 'RowIndexField'
-            dataTable = 'RowDataTable'
-            tempTable = 'TempRowIndex'
+            indexArray = 'rowIndexArray'
+            indexField = 'rowIndexField'
+            dataTable = 'rowDataTable'
+            tempTable = 'tempRowIndex'
         else:
-            indexArray = 'ColumnIndexArray'
-            indexField = 'ColumnIndexField'
-            dataTable = 'ColumnDataTable'
-            tempTable = 'TempColIndex'
+            indexArray = 'columnIndexArray'
+            indexField = 'columnIndexField'
+            dataTable = 'columnDataTable'
+            tempTable = 'tempColIndex'
         if table_settings[indexArray]:
             #We have an array that matches to a column in the 1D SQL, we add an index to the 1D SQL
             #Firstly create a temporary table with the index array
@@ -438,8 +438,8 @@ class SettingsDAO(object):
                 index = remote_hdf5[table_settings[indexArray]]
             except KeyError:
                 raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings[indexArray]))
-            for prop in table_settings['Properties']:
-                if len(index) != remote_hdf5[prop['Id']].shape[0 if table_settings['FirstArrayDimension'] == dimension else 1]:
+            for prop in table_settings['properties']:
+                if len(index) != remote_hdf5[prop['id']].shape[0 if table_settings['firstArrayDimension'] == dimension else 1]:
                     raise Exception("Property {0} has a different row length to the row index".format(property))
                 
             self.dropTable(tempTable)

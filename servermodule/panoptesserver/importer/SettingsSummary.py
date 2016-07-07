@@ -10,10 +10,10 @@ class SettingsSummary(SettingsDataTable):
     def getSettings(self):
         parentSettings = SettingsDataTable.getSettings(self)
         #copy is used for settings that will be modified
-        summarySettings = { 'Properties':copy.deepcopy(parentSettings['Properties'])}
-        #summarySettings.append(parentSettings['Properties']['children']['SummaryValues']['children'])
+        summarySettings = { 'properties':copy.deepcopy(parentSettings['properties'])}
+        #summarySettings.append(parentSettings['properties']['children']['summaryValues']['children'])
         #print (summarySettings)
-        #del summarySettings['Properties']['children']['SummaryValues']
+        #del summarySettings['properties']['children']['summaryValues']
 
         return summarySettings
         
@@ -26,25 +26,25 @@ class SettingsSummary(SettingsDataTable):
             if self._logLevel:
                 self._log('Loading props file settings from: '+fileName)
             self._settings = {}
-            self._settings['Properties'] = []
+            self._settings['properties'] = []
             with open(self.fileName, 'r') as configfile:
                 try:
                     input = yaml.load(configfile.read())
-                    input['Name'] = propName
-                    input['Id'] = propName
-                    if 'DataType' not in input:
-                        if 'IsCategorical' in input and input['IsCategorical']:
-                            input['DataType'] = 'Text'
+                    input['name'] = propName
+                    input['id'] = propName
+                    if 'dataType' not in input:
+                        if 'isCategorical' in input and input['isCategorical']:
+                            input['dataType'] = 'Text'
                         else:
-                            input['DataType'] = 'Value'
+                            input['dataType'] = 'Value'
                     #Because there's a different definition hierarchy
-                    if not 'SummaryValues' in input:
-                        input['SummaryValues'] = {}
-                        for key in self._propertiesDefault['SummaryValues']['children']:
+                    if not 'summaryValues' in input:
+                        input['summaryValues'] = {}
+                        for key in self._propertiesDefault['summaryValues']['children']:
                             if key in input:
-                                input['SummaryValues'][key] = input[key]
+                                input['summaryValues'][key] = input[key]
                                 del input[key]
-                    self._settings['Properties'].append(input)
+                    self._settings['properties'].append(input)
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
                     raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))

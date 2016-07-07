@@ -42,11 +42,11 @@ let DataItem = React.createClass({
   },
 
   icon() {
-    return this.config.tables[this.props.table].icon;
+    return this.config.tablesById[this.props.table].icon;
   },
 
   title() {
-    return `${this.config.tables[this.props.table].tableCapNameSingle} "${this.props.primKey}"`;
+    return `${this.config.tablesById[this.props.table].capNameSingle} "${this.props.primKey}"`;
   },
 
   render() {

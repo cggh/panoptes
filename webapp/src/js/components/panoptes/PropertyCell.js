@@ -40,7 +40,7 @@ let PropertyCell = React.createClass({
                    fixedWidth={false}
                    name={val ? 'check' : 'times'} />;
     } else if (prop.isPrimKey) {
-      return <ItemLink table={prop.tableid} primKey={value} />;
+      return <ItemLink table={prop.tableId} primKey={value} />;
     }
     return <span className="prop">
       {text}

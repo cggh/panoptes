@@ -175,7 +175,7 @@ let PerRowNumericalTrack = React.createClass({
   fetchData(props, requestContext) {
     let {chromosome, blockStart, blockEnd, blockPixelWidth,
       width, sideWidth, table, channel, query, colourProperty} = props;
-    let tableConfig = this.config.tables[table];
+    let tableConfig = this.config.tablesById[table];
 
     if (['chromosome', 'table',
         'channel', 'query'].some((prop) => this.props[prop] !== props[prop])) {
@@ -191,20 +191,20 @@ let PerRowNumericalTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (!this.config.tables[table] || !this.config.tables[table].tableBasedSummaryValues[channel]) {
+    if (!this.config.tablesById[table] || !this.config.tablesById[table].tableBasedSummaryValues[channel]) {
       ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid per row summary track`);
       return;
     }
-    if (colourProperty && !this.config.tables[table].propertiesMap[colourProperty]) {
+    if (colourProperty && !this.config.tablesById[table].propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
-    let columns = [tableConfig.primkey];
+    let columns = [tableConfig.primKey];
     if (colourProperty)
       columns.push(colourProperty);
     let columnspec = {};
-    columns.forEach((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultFetchEncoding);
+    columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
     let APIargs = {
       database: this.config.dataset,
       table: table,
@@ -219,22 +219,22 @@ let PerRowNumericalTrack = React.createClass({
             API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         ).then((tableData) => {
-          let primKeys = tableData[tableConfig.primkey].slice(0, 50);
+          let primKeys = tableData[tableConfig.primKey].slice(0, 50);
           this.data.primKeys = primKeys;
           if (colourProperty) {
             this.data.colourVals = tableData[colourProperty].slice(0, 50);
           }
-          return Promise.all(primKeys.map((primkey) =>
+          return Promise.all(primKeys.map((primKey) =>
             SummarisationCache.fetch({
               columns: {
-                [primkey]: {
-                  primkey: primkey,
-                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primkey}`,
+                [primKey]: {
+                  primKey: primKey,
+                  folder: `SummaryTracks/${this.config.dataset}/TableTracks/${table}/${channel}/${primKey}`,
                   config: 'Summ',
-                  name: `${channel}_${primkey}_avg`
+                  name: `${channel}_${primKey}_avg`
                 }
               },
-              minBlockSize: this.config.tables[table].tableBasedSummaryValues[channel].minblocksize,
+              minBlockSize: this.config.tablesById[table].tableBasedSummaryValues[channel].minblocksize,
               chromosome: chromosome,
               start: blockStart,
               end: blockEnd,
@@ -270,7 +270,7 @@ let PerRowNumericalTrack = React.createClass({
     let {interpolation, tension, table, colourProperty, onKnownLegendValuesChange} = props;
     let colourFunc = categoryColours('__default__');
     if (colourProperty)
-      colourFunc = propertyColour(this.config.tables[table].propertiesMap[colourProperty]);
+      colourFunc = propertyColour(this.config.tablesById[table].propertiesById[colourProperty]);
     let lines = {};
     let colours = {};
     primKeys.forEach((primKey, i) => {
@@ -293,7 +293,7 @@ let PerRowNumericalTrack = React.createClass({
     //  .y((d) => d)
     //  .y0((d, i) => min[i])(max);
     //
-    if (table && colourProperty && onKnownLegendValuesChange && this.config.tables[table].propertiesMap[colourProperty].isText) {
+    if (table && colourProperty && onKnownLegendValuesChange && this.config.tablesById[table].propertiesById[colourProperty].isText) {
       onKnownLegendValuesChange(_uniq(colourVals));
     }
     this.setState({

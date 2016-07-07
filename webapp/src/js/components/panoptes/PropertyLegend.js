@@ -22,7 +22,7 @@ let PropertyLegend = React.createClass({
   render() {
     let {table, property, knownValues, min, max} = this.props;
     if (!table || !property) return null;
-    const propConfig = this.config.tables[table].propertiesMap[property];
+    const propConfig = this.config.tablesById[table].propertiesById[property];
     const colourFunc = propertyColour(propConfig);
     let elements = null;
     if (propConfig.categoryColors) {

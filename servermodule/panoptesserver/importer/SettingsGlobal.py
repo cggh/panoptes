@@ -11,10 +11,10 @@ class SettingsGlobal(SettingsDataset):
         for token in self._settings.keys():
             st = self._settings[token]
     
-            if token == 'IntroSections':
+            if token == 'introSections':
                 for sect in st:
-                    if 'Content' in sect:
-                        sect['Content'] = sect['Content'].replace('\r', '\\r').replace('\n', '\\n').replace('"', '\\"')
+                    if 'content' in sect:
+                        sect['content'] = sect['content'].replace('\r', '\\r').replace('\n', '\\n').replace('"', '\\"')
     
             if (type(st) is list) or (type(st) is dict):
                 st = simplejson.dumps(st)

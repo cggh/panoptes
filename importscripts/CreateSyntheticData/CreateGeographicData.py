@@ -102,7 +102,7 @@ for nr in range(samplenr):
 basedir = '/Users/pvaut/Documents/SourceCode/WebApps/panoptes/sampledata'
 
 fp = open(basedir + '/datasets/Geographic/datatables/samples/data', 'w')
-fp.write('ID\tCatId\tRegionId\tLongitude\tLattitude\tNumProp1\tNumProp2\tCollectionDate\n')
+fp.write('ID\tCatId\tRegionId\tLongitude\tLatitude\tNumProp1\tNumProp2\tCollectionDate\n')
 for nr in range(samplenr):
     fp.write('{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n'.format(
         str(nr).zfill(9),

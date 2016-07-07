@@ -56,7 +56,7 @@ let ItemMapWidget = React.createClass({
 
     let {table, primKey, lngProperty, latProperty, highlight} = props;
 
-    let locationTableConfig = this.config.tables[table];
+    let locationTableConfig = this.config.tablesById[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -67,12 +67,12 @@ let ItemMapWidget = React.createClass({
       loadStatus: 'loading'
     });
 
-    let locationPrimKeyProperty = locationTableConfig.primkey;
+    let locationPrimKeyProperty = locationTableConfig.primKey;
 
     // If specified, use the lat lng properties from the props.
     // Otherwise, use the lat lng properties from the config.
-    let locationLongitudeProperty = lngProperty ? lngProperty : locationTableConfig.propIdGeoCoordLongit;
-    let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.propIdGeoCoordLattit;
+    let locationLongitudeProperty = lngProperty ? lngProperty : locationTableConfig.longitude;
+    let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.latitude;
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
@@ -84,7 +84,7 @@ let ItemMapWidget = React.createClass({
     }
 
     let locationColumnsColumnSpec = {};
-    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesMap[column].defaultDisplayEncoding);
+    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
 
     requestContext.request(
       (componentCancellation) => {
@@ -97,7 +97,7 @@ let ItemMapWidget = React.createClass({
           let APIargs = {
             database: this.config.dataset,
             table: table,
-            primKeyField: this.config.tables[table].primkey,
+            primKeyField: this.config.tablesById[table].primKey,
             primKeyValue: primKey
           };
 
@@ -136,8 +136,8 @@ let ItemMapWidget = React.createClass({
         let markers = [];
 
         // Translate the fetched locationData into markers.
-        let locationTableConfig = this.config.tables[table];
-        let locationPrimKeyProperty = locationTableConfig.primkey;
+        let locationTableConfig = this.config.tablesById[table];
+        let locationPrimKeyProperty = locationTableConfig.primKey;
 
         // If a primKey value has been specified then expect data to contain a single record.
         // Otherwise data should contain an array of records.
@@ -146,8 +146,8 @@ let ItemMapWidget = React.createClass({
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
           markers.push({
-            lat: parseFloat(data[locationTableConfig.propIdGeoCoordLattit]),
-            lng: parseFloat(data[locationTableConfig.propIdGeoCoordLongit]),
+            lat: parseFloat(data[locationTableConfig.latitude]),
+            lng: parseFloat(data[locationTableConfig.longitude]),
             title: locationDataPrimKey,
             table: table,
             primKey: locationDataPrimKey
@@ -170,8 +170,8 @@ let ItemMapWidget = React.createClass({
             }
 
             markers.push({
-              lat: parseFloat(data[i][locationTableConfig.propIdGeoCoordLattit]),
-              lng: parseFloat(data[i][locationTableConfig.propIdGeoCoordLongit]),
+              lat: parseFloat(data[i][locationTableConfig.latitude]),
+              lng: parseFloat(data[i][locationTableConfig.longitude]),
               title: locationDataPrimKey,
               table: table,
               primKey: locationDataPrimKey,

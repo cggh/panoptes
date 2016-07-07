@@ -55,9 +55,9 @@ class Import2DDataTable(BaseImport):
     def getSettings(self, tableid):
         tableSettings = self._fetchSettings(tableid)
         
-        if tableSettings['ShowInGenomeBrowser']:
-            sigb = tableSettings['ShowInGenomeBrowser']
-            if not ('Call' in sigb or 'AlleleDepth' in sigb):
+        if tableSettings['showInGenomeBrowser']:
+            sigb = tableSettings['showInGenomeBrowser']
+            if not ('call' in sigb or 'alleleDepth' in sigb):
                 raise ValueError('Genome browsable 2D table must have call or allele depth')
             
         return tableSettings
@@ -81,31 +81,31 @@ class Import2DDataTable(BaseImport):
             settingsFile, dataFile = self._getDataFiles(tableid)
             remote_hdf5 = h5py.File(dataFile, 'r')
             #Check that the referenced tables exist and have the primary key specified.
-            if table_settings['ColumnDataTable']:
-                tables = self._dao.getTablesInfo(table_settings['ColumnDataTable'])
+            if table_settings['columnDataTable']:
+                tables = self._dao.getTablesInfo(table_settings['columnDataTable'])
                 cat_id = tables[0]["id"]
-                self._dao.checkForColumn(table_settings['ColumnDataTable'], table_settings['ColumnIndexField'])
-            if table_settings['RowDataTable']:
-                tables = self._dao.getTablesInfo(table_settings['RowDataTable'])
+                self._dao.checkForColumn(table_settings['columnDataTable'], table_settings['columnIndexField'])
+            if table_settings['rowDataTable']:
+                tables = self._dao.getTablesInfo(table_settings['rowDataTable'])
                 cat_id = tables[0]["id"]
 
-                self._dao.checkForColumn(table_settings['RowDataTable'], table_settings['RowIndexField'])
+                self._dao.checkForColumn(table_settings['rowDataTable'], table_settings['rowIndexField'])
     
-            if table_settings['ShowInGenomeBrowser']:
-                sql = "SELECT IsPositionOnGenome FROM tablecatalog WHERE id='{0}' ".format(table_settings['ColumnDataTable'])
+            if table_settings['showInGenomeBrowser']:
+                sql = "SELECT IsPositionOnGenome FROM tablecatalog WHERE id='{0}' ".format(table_settings['columnDataTable'])
                 is_position = self._dao._execSqlQuery(sql)[0][0]
                 if not is_position:
-                    raise Exception(table_settings['ColumnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
-            if table_settings['FirstArrayDimension'] not in ['column', 'row']:
-                raise Exception("FirstArrayDimension must be column or row")
+                    raise Exception(table_settings['columnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
+            if table_settings['firstArrayDimension'] not in ['column', 'row']:
+                raise Exception("firstArrayDimension must be column or row")
     
             # Add to tablecatalog
             sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', {6})".format(
                 tableid,
-                table_settings['NamePlural'],
-                table_settings['ColumnDataTable'],
-                table_settings['RowDataTable'],
-                table_settings['FirstArrayDimension'],
+                table_settings['namePlural'],
+                table_settings['columnDataTable'],
+                table_settings['rowDataTable'],
+                table_settings['firstArrayDimension'],
                 table_settings.serialize(),
                 self.tableOrder
             )
@@ -113,15 +113,15 @@ class Import2DDataTable(BaseImport):
             self.tableOrder += 1
     
             for propname in table_settings.getPropertyNames():
-                propid = table_settings.getPropertyValue(propname,'Id')
+                propid = table_settings.getPropertyValue(propname,'id')
                 dtype = arraybuffer._strict_dtype_string(remote_hdf5[propid].dtype)
                 arity = 1 if len(remote_hdf5[propid].shape) == 2 else remote_hdf5[propid].shape[2]
                 sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}', {8})".format(
                     propid,
                     tableid,
-                    table_settings['ColumnDataTable'],
-                    table_settings['RowDataTable'],
-                    table_settings.getPropertyValue(propname,'Name'),
+                    table_settings['columnDataTable'],
+                    table_settings['rowDataTable'],
+                    table_settings.getPropertyValue(propname,'name'),
                     self.property_order,
                     dtype,
                     table_settings.serializeProperty(propname),
@@ -132,14 +132,14 @@ class Import2DDataTable(BaseImport):
     
             if not self._importSettings['ConfigOnly']:
                 #Insert an index column into the index tables
-                if table_settings['ColumnDataTable']:
+                if table_settings['columnDataTable']:
                     # Assume that index field has been created on import in LoadTable - it's much faster
                     # We could just run the command and ignore the error raised if it already exists
-                    # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['ColumnDataTable'], tableid)
+                    # sql = "ALTER TABLE `{0}` ADD `{1}_column_index` INT DEFAULT NULL;".format(table_settings['columnDataTable'], tableid)
                     # self._execSql(sql)
                     self._dao.insert2DIndexes(remote_hdf5, "column", tableid, table_settings, max_line_count)
 
-                if table_settings['RowDataTable']:
+                if table_settings['rowDataTable']:
                     self._dao.insert2DIndexes(remote_hdf5, "row", tableid, table_settings, None)
        
                 #We have the indexes - now we need a local copy of the HDF5 data for each property
@@ -149,15 +149,15 @@ class Import2DDataTable(BaseImport):
                     os.remove(path_join)
                 except OSError:
                     pass
-                if table_settings['SymlinkData']:
+                if table_settings['symlinkData']:
                     print "Symlinking datasets - will only work on unix"
                     os.symlink(dataFile, path_join)
                 else:
                     local_hdf5 = h5py.File(path_join, 'w', libver='latest')
                     print "Copying HDF5 datasets"
-                    for prop in table_settings['Properties']:
+                    for prop in table_settings['properties']:
                         print "..", prop
-                        prop_in = remote_hdf5[prop['Id']]
+                        prop_in = remote_hdf5[prop['id']]
                         #Make some choices assuming data is variants/samples
                         if prop_in.shape[0] > prop_in.shape[1]:
                             chunks = [min(1000, prop_in.shape[0]), min(10, prop_in.shape[1])]
@@ -166,8 +166,8 @@ class Import2DDataTable(BaseImport):
                         arity = 1 if len(prop_in.shape) == 2 else prop_in.shape[2]
                         if arity > 1:
                             chunks.append(arity)
-                        prop_out = local_hdf5.create_dataset(prop['Id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
-                        self._hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['FirstArrayDimension'] == 'row' else (max_line_count, None))
+                        prop_out = local_hdf5.create_dataset(prop['id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
+                        self._hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['firstArrayDimension'] == 'row' else (max_line_count, None))
                         print "done"
                     print "all copies complete"
                     local_hdf5.close()

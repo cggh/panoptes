@@ -1,36 +1,35 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: population
-NamePlural: populations
+nameSingle: population
+namePlural: populations
 
-IsHidden: true #If set to true, this data table will not be displayed as a standalone entity (e.g. no tab)
-DisableNotes: true
+isHidden: true #If set to true, this data table will not be displayed as a standalone entity (e.g. no tab)
+disableNotes: true
 
-Icon: fa-group # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
+icon: fa-group # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
 
-PrimKey: ID
+primKey: ID
 
-Properties:
+properties:
+- id: ID
+  description: Population identifier
+  dataType: Text
+  search: Pattern
 
-- Id: ID
-  Description: Population identifier
-  DataType: Text
-  Search: Pattern
+- id: Name
+  description: Population name
+  dataType: Text
+  search: Pattern
 
-- Id: Name
-  Description: Population name
-  DataType: Text
-  Search: Pattern
+- id: Longitude
+  description: Longitude of the center of gravity of the population
+  dataType: GeoLongitude
 
-- Id: Longitude
-  Description: Longitude of the center of gravity of the population
-  DataType: GeoLongitude
+- id: Latitude
+  description: Latitude of the center of gravity of the population
+  dataType: GeoLatitude
 
-- Id: Lattitude
-  Description: Lattitude of the center of gravity of the population
-  DataType: GeoLattitude
-
-- Id: SampleCount
-  Name: Sample count
-  Description: Number of samples in the population
-  DataType: Value
+- id: SampleCount
+  name: Sample count
+  description: Number of samples in the population
+  dataType: Value

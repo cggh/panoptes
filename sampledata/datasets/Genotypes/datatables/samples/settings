@@ -1,34 +1,33 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: sample
-NamePlural: samples
-Description: This is a table containing a number of samples
-PrimKey: ID
-IsPositionOnGenome: false
-FetchRecordCount: true
-QuickFindFields: ID
+nameSingle: sample
+namePlural: samples
+description: This is a table containing a number of samples
+primKey: ID
+isPositionOnGenome: false
+fetchRecordCount: true
+quickFindFields: ID
 
-Properties:
+properties:
+- id: ID
+  name: Sample ID
+  description: Sample identifier
+  dataType: Text
 
-- Id: ID
-  Name: Sample ID
-  Description: Sample identifier
-  DataType: Text
+- id: Name
+  name: Name
+  dataType: Text
 
-- Id: Name
-  Name: Name
-  DataType: Text
+- id: Category1
+  name: Category 1
+  dataType: Text
 
-- Id: Category1
-  Name: Category 1
-  DataType: Text
+- id: Category2
+  name: Category 2
+  dataType: Text
 
-- Id: Category2
-  Name: Category 2
-  DataType: Text
-
-- Id: Value1
-  Name: Value 1
-  DataType: Value
-  DecimDigits: 4
+- id: Value1
+  name: Value 1
+  dataType: Value
+  decimDigits: 4
 

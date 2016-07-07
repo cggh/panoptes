@@ -1,53 +1,53 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/twoddatatable.html
 
-NameSingle: haploid
-NamePlural: haploid
-Description: A table of haploid genotypes
+nameSingle: haploid
+namePlural: haploid
+description: A table of haploid genotypes
 
-ColumnDataTable: variants            # The 1D data table where each entry corresponds to a column
-ColumnIndexField: SnpName            # The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-ColumnIndexArray: col_index          # 1D Array in HDF5 that gives the value of ColumnIndexField for each column,
+columnDataTable: variants            # The 1D data table where each entry corresponds to a column
+columnIndexField: SnpName            # The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+columnIndexArray: col_index          # 1D Array in HDF5 that gives the value of ColumnIndexField for each column,
                                      # if this is missing then it is assumed that the HDF5 columns are in the same
                                      # order as the "ColumnDataTable" sorted by "ColumnIndexField"
 
-RowDataTable: samples                # The 1D data table where each entry corresponds to a row
-RowIndexField: ID                    # The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-RowIndexArray: row_index             # 1D Array in HDF5 that gives the value of RowIndexField for each row
+rowDataTable: samples                # The 1D data table where each entry corresponds to a row
+rowIndexField: ID                    # The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+rowIndexArray: row_index             # 1D Array in HDF5 that gives the value of RowIndexField for each row
                                      # if this is missing then it is assumed that the HDF5 rows are in the same
                                      # order as the "RowDataTable" sorted by "RowIndexField"
 
-FirstArrayDimension: row             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
+firstArrayDimension: row             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
 
 #SymlinkData: False
 
-Properties:
-    -  Id: genotype                            #Name of dataset in HDF5
-       Name: Call
-       Description: Genotype call
+properties:
+- id: genotype                                 #Name of dataset in HDF5
+  name: Call
+  description: Genotype call
 
-    -  Id: allele_depth
-       Name: Allele depth
-       Description: Number of reads for each allele
-       MinVal: 0
-       MaxVal: 200
+- id: allele_depth
+  name: Allele depth
+  description: Number of reads for each allele
+  minVal: 0
+  maxVal: 200  
 
-    -  Id: total_depth
-       Name: Total Depth
-       Description: Total number of reads for all alleles
-       MinVal: 0
-       MaxVal: 200
+- id: total_depth
+  name: Total Depth
+  description: Total number of reads for all alleles
+  minVal: 0
+  maxVal: 200  
 
-    -  Id: gq
-       Name: Genotype Quality
-       Description: Quality of the call
-       MinVal: 0
-       MaxVal: 100
+- id: gq
+  name: Genotype Quality
+  description: Quality of the call
+  minVal: 0
+  maxVal: 100  
 
-ShowInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
-    Call:  genotype                  # Reference to property that holds the calls
-    AlleleDepth: allele_depth        # Reference to property that holds allele depths, if avaliable
-    ExtraProperties:                 # Properties that will be available to map to display properties
-    - gq
-    - total_depth
+showInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
+  call: genotype                     # Reference to property that holds the calls
+  alleleDepth: allele_depth          # Reference to property that holds allele depths, if avaliable
+  extraProperties:
+  - gq                               # Properties that will be available to map to display properties
+  - total_depth
 
-GenomeMaxViewportSizeX: 5000
+genomeMaxViewportSizeX: 5000

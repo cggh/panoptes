@@ -1,72 +1,73 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: contributor
-NamePlural: contributors
-Description: The entities that contributed the samples
+nameSingle: contributor
+namePlural: contributors
+description: The entities that contributed the samples
 
-Icon: fa-institution # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
+icon: fa-institution # Optionally specify an icon identifier taken from the list http://fortawesome.github.io/Font-Awesome/icons/
 
-DisableNotes: true
+disableNotes: true
 
-PrimKey: ID
+primKey: ID
 
-ItemTitle: <b>{{ID}}</b> {{Name}}
+itemTitle: <b>{{ID}}</b> {{Name}}
 
-Properties:
-- Id: ID
-  Description: Contributor identifier
-  DataType: Text
-  Search: Pattern
+properties:
+- id: ID
+  description: Contributor identifier
+  dataType: Text
+  search: Pattern
 
-- Id: Name
-  Description: Contributor name
-  DataType: Text
-  Search: Pattern
+- id: Name
+  description: Contributor name
+  dataType: Text
+  search: Pattern
 
-- Id: Contact
-  Description: The highly-coupled knowledge-system that is responsible for the contribution
-  DataType: Text
-  Search: Pattern
+- id: Contact
+  description: The highly-coupled knowledge-system that is responsible for the contribution
+  dataType: Text
+  search: Pattern
 
-- Id: SomeText
-  Name: Sample count
-  Description: A description about the entity's relationship to the samples
-  DataType: Text
-  Search: Pattern
+- id: SomeText
+  name: Sample count
+  description: A description about the entity's relationship to the samples
+  dataType: Text
+  search: Pattern
 
-ListView: true
+listView: true
 
-DataItemViews: # Lists the custom views that should appear in the popup for an individual data table item
+dataItemViews:
+-              # Lists the custom views that should appear in the popup for an individual data table item
 
-- Type: Template                                       # Add a template based view
-  Name: Details
-  Content: |
-      <h4>ID: {{ID}}</h4>
-      <h2>Contributing Entity: {{Name}}</h2>
-      <h3>Contact Person: {{Contact}}</h3>
-      <h4>
-      {{#if SomeText}}
-              {{{SomeText}}}
-      {{else}}
-              <i>There is no description available for this entity</i>
-      {{/if}}
-      </h4>
-      <h3>Sites:</h3>
-      <ul>
-      {{#each samplingsites}}
-        <li>
-            {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
-            <ItemLink table='samplingsites' primKey='{{SiteID}}' />
-        </li>
-      {{else}}
-        No sites from this contributor
-      {{/each}}
-      </ul>
-      <div style="width:300px;height:300px">
-        <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
-      </div>
-      <h4>
-        More information on the nature of contribution <a class="doclink" href="samples">here</a>
-      </h4>
+  type: Template                                       # Add a template based view
+  name: Details
+  content: |
+    <h4>ID: {{ID}}</h4>
+    <h2>Contributing Entity: {{Name}}</h2>
+    <h3>Contact Person: {{Contact}}</h3>
+    <h4>
+    {{#if SomeText}}
+            {{{SomeText}}}
+    {{else}}
+            <i>There is no description available for this entity</i>
+    {{/if}}
+    </h4>
+    <h3>Sites:</h3>
+    <ul>
+    {{#each samplingsites}}
+      <li>
+          {{SiteID}}, {{#if Country}}{{Country}}{{else}}<i>No country specified</i>{{/if}}
+          <ItemLink table='samplingsites' primKey='{{SiteID}}' />
+      </li>
+    {{else}}
+      No sites from this contributor
+    {{/each}}
+    </ul>
+    <div style="width:300px;height:300px">
+      <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
+    </div>
+    <h4>
+      More information on the nature of contribution <a class="doclink" href="samples">here</a>
+    </h4>
 
 

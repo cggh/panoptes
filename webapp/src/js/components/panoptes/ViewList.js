@@ -28,8 +28,8 @@ let ViewList = React.createClass({
 
 
   render() {
-    const hasGeo = _some(_filter(this.config.tables, {hasGeoCoord: true}));
-    const hasShowableTables = _some(_filter(this.config.tables, (table) => !table.settings.isHidden));
+    const hasShowableTables = _some(this.config.visibleTables);
+    const hasGeo = _some(_filter(this.config.tablesById, {hasGeoCoord: true}));
 
     return (
       <List style={this.props.style}>

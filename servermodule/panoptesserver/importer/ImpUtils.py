@@ -25,12 +25,12 @@ def convertToBooleanInt(vl):
     return None
 
 def IsValidDataTypeIdenfifier(datatypeIdentifier):
-    return datatypeIdentifier in ['Text', 'Value', 'LowPrecisionValue', 'HighPrecisionValue', 'Boolean', 'GeoLongitude', 'GeoLattitude', 'Date']
+    return datatypeIdentifier in ['Text', 'Value', 'LowPrecisionValue', 'HighPrecisionValue', 'Boolean', 'GeoLongitude', 'GeoLatitude', 'Date']
 
 def IsValueDataTypeIdenfifier(datatypeIdentifier):
     return (datatypeIdentifier == 'Value') or \
            (datatypeIdentifier == 'GeoLongitude') or\
-           (datatypeIdentifier == 'GeoLattitude') or\
+           (datatypeIdentifier == 'GeoLatitude') or\
            (datatypeIdentifier == 'LowPrecisionValue') or\
            (datatypeIdentifier == 'HighPrecisionValue') or\
            (datatypeIdentifier == 'Date')

@@ -105,21 +105,21 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                 attrib_genename = 'Name'
                 attrib_genenames = 'Name,Alias,previous_systematic_id'
                 attrib_descr = 'descr'
-                if settings['Annotation']:
-                    annotationsettings = settings['Annotation']
+                if settings['annotation']:
+                    annotationsettings = settings['annotation']
                     print('Annotation settings: '+str(annotationsettings))
-                    if 'Format' in annotationsettings:
-                        formatid = annotationsettings['Format']
-                    if 'GeneFeature' in annotationsettings:
-                        geneidlist = flattenarglist(annotationsettings['GeneFeature'])
-                    if 'ExonFeature' in annotationsettings:
-                        exonid = annotationsettings['ExonFeature']
-                    if 'GeneNameAttribute' in annotationsettings:
-                        attrib_genename = flattenarglist(annotationsettings['GeneNameAttribute'])
-                    if 'GeneNameSetAttribute' in annotationsettings:
-                        attrib_genenames = flattenarglist(annotationsettings['GeneNameSetAttribute'])
-                    if 'GeneDescriptionAttribute' in annotationsettings:
-                        attrib_descr = flattenarglist(annotationsettings['GeneDescriptionAttribute'])
+                    if 'format' in annotationsettings:
+                        formatid = annotationsettings['format']
+                    if 'geneFeature' in annotationsettings:
+                        geneidlist = flattenarglist(annotationsettings['geneFeature'])
+                    if 'exonFeature' in annotationsettings:
+                        exonid = annotationsettings['exonFeature']
+                    if 'geneNameAttribute' in annotationsettings:
+                        attrib_genename = flattenarglist(annotationsettings['geneNameAttribute'])
+                    if 'geneNameSetAttribute' in annotationsettings:
+                        attrib_genenames = flattenarglist(annotationsettings['geneNameSetAttribute'])
+                    if 'geneDescriptionAttribute' in annotationsettings:
+                        attrib_descr = flattenarglist(annotationsettings['geneDescriptionAttribute'])
 
                 tempgfffile = ImpUtils.GetTempFileName()
                 temppath = os.path.dirname(tempgfffile)

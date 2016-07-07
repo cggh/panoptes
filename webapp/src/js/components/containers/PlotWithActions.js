@@ -84,16 +84,16 @@ let PlotWithActions = React.createClass({
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
     const actions = this.getFlux().actions;
 
-    let tableOptions = _map(_filter(this.config.tables, (table) => !table.settings.isHidden), (table) => ({
+    let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
       leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
-      label: table.tableCapNamePlural
+      label: table.capNamePlural
     }));
 
     let propertyMenu = [];
     let i = 0;
     if (table) {
-      const propertyGroups = this.config.tables[table].propertyGroups;
+      const propertyGroups = this.config.tablesById[table].propertyGroups;
       _each(propertyGroups, (group) => {
         if (propertyMenu.length) {
           propertyMenu.push(<Divider key={i++}/>);
@@ -101,8 +101,8 @@ let PlotWithActions = React.createClass({
         let {id, name} = group;
         propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
         _each(group.properties, (property) => {
-          let {propid, name} = property;
-          propertyMenu.push(<MenuItem value={propid} key={propid} primaryText={name}/>);
+          let {id, name} = property;
+          propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
         });
       });
     }
@@ -150,7 +150,7 @@ let PlotWithActions = React.createClass({
           </SelectField>
           {table && plotType ?
             _map(plotTypes[plotType].dimensions, (dimension) =>
-              <SelectField value={this.config.tables[table].propertiesMap[this.props[dimension]] ? this.props[dimension] : null}
+              <SelectField value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
                            key={dimension}
                            autoWidth={true}
                            floatingLabelText={titleCase(dimension)}
@@ -173,7 +173,7 @@ let PlotWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} Plot of ${this.config.tables[table].tableCapNamePlural}` : 'Plot'}</span>
+            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} Plot of ${this.config.tablesById[table].capNamePlural}` : 'Plot'}</span>
             {plotType && table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>

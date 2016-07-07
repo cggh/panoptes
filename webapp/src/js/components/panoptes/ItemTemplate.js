@@ -51,13 +51,13 @@ let ItemTemplate = React.createClass({
     if (data)
       return;
     this.setState({loadStatus: 'loading'});
-    let relations = this.config.tables[table].relationsParentOf;
+    let relations = this.config.tablesById[table].relationsParentOf;
     // Extract all the childTableIds
     let possibleChildTables = [];
     let childField = {};
     relations.forEach((rel) => {
       possibleChildTables.push(rel.childtableid);
-      childField[rel.childtableid] = rel.childpropid;
+      childField[rel.childtableid] = rel.childid;
     });
 
     // Determine which childTables are actually used in the raw template.
@@ -68,10 +68,10 @@ let ItemTemplate = React.createClass({
     for (let i = 0, len = usedChildTables.length; i < len; i++) {
       let usedChildTable = usedChildTables[i];
       columnSpecsByTable[usedChildTable] = {};
-      for (let property in this.config.tables[usedChildTable].propertiesMap) {
+      for (let property in this.config.tablesById[usedChildTable].propertiesById) {
         // Don't include the StoredSelection property; otherwise the API call breaks. (TODO: why?)
         if (property === 'StoredSelection') continue;
-        columnSpecsByTable[usedChildTable][property] = this.config.tables[usedChildTable].propertiesMap[property].defaultDisplayEncoding;
+        columnSpecsByTable[usedChildTable][property] = this.config.tablesById[usedChildTable].propertiesById[property].defaultDisplayEncoding;
       }
     }
 
@@ -99,7 +99,7 @@ let ItemTemplate = React.createClass({
         let mainTableAPIargs = {
           database: this.config.dataset,
           table: table,
-          primKeyField: this.config.tables[table].primkey,
+          primKeyField: this.config.tablesById[table].primKey,
           primKeyValue: primKey
         };
         promises.push(

@@ -24,7 +24,7 @@ let QueryString = React.createClass({
   },
 
   componentWillMount() {
-    this.tableConfig = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tablesById[this.props.table];
   },
 
   getStateFromFlux() {
@@ -44,7 +44,7 @@ let QueryString = React.createClass({
 
     let nameMap = {};
     this.tableConfig.properties.forEach((property) => {
-      nameMap[property.propid] = {
+      nameMap[property.id] = {
         name: property.name,
         toDisplayString: Formatter.bind(this, property)
       };

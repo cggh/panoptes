@@ -1,8 +1,8 @@
-Name: Uniqueness
-Order: 1
-ChannelColor: rgb(255,0,0)
-MinVal: 0
-MaxVal: 200
-BlockSizeMin: 20
-BlockSizeMax: 50000
-DefaultVisible: true
+name: Uniqueness
+order: 1
+channelColor: rgb(255,0,0)
+minVal: 0
+maxVal: 200
+blockSizeMin: 20
+blockSizeMax: 50000
+defaultVisible: true

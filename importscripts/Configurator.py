@@ -29,8 +29,8 @@ class Configurator(object):
  
         for conf in self._fileColNames:
             config[conf] = {}
-            config[conf]['Id'] = conf
-            config[conf]['Name'] = conf
+            config[conf]['id'] = conf
+            config[conf]['name'] = conf
             values[conf] = []
         
         return config, values
@@ -49,12 +49,12 @@ class Configurator(object):
             i = i + 1
             idx = name
             
-            config[idx]['MaxLen'] = max(config[idx].get('MaxLen', 0), len(content))
+            config[idx]['maxLen'] = max(config[idx].get('maxLen', 0), len(content))
 
             #It's just too slow....
-            if lineCount > 10000 and 'DataType' in config[idx]:
-                if config[idx]['DataType'] == 'Value' and config[idx]['DecimDigits'] > 0 and '.' in content:
-                    config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), abs(decimal.Decimal(content).as_tuple().exponent))
+            if lineCount > 10000 and 'dataType' in config[idx]:
+                if config[idx]['dataType'] == 'value' and config[idx]['decimDigits'] > 0 and '.' in content:
+                    config[idx]['decimDigits'] = max(config[idx].get('decimDigits',0), abs(decimal.Decimal(content).as_tuple().exponent))
                 continue
 
             if content == '':
@@ -69,23 +69,23 @@ class Configurator(object):
             dataType = 'Text'
             if type(parsed) is float:
                 dataType = 'Value'
-                config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), abs(decimal.Decimal(content).as_tuple().exponent))
+                config[idx]['decimDigits'] = max(config[idx].get('decimDigits',0), abs(decimal.Decimal(content).as_tuple().exponent))
             elif type(parsed) is int:
                 dataType = 'Value'
-                config[idx]['DecimDigits'] = max(config[idx].get('DecimDigits',0), 0)
+                config[idx]['decimDigits'] = max(config[idx].get('decimDigits',0), 0)
             elif type(parsed) is bool:
                 dataType = 'Boolean'
             elif type(parsed) is str or type(parsed) is list or parsed is None or type(parsed) is dict:
                 dataType = 'Text'
                 #If you use True/False then the True doesn't appear in the output
-                cate = config[idx].get('IsCategorical','true')
+                cate = config[idx].get('isCategorical','true')
                 if cate == 'true':
-                    if not 'IsCategorical' in config[idx]:
-                        config[idx]['IsCategorical'] = 'true'
+                    if not 'isCategorical' in config[idx]:
+                        config[idx]['isCategorical'] = 'true'
                     if not content in values[idx]:
                         values[idx].append(content)
                         if len(values[idx]) > 12:
-                            config[idx]['IsCategorical'] = 'false'
+                            config[idx]['isCategorical'] = 'false'
             elif type(parsed) is datetime.date:
                 dataType = 'Date'
             else:
@@ -96,34 +96,34 @@ class Configurator(object):
             if content.startswith('000'):
                 dataType = 'Text'
                 if dataType == 'Value':
-                    del config[idx]['DecimDigits']
+                    del config[idx]['decimDigits']
                 
             if dataType == 'Value' and 'lat' in name.lower() and parsed > -90 and parsed < 90:
-                dataType = 'GeoLattitude'
-                del config[idx]['DecimDigits']
+                dataType = 'GeoLatitude'
+                del config[idx]['decimDigits']
                 
             if dataType == 'Value' and 'long' in name.lower() and parsed > -180 and parsed < 180:
                 dataType = 'GeoLongitude'
-                del config[idx]['DecimDigits']
+                del config[idx]['decimDigits']
                    
-            if config[idx].get('DataType',dataType) != dataType:
+            if config[idx].get('dataType',dataType) != dataType:
 #                if parsed is None:
-#                    dataType = config[idx]['DataType']
+#                    dataType = config[idx]['dataType']
 #                else:
-                    logging.warn("Mixed content type for %s:%s:%s(%s): previously %s from %s" % (str(name),dataType,content,str(type(parsed)),config[idx]['DataType'], self._definitions.get(idx,'')))
+                    logging.warn("Mixed content type for %s:%s:%s(%s): previously %s from %s" % (str(name),dataType,content,str(type(parsed)),config[idx]['dataType'], self._definitions.get(idx,'')))
         	    self._definitions[idx] = content
-                    if config[idx]['DataType'] == 'Value':
-                        del config[idx]['DecimDigits']
-                        del config[idx]['MaxVal']
-                        del config[idx]['MinVal']
+                    if config[idx]['dataType'] == 'Value':
+                        del config[idx]['decimDigits']
+                        del config[idx]['maxVal']
+                        del config[idx]['minVal']
                     
-            config[idx]['DataType'] = dataType
+            config[idx]['dataType'] = dataType
                 
             if dataType == 'Value' and not parsed is None:
                 max_val = math.ceil(float(parsed))
                 min_val = math.floor(float(parsed))
-                config[idx]['MaxVal'] = max(config[idx].get('MaxVal',0), max_val)
-                config[idx]['MinVal'] = min(config[idx].get('MinVal',0), min_val)
+                config[idx]['maxVal'] = max(config[idx].get('maxVal',0), max_val)
+                config[idx]['minVal'] = min(config[idx].get('minVal',0), min_val)
       
     
     def processFile(self, sourceFileName):
@@ -163,28 +163,28 @@ class Configurator(object):
                         
                
             rootProps = OrderedDict((
-             ('NameSingle', os.path.basename(os.path.dirname(sourceFileName))),
-             ('NamePlural', os.path.basename(os.path.dirname(sourceFileName))),
-             ('Description', 'Default description'),
-             ('PrimKey', 'AutoKey')
+             ('nameSingle', os.path.basename(os.path.dirname(sourceFileName))),
+             ('namePlural', os.path.basename(os.path.dirname(sourceFileName))),
+             ('description', 'Default description'),
+             ('primKey', 'AutoKey')
             ))
             for conf in config:
-                if 'DataType' in config[conf] and config[conf]['DataType'] == 'Value':
+                if 'dataType' in config[conf] and config[conf]['dataType'] == 'Value':
                     if len(values[conf]) > 0:
-                        config[conf]['StringValues'] = values[conf]
-                if config[conf]['Id'].lower().startswith('pos'):
-                    rootProps['Position'] = config[conf]['Id']
-                    rootProps['IsPositionOnGenome'] = 'true'
-                if config[conf]['Id'].lower().startswith('chr'):
-                    rootProps['Chromosome'] = config[conf]['Id']
-                    rootProps['IsPositionOnGenome'] = 'true'
+                        config[conf]['stringValues'] = values[conf]
+                if config[conf]['id'].lower().startswith('pos'):
+                    rootProps['position'] = config[conf]['id']
+                    rootProps['isPositionOnGenome'] = 'true'
+                if config[conf]['id'].lower().startswith('chr'):
+                    rootProps['chromosome'] = config[conf]['id']
+                    rootProps['isPositionOnGenome'] = 'true'
              
             if lineCount == 1:
                 rootProps = {
-                 'Name': os.path.basename(os.path.dirname(sourceFileName)),
-                 'Format': 'newick',
-                 'Description': 'Sample Description',
-                 'CrossLink': 'unknown'
+                 'name': os.path.basename(os.path.dirname(sourceFileName)),
+                 'format': 'newick',
+                 'description': 'sample Description',
+                 'crossLink': 'unknown'
                 }
                 config = {}
                 
@@ -204,8 +204,8 @@ class Configurator(object):
                     #Old style - no header - 3 columns chrom, pos, value
                     #Id = directory Name
                     key = self._fileColNames[len(self._fileColNames) - 1]
-                    config[key]["Id"] = os.path.basename(dirName)
-                    config[key]["Name"] = os.path.basename(dirName)
+                    config[key]["id"] = os.path.basename(dirName)
+                    config[key]["name"] = os.path.basename(dirName)
                     conf = config[key]
                     config = [ conf ]
                 else:
@@ -214,7 +214,7 @@ class Configurator(object):
                     #Directory name in FilePattern
                     conf = []
                     for key in config:
-                        config[key]["FilePattern"] = os.path.basename(dirName) + "/*"
+                        config[key]["filePattern"] = os.path.basename(dirName) + "/*"
                         conf.append(config[key])
                     config = conf
                 return config
@@ -235,24 +235,24 @@ if __name__ == "__main__":
         if 'data' in fileList:
             configurator = Configurator()
             config = {}
-            config["Properties"] = []
+            config["properties"] = []
             rootProps, props, values = configurator.processFile(os.path.join(dirName,'data'))
             config.update(rootProps)
             for key in configurator.getColumnNames():
                 value = props[key]
-                if 'IsCategorical' in value and value['IsCategorical'] == 'true':
-                    value['Categories'] = values[key]
-                config["Properties"].append(value)
+                if 'isCategorical' in value and value['isCategorical'] == 'true':
+                    value['categories'] = values[key]
+                config["properties"].append(value)
 #            for key, value in props.iteritems():
-#                config["Properties"].append(value)
+#                config["properties"].append(value)
             if len(subdirList) > 0:
                 for sampleDir in subdirList:
                     if sampleDir != 'graphs':
                         tbsv = configurator.processSamples(os.path.join(dirName,sampleDir))
-                        if "TableBasedSummaryValues" in config and config["TableBasedSummaryValues"]:
-                            config["TableBasedSummaryValues"].append(tbsv)
+                        if "tableBasedSummaryValues" in config and config["tableBasedSummaryValues"]:
+                            config["tableBasedSummaryValues"].append(tbsv)
                         else:
-                            config["TableBasedSummaryValues"] = tbsv
+                            config["tableBasedSummaryValues"] = tbsv
             
             configurator.output(os.path.join(dirName,'settings.gen'), config)
             

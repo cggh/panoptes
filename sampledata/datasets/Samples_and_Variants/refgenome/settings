@@ -1,19 +1,21 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/refgenome.html
 
-AnnotMaxViewPortSize: 750000  # Maximum viewport (in bp) the genome browser can have in order to show the annotation track
-RefSequenceSumm: Yes          # Include a summary track displaying the reference sequence
+annotMaxViewPortSize: 750000  # Maximum viewport (in bp) the genome browser can have in order to show the annotation track
+refSequenceSumm: Yes          # Include a summary track displaying the reference sequence
 
-Annotation:                                # Directives for parsing the annotation file (annotation.gff)
-  Format: GFF                              # Format: GFF = Version 3 GFF file ; GTF = Version 2 GTF file
-  GeneFeature: [gene, pseudogene]          # Feature id(s) used to identify genes
-  ExonFeature: exon                        # Feature id(s) used to identify exons
-  GeneNameAttribute: Name                  # Attribute id used to identify gene names
-  GeneNameSetAttribute: [Name,Alias]       # Attribute id(s) used to identify gene name sets
-  GeneDescriptionAttribute: description    # Attribute id(s) used to identify gene descriptions
+annotation:                                # Directives for parsing the annotation file (annotation.gff)
+  format: GFF                              # Format: GFF = Version 3 GFF file ; GTF = Version 2 GTF file
+  geneFeature: [gene, pseudogene]          # Feature id(s) used to identify genes
+  exonFeature: exon                        # Feature id(s) used to identify exons
+  geneNameAttribute: Name                  # Attribute id used to identify gene names
+  geneNameSetAttribute: [Name, Alias]      # Attribute id(s) used to identify gene name sets
+  geneDescriptionAttribute: description    # Attribute id(s) used to identify gene descriptions
 
-ExternalGeneLinks:                             # Links to external web page that will show up for each gene
-- Url: https://www.google.co.uk/search?q={Id}  # Url. {Id} will expand into the Gene ID as specified in the GFF file
-  Name: Google search                          # Display name of the link
+externalGeneLinks:
+-                                              # Links to external web page that will show up for each gene
+  url: https://www.google.co.uk/search?q={Id}  # Url. {Id} will expand into the Gene ID as specified in the GFF file
+  name: Google search                          # Display name of the link
 
 # Descriptive text that will be displayed in the genome browser section of the main page
-GenomeBrowserDescr: Some information about what is possible with the genome browser. <a class="doclink" href="genomebrowser">Read more...</a>
+genomeBrowserDescr: Some information about what is possible with the genome browser.
+  <a class="doclink" href="genomebrowser">Read more...</a>

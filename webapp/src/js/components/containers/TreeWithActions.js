@@ -62,8 +62,8 @@ let TreeWithActions = React.createClass({
   handleCrossLink() {
     const {table, tree} = this.props;
     const actions = this.getFlux().actions.panoptes;
-    const treeInfo = table && tree && this.config.tables[table].treesById[tree];
-    if (treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0])) {
+    const treeInfo = table && tree && this.config.tablesById[table].treesById[tree];
+    if (treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0])) {
       const [table, primKey] = treeInfo.crossLink.split('::');
       actions.dataItemPopup({table, primKey});
     }
@@ -84,17 +84,17 @@ let TreeWithActions = React.createClass({
   render() {
     const {sidebar, table, tree, treeType, componentUpdate} = this.props;
 
-    let tableOptions = _map(_filter(this.config.tables, (table) => table.trees.length > 0 && !table.settings.isHidden),
+    let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.trees.length > 0),
       (table) => ({
         value: table.id,
         leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
-        label: table.tableCapNamePlural
+        label: table.capNamePlural
       })
     );
 
     let treeOptions = [];
     if (table) {
-      treeOptions = _map(this.config.tables[table].trees,
+      treeOptions = _map(this.config.tablesById[table].trees,
         (tree) => ({
           value: tree.id,
           label: tree.id
@@ -109,7 +109,7 @@ let TreeWithActions = React.createClass({
       })
     );
 
-    const treeInfo = table && tree && this.config.tables[table].treesById[tree];
+    const treeInfo = table && tree && this.config.tablesById[table].treesById[tree];
 
     let sidebarContent = (
       <div className="sidebar tree-sidebar">
@@ -131,10 +131,10 @@ let TreeWithActions = React.createClass({
               options={treeOptions}
             />
             : null }
-          {treeInfo && treeInfo.crossLink && _has(this.config.tables, treeInfo.crossLink.split('::')[0]) ?
+          {treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0]) ?
             <RaisedButton onClick={this.handleCrossLink}
-                        label={`Show ${this.config.tables[treeInfo.crossLink.split('::')[0]].tableCapNameSingle}`}
-                        icon={<Icon fixedWidth={true} name={this.config.tables[treeInfo.crossLink.split('::')[0]].icon} />}
+                        label={`Show ${this.config.tablesById[treeInfo.crossLink.split('::')[0]].capNameSingle}`}
+                        icon={<Icon fixedWidth={true} name={this.config.tablesById[treeInfo.crossLink.split('::')[0]].icon} />}
             />
             : null}
           {treeInfo ?
@@ -160,7 +160,7 @@ let TreeWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">Tree {table ? `of ${this.config.tables[table].tableCapNamePlural}` : ''} </span>
+            <span className="text">Tree {table ? `of ${this.config.tablesById[table].capNamePlural}` : ''} </span>
           </div>
           <div className="grow">
             <TreeContainer {...this.props}/>

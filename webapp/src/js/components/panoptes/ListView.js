@@ -65,16 +65,16 @@ let ListView = React.createClass({
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
     let {table, autoSelectIfNoneSelected, onSelect, selectedPrimKey} = props;
-    let tableConfig = this.config.tables[table];
+    let tableConfig = this.config.tablesById[table];
 
     //Get at list of the columns we need to show the list
-    let itemTitle = tableConfig.settings.itemTitle || `{{${tableConfig.primkey}}}`;
-    let columns = templateFieldsUsed(itemTitle, _keys(tableConfig.propertiesMap));
-    columns.push(this.config.tables[table].primkey);
+    let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
+    let columns = templateFieldsUsed(itemTitle, _keys(tableConfig.propertiesById));
+    columns.push(this.config.tablesById[table].primKey);
     columns = _uniq(columns);
 
     let columnspec = {};
-    columns.map((column) => columnspec[column] = tableConfig.propertiesMap[column].defaultDisplayEncoding);
+    columns.map((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
     this.setState({loadStatus: 'loading'});
 
     let pageQueryAPIargs = {
@@ -107,7 +107,7 @@ let ListView = React.createClass({
     )
     .then(([data, rowsCount]) => {
       if (autoSelectIfNoneSelected && !selectedPrimKey) {
-        onSelect(data[0][tableConfig.primkey]);
+        onSelect(data[0][tableConfig.primKey]);
       }
       this.setState({
         loadStatus: 'loaded',
@@ -137,8 +137,8 @@ let ListView = React.createClass({
     let {icon, table, search, selectedPrimKey} = this.props;
     let {loadStatus, rows} = this.state;
 
-    let tableConfig = this.config.tables[table];
-    let itemTitle = tableConfig.settings.itemTitle || `{{${tableConfig.primkey}}}`;
+    let tableConfig = this.config.tablesById[table];
+    let itemTitle = tableConfig.itemTitle || `{{${tableConfig.primKey}}}`;
 
     if (!tableConfig) {
       console.error(`Error: table ${table} has no associated config.`);
@@ -151,7 +151,7 @@ let ListView = React.createClass({
 
       rows.map((row) => {
 
-        let primKey = row[tableConfig.primkey];
+        let primKey = row[tableConfig.primKey];
         let className = selectedPrimKey !== primKey ? 'picked' : '';
 
         let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(

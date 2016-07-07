@@ -1,68 +1,67 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
 
-NameSingle: repeat region
-NamePlural: repeat regions
-Description: Contains a number of repeat regions defined on the genome
+nameSingle: repeat region
+namePlural: repeat regions
+description: Contains a number of repeat regions defined on the genome
 
-Icon: fa-align-center
+icon: fa-align-center
 
-PrimKey: regid
-SortDefault: regionstart            # Set the start position as default sort field
+primKey: regid
+sortDefault: regionstart            # Set the start position as default sort field
 
-DisableSubsets: true  # If this flag is set, there will be no subsets option for this data table
-DisableNotes: true    # If this flag is set, no user notes can be added to items in this table
+disableSubsets: true  # If this flag is set, there will be no subsets option for this data table
+disableNotes: true    # If this flag is set, no user notes can be added to items in this table
 
 
 # The following set of tags is used to define the items in this data table as regions on the genome
-IsRegionOnGenome: true              # Tells Panoptes that this should be interpreted as genomic regions
-Chromosome: chromosome              # Speficies the table column ID that contains the chromosome
-RegionStart: regionstart            # Specifies the table column ID that contains the start position of the region
-RegionStop: regionstop              # Specifies the table column ID that contains the end position of the region
-GenomeMaxViewportSizeX: 10000000    # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
-BrowserDefaultVisible: true         # Specifies the default visibility status of this track in the genome browser
-BrowserDefaultLabel: None           # Specifies the default label that is used in the genome browser (used for genome regions; 'None' indicates that no label is displayed)
-BrowserTrackHeightFactor: 0.6       # Specifies a relative size factor for the genome browser track height
+isRegionOnGenome: true              # Tells Panoptes that this should be interpreted as genomic regions
+chromosome: chromosome              # Speficies the table column ID that contains the chromosome
+regionStart: regionstart            # Specifies the table column ID that contains the start position of the region
+regionStop: regionstop              # Specifies the table column ID that contains the end position of the region
+genomeMaxViewportSizeX: 10000000    # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
+browserDefaultVisible: true         # Specifies the default visibility status of this track in the genome browser
+browserDefaultLabel: None           # Specifies the default label that is used in the genome browser (used for genome regions; 'None' indicates that no label is displayed)
+browserTrackHeightFactor: 0.6       # Specifies a relative size factor for the genome browser track height
 
 # The following lists all the columns in the data files, and tells Panoptes how to interpret them as properties of the data items
 # NOTE: Optionally, "AutoScanProperties=true" can be used to instruct Panoptes to automatically import all datatable columns
 # Both mechanisms can be combined: further settings can still be specified for individual properties
-Properties:
+properties:
+- id: regid                      # Identifier of the property, corresponding to the column header in the [data] file
+  name: Region ID                # Display name of the property
+  description: Region Identifier # Description of the property
+  dataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
 
-- Id: regid                      # Identifier of the property, corresponding to the column header in the [data] file
-  Name: Region ID                # Display name of the property
-  Description: Region Identifier # Description of the property
-  DataType: Text                 # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLattitude, Date
+- id: chromosome
+  name: Chromosome
+  description: Chromosome name
+  dataType: Text
 
-- Id: chromosome
-  Name: Chromosome
-  Description: Chromosome name
-  DataType: Text
+- id: regionstart
+  name: Start position
+  dataType: Value
+  decimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
 
-- Id: regionstart
-  Name: Start position
-  DataType: Value
-  DecimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+- id: regionstop
+  name: Stop position
+  dataType: Value
+  decimDigits: 0
 
-- Id: regionstop
-  Name: Stop position
-  DataType: Value
-  DecimDigits: 0
+- id: length
+  name: Length
+  dataType: Value
+  decimDigits: 0
 
-- Id: length
-  Name: Length
-  DataType: Value
-  DecimDigits: 0
+- id: name
+  name: Region name
+  dataType: Text
 
-- Id: name
-  Name: Region name
-  DataType: Text
+- id: Value1, Value2, Value3  # Properties sharing the same settings can also be defined in group
+  dataType: Value
 
-- Id: Value1, Value2, Value3  # Properties sharing the same settings can also be defined in group
-  DataType: Value
-
-- Id: type
-  Name: Feature type
-  Description: An example categorical property
-  DataType: Text
-  IsCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
+- id: type
+  name: Feature type
+  description: An example categorical property
+  dataType: Text
+  isCategorical: true        # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
 

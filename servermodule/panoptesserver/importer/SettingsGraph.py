@@ -7,12 +7,12 @@ class SettingsGraph(ImportSettings):
     
     def getSettings(self):
         graphSettings = OrderedDict((
-                              ('Name', {
+                              ('name', {
                                         'type': 'Text',
                                         'required': True,
                                         'description': ''
                                         }),
-                              ('Format', {
+                              ('format', {
                                         'type': 'Text',
                                         'required': True,
                                         'description': '',
@@ -20,12 +20,12 @@ class SettingsGraph(ImportSettings):
                                                                            'description': ''
                                                                            }}
                                         }),
-                              ('Description', {
+                              ('description', {
                                         'type': 'Text',
                                         'required': True,
                                         'description': ''
                                         }),
-                              ('CrossLink', {
+                              ('crossLink', {
                                         'type': 'Text',
                                         'required': False,
                                         'default': '',

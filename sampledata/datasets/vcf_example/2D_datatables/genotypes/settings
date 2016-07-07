@@ -1,37 +1,37 @@
-NameSingle: Genotype
-NamePlural: Genotypes
+nameSingle: Genotype
+namePlural: Genotypes
 
-ColumnDataTable: variants            # The 1D data table where each entry corresponds to a column
-ColumnIndexField: AutoKey            # The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+columnDataTable: variants            # The 1D data table where each entry corresponds to a column
+columnIndexField: AutoKey            # The column name in ColumnDataTable that maps into ColumnIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
 
-RowDataTable: samples                # The 1D data table where each entry corresponds to a row
-RowIndexField: sample_id             # The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
-RowIndexArray: samples               # 1D Array in HDF5 that gives the value of RowIndexField for each row
+rowDataTable: samples                # The 1D data table where each entry corresponds to a row
+rowIndexField: sample_id             # The column name in RowDataTable that maps into RowIndexArray, note that "AutoKey" can be used if your rows do not have Unique IDs
+rowIndexArray: samples               # 1D Array in HDF5 that gives the value of RowIndexField for each row
 
 
-FirstArrayDimension: column             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
+firstArrayDimension: column             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
 
-Properties:
-    -  Id: calldata/genotype                            #Name of dataset in HDF5
-       Name: Call
-       Description: Genotype call
+properties:
+- id: calldata/genotype                                 #Name of dataset in HDF5
+  name: Call
+  description: Genotype call
 
-    -  Id: calldata/DP
-       Name: Total Depth
-       Description: Total number of reads for all alleles
-       MinVal: 0
-       MaxVal: 200
+- id: calldata/DP
+  name: Total Depth
+  description: Total number of reads for all alleles
+  minVal: 0
+  maxVal: 200  
 
-    -  Id: calldata/GQ
-       Name: Genotype Quality
-       Description: Quality of the call
-       MinVal: 0
-       MaxVal: 100
+- id: calldata/GQ
+  name: Genotype Quality
+  description: Quality of the call
+  minVal: 0
+  maxVal: 100  
 
-ShowInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
-    Call: calldata/genotype                   # Reference to property that holds the calls
+showInGenomeBrowser:                 # Requires that ColumnDataTable "IsPositionOnGenome"
+  call: calldata/genotype                     # Reference to property that holds the calls
 #    AlleleDepth: allele_depth        # Reference to property that holds allele depths, if avaliable
-    ExtraProperties:                 # Properties that will be available to map to display properties
-    - calldata/GQ
-    - calldata/DP
+  extraProperties:
+  - calldata/GQ                      # Properties that will be available to map to display properties
+  - calldata/DP
 

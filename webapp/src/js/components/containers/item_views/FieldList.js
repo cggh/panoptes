@@ -47,7 +47,7 @@ let FieldListTab = React.createClass({
     let APIargs = {
       database: this.config.dataset,
       table: table,
-      primKeyField: this.config.tables[table].primkey,
+      primKeyField: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 
@@ -83,14 +83,14 @@ let FieldListTab = React.createClass({
     let propertiesDataIndexes = {};
 
     // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tables[table].properties);
+    let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
 
     for (let i = 0; i < propertiesData.length; i++) {
       // Augment the array element (an object) with the fetched value of the property.
-      propertiesData[i].value = data[propertiesData[i].propid];
+      propertiesData[i].value = data[propertiesData[i].id];
 
       // Record which array index in propertiesData relates to which property Id.
-      propertiesDataIndexes[propertiesData[i].propid] = i;
+      propertiesDataIndexes[propertiesData[i].id] = i;
     }
 
     // Collect the propertiesData for the specified list of fields.

@@ -31,7 +31,7 @@ class ImportWorkspaces(BaseImport):
             self.setWorkspaceId(workspaceid)
             settings = self.getSettings(workspaceid)
             self._log(str(settings))
-            workspaceName = settings['Name']
+            workspaceName = settings['name']
     
             if not ImpUtils.IsDatasetPresentInServer(self._calculationObject.credentialInfo, self._datasetId):
                 raise Exception('Dataset {0} is not found. Please import the dataset first'.format(self._datasetId))
@@ -68,7 +68,7 @@ class ImportWorkspaces(BaseImport):
                     print('Removing existing workspace properties')
                     execSQL("DELETE FROM propertycatalog WHERE workspaceid='{0}' and tableid='{1}'".format(workspaceid, tabid) )
 
-                    sett = '{"CanUpdate": true, "Index": false, "ReadData": false, "showInTable": false, "Search":"None" }'
+                    sett = '{"canUpdate": true, "index": false, "readData": false, "showInTable": false, "search":"None" }'
                     cmd = "INSERT INTO propertycatalog VALUES ('{0}', 'custom', 'Boolean', 'StoredSelection', '{1}', 'Stored selection', 0, '{2}')".format(workspaceid, tabid, sett)
                     execSQL(cmd)
     
@@ -81,7 +81,7 @@ class ImportWorkspaces(BaseImport):
                         #If a view has been materialized then it's necessary to get rid of it
                         viewName = Utils.GetTableWorkspaceView(workspaceid, table['id'])
                         self._dao.dropTable(viewName, cur)
-                        Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['AllowSubSampling'], cur)
+                        Utils.UpdateTableInfoView(workspaceid, table['id'], table['settings']['allowSubSampling'], cur)
     
                 cur.commit()
     
@@ -107,7 +107,7 @@ class ImportWorkspaces(BaseImport):
             tablesInfo = self._dao.getTablesInfo(tableid)
             tableSettings = tablesInfo[0]["settings"]
             #print('Table settings= '+tableSettings)
-            if tableSettings['CacheWorkspaceData']:
+            if tableSettings['cacheWorkspaceData']:
                 print('Executing materialising')
                 cur.execute('show indexes from {0}'.format(tableid))
                 indexedColumns1 = [indexRow[4] for indexRow in cur.fetchall()]
@@ -119,7 +119,7 @@ class ImportWorkspaces(BaseImport):
                 
                 self._dao.materializeView(tableSettings, indexedColumns, wstable)
     
-                if tableSettings['AllowSubSampling']:
+                if tableSettings['allowSubSampling']:
                     print('Processing subsampling table')
                     indexedColumnsSubSampling = set(indexedColumns1 + indexedColumns2 + ['RandPrimKey'])
                     wstable = '{0}CMBSORTRAND_{1}'.format(tableid, workspaceId)

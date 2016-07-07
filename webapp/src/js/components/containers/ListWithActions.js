@@ -56,7 +56,7 @@ let ListWithActions = React.createClass({
   },
 
   componentWillMount() {
-    this.tableConfig = this.config.tables[this.props.table];
+    this.tableConfig = this.config.tablesById[this.props.table];
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -70,7 +70,7 @@ let ListWithActions = React.createClass({
   },
 
   title() {
-    return this.props.title || this.tableConfig.tableCapNamePlural;
+    return this.props.title || this.tableConfig.capNamePlural;
   },
 
   handleSelect(selectedPrimKey) {
@@ -234,7 +234,7 @@ let ListWithActions = React.createClass({
             />
             {selectedPrimKey ?
               <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
-                {this.tableConfig.settings.itemTitle || `{{${this.tableConfig.primkey}}}`}
+                {this.tableConfig.itemTitle || `{{${this.tableConfig.primKey}}}`}
               </ItemTemplate> :
             null}
           </div>

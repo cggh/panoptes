@@ -46,7 +46,7 @@ let PropertyGroupTab = React.createClass({
     let APIargs = {
       database: this.config.dataset,
       table: table,
-      primKeyField: this.config.tables[table].primkey,
+      primKeyField: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 
@@ -85,14 +85,14 @@ let PropertyGroupTab = React.createClass({
     let propertyGroupPropertiesData = [];
 
     // Make a clone of the propertiesData, which will be augmented.
-    let propertiesData = _cloneDeep(this.config.tables[table].properties);
+    let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
 
     for (let i = 0; i < propertiesData.length; i++) {
-      if (propertiesData[i].settings.groupId === propertyGroupId) {
+      if (propertiesData[i].groupId === propertyGroupId) {
         // Only collect data for the specified propertyGroup.
 
         // Augment the array element (an object) with the fetched value of the property.
-        propertiesData[i].value = data[propertiesData[i].propid];
+        propertiesData[i].value = data[propertiesData[i].id];
 
         // Push the array element (an object) into the array of propertiesData for the specified propertyGroup.
         propertyGroupPropertiesData.push(propertiesData[i]);

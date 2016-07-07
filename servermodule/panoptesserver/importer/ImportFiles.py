@@ -95,7 +95,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
-            dao.registerDataset(globalSettings['Name'], importSettings['ConfigOnly'])
+            dao.registerDataset(globalSettings['name'], importSettings['ConfigOnly'])
             
         modules.importAll('post')
 

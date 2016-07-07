@@ -81,13 +81,20 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
 Promise.all([InitialConfig(), getAppState(window.location)])
   .then((values) => {
     let [config, appState] = values;
+    console.log(config);
+    let defaultTableQueries = {};
+    let storedTableQueries = {};
+    for (const table of config.tables) {
+      defaultTableQueries[table.id] = table.defaultQuery;
+      storedTableQueries[table.id] = table.storedTableQueries;
+    }
     let stores = {
       //USE STATE FROM APPSTATE? THINK WE NEED TO REFACTOR TO SESSION SPECIFIC VS DATASET SPECIFIC VS USER SPECIFIC?
       PanoptesStore: new PanoptesStore({
         user: config.user,
         storedSubsets: config.subsets,
-        defaultTableQueries: config.defaultTableQueries,
-        storedTableQueries: config.storedTableQueries
+        defaultTableQueries: defaultTableQueries,
+        storedTableQueries: storedTableQueries
       }),
       SessionStore: new SessionStore(appState.session)
     };

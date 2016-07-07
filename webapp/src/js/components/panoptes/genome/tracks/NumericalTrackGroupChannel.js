@@ -140,12 +140,12 @@ let NumericalTrackGroupControls = React.createClass({
     this.trackGroups = Immutable.Map();
     _forEach(this.config.summaryValues, (properties, groupId) => {
       this.trackGroups = this.trackGroups.set(groupId, Immutable.fromJS({
-        name: groupId === '__reference__' ? 'Reference' : this.config.tables[groupId].tableCapNamePlural,
-        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tables[groupId].icon,
+        name: groupId === '__reference__' ? 'Reference' : this.config.tablesById[groupId].capNamePlural,
+        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tablesById[groupId].icon,
         items: _transform(properties, (result, prop) => {
             //Only numerical tracks can be added
-          if (!prop.settings.isCategorical)
-            result[prop.propid] = {
+          if (!prop.isCategorical)
+            result[prop.id] = {
               name: prop.name,
               description: prop.description,
               icon: 'line-chart',
@@ -154,7 +154,7 @@ let NumericalTrackGroupControls = React.createClass({
                 name: prop.name,
                 props: {
                   group: groupId,
-                  track: prop.propid
+                  track: prop.id
                 }
               }
             };

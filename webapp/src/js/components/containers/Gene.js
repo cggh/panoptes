@@ -23,6 +23,8 @@ import DetectResize from 'utils/DetectResize';
 import Loading from 'ui/Loading';
 import Icon from 'ui/Icon';
 
+import _forEach from 'lodash/forEach';
+
 import "genomebrowser.scss";
 
 let Gene = React.createClass({
@@ -104,32 +106,27 @@ let Gene = React.createClass({
     if (!geneData) return null;
 
     let genomePositionTableButtons = [];
-    for (let table in this.config.tables) {
-
-      // Only list tables that are not hidden.
-      if (this.config.tables[table].settings.isHidden) continue;
-
-      if (this.config.tables[table].hasGenomePositions || this.config.tables[table].hasGenomeRegions) {
+    _forEach(this.config.visibleTables, (table) => {
+      if (table.hasGenomePositions || table.isRegionOnGenome) {
         let genomePositionTableQuery = null;
-        if (this.config.tables[table].hasGenomePositions) {
+        if (table.hasGenomePositions) {
           genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.chromosome, '=', geneData['chromid']),
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.position, '>=', parseInt(geneData['fstart'])),
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.position, '<=', parseInt(geneData['fstop']))
+            SQL.WhereClause.CompareFixed(table.chromosome, '=', geneData['chromid']),
+            SQL.WhereClause.CompareFixed(table.position, '>=', parseInt(geneData['fstart'])),
+            SQL.WhereClause.CompareFixed(table.position, '<=', parseInt(geneData['fstop']))
           ]));
-        } else if (this.config.tables[table].hasGenomeRegions) {
+        } else if (table.isRegionOnGenome) {
           genomePositionTableQuery = SQL.WhereClause.encode(SQL.WhereClause.AND([
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.chromosome, '=', geneData['chromid']),
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.regionStart, '<=', parseInt(geneData['fstop'])),
-            SQL.WhereClause.CompareFixed(this.config.tables[table].settings.regionStop, '>=', parseInt(geneData['fstart']))
+            SQL.WhereClause.CompareFixed(table.chromosome, '=', geneData['chromid']),
+            SQL.WhereClause.CompareFixed(table.regionStart, '<=', parseInt(geneData['fstop'])),
+            SQL.WhereClause.CompareFixed(table.regionStop, '>=', parseInt(geneData['fstart']))
           ]));
         }
-
         let genomePositionTableButton = (
           <PopupButton key={table}
                        label={'Show ' + table + ' in ' + geneData['fname']}
-                       icon={this.config.tables[table].icon}
-                       componentPath={this.config.tables[table].settings.listView ? 'containers/ListWithActions' : 'containers/DataTableWithActions'}
+                       icon={table.icon}
+                       componentPath={table.listView ? 'containers/ListWithActions' : 'containers/DataTableWithActions'}
                        componentUpdate={componentUpdate}
                        table={table}
                        query={genomePositionTableQuery}
@@ -137,8 +134,7 @@ let Gene = React.createClass({
         );
         genomePositionTableButtons.push(genomePositionTableButton);
       }
-
-    }
+    });
 
     let externalGeneLinks = JSON.parse(this.config.settings.externalGeneLinks);
     let externalGeneLinkButtons = [];
