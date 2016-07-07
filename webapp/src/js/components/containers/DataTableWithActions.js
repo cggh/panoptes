@@ -283,10 +283,14 @@ let DataTableWithActions = React.createClass({
 
     let dataTableQuery = this.createDataTableQuery();
 
+    let filterButtonLabel = 'Change Filter';
+    let decodedQuery = SQL.WhereClause.decode(query);
+    if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={description}/>
-        <FlatButton label="Change Filter"
+        <FlatButton label={filterButtonLabel}
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/QueryPicker',
                       {

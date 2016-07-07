@@ -326,10 +326,15 @@ const PerRowIndicatorControls = React.createClass({
   render() {
     let {table, query, colourProperty} = this.props;
     let actions = this.getFlux().actions;
+
+    let filterButtonLabel = 'Change Filter';
+    let decodedQuery = SQL.WhereClause.decode(query);
+    if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
+
     return (
       <div className="channel-controls">
         <div className="control">
-          <FlatButton label="Change Filter"
+          <FlatButton label={filterButtonLabel}
                       primary={true}
                       onClick={() => actions.session.modalOpen('containers/QueryPicker',
                         {
