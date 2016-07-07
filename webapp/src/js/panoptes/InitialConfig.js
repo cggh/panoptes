@@ -19,41 +19,6 @@ function columnSpec(list) {
   return ret;
 }
 
-function caseChange(config) {
-  let out = {};
-  if (_isString(config))
-    return config;
-  _keys(config).forEach((key) => {
-    let destKey = key[0].toLowerCase() + key.slice(1);
-    let value = config[key];
-    if (Array.isArray(value)) {
-      let arr = [];
-      value.forEach((ele) => arr.push(caseChange(ele)));
-      value = arr;
-    } else if (
-      typeof value === 'object' &&
-      key !== 'chromosomes' &&
-      destKey !== 'categoryColors'
-    ) {
-      value = caseChange(value);
-    }
-    //Annoyingly we have to have these exceptions for config defined names - shouldn't be a problem when this is made server side.
-    if (
-      typeof value === 'object' &&
-      (key === 'tablesById' ||
-      key === 'twoDTablesById')
-    ) {
-      let out = {};
-      _forEach(value, (val, key) => {
-        out[key] = caseChange(val);
-      });
-      value = out;
-    }
-    out[destKey] = value;
-  });
-  return out;
-}
-
 let addRelationConfig = function (config) {
   config.tables.forEach((tableInfo) => {
     tableInfo.relationsChildOf = [];
@@ -85,7 +50,7 @@ let addTableConfig = function (config) {
     });
   }
   config.tables.forEach((table) => {
-    table.hasGenomePositions = table.IsPositionOnGenome == '1';
+    table.hasGenomePositions = table.isPositionOnGenome == '1';
     table.nameSingle = table.nameSingle || table.name;
     table.namePlural = table.namePlural || table.name;
     table.capNameSingle = table.nameSingle.charAt(0).toUpperCase() + table.nameSingle.slice(1);
@@ -353,7 +318,6 @@ let fetchInitialConfig = function () {
       })])
     )
     .then(([storedTableQueries, {config}]) => ({storedTableQueries, ...config}))
-    .then(caseChange)
     .then(addTableConfig)
     .then(addPropertyConfig)
     .then(addRelationConfig)
