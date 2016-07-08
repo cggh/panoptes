@@ -13,6 +13,9 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 // Panoptes
 import Icon from 'ui/Icon';
 
+// Lodash
+import _isEqual from 'lodash/isEqual';
+
 let Popup = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -97,10 +100,30 @@ let Popup = React.createClass({
 
   componentWillMount() {
     this.setPosition();
+
+    // Set the initial position and size of this popup in the session
+    if (this.props.onMoveStop) {
+      this.props.onMoveStop({x: this.state.position.get('x'), y: this.state.position.get('y')});
+    }
+    if (this.props.onResizeStop) {
+      this.props.onResizeStop({width: this.state.size.get('width'), height: this.state.size.get('height')});
+    }
+
   },
 
   componentDidMount() {
     this.componentDidUpdate();
+  },
+
+  componentWillReceiveProps(nextProps) {
+
+    if (!_isEqual(nextProps.initialPosition, this.props.initialPosition)) {
+      this.setState({position: nextProps.initialPosition});
+    }
+    if (!_isEqual(nextProps.initialSize, this.props.initialSize)) {
+      this.setState({size: nextProps.initialSize});
+    }
+
   },
 
   componentDidUpdate() {

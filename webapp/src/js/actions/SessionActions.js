@@ -77,6 +77,9 @@ let SessionActions = {
       table: table,
       query: query
     });
+  },
+  appResize() {
+    this.dispatch(SESSION.APP_RESIZE, {});
   }
 
 };

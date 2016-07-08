@@ -4,9 +4,14 @@ import uid from 'uid';
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
 import _isFunction from 'lodash/isFunction';
+import _isEqual from 'lodash/isEqual';
 
 const EMPTY_TAB = 'containers/EmptyTab';
 const START_TAB = 'containers/StartTab';
+
+// TODO: For app config?
+const MIN_POPUP_WIDTH_PIXELS = 200;
+const MIN_POPUP_HEIGHT_PIXELS = 150;
 
 let SessionStore = Fluxxor.createStore({
 
@@ -29,7 +34,8 @@ let SessionStore = Fluxxor.createStore({
       SESSION.TAB_POP_OUT, this.emitIfNeeded(this.tabPopOut),
       SESSION.TAB_SWITCH, this.emitIfNeeded(this.tabSwitch),
       SESSION.GENE_FOUND, this.emitIfNeeded(this.geneFound),
-      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed)
+      SESSION.TABLE_QUERY_USED, this.emitIfNeeded(this.tableQueryUsed),
+      SESSION.APP_RESIZE, this.emitIfNeeded(this.appResize)
     );
   },
 
@@ -195,6 +201,48 @@ let SessionStore = Fluxxor.createStore({
     // Remove the query from the list, if it already exists.
     // Put the query at the top of the list.
     this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table: table, query: query})));
+
+  },
+
+  appResize() {
+
+    // Trim popups
+
+    let popups = this.state.getIn(['popups', 'components']);
+
+    popups.map((compId) => {
+
+      let position = this.state.getIn(['popups', 'state', compId, 'position']);
+      let size = this.state.getIn(['popups', 'state', compId, 'size']);
+
+      if (position !== undefined && size !== undefined) {
+
+        let positionX = position.get('x');
+        let positionY = position.get('y');
+        let sizeWidth = size.get('width');
+        let sizeHeight = size.get('height');
+
+        // Trim window size to fit viewport.
+        if ((positionX + sizeWidth) >= window.innerWidth) {
+          sizeWidth = window.innerWidth - positionX - 1;
+          if (sizeWidth < MIN_POPUP_WIDTH_PIXELS) {
+            sizeWidth = MIN_POPUP_WIDTH_PIXELS;
+          }
+        }
+        if ((positionY + sizeHeight) >= window.innerHeight) {
+          sizeHeight = window.innerHeight - positionY - 1;
+          if (sizeHeight < MIN_POPUP_HEIGHT_PIXELS) {
+            sizeHeight = MIN_POPUP_HEIGHT_PIXELS;
+          }
+        }
+
+        let newSize = Immutable.Map({width: sizeWidth, height: sizeHeight});
+
+        if (!_isEqual(size, newSize)) {
+          this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], newSize);
+        }
+      }
+    });
 
   }
 
