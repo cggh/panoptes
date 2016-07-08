@@ -81,7 +81,6 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
 Promise.all([InitialConfig(), getAppState(window.location)])
   .then((values) => {
     let [config, appState] = values;
-    console.log(config);
     let defaultTableQueries = {};
     let storedTableQueries = {};
     for (const table of config.tables) {

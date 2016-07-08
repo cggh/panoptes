@@ -2,16 +2,20 @@ import React from  'react';
 import Immutable from 'immutable';
 import NotificationSystem from 'react-notification-system';
 
+// Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
+// Panoptes UI
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
+
+// Material UI
 import IconButton from 'material-ui/IconButton';
 import getMuiTheme from  'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -122,7 +126,7 @@ let Panoptes = React.createClass({
           </Modal>
           <NotificationSystem ref="notificationSystem"/>
         </div>
-        </MuiThemeProvider>
+      </MuiThemeProvider>
     );
   }
 });

@@ -1,17 +1,17 @@
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import Draggable from 'react-draggable';
+import {Resizable} from 'react-resizable';
+import 'react-resizable/css/styles.css';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-import Draggable from 'react-draggable';
-import {Resizable} from 'react-resizable';
-import 'react-resizable/css/styles.css';
+// Panoptes
 import Icon from 'ui/Icon';
-
 
 let Popup = React.createClass({
   mixins: [
@@ -73,11 +73,17 @@ let Popup = React.createClass({
     };
   },
 
-  componentWillMount() {
+  setPosition() {
+    // Depending on the current number of popups,
+    // set the position of this popup according to the wrapping-cascade pattern.
+
+    // Prevent popups overlapping by incrementally offsetting the position by the cascadePositionOffset (x, y).
+    // Prevent offset popups falling outside the viewport by starting a new cascade,
+    //   firstly at initialPosition (x, y) + cascadePositionOffset.get('x'), then at initialPosition (x, y) + (2 * cascadePositionOffset.get('x')), ...
+    // Prevent the first popup of a new cascade falling outside the viewport by restarting the cascade at initialPosition (x, y).
 
     let positionOffsetX = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('x');
     let positionOffsetY = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('y');
-
 
     let maxPopupsDown = Math.floor((window.innerHeight - this.props.initialPosition.get('y') - this.props.initialSize.get('height')) / this.props.cascadePositionOffset.get('y'));
     let maxPopupsRight = Math.floor((window.innerWidth - this.props.initialPosition.get('x') - this.props.initialSize.get('width')) / this.props.cascadePositionOffset.get('x'));
@@ -91,19 +97,17 @@ let Popup = React.createClass({
 
       positionOffsetX = positionOffsetX - (cascadeRow * (maxPopupsDown - 1) * this.props.cascadePositionOffset.get('x'));
       positionOffsetY = positionOffsetY - (cascadeRow * maxPopupsDown * this.props.cascadePositionOffset.get('y'));
-
-console.log('max num popups down: ' + maxPopupsDown);
-console.log('max num popups right: ' + maxPopupsRight);
-console.log('this.state.numberOfPopups: ' + this.state.numberOfPopups);
-console.log('cascadeRow: ' + cascadeRow);
-
     }
 
     let positionX = this.props.initialPosition.get('x') + positionOffsetX;
     let positionY = this.props.initialPosition.get('y') + positionOffsetY;
 
     this.setState({position: Immutable.Map({x: positionX, y: positionY})});
+    // TODO: persist state after refresh
+  },
 
+  componentWillMount() {
+    this.setPosition();
   },
 
   componentDidMount() {
