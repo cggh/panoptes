@@ -117,7 +117,6 @@ let Panoptes = React.createClass({
                 let initialPosition = undefined;
                 let initialSize = undefined;
                 if (state) {
-                  //let stateObj = state.toObject();
                   initialPosition = state.get('position');
                   initialSize = state.get('size');
                 }
