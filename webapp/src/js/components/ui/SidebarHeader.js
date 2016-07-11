@@ -7,7 +7,7 @@ let SidebarHeader = React.createClass({
 
   propTypes: {
     icon: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string
+    description: React.PropTypes.node
   },
 
   render() {
