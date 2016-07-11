@@ -12,6 +12,7 @@ import Loading from 'components/ui/Loading.js';
 
 import SessionStore from 'stores/SessionStore';
 import PanoptesStore from 'stores/PanoptesStore';
+import ConfigStore from 'stores/ConfigStore';
 
 import SessionActions from 'actions/SessionActions';
 import PanoptesActions from 'actions/PanoptesActions';
@@ -78,24 +79,18 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
   ;
 };
 
-Promise.all([InitialConfig(), getAppState(window.location)])
+Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]) //eslint-disable-line no-undef
   .then((values) => {
     let [config, appState] = values;
-    let defaultTableQueries = {};
-    let storedTableQueries = {};
-    for (const table of config.tables) {
-      defaultTableQueries[table.id] = table.defaultQuery;
-      storedTableQueries[table.id] = table.storedTableQueries;
-    }
     let stores = {
-      //USE STATE FROM APPSTATE? THINK WE NEED TO REFACTOR TO SESSION SPECIFIC VS DATASET SPECIFIC VS USER SPECIFIC?
       PanoptesStore: new PanoptesStore({
-        user: config.user,
-        storedSubsets: config.subsets,
-        defaultTableQueries: defaultTableQueries,
-        storedTableQueries: storedTableQueries
+        user: {
+          id: initialConfig.userID, //eslint-disable-line no-undef
+          isManager: initialConfig.isManager //eslint-disable-line no-undef
+        },
       }),
-      SessionStore: new SessionStore(appState.session)
+      SessionStore: new SessionStore(appState.session),
+      ConfigStore: new ConfigStore(config)
     };
 
     //Listen to the stores and update the URL after storing the state, when it changes.
@@ -103,7 +98,6 @@ Promise.all([InitialConfig(), getAppState(window.location)])
       let state = Immutable.Map();
       //Clear the modal as we don't want that to be stored
       state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
-      state = state.set('panoptes', stores.PanoptesStore.getState());
       return state;
     };
     let lastState = getState();
@@ -129,7 +123,6 @@ Promise.all([InitialConfig(), getAppState(window.location)])
     };
     storeState = _debounce(storeState, 250);
     stores.SessionStore.on('change', storeState);
-    stores.PanoptesStore.on('change', storeState);
 
     history.listen((location) => {
       if (location.action === 'POP') {

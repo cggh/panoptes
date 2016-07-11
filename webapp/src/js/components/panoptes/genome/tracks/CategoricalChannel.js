@@ -28,6 +28,7 @@ let CategoricalChannel = React.createClass({
         'onClose'
       ]
     }),
+    FluxMixin,
     ConfigMixin
   ],
 
@@ -85,8 +86,8 @@ let CategoricalChannel = React.createClass({
 
 let CategoricalTrack = React.createClass({
   mixins: [
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track', 'width', 'sideWidth')
   ],
 

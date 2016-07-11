@@ -44,8 +44,8 @@ let PerRowIndicatorChannel = React.createClass({
         'query'
       ]
     }),
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth', 'colourProperty')
   ],
 

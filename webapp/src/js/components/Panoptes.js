@@ -74,7 +74,7 @@ let Panoptes = React.createClass({
     let {tabs, popups, modal, components} = this.state.session.toObject();
     modal = modal.toObject();
     let userID = this.state.panoptes.getIn(['user', 'id']);
-    let config = this.getConfig();
+    let config = this.config;
     return (
       <DetectResize onResize={this.handleResize}>
         <MuiThemeProvider muiTheme={muiTheme}>

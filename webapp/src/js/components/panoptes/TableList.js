@@ -8,10 +8,12 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
 import striptags from 'striptags';
+import FluxMixin from 'mixins/FluxMixin';
 
 let TableList = React.createClass({
   mixins: [
     PureRenderMixin,
+    FluxMixin,
     ConfigMixin
   ],
 

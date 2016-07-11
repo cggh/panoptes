@@ -136,7 +136,6 @@ let QueryPicker = React.createClass({
         table: this.props.table,
         query: this.state.query,
         name: this.state.storedFilterName,
-        workspace: this.config.workspace
       }
     );
 

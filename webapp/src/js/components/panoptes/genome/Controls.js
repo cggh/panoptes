@@ -5,12 +5,14 @@ import classnames from 'classnames';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 const FALLBACK_MAXIMUM = 1000000000;
 
 let Controls = React.createClass({
   mixins: [
     PureRenderMixin,
+    FluxMixin,
     ConfigMixin
   ],
 

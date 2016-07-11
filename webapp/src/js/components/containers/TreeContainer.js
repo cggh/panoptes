@@ -18,8 +18,8 @@ import Loading from 'ui/Loading';
 let TreeContainer = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('tree', 'table')
   ],
 

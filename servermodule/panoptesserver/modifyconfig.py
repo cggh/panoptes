@@ -18,7 +18,7 @@ def response(returndata):
     except ValueError:
         length = 0
     content = json.loads((returndata['environ']['wsgi.input'].read(length)))
-    configReadWrite.writeJSONConfig(datasetId, path, content)
+    configReadWrite.writeJSONConfig(datasetId, action, path, content)
     return returndata
 
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     configReadWrite.writeJSONConfig('Samples_and_Variants', 'replace', 'tablesById.variants.storedQueries', [{'name':'BEN', 'query':'QUERY'}])
     configReadWrite.writeJSONConfig('Samples_and_Variants', 'merge', 'tablesById.variants.storedQueries', [{'name': 'BEN2', 'query': 'QUERY2'}])
     configReadWrite.writeJSONConfig('Samples_and_Variants', 'merge', 'tablesById.variants.storedQueries.1', {'name': 'BEN2mod', 'query': 'QUERY2mod'})
-    configReadWrite.writeJSONConfig('Samples_and_Variants', 'delete', 'tablesById.variants.storedQueries.1', [{'name': 'BEN2', 'query': 'QUERY2'}])
+    configReadWrite.writeJSONConfig('Samples_and_Variants', 'delete', 'tablesById.variants.storedQueries.1', None)
     configReadWrite.writeJSONConfig('Samples_and_Variants', 'replace', 'tablesById.variants.properties.0.name',
                                 'BEN')
     # configReadWrite.writeJSONConfig('Samples_and_Variants', 'replace', 'chromosomes.wat', 'BEN')

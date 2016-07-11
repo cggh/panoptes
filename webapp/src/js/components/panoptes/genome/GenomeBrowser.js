@@ -23,6 +23,7 @@ import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 import Background from 'panoptes/genome/Background';
 import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
+import FluxMixin from 'mixins/FluxMixin';
 
 const dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./tracks/' + path);
@@ -38,6 +39,7 @@ const CONTROLS_HEIGHT = 33;
 let GenomeBrowser = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({redirect: ['componentUpdate']}),
+    FluxMixin,
     ConfigMixin
   ],
 

@@ -12,8 +12,8 @@ import Formatter from 'panoptes/Formatter';
 let QueryString = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     StoreWatchMixin('PanoptesStore')
   ],
 

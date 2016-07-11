@@ -3,6 +3,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import FluxMixin from 'mixins/FluxMixin';
 
 
 const PropertySelector = React.createClass({
@@ -16,6 +17,7 @@ const PropertySelector = React.createClass({
         'value'
       ]
     }),
+    FluxMixin,
     ConfigMixin
   ],
 

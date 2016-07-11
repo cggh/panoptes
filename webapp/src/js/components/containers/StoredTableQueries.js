@@ -75,7 +75,7 @@ let StoredTableQueries = React.createClass({
 
   },
 
-  handleDelete(e, storedTableQueryId) {
+  handleDelete(e, storedTableQueryIndex) {
 
     if (!this.config.isManager) {
       console.error('handleDelete requires isManager');
@@ -89,7 +89,7 @@ let StoredTableQueries = React.createClass({
       {
         dataset: this.config.dataset,
         table: this.props.table,
-        id: storedTableQueryId
+        index: storedTableQueryIndex
       }
     );
 
@@ -104,7 +104,7 @@ let StoredTableQueries = React.createClass({
     // TODO: remove storedTableQueries (assume defined)
     if (storedTableQueries && storedTableQueries.size > 0) {
 
-      storedTableQueries.forEach((storedTableQuery) => {
+      storedTableQueries.forEach((storedTableQuery, index) => {
 
         // FIXME: IconMenu isn't showing (meantime developing using List instead).
 
@@ -122,7 +122,7 @@ let StoredTableQueries = React.createClass({
               <IconButton
                 tooltip="Delete"
                 tooltipPosition="top-left"
-                onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))}
+                onClick={(e) => this.handleDelete(e, index)}
               >
                 <Icon name={'trash-o'} inverse={false} />
               </IconButton>
@@ -132,7 +132,7 @@ let StoredTableQueries = React.createClass({
 
         let storedTableQueriesListItem = (
           <ListItem
-            key={storedTableQuery.get('id')}
+            key={index}
             primaryText={storedTableQuery.get('name')}
             secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')} /></p>}
             secondaryTextLines={2}

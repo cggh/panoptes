@@ -24,6 +24,9 @@ function _filterError(json) {
       throw Error(`Error: ${json.Error}`);
     }
   }
+  if ('issue' in json) {
+    throw Error(json.issue);
+  }
   return json;
 }
 
@@ -38,7 +41,7 @@ function errorMessage(xhr) {
   return `Error: ${xhr.statusText || xhr.message}`;
 }
 
-function requestJSON(options) {
+function requestJSON(options, method='GET') {
   let defaults = {
     url: serverURL,
     method: 'GET',
