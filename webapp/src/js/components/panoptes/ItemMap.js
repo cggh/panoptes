@@ -5,6 +5,9 @@ import {Map, Marker, Popup, TileLayer} from 'react-leaflet';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
+// CSS
+import 'leaflet.css';
+
 let ItemMap = React.createClass({
 
   mixins: [
