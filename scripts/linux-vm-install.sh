@@ -17,7 +17,7 @@ then
   curl -L https://www.opscode.com/chef/install.sh | bash
 fi
 curl -L https://github.com/cggh/panoptes-boxes/archive/master.zip > panoptes-boxes.zip
-unzip -f panoptes-boxes.zip
+unzip -o panoptes-boxes.zip
 rm panoptes-boxes.zip
 cd panoptes-boxes-master
 cd common
