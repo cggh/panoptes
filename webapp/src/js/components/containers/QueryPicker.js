@@ -67,9 +67,6 @@ let QueryPicker = React.createClass({
     };
   },
 
-  componentWillMount() {
-    this.tableConfig = this.config.tablesById[this.props.table];
-  },
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.storedFilterNameOpen) {
@@ -81,7 +78,7 @@ let QueryPicker = React.createClass({
     return 'filter';
   },
   title() {
-    return `Pick filter for ${this.tableConfig.tableNamePlural}`;
+    return `Pick filter for ${this.tableConfig().tableNamePlural}`;
   },
 
   handleEnter() {

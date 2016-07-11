@@ -40,7 +40,7 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
+  channelGroups() {
     let groups = Object.assign(
       {
         __reference__: {
@@ -126,7 +126,7 @@ let GenomeBrowserWithActions = React.createClass({
       }
     });
 
-    this.channelGroups = Immutable.fromJS(groups);
+    return Immutable.fromJS(groups);
   },
 
 
@@ -163,7 +163,7 @@ let GenomeBrowserWithActions = React.createClass({
                         title: 'Pick channels to be added',
                         itemName: 'channel',
                         itemVerb: 'add',
-                        groups: this.channelGroups,
+                        groups: this.channelGroups(),
                         onPick: this.handleChannelAdd
                       })}/>
       </div>

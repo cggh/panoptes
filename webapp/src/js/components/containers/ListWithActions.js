@@ -56,10 +56,6 @@ let ListWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
-    this.tableConfig = this.config.tablesById[this.props.table];
-  },
-
   componentDidUpdate(prevProps, prevState) {
     if (this.props.initialSearchFocus) {
       this.refs.search.focus();
@@ -67,11 +63,11 @@ let ListWithActions = React.createClass({
   },
 
   icon() {
-    return this.tableConfig.icon;
+    return this.tableConfig().icon;
   },
 
   title() {
-    return this.props.title || this.tableConfig.capNamePlural;
+    return this.props.title || this.tableConfig().capNamePlural;
   },
 
   handleSelect(selectedPrimKey) {
@@ -91,7 +87,7 @@ let ListWithActions = React.createClass({
       {
         dataset: this.config.dataset,
         table: this.props.table,
-        tableConfig: this.tableConfig,
+        tableConfig: this.tableConfig(),
         rowsCount: this.state.rowsCount,
         onLimitBreach: this.handleDownloadLimitBreach
       }
@@ -106,7 +102,7 @@ let ListWithActions = React.createClass({
 
   render() {
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
-    let {description} = this.tableConfig;
+    let {description} = this.tableConfig();
     let {search} = this.state;
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
@@ -144,7 +140,7 @@ let ListWithActions = React.createClass({
 /////////////// TODO: Adapted from PanoptesActions.js
 // TODO: Put const viewTypes into constants file?
 
-    let dataItemViews = this.tableConfig.dataItemViews;
+    let dataItemViews = this.tableConfig().dataItemViews;
 
     let views = Immutable.List();
     if (!dataItemViews) {
@@ -156,7 +152,7 @@ let ListWithActions = React.createClass({
         }
       });
 
-      if (this.tableConfig.hasGeoCoord) {
+      if (this.tableConfig().hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
           view: 'ItemMap',
@@ -236,7 +232,7 @@ let ListWithActions = React.createClass({
             />
             {selectedPrimKey ?
               <ItemTemplate className="text" table={table} primKey={selectedPrimKey}>
-                {this.tableConfig.itemTitle || `{{${this.tableConfig.primKey}}}`}
+                {this.tableConfig().itemTitle || `{{${this.tableConfig().primKey}}}`}
               </ItemTemplate> :
             null}
           </div>

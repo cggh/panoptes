@@ -7,6 +7,7 @@ let ConfigMixin = {
       throw new Error('Could not find config on this.props or this.context' + namePart);
     }
     this.config = this.getConfig();
+    this.tableConfig = () => this.config.tablesById[this.props.table];
   },
 
   childContextTypes: {
