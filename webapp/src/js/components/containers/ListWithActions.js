@@ -108,7 +108,7 @@ let ListWithActions = React.createClass({
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
     let {description} = this.tableConfig;
     let {search} = this.state;
-    let descriptionWithHTML = <HTMLWithComponents className="item-template">{description}</HTMLWithComponents>;
+    let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
       <div className="sidebar">

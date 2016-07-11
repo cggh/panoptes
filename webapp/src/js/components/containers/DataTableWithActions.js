@@ -289,7 +289,7 @@ let DataTableWithActions = React.createClass({
     let decodedQuery = SQL.WhereClause.decode(query);
     if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
 
-    let descriptionWithHTML = <HTMLWithComponents className="item-template">{description}</HTMLWithComponents>;
+    let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
       <div className="sidebar">
