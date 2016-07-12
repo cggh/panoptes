@@ -11,6 +11,10 @@ import DetectResize from 'utils/DetectResize';
 // CSS
 import 'leaflet.css';
 
+// Lodash
+import _minBy from 'lodash/minBy';
+import _maxBy from 'lodash/maxBy';
+
 let ItemMap = React.createClass({
 
   mixins: [
@@ -28,10 +32,9 @@ let ItemMap = React.createClass({
     };
   },
 
-
   // Event handlers
 
-  handleDetectResize(payload) {
+  handleDetectResize() {
     this.refs.map.leafletElement.invalidateSize();
   },
 
@@ -40,36 +43,38 @@ let ItemMap = React.createClass({
 
     // TODO: let actions = this.getFlux().actions;
 
+    let L = window.L;
+
     let mapMarkers = [];
 
-    if (markers.length == 1) {
+    let bounds = undefined;
 
-      // If there is only one marker,
-      // then set the map's center to the coordinates of that marker,
-      // and zoom in.
-      center = {lat: markers[0].lat, lng: markers[0].lng};
-      zoom = 4;
+    if (markers.length >= 1) {
+
+      let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
+      let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
+
+      bounds = L.latLngBounds(northWest, southEast);
     }
 
     for (let i = 0, len = markers.length; i < len; i++) {
 
       // Create a new marker at the given position.
 
-      // TODO: NOT isHighlighted
-      // icon: {
-      //   path: this.maps.SymbolPath.CIRCLE,
-      //   fillColor: '#F26C6C',
-      //   fillOpacity: 1,
-      //   scale: 4,
-      //   strokeColor: '#BC0F0F',
-      //   strokeWeight: 1
-      // }
+        // path: this.maps.SymbolPath.CIRCLE,
+        // fillColor: '#F26C6C',
+        // fillOpacity: 1,
+        // scale: 4,
+        // strokeColor: '#BC0F0F',
+        // strokeWeight: 1
+
+      let icon = markers[i].isHighlighted || len === 1 ? undefined : L.divIcon({html: '<span>hello</span>'});
 
       let mapMarker = (
         <Marker
           key={i}
           position={{lat: markers[i].lat, lng: markers[i].lng}}
-          isHighlighted={markers[i].isHighlighted}
+          icon={icon}
         >
           <Popup>
             <span>{markers[i].title}</span>
@@ -86,8 +91,6 @@ let ItemMap = React.createClass({
     const TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
     const TileLayerAttribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
 
-    // TODO: Shorten Map height by height of top-bar.
-
     return (
       <DetectResize onResize={this.handleDetectResize}>
         <Map
@@ -95,6 +98,7 @@ let ItemMap = React.createClass({
           center={center}
           zoom={zoom}
           style={{height: '100%', width: '100%'}}
+          bounds={bounds}
         >
           <TileLayer
             url={TileLayerUrl}
