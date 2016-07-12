@@ -74,13 +74,13 @@ let DataItemActions = React.createClass({
       treeTable.trees.forEach((tree) => {
         if (crossLink === tree.crossLink) {
           treeLinks.push(<PopupButton label={`Show associated ${this.config.tablesById[treeTable.id].capNameSingle} tree`}
-                                        icon="tree"
-                                        componentPath="containers/TreeWithActions"
-                                        table={treeTable.id}
-                                        tree={tree.id}
-                                        key={tree.id}
-              />
-            );
+                                      icon="tree"
+                                      componentPath="containers/TreeWithActions"
+                                      table={treeTable.id}
+                                      tree={tree.id}
+                                      key={tree.id}
+            />
+          );
         }
       });
     });
