@@ -1,24 +1,23 @@
 import React from 'react';
 import _cloneDeep from 'lodash/cloneDeep';
-
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-// Utils
-import LRUCache from 'util/LRUCache';
-
 // Panoptes components
 import API from 'panoptes/API';
 import PropertyList from 'panoptes/PropertyList';
 import ErrorReport from 'panoptes/ErrorReporter';
 
+// Utils
+import LRUCache from 'util/LRUCache';
+
 // UI components
 import Loading from 'ui/Loading';
 
-let FieldListTab = React.createClass({
+let PropertyGroupWidget = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -31,7 +30,7 @@ let FieldListTab = React.createClass({
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
-    fields: React.PropTypes.arrayOf(React.PropTypes.string),
+    propertyGroupId: React.PropTypes.string,
     className: React.PropTypes.string
   },
 
@@ -77,39 +76,34 @@ let FieldListTab = React.createClass({
   },
 
   render() {
-    let {table, fields, className} = this.props;
+    let {table, propertyGroupId, className} = this.props;
     let {data, loadStatus} = this.state;
 
     if (!data) return null;
 
-    let propertiesDataIndexes = {};
+    if (!propertyGroupId) return null;
+
+    // Collect the propertiesData for the specified propertyGroup.
+    let propertyGroupPropertiesData = [];
 
     // Make a clone of the propertiesData, which will be augmented.
     let propertiesData = _cloneDeep(this.config.tablesById[table].properties);
 
     for (let i = 0; i < propertiesData.length; i++) {
-      // Augment the array element (an object) with the fetched value of the property.
-      propertiesData[i].value = data[propertiesData[i].id];
+      if (propertiesData[i].groupId === propertyGroupId) {
+        // Only collect data for the specified propertyGroup.
 
-      // Record which array index in propertiesData relates to which property Id.
-      propertiesDataIndexes[propertiesData[i].id] = i;
-    }
+        // Augment the array element (an object) with the fetched value of the property.
+        propertiesData[i].value = data[propertiesData[i].id];
 
-    // Collect the propertiesData for the specified list of fields.
-    let fieldListPropertiesData = [];
-    fields.forEach((field) => {
-      let propertiesDataIndex = propertiesDataIndexes[field];
-      if (typeof propertiesDataIndex !== 'undefined') {
-        fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
-      } else {
-        console.log('Foreign property: ' + field);
+        // Push the array element (an object) into the array of propertiesData for the specified propertyGroup.
+        propertyGroupPropertiesData.push(propertiesData[i]);
       }
-    });
-
+    }
 
     return (
         <div>
-          <PropertyList propertiesData={fieldListPropertiesData} className={className} />
+          <PropertyList propertiesData={propertyGroupPropertiesData} className={className} />
           <Loading status={loadStatus}/>
         </div>
     );
@@ -117,4 +111,4 @@ let FieldListTab = React.createClass({
 
 });
 
-module.exports = FieldListTab;
+module.exports = PropertyGroupWidget;
