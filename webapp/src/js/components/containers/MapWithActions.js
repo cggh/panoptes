@@ -141,7 +141,9 @@ let MapWithActions = React.createClass({
               </span>
               : null}
           </div>
-          {table ? <ItemMap {...this.props}  /> : 'Pick a table'}
+          <div className="vertical stack">
+            {table ? <ItemMap {...this.props}  /> : 'Pick a table'}
+          </div>
         </div>
       </Sidebar>
     );
