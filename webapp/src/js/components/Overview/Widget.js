@@ -18,7 +18,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 // UI components
 import Loading from 'ui/Loading';
 
-let OverviewTab = React.createClass({
+let OverviewWidget = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -98,4 +98,4 @@ let OverviewTab = React.createClass({
 
 });
 
-module.exports = OverviewTab;
+module.exports = OverviewWidget;

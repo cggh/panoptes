@@ -19,7 +19,7 @@ import Icon from 'ui/Icon';
 // Panoptes
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
-import DataItem from 'containers/DataItem';
+import DataItemWidget from 'DataItem/Widget';
 import DataDownloader from 'utils/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
@@ -157,7 +157,7 @@ let ListWithActions = React.createClass({
       if (this.tableConfig().hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
-          view: 'ItemMap',
+          view: 'Map',
           props: {
             title: 'Location'
           }
@@ -181,7 +181,7 @@ let ListWithActions = React.createClass({
             }
           }),
           ItemMap: () => ({
-            view: 'ItemMap',
+            view: 'Map',
             props: {
               title: dataItemView.name
             }
@@ -217,7 +217,7 @@ let ListWithActions = React.createClass({
 
     let dataItem = '';
     if (selectedPrimKey) {
-      dataItem = <DataItem views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
+      dataItem = <DataItemWidget views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
     }
 
     return (

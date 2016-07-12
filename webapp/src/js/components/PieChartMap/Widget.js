@@ -24,7 +24,7 @@ import Loading from 'ui/Loading';
 const RESIDUAL_SECTOR_COLOR = 'rgb(191,191,191)';
 
 
-let PieChartMapTab = React.createClass({
+let PieChartMapWidget = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -207,4 +207,4 @@ let PieChartMapTab = React.createClass({
 
 });
 
-module.exports = PieChartMapTab;
+module.exports = PieChartMapWidget;

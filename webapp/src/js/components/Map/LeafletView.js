@@ -15,7 +15,7 @@ import 'leaflet.css';
 import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
 
-let ItemMap = React.createClass({
+let MapLeafletView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -44,48 +44,51 @@ let ItemMap = React.createClass({
     // TODO: let actions = this.getFlux().actions;
 
     let L = window.L;
-
-    let mapMarkers = [];
-
+    let mapMarkers = undefined;
     let bounds = undefined;
 
-    if (markers.length >= 1) {
+    if (markers !== undefined) {
 
-      let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
-      let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
+      if (markers.length >= 1) {
 
-      bounds = L.latLngBounds(northWest, southEast);
-    }
+        let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
+        let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
 
-    for (let i = 0, len = markers.length; i < len; i++) {
+        bounds = L.latLngBounds(northWest, southEast);
+      }
 
-      // Create a new marker at the given position.
+      mapMarkers = [];
 
-        // path: this.maps.SymbolPath.CIRCLE,
-        // fillColor: '#F26C6C',
-        // fillOpacity: 1,
-        // scale: 4,
-        // strokeColor: '#BC0F0F',
-        // strokeWeight: 1
+      for (let i = 0, len = markers.length; i < len; i++) {
 
-      let icon = markers[i].isHighlighted || len === 1 ? undefined : L.divIcon({html: '<span>hello</span>'});
+        // Create a new marker at the given position.
 
-      let mapMarker = (
-        <Marker
-          key={i}
-          position={{lat: markers[i].lat, lng: markers[i].lng}}
-          icon={icon}
-        >
-          <Popup>
-            <span>{markers[i].title}</span>
-          </Popup>
-        </Marker>
-      );
+          // path: this.maps.SymbolPath.CIRCLE,
+          // fillColor: '#F26C6C',
+          // fillOpacity: 1,
+          // scale: 4,
+          // strokeColor: '#BC0F0F',
+          // strokeWeight: 1
 
-      // TODO: mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()}));
+        let icon = markers[i].isHighlighted || len === 1 ? undefined : L.divIcon({html: '<span>hello</span>'});
 
-      mapMarkers.push(mapMarker);
+        let mapMarker = (
+          <Marker
+            key={i}
+            position={{lat: markers[i].lat, lng: markers[i].lng}}
+            icon={icon}
+          >
+            <Popup>
+              <span>{markers[i].title}</span>
+            </Popup>
+          </Marker>
+        );
 
+        // TODO: mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()}));
+
+        mapMarkers.push(mapMarker);
+
+      }
     }
 
     const TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
@@ -113,4 +116,4 @@ let ItemMap = React.createClass({
 
 });
 
-module.exports = ItemMap;
+module.exports = MapLeafletView;

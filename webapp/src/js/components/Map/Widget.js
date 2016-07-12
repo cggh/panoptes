@@ -10,13 +10,13 @@ import LRUCache from 'util/LRUCache';
 
 // Panoptes components
 import API from 'panoptes/API';
-import ItemMap from 'panoptes/ItemMap';
+import MapView from 'Map/LeafletView';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
 import Loading from 'ui/Loading';
 
-let ItemMapWidget = React.createClass({
+let MapWidget = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -53,7 +53,7 @@ let ItemMapWidget = React.createClass({
   },
 
   fetchData(props, requestContext) {
-
+//FIXME: Initial load from ListWithActions (default 1st selected) > DataItemWidget, isn't showing marker.
     let {table, primKey, lngProperty, latProperty, highlight} = props;
 
     let locationTableConfig = this.config.tablesById[table];
@@ -188,13 +188,14 @@ let ItemMapWidget = React.createClass({
         });
       })
       .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled)
-      .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        this.setState({
-          loadStatus: 'error'
-        });
-      });
+      .catch(LRUCache.filterCancelled);
+      // FIXME:
+      // .catch((error) => {
+      //   ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+      //   this.setState({
+      //     loadStatus: 'error'
+      //   });
+      // });
   },
 
   title() {
@@ -207,7 +208,7 @@ let ItemMapWidget = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: width, height: height}}>
-          <ItemMap
+          <MapView
             center={center}
             zoom={zoom}
             markers={markers}
@@ -220,4 +221,4 @@ let ItemMapWidget = React.createClass({
 
 });
 
-module.exports = ItemMapWidget;
+module.exports = MapWidget;

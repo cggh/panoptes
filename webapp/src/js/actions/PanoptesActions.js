@@ -13,11 +13,10 @@ const PanoptesActions = (config) => ({
           title: 'Overview'
         }
       });
-
       if (config.tablesById[table].hasGeoCoord) {
-        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
+        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing a Map
         views.push({
-          view: 'ItemMap',
+          view: 'Map',
           props: {
             title: 'Location'
           }
@@ -40,8 +39,8 @@ const PanoptesActions = (config) => ({
               chartConfig: dataItemView
             }
           }),
-          ItemMap: () => ({
-            view: 'ItemMap',
+          Map: () => ({
+            view: 'Map',
             props: {
               title: dataItemView.name
             }
@@ -75,7 +74,7 @@ const PanoptesActions = (config) => ({
 
     this.dispatch(SESSION.POPUP_OPEN, {
       component: {
-        component: 'containers/DataItem',
+        component: 'DataItem/Widget',
         props: {table, primKey, views}
       },
       switchTo: switchTo
