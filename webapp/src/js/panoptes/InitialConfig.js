@@ -70,6 +70,7 @@ let addTableConfig = function (config) {
     });
     if (table.defaultQuery === '')
       table.defaultQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+    table.trees = table.trees || [];
   });
   return config;
 };

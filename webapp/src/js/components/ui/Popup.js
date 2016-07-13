@@ -1,17 +1,20 @@
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import Draggable from 'react-draggable';
+import {Resizable} from 'react-resizable';
+import 'react-resizable/css/styles.css';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-import Draggable from 'react-draggable';
-import {Resizable} from 'react-resizable';
-import 'react-resizable/css/styles.css';
+// Panoptes
 import Icon from 'ui/Icon';
 
+// Lodash
+import _isEqual from 'lodash/isEqual';
 
 let Popup = React.createClass({
   mixins: [
@@ -52,7 +55,7 @@ let Popup = React.createClass({
         height: 500
       }),
       cascadePositionOffset: Immutable.Map({
-        x: 10,
+        x: 20,
         y: 20
       })
     };
@@ -73,17 +76,54 @@ let Popup = React.createClass({
     };
   },
 
+  setPosition() {
+    // Depending on the current number of popups,
+    // set the position of this popup according to a repeating cascade pattern.
+
+    // Prevent popups from overlapping by incrementally offsetting the position by the cascadePositionOffset (x, y).
+    // Prevent offset popups from falling outside the viewport by restarting the cascade from initialPosition (x, y).
+
+    let maxPopupsDown = Math.floor((window.innerHeight - this.props.initialPosition.get('y') - this.props.initialSize.get('height')) / this.props.cascadePositionOffset.get('y'));
+    let maxPopupsUp = Math.floor((window.innerWidth - this.props.initialPosition.get('x') - this.props.initialSize.get('width')) / this.props.cascadePositionOffset.get('x'));
+
+    let numberOfOffsets = (this.state.numberOfPopups - 1) % Math.min(maxPopupsDown, maxPopupsUp);
+    let positionX = this.props.initialPosition.get('x') + (numberOfOffsets * this.props.cascadePositionOffset.get('x'));
+    let positionY = this.props.initialPosition.get('y') + (numberOfOffsets * this.props.cascadePositionOffset.get('y'));
+
+    this.setState({position: Immutable.Map({x: positionX, y: positionY})});
+
+    // TODO: persist popup position in session
+    if (this.props.onMoveStop) {
+      this.props.onMoveStop({x: positionX, y: positionY});
+    }
+  },
+
   componentWillMount() {
+    this.setPosition();
 
-    let positionOffsetX = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('x');
-    let positionOffsetY = (this.state.numberOfPopups - 1) * this.props.cascadePositionOffset.get('y');
-
-    this.setState({position: Immutable.Map({x: this.props.initialPosition.get('x') + positionOffsetX, y: this.props.initialPosition.get('y') + positionOffsetY})});
+    // Set the initial position and size of this popup in the session
+    if (this.props.onMoveStop) {
+      this.props.onMoveStop({x: this.state.position.get('x'), y: this.state.position.get('y')});
+    }
+    if (this.props.onResizeStop) {
+      this.props.onResizeStop({width: this.state.size.get('width'), height: this.state.size.get('height')});
+    }
 
   },
 
   componentDidMount() {
     this.componentDidUpdate();
+  },
+
+  componentWillReceiveProps(nextProps) {
+
+    if (!_isEqual(nextProps.initialPosition, this.props.initialPosition)) {
+      this.setState({position: nextProps.initialPosition});
+    }
+    if (!_isEqual(nextProps.initialSize, this.props.initialSize)) {
+      this.setState({size: nextProps.initialSize});
+    }
+
   },
 
   componentDidUpdate() {

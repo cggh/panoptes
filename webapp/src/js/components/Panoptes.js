@@ -2,16 +2,20 @@ import React from  'react';
 import Immutable from 'immutable';
 import NotificationSystem from 'react-notification-system';
 
+// Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
+// Panoptes UI
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
+
+// Material UI
 import IconButton from 'material-ui/IconButton';
 import getMuiTheme from  'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -19,6 +23,9 @@ import {
   blue500, blue700,
   pinkA200,
 } from 'material-ui/styles/colors';
+
+// Panoptes utils
+import DetectResize from 'utils/DetectResize';
 
 import 'font-awesome.css';
 import 'ui-components.scss';
@@ -58,6 +65,10 @@ let Panoptes = React.createClass({
     };
   },
 
+  handleResize() {
+    this.getFlux().actions.session.appResize();
+  },
+
   render() {
     let actions = this.getFlux().actions.session;
     let {tabs, popups, modal, components} = this.state.session.toObject();
@@ -65,64 +76,75 @@ let Panoptes = React.createClass({
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.getConfig();
     return (
-      <MuiThemeProvider muiTheme={muiTheme}>
-        <div>
-          <div className="loading-container">
-            <div className="spinner" />
-          </div>
-          <div className="page">
-            <Header name={config.settings.name} userID={userID} logo={config.logo}/>
-            <div className="body">
-              <TabbedArea activeTab={tabs.get('selectedTab')}
-                          unclosableTab={tabs.get('unclosableTab')}
-                          onSwitch={actions.tabSwitch}
-                          onClose={actions.tabClose}
-                          onAddTab={actions.tabOpen}
-                          onDragAway={actions.tabPopOut}
-              >
-                {tabs.get('components').map((compId) => {
-                  let tab = components.get(compId).toObject();
-                  let props = tab.props ? tab.props.toObject() : {};
-                  props.componentUpdate = actions.componentUpdateFor(compId);
-                  return (
-                    <TabPane
-                      compId={compId}
-                      key={compId}>
-                      {React.createElement(dynamicRequire(tab.component), props)}
-                    </TabPane>
-                  );
-                })}
-              </TabbedArea>
+      <DetectResize onResize={this.handleResize}>
+        <MuiThemeProvider muiTheme={muiTheme}>
+          <div>
+            <div className="loading-container">
+              <div className="spinner" />
             </div>
+            <div className="page">
+              <Header name={config.settings.name} userID={userID} logo={config.logo}/>
+              <div className="body">
+                <TabbedArea activeTab={tabs.get('selectedTab')}
+                            unclosableTab={tabs.get('unclosableTab')}
+                            onSwitch={actions.tabSwitch}
+                            onClose={actions.tabClose}
+                            onAddTab={actions.tabOpen}
+                            onDragAway={actions.tabPopOut}
+                >
+                  {tabs.get('components').map((compId) => {
+                    let tab = components.get(compId).toObject();
+                    let props = tab.props ? tab.props.toObject() : {};
+                    props.componentUpdate = actions.componentUpdateFor(compId);
+                    return (
+                      <TabPane
+                        compId={compId}
+                        key={compId}>
+                        {React.createElement(dynamicRequire(tab.component), props)}
+                      </TabPane>
+                    );
+                  })}
+                </TabbedArea>
+              </div>
+            </div>
+            <Popups>
+              {popups.get('components').map((compId) => {
+                let popup = components.get(compId).toObject();
+                let props = popup.props ? popup.props.toObject() : {};
+                props.componentUpdate = actions.componentUpdateFor(compId);
+                let state = popups.getIn(['state', compId]);
+
+                let initialPosition = undefined;
+                let initialSize = undefined;
+                if (state) {
+                  initialPosition = state.get('position');
+                  initialSize = state.get('size');
+                }
+
+                return (
+                  <Popup
+                    initialPosition={initialPosition}
+                    initialSize={initialSize}
+                    compId={compId}
+                    key={compId}
+                    onMoveStop={actions.popupMove.bind(this, compId)}
+                    onResizeStop={actions.popupResize.bind(this, compId)}
+                    onClose={actions.popupClose.bind(this, compId)}
+                    onMaximise={actions.popupToTab.bind(this, compId)}
+                    onClick={actions.popupFocus.bind(this, compId)}>
+                    {React.createElement(dynamicRequire(popup.component), props)}
+                  </Popup>
+                );
+              })}
+            </Popups>
+            <Modal visible={modal.component ? true : false}
+                   onClose={actions.modalClose}>
+              {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
+            </Modal>
+            <NotificationSystem ref="notificationSystem"/>
           </div>
-          <Popups>
-            {popups.get('components').map((compId) => {
-              let popup = components.get(compId).toObject();
-              let props = popup.props ? popup.props.toObject() : {};
-              props.componentUpdate = actions.componentUpdateFor(compId);
-              let state = popups.getIn(['state', compId]) || Immutable.Map();
-              return (
-                <Popup
-                  {...state.toObject()}
-                  compId={compId}
-                  key={compId}
-                  onMoveStop={actions.popupMove.bind(this, compId)}
-                  onResizeStop={actions.popupResize.bind(this, compId)}
-                  onClose={actions.popupClose.bind(this, compId)}
-                  onMaximise={actions.popupToTab.bind(this, compId)}
-                  onClick={actions.popupFocus.bind(this, compId)}>
-                  {React.createElement(dynamicRequire(popup.component), props)}
-                </Popup>
-              );
-            })}
-          </Popups>
-          <Modal visible={modal.component ? true : false}
-                 onClose={actions.modalClose}>
-            {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
-          </Modal>
-          <NotificationSystem ref="notificationSystem"/>
-        </div>
         </MuiThemeProvider>
+      </DetectResize>
     );
   }
 });
