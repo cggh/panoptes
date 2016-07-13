@@ -22,6 +22,7 @@ import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
 import DataItem from 'containers/DataItem';
 import DataDownloader from 'utils/DataDownloader';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 
 let ListWithActions = React.createClass({
@@ -107,11 +108,12 @@ let ListWithActions = React.createClass({
     let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
     let {description} = this.tableConfig;
     let {search} = this.state;
+    let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
       <div className="sidebar">
         <div className="item-picker">
-          <SidebarHeader icon={this.icon()} description={description}/>
+          <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
           <FlatButton label="Download data"
                       primary={true}
                       onClick={() => this.handleDownload()}

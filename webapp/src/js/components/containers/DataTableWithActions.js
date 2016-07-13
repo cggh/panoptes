@@ -30,6 +30,7 @@ import DataTableView from 'panoptes/DataTableView';
 import QueryString from 'panoptes/QueryString';
 import SQL from 'panoptes/SQL';
 import DataDownloader from 'utils/DataDownloader';
+import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -288,9 +289,11 @@ let DataTableWithActions = React.createClass({
     let decodedQuery = SQL.WhereClause.decode(query);
     if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
 
+    let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
+
     let sidebarContent = (
       <div className="sidebar">
-        <SidebarHeader icon={this.icon()} description={description}/>
+        <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
         <FlatButton label={filterButtonLabel}
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/QueryPicker',
