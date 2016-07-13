@@ -17,8 +17,10 @@ def response(returndata):
         length = int(returndata['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:
         length = 0
-    content = json.loads((returndata['environ']['wsgi.input'].read(length)))
+    content = returndata['environ']['wsgi.input'].read(length)
+    content = json.loads(content) if len(content) > 0 else None
     configReadWrite.writeJSONConfig(datasetId, action, path, content)
+    returndata['config'] = configReadWrite.readJSONConfig(returndata['dataset'])
     return returndata
 
 

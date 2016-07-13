@@ -84,10 +84,7 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     let [config, appState] = values;
     let stores = {
       PanoptesStore: new PanoptesStore({
-        user: {
-          id: initialConfig.userID, //eslint-disable-line no-undef
-          isManager: initialConfig.isManager //eslint-disable-line no-undef
-        },
+        storedSubsets: {}
       }),
       SessionStore: new SessionStore(appState.session),
       ConfigStore: new ConfigStore(config)

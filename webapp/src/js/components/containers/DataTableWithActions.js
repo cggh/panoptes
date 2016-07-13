@@ -53,7 +53,7 @@ let DataTableWithActions = React.createClass({
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.NullQuery,
+      query: SQL.nullQuery,
       order: null,
       ascending: true,
       columnWidths: Immutable.Map(),

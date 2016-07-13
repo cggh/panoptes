@@ -65,7 +65,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   getDefaultProps() {
     return {
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: SQL.nullQuery
     };
   },
 

@@ -62,7 +62,7 @@ let DataTableView = React.createClass({
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+      query: SQL.nullQuery,
       order: null,
       ascending: true,
       startRowIndex: 0,

@@ -629,8 +629,13 @@ SQL.WhereClause.encode = function(whc) {
 
 //Decodes astring encoded whereclause object and returns the whereclause
 SQL.WhereClause.decode = function(st) {
-  st = Base64.decode(st);
-  let tree = JSON.parse(st);
+  let tree = Base64.decode(st);
+  try {
+    tree = JSON.parse(tree);
+  } catch (e) {
+    console.error("Bad query - can't parse. Using null query");
+    return SQL.WhereClause.Trivial();
+  }
   function makeCompatible(parent, component) {
     //Need to keep compatibility... rename a few things for sanity
     component.components = (component.Components === undefined) ? component.components : component.Components;
@@ -774,6 +779,6 @@ SQL.TableSort = function(icollist) {
   return that;
 };
 
-SQL.NullQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+SQL.nullQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
 
 module.exports = SQL;

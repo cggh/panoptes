@@ -84,7 +84,7 @@ let PerRowScaledSVGChannel = React.createClass({
       interpolation: 'step',
       autoYScale: true,
       tension: 0.5,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: SQL.nullQuery
     };
   },
 

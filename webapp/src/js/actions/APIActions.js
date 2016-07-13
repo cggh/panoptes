@@ -3,6 +3,7 @@ const APICONST = Constants.API;
 import API from 'panoptes/API';
 
 import ErrorReport from 'panoptes/ErrorReporter.js';
+import {assertRequired} from 'util/Assert';
 
 let APIActions = {
   fetchUser(dataset) {
@@ -63,10 +64,14 @@ let APIActions = {
       });
   },
 
-  modifyConfig(payload) {
-
-    let {dataset, path, action, content} = payload;
-
+  //Action is replace, merge or delete
+  modifyConfig(options) {
+    assertRequired(options, ['dataset', 'path']);
+    let defaults = {
+      action: 'replace',
+      content: null
+    };
+    let {dataset, path, action, content} = {...defaults, ...options};
     this.dispatch(APICONST.MODIFY_CONFIG);
     API.modifyConfig(
       {

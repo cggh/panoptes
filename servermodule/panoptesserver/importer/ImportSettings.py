@@ -289,7 +289,7 @@ class ImportSettings:
             if self._logLevel:
                 self._log('Loading settings from: '+fileName)
 
-            with open(self.fileName, 'r') as configfile:
+            with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
                 try:
                     self._settings = yaml.load(configfile.read())
                     

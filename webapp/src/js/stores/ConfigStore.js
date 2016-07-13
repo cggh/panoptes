@@ -20,7 +20,7 @@ const ConfigStore = Fluxxor.createStore({
 
   modifyConfigSuccess(payload) {
     const {newConfig} = payload;
-    this.state = this.addDerivedConfig(newConfig);
+    this.state = {...this.state, ...this.addDerivedConfig(newConfig)};
     this.emit('change');
   },
 
@@ -93,7 +93,7 @@ const ConfigStore = Fluxxor.createStore({
         group.properties = []; //Added later in addPropertyConfig
       });
       if (table.defaultQuery === '')
-        table.defaultQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+        table.defaultQuery = SQL.nullQuery;
       table.trees = table.trees || [];
     });
     return config;

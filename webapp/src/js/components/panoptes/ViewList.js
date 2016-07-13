@@ -36,7 +36,7 @@ let ViewList = React.createClass({
     return (
       <List style={this.props.style}>
         <Subheader>Open a view:</Subheader>
-        {this.config.isManager ?
+        {this.config.user.isManager ?
           <ListItem primaryText="Dataset Manager"
                     secondaryText="Import and configure datasets"
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}

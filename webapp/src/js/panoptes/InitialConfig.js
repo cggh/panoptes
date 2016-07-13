@@ -2,6 +2,7 @@ import API from 'panoptes/API';
 
 //TODO CONFIG SHOULD BE COMPILED SERVER SIDE AND SENT DOWN IN INDEX.HTML, NOT AJAXED IN
 let fetchInitialConfig = function (dataset) {
+  let isManager = false;
   return API.requestJSON({
     params: {
       datatype: 'custom',
@@ -15,7 +16,7 @@ let fetchInitialConfig = function (dataset) {
         console.log('Schema full reload');
       if (resp.needconfigreload)
         console.log('Schema config reload');
-      initialConfig.isManager = resp.manager; //eslint-disable-line no-undef
+      isManager = resp.manager; //eslint-disable-line no-undef
     })
     .then(() => API.requestJSON({
         params: {
@@ -25,7 +26,7 @@ let fetchInitialConfig = function (dataset) {
           dataset
         }
       }))
-    .then((resp) => ({dataset, ...resp.config}));
+    .then((resp) => ({dataset, user:{isManager}, ...resp.config}));
 };
 
 module.exports = fetchInitialConfig;

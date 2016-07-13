@@ -54,7 +54,7 @@ let PlotWithActions = React.createClass({
 
   getDefaultProps() {
     return {
-      query: SQL.NullQuery,
+      query: SQL.nullQuery,
       componentUpdate: null,
       sidebar: true
     };
@@ -116,7 +116,7 @@ let PlotWithActions = React.createClass({
       clearFilterButton = <FlatButton
                                 label="Clear Filter"
                                 primary={true}
-                                onClick={() => componentUpdate({query: SQL.NullQuery})}
+                                onClick={() => componentUpdate({query: SQL.nullQuery})}
                               />;
     }
 

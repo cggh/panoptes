@@ -8,7 +8,7 @@ const MAX_DOWNLOAD_DATA_POINTS = 100000;
 function downloadTableData(payload) {
 
   let defaults = {
-    query: SQL.NullQuery,
+    query: SQL.nullQuery,
     ascending: true
   };
 
