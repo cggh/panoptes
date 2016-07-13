@@ -7,6 +7,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
+import striptags from 'striptags';
 
 let TableList = React.createClass({
   mixins: [
@@ -42,7 +43,7 @@ let TableList = React.createClass({
           this.config.tablesById[table.id].isHidden ? null :
           <ListItem key={table.id}
                     primaryText={table.capNamePlural}
-                    secondaryText={table.description}
+                    secondaryText={striptags(table.description)}
                     leftIcon={<div><Icon fixedWidth={true} name={table.icon}/></div>}
                     onClick={(e) => this.handleTableClick(e, table)} />
         ))}
