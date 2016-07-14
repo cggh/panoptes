@@ -17,6 +17,11 @@ let ConfigMixin = {
 
   },
 
+  componentWillUnmount: function() {
+    let flux = this.props.flux || (this.context && this.context.flux);
+    flux.store('ConfigStore').removeListener('change', this._setStateFromFlux);
+  },
+
   _setConfigFromFlux: function() {
     let flux = this.props.flux || (this.context && this.context.flux);
     this.config = flux.store('ConfigStore').getState();
