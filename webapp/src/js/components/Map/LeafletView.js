@@ -63,14 +63,18 @@ let MapLeafletView = React.createClass({
 
         // Create a new marker at the given position.
 
-          // path: this.maps.SymbolPath.CIRCLE,
-          // fillColor: '#F26C6C',
-          // fillOpacity: 1,
-          // scale: 4,
-          // strokeColor: '#BC0F0F',
-          // strokeWeight: 1
+        // Give this marker a big icon if it isHighlighted or if there is only one marker.
+        // Otherwise, give this marker a small icon.
 
-        let icon = markers[i].isHighlighted || len === 1 ? undefined : L.divIcon({html: '<span>hello</span>'});
+        // path: this.maps.SymbolPath.CIRCLE,
+        // fillColor: '#F26C6C',
+        // fillOpacity: 1,
+        // scale: 4,
+        // strokeColor: '#BC0F0F',
+        // strokeWeight: 1
+
+
+        let icon = (markers[i].isHighlighted || len === 1) ? undefined : L.divIcon({html: '<span>hello</span>'});
 
         let mapMarker = (
           <Marker
