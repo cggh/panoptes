@@ -31,7 +31,7 @@ let QueryString = React.createClass({
   },
 
   render() {
-    let {query, prepend, ...other} = this.props;
+    let {query, prepend, table, ...other} = this.props;
     let qry = SQL.WhereClause.decode(query);
 
     if ((!qry) || (qry.isTrivial))

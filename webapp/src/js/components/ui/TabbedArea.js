@@ -140,8 +140,16 @@ let TabbedArea = React.createClass({
   },
 
   render() {
+    const divProps = Object.assign({}, this.props);
+    delete divProps.unclosableTab;
+    delete divProps.activeTab;
+    delete divProps.onSwitch;
+    delete divProps.onClose;
+    delete divProps.onAddTab;
+    delete divProps.onDragAway;
+
     return (
-      <div {...this.props} className="tabbed-area">
+      <div {...divProps} className="tabbed-area">
         <div className="tabs">
           {ValidComponentChildren.map(this.props.children, this.renderTab, this)}
           {this.props.onAddTab ? <Icon name="plus-circle" onClick={this.handleAddTab}/> : null}

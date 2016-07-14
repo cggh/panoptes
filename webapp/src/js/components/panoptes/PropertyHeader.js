@@ -30,7 +30,7 @@ let PropertyHeader = React.createClass({
 
   render: function() {
 
-    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, columnKey, ...other} = this.props;
 
     let tooltip = '';
     if (description) {
@@ -40,7 +40,6 @@ let PropertyHeader = React.createClass({
           <Icon className="info" name="info-circle"/>
         </Tooltip>;
     }
-
 
 
     return (

@@ -19,13 +19,17 @@ let TabPane = React.createClass({
   },
 
   render() {
+    const divProps = Object.assign({}, this.props);
+    delete divProps.active;
+    delete divProps.compId;
+
     let classes = {
       'tab-pane': true,
       'active': this.props.active
     };
 
     return (
-      <div {...this.props} className={classNames(this.props.className, classes)}>
+      <div {...divProps} className={classNames(this.props.className, classes)}>
         {React.cloneElement(this.props.children, {ref: 'child'})}
       </div>
     );
