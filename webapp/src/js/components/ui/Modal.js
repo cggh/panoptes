@@ -79,7 +79,7 @@ let Modal = React.createClass({
   },
 
   render: function() {
-    let {visible, unclosable, children, ...other} = this.props;
+    let {visible, unclosable, children, onClose, closable, ...other} = this.props;
     let {icon, title} = this.state;
     if (!children)
       return null;
