@@ -68,9 +68,6 @@ let Criterion = React.createClass({
     StoreWatchMixin('PanoptesStore')
   ],
 
-  componentWillMount() {
-    this.tableConfig = this.config.tablesById[this.props.table];
-  },
 
   getStateFromFlux() {
     return {
@@ -82,7 +79,7 @@ let Criterion = React.createClass({
     let {component, onChange} = this.props;
 
     // Get the property info for this table's primary key.
-    let property = this.tableConfig.propertiesById[this.tableConfig.primKey];
+    let property = this.tableConfig().propertiesById[this.tableConfig().primKey];
 
     // Get the valid operators for this table's primary key.
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
@@ -91,7 +88,7 @@ let Criterion = React.createClass({
     let newComponent = _find(SQL.WhereClause._fieldComparisonOperators, {ID: validOperators[0].ID}).Create();
 
     // Set the new component's primary column name to this table's primary key.
-    newComponent.ColName = this.tableConfig.primKey;
+    newComponent.ColName = this.tableConfig().primKey;
 
     // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
     newComponent.isTrivial = false;
@@ -119,7 +116,7 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    return SQL.WhereClause.CompareFixed(this.tableConfig.primKey, '=', '');
+    return SQL.WhereClause.CompareFixed(this.tableConfig().primKey, '=', '');
   },
 
   handleAddOr() {
@@ -170,7 +167,7 @@ let Criterion = React.createClass({
     });
 
     // Get the property info for the new component's primary column.
-    let property = this.tableConfig.propertiesById[newComponent.ColName];
+    let property = this.tableConfig().propertiesById[newComponent.ColName];
 
     // Copy over the comparison(?) value properties, either from the the current component or otherwise the state, to the new component, to preserve them.
     ['CompValue', 'CompValueMin', 'CompValueMax'].forEach((name) => {
@@ -194,7 +191,7 @@ let Criterion = React.createClass({
   handlePropertyChange() {
     let {component, onChange} = this.props;
     component.ColName = this.refs.property.value;
-    let property = this.tableConfig.propertiesById[component.ColName];
+    let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
     // If the currentOperator is one of the validOperators for the new property,
@@ -242,7 +239,7 @@ let Criterion = React.createClass({
 
   handleValueChange() {
     let {component, onChange} = this.props;
-    let property = this.tableConfig.propertiesById[component.ColName];
+    let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
 
     let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
@@ -288,7 +285,7 @@ let Criterion = React.createClass({
         </div>
       );
 
-    let groups = _clone(this.tableConfig.propertyGroups);
+    let groups = _clone(this.tableConfig().propertyGroups);
     groups.other = {
       id: 'other',
       name: 'Other',
@@ -319,7 +316,7 @@ let Criterion = React.createClass({
       </select>
     );
 
-    let property = this.tableConfig.propertiesById[component.ColName];
+    let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
     let operatorSelect = null;
     if (validOperators.length == 1) {

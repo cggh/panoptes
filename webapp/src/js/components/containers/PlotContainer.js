@@ -38,7 +38,7 @@ let PlotContainer = React.createClass({
 
   getDefaultProps() {
     return {
-      query: SQL.NullQuery
+      query: SQL.nullQuery
     };
   },
 

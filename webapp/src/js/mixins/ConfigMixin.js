@@ -1,30 +1,31 @@
 import React from 'react';
 
+//This is a special case of StoreWatchMixin, which forces update on config change.
+//As config changes should be rare this simplifies component code as config is kept out of component state.
+//Note that this mixin requires that FluxMixin also be used, unless flux i spassed as a prop.
+
 let ConfigMixin = {
   componentWillMount: function() {
-    if (!this.props.config && (!this.context || !this.context.config)) {
-      let namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
-      throw new Error('Could not find config on this.props or this.context' + namePart);
+    if (!this.props.flux && (!this.context || !this.context.flux)) {
+      var namePart = this.constructor.displayName ? " of " + this.constructor.displayName : "";
+      throw new Error('Could not find flux on this.props or this.context' + namePart);
     }
-    this.config = this.getConfig();
+    let flux = this.props.flux || (this.context && this.context.flux);
+    flux.store('ConfigStore').on('change', this._setConfigFromFlux);
+    this.tableConfig = () => this.config.tablesById[this.props.table];
+    this._setConfigFromFlux();
+
   },
 
-  childContextTypes: {
-    config: React.PropTypes.object
+  componentWillUnmount: function() {
+    let flux = this.props.flux || (this.context && this.context.flux);
+    flux.store('ConfigStore').removeListener('change', this._setStateFromFlux);
   },
 
-  contextTypes: {
-    config: React.PropTypes.object
-  },
-
-  getChildContext: function() {
-    return {
-      config: this.getConfig()
-    };
-  },
-
-  getConfig: function() {
-    return this.props.config || (this.context && this.context.config);
+  _setConfigFromFlux: function() {
+    let flux = this.props.flux || (this.context && this.context.flux);
+    this.config = flux.store('ConfigStore').getState();
+    this.forceUpdate();
   }
 };
 

@@ -6,6 +6,8 @@ from collections import OrderedDict
 import simplejson
 import abc
 from abc import ABCMeta
+import ruamel.yaml
+import portalocker
 
 class ImportSettings:
            
@@ -287,7 +289,7 @@ class ImportSettings:
             if self._logLevel:
                 self._log('Loading settings from: '+fileName)
 
-            with open(self.fileName, 'r') as configfile:
+            with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
                 try:
                     self._settings = yaml.load(configfile.read())
                     
@@ -411,7 +413,7 @@ class ImportSettings:
 
         if pkey in testDict:
             value = testDict[pkey]
-            
+
             #Check enumerated values
             if 'values' in pdef:
                 if value not in pdef['values']:
@@ -431,7 +433,7 @@ class ImportSettings:
                 if not (type(value) is int or type(value) is float):
                     self._errors.append("{} must be a Value is {}".format(pkey, value))
             elif pdef['type'] == 'Text' or pdef['type'] == 'DatatableID':
-                if not type(value) is str:
+                if not (type(value) is str or type(value) is unicode):
                     self._errors.append("{} must be a str is {}".format(pkey, value))
             elif pdef['type'] == 'Text or List':
                 if not (type(value) is str or type(value) is list):
@@ -616,8 +618,6 @@ class ImportSettings:
                         setDefaults(subSettings[key], value['children'])
         setDefaults(tosave, defn)
 
-
-                
         return simplejson.dumps(tosave)
         
     #For insertion into tablecatalog, graphs
@@ -667,7 +667,86 @@ class ImportSettings:
 
         return simplejson.dumps(saved)
 
-     
+
+    def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
+        if action not in ['replace', 'merge', 'delete']:
+            raise ValueError("Action must be one of 'replace', 'merge', 'delete'")
+
+        def updateConfig(settings):
+            if len(updatePath) > 0:
+                def emptyValueFor(settingsDef):
+                    type = settingsDef['type']
+                    if type == 'List':
+                        return settingsDef.get('default', [])
+                    elif type == 'Block':
+                        return settingsDef.get('default', {})
+
+                updatePoint = settings
+                updatePointSettings = self._settingsDef
+                #First recursively navigate to the level above the update point - note that we follow the path inserting if we need to
+                for key in updatePath[:-1]:
+                    if isinstance(updatePoint, dict):
+                        updatePoint = updatePoint.setdefault(key, emptyValueFor(updatePointSettings[key]))
+                        updatePointSettings = updatePointSettings[key].get('children', {})
+                    elif isinstance(updatePoint, list):
+                        updatePoint = updatePoint[int(key)]
+                        # print (updatePointSettings['name'])
+                        # updatePointSettings = updatePointSettings[key].get('children', {})
+                    else:
+                        raise ValueError("Bad key in path:"+key)
+
+                #We're one level above, the final behaviour depends on the type of this level and the action
+                key = updatePath[-1]
+                actualAction = action
+                if isinstance(updatePoint, dict):
+                    #If there is nothing to merge into then switch to replace
+                    if key not in updatePoint and actualAction == 'merge':
+                        actualAction = 'replace'
+                elif isinstance(updatePoint, list):
+                    key = int(key)
+
+                if actualAction == 'replace':
+                    updatePoint[key] = newConfig
+                elif actualAction == 'delete':
+                    try:
+                        del updatePoint[key]
+                    except KeyError:
+                        pass
+                elif actualAction == 'merge':
+                    if isinstance(updatePoint[key], dict):
+                        if not isinstance(newConfig, dict):
+                            raise ValueError("Cannot merge non-dict")
+                        updatePoint[key].update(newConfig)
+                    elif isinstance(updatePoint[key], list):
+                        if not isinstance(newConfig, list):
+                            raise ValueError("Cannot append non-list")
+                        updatePoint[key] += newConfig
+                    else:
+                        updatePoint[key] = newConfig
+            else:
+                if action == 'replace':
+                    return newConfig
+                elif action == 'delete':
+                    raise Exception("Can't delete all config")
+                elif action == 'merge':
+                    assert(isinstance(newConfig, dict))
+                    settings.update(newConfig)
+            return settings
+
+        self._settings = updateConfig(self._settings)
+        if validate:
+            self._validate(self._settings, self._settingsDef)
+        if len(self._errors) > 0:
+            raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
+
+        #We now write the change to the YAML - we reload as the load on constuction adds defaults etc and strips comments.
+        with portalocker.Lock(self.fileName, mode="r+", timeout=5, truncate=None) as configfile:
+            config = ruamel.yaml.load(configfile.read(), ruamel.yaml.RoundTripLoader)
+            config = updateConfig(config)
+            configfile.seek(0)
+            configfile.truncate(0)
+            configfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+
     def __getitem__(self, key):
         
         settings = self._settings

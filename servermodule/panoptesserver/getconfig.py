@@ -4,9 +4,9 @@
 
 import DQXDbTools
 import authorization
-from importer import readConfig
+from importer import configReadWrite
 
 def response(returndata):
     DQXDbTools.CredentialInformation(returndata).VerifyCanDo(DQXDbTools.DbOperationRead(returndata['dataset']))
-    returndata['config'] = readConfig.readJSONConfig(returndata['dataset'])
+    returndata['config'] = configReadWrite.readJSONConfig(returndata['dataset'])
     return returndata

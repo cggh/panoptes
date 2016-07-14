@@ -4,7 +4,6 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
 import {List, ListItem} from 'material-ui/List';
@@ -24,24 +23,12 @@ let StoredTableQueries = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    StoreWatchMixin('PanoptesStore')
   ],
-
-  componentDidMount() {
-    // TODO: Where is the best place to define trivialTableQuery?
-    this.trivialTableQuery = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
-  },
 
   title() {
     return this.props.title;
   },
 
-  getStateFromFlux() {
-    return {
-      defaultTableQuery: this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table),
-      storedTableQueries: this.getFlux().store('PanoptesStore').getStoredTableQueriesFor(this.props.table)
-    };
-  },
 
   getInitialState() {
     return null;
@@ -57,39 +44,40 @@ let StoredTableQueries = React.createClass({
 
   handleOverwriteDefault(e, query) {
 
-    if (!this.config.isManager) {
-      console.error('handleOverwriteDefault requires isManager');
+    if (!this.config.user.isManager) {
+      console.error('handleOverwriteDefault requires user.isManager');
       return null;
     }
 
     // TODO: Use Confirm, but we are already in a modal!
 
     // Overwrite the default query in the db with the specified stored query and then update the state.
-    this.getFlux().actions.api.setDefaultTableQuery(
+    this.getFlux().actions.api.modifyConfig(
       {
         dataset: this.config.dataset,
-        table: this.props.table,
-        query: query
+        path: `tablesById.${this.props.table}.defaultQuery`,
+        action: 'replace',
+        content: query
       }
     );
 
   },
 
-  handleDelete(e, storedTableQueryId) {
+  handleDelete(e, storedQueryIndex) {
 
-    if (!this.config.isManager) {
-      console.error('handleDelete requires isManager');
+    if (!this.config.user.isManager) {
+      console.error('handleDelete requires user.isManager');
       return null;
     }
 
     // TODO: Use Confirm, but we are already in a modal!
 
     // Delete the specified query in the db and then update the state.
-    this.getFlux().actions.api.deleteStoredTableQuery(
+    this.getFlux().actions.api.modifyConfig(
       {
         dataset: this.config.dataset,
-        table: this.props.table,
-        id: storedTableQueryId
+        path: `tablesById.${this.props.table}.storedQueries.${storedQueryIndex}`,
+        action: 'delete'
       }
     );
 
@@ -97,57 +85,48 @@ let StoredTableQueries = React.createClass({
 
   render() {
     let {table} = this.props;
-    let {defaultTableQuery, storedTableQueries} = this.state;
+    const defaultQuery = this.tableConfig().defaultQuery || SQL.nullQuery;
+    const storedQueries = this.tableConfig().storedQueries || [];
 
-    let storedTableQueriesListItems = [];
+    let storedQueriesListItems = storedQueries.map((storedQuery, index) => {
+      const {name, query} = storedQuery;
 
-    // TODO: remove storedTableQueries (assume defined)
-    if (storedTableQueries && storedTableQueries.size > 0) {
-
-      storedTableQueries.forEach((storedTableQuery) => {
-
-        // FIXME: IconMenu isn't showing (meantime developing using List instead).
-
-        let rightIconButtons = null;
-        if (this.config.isManager) {
-          rightIconButtons = (
-            <div>
-              <IconButton
-                tooltip="Set as default"
-                tooltipPosition="top-left"
-                onClick={(e) => this.handleOverwriteDefault(e, storedTableQuery.get('query'))}
-              >
-                <Icon name={'thumb-tack'} inverse={false} />
-              </IconButton>
-              <IconButton
-                tooltip="Delete"
-                tooltipPosition="top-left"
-                onClick={(e) => this.handleDelete(e, storedTableQuery.get('id'))}
-              >
-                <Icon name={'trash-o'} inverse={false} />
-              </IconButton>
-            </div>
-          );
-        }
-
-        let storedTableQueriesListItem = (
-          <ListItem
-            key={storedTableQuery.get('id')}
-            primaryText={storedTableQuery.get('name')}
-            secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={storedTableQuery.get('query')} /></p>}
-            secondaryTextLines={2}
-            onClick={(e) => this.handleClick(e, storedTableQuery.get('query'))}
-            onDoubleClick={(e) => this.handleDoubleClick(e, storedTableQuery.get('query'))}
-            leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
-            rightIconButton={rightIconButtons}
-          />
+      // FIXME: IconMenu isn't showing (meantime developing using List instead).
+      let rightIconButtons = null;
+      if (this.config.user.isManager) {
+        rightIconButtons = (
+          <div>
+            <IconButton
+              tooltip="Set as default"
+              tooltipPosition="top-left"
+              onClick={(e) => this.handleOverwriteDefault(e, query)}
+            >
+              <Icon name={'thumb-tack'} inverse={false} />
+            </IconButton>
+            <IconButton
+              tooltip="Delete"
+              tooltipPosition="top-left"
+              onClick={(e) => this.handleDelete(e, index)}
+            >
+              <Icon name={'trash-o'} inverse={false} />
+            </IconButton>
+          </div>
         );
+      }
 
-        storedTableQueriesListItems.push(storedTableQueriesListItem);
+      return <ListItem
+               key={index}
+               primaryText={name}
+               secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={query} /></p>}
+               secondaryTextLines={2}
+               onClick={(e) => this.handleClick(e, query)}
+               onDoubleClick={(e) => this.handleDoubleClick(e, query)}
+               leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle-thin'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /></span></div>}
+               rightIconButton={rightIconButtons}
+             />;
 
-      });
+    });
 
-    }
 
     // TODO: Fix icon position and font-size style for stacked icons, being overridden by .icon style.
     return (
@@ -155,19 +134,19 @@ let StoredTableQueries = React.createClass({
         <Subheader>Stored filters:</Subheader>
         <ListItem
           primaryText="No filter"
-          onClick={(e) => this.handleClick(e, this.trivialTableQuery)}
-          onDoubleClick={(e) => this.handleDoubleClick(e, this.trivialTableQuery)}
+          onClick={(e) => this.handleClick(e, SQL.nullQuery)}
+          onDoubleClick={(e) => this.handleDoubleClick(e, SQL.nullQuery)}
           leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span></div>}
         />
         <ListItem
           primaryText="Default filter"
-          secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultTableQuery} /></p>}
+          secondaryText={<p className="list-string"><QueryString className="text" prepend="" table={table} query={defaultQuery} /></p>}
           secondaryTextLines={2}
-          onClick={(e) => this.handleClick(e, defaultTableQuery)}
-          onDoubleClick={(e) => this.handleDoubleClick(e, defaultTableQuery)}
+          onClick={(e) => this.handleClick(e, defaultQuery)}
+          onDoubleClick={(e) => this.handleDoubleClick(e, defaultQuery)}
           leftIcon={<div><span className={'fa-stack'}><Icon style={{position: 'absolute', fontSize: '2em'}} name={'circle'} stack={'2x'} /><Icon style={{position: 'absolute'}} name={'filter'} stack={'1x'} inverse={true} /></span></div>}
         />
-        {storedTableQueriesListItems}
+        {storedQueriesListItems}
       </List>
     );
 

@@ -3,6 +3,7 @@ import _some from 'lodash/some';
 import _filter from 'lodash/filter';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
+import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
 import {List, ListItem} from 'material-ui/List';
@@ -12,6 +13,7 @@ import Icon from 'ui/Icon';
 let ViewList = React.createClass({
   mixins: [
     PureRenderMixin,
+    FluxMixin,
     ConfigMixin
   ],
 
@@ -34,7 +36,7 @@ let ViewList = React.createClass({
     return (
       <List style={this.props.style}>
         <Subheader>Open a view:</Subheader>
-        {this.config.isManager ?
+        {this.config.user.isManager ?
           <ListItem primaryText="Dataset Manager"
                     secondaryText="Import and configure datasets"
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}

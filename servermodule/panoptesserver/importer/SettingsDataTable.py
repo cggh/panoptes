@@ -49,6 +49,28 @@ class SettingsDataTable(ImportSettings):
                                    'required': False,
                                    'description': 'Specifies the property ID (i.e. column name in the ``data`` source file) used as the default sort field.'
                                 }),
+                         ('defaultQuery', {
+                             'type': 'Text',
+                             'required': False,
+                             'description': 'Specifies the default query used thoughout the app for this table.'
+                         }),
+                         ('storedQueries', {
+                             'type': 'List',
+                             'required': False,
+                             'default': [],
+                             'description': 'A list of queries to be displayed in the app for this table',
+                             'children': {'query': {
+                                 'type': 'Text',
+                                 'required': True,
+                                 'description': 'a query string'
+                             },
+                                 'name': {
+                                     'type': 'Text',
+                                     'required': True,
+                                     'description': 'a display name for this query'
+                                 }
+                             }
+                         }),
                          ('cacheWorkspaceData', {
                                    'type': 'Boolean',
                                    'required': False,

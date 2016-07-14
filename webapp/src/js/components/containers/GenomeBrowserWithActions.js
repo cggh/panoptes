@@ -40,7 +40,7 @@ let GenomeBrowserWithActions = React.createClass({
     };
   },
 
-  componentWillMount() {
+  channelGroups() {
     let groups = Object.assign(
       {
         __reference__: {
@@ -50,7 +50,7 @@ let GenomeBrowserWithActions = React.createClass({
         }
       },
       _transform(this.config.tablesById, (result, table, tableId) => {
-        if (table.hasGenomePositions && !table.settings.isHidden)
+        if (table.hasGenomePositions && !table.isHidden)
           result[tableId] = {
             name: table.capNamePlural,
             icon: table.icon,
@@ -126,7 +126,7 @@ let GenomeBrowserWithActions = React.createClass({
       }
     });
 
-    this.channelGroups = Immutable.fromJS(groups);
+    return Immutable.fromJS(groups);
   },
 
 
@@ -163,7 +163,7 @@ let GenomeBrowserWithActions = React.createClass({
                         title: 'Pick channels to be added',
                         itemName: 'channel',
                         itemVerb: 'add',
-                        groups: this.channelGroups,
+                        groups: this.channelGroups(),
                         onPick: this.handleChannelAdd
                       })}/>
       </div>

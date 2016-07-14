@@ -31,8 +31,8 @@ import 'tree.scss';
 let TreeWithActions = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
-    FluxMixin
+    FluxMixin,
+    ConfigMixin
   ],
 
   propTypes: {

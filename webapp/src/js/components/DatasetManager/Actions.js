@@ -57,7 +57,7 @@ let DatasetManagerActions = React.createClass({
   render() {
     let {sidebar, componentUpdate} = this.props;
 
-    if (!this.config.isManager) {
+    if (!this.config.user.isManager) {
       return <Loading status="custom">Sorry you do not have management permissions for this dataset</Loading>;
     }
     const name = this.config.settings.name;

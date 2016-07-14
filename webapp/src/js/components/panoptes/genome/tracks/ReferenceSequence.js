@@ -20,8 +20,8 @@ const HEIGHT = 26;
 let ReferenceSequence = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'start', 'end', 'width', 'sideWidth')
   ],
 

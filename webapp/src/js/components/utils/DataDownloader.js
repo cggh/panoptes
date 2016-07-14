@@ -8,7 +8,7 @@ const MAX_DOWNLOAD_DATA_POINTS = 100000;
 function downloadTableData(payload) {
 
   let defaults = {
-    query: SQL.NullQuery,
+    query: SQL.nullQuery,
     ascending: true
   };
 
@@ -28,7 +28,7 @@ function downloadTableData(payload) {
 
   // If no columns have been specified, get all of the showable columns.
   if (!columns)
-    columns = Immutable.List(this.tableConfig.properties)
+    columns = Immutable.List(tableConfig.properties)
       .filter((prop) => prop.showByDefault && prop.showInTable)
       .map((prop) => prop.id);
 

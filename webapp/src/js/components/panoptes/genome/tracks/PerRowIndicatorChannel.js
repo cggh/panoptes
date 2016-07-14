@@ -44,8 +44,8 @@ let PerRowIndicatorChannel = React.createClass({
         'query'
       ]
     }),
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'start', 'end', 'table', 'query', 'width', 'sideWidth', 'colourProperty')
   ],
 
@@ -65,7 +65,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   getDefaultProps() {
     return {
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: SQL.nullQuery
     };
   },
 

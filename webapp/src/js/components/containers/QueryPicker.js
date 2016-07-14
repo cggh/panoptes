@@ -6,7 +6,6 @@ import scrollbarSize from 'scrollbar-size';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // Material UI
 import RaisedButton from 'material-ui/RaisedButton';
@@ -24,7 +23,6 @@ import Icon from 'ui/Icon';
 import QueryString from 'panoptes/QueryString';
 import QueryEditor from 'panoptes/QueryEditor';
 import SQL from 'panoptes/SQL';
-import API from 'panoptes/API';
 
 // Containers
 import RecentlyUsedTableQueries from 'containers/RecentlyUsedTableQueries';
@@ -35,7 +33,6 @@ let QueryPicker = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    StoreWatchMixin('PanoptesStore')
   ],
 
   propTypes: {
@@ -51,24 +48,13 @@ let QueryPicker = React.createClass({
     };
   },
 
-  getStateFromFlux() {
-    return {
-      defaultTableQuery: this.getFlux().store('PanoptesStore').getDefaultTableQueryFor(this.props.table)
-    };
-  },
-
-  // TODO: Can we move stuff out of state and into props, maybe using the componentUpdate prop?
   getInitialState() {
     return {
-      query: this.props.initialQuery || this.state.defaultTableQuery || SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+      query: this.props.initialQuery || this.state.defaultTableQuery || SQL.nullQuery,
       storedFilterNameOpen: this.props.initialStoredFilterNameFocus,
       hasSidebar: true,
       storedFilterName: ''
     };
-  },
-
-  componentWillMount() {
-    this.tableConfig = this.config.tablesById[this.props.table];
   },
 
   componentDidUpdate(prevProps, prevState) {
@@ -81,7 +67,7 @@ let QueryPicker = React.createClass({
     return 'filter';
   },
   title() {
-    return `Pick filter for ${this.tableConfig.tableNamePlural}`;
+    return `Pick filter for ${this.tableConfig().namePlural}`;
   },
 
   handleEnter() {
@@ -100,12 +86,10 @@ let QueryPicker = React.createClass({
   },
 
   handleStoredFilterNameOpen() {
-
-    if (!this.config.isManager) {
-      console.error('handleStoredFilterNameOpen requires isManager');
+    if (!this.config.user.isManager) {
+      console.error('handleStoredFilterNameOpen requires user.isManager');
       return null;
     }
-
     this.setState({storedFilterNameOpen: true});
   },
 
@@ -121,30 +105,27 @@ let QueryPicker = React.createClass({
   },
 
   handleStore() {
-
-    if (!this.config.isManager) {
-      console.error('handleStore requires isManager');
+    if (!this.config.user.isManager) {
+      console.error('handleStore requires user.isManager');
       return null;
     }
-
     if (this.state.storedFilterName === '') {
       // TODO: error message to user
       return null;
     }
-
     // Store the current query in the db and update the state.
-    this.getFlux().actions.api.storeTableQuery(
+    this.getFlux().actions.api.modifyConfig(
       {
         dataset: this.config.dataset,
-        table: this.props.table,
-        query: this.state.query,
-        name: this.state.storedFilterName,
-        workspace: this.config.workspace
+        path: `tablesById.${this.props.table}.storedQueries`,
+        action: 'merge',
+        content: [{
+          query: this.state.query,
+          name: this.state.storedFilterName,
+        }],
       }
     );
-
     this.setState({storedFilterNameOpen: false});
-
   },
 
   handleToggleSidebar() {
@@ -186,7 +167,7 @@ let QueryPicker = React.createClass({
           </div>
           <div className="centering-container">
             {
-              this.config.isManager && storedFilterNameOpen ?
+              this.config.user.isManager && storedFilterNameOpen ?
               <div>
                 <TextField
                   ref="storedFilterNameField"
@@ -207,7 +188,7 @@ let QueryPicker = React.createClass({
               : null
             }
             {
-              this.config.isManager && !storedFilterNameOpen ?
+              this.config.user.isManager && !storedFilterNameOpen ?
               <div>
                 <RaisedButton
                   style={{marginRight: '10px'}}

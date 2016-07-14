@@ -32,3 +32,23 @@ def readJSONConfig(datasetId):
         'tablesById': tables,
         'twoDTablesById': twoDTables,
     }
+
+class ReadOnlyErrorWriter:
+    def __init__(self, name):
+        self.name = name
+    def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
+        raise Exception("The config at:"+'.'.join([self.name]+updatePath)+" is read-only")
+
+def writeJSONConfig(datasetId, action, path, newConfig):
+    datasetFolder = join(baseFolder, datasetId)
+    settingsFile = join(datasetFolder, 'settings')
+    #We have a path in the combined JSON object - we now follow the path until we hit a subset confined to one YAML handler
+    writers = {
+        'settings': lambda path: (path, SettingsGlobal(settingsFile, validate=True)),
+        'chromosomes': lambda path: (path, ReadOnlyErrorWriter('chromosomes')),
+        'tablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, 'datatables', path[0], 'settings'), validate=True)),
+        'twoDTablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, '2D_datatables', path[0], 'settings'), validate=True)),
+    }
+    path = path.split('.')
+    (path, writer) = writers[path[0]](path[1:])
+    writer.updateAndWriteBack(action, path, newConfig, validate=True)

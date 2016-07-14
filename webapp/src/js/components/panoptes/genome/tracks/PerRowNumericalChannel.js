@@ -49,6 +49,7 @@ let PerRowScaledSVGChannel = React.createClass({
         'onClose'
       ]
     }),
+    FluxMixin,
     ConfigMixin
   ],
 
@@ -83,7 +84,7 @@ let PerRowScaledSVGChannel = React.createClass({
       interpolation: 'step',
       autoYScale: true,
       tension: 0.5,
-      query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+      query: SQL.nullQuery
     };
   },
 
@@ -116,8 +117,8 @@ let PerRowScaledSVGChannel = React.createClass({
 
 let PerRowNumericalTrack = React.createClass({
   mixins: [
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table',
       'channel', 'query', 'width', 'sideWidth', 'colourProperty')
   ],

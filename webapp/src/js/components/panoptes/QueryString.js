@@ -12,8 +12,8 @@ import Formatter from 'panoptes/Formatter';
 let QueryString = React.createClass({
   mixins: [
     PureRenderMixin,
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     StoreWatchMixin('PanoptesStore')
   ],
 
@@ -23,9 +23,6 @@ let QueryString = React.createClass({
     prepend: React.PropTypes.string.isRequired
   },
 
-  componentWillMount() {
-    this.tableConfig = this.config.tablesById[this.props.table];
-  },
 
   getStateFromFlux() {
     return {
@@ -43,7 +40,7 @@ let QueryString = React.createClass({
       </span>;
 
     let nameMap = {};
-    this.tableConfig.properties.forEach((property) => {
+    this.tableConfig().properties.forEach((property) => {
       nameMap[property.id] = {
         name: property.name,
         toDisplayString: Formatter.bind(this, property)

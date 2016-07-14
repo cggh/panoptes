@@ -29,8 +29,8 @@ let AnnotationChannel = React.createClass({
         'name'
       ]
     }),
-    ConfigMixin,
     FluxMixin,
+    ConfigMixin,
     DataFetcherMixin('chromosome', 'start', 'end', 'table', 'width', 'sideWidth')
   ],
 

@@ -24,6 +24,9 @@ function _filterError(json) {
       throw Error(`Error: ${json.Error}`);
     }
   }
+  if ('issue' in json) {
+    throw Error(json.issue);
+  }
   return json;
 }
 
@@ -38,13 +41,13 @@ function errorMessage(xhr) {
   return `Error: ${xhr.statusText || xhr.message}`;
 }
 
-function requestJSON(options) {
+function requestJSON(options, method='GET', data=null) {
   let defaults = {
     url: serverURL,
-    method: 'GET',
+    method: method,
     params: {},
     timeout: 60000,
-    data: null
+    data: data
   };
 
   //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with qajax.
@@ -87,7 +90,7 @@ function _decodeSummaryList(columns) {
 function pageQuery(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
-    query: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+    query: SQL.nullQuery,
     order: null,
     ascending: true,
     count: false,
@@ -340,7 +343,7 @@ function fetchImportStatusData(options) {
   // TODO: only get logs for this dataset
   //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
 
-  let query = SQL.WhereClause.encode(SQL.WhereClause.Trivial());
+  let query = SQL.nullQuery;
   return pageQuery(
     {
       database: '', // Falls back to default DB in DQXServer config
@@ -402,70 +405,11 @@ function importDatasetConfig(dataset) {
 }
 
 
-function storeTableQuery(options) {
-  assertRequired(options, ['dataset', 'table', 'query', 'name', 'workspace']);
-  let {dataset, table, query, name, workspace} = options;
-
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'addstoredentity',
-      database: dataset,
-      tablename: 'storedqueries',
-      tableid: table,
-      name: name,
-      content: query,
-      workspaceid: workspace
-    }
-  }).then((response) => response);
-
-}
-
-
-function deleteStoredTableQuery(options) {
-  assertRequired(options, ['dataset', 'id']);
-  let {dataset, id} = options;
-
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'delstoredentity',
-      database: dataset,
-      tablename: 'storedqueries',
-      id: id
-    }
-  }).then((response) => response);
-}
-
-function setDefaultTableQuery(options) {
-  assertRequired(options, ['dataset', 'table', 'query']);
-  let {dataset, table, query} = options;
-
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'update_default_query',
-      database: dataset,
-      id: table,
-      defaultQuery: query
-    }
-  }).then((response) => response);
-}
-
 function recordCount(options) {
   assertRequired(options, ['database', 'table']);
 
   let defaults = {
-    query: SQL.WhereClause.encode(SQL.WhereClause.Trivial())
+    query: SQL.nullQuery
   };
 
   let {database, table, query, maxRecordCount} = {...defaults, ...options};
@@ -483,6 +427,27 @@ function recordCount(options) {
   }).then((response) => response.TotalRecordCount);
 }
 
+function modifyConfig(options) {
+  assertRequired(options, ['dataset', 'path', 'action', 'content']);
+  let {dataset, path, action, content} = options;
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestJSON({
+    ...args,
+    method: 'POST',
+    data: JSON.stringify(content),
+    params: {
+      dataset,
+      path,
+      action,
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'modifyconfig'
+    }
+  }).then((response) => response.config);
+}
+
+
+
 // TODO: Maintain an order to this list?
 
 module.exports = {
@@ -492,7 +457,6 @@ module.exports = {
   requestJSON,
   pageQuery,
   storeData,
-  storeTableQuery,
   fetchData,
   summaryData,
   annotationData,
@@ -505,7 +469,6 @@ module.exports = {
   fetchImportStatusLog,
   importDataset,
   importDatasetConfig,
-  deleteStoredTableQuery,
-  setDefaultTableQuery,
-  recordCount
+  recordCount,
+  modifyConfig
 };

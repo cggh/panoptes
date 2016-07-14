@@ -3,6 +3,7 @@ const APICONST = Constants.API;
 import API from 'panoptes/API';
 
 import ErrorReport from 'panoptes/ErrorReporter.js';
+import {assertRequired} from 'util/Assert';
 
 let APIActions = {
   fetchUser(dataset) {
@@ -63,102 +64,34 @@ let APIActions = {
       });
   },
 
-  storeTableQuery(payload) {
-
-    let {dataset, table, query, name, workspace} = payload;
-
-    // Store the current query in the db via the API.
-    API.storeTableQuery(
+  //Action is replace, merge or delete
+  modifyConfig(options) {
+    assertRequired(options, ['dataset', 'path']);
+    let defaults = {
+      action: 'replace',
+      content: null
+    };
+    let {dataset, path, action, content} = {...defaults, ...options};
+    this.dispatch(APICONST.MODIFY_CONFIG);
+    API.modifyConfig(
       {
-        dataset: dataset,
-        table: table,
-        query: query,
-        name: name,
-        workspace: workspace
+        dataset,
+        path,
+        action,
+        content
       }
     )
     .then((resp) => {
-
-      if ('issue' in resp) {
-        throw Error(resp.issue);
-      }
-
       this.dispatch(
-        APICONST.STORE_TABLE_QUERY_SUCCESS,
+        APICONST.MODIFY_CONFIG_SUCCESS,
         {
-          id: resp.id,
-          table: resp.tableid,
-          query: resp.content,
-          name: resp.name
+          newConfig: resp
         }
       );
     })
     .catch((error) => {
-      this.dispatch(APICONST.STORE_TABLE_QUERY_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.storeTableQuery({dataset, table, query, name, workspace}));
-    });
-  },
-
-  deleteStoredTableQuery(payload) {
-
-    let {dataset, table, id} = payload;
-
-    // Store the current query in the db via the API.
-    API.deleteStoredTableQuery(
-      {
-        dataset: dataset,
-        id: id
-      }
-    )
-    .then((resp) => {
-
-      if ('issue' in resp) {
-        throw Error(resp.issue);
-      }
-
-      this.dispatch(
-        APICONST.DELETE_STORED_TABLE_QUERY_SUCCESS,
-        {
-          table: table,
-          id: resp.id
-        }
-      );
-    })
-    .catch((error) => {
-      this.dispatch(APICONST.DELETE_STORED_TABLE_QUERY_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.deleteStoredTableQuery({dataset, table, id}));
-    });
-  },
-
-  setDefaultTableQuery(payload) {
-
-    let {dataset, table, query} = payload;
-
-    // Overwrite the default query in the db via the API.
-    API.setDefaultTableQuery(
-      {
-        dataset: dataset,
-        table: table,
-        query: query
-      }
-    )
-    .then((resp) => {
-
-      if ('issue' in resp) {
-        throw Error(resp.issue);
-      }
-
-      this.dispatch(
-        APICONST.SET_DEFAULT_TABLE_QUERY_SUCCESS,
-        {
-          table: resp.id,
-          query: resp.defaultQuery
-        }
-      );
-    })
-    .catch((error) => {
-      this.dispatch(APICONST.SET_DEFAULT_TABLE_QUERY_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.setDefaultTableQuery({dataset, table, query}));
+      this.dispatch(APICONST.MODIFY_CONFIG_FAIL);
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(payload));
     });
   }
 
