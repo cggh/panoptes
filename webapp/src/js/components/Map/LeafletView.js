@@ -32,10 +32,20 @@ let MapLeafletView = React.createClass({
     };
   },
 
-  // Event handlers
 
+  // Lifecycle methods
+  componentWillUnmount() {
+console.log('LeafletView componentWillUnmount this: %o', this);
+console.log('LeafletView componentWillUnmount window.L: %o', window.L);
+  },
+
+  // Event handlers
   handleDetectResize() {
     this.refs.map.leafletElement.invalidateSize();
+  },
+  handleMarkerOnClick(e, payload) {
+    let {table, primKey} = payload;
+    this.getFlux().actions.panoptes.dataItemPopup({table, primKey});
   },
 
   render() {
@@ -80,7 +90,7 @@ let MapLeafletView = React.createClass({
             position={{lat: markers[i].lat, lng: markers[i].lng}}
             icon={icon}
             title={markers[i].title}
-            onClick={() => this.getFlux().actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()})}
+            onClick={(e) => this.handleMarkerOnClick(e, {table: markers[i].table, primKey: markers[i].primKey.toString()})}
           />
         );
 
