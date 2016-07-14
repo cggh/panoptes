@@ -142,7 +142,7 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     ReactDOM.render(
       <div>
         <Loading status="done"/>
-        <Panoptes flux={flux} config={config}/>
+        <Panoptes flux={flux} />
       </div>
       , document.getElementById('main'));
   })
@@ -165,19 +165,15 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
 
     let config = {
       ...initialConfig,
-      isManager: true, //Should come from server in html really?
+      user:{isManager:false},
       settings: {
         name: initialConfig.dataset
       }
     };
     let stores = {
-      PanoptesStore: new PanoptesStore({
-        user: {
-          id: initialConfig.userID,
-          isManager: true
-        }
-      }),
-      SessionStore: new SessionStore(appState.session)
+      PanoptesStore: new PanoptesStore({}),
+      SessionStore: new SessionStore(appState.session),
+      ConfigStore: new ConfigStore(config)
     };
     let actions = {
       session: SessionActions,
@@ -190,7 +186,7 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     ReactDOM.render(
       <div>
         <Loading status="done"/>
-        <Panoptes flux={flux} config={config}/>
+        <Panoptes flux={flux} />
       </div>
       , document.getElementById('main'));
 
