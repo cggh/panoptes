@@ -50,7 +50,7 @@ let GenomeBrowserWithActions = React.createClass({
         }
       },
       _transform(this.config.tablesById, (result, table, tableId) => {
-        if (table.hasGenomePositions && !table.settings.isHidden)
+        if (table.hasGenomePositions && !table.isHidden)
           result[tableId] = {
             name: table.capNamePlural,
             icon: table.icon,
