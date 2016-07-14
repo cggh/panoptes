@@ -41,7 +41,7 @@ let MapLeafletView = React.createClass({
   render() {
     let {center, zoom, markers} = this.props;
 
-    // TODO: let actions = this.getFlux().actions;
+    let actions = this.getFlux().actions;
 
     let L = window.L;
     let mapMarkers = undefined;
@@ -81,14 +81,10 @@ let MapLeafletView = React.createClass({
             key={i}
             position={{lat: markers[i].lat, lng: markers[i].lng}}
             icon={icon}
-          >
-            <Popup>
-              <span>{markers[i].title}</span>
-            </Popup>
-          </Marker>
+            title={markers[i].title}
+            onClick={() => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()})}
+          />
         );
-
-        // TODO: mapMarker.addListener('click', () => actions.panoptes.dataItemPopup({table: markers[i].table, primKey: markers[i].primKey.toString()}));
 
         mapMarkers.push(mapMarker);
 
