@@ -47,14 +47,6 @@ CREATE TABLE `settings` (
   `content` text
 );
 
-CREATE TABLE `storedqueries` (
-  `id` varchar(255),
-  `name` varchar(255),
-  `tableid` varchar(255),
-  `workspaceid` varchar(255),
-  `content` text
-);
-
 CREATE TABLE `storedsubsets` (
   `subsetid` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255),
@@ -156,20 +148,6 @@ CREATE TABLE `workspaces` (
   `name` varchar(255)
 );
 
-
-CREATE TABLE `introviews` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `workspaceid` varchar(255),
-  `name` varchar(255),
-  `section` varchar(255),
-  `description` varchar(255),
-  `viewicon` varchar(255),
-  `ordr` int(11),
-  `url` varchar(2000),
-  `storedviewid` varchar(255),
-  `activetab` varchar(255),
-  PRIMARY KEY (`id`)
-);
 
 CREATE TABLE `notes` (
   `id` varchar(255),
