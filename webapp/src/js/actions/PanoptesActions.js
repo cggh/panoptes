@@ -39,7 +39,7 @@ const PanoptesActions = (config) => ({
               chartConfig: dataItemView
             }
           }),
-          Map: () => ({
+          ItemMap: () => ({
             view: 'Map',
             props: {
               title: dataItemView.name
