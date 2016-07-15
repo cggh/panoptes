@@ -193,6 +193,7 @@ const ConfigStore = Fluxxor.createStore({
         if (!prop.groupId) {
           if (!table.propertyGroupsById['_UNGROUPED_']) {
             table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: []};
+            table.propertyGroups.push(table.propertyGroupsById['_UNGROUPED_']);
           }
           table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
         }
