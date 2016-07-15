@@ -258,7 +258,7 @@ let GenomeBrowser = React.createClass({
             ref={(c) => this.rootHammer = c}
             onDoubleTap={this.handleDoubleTap}
             onPan={this.handlePan}
-            vertical={true}
+            direction={Hammer.DIRECTION_VERTICAL}
             onPinch={(e) => console.log('Pinch not implemented', e)}
             onWheel={this.handleMouseWheel}
           >
