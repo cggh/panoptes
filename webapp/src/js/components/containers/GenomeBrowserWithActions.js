@@ -49,75 +49,77 @@ let GenomeBrowserWithActions = React.createClass({
           items: {}
         }
       },
-      _transform(this.config.tablesById, (result, table, tableId) => {
-        if (table.hasGenomePositions && !table.isHidden)
-          result[tableId] = {
-            name: table.capNamePlural,
-            icon: table.icon,
-            items: {
-              __rows__: {
-                name: table.capNamePlural,
-                description: `Positions of ${table.capNamePlural}`,
-                icon: 'arrow-down',
-                payload: {
-                  channel: 'PerRowIndicatorChannel',
-                  props: {
-                    table: tableId
-                  }
-                }
-              }
-            }
-          };
-      })
     );
 
     //Normal summaries
-    _forEach(this.config.summaryValues, (properties, groupId) => {
-      Object.assign(groups[groupId].items, _transform(properties, (result, prop) =>
-        result[prop.id] = {
-          name: prop.name,
-          description: groupId === '__reference__' ? 'Description needs to be implemented' : prop.description,
-          icon: prop.isCategorical ? 'bar-chart' : 'line-chart',
-          payload: prop.isCategorical ? {
-            channel: 'CategoricalChannel',
-            props: {
-              name: prop.name,
-              group: groupId,
-              track: prop.id
-            }
-          } : {
-            channel: 'NumericalTrackGroupChannel',
-            props: {
-              tracks: [{
-                track: 'NumericalSummaryTrack',
-                name: prop.name,
+    _forEach(this.config.tables, (table) => {
+      if (table.hasGenomePositions && !table.isHidden) {
+        groups[table.id] = {
+          name: table.capNamePlural,
+          icon: table.icon,
+          items: {
+            __rows__: {
+              name: table.capNamePlural,
+              description: `Positions of ${table.capNamePlural}`,
+              icon: 'arrow-down',
+              payload: {
+                channel: 'PerRowIndicatorChannel',
                 props: {
-                  group: groupId,
-                  track: prop.id
+                  table: table.id
                 }
-              }]
+              }
             }
           }
-        }));
+        };
+        _forEach(table.properties, (prop) => {
+          if (prop.showInBrowser) {
+            groups[table.id].items[prop.id] = {
+              name: prop.name,
+              description: prop.description,
+              icon: prop.isCategorical ? 'bar-chart' : 'line-chart',
+              payload: prop.isCategorical ? {
+                channel: 'CategoricalChannel',
+                props: {
+                  name: prop.name,
+                  group: table.id,
+                  track: prop.id
+                }
+              } : {
+                channel: 'NumericalTrackGroupChannel',
+                props: {
+                  tracks: [{
+                    track: 'NumericalSummaryTrack',
+                    name: prop.name,
+                    props: {
+                      group: table.id,
+                      track: prop.id
+                    }
+                  }]
+                }
+              }
+            }
+          }
+        });
+      }
     });
 
     //Per-row based summaries
     _forEach(this.config.visibleTables, (table) => {
-      if (table.tableBasedSummaryValues) {
+      if (table.tableBasedSummaryValues.length > 0) {
         groups[`per_${table.id}`] = Immutable.fromJS({
           name: `Per ${table.capNameSingle}`,
           icon: table.icon,
-          items: _transform(table.tableBasedSummaryValues, (result, channel) => {
-            result[channel.trackid] = {
+          items: _transform(table.tableBasedSummaryValuesById, (result, channel) => {
+            result[channel.id] = {
               name: channel.trackname,
               description: 'Description needs to be implemented',
               icon: 'line-chart',
               payload: {
                 channel: 'PerRowNumericalChannel',
                 props: {
-                  name: channel.trackname,
+                  name: channel.name,
                   table: table.id,
-                  channel: channel.trackid
+                  channel: channel.id
                 }
               }
             };
@@ -125,7 +127,6 @@ let GenomeBrowserWithActions = React.createClass({
         });
       }
     });
-
     return Immutable.fromJS(groups);
   },
 

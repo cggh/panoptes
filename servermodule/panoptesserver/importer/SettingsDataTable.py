@@ -440,6 +440,8 @@ containing the relative size of that specific pie'''
                          ('tableBasedSummaryValues', {
                                    'type': 'List',
                                    'required': False,
+                                   'default': [],
+
                                    'description': '''Declares that numerical genome values for are available for each item in the table.
   Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser.
   A typical use case is if the data table contains samples that were sequenced, and there is coverage data available
