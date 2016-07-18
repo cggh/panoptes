@@ -87,6 +87,7 @@
     "react-immutable-proptypes": "^1.7.1",
     "react-immutable-render-mixin": "^0.9.6",
     "react-leaflet": "^0.12.1",
+    "react-leaflet-div-icon": "^1.0.1",
     "react-motion": "^0.4.3",
     "react-notification-system": "^0.2.7",
     "react-phylocanvas": "0.0.2",
