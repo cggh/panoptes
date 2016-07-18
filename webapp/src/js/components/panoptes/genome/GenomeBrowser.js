@@ -228,7 +228,7 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
-    let {settings} = this.config;
+    let settings = this.config.genome;
     let {start, end, sideWidth, chromosome, channels} = this.props;
     chromosome = chromosome || this.defaultChrom;
     let {loading} = this.state;
@@ -293,7 +293,9 @@ let GenomeBrowser = React.createClass({
                         { settings.refSequenceSumm ?
                           <ReferenceSequence {...trackProps}/> :
                           null }
-                        <AnnotationChannel {...trackProps} />
+                        { settings.annotation ?
+                          <AnnotationChannel {...trackProps} /> :
+                          null }
                       </div>
                       <div className="scrolling grow scroll-within">
                         {channels.map((channel, channelId) => {

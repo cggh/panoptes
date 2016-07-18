@@ -7,16 +7,6 @@ class SettingsRefGenome(ImportSettings):
     
     def getSettings(self):
         refGenomeSettings = OrderedDict((
-                         ('genomeBrowserDescr', {
-                              'type': 'Text',
-                              'required': False,
-                              'description': 'Descriptive text that will be displayed in the genome browser section of the main page'
-                              }),
-                         ('annotMaxViewPortSize', {
-                                                  'type': 'Value',
-                                                  'required': False,
-                                                  'description': 'Maximum viewport (in bp) the genome browser can have in order to show the genome annotation track'
-                                                  }),
                          ('refSequenceSumm', {
                                                   'type': 'Boolean',
                                                   'required': False,
