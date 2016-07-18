@@ -2,7 +2,6 @@ import React from 'react';
 import HtmlToReact from 'html-to-react';
 import MapWidget from 'Map/Widget';
 import ItemLink from 'panoptes/ItemLink';
-// import ComponentWrapper from 'panoptes/ComponentWrapper';
 import TreeContainer from 'containers/TreeContainer';
 import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
@@ -58,4 +57,3 @@ let HTMLWithComponents = React.createClass({
 });
 
 module.exports = HTMLWithComponents;
-
