@@ -14,7 +14,7 @@ import LRUCache from 'util/LRUCache';
 
 // Panoptes components
 import API from 'panoptes/API';
-import PieChartMap from 'panoptes/PieChartMap';
+import PieChartMapView from 'PieChartMap/LeafletView';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
@@ -193,13 +193,13 @@ let PieChartMapWidget = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: '100%', height: '100%'}}>
-          <PieChartMap
-            center={center}
-            zoom={zoom}
-            markers={markers}
-            onPanZoom={this.handlePanZoom}
-          />
-          <Loading status={loadStatus}/>
+        <PieChartMapView
+          center={center}
+          zoom={zoom}
+          markers={markers}
+          onPanZoom={this.handlePanZoom}
+        />
+        <Loading status={loadStatus}/>
       </div>
     );
 
