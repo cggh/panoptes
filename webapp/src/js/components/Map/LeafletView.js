@@ -80,7 +80,7 @@ let MapLeafletView = React.createClass({
           // Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar"/>
           conditionalMarkerChild = (
             <DivIcon position={{lat: markers[i].lat, lng: markers[i].lng}}>
-              <svg height="16" width="16"><circle cx="8" cy="8" r="6" stroke="#BC0F0F" stroke-width="1" fill="#F26C6C" /></svg>
+              <svg height="16" width="16"><circle cx="8" cy="8" r="6" stroke="#BC0F0F" strokeWidth="1" fill="#F26C6C" /></svg>
             </DivIcon>
           );
         }
