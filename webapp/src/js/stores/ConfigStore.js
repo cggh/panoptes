@@ -291,9 +291,6 @@ const ConfigStore = Fluxxor.createStore({
         prop.id == table.chromosome ||
         prop.id == table.position ||
         false;
-        if (prop.summaryValues) {
-          prop.summaryValues.minblocksize = parseFloat(prop.summaryValues.minblocksize);
-        }
       });
       table.hasGeoCoord = !!(table.longitude && table.latitude);
     });

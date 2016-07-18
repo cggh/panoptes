@@ -41,15 +41,13 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   channelGroups() {
-    let groups = Object.assign(
-      {
+    let groups = {
         __reference__: {
           name: 'Reference',
           icon: 'bitmap:genomebrowser.png',
           items: {}
         }
-      },
-    );
+      };
 
     //Normal summaries
     _forEach(this.config.tables, (table) => {
@@ -72,26 +70,34 @@ let GenomeBrowserWithActions = React.createClass({
           }
         };
         _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser) {
+          if (prop.showInBrowser && prop.summaryValues && (prop.isCategorical || prop.isBoolean)) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
-              icon: prop.isCategorical ? 'bar-chart' : 'line-chart',
-              payload: prop.isCategorical ? {
+              icon: prop.icon,
+              payload: {
                 channel: 'CategoricalChannel',
                 props: {
                   name: prop.name,
-                  group: table.id,
+                  table: table.id,
                   track: prop.id
                 }
-              } : {
+              }
+            }
+          }
+          if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
+            groups[table.id].items[prop.id] = {
+              name: prop.name,
+              description: prop.description,
+              icon: prop.icon,
+              payload: {
                 channel: 'NumericalTrackGroupChannel',
                 props: {
                   tracks: [{
                     track: 'NumericalSummaryTrack',
                     name: prop.name,
                     props: {
-                      group: table.id,
+                      table: table.id,
                       track: prop.id
                     }
                   }]
@@ -106,12 +112,12 @@ let GenomeBrowserWithActions = React.createClass({
     //Per-row based summaries
     _forEach(this.config.visibleTables, (table) => {
       if (table.tableBasedSummaryValues.length > 0) {
-        groups[`per_${table.id}`] = Immutable.fromJS({
+        groups[`per_${table.id}`] = {
           name: `Per ${table.capNameSingle}`,
           icon: table.icon,
           items: _transform(table.tableBasedSummaryValuesById, (result, channel) => {
             result[channel.id] = {
-              name: channel.trackname,
+              name: channel.name,
               description: 'Description needs to be implemented',
               icon: 'line-chart',
               payload: {
@@ -124,7 +130,7 @@ let GenomeBrowserWithActions = React.createClass({
               }
             };
           })
-        });
+        };
       }
     });
     return Immutable.fromJS(groups);

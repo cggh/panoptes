@@ -45,7 +45,7 @@ let CategoricalChannel = React.createClass({
     yMax: React.PropTypes.number,
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
-    group: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired
   },
 
@@ -88,7 +88,7 @@ let CategoricalTrack = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group', 'track', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table', 'track', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -101,7 +101,7 @@ let CategoricalTrack = React.createClass({
     autoYScale: React.PropTypes.bool,
     fractional: React.PropTypes.bool,
     onYLimitChange: React.PropTypes.func,
-    group: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired
   },
 
@@ -151,8 +151,14 @@ let CategoricalTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (!this.config.summaryValues[props.group] || !this.config.summaryValues[props.group][props.track]) {
-      ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid summary track`);
+    if (!this.config.tablesById[props.table] ||
+      !this.config.tablesById[props.table].propertiesById[props.track] ||
+      !this.config.tablesById[props.table].propertiesById[props.track].showInBrowser ||
+      !(this.config.tablesById[props.table].propertiesById[props.track].isCategorical ||
+        this.config.tablesById[props.table].propertiesById[props.track].isBoolean) ||
+      !this.config.tablesById[props.table].propertiesById[props.track].summaryValues
+    ) {
+      ErrorReport(this.getFlux(), `${props.table}/${props.track} is not a valid categorical summary track`);
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
@@ -166,7 +172,7 @@ let CategoricalTrack = React.createClass({
               name: `${props.track}_cats`
             }
           },
-          minBlockSize: this.config.summaryValues[props.group][props.track].minblocksize,
+          minBlockSize: this.tableConfig().propertiesById[props.track].summaryValues.blockSizeMin,
           chromosome: chromosome,
           start: blockStart,
           end: blockEnd,
@@ -199,7 +205,7 @@ let CategoricalTrack = React.createClass({
 
     let {summariser, data} = columns.categories;
     let categories = summariser.categories || summariser.Categories;
-    let catColours = this.config.summaryValues[props.group][props.track].categoryColors;
+    let catColours = this.tableConfig().propertiesById[props.track].categoryColors;
     let colours = categories.map((cat) => catColours[cat]);
     let layers = categories.map((category, i) =>
       data.map((point, j) => ({
@@ -317,7 +323,6 @@ let CategoricalTrackControls = React.createClass({
                  ref="yMax"
                  type="number"
                  value={yMax}
-                 onChange={this.handleRangeChange}
                  onChange={() => {
                    let value = parseFloat(this.refs.yMax.value);
                    if (_isFinite(value))

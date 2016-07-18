@@ -114,8 +114,8 @@ properties:
   showInBrowser: true
   isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   categoryColors:                   # Specifies display colours for the categorical states of this property
-    a: rgb(255,128,60)
-    b: rgb(0,180,0)
+    A: rgb(255,128,60)
+    B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
   summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
     blockSizeMin: 20
