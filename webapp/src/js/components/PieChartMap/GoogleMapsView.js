@@ -17,7 +17,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import PieChart from 'panoptes/PieChart';
+import PieChartWidget from 'PieChart/Widget';
 
 function getMapOptions(maps) {
   return {
@@ -33,7 +33,7 @@ function getMapOptions(maps) {
   };
 }
 
-let PieChartMap = React.createClass({
+let PieChartMapGoogleMapsView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -188,7 +188,7 @@ let PieChartMap = React.createClass({
                 {
                   renderNodes.map(
                     (marker, index) =>
-                      <PieChart
+                      <PieChartWidget
                         debounced={false}
                         lng={marker.lng}
                         lat={marker.lat}
@@ -213,4 +213,4 @@ let PieChartMap = React.createClass({
 
 });
 
-module.exports = PieChartMap;
+module.exports = PieChartMapGoogleMapsView;

@@ -6,7 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import PieChartSector from 'panoptes/PieChartSector';
+import PieChartSectorWidget from 'PieChartSector/Widget';
 
 import 'pie-chart.scss';
 
@@ -14,7 +14,7 @@ import 'pie-chart.scss';
 // TODO: to go in config?
 const DEFAULT_OUTER_RADIUS = 25;
 
-let PieChart = React.createClass({
+let PieChartWidget = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -63,7 +63,7 @@ let PieChart = React.createClass({
       outerRadius = geoService.project({lat: 0, lng: radius}).x - geoService.project({lat: 0, lng: 0}).x;
     }
     let sectors = sectorsData.map((sectorData, i) =>
-        <PieChartSector
+        <PieChartSectorWidget
           key={i}
           arcDescriptor={arcDescriptors[i]}
           outerRadius={outerRadius}
@@ -98,4 +98,4 @@ let PieChart = React.createClass({
 
 });
 
-module.exports = PieChart;
+module.exports = PieChartWidget;

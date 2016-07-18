@@ -9,6 +9,7 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import DetectResize from 'utils/DetectResize';
+// TODO: import GeoLayouter from 'utils/GeoLayouter';
 
 // CSS
 import 'leaflet.css';
@@ -17,7 +18,7 @@ import 'leaflet.css';
 import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
 
-let MapLeafletView = React.createClass({
+let PieChartMapLeafletView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -59,22 +60,26 @@ let MapLeafletView = React.createClass({
 
       if (markers.length >= 1) {
 
-        let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
-        let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
+        let markersJS = markers.toJS();
+
+        let northWest = L.latLng(_maxBy(markersJS, 'lat').lat, _minBy(markersJS, 'lng').lng);
+        let southEast = L.latLng(_minBy(markersJS, 'lat').lat, _maxBy(markersJS, 'lng').lng);
 
         bounds = L.latLngBounds(northWest, southEast);
       }
 
       mapMarkers = [];
 
-      for (let i = 0, len = markers.length; i < len; i++) {
+      for (let i = 0, len = markers.size; i < len; i++) {
 
         // Create a new marker at the given position.
+
+        let marker = markers.get(i);
 
         let conditionalMarkerProps = {};
         let conditionalMarkerChild = null;
 
-        if (markers[i].isHighlighted || len === 1) {
+        if (marker.isHighlighted || len === 1) {
           // If this icon isHighlighted or if there is only one marker, give this marker the standard "big" icon.
           // no op
         } else {
@@ -85,7 +90,7 @@ let MapLeafletView = React.createClass({
 
           // Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar"/>
           conditionalMarkerChild = (
-            <DivIcon position={{lat: markers[i].lat, lng: markers[i].lng}}>
+            <DivIcon position={{lat: marker.get('lat'), lng: marker.get('lng')}}>
               <svg height="16" width="16"><circle cx="8" cy="8" r="6" stroke="#BC0F0F" strokeWidth="1" fill="#F26C6C" /></svg>
             </DivIcon>
           );
@@ -94,9 +99,9 @@ let MapLeafletView = React.createClass({
         let mapMarker = (
           <Marker
             key={i}
-            position={{lat: markers[i].lat, lng: markers[i].lng}}
-            title={markers[i].title}
-            onClick={(e) => this.handleMarkerClick(e, {table: markers[i].table, primKey: markers[i].primKey.toString()})}
+            position={{lat: marker.get('lat'), lng: marker.get('lng')}}
+            title={marker.title}
+            onClick={(e) => this.handleMarkerClick(e, {table: marker.get('locationTable'), primKey: marker.get('locationPrimKey').toString()})}
             {...conditionalMarkerProps}
           >
             {conditionalMarkerChild}
@@ -133,4 +138,4 @@ let MapLeafletView = React.createClass({
 
 });
 
-module.exports = MapLeafletView;
+module.exports = PieChartMapLeafletView;
