@@ -16,19 +16,13 @@ Possible keys
 .............
 
 
-genomeBrowserDescr
-  *Text.* Descriptive text that will be displayed in the genome browser section of the main page.
-
-annotMaxViewPortSize
-  *Value.* Maximum viewport (in bp) the genome browser can have in order to show the genome annotation track.
-
 refSequenceSumm
   *Boolean.* If set, a summary track displaying the reference sequence with be included in the genome browser.
 
 annotation
   *Block.* Directives for parsing the annotation file (annotation.gff).
   The block can contain the following keys:
-    Format
+    format
       *Text.* File format. Possible values
         GFF = Version 3 GFF file
         GTF = Version 2 GTF file

@@ -25,7 +25,7 @@ cd webapp
 npm run build
 cd ..
 git add -u
-git add webapp/dist/*
+git add webapp/dist/* || true
 echo $1
 git commit -m "Pre-release tasks" || true #Might fail due to no changes
 git push origin master

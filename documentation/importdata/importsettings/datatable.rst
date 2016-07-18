@@ -48,6 +48,19 @@ itemTitle
 sortDefault
   *PropertyID.* Specifies the property ID (i.e. column name in the ``data`` source file) used as the default sort field..
 
+defaultQuery
+  *Text.* Specifies the default query used thoughout the app for this table..
+
+storedQueries
+  *List.*  Default:[].  A list of queries to be displayed in the app for this table.
+  The block can contain the following keys:
+    query
+      *Text (required).* a query string.
+
+    name
+      *Text (required).* a display name for this query.
+
+
 cacheWorkspaceData
   *Boolean.* If set, a materialised table will be created in the relational database for this data in each workspace.
   For large data tables (>1M records), this option is faster than the standard option, which uses a JOIN statement.
@@ -172,7 +185,7 @@ browserDefaultLabel
   None indicates that no label is displayed by default.
 
 tableBasedSummaryValues
-  *List.* Declares that numerical genome values for are available for each item in the table.
+  *List.*  Default:[].  Declares that numerical genome values for are available for each item in the table.
   Panoptes will process these using the multiresolution filterbanking, and the user can display these as tracks in the genome browser.
   A typical use case is if the data table contains samples that were sequenced, and there is coverage data available
 
