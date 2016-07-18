@@ -295,7 +295,6 @@ let Criterion = React.createClass({
         disabled: (this.state.subsets.size === 0)
       }]
     };
-
     let propertySelect = (
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
         {_map(groups, (group) =>

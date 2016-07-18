@@ -72,7 +72,7 @@ let Finder = React.createClass({
 
     let listItems = [];
 
-    if (this.config.hasGenomeBrowser) {
+    if (this.config.genome.annotation) {
 
       // TODO: not sure whether exposing these setting values (GeneNameAttribute, GeneDescriptionAttribute) is wise
       // let annotationSettings = JSON.parse(this.config.settings.annotation);

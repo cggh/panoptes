@@ -6,17 +6,19 @@ from PanoptesConfig import PanoptesConfig
 from SettingsGlobal import SettingsGlobal
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
-
+from SettingsRefGenome import SettingsRefGenome
+from SettingsSummary import SettingsSummary
 
 config = PanoptesConfig(None)
 baseFolder = join(config.getSourceDataDir(), 'datasets')
 
-def readSetOfSettings(dirPath, loader, wanted_names):
+def readSetOfSettings(dirPath, loader, wanted_names=None):
     if not path.isdir(dirPath):
         return {}
     return {name: loads(loader(join(dirPath, name, 'settings'), validate=True).serialize())
                  for name in listdir(dirPath)
                   if path.isdir(join(dirPath, name)) and (not wanted_names or name in wanted_names)}
+
 
 def readJSONConfig(datasetId):
     datasetFolder = join(baseFolder, datasetId)
@@ -26,11 +28,15 @@ def readJSONConfig(datasetId):
         chromosomes = {fasta.id: len(fasta.seq) for fasta in SeqIO.parse(fastaFile, 'fasta')}
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
+    genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
+    # We currently have two ways of expressing this (single prop and datatable see ProcessFilterBank:471. I think we should simplify so punting this to later.
+    # genome['summaryValues'] = readSetOfSettings(join(datasetFolder, 'refgenome', 'summaryvalues'), SettingsSummary)
     return {
         'settings': settings,
         'chromosomes': chromosomes,
         'tablesById': tables,
         'twoDTablesById': twoDTables,
+        'genome': genome
     }
 
 class ReadOnlyErrorWriter:
@@ -46,6 +52,7 @@ def writeJSONConfig(datasetId, action, path, newConfig):
     writers = {
         'settings': lambda path: (path, SettingsGlobal(settingsFile, validate=True)),
         'chromosomes': lambda path: (path, ReadOnlyErrorWriter('chromosomes')),
+        'genome': lambda path: (path, ReadOnlyErrorWriter('genome')), #For now as this will likely get a refactor
         'tablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, 'datatables', path[0], 'settings'), validate=True)),
         'twoDTablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, '2D_datatables', path[0], 'settings'), validate=True)),
     }

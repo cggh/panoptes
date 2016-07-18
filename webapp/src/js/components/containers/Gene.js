@@ -123,12 +123,12 @@ let Gene = React.createClass({
           ]));
         }
         let genomePositionTableButton = (
-          <PopupButton key={table}
-                       label={'Show ' + table + ' in ' + geneData['fname']}
+          <PopupButton key={table.id}
+                       label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
                        icon={table.icon}
                        componentPath={table.listView ? 'containers/ListWithActions' : 'containers/DataTableWithActions'}
                        componentUpdate={componentUpdate}
-                       table={table}
+                       table={table.id}
                        query={genomePositionTableQuery}
           />
         );
@@ -136,13 +136,13 @@ let Gene = React.createClass({
       }
     });
 
-    let externalGeneLinks = JSON.parse(this.config.settings.externalGeneLinks);
+    let externalGeneLinks = this.config.genome.externalGeneLinks;
     let externalGeneLinkButtons = [];
     for (let i = 0, len = externalGeneLinks.length; i < len; i++) {
       let externalGeneLinkButton = (
         <ExternalLinkButton key={'externalGeneLinkButton_' + i}
-                            label={externalGeneLinks[i].Name}
-                            urls={[externalGeneLinks[i].Url.replace('{Id}', geneData['fid'])]}
+                            label={externalGeneLinks[i].name}
+                            urls={[externalGeneLinks[i].url.replace('{Id}', geneData['fid'])]}
         />
       );
       externalGeneLinkButtons.push(externalGeneLinkButton);
@@ -160,7 +160,7 @@ let Gene = React.createClass({
         <div>
           <div className="vertical stack">
             <GenomeScale {...trackProps}/>
-            { this.config.settings.refSequenceSumm ?
+            { this.config.genome.refSequenceSumm ?
               <ReferenceSequence {...trackProps}/> :
               null }
             <AnnotationChannel name="Structure" {...trackProps} />

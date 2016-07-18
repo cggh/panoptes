@@ -192,7 +192,7 @@ let PerRowNumericalTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (!this.config.tablesById[table] || !this.config.tablesById[table].tableBasedSummaryValues[channel]) {
+    if (!this.config.tablesById[table] || !this.config.tablesById[table].tableBasedSummaryValuesById[channel]) {
       ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid per row summary track`);
       return;
     }
@@ -235,7 +235,7 @@ let PerRowNumericalTrack = React.createClass({
                   name: `${channel}_${primKey}_avg`
                 }
               },
-              minBlockSize: this.config.tablesById[table].tableBasedSummaryValues[channel].minblocksize,
+              minBlockSize: this.tableConfig().tableBasedSummaryValuesById[channel].blockSizeMin,
               chromosome: chromosome,
               start: blockStart,
               end: blockEnd,
@@ -445,7 +445,6 @@ let PerRowNumericalTrackControls = React.createClass({
                  ref="yMax"
                  type="number"
                  value={yMax}
-                 onChange={this.handleRangeChange}
                  onChange={() => {
                    let value = parseFloat(this.refs.yMax.value);
                    if (_isFinite(value))

@@ -4,7 +4,6 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import _isFinite from 'lodash/isFinite';
 import _forEach from 'lodash/forEach';
-import _transform from 'lodash/transform';
 import _map from 'lodash/map';
 
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -136,16 +135,25 @@ let NumericalTrackGroupControls = React.createClass({
     })
   ],
 
-  componentWillMount() {
-    this.trackGroups = Immutable.Map();
-    _forEach(this.config.summaryValues, (properties, groupId) => {
-      this.trackGroups = this.trackGroups.set(groupId, Immutable.fromJS({
-        name: groupId === '__reference__' ? 'Reference' : this.config.tablesById[groupId].capNamePlural,
-        icon: groupId === '__reference__' ? 'bitmap:genomebrowser.png' : this.config.tablesById[groupId].icon,
-        items: _transform(properties, (result, prop) => {
-            //Only numerical tracks can be added
-          if (!prop.isCategorical)
-            result[prop.id] = {
+  trackGroups() {
+    let groups = {
+      __reference__: {
+        name: 'Reference',
+        icon: 'bitmap:genomebrowser.png',
+        items: {}
+      }
+    };
+
+    _forEach(this.config.tables, (table) => {
+      if (table.hasGenomePositions && !table.isHidden) {
+        groups[table.id] = {
+          name: table.capNamePlural,
+          icon: table.icon,
+          items: {}
+        };
+        _forEach(table.properties, (prop) => {
+          if (prop.showInBrowser && prop.isFloat && prop.summaryValues) {
+            groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
               icon: 'line-chart',
@@ -153,15 +161,16 @@ let NumericalTrackGroupControls = React.createClass({
                 track: 'NumericalSummaryTrack',
                 name: prop.name,
                 props: {
-                  group: groupId,
+                  table: table.id,
                   track: prop.id
                 }
               }
-            };
-        }, {}
-        )
-      }));
+            }
+          }
+        });
+      }
     });
+    return Immutable.fromJS(groups);
   },
 
 
@@ -175,7 +184,7 @@ let NumericalTrackGroupControls = React.createClass({
     let {interpolation, tension, autoYScale, yMin, yMax, tracks} = this.props;
     let actions = this.getFlux().actions;
     tracks = tracks.map((track) => Immutable.Map({
-      groupId: track.getIn(['props', 'group']),
+      groupId: track.getIn(['props', 'table']),
       itemId: track.getIn(['props', 'track']),
       payload: track
     })
@@ -190,7 +199,7 @@ let NumericalTrackGroupControls = React.createClass({
                           title: 'Pick tracks to be displayed',
                           itemName: 'Numerical track',
                           itemVerb: 'display',
-                          groups: this.trackGroups,
+                          groups: this.trackGroups(),
                           initialSelection: tracks,
                           onPick: this.handleTrackChange
                         })}/>
@@ -246,7 +255,6 @@ let NumericalTrackGroupControls = React.createClass({
                  ref="yMax"
                  type="number"
                  value={yMax}
-                 onChange={this.handleRangeChange}
                  onChange={() => {
                    let value = parseFloat(this.refs.yMax.value);
                    if (_isFinite(value))

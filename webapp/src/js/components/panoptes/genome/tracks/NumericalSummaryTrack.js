@@ -20,7 +20,7 @@ let NumericalSummaryTrack = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'group,', 'track', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'track', 'width', 'sideWidth')
   ],
 
   propTypes: {
@@ -34,7 +34,7 @@ let NumericalSummaryTrack = React.createClass({
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
     onYLimitChange: React.PropTypes.func,
-    group: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired
   },
 
@@ -76,8 +76,13 @@ let NumericalSummaryTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (!this.config.summaryValues[props.group] || !this.config.summaryValues[props.group][props.track]) {
-      ErrorReport(this.getFlux(), `${props.group}/${props.track} is not a valid summary track`);
+    if (!this.config.tablesById[props.table] ||
+      !this.config.tablesById[props.table].propertiesById[props.track] ||
+      !this.config.tablesById[props.table].propertiesById[props.track].showInBrowser ||
+      !this.config.tablesById[props.table].propertiesById[props.track].isFloat ||
+      !this.config.tablesById[props.table].propertiesById[props.track].summaryValues
+    ) {
+      ErrorReport(this.getFlux(), `${props.table}/${props.track} is not a valid numerical summary track`);
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
@@ -101,7 +106,7 @@ let NumericalSummaryTrack = React.createClass({
               name: `${props.track}_min`
             }
           },
-          minBlockSize: this.config.summaryValues[props.group][props.track].minblocksize,
+          minBlockSize: this.tableConfig().propertiesById[props.track].summaryValues.blockSizeMin,
           chromosome: chromosome,
           start: blockStart,
           end: blockEnd,
