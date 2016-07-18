@@ -1,5 +1,6 @@
 import React from 'react';
 import {Map, Marker, Popup, TileLayer} from 'react-leaflet';
+import DivIcon from 'react-leaflet-div-icon';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -30,13 +31,6 @@ let MapLeafletView = React.createClass({
         lng: 0
       }
     };
-  },
-
-
-  // Lifecycle methods
-  componentWillUnmount() {
-console.log('LeafletView componentWillUnmount this: %o', this);
-console.log('LeafletView componentWillUnmount window.L: %o', window.L);
   },
 
   // Event handlers
@@ -71,27 +65,36 @@ console.log('LeafletView componentWillUnmount window.L: %o', window.L);
 
         // Create a new marker at the given position.
 
-        // Give this marker a big icon if it isHighlighted or if there is only one marker.
-        // Otherwise, give this marker a small icon.
+        let conditionalMarkerProps = {};
+        let conditionalMarkerChild = null;
 
-        // path: this.maps.SymbolPath.CIRCLE,
-        // fillColor: '#F26C6C',
-        // fillOpacity: 1,
-        // scale: 4,
-        // strokeColor: '#BC0F0F',
-        // strokeWeight: 1
+        if (markers[i].isHighlighted || len === 1) {
+          // If this icon isHighlighted or if there is only one marker, give this marker the standard "big" icon.
+          // no op
+        } else {
+          // Otherwise (if this icon is not highlighted and there is more than one icon), give this marker a "small" icon.
 
+          // FIXME: Workaround to hide the default icon.
+          conditionalMarkerProps.icon = L.divIcon({html: ''});
 
-        let icon = (markers[i].isHighlighted || len === 1) ? undefined : L.divIcon({html: '<span>hello</span>'});
+          // Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar"/>
+          conditionalMarkerChild = (
+            <DivIcon position={{lat: markers[i].lat, lng: markers[i].lng}}>
+              <svg height="16" width="16"><circle cx="8" cy="8" r="6" stroke="#BC0F0F" stroke-width="1" fill="#F26C6C" /></svg>
+            </DivIcon>
+          );
+        }
 
         let mapMarker = (
           <Marker
             key={i}
             position={{lat: markers[i].lat, lng: markers[i].lng}}
-            icon={icon}
             title={markers[i].title}
             onClick={(e) => this.handleMarkerOnClick(e, {table: markers[i].table, primKey: markers[i].primKey.toString()})}
-          />
+            {...conditionalMarkerProps}
+          >
+            {conditionalMarkerChild}
+          </Marker>
         );
 
         mapMarkers.push(mapMarker);
