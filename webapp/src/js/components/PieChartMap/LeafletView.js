@@ -58,7 +58,7 @@ let PieChartMapLeafletView = React.createClass({
 
     if (markers !== undefined) {
 
-      if (markers.length >= 1) {
+      if (markers.size >= 1) {
 
         let markersJS = markers.toJS();
 
