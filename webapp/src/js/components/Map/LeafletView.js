@@ -36,16 +36,14 @@ let MapLeafletView = React.createClass({
 
   // Event handlers
   handleDetectResize() {
-    this.refs.map.leafletElement.invalidateSize();
-  },
-  handleMarkerClick(e, payload) {
-    let {table, primKey} = payload;
-    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
-    if (middleClick) {
-      // TODO: stop the dataItemPopup stealing focus.
+    if (this.map) {
+      this.map.leafletElement.invalidateSize();
     }
-    let switchTo = !middleClick;
-    this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo});
+  },
+  handleClickMarker(e, marker) {
+    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
+    // TODO: when left click, focus dataItemPopup. When middleclick, maintain focus on this component.
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey.toString(), switchTo: !middleClick});
   },
 
   render() {
@@ -96,7 +94,7 @@ let MapLeafletView = React.createClass({
             key={i}
             position={{lat: markers[i].lat, lng: markers[i].lng}}
             title={markers[i].title}
-            onClick={(e) => this.handleMarkerClick(e, {table: markers[i].table, primKey: markers[i].primKey.toString()})}
+            onClick={(e) => this.handleClickMarker(e, {table: markers[i].table, primKey: markers[i].primKey.toString()})}
             {...conditionalMarkerProps}
           >
             {conditionalMarkerChild}
@@ -114,7 +112,7 @@ let MapLeafletView = React.createClass({
     return (
       <DetectResize onResize={this.handleDetectResize}>
         <Map
-          ref="map"
+          ref={(ref) => this.map = ref}
           center={center}
           zoom={zoom}
           style={{height: '100%', width: '100%'}}

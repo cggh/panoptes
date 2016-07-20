@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Map, Marker, Popup, TileLayer} from 'react-leaflet';
 import DivIcon from 'react-leaflet-div-icon';
+import Immutable from 'immutable';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -9,7 +10,9 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import DetectResize from 'utils/DetectResize';
-// TODO: import GeoLayouter from 'utils/GeoLayouter';
+import GeoLayouter from 'utils/GeoLayouter';
+import PieChartWidget from 'PieChart/Widget';
+import {latlngToMercatorXY} from 'util/WebMercator';
 
 // CSS
 import 'leaflet.css';
@@ -17,6 +20,9 @@ import 'leaflet.css';
 // Lodash
 import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
+
+// Constants
+const L = window.L;
 
 let PieChartMapLeafletView = React.createClass({
 
@@ -37,100 +43,191 @@ let PieChartMapLeafletView = React.createClass({
 
   // Event handlers
   handleDetectResize() {
-    this.refs.map.leafletElement.invalidateSize();
-  },
-  handleMarkerClick(e, payload) {
-    let {table, primKey} = payload;
-    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
-    if (middleClick) {
-      // TODO: stop the dataItemPopup stealing focus.
+    if (this.refs.map) {
+      this.refs.map.leafletElement.invalidateSize();
     }
-    let switchTo = !middleClick;
-    this.getFlux().actions.panoptes.dataItemPopup({table, primKey, switchTo});
+  },
+  handleClickMarker(e, marker) {
+    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
+    // TODO: when left click, focus dataItemPopup. When middleclick, maintain focus on this component.
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.locationTable, primKey: marker.locationPrimKey.toString(), switchTo: !middleClick});
+  },
+  handleClickPieChart(e, marker) {
+    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
+    if (!middleClick) {
+      e.stopPropagation();
+    }
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.locationTable, primKey: marker.locationPrimKey.toString(), switchTo: !middleClick});
   },
 
   render() {
     let {center, zoom, markers} = this.props;
 
-    let L = window.L;
-    let mapMarkers = undefined;
     let bounds = undefined;
 
-    if (markers !== undefined) {
+    if (markers !== undefined && markers.size >= 1 && this.map !== undefined) {
 
-      if (markers.size >= 1) {
 
-        let markersJS = markers.toJS();
+      let markersJS = markers.toJS();
 
-        let northWest = L.latLng(_maxBy(markersJS, 'lat').lat, _minBy(markersJS, 'lng').lng);
-        let southEast = L.latLng(_minBy(markersJS, 'lat').lat, _maxBy(markersJS, 'lng').lng);
+console.log('this.map: %o', this.map);
 
-        bounds = L.latLngBounds(northWest, southEast);
+      //// Define two corners, in this case: northWest (nw), and southEast (se).
+
+      // First as a simple object, to calculate piechart areas, etc.
+      let nw = {lat: _maxBy(markersJS, 'lat').lat, lng: _minBy(markersJS, 'lng').lng};
+      let se = {lat: _minBy(markersJS, 'lat').lat, lng: _maxBy(markersJS, 'lng').lng};
+
+      // Then as a Leaflet LatLng, required to automagically adjust the map's bounds.
+      let northWestLatLng = L.latLng(nw.lat, nw.lng);
+      let southEastLatLng = L.latLng(se.lat, se.lng);
+console.log('northWestLatLng: %o', northWestLatLng);
+console.log('southEastLatLng: %o', southEastLatLng);
+      bounds = L.latLngBounds(northWestLatLng, southEastLatLng);
+
+// This bounds var is to be used initially for the Map, where it will change the map's actual bounds.
+console.log('bounds %o', bounds);
+
+console.log('nw: %o', nw);
+console.log('se: %o', se);
+
+
+
+      // Now we have bounds we can set sensible radii.
+
+// This bounds var is to be used upon rerender, when the map's actual bounds have changed.
+// The methods for getting all four corners are available, e.g.: getNorthWest(); getSouthEast().
+console.log('this.map.leafletElement.getBounds(): %o', this.map.leafletElement.getBounds());
+
+      let actualBounds = this.map.leafletElement.getBounds();
+
+      let actualNorthWestLatLng = actualBounds.getNorthWest();
+      let actualSouthEastLatLng = actualBounds.getSouthEast();
+
+console.log('actualNorthWestLatLng: %o', actualNorthWestLatLng);
+console.log('actualSouthEastLatLng: %o', actualSouthEastLatLng);
+
+      // If the map starts to loop (wrap?), we need to correct the bounds,
+      // so the piecharts don't get clipped.
+      if (se.lng < nw.lng) {
+        se.lng = 180, nw.lng = -180;
+console.log('clip');
       }
 
-      mapMarkers = [];
-
-      for (let i = 0, len = markers.size; i < len; i++) {
-
-        // Create a new marker at the given position.
-
-        let marker = markers.get(i);
-
-        let conditionalMarkerProps = {};
-        let conditionalMarkerChild = null;
-
-        if (marker.isHighlighted || len === 1) {
-          // If this icon isHighlighted or if there is only one marker, give this marker the standard "big" icon.
-          // no op
-        } else {
-          // Otherwise (if this icon is not highlighted and there is more than one icon), give this marker a "small" icon.
-
-          // FIXME: Workaround to hide the default icon.
-          conditionalMarkerProps.icon = L.divIcon({html: ''});
-
-          // Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar"/>
-          conditionalMarkerChild = (
-            <DivIcon position={{lat: marker.get('lat'), lng: marker.get('lng')}}>
-              <svg height="16" width="16"><circle cx="8" cy="8" r="6" stroke="#BC0F0F" strokeWidth="1" fill="#F26C6C" /></svg>
-            </DivIcon>
-          );
-        }
-
-        let mapMarker = (
-          <Marker
-            key={i}
-            position={{lat: marker.get('lat'), lng: marker.get('lng')}}
-            title={marker.title}
-            onClick={(e) => this.handleMarkerClick(e, {table: marker.get('locationTable'), primKey: marker.get('locationPrimKey').toString()})}
-            {...conditionalMarkerProps}
-          >
-            {conditionalMarkerChild}
-          </Marker>
+      // Filter piecharts to those that fall within the bounds,
+      // and work out the area of each piechart.
+      // NB: This is in lat/lng, but we only need to be rough.
+      let pieAreaSum = markers
+        .filter(
+          (marker) => {
+            let thing = (
+              marker.get('lat') > se.lat &&
+              marker.get('lat') < nw.lat &&
+              marker.get('lng') > nw.lng &&
+              marker.get('lng') < se.lng
+            );
+console.log('filter: ' + thing);
+            return thing;
+          }
+        )
+        .map(
+          (marker) => {
+console.log('map: ' + marker.get('radius') * marker.get('radius') * 2 * Math.PI);
+            return (marker.get('radius') * marker.get('radius') * 2 * Math.PI);
+          }
+        )
+        .reduce(
+          (sum, val) => {
+console.log('reduce: ' + (sum + val, 0));
+            return (sum + val, 0);
+          }
         );
 
-        mapMarkers.push(mapMarker);
 
+console.log('pieAreaSum: %o', pieAreaSum);
+
+      if (pieAreaSum > 0) {
+        nw = latlngToMercatorXY(nw);
+        se = latlngToMercatorXY(se);
+        let mapArea = (nw.y - se.y) * (se.x - nw.x);
+        let factor = 75 * Math.sqrt(mapArea / pieAreaSum);
+        this.lastFactor = factor;
       }
+
+console.log('lastFactor: %o', this.lastFactor);
+
+      // if (this.lastFactor) {
+      markers = markers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
+      // } else {
+      //   markers = Immutable.List();
+      // }
+
     }
 
     const TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
     const TileLayerAttribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
 
+    let crs = L.CRS.EPSG3857; // this.map is not available on the first render.
+    if (this.map) {
+      crs = this.map.leafletElement.options.crs;
+    }
+
     return (
       <DetectResize onResize={this.handleDetectResize}>
-        <Map
-          ref="map"
-          center={center}
-          zoom={zoom}
-          style={{height: '100%', width: '100%'}}
-          bounds={bounds}
-        >
-          <TileLayer
-            url={TileLayerUrl}
-            attribution={TileLayerAttribution}
-          />
-          {mapMarkers}
-        </Map>
+        <GeoLayouter nodes={markers}>
+          {
+            (renderNodes) =>
+              <Map
+                ref={(ref) => this.map = ref}
+                center={center}
+                zoom={zoom}
+                style={{height: '100%', width: '100%'}}
+                bounds={bounds}
+              >
+                <TileLayer
+                  url={TileLayerUrl}
+                  attribution={TileLayerAttribution}
+                />
+                {
+                  renderNodes.map(
+                    (marker, index) => {
+
+                      // FIXME: Workaround to hide the default icon.
+                      let icon = L.divIcon({html: ''});
+
+                      // NB: Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar "/>
+
+                      return (
+                        <Marker
+                          key={index}
+                          position={{lat: marker.lat, lng: marker.lng}}
+                          title={marker.title}
+                          onClick={(e) => this.handleClickMarker(e, marker)}
+                          icon={icon}
+                        >
+                          <DivIcon position={{lat: marker.lat, lng: marker.lng}}>
+                            <PieChartWidget
+                              debounced={false}
+                              lng={marker.lng}
+                              lat={marker.lat}
+                              originalLng={marker.originalNode.lng}
+                              originalLat={marker.originalNode.lat}
+                              key={index}
+                              name={marker.name}
+                              radius={marker.radius}
+                              chartData={marker.chartData}
+                              crs={crs}
+                              onClick={(e) => this.handleClickPieChart(e, marker)}
+                            />
+                          </DivIcon>
+                        </Marker>
+                      );
+                    }
+                  )
+                }
+              </Map>
+          }
+        </GeoLayouter>
       </DetectResize>
     );
 
