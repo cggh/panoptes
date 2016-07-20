@@ -1,5 +1,6 @@
 import React from 'react';
 import d3 from 'd3';
+import Point from 'point-geometry';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -13,6 +14,11 @@ import 'pie-chart.scss';
 // constants in this component
 // TODO: to go in config?
 const DEFAULT_OUTER_RADIUS = 25;
+
+function project(latlng) {
+
+  return; //locationPoint(latlng) // Point
+}
 
 let PieChartWidget = React.createClass({
 
@@ -31,6 +37,7 @@ let PieChartWidget = React.createClass({
     originalLng: React.PropTypes.number,
     chartData: React.PropTypes.array,
     $geoService: React.PropTypes.object,
+    crs: React.PropTypes.object
   },
 
   getDefaultProps() {
@@ -40,8 +47,12 @@ let PieChartWidget = React.createClass({
   },
 
   render() {
-    let {name, radius, chartData, onClick} = this.props;
-    let geoService = this.props.$geoService;
+    let {name, radius, chartData, onClick, crs} = this.props;
+
+    // Support the GoogleMapsView
+    if (crs === undefined && this.props.$geoService !== undefined) {
+      crs = this.props.$geoService;
+    }
 
     let sectorsData = [];
     let pieData = [];
@@ -60,7 +71,7 @@ let PieChartWidget = React.createClass({
 
     let outerRadius = DEFAULT_OUTER_RADIUS;
     if (radius) {
-      outerRadius = geoService.project({lat: 0, lng: radius}).x - geoService.project({lat: 0, lng: 0}).x;
+      outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
     }
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSectorWidget
@@ -78,19 +89,20 @@ let PieChartWidget = React.createClass({
     let translateX = 0;
     let translateY = 0;
 
-    let location = geoService.project(this.props);
-    let originalLocation = geoService.project({lat: this.props.originalLat, lng: this.props.originalLng});
-
+    let location = crs.project(this.props);
+    let originalLocation = crs.project({lat: this.props.originalLat, lng: this.props.originalLng});
 
     return (
       <svg style={{overflow: 'visible'}} width={width} height={height}>
         <g transform={'translate(' + translateX + ', ' + translateY + ')'}>
           {sectors}
         </g>
-        <line className="pie-chart-line"
-              style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
-              x1="0" y1="0"
-              x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}/>
+        <line
+          className="pie-chart-line"
+          style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
+          x1="0" y1="0"
+          x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
+        />
       </svg>
     );
 
