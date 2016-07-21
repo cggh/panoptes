@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Color from 'color';
-
+import _uniq from 'lodash/uniq';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -32,6 +32,7 @@ const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 const SCROLLBAR_HEIGHT = 15;
+const COLUMN_WIDTH = 100;
 
 let DataTableView = React.createClass({
   mixins: [
@@ -58,7 +59,7 @@ let DataTableView = React.createClass({
 
   getInitialState() {
     return {
-      rows: [],
+      data: [],
       loadStatus: 'loaded',
       width: 0,
       height: 0,
@@ -81,14 +82,15 @@ let DataTableView = React.createClass({
       columnspec[rowProperty] = tableConfig.propertiesById[rowProperty].defaultDisplayEncoding;
       groupby.push(rowProperty);
     }
-    this.setState({loadStatus: 'loading'});
+    this.setState({loadStatus: 'loading', dataByColumnRow:null, uniqueColumns:null, uniqueRows:null});
 
     let pageQueryAPIargs = {
       database: this.config.dataset,
       table: tableConfig.fetchTableName,
       columns: columnspec,
       query: query,
-      groupby
+      groupby,
+      transpose: false
     };
 
     requestContext.request((componentCancellation) =>
@@ -99,19 +101,44 @@ let DataTableView = React.createClass({
           componentCancellation
         ),
     )
-    .then((rows) => {
+    .then((data) => {
+      let columnData = data[columnProperty];
+      let rowData = data[rowProperty];
+      var countData = data['count(*)'];
+      let uniqueColumns = _uniq(columnData);
+      uniqueColumns.push('_all_');
+      let uniqueRows = _uniq(rowData);
+      uniqueRows.push('_all_');
+      let dataByColumnRow = {};
+      uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_' : 0});
+      dataByColumnRow['_all_'] = {};
+      uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
+      for (let i = 0; i < countData.length; ++i) {
+        dataByColumnRow['_all_']['_all_'] += countData[i];
+        if (columnProperty) {
+          dataByColumnRow[columnData[i]]['_all_'] += countData[i];
+        }
+        if (rowProperty) {
+          dataByColumnRow['_all_'][rowData[i]] += countData[i];
+        }
+        if (columnProperty && rowProperty) {
+          dataByColumnRow[columnData[i]][rowData[i]] = countData[i];
+        }
+      }
       this.setState({
         loadStatus: 'loaded',
-        rows: rows,
+        uniqueRows,
+        uniqueColumns,
+        dataByColumnRow
       });
     })
     .catch(API.filterAborted)
     .catch(LRUCache.filterCancelled)
-    // .catch((xhr) => {
-    //   ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-    //   this.setState({loadStatus: 'error'});
-    // });
-    .done()
+    .catch((xhr) => {
+      ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+      this.setState({loadStatus: 'error'});
+    })
+    .done();
   },
 
   handleResize(size) {
@@ -120,14 +147,93 @@ let DataTableView = React.createClass({
 
   render() {
     let {className, columnProperty, rowProperty} = this.props;
-    let {loadStatus, rows, width, height} = this.state;
-    let tableConfig = this.config.tablesById[this.props.table];
+    let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
+    let tableConfig = this.tableConfig();
     if (!tableConfig) {
       console.log(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    return <div>{JSON.stringify(rows)}</div>;
-
+    if (!dataByColumnRow)
+      return null;
+    return (
+      <DetectResize onResize={this.handleResize}>
+        <div className={classNames('datatable', className)}>
+          <Table
+            rowHeight={ROW_HEIGHT}
+            rowsCount={uniqueRows.length}
+            width={width}
+            height={height}
+            headerHeight={HEADER_HEIGHT}
+            //headerDataGetter={this.headerData}
+            //onColumnResizeEndCallback={this.handleColumnResize}
+            isColumnResizing={false}
+          >
+            <Column
+              //TODO Better default column widths
+              width={COLUMN_WIDTH}
+              allowCellsRecycling={true}
+              isFixed={true}
+              isResizable={false}
+              minWidth={50}
+              header=""
+              cell={({rowIndex}) => {
+                return (
+                  <div className="table-row-cell"
+                       style={{
+                         textAlign: uniqueRows[rowIndex] == '_all_' ? 'center' : tableConfig.propertiesById[rowProperty].alignment,
+                         width: COLUMN_WIDTH,
+                         height: ROW_HEIGHT + 'px',
+                         //background: background
+                       }}>
+                    {
+                      uniqueRows[rowIndex] == '_all_' ? 'All' :
+                        <PropertyCell prop={tableConfig.propertiesById[rowProperty]} value={uniqueRows[rowIndex]}/>
+                    }
+                  </div>
+                );
+              }}
+            />
+            {uniqueColumns.map((columnValue) => {
+              return <Column
+                //TODO Better default column widths
+                width={COLUMN_WIDTH}
+                key={columnValue}
+                allowCellsRecycling={true}
+                isResizable={false}
+                minWidth={50}
+                header={
+                    <div className="table-row-cell"
+                         style={{
+                           textAlign: columnValue == '_all_' ? 'center' : tableConfig.propertiesById[columnProperty].alignment,
+                           width: COLUMN_WIDTH,
+                           height: HEADER_HEIGHT + 'px',
+                           //background: background
+                         }}>
+                      { columnValue == '_all_' ? 'All' :
+                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
+                    </div>
+                }
+                cell={({rowIndex}) => {
+                  return (
+                    <div className="table-row-cell"
+                         style={{
+                           textAlign: 'right',
+                           width: COLUMN_WIDTH,
+                           height: ROW_HEIGHT + 'px',
+                           //background: background
+                         }}>
+                      {dataByColumnRow[columnValue][uniqueRows[rowIndex]]}
+                    </div>
+                  );
+                }}
+              />;
+            })
+            }
+          </Table>
+          <Loading status={loadStatus}/>
+        </div>
+      </DetectResize>
+      );
   }
 
 });

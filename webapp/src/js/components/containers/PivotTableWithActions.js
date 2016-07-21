@@ -75,11 +75,13 @@ let PivotTableWithActions = React.createClass({
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
                             label="Column"
+                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => componentUpdate({columnProperty: v})}/>
           <PropertySelector table={table}
                             key="rowProperty"
                             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
                             label="Row"
+                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => componentUpdate({rowProperty: v})}/>
         </div>
       </div>
