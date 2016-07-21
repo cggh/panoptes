@@ -102,7 +102,6 @@ let DataTableWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
   },
 
@@ -309,7 +308,7 @@ let DataTableWithActions = React.createClass({
         {searchGUI}
         <FlatButton label="Pivot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen('containers/PivotTableWithActions', {table}, false)}
+                    onClick={() => this.flux.actions.session.tabOpen('containers/PivotTableWithActions', {table}, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
       </div>

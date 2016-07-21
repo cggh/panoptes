@@ -92,6 +92,7 @@ function pageQuery(options) {
   let defaults = {
     query: SQL.nullQuery,
     order: null,
+    groupby: null,
     ascending: true,
     count: false,
     start: 0,
@@ -99,7 +100,7 @@ function pageQuery(options) {
     distinct: false,
     transpose: true
   };
-  let {database, table, columns, query, order,
+  let {database, table, columns, query, order, groupby,
     ascending, count, start, stop, distinct, transpose} = {...defaults, ...options};
 
   let collist = '';
@@ -108,15 +109,18 @@ function pageQuery(options) {
     collist += encoding + id;
   });
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  let params = {};
+  params = order ? {order, ...params} : params;
+  params = groupby ? {groupby: groupby.join('~'), ...params} : params;
   return requestJSON({
     ...args,
     params: {
+      ...params,
       datatype: 'pageqry',
-      database: database,
+      database,
       tbname: table,
       qry: query,
       collist: LZString.compressToEncodedURIComponent(collist),
-      order: order,
       sortreverse: ascending ? '0' : '1',
       needtotalcount: count ? '1' : '0',
       limit: `${start}~${stop}`,
