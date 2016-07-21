@@ -15,11 +15,6 @@ import 'pie-chart.scss';
 // TODO: to go in config?
 const DEFAULT_OUTER_RADIUS = 25;
 
-function project(latlng) {
-
-  return; //locationPoint(latlng) // Point
-}
-
 let PieChartWidget = React.createClass({
 
   mixins: [
@@ -89,7 +84,7 @@ let PieChartWidget = React.createClass({
     let translateX = 0;
     let translateY = 0;
 
-    let location = crs.project(this.props);
+    let location = crs.project({lat: this.props.lat, lng: this.props.lng});
     let originalLocation = crs.project({lat: this.props.originalLat, lng: this.props.originalLng});
 
     return (
