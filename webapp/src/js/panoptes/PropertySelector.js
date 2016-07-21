@@ -1,9 +1,11 @@
 import React from 'react';
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
 import FluxMixin from 'mixins/FluxMixin';
+import Divider from 'material-ui/Divider';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import _each from 'lodash/map';
 
 
 const PropertySelector = React.createClass({
@@ -28,15 +30,32 @@ const PropertySelector = React.createClass({
   },
 
   render() {
-    const { table, value } = this.props;
+    const { table, value, label} = this.props;
+
+    let propertyMenu = [];
+    let i = 0;
+    if (table) {
+      const propertyGroups = this.config.tablesById[table].propertyGroups;
+      _each(propertyGroups, (group) => {
+        if (propertyMenu.length) {
+          propertyMenu.push(<Divider key={i++}/>);
+        }
+        let {id, name} = group;
+        propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
+        _each(group.properties, (property) => {
+          let {id, name} = property;
+          propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
+        });
+      });
+    }
+
     return (
-      <DropDownMenu className="dropdown"
-                  value={value}
-                  onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>
-        <MenuItem key="__none__" value={undefined} primaryText="None"/>
-        {this.config.tablesById[table].properties.map((property) =>
-          <MenuItem key={property.id} value={property.id} primaryText={property.name}/>)}
-      </DropDownMenu>
+    <SelectField value={value}
+                 autoWidth={true}
+                 floatingLabelText={label}
+                 onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>
+      {propertyMenu}
+    </SelectField>
     );
   }
 });
