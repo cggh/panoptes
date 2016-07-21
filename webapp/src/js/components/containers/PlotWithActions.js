@@ -13,7 +13,6 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Material UI
-import {FlatButton} from 'material-ui';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
@@ -28,6 +27,7 @@ import PlotContainer from 'containers/PlotContainer';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import FilterButton from 'panoptes/FilterButton';
 
 import "plot.scss";
 
@@ -68,7 +68,6 @@ let PlotWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
   },
 
@@ -78,7 +77,6 @@ let PlotWithActions = React.createClass({
 
   render() {
     let {sidebar, table, query, plotType, componentUpdate} = this.props;
-    const actions = this.getFlux().actions;
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
@@ -86,18 +84,7 @@ let PlotWithActions = React.createClass({
       label: table.capNamePlural
     }));
 
-    let filterButtonLabel = 'Change Filter';
-    let decodedQuery = SQL.WhereClause.decode(query);
-    let clearFilterButton = null;
-    if (!query || decodedQuery.isTrivial) {
-      filterButtonLabel = 'Add Filter';
-    } else if (table) {
-      clearFilterButton = <FlatButton
-                                label="Clear Filter"
-                                primary={true}
-                                onClick={() => componentUpdate({query: SQL.nullQuery})}
-                              />;
-    }
+
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -110,16 +97,8 @@ let PlotWithActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FlatButton label={filterButtonLabel}
-                      primary={true}
-                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                        {
-                          table: table,
-                          initialQuery: query,
-                          onPick: this.handleQueryPick
-                        })}/>
+          {table ? <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
             : null}
-          {clearFilterButton}
           <SelectField value={plotType}
                        autoWidth={true}
                        floatingLabelText="Plot Type:"
