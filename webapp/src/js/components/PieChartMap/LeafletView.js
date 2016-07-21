@@ -40,13 +40,53 @@ let PieChartMapLeafletView = React.createClass({
       }
     };
   },
+  getInitialState() {
+    return {
+      bounds: undefined
+    };
+  },
+
+  // Lifecycle methods
+  componentWillReceiveProps(nextProps) {
+    let {markers} = nextProps;
+    let {bounds} = this.state;
+
+    if (markers !== undefined && markers.size >= 1 && bounds === undefined) {
+
+      // If we have markers but no bounds, then calculate the initial bounds using the markers.
+
+      // Define two corners, in this case: northWest (nw), and southEast (se).
+
+      // First as a simple object, to calculate piechart areas, etc.
+      let markersJS = markers.toJS();
+      let nw = {lat: _maxBy(markersJS, 'lat').lat, lng: _minBy(markersJS, 'lng').lng};
+      let se = {lat: _minBy(markersJS, 'lat').lat, lng: _maxBy(markersJS, 'lng').lng};
+
+      // Then as a Leaflet LatLng, required to automagically adjust the map's bounds.
+      let northWestLatLng = L.latLng(nw.lat, nw.lng);
+      let southEastLatLng = L.latLng(se.lat, se.lng);
+
+      // This bounds object will be used as a prop for the Map component, where it will be used to adjust the map's actual bounds.
+      let bounds = L.latLngBounds(northWestLatLng, southEastLatLng);
+
+      this.setState({bounds});
+    }
+  },
+  componentDidMount() {
+    if (this.map) {
+      this.map.leafletElement.on('moveend', (e) => {
+        this.handleMapMove(e);
+      });
+    }
+  },
 
   // Event handlers
   handleDetectResize() {
-    if (this.refs.map) {
-      this.refs.map.leafletElement.invalidateSize();
+    if (this.map) {
+      this.map.leafletElement.invalidateSize();
     }
   },
+  // TODO: Distinguish between clicking on a piechart / marker and dragging on the map (dragging on a marker).
   handleClickMarker(e, marker) {
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     // TODO: when left click, focus dataItemPopup. When middleclick, maintain focus on this component.
@@ -59,59 +99,32 @@ let PieChartMapLeafletView = React.createClass({
     }
     this.getFlux().actions.panoptes.dataItemPopup({table: marker.locationTable, primKey: marker.locationPrimKey.toString(), switchTo: !middleClick});
   },
+  handleMapMove(e) {
+
+    // if (this.map) {
+    //   this.setState({bounds: this.map.leafletElement.getBounds()});
+    //   if (this.props.onPanZoom) {
+    //     this.props.onPanZoom({center: this.map.leafletElement.getCenter(), zoom: this.map.leafletElement.getZoom()});
+    //   }
+    // }
+
+  },
 
   render() {
     let {center, zoom, markers} = this.props;
+    let {bounds} = this.state;
 
-    let bounds = undefined;
-
-    if (markers !== undefined && markers.size >= 1 && this.map !== undefined) {
-
-
-      let markersJS = markers.toJS();
-
-console.log('this.map: %o', this.map);
-
-      //// Define two corners, in this case: northWest (nw), and southEast (se).
-
-      // First as a simple object, to calculate piechart areas, etc.
-      let nw = {lat: _maxBy(markersJS, 'lat').lat, lng: _minBy(markersJS, 'lng').lng};
-      let se = {lat: _minBy(markersJS, 'lat').lat, lng: _maxBy(markersJS, 'lng').lng};
-
-      // Then as a Leaflet LatLng, required to automagically adjust the map's bounds.
-      let northWestLatLng = L.latLng(nw.lat, nw.lng);
-      let southEastLatLng = L.latLng(se.lat, se.lng);
-console.log('northWestLatLng: %o', northWestLatLng);
-console.log('southEastLatLng: %o', southEastLatLng);
-      bounds = L.latLngBounds(northWestLatLng, southEastLatLng);
-
-// This bounds var is to be used initially for the Map, where it will change the map's actual bounds.
-console.log('bounds %o', bounds);
-
-console.log('nw: %o', nw);
-console.log('se: %o', se);
-
-
+    if (markers !== undefined && markers.size >= 1 && bounds !== undefined) {
 
       // Now we have bounds we can set sensible radii.
 
-// This bounds var is to be used upon rerender, when the map's actual bounds have changed.
-// The methods for getting all four corners are available, e.g.: getNorthWest(); getSouthEast().
-console.log('this.map.leafletElement.getBounds(): %o', this.map.leafletElement.getBounds());
-
-      let actualBounds = this.map.leafletElement.getBounds();
-
-      let actualNorthWestLatLng = actualBounds.getNorthWest();
-      let actualSouthEastLatLng = actualBounds.getSouthEast();
-
-console.log('actualNorthWestLatLng: %o', actualNorthWestLatLng);
-console.log('actualSouthEastLatLng: %o', actualSouthEastLatLng);
+      let nw = bounds.getNorthWest();
+      let se = bounds.getSouthEast();
 
       // If the map starts to loop (wrap?), we need to correct the bounds,
       // so the piecharts don't get clipped.
       if (se.lng < nw.lng) {
         se.lng = 180, nw.lng = -180;
-console.log('clip');
       }
 
       // Filter piecharts to those that fall within the bounds,
@@ -119,58 +132,41 @@ console.log('clip');
       // NB: This is in lat/lng, but we only need to be rough.
       let pieAreaSum = markers
         .filter(
-          (marker) => {
-            let thing = (
-              marker.get('lat') > se.lat &&
-              marker.get('lat') < nw.lat &&
-              marker.get('lng') > nw.lng &&
-              marker.get('lng') < se.lng
-            );
-console.log('filter: ' + thing);
-            return thing;
-          }
+          (marker) =>
+              marker.get('lat') >= se.lat &&
+              marker.get('lat') <= nw.lat &&
+              marker.get('lng') >= nw.lng &&
+              marker.get('lng') <= se.lng
         )
         .map(
-          (marker) => {
-console.log('map: ' + marker.get('radius') * marker.get('radius') * 2 * Math.PI);
-            return (marker.get('radius') * marker.get('radius') * 2 * Math.PI);
-          }
+          (marker) =>
+            (marker.get('radius') * marker.get('radius') * 2 * Math.PI)
         )
         .reduce(
-          (sum, val) => {
-console.log('reduce: ' + (sum + val, 0));
-            return (sum + val, 0);
-          }
+          (sum, val) =>
+            (sum + val)
+          , 0
         );
-
-
-console.log('pieAreaSum: %o', pieAreaSum);
 
       if (pieAreaSum > 0) {
         nw = latlngToMercatorXY(nw);
         se = latlngToMercatorXY(se);
         let mapArea = (nw.y - se.y) * (se.x - nw.x);
-        let factor = 75 * Math.sqrt(mapArea / pieAreaSum);
+        let factor = 0.01 * Math.sqrt(mapArea / pieAreaSum); // was 75 * ...
         this.lastFactor = factor;
       }
 
-console.log('lastFactor: %o', this.lastFactor);
-
-      // if (this.lastFactor) {
-      markers = markers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
-      // } else {
-      //   markers = Immutable.List();
-      // }
+      if (this.lastFactor) {
+        markers = markers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
+      } else {
+        console.error('this.lastFactor: ' + this.lastFactor);
+        markers = Immutable.List();
+      }
 
     }
 
-    const TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
-    const TileLayerAttribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
-
-    let crs = L.CRS.EPSG3857; // this.map is not available on the first render.
-    if (this.map) {
-      crs = this.map.leafletElement.options.crs;
-    }
+    // NB: this.map is not available on the first render.
+    let crs = this.map ? this.map.leafletElement.options.crs : L.CRS.EPSG3857;
 
     return (
       <DetectResize onResize={this.handleDetectResize}>
@@ -185,8 +181,8 @@ console.log('lastFactor: %o', this.lastFactor);
                 bounds={bounds}
               >
                 <TileLayer
-                  url={TileLayerUrl}
-                  attribution={TileLayerAttribution}
+                  url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 />
                 {
                   renderNodes.map(

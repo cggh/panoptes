@@ -62,8 +62,8 @@ let PieChartMapGoogleMapsView = React.createClass({
 
   getInitialState() {
     return {
-      width: 100,
-      height: 100,
+      width: 100, // FIXME: required for fitBounds but arbitrary value?
+      height: 100, // FIXME: required for fitBounds but arbitrary value?
       bounds: null
     };
   },
