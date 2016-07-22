@@ -52,10 +52,12 @@ let DataTableView = React.createClass({
     startRowIndex: React.PropTypes.number,
     columns: ImmutablePropTypes.listOf(React.PropTypes.string),
     columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
+    maxRowsCount: React.PropTypes.number,
     onColumnResize: React.PropTypes.func,
     onOrderChange: React.PropTypes.func,
     onShowableRowsCountChange: React.PropTypes.func,
-    onFetchedRowsCountChange: React.PropTypes.func
+    onFetchedRowsCountChange: React.PropTypes.func,
+    onTotalTruncatedRowsCountChange: React.PropTypes.func
   },
 
 
@@ -78,7 +80,7 @@ let DataTableView = React.createClass({
       width: 0,
       height: 0,
       showableRowsCount: 0,
-      totalRowsCount: 0
+      totalTruncatedRowsCount: 0
     };
   },
 
@@ -89,7 +91,7 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, startRowIndex} = props;
+    let {table, query, columns, order, ascending, startRowIndex, maxRowsCount} = props;
     let {showableRowsCount} = this.state;
     let tableConfig = this.config.tablesById[table];
     let columnspec = {};
@@ -102,17 +104,18 @@ let DataTableView = React.createClass({
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columnspec,
-        order: order,
+        order,
         ascending: ascending,
-        query: query,
+        query,
         start: startRowIndex,
         stop: stopRowIndex
       };
 
-      let recordCountAPIargs = {
+      let truncatedRowsCountAPIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
-        query: query
+        query,
+        maxRowsCount
       };
 
       requestContext.request((componentCancellation) =>
@@ -124,18 +127,18 @@ let DataTableView = React.createClass({
             componentCancellation
           ),
           LRUCache.get(
-            'recordCount' + JSON.stringify(recordCountAPIargs),
+            'truncatedRowsCount' + JSON.stringify(truncatedRowsCountAPIargs),
             (cacheCancellation) =>
-              API.recordCount({cancellation: cacheCancellation, ...recordCountAPIargs}),
+              API.truncatedRowsCount({cancellation: cacheCancellation, ...truncatedRowsCountAPIargs}),
             componentCancellation
           )
         ])
       )
-      .then(([rows, rowsCount]) => {
+      .then(([rows, truncatedRowsCount]) => {
         this.setState({
           loadStatus: 'loaded',
           rows: rows,
-          totalRowsCount: rowsCount
+          totalTruncatedRowsCount: truncatedRowsCount
         });
       })
       .catch(API.filterAborted)
@@ -198,8 +201,8 @@ let DataTableView = React.createClass({
     if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length) {
       this.props.onFetchedRowsCountChange(this.state.rows.length);
     }
-    if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
-      this.props.onTotalRowsCountChange(this.state.totalRowsCount);
+    if (this.props.onTotalTruncatedRowsCountChange && prevState.totalTruncatedRowsCount !== this.state.totalTruncatedRowsCount) {
+      this.props.onTotalTruncatedRowsCountChange(this.state.totalTruncatedRowsCount);
     }
   },
 
