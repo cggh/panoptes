@@ -364,29 +364,16 @@ let PerRowNumericalTrackControls = React.createClass({
   ],
 
   handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
     this.redirectedProps.componentUpdate({query});
   },
 
   render() {
     let {interpolation, tension, autoYScale, yMin, yMax, query, table, colourProperty} = this.props;
-    let actions = this.getFlux().actions;
-
-    let filterButtonLabel = 'Change Filter';
-    let decodedQuery = SQL.WhereClause.decode(query);
-    if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
 
     return (
       <div className="channel-controls">
         <div className="control">
-          <FlatButton label={filterButtonLabel}
-                      primary={true}
-                      onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                        {
-                          table: table,
-                          initialQuery: query,
-                          onPick: this.handleQueryPick
-                        })}/>
+          <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
         </div>
         <div className="control">
           <div className="label">Colour By:</div>

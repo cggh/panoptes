@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import LZString from 'lz-string';
 import Sidebar from 'react-sidebar';
 import scrollbarSize from 'scrollbar-size';
 
@@ -31,6 +30,7 @@ import QueryString from 'panoptes/QueryString';
 import SQL from 'panoptes/SQL';
 import DataDownloader from 'utils/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import FilterButton from 'panoptes/FilterButton';
 
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
@@ -102,7 +102,6 @@ let DataTableWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
   },
 
@@ -283,25 +282,12 @@ let DataTableWithActions = React.createClass({
 
     let dataTableQuery = this.createDataTableQuery();
 
-    let filterButtonLabel = 'Change Filter';
-    let decodedQuery = SQL.WhereClause.decode(query);
-    if (!query || decodedQuery.isTrivial) filterButtonLabel = 'Add Filter';
-
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-        <FlatButton label={filterButtonLabel}
-                    primary={true}
-                    onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                      {
-                        table: table,
-                        initialQuery: query,
-                        onPick: this.handleQueryPick
-                      })}
-                      icon={<Icon fixedWidth={true} name="filter" />}
-        />
+        <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
         <FlatButton label="Add/Remove Columns"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
@@ -320,6 +306,11 @@ let DataTableWithActions = React.createClass({
                     icon={<Icon fixedWidth={true} name="download" />}
         />
         {searchGUI}
+        <FlatButton label="Pivot Table"
+                    primary={true}
+                    onClick={() => this.flux.actions.session.tabOpen('containers/PivotTableWithActions', {table}, true)}
+                    icon={<Icon fixedWidth={true} name="table" />}
+        />
       </div>
     );
 

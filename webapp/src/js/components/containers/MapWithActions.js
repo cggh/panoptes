@@ -21,6 +21,7 @@ import {FlatButton} from 'material-ui';
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
+import FilterButton from 'panoptes/FilterButton';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
@@ -64,7 +65,6 @@ let MapWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.getFlux().actions.session.modalClose();
     this.props.componentUpdate({query: query});
   },
 
@@ -101,19 +101,6 @@ let MapWithActions = React.createClass({
       });
     }
 
-    let filterButtonLabel = 'Change Filter';
-    let decodedQuery = SQL.WhereClause.decode(query);
-    let clearFilterButton = null;
-    if (!query || decodedQuery.isTrivial) {
-      filterButtonLabel = 'Add Filter';
-    } else if (table) {
-      clearFilterButton = <FlatButton
-                                label="Clear Filter"
-                                primary={true}
-                                onClick={() => componentUpdate({query: SQL.nullQuery})}
-                              />;
-    }
-
     let sidebarContent = (
       <div className="sidebar map-sidebar">
         <SidebarHeader icon={this.icon()} description="Something here"/>
@@ -125,16 +112,8 @@ let MapWithActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FlatButton label={filterButtonLabel}
-                               primary={true}
-                               onClick={() => actions.session.modalOpen('containers/QueryPicker',
-                                 {
-                                   table: table,
-                                   initialQuery: query,
-                                   onPick: this.handleQueryPick
-                                 })}/>
+          {table ? <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
             : null}
-          {clearFilterButton}
           {table ?
               <SelectField value={this.config.tablesById[table].propertiesById[column] ? column : null}
                            autoWidth={true}
