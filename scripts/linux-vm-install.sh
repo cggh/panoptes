@@ -6,7 +6,7 @@ fi
 which vagrant
 if [ $? -ne 0 ]
 then
-  curl -L https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb > vagrant.deb
+  curl -L https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb > vagrant.deb
   dpkg -i vagrant.deb
   rm vagrant.deb
 fi
