@@ -409,14 +409,16 @@ function importDatasetConfig(dataset) {
 }
 
 
-function recordCount(options) {
+function truncatedRowsCount(options) {
   assertRequired(options, ['database', 'table']);
 
+  // NB: If no maxRowsCount (maxRecordCount) is specified, then DQXServer's getrecordcount.py defaults to 10000
   let defaults = {
-    query: SQL.nullQuery
+    query: SQL.nullQuery,
+    maxRowsCount: 10000
   };
 
-  let {database, table, query, maxRecordCount} = {...defaults, ...options};
+  let {database, table, query, maxRowsCount} = {...defaults, ...options};
 
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestJSON({
@@ -426,7 +428,7 @@ function recordCount(options) {
       database: database,
       tbname: table,
       qry: query,
-      maxrecordcount: maxRecordCount
+      maxrecordcount: maxRowsCount
     }
   }).then((response) => response.TotalRecordCount);
 }
@@ -473,6 +475,6 @@ module.exports = {
   fetchImportStatusLog,
   importDataset,
   importDatasetConfig,
-  recordCount,
+  truncatedRowsCount,
   modifyConfig
 };

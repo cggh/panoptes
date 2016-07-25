@@ -42,7 +42,7 @@ let ListView = React.createClass({
     onSelect: React.PropTypes.func.isRequired,
     search: React.PropTypes.string,
     autoSelectIfNoneSelected: React.PropTypes.bool,
-    onRowsCountChange: React.PropTypes.func
+    onTruncatedRowsCountChange: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -57,7 +57,7 @@ let ListView = React.createClass({
     return {
       rows: [],
       loadStatus: 'loaded',
-      rowsCount: 0
+      truncatedRowsCount: 0
     };
   },
 
@@ -84,7 +84,7 @@ let ListView = React.createClass({
       start: 0
     };
 
-    let recordCountAPIargs = {
+    let truncatedRowsCountAPIargs = {
       database: this.config.dataset,
       table: tableConfig.fetchTableName
     };
@@ -98,21 +98,21 @@ let ListView = React.createClass({
           componentCancellation
         ),
         LRUCache.get(
-          'recordCount' + JSON.stringify(recordCountAPIargs),
+          'truncatedRowsCount' + JSON.stringify(truncatedRowsCountAPIargs),
           (cacheCancellation) =>
-            API.recordCount({cancellation: cacheCancellation, ...recordCountAPIargs}),
+            API.truncatedRowsCount({cancellation: cacheCancellation, ...truncatedRowsCountAPIargs}),
           componentCancellation
         )
       ])
     )
-    .then(([data, rowsCount]) => {
+    .then(([data, truncatedRowsCount]) => {
       if (autoSelectIfNoneSelected && !selectedPrimKey) {
         onSelect(data[0][tableConfig.primKey]);
       }
       this.setState({
         loadStatus: 'loaded',
         rows: data,
-        rowsCount
+        truncatedRowsCount
       });
     })
     .catch(API.filterAborted)
@@ -128,8 +128,8 @@ let ListView = React.createClass({
   },
 
   componentDidUpdate: function(prevProps, prevState) {
-    if (this.props.onRowsCountChange && prevState.rowsCount !== this.state.rowsCount) {
-      this.props.onRowsCountChange(this.state.rowsCount);
+    if (this.props.onTruncatedRowsCountChange && prevState.truncatedRowsCount !== this.state.truncatedRowsCount) {
+      this.props.onTruncatedRowsCountChange(this.state.truncatedRowsCount);
     }
   },
 

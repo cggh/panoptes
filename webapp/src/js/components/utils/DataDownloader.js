@@ -14,23 +14,18 @@ function downloadTableData(payload) {
 
   let {dataset, table, query, columns, tableConfig, ascending, rowsCount, onLimitBreach} = {...defaults, ...payload};
 
-  // Calculate the number of data points in the requested download (rows x cols).
-  if (!columns)
-    columns = Immutable.List(tableConfig.properties)
-      .filter((prop) => prop.showByDefault && prop.showInTable)
-      .map((prop) => prop.id);
-
-  let totalDataPoints = rowsCount * columns.size;
-  if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
-    onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
-    return null;
-  }
-
   // If no columns have been specified, get all of the showable columns.
   if (!columns)
     columns = Immutable.List(tableConfig.properties)
       .filter((prop) => prop.showByDefault && prop.showInTable)
       .map((prop) => prop.id);
+
+  // Calculate the number of data points in the requested download (rows x cols).
+  let totalDataPoints = rowsCount * columns.size;
+  if (totalDataPoints > MAX_DOWNLOAD_DATA_POINTS) {
+    onLimitBreach({totalDataPoints, maxDataPoints: MAX_DOWNLOAD_DATA_POINTS});
+    return null;
+  }
 
   // Get the list of columns being shown.
   let columnList = '';
@@ -52,11 +47,11 @@ function downloadTableData(payload) {
   downloadURL += '&qry' + '=' + query;
   downloadURL += '&tbname' + '=' + table;
   downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
-  if (tableConfig.positionField) {
-    downloadURL += '&posfield' + '=' + tableConfig.positionField;
-    downloadURL += '&order' + '=' + tableConfig.positionField;
+  if (tableConfig.position) {
+    downloadURL += '&posfield' + '=' + tableConfig.position;
+    downloadURL += '&order' + '=' + tableConfig.position;
   } else {
-    downloadURL += '&order' + '=' + tableConfig.primkey;
+    downloadURL += '&order' + '=' + tableConfig.primKey;
   }
   downloadURL += '&sortreverse' + '=' + (ascending ? '0' : '1');
 

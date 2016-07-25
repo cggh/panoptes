@@ -24,6 +24,8 @@ import DataItem from 'containers/DataItem';
 import DataDownloader from 'utils/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 
+// Constants
+const MAX_ROWS_COUNT = 10000;
 
 let ListWithActions = React.createClass({
 
@@ -78,8 +80,8 @@ let ListWithActions = React.createClass({
     this.setState({'search': event.target.value});
   },
 
-  handleRowsCountChange(rowsCount) {
-    this.setState({rowsCount: rowsCount});
+  handleTruncatedRowsCountChange(truncatedRowsCount) {
+    this.setState({truncatedRowsCount});
   },
 
   handleDownload() {
@@ -88,7 +90,7 @@ let ListWithActions = React.createClass({
         dataset: this.config.dataset,
         table: this.props.table,
         tableConfig: this.tableConfig(),
-        rowsCount: this.state.rowsCount,
+        truncatedRowsCount: this.state.truncatedRowsCount,
         onLimitBreach: this.handleDownloadLimitBreach
       }
     );
@@ -130,7 +132,8 @@ let ListWithActions = React.createClass({
              onSelect={this.handleSelect}
              icon={this.icon()}
              autoSelectIfNoneSelected
-             onRowsCountChange={this.handleRowsCountChange}
+             onTruncatedRowsCountChange={this.handleTruncatedRowsCountChange}
+             maxRowsCount={MAX_ROWS_COUNT}
             />
         </div>
       </div>
