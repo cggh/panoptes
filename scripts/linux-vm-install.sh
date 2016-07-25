@@ -1,20 +1,20 @@
 which virtualbox
 if [ $? -ne 0 ]
 then
-  apt-get install virtualbox-ose
+  sudo apt-get install virtualbox-ose
 fi
 which vagrant
 if [ $? -ne 0 ]
 then
   curl -L https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb > vagrant.deb
-  dpkg -i vagrant.deb
+  sudo dpkg -i vagrant.deb
   rm vagrant.deb
 fi
 
 which chef-solo
 if [ $? -ne 0 ]
 then
-  curl -L https://www.opscode.com/chef/install.sh | bash
+  sudo curl -L https://www.opscode.com/chef/install.sh | bash
 fi
 curl -L https://github.com/cggh/panoptes-boxes/archive/master.zip > panoptes-boxes.zip
 unzip -o panoptes-boxes.zip
