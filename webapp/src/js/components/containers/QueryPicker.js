@@ -1,5 +1,6 @@
 import React from 'react';
 import Sidebar from 'react-sidebar';
+import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 import scrollbarSize from 'scrollbar-size';
 
 // Mixins
@@ -32,7 +33,7 @@ let QueryPicker = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
+    ConfigMixin
   ],
 
   propTypes: {
@@ -58,8 +59,8 @@ let QueryPicker = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.storedFilterNameOpen) {
-      this.refs.storedFilterNameField.focus();
+    if (this.state.storedFilterNameOpen && this.storedFilterNameField) {
+      this.storedFilterNameField.focus();
     }
   },
 
@@ -135,6 +136,14 @@ let QueryPicker = React.createClass({
   render() {
     let {query, storedFilterNameOpen, hasSidebar, storedFilterName} = this.state;
     let {table} = this.props;
+
+    let hotKeysKeyMap = {
+      'storeFilter': ['enter']
+    };
+    let hotKeysHandlers = {
+      'storeFilter': (e) => { this.handleStore(); }
+    };
+
     return (
       <div className="large-modal query-picker">
         <Sidebar
@@ -169,21 +178,23 @@ let QueryPicker = React.createClass({
             {
               this.config.user.isManager && storedFilterNameOpen ?
               <div>
-                <TextField
-                  ref="storedFilterNameField"
-                  hintText="Stored filter name"
-                  value={storedFilterName}
-                  onChange={this.handleStoredFilterNameChange}
-                  onBlur={this.handleStoredFilterNameBlur}
-                  style={{width: '10em', marginRight: '10px'}}
-                />
-                <RaisedButton
-                  style={{marginRight: '10px'}}
-                  label="Store"
-                  primary={false}
-                  onClick={this.handleStore}
-                  icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
-                />
+                <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
+                  <TextField
+                    ref={(ref) => this.storedFilterNameField = ref}
+                    hintText="Stored filter name"
+                    value={storedFilterName}
+                    onChange={this.handleStoredFilterNameChange}
+                    onBlur={this.handleStoredFilterNameBlur}
+                    style={{width: '10em', marginRight: '10px'}}
+                  />
+                  <RaisedButton
+                    style={{marginRight: '10px'}}
+                    label="Store"
+                    primary={false}
+                    onClick={this.handleStore}
+                    icon={<Icon fixedWidth={true} name={'database'} inverse={false} />}
+                  />
+                </HotKeys>
               </div>
               : null
             }

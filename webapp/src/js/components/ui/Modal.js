@@ -3,14 +3,11 @@ import ReactDOM from 'react-dom';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
 import Icon from 'ui/Icon';
-import Hotkey from 'react-hotkey';
-Hotkey.activate();
-import keycodes from 'keycodes';
+import {HotKeys} from 'react-hotkeys'; // 0.9.0 needs {...}
 
 let Modal = React.createClass({
   mixins: [
-    PureRenderMixin,
-    Hotkey.Mixin('handleHotkey')
+    PureRenderMixin
   ],
 
   propTypes: {
@@ -65,44 +62,47 @@ let Modal = React.createClass({
     }
   },
 
-  handleHotkey(e) {
-    let {child} = this.refs;
-    if (e.keyCode == keycodes('escape') && !this.props.uncloseable) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.props.onClose();
-    } else if (e.keyCode == keycodes('enter') && child && child.handleEnter) {
-      e.preventDefault();
-      e.stopPropagation();
-      child.handleEnter();
-    }
-  },
-
   render: function() {
     let {visible, unclosable, children, onClose, closable, ...other} = this.props;
     let {icon, title} = this.state;
+
     if (!children)
       return null;
     let classes = {
       modal: true,
       visible: visible
     };
+
+    let hotKeysKeyMap = {
+      'handleKonami': 'up up down down left right left right b a enter',
+      'handleClose': ['escape'],
+      'handleEnter': ['enter']
+    };
+    let hotKeysHandlers = {
+      'handleKonami': (e) => { console.error('kong.am.i'); },
+      'handleClose': (e) => { closable ? onClose() : null; },
+      'handleEnter': (e) => { this.child && this.child.handleEnter ? this.child.handleEnter() : null; }
+    };
+
     return (
-      <div className={classNames(classes)}
-           ref="overlay"
-           onClick={this.handleOverlayClick}>
-        <div className="popup"
-          {...other}>
-          <div className="popup-header">
-            {icon ? <Icon name={icon}/> : null}
-            <div className="title">{title}</div>
-            {!unclosable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
-          </div>
-          <div className="popup-body">
-            {React.cloneElement(children, {ref: 'child'})}
+      <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
+        <div className={classNames(classes)}
+             ref="overlay"
+             onClick={this.handleOverlayClick}>
+          <div className="popup"
+            {...other}>
+            <div className="popup-header">
+              {icon ? <Icon name={icon}/> : null}
+              <div className="title">{title}</div>
+              {!unclosable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
+            </div>
+            <div className="popup-body">
+              {React.cloneElement(children, {ref: (ref) => this.child = ref})}
+            </div>
           </div>
         </div>
-      </div>);
+      </HotKeys>
+    );
   }
 });
 
