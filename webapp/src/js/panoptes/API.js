@@ -41,6 +41,16 @@ function errorMessage(xhr) {
   return `Error: ${xhr.statusText || xhr.message}`;
 }
 
+function encodeQuery(query) {
+  let st = Base64.encode(query);
+  st = st.replace(/\+/g, '-');
+  st = st.replace(/\//g, '_');
+  if (Base64.decode(st) != query) {
+    throw Error('Invalid encoding');
+  }
+  return st;
+}
+
 function requestJSON(options, method='GET', data=null) {
   let defaults = {
     url: serverURL,
@@ -119,7 +129,7 @@ function pageQuery(options) {
       datatype: 'pageqry',
       database,
       tbname: table,
-      qry: query,
+      qry: encodeQuery(query),
       collist: LZString.compressToEncodedURIComponent(collist),
       sortreverse: ascending ? '0' : '1',
       needtotalcount: count ? '1' : '0',
@@ -427,7 +437,7 @@ function truncatedRowsCount(options) {
       datatype: 'getrecordcount',
       database: database,
       tbname: table,
-      qry: query,
+      qry: encodeQuery(query),
       maxrecordcount: maxRowsCount
     }
   }).then((response) => response.TotalRecordCount);
