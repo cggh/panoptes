@@ -5,6 +5,8 @@ var path = require("path");
 var WebpackDevServer = require("webpack-dev-server");
 var webpackConfig = require("../webpack.config.js");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var port = 8080 ;
+var host = '0.0.0.0' ;
 
 gulp.task("webpack-dev-server", function(callback) {
   // modify some webpack config options
@@ -19,8 +21,8 @@ gulp.task("webpack-dev-server", function(callback) {
     }),
   ];
   //Make the webpack dev server inline instead of iframe
-  myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
-  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://localhost:8080");
+  myConfig.entry.babel.unshift("webpack-dev-server/client?http://"+host+":"+port);
+  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://"+host+":"+port);
 
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(myConfig), {
@@ -30,9 +32,9 @@ gulp.task("webpack-dev-server", function(callback) {
       chunkModules: false, //Reduce logging a bit!
       assets: false
     }
-  }).listen(8080, "localhost", function(err) {
+  }).listen(port, host, function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
-      gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/index.html");
+      gutil.log("[webpack-dev-server]", "http://"+host+":"+port+"/webpack-dev-server/index.html");
     });
 });
 
@@ -53,8 +55,8 @@ gulp.task("webpack-devhot-server", function(callback) {
     new webpack.NoErrorsPlugin()
   ];
   //Make the webpack dev server inline instead of iframe
-  myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
-  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://localhost:8080");
+  myConfig.entry.babel.unshift("webpack-dev-server/client?http://"+host+":"+port);
+  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://"+host+":"+port);
 
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(myConfig), {
@@ -65,9 +67,9 @@ gulp.task("webpack-devhot-server", function(callback) {
       chunkModules: false, //Reduce logging a bit!
       assets: false
     }
-  }).listen(8080, "localhost", function(err) {
+  }).listen(port, host, function(err) {
     if(err) throw new gutil.PluginError("webpack-dev-server", err);
-    gutil.log("[webpack-devhot-server]", "http://localhost:8080/webpack-dev-server/index.html");
+    gutil.log("[webpack-devhot-server]", "http://"+host+":"+port+"/webpack-dev-server/index.html");
   });
 });
 
@@ -81,8 +83,8 @@ gulp.task("webpack-prodtest-server", function(callback) {
     stats: {
       colors: true
     }
-  }).listen(8080, "0.0.0.0", function(err) {
+  }).listen(port, "0.0.0.0", function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
-      gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/index.html");
+      gutil.log("[webpack-dev-server]", "http://"+host+":"+port+"/webpack-dev-server/index.html");
     });
 });
