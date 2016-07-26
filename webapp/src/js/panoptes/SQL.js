@@ -617,19 +617,12 @@ SQL.WhereClause.encode = function(whc) {
   }
   removeParents(whc);
   let jsonstring = JSON.stringify(whc);
-  let st = Base64.encode(jsonstring);
-  st = st.replace(/\+/g, '-');
-  st = st.replace(/\//g, '_');
-  if (Base64.decode(st) != jsonstring) {
-    throw Error('Invalid encoding');
-  }
   //st = st.replace(/=/g, "*");!!! this should be added in client& server code
-  return st;
+  return jsonstring;
 };
 
 //Decodes astring encoded whereclause object and returns the whereclause
-SQL.WhereClause.decode = function(st) {
-  let tree = Base64.decode(st);
+SQL.WhereClause.decode = function(tree) {
   try {
     tree = JSON.parse(tree);
   } catch (e) {
