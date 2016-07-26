@@ -33,14 +33,14 @@ const PanoptesActions = (config) => ({
             }
           }),
           PieChartMap: () => ({
-            view: 'PieChartMap',
+            view: 'AwesomeMap',
             props: {
               title: dataItemView.name,
               chartConfig: dataItemView
             }
           }),
           ItemMap: () => ({
-            view: 'Map',
+            view: 'AwesomeMap',
             props: {
               title: dataItemView.name
             }
