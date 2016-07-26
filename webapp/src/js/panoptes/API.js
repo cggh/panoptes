@@ -455,7 +455,7 @@ function modifyConfig(options) {
       action,
       datatype: 'custom',
       respmodule: 'panoptesserver',
-      respid: 'modifyconfig'
+      respid:'modifyconfig'
     }
   }).then((response) => response.config);
 }
