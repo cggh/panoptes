@@ -5,7 +5,7 @@ import Icon from 'ui/Icon';
 import RaisedButton from 'material-ui/RaisedButton';
 
 const componentTranslation = {
-  ItemMap: 'Map/Actions',
+  ItemMap: 'AwesomeMap/Actions',
   Tree: 'containers/TreeWithActions',
   Plot: 'containers/PlotWithActions'
 };

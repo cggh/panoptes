@@ -157,7 +157,7 @@ let ListWithActions = React.createClass({
       if (this.tableConfig().hasGeoCoord) {
         // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
         views.push({
-          view: 'Map',
+          view: 'AwesomeMap',
           props: {
             title: 'Location'
           }
@@ -174,14 +174,14 @@ let ListWithActions = React.createClass({
             }
           }),
           PieChartMap: () => ({
-            view: 'PieChartMap',
+            view: 'AwesomeMap',
             props: {
               title: dataItemView.name,
               chartConfig: dataItemView
             }
           }),
           ItemMap: () => ({
-            view: 'Map',
+            view: 'AwesomeMap',
             props: {
               title: dataItemView.name
             }
