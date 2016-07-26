@@ -48,7 +48,7 @@ function encodeQuery(query) {
   return st;
 }
 
-function requestJSON(options, method='GET', data=null) {
+function requestJSON(options, method = 'GET', data = null) {
   let defaults = {
     url: initialConfig.serverURL,
     method: method,
@@ -256,13 +256,14 @@ function fetchSingleRecord(options) {
   assertRequired(options, ['database', 'table', 'primKeyField', 'primKeyValue']);
   let {database, table, primKeyField, primKeyValue} = options;
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  let query = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue));
   return requestJSON({
     ...args,
     params: {
       datatype: 'recordinfo',
       database: database,
       tbname: table,
-      qry: SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue))
+      qry: encodeQuery(query)
     }
   }).then((response) => response.Data);
 }
