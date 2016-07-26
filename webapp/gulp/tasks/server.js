@@ -3,6 +3,7 @@ var gutil = require("gulp-util");
 var webpack = require("webpack");
 var path = require("path");
 var WebpackDevServer = require("webpack-dev-server");
+var config = require("../config.js");
 var webpackConfig = require("../webpack.config.js");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -19,8 +20,8 @@ gulp.task("webpack-dev-server", function(callback) {
     }),
   ];
   //Make the webpack dev server inline instead of iframe
-  myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
-  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://localhost:8080");
+  myConfig.entry.babel.unshift("webpack-dev-server/client?http://"+config.server.settings.host+":"+config.server.settings.port);
+  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://"+config.server.settings.host+":"+config.server.settings.port);
 
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(myConfig), {
@@ -30,9 +31,9 @@ gulp.task("webpack-dev-server", function(callback) {
       chunkModules: false, //Reduce logging a bit!
       assets: false
     }
-  }).listen(8080, "localhost", function(err) {
+  }).listen(config.server.settings.port, config.server.settings.host, function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
-      gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/index.html");
+      gutil.log("[webpack-dev-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");
     });
 });
 
@@ -53,8 +54,8 @@ gulp.task("webpack-devhot-server", function(callback) {
     new webpack.NoErrorsPlugin()
   ];
   //Make the webpack dev server inline instead of iframe
-  myConfig.entry.babel.unshift("webpack-dev-server/client?http://localhost:8080");
-  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://localhost:8080");
+  myConfig.entry.babel.unshift("webpack-dev-server/client?http://"+config.server.settings.host+":"+config.server.settings.port);
+  myConfig.entry.panoptes.unshift("webpack-dev-server/client?http://"+config.server.settings.host+":"+config.server.settings.port);
 
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(myConfig), {
@@ -65,9 +66,9 @@ gulp.task("webpack-devhot-server", function(callback) {
       chunkModules: false, //Reduce logging a bit!
       assets: false
     }
-  }).listen(8080, "localhost", function(err) {
+  }).listen(config.server.settings.port, config.server.settings.host, function(err) {
     if(err) throw new gutil.PluginError("webpack-dev-server", err);
-    gutil.log("[webpack-devhot-server]", "http://localhost:8080/webpack-dev-server/index.html");
+    gutil.log("[webpack-devhot-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");
   });
 });
 
@@ -81,8 +82,8 @@ gulp.task("webpack-prodtest-server", function(callback) {
     stats: {
       colors: true
     }
-  }).listen(8080, "0.0.0.0", function(err) {
+  }).listen(config.server.settings.port, config.server.settings.host, function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
-      gutil.log("[webpack-dev-server]", "http://localhost:8080/webpack-dev-server/index.html");
+      gutil.log("[webpack-dev-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");
     });
 });

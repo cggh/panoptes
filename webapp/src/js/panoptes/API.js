@@ -7,9 +7,6 @@ import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
 
-//Global for now
-const serverURL = initialConfig.serverURL; //eslint-disable-line no-undef
-
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {
   if (typeof (json) !== 'object') {
@@ -53,7 +50,7 @@ function encodeQuery(query) {
 
 function requestJSON(options, method='GET', data=null) {
   let defaults = {
-    url: serverURL,
+    url: initialConfig.serverURL,
     method: method,
     params: {},
     timeout: 60000,
@@ -467,7 +464,7 @@ function modifyConfig(options) {
 // TODO: Maintain an order to this list?
 
 module.exports = {
-  serverURL,
+  serverURL: initialConfig.serverURL,
   filterAborted,
   errorMessage,
   requestJSON,
