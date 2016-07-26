@@ -46,7 +46,11 @@ let PieChart = React.createClass({
 
     for (let i = 0, len = chartData.length; i < len; i++) {
       sectorsData.push({color: chartData[i].color, title: name + '\n' + chartData[i].name + ': ' + chartData[i].value});
-      pieData.push(chartData[i].value);
+      if (chartData[i].value !== undefined && chartData[i].value !== null && chartData[i].value !== '' && !isNaN(chartData[i].value)) {
+        pieData.push(chartData[i].value);
+      } else {
+        pieData.push(0);
+      }
     }
 
     let pie = d3.layout.pie().sort(null);
