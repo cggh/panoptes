@@ -1,54 +1,55 @@
 module.exports = {
   'rules': {
     'indent': [
-      2,
+      'error',
       2
     ],
     'quotes': [
-      2,
+      'error',
       'single',
       'avoid-escape'
     ],
     'linebreak-style': [
-      2,
+      'error',
       'unix'
     ],
     'semi': [
-      2,
+      'error',
       'always'
     ],
 
-    'no-console': 0,
-    'no-unused-vars': [2, {'vars': 'all', 'args': 'none'}],
-    'array-bracket-spacing': 2,
-    'block-spacing': 2,
-    'brace-style': [2, '1tbs', {'allowSingleLine': true}],
-    'camelcase': 2,
-    'comma-spacing': 2,
-    'comma-style': 2,
-    'eol-last': 2,
-    'key-spacing': 2,
-    'no-spaced-func': 2,
-    'no-trailing-spaces': 2,
-    'object-curly-spacing': 2,
-    'space-before-blocks': 2,
-    'space-before-function-paren': [2, 'never'],
-    'space-infix-ops': [2, {'int32Hint': true}],
-    'space-unary-ops': 2,
-    'keyword-spacing': 2,
+    'no-console': 'off',
+    'no-unused-vars': ['error', {'vars': 'all', 'args': 'none'}],
+    'array-bracket-spacing': 'error',
+    'block-spacing': 'error',
+    'brace-style': ['error', '1tbs', {'allowSingleLine': true}],
+    'camelcase': 'error',
+    'comma-spacing': 'error',
+    'comma-style': 'error',
+    'eol-last': 'error',
+    'key-spacing': 'error',
+    'no-spaced-func': 'error',
+    'no-trailing-spaces': 'error',
+    'object-curly-spacing': 'error',
+    'space-before-blocks': 'error',
+    'space-before-function-paren': ['error', 'never'],
+    'space-infix-ops': ['error', {'int32Hint': true}],
+    'space-unary-ops': 'error',
+    'keyword-spacing': 'error',
     'jsx-quotes': [
-      2,
+      'error',
       'prefer-double'
     ],
 
-    //'new-cap': 2, //Disabled as lots of legacy DQX uses caps
-    'arrow-body-style': 2,
-    'arrow-parens': 2,
-    'arrow-spacing': 2,
-    'no-const-assign': 2,
-    'no-dupe-class-members': 2,
-    'no-var': 2,
-    'prefer-arrow-callback': 2
+    // 'new-cap': 'error', //Disabled as lots of legacy DQX uses caps
+    'arrow-body-style': 'error',
+    'arrow-parens': 'error',
+    'arrow-spacing': 'error',
+    'no-const-assign': 'error',
+    'no-dupe-class-members': 'error',
+    'no-var': 'error',
+    'prefer-arrow-callback': 'error',
+    'no-cond-assign': 'error',
 
   },
   'env': {
@@ -56,7 +57,7 @@ module.exports = {
     'browser': true,
     'commonjs': true
   },
-  'extends': 'eslint:recommended',
+  'extends': ["eslint:recommended", "plugin:react/recommended"],
   'parserOptions': {
     'ecmaVersion': 6,
     'sourceType': "module",
