@@ -40,7 +40,9 @@ let ItemPicker = React.createClass({
           })
         )
       })),
-    onPick: React.PropTypes.func.isRequired
+    onPick: React.PropTypes.func.isRequired,
+    icon: React.PropTypes.string,
+    title: React.PropTypes.string
   },
 
   getDefaultProps() {

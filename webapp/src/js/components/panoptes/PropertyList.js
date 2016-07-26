@@ -15,7 +15,8 @@ let PropertyList = React.createClass({
   ],
 
   propTypes: {
-    propertiesData: React.PropTypes.array.isRequired
+    propertiesData: React.PropTypes.array.isRequired,
+    className: React.PropTypes.string
   },
 
   render: function() {

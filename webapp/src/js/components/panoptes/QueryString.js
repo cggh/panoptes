@@ -31,11 +31,11 @@ let QueryString = React.createClass({
   },
 
   render() {
-    let {query, prepend, table, ...other} = this.props;
+    let {query, prepend} = this.props;
     let qry = SQL.WhereClause.decode(query);
 
     if ((!qry) || (qry.isTrivial))
-      return <span {...other}>
+      return <span>
         {`${prepend} No filter`}
       </span>;
 
@@ -59,7 +59,7 @@ let QueryString = React.createClass({
       subsetMap: subsetMap
     };
     return (
-      <span {...other}>
+      <span>
         { prepend + ' ' + qry.toQueryDisplayString(queryData, 0) }
       </span>
     );

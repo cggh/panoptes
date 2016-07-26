@@ -29,7 +29,7 @@ let PropertyLegend = React.createClass({
     let elements = null;
     if (propConfig.categoryColors) {
       elements = _map(propConfig.categoryColors, (colour, key) => (
-        <LegendElement key={key} name={key === "_other_" ? "Other" : key} colour={colour} />));
+        <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={colour} />));
     } else if (propConfig.isBoolean) {
       elements = [
         <LegendElement key="true" name="True" colour={colourFunc(true)} />,
@@ -39,10 +39,10 @@ let PropertyLegend = React.createClass({
       elements = _map(propConfig.propCategories || knownValues || [], (value) => (
         <LegendElement key={value} name={value} colour={colourFunc(value)} />));
     } else {
-      const colour = scaleColour([0,1]);
+      const colour = scaleColour([0, 1]);
       let background = `linear-gradient(to right, ${colour(0)} 0%`;
       for (let i = 0.1; i < 1; i += 0.1) {
-        background += `,${colour(i)} ${i*100}%`
+        background += `,${colour(i)} ${i * 100}%`;
       }
       background += ')';
       elements = [<div key="min" className="legend-element">{min || propConfig.minVal}</div>,

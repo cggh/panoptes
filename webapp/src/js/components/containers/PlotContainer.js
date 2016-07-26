@@ -15,9 +15,9 @@ import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
-import { plotTypes, allDimensions } from 'panoptes/plotTypes';
+import {allDimensions} from 'panoptes/plotTypes';
 
-import "plot.scss";
+import 'plot.scss';
 
 
 let PlotContainer = React.createClass({
@@ -97,8 +97,8 @@ let PlotContainer = React.createClass({
   },
 
   render() {
-    const { plotType } = this.props;
-    const { loadStatus } = this.state;
+    const {plotType} = this.props;
+    const {loadStatus} = this.state;
     return (
       <div className="plot-container">
         { plotType ?

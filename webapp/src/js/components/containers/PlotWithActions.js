@@ -19,7 +19,7 @@ import MenuItem from 'material-ui/MenuItem';
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
-import PropertySelector from 'panoptes/PropertySelector'
+import PropertySelector from 'panoptes/PropertySelector';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
@@ -29,7 +29,7 @@ import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import FilterButton from 'panoptes/FilterButton';
 
-import "plot.scss";
+import 'plot.scss';
 
 let PlotWithActions = React.createClass({
   mixins: [

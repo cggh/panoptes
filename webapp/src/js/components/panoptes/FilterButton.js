@@ -5,12 +5,6 @@ import SQL from 'panoptes/SQL';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 
-const componentTranslation = {
-  ItemMap: 'containers/MapWithActions',
-  Tree: 'containers/TreeWithActions',
-  Plot: 'containers/PlotWithActions'
-};
-
 let FilterButton = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -31,7 +25,7 @@ let FilterButton = React.createClass({
 
   handlePick(query) {
     this.getFlux().actions.session.modalClose();
-    this.props.onPick(query)
+    this.props.onPick(query);
   },
 
   render() {
@@ -54,13 +48,13 @@ let FilterButton = React.createClass({
           label="Clear Filter"
           primary={true}
           onClick={() => {
-            this.handlePick(SQL.nullQuery)
+            this.handlePick(SQL.nullQuery);
           }}
-          icon={<span className={'fa-stack'}><Icon style={{position: 'absolute', color:'rgb(153, 200, 236)'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span>}
+          icon={<span className={'fa-stack'}><Icon style={{position: 'absolute', color: 'rgb(153, 200, 236)'}} name={'filter'} stack={'1x'} /><Icon style={{position: 'absolute', fontSize: '2em', color: '#2196f3'}} name={'ban'} stack={'2x'} /></span>}
         />
       }
 
-    </div>
+    </div>;
   }
 
 });

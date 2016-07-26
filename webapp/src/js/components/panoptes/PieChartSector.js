@@ -3,6 +3,17 @@ import d3 from 'd3';
 
 let PieChartSector = React.createClass({
 
+  propTypes: {
+    outerRadius: React.PropTypes.number,
+    innerRadius: React.PropTypes.number,
+    fillColor: React.PropTypes.string,
+    arcDescriptor: React.PropTypes.string,
+    title: React.PropTypes.string,
+    onClick: React.PropTypes.func,
+    transform: React.PropTypes.string,
+    className: React.PropTypes.string
+  },
+
   getDefaultProps() {
     return {
       outerRadius: 20,

@@ -27,7 +27,12 @@ let FindGeneByRegion = React.createClass({
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
-    activeTab: React.PropTypes.string
+    activeTab: React.PropTypes.string,
+    search: React.PropTypes.string,
+    chromosome: React.PropTypes.string,
+    startPosition: React.PropTypes.number,
+    endPosition: React.PropTypes.number,
+    chromosomeLength: React.PropTypes.number,
   },
 
   getDefaultProps() {
@@ -48,10 +53,6 @@ let FindGeneByRegion = React.createClass({
       findStartPosition: null,
       findEndPosition: null
     };
-  },
-
-  title() {
-    return this.props.title;
   },
 
   componentWillMount() {

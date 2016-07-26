@@ -7,7 +7,8 @@ let Loading = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    status: React.PropTypes.string.isRequired
+    status: React.PropTypes.string.isRequired,
+    children: React.PropTypes.any
   },
 
   render() {

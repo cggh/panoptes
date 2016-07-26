@@ -73,7 +73,7 @@ let TreeContainer = React.createClass({
 
 
   render() {
-    const { data, loadStatus } = this.state;
+    const {data, loadStatus} = this.state;
     return (
       <div className="tree-container">
         {data ?

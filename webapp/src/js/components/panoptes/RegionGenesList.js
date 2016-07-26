@@ -34,7 +34,8 @@ let RegionGenesList = React.createClass({
     chromosome: React.PropTypes.string.isRequired,
     onSelectGene: React.PropTypes.func.isRequired,
     startPosition: React.PropTypes.number.isRequired,
-    endPosition: React.PropTypes.number.isRequired
+    endPosition: React.PropTypes.number.isRequired,
+    icon: React.PropTypes.string
   },
 
   getDefaultProps() {

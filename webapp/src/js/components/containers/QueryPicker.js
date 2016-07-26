@@ -10,10 +10,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 
 // Material UI
 import RaisedButton from 'material-ui/RaisedButton';
-import IconButton from 'material-ui/IconButton';
-import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import Subheader from 'material-ui/Subheader';
 import TextField from 'material-ui/TextField';
 
 // UI

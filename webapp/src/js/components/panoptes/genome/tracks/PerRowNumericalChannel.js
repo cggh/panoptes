@@ -26,7 +26,7 @@ import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Slider from 'material-ui/Slider';
-import FlatButton from 'material-ui/FlatButton';
+import FilterButton from 'panoptes/FilterButton';
 
 
 const INTERPOLATIONS = [
@@ -69,7 +69,8 @@ let PerRowScaledSVGChannel = React.createClass({
     table: React.PropTypes.string,
     channel: React.PropTypes.string,
     name: React.PropTypes.string,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    colourProperty: React.PropTypes.string
   },
 
   getInitialState() {
@@ -93,7 +94,7 @@ let PerRowScaledSVGChannel = React.createClass({
   },
 
   handleKnownLegendValuesChange(legendValues) {
-    this.setState({legendValues})
+    this.setState({legendValues});
   },
 
   render() {
@@ -130,6 +131,8 @@ let PerRowNumericalTrack = React.createClass({
     blockPixelWidth: React.PropTypes.number,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
+    width: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
@@ -138,7 +141,8 @@ let PerRowNumericalTrack = React.createClass({
     table: React.PropTypes.string.isRequired,
     channel: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
-    colourProperty: React.PropTypes.string
+    colourProperty: React.PropTypes.string,
+    onChangeLoadStatus: React.PropTypes.func
   },
 
   getInitialState() {
@@ -338,7 +342,7 @@ let PerRowNumericalTrack = React.createClass({
     return (
       <g className="numerical-track">
         <path className="area" d={area}/>
-        {_map(lines, (line, primKey) => <path key={primKey} className="line" style={{stroke:colours[primKey]}} d={line} />)}
+        {_map(lines, (line, primKey) => <path key={primKey} className="line" style={{stroke: colours[primKey]}} d={line} />)}
       </g>
     );
   }
@@ -362,6 +366,17 @@ let PerRowNumericalTrackControls = React.createClass({
       redirect: ['componentUpdate']
     })
   ],
+
+  propTypes: {
+    interpolation: React.PropTypes.string,
+    autoYScale: React.PropTypes.bool,
+    tension: React.PropTypes.number,
+    yMin: React.PropTypes.number,
+    yMax: React.PropTypes.number,
+    query: React.PropTypes.string,
+    table: React.PropTypes.string,
+    colourProperty: React.PropTypes.string
+  },
 
   handleQueryPick(query) {
     this.redirectedProps.componentUpdate({query});

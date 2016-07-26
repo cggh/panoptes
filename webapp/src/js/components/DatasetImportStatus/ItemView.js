@@ -23,7 +23,9 @@ let DatasetImportStatusItemView = React.createClass({
   ],
 
   propTypes: {
-    logId: React.PropTypes.string.isRequired
+    logId: React.PropTypes.string.isRequired,
+    title: React.PropTypes.string,
+    icon: React.PropTypes.string
   },
 
   getInitialState() {

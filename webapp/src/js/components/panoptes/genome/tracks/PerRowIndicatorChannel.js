@@ -23,7 +23,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import FilterButton from 'panoptes/FilterButton';
 
 import 'hidpi-canvas';
-import {propertyColour, categoryColours} from 'util/Colours';
+import {propertyColour} from 'util/Colours';
 
 const HEIGHT = 50;
 
@@ -60,7 +60,8 @@ let PerRowIndicatorChannel = React.createClass({
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
-    colourProperty: React.PropTypes.string
+    colourProperty: React.PropTypes.string,
+    onChangeLoadStatus: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -78,7 +79,6 @@ let PerRowIndicatorChannel = React.createClass({
   componentWillMount() {
     this.positions = [];
     this.tooBigBlocks = [];
-    this.blocks = [];
   },
 
   componentDidUpdate() {
@@ -160,7 +160,6 @@ let PerRowIndicatorChannel = React.createClass({
   applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tablesById[table];
-    this.blocks = blocks;
     this.positions = this.combineBlocks(blocks, tableConfig.position);
     if (colourProperty) {
       this.colourData = this.combineBlocks(blocks, colourProperty);
@@ -317,6 +316,12 @@ const PerRowIndicatorControls = React.createClass({
     }),
     FluxMixin
   ],
+
+  propTypes: {
+    table: React.PropTypes.string,
+    query: React.PropTypes.string,
+    colourProperty: React.PropTypes.string
+  },
 
   handleQueryPick(query) {
     this.redirectedProps.componentUpdate({query});

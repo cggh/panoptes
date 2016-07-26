@@ -19,9 +19,10 @@ let RecentlyFoundGenes = React.createClass({
     StoreWatchMixin('SessionStore')
   ],
 
-  title() {
-    return this.props.title;
+  propTypes: {
+    componentUpdate: React.PropTypes.func
   },
+
 
   handleSelectGene(e, geneId) {
 

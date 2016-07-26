@@ -19,7 +19,9 @@ let ConfirmButton = React.createClass({
     onConfirm: React.PropTypes.func,
     onCancel: React.PropTypes.func,
     confirmButtonLabel: React.PropTypes.string,
-    cancelButtonLabel: React.PropTypes.string
+    cancelButtonLabel: React.PropTypes.string,
+    primary: React.PropTypes.bool,
+    icon: React.PropTypes.element
   },
 
   handleClick(e) {

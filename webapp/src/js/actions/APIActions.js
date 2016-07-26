@@ -91,7 +91,7 @@ let APIActions = {
     })
     .catch((error) => {
       this.dispatch(APICONST.MODIFY_CONFIG_FAIL);
-      ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(payload));
+      ErrorReport(this.flux, error.message, () => this.flux.actions.api.modifyConfig(options));
     });
   }
 

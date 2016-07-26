@@ -39,7 +39,8 @@ let PieChartMapTab = React.createClass({
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
     chartConfig: ImmutablePropTypes.map.isRequired,
-    componentUpdate: React.PropTypes.func.isRequired
+    componentUpdate: React.PropTypes.func.isRequired,
+    defaultResidualFractionName: React.PropTypes.string
   },
 
   getDefaultProps() {

@@ -1,5 +1,5 @@
 import _debounce from 'lodash/debounce';
-import { createHistory } from 'history';
+import {createHistory} from 'history';
 const history = createHistory();
 
 //Needed for JSX
@@ -36,7 +36,7 @@ injectTapEventPlugin();
 //Throw up a loader till we are ready
 ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
-initialConfig.serverURL = process.env.NODE_ENV === "production" ? "/api" : "//"+window.location.hostname+":8000/api";
+initialConfig.serverURL = process.env.NODE_ENV === 'production' ? '/api' : '//' + window.location.hostname + ':8000/api'; //eslint-disable-line no-undef
 
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
@@ -166,10 +166,10 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     };
 
     let config = {
-      ...initialConfig,
-      user:{isManager:false},
+      ...initialConfig,   //eslint-disable-line no-undef
+      user: {isManager: false},
       settings: {
-        name: initialConfig.dataset
+        name: initialConfig.dataset //eslint-disable-line no-undef
       }
     };
     let stores = {

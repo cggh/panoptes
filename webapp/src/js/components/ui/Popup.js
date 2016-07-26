@@ -82,13 +82,16 @@ let Popup = React.createClass({
 
     // Prevent popups from overlapping by incrementally offsetting the position by the cascadePositionOffset (x, y).
     // Prevent offset popups from falling outside the viewport by restarting the cascade from initialPosition (x, y).
+    let initialPosition = this.props.initialPosition.toJS();             //eslint-disable-line react/prop-types
+    let initialSize = this.props.initialSize.toJS();                     //eslint-disable-line react/prop-types
+    let cascadePositionOffset = this.props.cascadePositionOffset.toJS(); //eslint-disable-line react/prop-types
 
-    let maxPopupsDown = Math.floor((window.innerHeight - this.props.initialPosition.get('y') - this.props.initialSize.get('height')) / this.props.cascadePositionOffset.get('y'));
-    let maxPopupsUp = Math.floor((window.innerWidth - this.props.initialPosition.get('x') - this.props.initialSize.get('width')) / this.props.cascadePositionOffset.get('x'));
+    let maxPopupsDown = Math.floor((window.innerHeight - initialPosition.y - initialSize.height) / cascadePositionOffset.y);
+    let maxPopupsUp = Math.floor((window.innerWidth - initialPosition.x - initialSize.width) / cascadePositionOffset.x);
 
     let numberOfOffsets = (this.state.numberOfPopups - 1) % Math.min(maxPopupsDown, maxPopupsUp);
-    let positionX = this.props.initialPosition.get('x') + (numberOfOffsets * this.props.cascadePositionOffset.get('x'));
-    let positionY = this.props.initialPosition.get('y') + (numberOfOffsets * this.props.cascadePositionOffset.get('y'));
+    let positionX = initialPosition.x + (numberOfOffsets * cascadePositionOffset.x);
+    let positionY = initialPosition.y + (numberOfOffsets * cascadePositionOffset.y);
 
     this.setState({position: Immutable.Map({x: positionX, y: positionY})});
 
@@ -126,6 +129,7 @@ let Popup = React.createClass({
 
   },
 
+  /*eslint-disable react/no-did-update-set-state*/
   componentDidUpdate() {
     let {child} = this.refs;
     if (child) {
@@ -133,6 +137,7 @@ let Popup = React.createClass({
       child.title ? this.setState({title: child.title()}) : null;
     }
   },
+  /*eslint-enable react/no-did-update-set-state*/
 
   handleResize(event, {element, size}) { //eslint-disable-line no-unused-vars
     this.setState((prev) => ({

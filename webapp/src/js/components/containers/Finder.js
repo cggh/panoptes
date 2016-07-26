@@ -20,6 +20,12 @@ let Finder = React.createClass({
     ConfigMixin
   ],
 
+  propTypes: {
+    icon: React.PropTypes.string,
+    title: React.PropTypes.string,
+  },
+
+
   getDefaultProps() {
     return {
       title: 'Find',

@@ -135,6 +135,19 @@ let NumericalTrackGroupControls = React.createClass({
     })
   ],
 
+  propTypes: {
+    interpolation: React.PropTypes.string,
+    tension: React.PropTypes.number,
+    autoYScale: React.PropTypes.bool,
+    yMin: React.PropTypes.number,
+    yMax: React.PropTypes.number,
+    tracks: ImmutablePropTypes.listOf(
+      ImmutablePropTypes.contains({
+        track: React.PropTypes.string.isRequired,
+        props: ImmutablePropTypes.map
+      }))
+  },
+
   trackGroups() {
     let groups = {
       __reference__: {
@@ -165,7 +178,7 @@ let NumericalTrackGroupControls = React.createClass({
                   track: prop.id
                 }
               }
-            }
+            };
           }
         });
       }

@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Highlight from 'react-highlighter';
 import _uniq from 'lodash/uniq';
 import _keys from 'lodash/keys';
@@ -14,7 +13,6 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import SQL from 'panoptes/SQL';
 import ItemTemplate from 'panoptes/ItemTemplate';
 
 // Utils
@@ -37,6 +35,7 @@ let ListView = React.createClass({
   ],
 
   propTypes: {
+    icon: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     selectedPrimKey: React.PropTypes.string,
     onSelect: React.PropTypes.func.isRequired,

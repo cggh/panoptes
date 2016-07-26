@@ -16,7 +16,6 @@ import FluxMixin from 'mixins/FluxMixin';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-import {FlatButton} from 'material-ui';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -74,7 +73,6 @@ let MapWithActions = React.createClass({
 
   render() {
     let {sidebar, table, query, column, componentUpdate} = this.props;
-    const actions = this.getFlux().actions;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({

@@ -1,9 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import classNames from 'classnames';
-import Color from 'color';
-import _throttle from 'lodash/throttle';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -12,7 +7,6 @@ import ConfigMixin from 'mixins/ConfigMixin';
 
 // Panoptes components
 import API from 'panoptes/API';
-import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
@@ -32,6 +26,10 @@ let DatasetImportStatusListView = React.createClass({
     FluxMixin,
     ConfigMixin
   ],
+
+  propTypes: {
+    refreshMilliseconds: React.PropTypes.number,
+  },
 
   getInitialState() {
     return {
@@ -64,7 +62,7 @@ let DatasetImportStatusListView = React.createClass({
       API.fetchImportStatusData({cancellation: componentCancellation, ...APIargs})
     )
       .then((data) => {
-      this.setState({
+        this.setState({
           loadStatus: 'loaded',
           rows: data
         });

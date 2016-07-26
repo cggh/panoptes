@@ -21,7 +21,8 @@ let BlockChunkedChannel = React.createClass({
     sideWidth: React.PropTypes.number.isRequired,
     side: React.PropTypes.element,
     controls: React.PropTypes.element,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    children: React.PropTypes.element
     //Note that there will be other props specific to each child channel
   },
 

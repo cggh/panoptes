@@ -71,9 +71,9 @@ let DataItemActions = React.createClass({
     const treeLinks = [];
     const crossLink = `${table}::${primKey}`;
     _forEach(this.config.visibleTables, (treeTable) => {
-        treeTable.trees.forEach((tree) => {
-          if (crossLink === tree.crossLink) {
-            treeLinks.push(<PopupButton label={`Show associated ${this.config.tablesById[treeTable.id].capNameSingle} tree`}
+      treeTable.trees.forEach((tree) => {
+        if (crossLink === tree.crossLink) {
+          treeLinks.push(<PopupButton label={`Show associated ${this.config.tablesById[treeTable.id].capNameSingle} tree`}
                                         icon="tree"
                                         componentPath="containers/TreeWithActions"
                                         table={treeTable.id}
@@ -81,8 +81,8 @@ let DataItemActions = React.createClass({
                                         key={tree.id}
               />
             );
-          }
-        });
+        }
+      });
     });
 
     return (

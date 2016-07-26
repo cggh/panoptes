@@ -1,5 +1,4 @@
 import React from  'react';
-import Immutable from 'immutable';
 import NotificationSystem from 'react-notification-system';
 
 // Mixins
@@ -154,6 +153,12 @@ let Header = React.createClass({
     PureRenderMixin,
     FluxMixin
   ],
+
+  propTypes: {
+    name: React.PropTypes.string,
+    userID: React.PropTypes.string,
+    logo: React.PropTypes.string
+  },
 
   render() {
     let {name, userID, logo} = this.props;

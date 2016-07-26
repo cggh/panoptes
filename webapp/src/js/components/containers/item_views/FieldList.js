@@ -30,7 +30,9 @@ let FieldListTab = React.createClass({
   propTypes: {
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired
+    primKey: React.PropTypes.string.isRequired,
+    fields: React.PropTypes.arrayOf(React.PropTypes.string),
+    className: React.PropTypes.string
   },
 
   getInitialState() {

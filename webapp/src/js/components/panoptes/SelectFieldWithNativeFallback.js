@@ -19,6 +19,14 @@ let ItemLink = React.createClass({
     FluxMixin
   ],
 
+  propTypes: {
+    value: React.PropTypes.string,
+    autoWidth: React.PropTypes.bool,
+    floatingLabelText: React.PropTypes.string,
+    onChange: React.PropTypes.func,
+    options: React.PropTypes.array,
+  },
+
   render() {
     let {value, autoWidth, floatingLabelText, onChange, options} = this.props;
 

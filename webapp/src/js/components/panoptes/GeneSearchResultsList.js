@@ -1,10 +1,5 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Highlight from 'react-highlighter';
-import _uniq from 'lodash/uniq';
-import _keys from 'lodash/keys';
-import striptags from 'striptags';
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,13 +9,9 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
-import SQL from 'panoptes/SQL';
-import ItemTemplate from 'panoptes/ItemTemplate';
-import DataDecoders from 'panoptes/DataDecoders';
 
 // Utils
 import LRUCache from 'util/LRUCache';
-import templateFieldsUsed from 'util/templateFieldsUsed';
 
 // Material UI components
 import {List, ListItem} from 'material-ui/List';
@@ -41,7 +32,9 @@ let GeneSearchResultsList = React.createClass({
 
   propTypes: {
     search: React.PropTypes.string.isRequired,
-    onSelectGene: React.PropTypes.func.isRequired
+    onSelectGene: React.PropTypes.func.isRequired,
+    maxMatches: React.PropTypes.number,
+    icon: React.PropTypes.string
   },
 
   getDefaultProps() {

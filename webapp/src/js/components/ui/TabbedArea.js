@@ -15,7 +15,9 @@ let TabbedArea = React.createClass({
     unclosableTab: React.PropTypes.string,
     onSwitch: React.PropTypes.func,
     onClose: React.PropTypes.func,
-    onDragAway: React.PropTypes.func
+    onDragAway: React.PropTypes.func,
+    onAddTab: React.PropTypes.func,
+    children: React.PropTypes.object
   },
 
   getInitialState() {
@@ -31,6 +33,8 @@ let TabbedArea = React.createClass({
     this.componentDidUpdate();
   },
 
+
+  /*eslint-disable react/no-did-update-set-state*/
   componentDidUpdate() {
     let icons = {};
     let titles = {};
@@ -44,6 +48,7 @@ let TabbedArea = React.createClass({
         titles: titles
       });
   },
+  /*eslint-enable react/no-did-update-set-state*/
 
   handleClick(tabId, e) {
     if (this.props.onSwitch) {
@@ -118,7 +123,7 @@ let TabbedArea = React.createClass({
           key={id}
           defaultPosition={{x: 0, y: 0}}
           onStop={() => this.handleDragStop(id)}
-          onDrag={() => this.setState({dragging:id})}
+          onDrag={() => this.setState({dragging: id})}
         >
         {tabMarkup}
         </Draggable>

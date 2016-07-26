@@ -11,6 +11,11 @@ let ItemLink = React.createClass({
     FluxMixin
   ],
 
+  propTypes: {
+    table: React.PropTypes.string,
+    primKey: React.PropTypes.string
+  },
+
   handleClick(e) {
     let {table, primKey} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;

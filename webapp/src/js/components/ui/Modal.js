@@ -12,7 +12,7 @@ let Modal = React.createClass({
 
   propTypes: {
     visible: React.PropTypes.bool,
-    unclosable: React.PropTypes.bool,
+    uncloseable: React.PropTypes.bool,
     onClose: React.PropTypes.func,
     children: React.PropTypes.element
   },
@@ -21,7 +21,7 @@ let Modal = React.createClass({
     return {
       onClose: function() {
       },
-      closable: true,
+      uncloseable: false,
       visible: true
     };
   },
@@ -37,6 +37,7 @@ let Modal = React.createClass({
     this.componentDidUpdate();
   },
 
+  /*eslint-disable react/no-did-update-set-state */   //It's pk here as it won't lead to thrashing and is the only way to do this
   componentDidUpdate() {
     let {child} = this.refs;
     if (child) {
@@ -44,6 +45,7 @@ let Modal = React.createClass({
       child.title ? this.setState({title: child.title()}) : null;
     }
   },
+  /*eslint-enable react/no-did-update-set-state */
 
   handleClose(e) {
     if (!this.props.uncloseable) {
@@ -54,7 +56,7 @@ let Modal = React.createClass({
   },
 
   handleOverlayClick(e) {
-    if (e.target === ReactDOM.findDOMNode(this.refs.overlay) && this.props.closable) {
+    if (e.target === ReactDOM.findDOMNode(this.refs.overlay) && !this.props.uncloseable) {
       e.preventDefault();
       e.stopPropagation();
       if (this.props.onClose)
@@ -63,7 +65,7 @@ let Modal = React.createClass({
   },
 
   render: function() {
-    let {visible, unclosable, children, onClose, closable, ...other} = this.props;
+    let {visible, uncloseable, children, onClose, ...other} = this.props;
     let {icon, title} = this.state;
 
     if (!children)
@@ -80,7 +82,7 @@ let Modal = React.createClass({
     };
     let hotKeysHandlers = {
       'handleKonami': (e) => { console.error('kong.am.i'); },
-      'handleClose': (e) => { closable ? onClose() : null; },
+      'handleClose': (e) => { !uncloseable ? onClose() : null; },
       'handleEnter': (e) => { this.child && this.child.handleEnter ? this.child.handleEnter() : null; }
     };
 
@@ -94,7 +96,7 @@ let Modal = React.createClass({
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>
-              {!unclosable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
+              {!uncloseable ? <Icon className="pointer close" name="close" onClick={this.handleClose}/> : null}
             </div>
             <div className="popup-body">
               {React.cloneElement(children, {ref: (ref) => this.child = ref})}
