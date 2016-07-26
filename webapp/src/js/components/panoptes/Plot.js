@@ -5,7 +5,7 @@ import _reduce from 'lodash/reduce';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import DetectResize from 'utils/DetectResize';
 
-import { plotTypes, allDimensions } from 'panoptes/plotTypes';
+import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
 
 let Plot = React.createClass({

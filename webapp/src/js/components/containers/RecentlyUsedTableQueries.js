@@ -23,8 +23,10 @@ let RecentlyUsedTableQueries = React.createClass({
     StoreWatchMixin('SessionStore')
   ],
 
-  title() {
-    return this.props.title;
+  propTypes: {
+    table: React.PropTypes.string,
+    onClick: React.PropTypes.func,
+    onDoubleClick: React.PropTypes.func
   },
 
   getStateFromFlux() {

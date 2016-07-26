@@ -28,6 +28,8 @@ let NumericalSummaryTrack = React.createClass({
     blockStart: React.PropTypes.number, //Provided by ScaledSVGChannel
     blockEnd: React.PropTypes.number, //Provided by ScaledSVGChannel
     blockPixelWidth: React.PropTypes.number, //Provided by ScaledSVGChannel
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     interpolation: React.PropTypes.string,
@@ -35,7 +37,8 @@ let NumericalSummaryTrack = React.createClass({
     tension: React.PropTypes.number,
     onYLimitChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired
+    track: React.PropTypes.string.isRequired,
+    onChangeLoadStatus: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {

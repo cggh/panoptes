@@ -57,7 +57,8 @@ let DataTableView = React.createClass({
     onOrderChange: React.PropTypes.func,
     onShowableRowsCountChange: React.PropTypes.func,
     onFetchedRowsCountChange: React.PropTypes.func,
-    onTotalTruncatedRowsCountChange: React.PropTypes.func
+    onTotalTruncatedRowsCountChange: React.PropTypes.func,
+    className: React.PropTypes.string
   },
 
 
@@ -69,7 +70,7 @@ let DataTableView = React.createClass({
       ascending: true,
       startRowIndex: 0,
       columns: Immutable.List(),
-      columnWidths: Immutable.Map()
+      columnWidths: Immutable.Map(),
     };
   },
 

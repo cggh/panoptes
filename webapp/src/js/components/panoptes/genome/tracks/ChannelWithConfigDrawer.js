@@ -21,7 +21,8 @@ let ChannelWithConfigDrawer = React.createClass({
     sideComponent: React.PropTypes.element,
     configComponent: React.PropTypes.element,
     legendComponent: React.PropTypes.element,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    children: React.PropTypes.element
   },
 
   getInitialState() {
@@ -32,7 +33,7 @@ let ChannelWithConfigDrawer = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if (['width', 'sideWidth','height', 'configComponent', 'legendComponent'].some((name) => prevProps[name] !== this.props[name]) ||
+    if (['width', 'sideWidth', 'height', 'configComponent', 'legendComponent'].some((name) => prevProps[name] !== this.props[name]) ||
       ['controlsOpen', 'legendOpen'].some((name) => prevState[name] !== this.state[name])
     )
       this.updateControlsHeight();
@@ -59,9 +60,9 @@ let ChannelWithConfigDrawer = React.createClass({
     if (!this.state.controlsOpen) {
       this.refs.controlsContainer.style.overflow = 'hidden';
       clearTimeout(this.controlOverFlowTimeout);
-    }
-    else
+    } else {
       this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500);
+    }
   },
 
   handleControlToggle(e) {

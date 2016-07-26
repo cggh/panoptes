@@ -8,7 +8,8 @@ let TooltipEllipsis = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    children: React.PropTypes.any
   },
 
   componentDidUpdate() {

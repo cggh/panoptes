@@ -5,7 +5,7 @@ let StoreWatchMixin = function() {
   return {
     componentDidMount: function() {
       if (!this.props.flux && (!this.context || !this.context.flux)) {
-        var namePart = this.constructor.displayName ? " of " + this.constructor.displayName : "";
+        let namePart = this.constructor.displayName ? ' of ' + this.constructor.displayName : '';
         throw new Error('Could not find flux on this.props or this.context' + namePart);
       }
       let flux = this.props.flux || (this.context && this.context.flux);
@@ -22,9 +22,7 @@ let StoreWatchMixin = function() {
     },
 
     _setStateFromFlux: function() {
-      if (this.isMounted()) {
-        this.setState(this.getStateFromFlux());
-      }
+      this.setState(this.getStateFromFlux());
     },
 
     getInitialState: function() {

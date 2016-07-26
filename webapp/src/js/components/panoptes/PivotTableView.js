@@ -1,8 +1,6 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
-import Color from 'color';
+// import Color from 'color';
 import _uniq from 'lodash/uniq';
 
 // Mixins
@@ -20,18 +18,16 @@ import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
-import PropertyHeader from 'panoptes/PropertyHeader';
 
 // UI components
 import Loading from 'ui/Loading';
-import Icon from 'ui/Icon';
 import DetectResize from 'utils/DetectResize';
 
 // Constants in this component
-const MAX_COLOR = Color('#44aafb');
+// const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
-const SCROLLBAR_HEIGHT = 15;
+// const SCROLLBAR_HEIGHT = 15;
 const COLUMN_WIDTH = 100;
 
 let DataTableView = React.createClass({
@@ -47,7 +43,7 @@ let DataTableView = React.createClass({
     query: React.PropTypes.string,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
-
+    className: React.PropTypes.string
   },
 
 
@@ -82,7 +78,7 @@ let DataTableView = React.createClass({
       columnspec[rowProperty] = tableConfig.propertiesById[rowProperty].defaultDisplayEncoding;
       groupby.push(rowProperty);
     }
-    this.setState({loadStatus: 'loading', dataByColumnRow:null, uniqueColumns:null, uniqueRows:null});
+    this.setState({loadStatus: 'loading', dataByColumnRow: null, uniqueColumns: null, uniqueRows: null});
 
     let pageQueryAPIargs = {
       database: this.config.dataset,
@@ -99,18 +95,18 @@ let DataTableView = React.createClass({
           (cacheCancellation) =>
             API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
           componentCancellation
-        ),
+        )
     )
     .then((data) => {
       let columnData = data[columnProperty];
       let rowData = data[rowProperty];
-      var countData = data['count(*)'];
+      let countData = data['count(*)'];
       let uniqueColumns = _uniq(columnData);
       uniqueColumns.push('_all_');
       let uniqueRows = _uniq(rowData);
       uniqueRows.push('_all_');
       let dataByColumnRow = {};
-      uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_' : 0});
+      uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
       dataByColumnRow['_all_'] = {};
       uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
       for (let i = 0; i < countData.length; ++i) {
@@ -176,8 +172,7 @@ let DataTableView = React.createClass({
               isResizable={false}
               minWidth={50}
               header=""
-              cell={({rowIndex}) => {
-                return (
+              cell={({rowIndex}) =>
                   <div className="table-row-cell"
                        style={{
                          textAlign: uniqueRows[rowIndex] == '_all_' ? 'center' : tableConfig.propertiesById[rowProperty].alignment,
@@ -190,11 +185,9 @@ let DataTableView = React.createClass({
                         <PropertyCell prop={tableConfig.propertiesById[rowProperty]} value={uniqueRows[rowIndex]}/>
                     }
                   </div>
-                );
-              }}
+                }
             />
-            {uniqueColumns.map((columnValue) => {
-              return <Column
+            {uniqueColumns.map((columnValue) => <Column
                 //TODO Better default column widths
                 width={COLUMN_WIDTH}
                 key={columnValue}
@@ -213,8 +206,7 @@ let DataTableView = React.createClass({
                         <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
                     </div>
                 }
-                cell={({rowIndex}) => {
-                  return (
+                cell={({rowIndex}) =>
                     <div className="table-row-cell"
                          style={{
                            textAlign: 'right',
@@ -224,10 +216,8 @@ let DataTableView = React.createClass({
                          }}>
                       {dataByColumnRow[columnValue][uniqueRows[rowIndex]]}
                     </div>
-                  );
-                }}
-              />;
-            })
+                  }
+              />)
             }
           </Table>
           <Loading status={loadStatus}/>

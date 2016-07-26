@@ -15,7 +15,10 @@ let Alert = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    message: React.PropTypes.string.isRequired
+    message: React.PropTypes.string.isRequired,
+    title: React.PropTypes.string,
+    OKButtonLabel: React.PropTypes.string,
+    onOK: React.PropTypes.func
   },
 
   getDefaultProps() {

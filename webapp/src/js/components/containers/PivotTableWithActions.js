@@ -1,22 +1,11 @@
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
-import {treeTypes} from 'phylocanvas';
-import titleCase from 'title-case';
 import Sidebar from 'react-sidebar';
-
-// Lodash
-import _map from 'lodash/map';
-import _has from 'lodash/has';
-import _filter from 'lodash/filter';
-import _keys from 'lodash/keys';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
-
-// Material U(I
-import {RaisedButton} from 'material-ui';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -100,7 +89,7 @@ let PivotTableWithActions = React.createClass({
             <span className="text"><QueryString prepend="Filter:" table={table} query={query}/></span>
           </div>
           <div className="grow">
-            {(columnProperty || rowProperty) ? <PivotTableView {...this.props}/> : "Pick properties"}
+            {(columnProperty || rowProperty) ? <PivotTableView {...this.props}/> : 'Pick properties'}
           </div>
         </div>
       </Sidebar>

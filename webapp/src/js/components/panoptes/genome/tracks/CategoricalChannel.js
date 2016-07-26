@@ -102,7 +102,10 @@ let CategoricalTrack = React.createClass({
     fractional: React.PropTypes.bool,
     onYLimitChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired
+    track: React.PropTypes.string.isRequired,
+    width: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number.isRequired,
+    onChangeLoadStatus: React.PropTypes.func.isRequired
   },
 
   getInitialState() {
@@ -282,6 +285,13 @@ let CategoricalTrackControls = React.createClass({
       redirect: ['componentUpdate']
     })
   ],
+
+  propTypes: {
+    autoYScale: React.PropTypes.bool,
+    fractional: React.PropTypes.bool,
+    yMin: React.PropTypes.number,
+    yMax: React.PropTypes.number,
+  },
 
   render() {
     let {fractional, autoYScale, yMin, yMax} = this.props;

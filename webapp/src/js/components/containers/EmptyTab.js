@@ -1,12 +1,8 @@
-import _map from 'lodash/map';
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-import Icon from 'ui/Icon';
 import ViewList from 'panoptes/ViewList';
 import TableList from 'panoptes/TableList';
 

@@ -42,12 +42,12 @@ let GenomeBrowserWithActions = React.createClass({
 
   channelGroups() {
     let groups = {
-        __reference__: {
-          name: 'Reference',
-          icon: 'bitmap:genomebrowser.png',
-          items: {}
-        }
-      };
+      __reference__: {
+        name: 'Reference',
+        icon: 'bitmap:genomebrowser.png',
+        items: {}
+      }
+    };
 
     //Normal summaries
     _forEach(this.config.tables, (table) => {
@@ -83,7 +83,7 @@ let GenomeBrowserWithActions = React.createClass({
                   track: prop.id
                 }
               }
-            }
+            };
           }
           if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
             groups[table.id].items[prop.id] = {
@@ -103,7 +103,7 @@ let GenomeBrowserWithActions = React.createClass({
                   }]
                 }
               }
-            }
+            };
           }
         });
       }

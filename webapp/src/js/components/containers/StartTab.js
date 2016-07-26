@@ -8,7 +8,6 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import ViewList from 'panoptes/ViewList';
 import TableList from 'panoptes/TableList';
 
-import Icon from 'ui/Icon';
 
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 

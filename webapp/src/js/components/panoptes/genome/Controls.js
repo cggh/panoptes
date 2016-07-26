@@ -20,7 +20,8 @@ let Controls = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired
+    end: React.PropTypes.number.isRequired,
+    minWidth: React.PropTypes.number.isRequired,
   },
 
   componentWillMount() {

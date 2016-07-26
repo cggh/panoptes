@@ -10,6 +10,10 @@ let LoadingIndicator = React.createClass({
     PureRenderMixin
   ],
 
+  propTypes: {
+    animate: React.PropTypes.bool,
+    width: React.PropTypes.number
+  },
 
   componentDidMount() {
     this.paint(this.refs.canvas, now() / 100 % 100);

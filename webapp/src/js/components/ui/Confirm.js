@@ -16,7 +16,12 @@ let Confirm = React.createClass({
   mixins: [PureRenderMixin, FluxMixin],
 
   propTypes: {
-    message: React.PropTypes.string.isRequired
+    message: React.PropTypes.string.isRequired,
+    title: React.PropTypes.string,
+    onCancel: React.PropTypes.func,
+    onConfirm: React.PropTypes.func,
+    cancelButtonLabel: React.PropTypes.string,
+    confirmButtonLabel: React.PropTypes.string
   },
 
   getDefaultProps() {

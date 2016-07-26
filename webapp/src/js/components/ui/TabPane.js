@@ -8,7 +8,8 @@ let TabPane = React.createClass({
   propTypes: {
     title: React.PropTypes.string,
     active: React.PropTypes.bool, //Usually set by TabbedArea
-    children: React.PropTypes.element
+    children: React.PropTypes.element,
+    className: React.PropTypes.string
   },
 
   icon() {

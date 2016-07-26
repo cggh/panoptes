@@ -28,7 +28,8 @@ const PropertySelector = React.createClass({
     table: React.PropTypes.string,
     value: React.PropTypes.string,
     filter: React.PropTypes.func,
-    onSelect: React.PropTypes.func
+    onSelect: React.PropTypes.func,
+    label: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -38,7 +39,7 @@ const PropertySelector = React.createClass({
   },
 
   render() {
-    const { table, value, label, filter} = this.props;
+    const {table, value, label, filter} = this.props;
 
     let propertyMenu = [];
     let i = 0;

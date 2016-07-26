@@ -50,7 +50,7 @@ function encodeQuery(query) {
 
 function requestJSON(options, method = 'GET', data = null) {
   let defaults = {
-    url: initialConfig.serverURL,
+    url: initialConfig.serverURL, //eslint-disable-line no-undef
     method: method,
     params: {},
     timeout: 60000,
@@ -341,7 +341,7 @@ function fetchGene(options) {
 
 function fetchImportStatusData(options) {
   assertRequired(options, ['dataset']);
-  let {dataset} = options;
+  // let {dataset} = options;
   let columns = {'id': 'GN',
                  'user': 'GN',
                  'timestamp': 'GN',
@@ -465,7 +465,7 @@ function modifyConfig(options) {
 // TODO: Maintain an order to this list?
 
 module.exports = {
-  serverURL: initialConfig.serverURL,
+  serverURL: initialConfig.serverURL, //eslint-disable-line no-undef
   filterAborted,
   errorMessage,
   requestJSON,

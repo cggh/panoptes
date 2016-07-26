@@ -1,5 +1,4 @@
 import _cloneDeep from 'lodash/cloneDeep';
-import Base64 from 'panoptes/Base64';
 import _filter from 'lodash/filter';
 
 let SQL = {};

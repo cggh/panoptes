@@ -30,7 +30,8 @@ let OverviewTab = React.createClass({
   propTypes: {
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired
+    primKey: React.PropTypes.string.isRequired,
+    className: React.PropTypes.string
   },
 
   getInitialState() {

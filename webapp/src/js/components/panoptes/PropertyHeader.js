@@ -30,7 +30,8 @@ let PropertyHeader = React.createClass({
 
   render: function() {
 
-    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, columnKey, ...other} = this.props;
+    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+    delete other.columnKey;
 
     let tooltip = '';
     if (description) {

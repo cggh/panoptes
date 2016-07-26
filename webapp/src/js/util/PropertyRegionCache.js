@@ -15,10 +15,10 @@ export function findBlock({start, end}) {
     blockLevel,
     blockIndex,
     needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex
-  }
+  };
 }
 
-export function regionCacheGet(options, cancellation=null) {
+export function regionCacheGet(options, cancellation = null) {
   assertRequired(options,
     ['database', 'table', 'columns', 'query', 'regionField', 'start', 'end', 'blockLimit']);
   const {database, table, columns, query, regionField, start, end, blockLimit} = options;
@@ -28,19 +28,19 @@ export function regionCacheGet(options, cancellation=null) {
   const cacheKey = JSON.stringify({database, table, columns, query: SQL.WhereClause.encode(query), regionField, blockLimit});
   //Find the 2 blocks that encapsulate us
   const {blockLevel, blockIndex, needNext} = findBlock(options);
-  const blockSize = Math.pow(2.0, blockLevel);
-  const blockStart = blockSize * blockIndex;
+  // const blockSize = Math.pow(2.0, blockLevel);
+  // const blockStart = blockSize * blockIndex;
 
   let blocks = [fetch(options, blockLevel, blockIndex, cancellation)
                   .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation)),
-                fetch(options, blockLevel, blockIndex + 1 , cancellation)
+                fetch(options, blockLevel, blockIndex + 1, cancellation)
                   .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex + 1, cancellation))];
   //If end isn't in the second block then don't bother with it
   if (!needNext) {
     blocks = [blocks[0]];
   }
   //If we haven't seen any fetches with this key, or if we have seen those exact blocks then just fetch those blocks
-  var seenBlocksForKey = seenBlocks[cacheKey];
+  let seenBlocksForKey = seenBlocks[cacheKey];
   if (!seenBlocksForKey ||
     (seenBlocksForKey[blockLevel] && seenBlocksForKey[blockLevel][blockIndex] && seenBlocksForKey[blockLevel][blockIndex + 1])) {
     return Promise.all(blocks)
@@ -50,7 +50,7 @@ export function regionCacheGet(options, cancellation=null) {
   //So iterate through the blocks bigger than us that also contain us, if any of those exist then return them
   let index = ~~(blockIndex / 2); //Using "~~" for integer DIV
   let index2 = ~~(blockIndex + 1 / 2);
-  for (let level = blockLevel + 1; level < seenBlocksForKey.length; ++level, index = ~~(index / 2), index2 = ~~(index2/2)) {
+  for (let level = blockLevel + 1; level < seenBlocksForKey.length; ++level, index = ~~(index / 2), index2 = ~~(index2 / 2)) {
     if (seenBlocksForKey[level] && seenBlocksForKey[level][index] && seenBlocksForKey[level][index2]) {
       return Promise.all((index === index2) ? [fetch(options, level, index, cancellation)]
                                             : [fetch(options, level, index, cancellation),
@@ -101,7 +101,7 @@ function fetch(options, blockLevel, blockIndex, cancellation) {
       seenBlocks[cacheKey][blockLevel] || (seenBlocks[cacheKey][blockLevel] = []);
       seenBlocks[cacheKey][blockLevel][blockIndex] = true;
       return data;
-    })
+    });
 }
 
 function ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation) {
@@ -126,7 +126,7 @@ function ifTooBigFetchDirectly(options, blockLevel, blockIndex, cancellation) {
     if (_some(blocks, (block) => block._tooBig)) {
       return Promise.all([fetch(options, blockLevel, blockIndex, cancellation)
                             .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation)),
-                          fetch(options, blockLevel, blockIndex + 1 , cancellation)
+                          fetch(options, blockLevel, blockIndex + 1, cancellation)
                             .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex + 1, cancellation))])
         .then(flatten);
     } else {

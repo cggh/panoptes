@@ -28,7 +28,9 @@ let PieChart = React.createClass({
     lat: React.PropTypes.number,
     lng: React.PropTypes.number,
     originalLat: React.PropTypes.number,
-    originalLng: React.PropTypes.number
+    originalLng: React.PropTypes.number,
+    chartData: React.PropTypes.array,
+    $geoService: React.PropTypes.object,
   },
 
   getDefaultProps() {

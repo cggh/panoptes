@@ -28,6 +28,7 @@ let ScaledSVGChannel = React.createClass({
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
+    autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
     dataYMin: React.PropTypes.number,
@@ -35,7 +36,8 @@ let ScaledSVGChannel = React.createClass({
     side: React.PropTypes.element,
     controls: React.PropTypes.element,
     legend: React.PropTypes.element,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    children: React.PropTypes.object
     //Note that there will be other props specific to each child channel
   },
 

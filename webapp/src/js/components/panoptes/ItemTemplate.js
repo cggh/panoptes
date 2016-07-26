@@ -1,5 +1,4 @@
 import React from 'react';
-import _uniq from 'lodash/uniq';
 import Handlebars from 'handlebars/dist/handlebars.js';
 
 // Mixins
@@ -37,7 +36,9 @@ let ItemTemplate = React.createClass({
     className: React.PropTypes.string,
     children: React.PropTypes.string.isRequired,
     table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired
+    primKey: React.PropTypes.string.isRequired,
+    data: React.PropTypes.any
+
   },
 
   getInitialState() {
@@ -120,11 +121,11 @@ let ItemTemplate = React.createClass({
         this.setState({loadStatus: 'loaded', data: templateData});
       })
       .catch(API.filterAborted)
-      .catch(LRUCache.filterCancelled);
-      //.catch((error) => {
-      //  ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-      //  this.setState({loadStatus: 'error'});
-      //});
+      .catch(LRUCache.filterCancelled)
+      .catch((error) => {
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
+        this.setState({loadStatus: 'error'});
+      });
   },
 
   render() {

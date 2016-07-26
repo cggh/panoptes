@@ -144,6 +144,16 @@ let SequenceText = React.createClass({
     PureRenderMixin
   ],
 
+  propTypes: {
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    dataStart: React.PropTypes.number,
+    dataStep: React.PropTypes.number,
+    sequence: React.PropTypes.array
+  },
+
   render() {
     let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
     if (!sequence)
@@ -170,6 +180,16 @@ let SequenceSquares = React.createClass({
   mixins: [
     PureRenderMixin
   ],
+
+  propTypes: {
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    dataStart: React.PropTypes.number,
+    dataStep: React.PropTypes.number,
+    sequence: React.PropTypes.array
+  },
 
   componentDidMount() {
     this.paint(this.refs.canvas);
@@ -247,7 +267,7 @@ let Legend = () =>
     ].map(([base, colour]) => (
      <LegendElement key={base} name={base} colour={colour} />
     ))}
-    <div style={{paddingLeft:'10px'}}>(Majority base over window)</div>
+    <div style={{paddingLeft: '10px'}}>(Majority base over window)</div>
   </div>;
 Legend.shouldComponentUpdate = () => false;
 

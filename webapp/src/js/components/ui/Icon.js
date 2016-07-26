@@ -19,7 +19,9 @@ let Icon = React.createClass({
     fixedWidth: PropTypes.bool,
     spin: PropTypes.bool,
     stack: React.PropTypes.oneOf(['1x', '2x']),
-    inverse: React.PropTypes.bool
+    inverse: React.PropTypes.bool,
+    className: React.PropTypes.string,
+    children: React.PropTypes.element
   },
 
   render() {

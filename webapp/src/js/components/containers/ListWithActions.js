@@ -17,7 +17,6 @@ import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
 
 // Panoptes
-import SQL from 'panoptes/SQL';
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
 import DataItem from 'containers/DataItem';

@@ -19,6 +19,10 @@ import Icon from 'ui/Icon';
 
 
 let Component = React.createClass({
+  propTypes: {
+    component: React.PropTypes.object.isRequired
+  },
+
   render() {
     let {component} = this.props;
     if (component.type === 'AND')
@@ -31,6 +35,10 @@ let Component = React.createClass({
 });
 
 let And = React.createClass({
+  propTypes: {
+    component: React.PropTypes.object.isRequired
+  },
+
   render() {
     let {component, ...other} = this.props;
     return (
@@ -42,6 +50,10 @@ let And = React.createClass({
 });
 
 let Or = React.createClass({
+  propTypes: {
+    component: React.PropTypes.object.isRequired
+  },
+
   render() {
     let {component, ...other} = this.props;
     return (
@@ -68,6 +80,11 @@ let Criterion = React.createClass({
     StoreWatchMixin('PanoptesStore')
   ],
 
+  propTypes: {
+    component: React.PropTypes.object.isRequired,
+    onChange: React.PropTypes.func.isRequired,
+    table: React.PropTypes.string.isRequired
+  },
 
   getStateFromFlux() {
     return {
@@ -489,7 +506,8 @@ let QueryEditor = React.createClass({
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string.isRequired,
-    onChange: React.PropTypes.func
+    onChange: React.PropTypes.func,
+    className: React.PropTypes.string
   },
 
   handleChange(newQuery) {

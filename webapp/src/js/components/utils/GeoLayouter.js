@@ -31,7 +31,8 @@ function setRadius(node) {
 let GeoLayouter = React.createClass({
 
   propTypes: {
-    nodes: ImmutablePropTypes.list
+    nodes: ImmutablePropTypes.list,
+    children: React.PropTypes.func
   },
 
   getDefaultProps() {

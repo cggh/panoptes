@@ -1,7 +1,4 @@
 import React from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import _isFunction from 'lodash/isFunction';
-
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -26,7 +23,12 @@ let FindGene = React.createClass({
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
-    activeTab: React.PropTypes.string
+    activeTab: React.PropTypes.string,
+    search: React.PropTypes.string,
+    chromosome: React.PropTypes.string,
+    startPosition: React.PropTypes.number,
+    endPosition: React.PropTypes.number,
+    chromosomeLength: React.PropTypes.number,
   },
 
   getDefaultProps: function() {
