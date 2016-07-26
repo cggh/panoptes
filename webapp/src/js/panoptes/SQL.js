@@ -567,7 +567,7 @@ SQL.WhereClause.Compound = function(icompoundtype, components) {
     }
   };
   that.removeChild = function(child) {
-    that.components = that.components.filter((myChild) => myChild === child);
+    that.components = that.components.filter((myChild) => myChild !== child);
     that.inlineIfOneChild();
   };
 
