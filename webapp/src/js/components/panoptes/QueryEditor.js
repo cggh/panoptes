@@ -105,8 +105,11 @@ let Criterion = React.createClass({
     onChange();
   },
 
-  handleRemove() {
-    let {component, onChange} = this.props;
+  handleRemove(component) {
+console.log('handleRemove this.props.component %o', this.props.component);
+console.log('handleRemove component %o', component);
+    //let {component, onChange} = this.props;
+    let {onChange} = this.props;
     if (component.isRoot) {
       Object.assign(component, SQL.WhereClause.Trivial());
     } else {
@@ -461,6 +464,10 @@ let Criterion = React.createClass({
       );
     }
 
+
+let thisCriterion = this;
+console.log('render thisCriterion.props.component: %o', thisCriterion.props.component);
+
     return (
       <Paper zDepth={1} className="criterion">
         <div className="inputs">
@@ -470,7 +477,7 @@ let Criterion = React.createClass({
         </div>
         <div className="actions">
           <div>
-            <Icon className="pointer close" name="close" onClick={this.handleRemove}/>
+            <Icon className="pointer close" name="close" onClick={() => thisCriterion.handleRemove(thisCriterion.props.component)}/>
           </div>
           <div className="action" onClick={this.handleAddOr}>
             OR
