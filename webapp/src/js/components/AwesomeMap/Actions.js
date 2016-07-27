@@ -74,7 +74,6 @@ let AwesomeMapActions = React.createClass({
 
   render() {
     let {sidebar, table, query, column, componentUpdate} = this.props;
-    const actions = this.getFlux().actions;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
