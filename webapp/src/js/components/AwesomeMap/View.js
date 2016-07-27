@@ -5,6 +5,9 @@ import {Map} from 'react-leaflet';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
+// Panoptes
+import DetectResize from 'utils/DetectResize';
+
 // CSS
 import 'leaflet.css';
 
@@ -31,6 +34,13 @@ let AwesomeMapView = React.createClass({
     };
   },
 
+  // Event handlers
+  handleDetectResize() {
+    if (this.map) {
+      this.map.leafletElement.invalidateSize();
+    }
+  },
+
   render() {
     let {center, zoom, height, width, children} = this.props;
 
@@ -40,13 +50,16 @@ let AwesomeMapView = React.createClass({
     }
 
     return (
-      <Map
-        style={{height, ...optionalMapStyles}}
-        center={center}
-        zoom={zoom}
-      >
-      {children}
-      </Map>
+      <DetectResize onResize={this.handleDetectResize}>
+        <Map
+          style={{height, ...optionalMapStyles}}
+          center={center}
+          zoom={zoom}
+          ref={(ref) => this.map = ref}
+        >
+        {children}
+        </Map>
+      </DetectResize>
     );
   }
 

@@ -49,54 +49,54 @@ let AwesomeMapWidget = React.createClass({
     const zoom = 13;
 
     return (
-      <div style={{height: '100%'}}>
-        <AwesomeMapView center={center} zoom={zoom}>
+      <AwesomeMapView
+        center={center}
+        zoom={zoom}
 
-          <LayersControl position="topright">
-            <BaseLayer checked name="OpenStreetMap.Mapnik">
-              <TileLayer
-                attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-              />
-            </BaseLayer>
-            <BaseLayer name="OpenStreetMap.BlackAndWhite">
-              <TileLayer
-                attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
-              />
-            </BaseLayer>
-            <Overlay name="Marker with popup">
-              <Marker position={center}>
-                <Popup>
-                  <div>
-                    <span>A pretty CSS3 popup. <br /> Easily customizable.</span>
-                    <HelloWorld msg="foobar" />
-                  </div>
-                </Popup>
-              </Marker>
-            </Overlay>
-            <Overlay checked name="Layer group with circles">
+      >
+        <LayersControl position="topright">
+          <BaseLayer checked name="OpenStreetMap.Mapnik">
+            <TileLayer
+              attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            />
+          </BaseLayer>
+          <BaseLayer name="OpenStreetMap.BlackAndWhite">
+            <TileLayer
+              attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
+            />
+          </BaseLayer>
+          <Overlay name="Marker with popup">
+            <Marker position={center}>
+              <Popup>
+                <div>
+                  <span>A pretty CSS3 popup. <br /> Easily customizable.</span>
+                  <HelloWorld msg="foobar" />
+                </div>
+              </Popup>
+            </Marker>
+          </Overlay>
+          <Overlay checked name="Layer group with circles">
+            <LayerGroup>
+              <Circle center={center} fillColor="blue" radius={200} />
+              <Circle center={center} fillColor="red" radius={100} stroke={false} />
               <LayerGroup>
-                <Circle center={center} fillColor="blue" radius={200} />
-                <Circle center={center} fillColor="red" radius={100} stroke={false} />
-                <LayerGroup>
-                  <Circle center={[51.51, -0.08]} color="green" fillColor="green" radius={100} />
-                </LayerGroup>
+                <Circle center={[51.51, -0.08]} color="green" fillColor="green" radius={100} />
               </LayerGroup>
-            </Overlay>
-            <Overlay name="Feature group">
-              <FeatureGroup color="purple">
-                <Popup>
-                  <span>Popup in FeatureGroup</span>
-                </Popup>
-                <Circle center={[51.51, -0.06]} radius={200} />
-                <Rectangle bounds={rectangle} />
-              </FeatureGroup>
-            </Overlay>
-          </LayersControl>
-
-        </AwesomeMapView>
-      </div>
+            </LayerGroup>
+          </Overlay>
+          <Overlay name="Feature group">
+            <FeatureGroup color="purple">
+              <Popup>
+                <span>Popup in FeatureGroup</span>
+              </Popup>
+              <Circle center={[51.51, -0.06]} radius={200} />
+              <Rectangle bounds={rectangle} />
+            </FeatureGroup>
+          </Overlay>
+        </LayersControl>
+      </AwesomeMapView>
     );
 
   }
