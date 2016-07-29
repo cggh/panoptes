@@ -82,6 +82,10 @@ let PerRowIndicatorChannel = React.createClass({
     this.tooBigBlocks = [];
   },
 
+  componentDidMount() {
+    this.draw();
+  },
+
   componentDidUpdate() {
     this.draw();
   },
@@ -141,7 +145,7 @@ let PerRowIndicatorChannel = React.createClass({
         regionCacheGet(APIargs, cacheArgs, componentCancellation)
           .then((blocks) => {
             this.props.onChangeLoadStatus('DONE');
-            this.applyData(props, blocks);
+            this.applyData(this.props, blocks);
           }))
         .catch((err) => {
           this.props.onChangeLoadStatus('DONE');
@@ -150,8 +154,8 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(props, {});
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+          this.applyData(this.props, {});
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
         });
     }
     this.draw(props);

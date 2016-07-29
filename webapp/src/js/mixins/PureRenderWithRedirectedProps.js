@@ -18,8 +18,8 @@ let PureRenderWithRedirectedProps = function({check, redirect}) {
       }
     },
 
-    //As component update is an anon func, it looks different on every prop change,
-    //so skip it when checking
+    //Anon funcs looks different on every prop change,
+    //so allow them to be specified and skipped.
     shouldComponentUpdate(nextProps, nextState) {
       let propsChanged = true;
       if (check)

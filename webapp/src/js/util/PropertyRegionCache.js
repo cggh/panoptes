@@ -67,7 +67,7 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
 
 function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   let {method, regionField, queryField, limitField, blockLimit, isBlockTooBig} = cacheArgs;
-  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => block[_keys(block)[0]].length <= blockLimit);
+  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].length <= blockLimit));
   const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   const blockSize = Math.pow(2.0, blockLevel);
   const blockStart = blockSize * blockIndex;

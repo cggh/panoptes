@@ -54,8 +54,8 @@
     "color": "^0.11.1",
     "console-polyfill": "^0.2.2",
     "d3": "^3.5.17",
-    "esprima": "^2.7.2",
     "datastream": "^1.0.0",
+    "esprima": "^2.7.2",
     "fixed-data-table": "^0.6.0",
     "fluxxor": "^1.7.3",
     "google-map-react": "^0.15.1",
@@ -96,6 +96,7 @@
     "shallow-equals": "0.0.0",
     "striptags": "^2.1.1",
     "title-case": "^2.1.0",
+    "tween.js": "^16.3.4",
     "uid": "0.0.2"
   }
 }
