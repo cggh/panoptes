@@ -1,45 +1,32 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {Map, Marker, Popup, TileLayer} from 'react-leaflet';
+import {FeatureGroup, Marker} from 'react-leaflet';
 import DivIcon from 'react-leaflet-div-icon';
-
-// Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
-import FluxMixin from 'mixins/FluxMixin';
-
-// Panoptes
-import DetectResize from 'utils/DetectResize';
-
-// CSS
-import 'leaflet.css';
 
 // Lodash
 import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
 
-let MapLeafletView = React.createClass({
+// Mixins
+import FluxMixin from 'mixins/FluxMixin';
+
+
+let LayerMapMarkerLayer = React.createClass({
 
   mixins: [
-    PureRenderMixin,
     FluxMixin
   ],
 
+  propTypes: {
+    markers: React.PropTypes.arrayOf(React.PropTypes.object),
+    color: React.PropTypes.string
+  },
+
   getDefaultProps() {
     return {
-      zoom: 1,
-      center: {
-        lat: 0,
-        lng: 0
-      }
+
     };
   },
 
-  // Event handlers
-  handleDetectResize() {
-    if (this.map) {
-      this.map.leafletElement.invalidateSize();
-    }
-  },
   handleClickMarker(e, marker) {
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     // TODO: when left click, focus dataItemPopup. When middleclick, maintain focus on this component.
@@ -47,7 +34,9 @@ let MapLeafletView = React.createClass({
   },
 
   render() {
-    let {center, zoom, markers} = this.props;
+
+    let {markers, color} = this.props;
+
 
     let L = window.L;
     let mapMarkers = undefined;
@@ -106,29 +95,14 @@ let MapLeafletView = React.createClass({
       }
     }
 
-    const TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
-    const TileLayerAttribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
-
     return (
-      <DetectResize onResize={this.handleDetectResize}>
-        <Map
-          ref={(ref) => this.map = ref}
-          center={center}
-          zoom={zoom}
-          style={{height: '100%', width: '100%'}}
-          bounds={bounds}
-        >
-          <TileLayer
-            url={TileLayerUrl}
-            attribution={TileLayerAttribution}
-          />
-          {mapMarkers}
-        </Map>
-      </DetectResize>
+      <FeatureGroup color={color}>
+        {mapMarkers}
+      </FeatureGroup>
     );
 
   }
 
 });
 
-module.exports = MapLeafletView;
+module.exports = LayerMapMarkerLayer;

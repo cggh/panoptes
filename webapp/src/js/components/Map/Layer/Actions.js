@@ -16,7 +16,6 @@ import FluxMixin from 'mixins/FluxMixin';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-import {FlatButton} from 'material-ui';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -25,13 +24,13 @@ import FilterButton from 'panoptes/FilterButton';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import AwesomeMapWidget from 'AwesomeMap/Widget';
+import LayerMapWidget from 'Map/Layer/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'map.scss';
 
-let AwesomeMapActions = React.createClass({
+let LayerMapActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -143,7 +142,7 @@ let AwesomeMapActions = React.createClass({
               : null}
           </div>
           <div className="vertical stack">
-            {table ? <AwesomeMapWidget {...this.props}  /> : 'Pick a table'}
+            {table ? <LayerMapWidget {...this.props}  /> : 'Pick a table'}
           </div>
         </div>
       </Sidebar>
@@ -151,4 +150,4 @@ let AwesomeMapActions = React.createClass({
   }
 });
 
-module.exports = AwesomeMapActions;
+module.exports = LayerMapActions;

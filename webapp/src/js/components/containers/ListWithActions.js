@@ -1,5 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
@@ -22,6 +21,7 @@ import ItemTemplate from 'panoptes/ItemTemplate';
 import DataItemWidget from 'DataItem/Widget';
 import DataDownloader from 'utils/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
+import DataItemViews from 'utils/DataItemViews';
 
 // Constants
 const MAX_ROWS_COUNT = 10000;
@@ -138,82 +138,7 @@ let ListWithActions = React.createClass({
       </div>
     );
 
-
-/////////////// TODO: Adapted from PanoptesActions.js
-// TODO: Put const viewTypes into constants file?
-
-    let dataItemViews = this.tableConfig().dataItemViews;
-
-    let views = Immutable.List();
-    if (!dataItemViews) {
-      // If there are no dataItemViews specified, then default to showing an Overview.
-      views.push({
-        view: 'Overview',
-        props: {
-          title: 'Overview'
-        }
-      });
-
-      if (this.tableConfig().hasGeoCoord) {
-        // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing an ItemMap
-        views.push({
-          view: 'AwesomeMap',
-          props: {
-            title: 'Location'
-          }
-        });
-      }
-    } else {
-      dataItemViews.forEach((dataItemView) => {
-        // Compose a tabPane for each of the specified dataItemViews
-        const viewTypes = {
-          Overview: () => ({
-            view: 'Overview',
-            props: {
-              title: 'Overview'
-            }
-          }),
-          PieChartMap: () => ({
-            view: 'AwesomeMap',
-            props: {
-              title: dataItemView.name,
-              chartConfig: dataItemView
-            }
-          }),
-          ItemMap: () => ({
-            view: 'AwesomeMap',
-            props: {
-              title: dataItemView.name
-            }
-          }),
-          FieldList: () => ({
-            view: 'FieldList',
-            props: {
-              title: dataItemView.name,
-              fields: dataItemView.fields
-            }
-          }),
-          PropertyGroup: () => ({
-            view: 'PropertyGroup',
-            props: {
-              title: dataItemView.name || dataItemView.groupId, //TODO This should be name from group config
-              propertyGroupId: dataItemView.groupId
-            }
-          }),
-          Template: () => ({
-            view: 'Template',
-            props: {
-              title: dataItemView.name, //TODO This should be name from group config
-              content: dataItemView.content
-            }
-          })
-        };
-        if (viewTypes[dataItemView.type])
-          views = views.push(Immutable.fromJS(viewTypes[dataItemView.type]()));
-      });
-    }
-
-///////////////
+    let views = DataItemViews.getViews(this.tableConfig().dataItemViews, this.tableConfig().hasGeoCoord);
 
     let dataItem = '';
     if (selectedPrimKey) {

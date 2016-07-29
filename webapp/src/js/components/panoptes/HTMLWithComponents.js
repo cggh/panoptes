@@ -1,15 +1,21 @@
 import React from 'react';
 import HtmlToReact from 'html-to-react';
-import AwesomeMapWidget from 'AwesomeMap/Widget';
+
 import ItemLink from 'panoptes/ItemLink';
 import TreeContainer from 'containers/TreeContainer';
 import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
+import MapWidget from 'Map/Widget';
+import MapMarkerWidget from 'Map/Marker/Widget';
+import TableMapWidget from 'Map/Table/Widget';
+
+
+
+
+// TODO: Deprecate ItemMap template component in favour of TableMap
 
 /*eslint-disable react/display-name */
 const components = {
-  ItemMap: (node, children) =>
-    <AwesomeMapWidget key={node.attribs.key} {...node.attribs} />,
   ItemLink: (node, children) =>
     <ItemLink key={node.attribs.key} {...node.attribs} />,
   Tree: (node, children) =>
@@ -17,7 +23,26 @@ const components = {
   Plot: (node, children) =>
     <PlotContainer key={node.attribs.key} {...node.attribs} />,
   PopupButton: (node, children) =>
-    <PopupButton key={node.attribs.key} {...node.attribs} />
+    <PopupButton key={node.attribs.key} {...node.attribs} />,
+  ItemMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  Map: (node, children) => {
+    console.log('Map node: %o', node);
+    console.log('Map children: %o', children);
+    return <MapWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapWidget>;
+  },
+  MapMarker: (node, children) =>
+    <MapMarkerWidget key={node.attribs.key} {...node.attribs} />,
+  TableMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  PieChartMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  BarChartMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  LayerMap: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs} />,
+  LayerGroup: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs} />,
 };
 /*eslint-enable react/display-name */
 

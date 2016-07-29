@@ -11,7 +11,7 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes
 import DetectResize from 'utils/DetectResize';
 import GeoLayouter from 'utils/GeoLayouter';
-import PieChartWidget from 'PieChart/Widget';
+import PieChartWidget from 'Chart/Pie/Widget';
 import {latlngToMercatorXY} from 'util/WebMercator';
 
 // CSS
@@ -24,7 +24,7 @@ import _maxBy from 'lodash/maxBy';
 // Constants
 const L = window.L;
 
-let PieChartMapLeafletView = React.createClass({
+let PieChartMapView = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -167,63 +167,57 @@ let PieChartMapLeafletView = React.createClass({
 
     // NB: this.map is not available on the first render.
     let crs = this.map ? this.map.leafletElement.options.crs : L.CRS.EPSG3857;
-
+console.log('markers: %o', markers);
     return (
       <DetectResize onResize={this.handleDetectResize}>
-        <GeoLayouter nodes={markers}>
+        <Map
+          ref={(ref) => this.map = ref}
+          center={center}
+          zoom={zoom}
+          style={{height: '100%', width: '100%'}}
+          bounds={bounds}
+        >
+          <TileLayer
+            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
           {
-            (renderNodes) =>
-              <Map
-                ref={(ref) => this.map = ref}
-                center={center}
-                zoom={zoom}
-                style={{height: '100%', width: '100%'}}
-                bounds={bounds}
-              >
-                <TileLayer
-                  url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {
-                  renderNodes.map(
-                    (marker, index) => {
+            markers.map(
+              (marker, index) => {
 
-                      // FIXME: Workaround to hide the default icon.
-                      let icon = L.divIcon({html: ''});
+                // FIXME: Workaround to hide the default icon.
+                let icon = L.divIcon({html: ''});
 
-                      // NB: Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar "/>
+                // NB: Using DivIcon so we can easily put JSX and React components in here, e.g. <HelloWorld msg="foobar "/>
 
-                      return (
-                        <Marker
-                          key={index}
-                          position={{lat: marker.lat, lng: marker.lng}}
-                          title={marker.title}
-                          onClick={(e) => this.handleClickMarker(e, marker)}
-                          icon={icon}
-                        >
-                          <DivIcon position={{lat: marker.lat, lng: marker.lng}}>
-                            <PieChartWidget
-                              debounced={false}
-                              lng={marker.lng}
-                              lat={marker.lat}
-                              originalLng={marker.originalNode.lng}
-                              originalLat={marker.originalNode.lat}
-                              key={index}
-                              name={marker.name}
-                              radius={marker.radius}
-                              chartData={marker.chartData}
-                              crs={crs}
-                              onClick={(e) => this.handleClickPieChart(e, marker)}
-                            />
-                          </DivIcon>
-                        </Marker>
-                      );
-                    }
-                  )
-                }
-              </Map>
+                return (
+                  <Marker
+                    key={index}
+                    position={{lat: marker.get('lat'), lng: marker.get('lng')}}
+                    title={marker.title}
+                    onClick={(e) => this.handleClickMarker(e, marker)}
+                    icon={icon}
+                  >
+                    <DivIcon position={{lat: marker.get('lat'), lng: marker.get('lng')}}>
+                      <PieChartWidget
+                        debounced={false}
+                        lat={marker.get('lat')}
+                        lng={marker.get('lng')}
+                        key={index}
+                        name={marker.get('name')}
+                        radius={marker.get('radius')}
+                        chartData={marker.get('chartData').toArray()}
+                        crs={crs}
+                        onClick={(e) => this.handleClickPieChart(e, marker)}
+                      />
+                    </DivIcon>
+                  </Marker>
+                );
+              }
+            )
           }
-        </GeoLayouter>
+        </Map>
+
       </DetectResize>
     );
 
@@ -231,4 +225,4 @@ let PieChartMapLeafletView = React.createClass({
 
 });
 
-module.exports = PieChartMapLeafletView;
+module.exports = PieChartMapView;

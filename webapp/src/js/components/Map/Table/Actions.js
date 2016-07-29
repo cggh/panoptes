@@ -24,7 +24,7 @@ import FilterButton from 'panoptes/FilterButton';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import MapWidget from 'Map/Widget';
+import TableMapWidget from 'Map/Table/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
@@ -142,7 +142,7 @@ let MapActions = React.createClass({
               : null}
           </div>
           <div className="vertical stack">
-            {table ? <MapWidget {...this.props}  /> : 'Pick a table'}
+            {table ? <TableMapWidget {...this.props}  /> : 'Pick a table'}
           </div>
         </div>
       </Sidebar>

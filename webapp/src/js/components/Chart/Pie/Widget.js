@@ -7,7 +7,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import PieChartSectorWidget from 'PieChartSector/Widget';
+import PieChartSectorWidget from 'Chart/Pie/Sector/Widget';
 
 import 'pie-chart.scss';
 
@@ -31,7 +31,6 @@ let PieChartWidget = React.createClass({
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
     chartData: React.PropTypes.array,
-    $geoService: React.PropTypes.object,
     crs: React.PropTypes.object
   },
 
@@ -42,12 +41,8 @@ let PieChartWidget = React.createClass({
   },
 
   render() {
-    let {name, radius, chartData, onClick, crs} = this.props;
-
-    // Support the GoogleMapsView
-    if (crs === undefined && this.props.$geoService !== undefined) {
-      crs = this.props.$geoService;
-    }
+    let {name, radius, chartData, onClick, crs, lat, lng, originalLat, originalLng} = this.props;
+console.log('PieChartWidget props: %o', this.props);
 
     let sectorsData = [];
     let pieData = [];
@@ -84,20 +79,27 @@ let PieChartWidget = React.createClass({
     let translateX = 0;
     let translateY = 0;
 
-    let location = crs.project({lat: this.props.lat, lng: this.props.lng});
-    let originalLocation = crs.project({lat: this.props.originalLat, lng: this.props.originalLng});
+    let location = crs.project({lat, lng});
 
-    return (
-      <svg style={{overflow: 'visible'}} width={width} height={height}>
-        <g transform={'translate(' + translateX + ', ' + translateY + ')'}>
-          {sectors}
-        </g>
+    let line = null;
+    if (originalLat && originalLng) {
+      let originalLocation = crs.project({lat: originalLat, lng: originalLng});
+      line = (
         <line
           className="pie-chart-line"
           style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
           x1="0" y1="0"
           x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
         />
+      );
+    }
+
+    return (
+      <svg style={{overflow: 'visible'}} width={width} height={height}>
+        <g transform={'translate(' + translateX + ', ' + translateY + ')'}>
+          {sectors}
+        </g>
+        {line}
       </svg>
     );
 

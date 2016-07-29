@@ -14,7 +14,7 @@ import LRUCache from 'util/LRUCache';
 
 // Panoptes components
 import API from 'panoptes/API';
-import PieChartMapView from 'PieChartMap/LeafletView';
+import PieChartMapView from 'Map/Chart/Pie/View';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
@@ -29,17 +29,17 @@ let PieChartMapWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chartConfig', 'table', 'primKey')
+    DataFetcherMixin('chartConfig', 'chartDataTable', 'chartDataTablePrimKey')
   ],
 
   propTypes: {
+    chartDataTable: React.PropTypes.string.isRequired,
+    chartDataTablePrimKey: React.PropTypes.string.isRequired,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
     center: React.PropTypes.object,
-    table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
+
     chartConfig: ImmutablePropTypes.map.isRequired,
-    componentUpdate: React.PropTypes.func.isRequired,
     defaultResidualFractionName: React.PropTypes.string
   },
 
@@ -57,10 +57,18 @@ let PieChartMapWidget = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {chartConfig, table, primKey, defaultResidualFractionName} = props;
+    let {
+      chartConfig,
+      chartDataTable,
+      chartDataTablePrimKey,
+      defaultResidualFractionName
+
+    } = props;
     chartConfig = chartConfig.toJS();
     let {locationDataTable, locationNameProperty, locationSizeProperty,
       residualFractionName, componentColumns} = chartConfig;
+
+console.log('PieChartMapWidget componentColumns: %o', componentColumns);
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     // Check that the table specified for locations has geographic coordinates.
@@ -96,9 +104,9 @@ let PieChartMapWidget = React.createClass({
 
     let chartAPIargs = {
       database: this.config.dataset,
-      table: table,
-      primKeyField: this.config.tablesById[table].primKey,
-      primKeyValue: primKey
+      table: chartDataTable,
+      primKeyField: this.config.tablesById[chartDataTable].primKey,
+      primKeyValue: chartDataTablePrimKey
     };
 
     requestContext.request(
@@ -180,14 +188,6 @@ let PieChartMapWidget = React.createClass({
     return this.props.title;
   },
 
-  handlePanZoom({center, zoom}) {
-    if (zoom != this.props.zoom ||
-      this.props.center.get('lat') != center.lat ||
-      this.props.center.get('lng') != center.lng) {
-      this.props.componentUpdate({center, zoom});
-    }
-  },
-
   render() {
     let {center, zoom} = this.props;
     let {loadStatus, markers} = this.state;
@@ -197,7 +197,6 @@ let PieChartMapWidget = React.createClass({
           center={center}
           zoom={zoom}
           markers={markers}
-          onPanZoom={this.handlePanZoom}
         />
         <Loading status={loadStatus}/>
       </div>

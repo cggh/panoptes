@@ -31,7 +31,7 @@ let FieldListWidget = React.createClass({
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
-    fields: React.PropTypes.arrayOf(React.PropTypes.string),
+    fields: React.PropTypes.object,
     className: React.PropTypes.string
   },
 

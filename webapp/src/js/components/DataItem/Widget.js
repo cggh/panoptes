@@ -30,7 +30,7 @@ let DataItemWidget = React.createClass({
     activeTab: React.PropTypes.string,
     views: ImmutablePropTypes.listOf(
       ImmutablePropTypes.contains({
-        view: React.PropTypes.string.isRequired,
+        component: React.PropTypes.string.isRequired,
         props: ImmutablePropTypes.map
       })).isRequired
   },
@@ -65,7 +65,7 @@ let DataItemWidget = React.createClass({
                 <TabPane
                   compId={viewId}
                   key={viewId}>
-                  {React.createElement(dynamicRequire(view.view),
+                  {React.createElement(dynamicRequire(view.component),
                     Object.assign(props,
                       {table, primKey},
                       {

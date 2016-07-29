@@ -17,7 +17,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import PieChartWidget from 'PieChart/Widget';
+import PieChartWidget from 'Chart/Pie/Widget';
 
 function getMapOptions(maps) {
   return {

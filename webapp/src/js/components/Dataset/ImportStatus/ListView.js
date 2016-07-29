@@ -76,7 +76,7 @@ let DatasetImportStatusListView = React.createClass({
 
   handleClickImportStatus(logId, title, icon) {
     let switchTo = true;
-    this.getFlux().actions.session.popupOpen('DatasetImportStatus/ItemView', {logId, title, icon}, switchTo);
+    this.getFlux().actions.session.popupOpen('Dataset/ImportStatus/ItemView', {logId, title, icon}, switchTo);
   },
 
   render() {
