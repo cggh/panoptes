@@ -1,4 +1,4 @@
-import tween from 'tween';
+import tween from 'tween.js';
 
 export default function (val, start, stop, func, out_start, out_stop) {
   func = func || tween.Easing.Quadratic.InOut;

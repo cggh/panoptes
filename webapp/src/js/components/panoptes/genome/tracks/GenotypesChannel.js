@@ -31,7 +31,8 @@ import FlatButton from 'material-ui/FlatButton';
 import 'hidpi-canvas';
 import {propertyColour, categoryColours} from 'util/Colours';
 
-const HEIGHT = 50;
+const FAN_HEIGHT = 60;
+const HEIGHT = 200;
 
 let GenotypesChannel = React.createClass({
   mixins: [
@@ -303,14 +304,14 @@ let GenotypesChannel = React.createClass({
         }
         //Override component update to get latest in case of skipped render
         configComponent={<GenotypesControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate}/>}
-        legendComponent={<div>LEDGE</div>}
+        legendComponent={<GenotypesLegend/>}
         onClose={this.redirectedProps.onClose}
       >
         <GenotypesFan
           genomicPositions={visibleGenomicPositions}
           colPositions={colPositions}
           width={width - sideWidth}
-          height={HEIGHT}
+          height={FAN_HEIGHT}
           start={start}
           end={end}
           colWidth={colWidth}/>
@@ -345,6 +346,25 @@ const GenotypesControls = React.createClass({
                             onSelect={(rowLabel) => this.redirectedProps.componentUpdate({rowLabel})}/>
         </div>
       </div>
+    );
+  }
+
+});
+
+const GenotypesLegend = React.createClass({
+  mixins: [
+    PureRenderWithRedirectedProps({
+      check: [
+        'rowLabel'
+      ],
+    }),
+
+  ],
+
+  render() {
+
+    return (
+      <div>Legend</div>
     );
   }
 
