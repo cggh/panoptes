@@ -24,13 +24,13 @@ import FilterButton from 'panoptes/FilterButton';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import ItemMap from 'containers/item_views/ItemMap';
+import MapWidget from 'Map/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'map.scss';
 
-let MapWithActions = React.createClass({
+let MapActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -141,11 +141,13 @@ let MapWithActions = React.createClass({
               </span>
               : null}
           </div>
-          {table ? <ItemMap {...this.props}  /> : 'Pick a table'}
+          <div className="vertical stack">
+            {table ? <MapWidget {...this.props}  /> : 'Pick a table'}
+          </div>
         </div>
       </Sidebar>
     );
   }
 });
 
-module.exports = MapWithActions;
+module.exports = MapActions;

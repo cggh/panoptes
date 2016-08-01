@@ -14,7 +14,7 @@ import LRUCache from 'util/LRUCache';
 
 // Panoptes components
 import API from 'panoptes/API';
-import PieChartMap from 'panoptes/PieChartMap';
+import PieChartMapView from 'PieChartMap/LeafletView';
 import ErrorReport from 'panoptes/ErrorReporter';
 
 // UI components
@@ -24,7 +24,7 @@ import Loading from 'ui/Loading';
 const RESIDUAL_SECTOR_COLOR = 'rgb(191,191,191)';
 
 
-let PieChartMapTab = React.createClass({
+let PieChartMapWidget = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -193,13 +193,13 @@ let PieChartMapTab = React.createClass({
     let {loadStatus, markers} = this.state;
     return (
       <div style={{width: '100%', height: '100%'}}>
-          <PieChartMap
-            center={center}
-            zoom={zoom}
-            markers={markers}
-            onPanZoom={this.handlePanZoom}
-          />
-          <Loading status={loadStatus}/>
+        <PieChartMapView
+          center={center}
+          zoom={zoom}
+          markers={markers}
+          onPanZoom={this.handlePanZoom}
+        />
+        <Loading status={loadStatus}/>
       </div>
     );
 
@@ -207,4 +207,4 @@ let PieChartMapTab = React.createClass({
 
 });
 
-module.exports = PieChartMapTab;
+module.exports = PieChartMapWidget;

@@ -1,8 +1,7 @@
 import React from 'react';
 import HtmlToReact from 'html-to-react';
-import ItemMap from 'containers/item_views/ItemMap';
+import AwesomeMapWidget from 'AwesomeMap/Widget';
 import ItemLink from 'panoptes/ItemLink';
-// import ComponentWrapper from 'panoptes/ComponentWrapper';
 import TreeContainer from 'containers/TreeContainer';
 import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
@@ -10,8 +9,7 @@ import PopupButton from 'panoptes/PopupButton';
 /*eslint-disable react/display-name */
 const components = {
   ItemMap: (node, children) =>
-    //<ComponentWrapper key={node.attribs.key}><ItemMap {...node.attribs} key={null} /></ComponentWrapper>,
-    <ItemMap key={node.attribs.key} {...node.attribs} />,
+    <AwesomeMapWidget key={node.attribs.key} {...node.attribs} />,
   ItemLink: (node, children) =>
     <ItemLink key={node.attribs.key} {...node.attribs} />,
   Tree: (node, children) =>
@@ -59,4 +57,3 @@ let HTMLWithComponents = React.createClass({
 });
 
 module.exports = HTMLWithComponents;
-
