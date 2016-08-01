@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import offset from 'bloody-offset';
 import classnames from 'classnames';
-
+import _debounce from 'lodash/debounce'
 import Icon from 'ui/Icon';
 
 
@@ -30,6 +30,10 @@ let ChannelWithConfigDrawer = React.createClass({
       controlsOpen: false,
       legendOpen: false
     };
+  },
+
+  componentDidMount() {
+    this.updateControlsHeight = _debounce(this.updateControlsHeight, 500);
   },
 
   componentDidUpdate(prevProps, prevState) {
