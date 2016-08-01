@@ -28,13 +28,13 @@ let GenotypesFan = React.createClass({
   },
 
   paint(canvas, props) {
-    const {genomicPositions, colPositions, start, end, width, height, colWidth} = props;
+    const {genomicPositions, layoutBlocks, start, end, width, height, colWidth} = props;
     const ctx = canvas.getContext('2d');
     const scale =  width / (end - start);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
-    if (!genomicPositions || !colPositions) {
+    if (!layoutBlocks || !genomicPositions) {
       return;
     }
     ctx.lineWidth = 1;//snp && snp.selected ? 2 : 1;
@@ -45,21 +45,24 @@ let GenotypesFan = React.createClass({
     //Correspondence line
     const lineHeight = height - HAT_HEIGHT;
     const mid = lineHeight * 0.5;
-    for (let i = 0, end = colPositions.length; i < end; ++i) {
-      // var key = col_primary_key[i];
-      const p = (colPositions[i] - start) * scale;
-      const o = (genomicPositions[i] - start) * scale;
-      // ctx.strokeStyle = 'rgba(80,80,80, 0.75)';
-      // if (fncIsColSelected(key)) {
-      //   ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
-      // }
-      ctx.beginPath();
-      ctx.moveTo(o,0);
-      ctx.bezierCurveTo(o, mid, p , mid, p, lineHeight);
-      if (alpha === 0) {
-        ctx.lineTo(p, height);
+    for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
+      const [blockStart, blockEnd, colStart] = layoutBlocks[i];
+      for (let j = blockStart, jCol = colStart+0.5; j < blockEnd; ++j, ++jCol) {
+        // var key = col_primary_key[i];
+        const p = jCol * pixColWidth;
+        const o = (genomicPositions[j] - start) * scale;
+        // ctx.strokeStyle = 'rgba(80,80,80, 0.75)';
+        // if (fncIsColSelected(key)) {
+        //   ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
+        // }
+        ctx.beginPath();
+        ctx.moveTo(o, 0);
+        ctx.bezierCurveTo(o, mid, p, mid, p, lineHeight);
+        if (alpha === 0) {
+          ctx.lineTo(p, height);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
     }
     if (alpha > 0) {
       //Little hat and area fill
@@ -67,32 +70,34 @@ let GenotypesFan = React.createClass({
       ctx.fillStyle = 'rgb(0,0,0)';
       ctx.strokeStyle = "rgba(0,0,0,0.2)";
       ctx.lineWidth = 1;
-      for (let i = 0, end = colPositions.length; i < end; ++i) {
-        // var key = col_primary_key[i];
-        var colour = 'rgba(190,190,190, 0.75)';
-        ctx.strokeStyle = 'rgba(120,120,120, 0.75)';
-        // if (fncIsColSelected(key)) {
-        //   var colour = 'rgba(190,80,80, 0.75)';
-        //   ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
-        // }
-        ctx.fillStyle = colour;
-        const spos = (colPositions[i] - start) * scale;
-        var middle = pixColWidth / 2;
+      for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
+        const [blockStart, blockEnd, colStart] = layoutBlocks[i];
+        for (let j = blockStart, jCol = colStart+0.5; j < blockEnd; ++j, ++jCol) {
+          // var key = col_primary_key[i];
+          var colour = 'rgba(190,190,190, 0.75)';
+          ctx.strokeStyle = 'rgba(120,120,120, 0.75)';
+          // if (fncIsColSelected(key)) {
+          //   var colour = 'rgba(190,80,80, 0.75)';
+          //   ctx.strokeStyle = 'rgba(150, 0, 0, 0.75)';
+          // }
+          ctx.fillStyle = colour;
+          const spos = jCol * pixColWidth;
+          var middle = pixColWidth / 2;
 
-        ctx.save();
-        ctx.translate(spos - middle, height);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(0, -10, middle, -10, middle, -HAT_HEIGHT);
-        ctx.bezierCurveTo(middle, -10, pixColWidth, -10, pixColWidth, 0);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
+          ctx.save();
+          ctx.translate(spos - middle, height);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(0, -10, middle, -10, middle, -HAT_HEIGHT);
+          ctx.bezierCurveTo(middle, -10, pixColWidth, -10, pixColWidth, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
 
+        }
       }
     }
-
   },
 
 

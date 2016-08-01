@@ -14,6 +14,9 @@ import _sumBy from 'lodash/sumBy';
 import _each from 'lodash/each';
 import _sortedIndex from 'lodash/sortedIndex';
 import _sortedLastIndex from 'lodash/sortedLastIndex';
+import _sortBy from 'lodash/sortBy';
+import _last from 'lodash/last';
+import _takeRight from 'lodash/takeRight';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
@@ -25,6 +28,7 @@ import LRUCache from 'util/LRUCache';
 import {hatchRect} from 'util/CanvasDrawing';
 import FilterButton from 'panoptes/FilterButton';
 import GenotypesFan from 'panoptes/genome/tracks/GenotypesFan';
+import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FlatButton from 'material-ui/FlatButton';
 
@@ -32,6 +36,7 @@ import 'hidpi-canvas';
 import {propertyColour, categoryColours} from 'util/Colours';
 
 const FAN_HEIGHT = 60;
+const TABLE_HEIGHT = 140;
 const HEIGHT = 200;
 
 let GenotypesChannel = React.createClass({
@@ -110,68 +115,49 @@ let GenotypesChannel = React.createClass({
   componentWillUpdate(props, {blocks}) {
   },
 
-  layoutColumns(props, genomicPositions) {
-    const {start, end, layoutMode, manualWidth} = props;
-    const visibleGenomicPositions = genomicPositions.subarray(_sortedIndex(genomicPositions, start), _sortedLastIndex(genomicPositions, end));
-    let colPositions = new Float64Array(visibleGenomicPositions);
-    let colWidth = 1;
-    if (layoutMode == 'manual')
-      colWidth = manualWidth;
-    if (layoutMode == 'auto') {
-      if (visibleGenomicPositions.length > 0)
-        colWidth = Math.max(3, (0.70 * ((end - start) / visibleGenomicPositions.length)));
+  layoutColumns(props, visibleGenomicPositions) {
+    const {start, end, layoutMode} = props;
+    visibleGenomicPositions = visibleGenomicPositions.subarray(_sortedIndex(visibleGenomicPositions, start), _sortedLastIndex(visibleGenomicPositions, end));
+
+    const gapCount = layoutMode === 'auto' ? 5 : 0 ;
+
+    //Get an array of all the gaps
+    let gaps = []; //Pair of (index, gap before)
+    gaps.push([0, visibleGenomicPositions[0] - start]);
+    for (let i = 1, iend = visibleGenomicPositions.length;i < iend; ++i) {
+      gaps.push([i, visibleGenomicPositions[i] - visibleGenomicPositions[i-1]]);
     }
+    gaps.push([visibleGenomicPositions.length, end - _last(visibleGenomicPositions)]);
 
-    if (layoutMode == 'auto' || layoutMode == 'manual') {
-      let mid_index = Math.floor(colPositions.length / 2);
-      let psxlast;
-      for (var cf = 0.1; cf <= 1; cf += 0.1) {
-        //Sweep middle out
-        psxlast = colPositions[mid_index];
-        for (var i = mid_index + 1, ref = colPositions.length; i < ref; i++) {
-          if (colPositions[i] < psxlast + cf * colWidth)
-            colPositions[i] = psxlast + cf * colWidth;
-          psxlast = colPositions[i];
-        }
-        psxlast = colPositions[mid_index];
-        for (i = mid_index - 1; i >= 0; i--) {
-          if (colPositions[i] > psxlast - cf * colWidth)
-            colPositions[i] = psxlast - cf * colWidth;
-          psxlast = colPositions[i];
-        }
-        cf += 0.1;
-        //Sweep edges in
-        psxlast = -Infinity;
-        for (i = 0, ref = mid_index; i < ref; i++) {
-          if (colPositions[i] < psxlast + cf * colWidth)
-            colPositions[i] = psxlast + cf * colWidth;
-          psxlast = colPositions[i];
-        }
-        psxlast = Infinity;
-        for (i = colPositions.length - 1; i >= mid_index; i--) {
-          if (colPositions[i] > psxlast - cf * colWidth)
-            colPositions[i] = psxlast - cf * colWidth;
-          psxlast = colPositions[i];
-        }
-      }
+    //We only need the biggest ones
+    gaps = _takeRight(_sortBy(gaps, (gap) => gap[1]), gapCount);
 
-      psxlast = -Infinity;
-      for (i = 0, ref = colPositions.length; i < colPositions.length; i++) {
-        if (colPositions[i] < psxlast + colWidth)
-          colPositions[i] = psxlast + colWidth;
-        psxlast = colPositions[i];
-      }
-      return {colWidth, colPositions, visibleGenomicPositions};
+    //Sum their sizes so we know how much total space to give to them
+    const gapSum = _sumBy(gaps, (gap) => gap[1])/2;
+    //Calculate how many blank columns that is
+    const spacingColumns = Math.floor((gapSum / ((end - start - gapSum) / visibleGenomicPositions.length)))
+    const colWidth = (end - start) / (visibleGenomicPositions.length + spacingColumns);
+
+    //Then allocate to the biggest one - subtracting the gap from it and allocating again.
+    const gapSizes = new Uint32Array(visibleGenomicPositions.length + 1); //+1 to include gap between last pos and end
+    for(let i = 0;i < spacingColumns; ++i) {
+      const gap = _last(gaps); //Find the buggest gap
+      gapSizes[gap[0]] += 1;   //And a skipped column to it
+      gap[1] -= colWidth;      //Subtract the skipped column width so we don't always allocate to this gap
+      gaps = _sortBy(gaps, (gap) => gap[1]); //Resort to find newest biggest
     }
-
-    if (layoutMode == 'fill') {
-      colWidth = (end - start) / visibleGenomicPositions.length;
-      for (i = 0, ref = colPositions.length; i < colPositions.length; i++) {
-        colPositions[i] = start + (i * colWidth) + colWidth / 2;
+    //We now have the number of blank columns before each column - translate this to a set of blocks.
+    const layoutBlocks = [];
+    let currentStart = 0; //Pos index
+    let colStart = gapSizes[0];     //Actual starting column of this block, first value is number of skipped columns from start
+    for (let i = 0, iend = gapSizes.length - 1;i < iend; ++i) {
+      if (gapSizes[i+1] > 0 || i === gapSizes.length - 2) {
+        layoutBlocks.push([currentStart, i + 1, colStart]);  //[blockStart, blockEnd, colStart]
+        colStart = colStart + (i - currentStart + 1) + gapSizes[i+1];
+        currentStart = i+1;
       }
-      return {colWidth, colPositions, visibleGenomicPositions};
     }
-
+    return {colWidth, visibleGenomicPositions, layoutBlocks};
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -281,6 +267,7 @@ let GenotypesChannel = React.createClass({
         arrayPos += data.length;
       }
     });
+
     this.setState({
       blocks,
       genomicPositions,
@@ -291,7 +278,7 @@ let GenotypesChannel = React.createClass({
 
   render() {
     let {width, sideWidth, table, start, end} = this.props;
-    const {blocks, genomicPositions, visibleGenomicPositions, colPositions, colWidth} = this.state;
+    const {layoutBlocks, visibleGenomicPositions, colWidth} = this.state;
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -304,14 +291,21 @@ let GenotypesChannel = React.createClass({
         }
         //Override component update to get latest in case of skipped render
         configComponent={<GenotypesControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate}/>}
-        legendComponent={<GenotypesLegend/>}
+        legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
       >
         <GenotypesFan
           genomicPositions={visibleGenomicPositions}
-          colPositions={colPositions}
+          layoutBlocks={layoutBlocks}
           width={width - sideWidth}
           height={FAN_HEIGHT}
+          start={start}
+          end={end}
+          colWidth={colWidth}/>
+        <GenotypesTable
+          layoutBlocks={layoutBlocks}
+          width={width - sideWidth}
+          height={TABLE_HEIGHT}
           start={start}
           end={end}
           colWidth={colWidth}/>
