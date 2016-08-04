@@ -66,7 +66,7 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
 }
 
 function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
-  let {method, regionField, queryField, limitField, blockLimit, isBlockTooBig} = cacheArgs;
+  let {method, regionField, queryField, limitField, blockLimit, postProcessBlock, isBlockTooBig} = cacheArgs;
   isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].length <= blockLimit));
   const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   const blockSize = Math.pow(2.0, blockLevel);
@@ -85,9 +85,9 @@ function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
       API[method]({cancellation: cacheCancellation, ...APIArgs})
         .then((block) => {
           if (isBlockTooBig(block, blockLimit)) {
-            return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true};
+            return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true, ...block};
           } else {
-            return {_blockStart: blockStart, _blockSize: blockSize, ...block};
+            return {_blockStart: blockStart, _blockSize: blockSize, ...(postProcessBlock ? postProcessBlock(block) : block)};
           }
         }),
     cancellation

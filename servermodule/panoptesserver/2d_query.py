@@ -262,12 +262,13 @@ def handler(start_response, request_data):
 
         col_idx = col_result[col_index_field]
         row_idx = row_result[row_index_field]
+        del col_result[col_index_field]
+        del row_result[row_index_field]
         if len(col_idx) == col_fail_limit:
             result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
+            for name, array in row_result.items():
+                result_set.append((('row_'+name), array))
         else:
-            del col_result[col_index_field]
-            del row_result[row_index_field]
-
             if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
                 sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
