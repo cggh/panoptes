@@ -122,7 +122,7 @@ let GenotypesChannel = React.createClass({
     const endIndex = _sortedLastIndex(genomicPositions, end);
     const visibleGenomicPositions = genomicPositions.subarray(startIndex, endIndex);
 
-    const maxGapCount = layoutMode === 'auto' ? 5 : 0 ;
+    const maxGapCount = layoutMode === 'auto' ? 20 : 0 ;
 
     //Get an array of all the gaps
     let gaps = []; //Pair of (index, gap before)
@@ -132,7 +132,7 @@ let GenotypesChannel = React.createClass({
     }
     gaps.push([visibleGenomicPositions.length, end - _last(visibleGenomicPositions)]);
 
-    //Filter to only those gaps more than twice the mean gap size
+    //Filter to only those gaps more than three times the mean gap size
     gaps = _filter(gaps, (gap) => gap[1] > 3*((end - start)/gaps.length));
 
     //We then only take the biggest ones
