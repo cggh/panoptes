@@ -76,7 +76,7 @@ with open('datatables/samples/data', 'wb') as tabfile:
     ctr = 0
     for id in sample_ids:
         ctr += 1
-        writer.writerow((id, 
+        writer.writerow((id,
                          'Sample' + str(ctr),
                          'Group '+str(1+ctr/10),
                          random.choice(['Cat A', 'Cat B', 'Cat C']),
@@ -171,30 +171,31 @@ allele_depth = np.empty((NUM_SAMPLES, NUM_VARIANTS, 2), dtype="int16")
 allele_depth[:, :, 0] = shuffled_ref_depth
 allele_depth[:, :, 1] = shuffled_alt_depth
 
+#We transpose everything to be column major since 2.0 standardised on it
 with h5py.File('2D_datatables/diploid/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
     row_index[:] = shuffled_sample_ids
-    gt = f.create_dataset("genotype", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int8')
-    gt[:, :, :] = genotype
-    ad = f.create_dataset("allele_depth", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int16')
-    ad[:, :, :] = allele_depth
-    total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
-    total_depth[:, :] = shuffled_total_depth
-    gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
-    gq[:, :] = shuffled_gq
+    gt = f.create_dataset("genotype", (NUM_VARIANTS, NUM_SAMPLES, 2), dtype='int8')
+    gt[:, :, :] = np.transpose(genotype, (1,0,2))
+    ad = f.create_dataset("allele_depth", (NUM_VARIANTS, NUM_SAMPLES, 2), dtype='int16')
+    ad[:, :, :] = np.transpose(allele_depth, (1,0,2))
+    total_depth = f.create_dataset("total_depth", (NUM_VARIANTS, NUM_SAMPLES), dtype='int16')
+    total_depth[:, :] = np.transpose(shuffled_total_depth)
+    gq = f.create_dataset("gq", (NUM_VARIANTS, NUM_SAMPLES), dtype='int16')
+    gq[:, :] = np.transpose(shuffled_gq)
 
 with h5py.File('2D_datatables/haploid/data.hdf5', 'w') as f:
     col_index = f.create_dataset("col_index", (NUM_VARIANTS,), dtype='S10')
     col_index[:] = shuffled_var_ids
     row_index = f.create_dataset("row_index", (NUM_SAMPLES,), dtype='S10')
     row_index[:] = shuffled_sample_ids
-    gt = f.create_dataset("genotype", (NUM_SAMPLES, NUM_VARIANTS), dtype='int8')
-    gt[:, :] = shuffled_first_allele
-    ad = f.create_dataset("allele_depth", (NUM_SAMPLES, NUM_VARIANTS, 2), dtype='int16')
-    ad[:, :, :] = allele_depth
-    total_depth = f.create_dataset("total_depth", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
-    total_depth[:, :] = shuffled_total_depth
-    gq = f.create_dataset("gq", (NUM_SAMPLES, NUM_VARIANTS), dtype='int16')
-    gq[:, :] = shuffled_gq
+    gt = f.create_dataset("genotype", (NUM_VARIANTS, NUM_SAMPLES), dtype='int8')
+    gt[:, :] = np.transpose(shuffled_first_allele)
+    ad = f.create_dataset("allele_depth", (NUM_VARIANTS, NUM_SAMPLES, 2), dtype='int16')
+    ad[:, :, :] = np.transpose(allele_depth, (1,0,2))
+    total_depth = f.create_dataset("total_depth", (NUM_VARIANTS, NUM_SAMPLES), dtype='int16')
+    total_depth[:, :] = np.transpose(shuffled_total_depth)
+    gq = f.create_dataset("gq", (NUM_VARIANTS, NUM_SAMPLES), dtype='int16')
+    gq[:, :] = np.transpose(shuffled_gq)
