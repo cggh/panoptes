@@ -494,13 +494,12 @@ function twoDPageQuery(options) {
     col_key: null,
     row_offset: null,
     row_limit: null,
-    first_dimension: 'row',
     col_fail_limit: null,
   };
   const {
     database, workspace, datatable, col_qry, row_qry, col_order, row_order, col_properties,
     row_properties, sort_mode, row_sort_property, row_sort_cols, col_key,
-    row_offset, row_limit, first_dimension, col_fail_limit
+    row_offset, row_limit, col_fail_limit
   } = {...defaults, ...options};
   const twoD_properties = {...defaults, ...options}['2D_properties'];
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
@@ -526,7 +525,6 @@ function twoDPageQuery(options) {
       col_key,
       row_offset,
       row_limit,
-      first_dimension,
       col_fail_limit,
     }
   });

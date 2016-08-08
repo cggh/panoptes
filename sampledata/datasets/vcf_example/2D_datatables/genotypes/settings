@@ -9,8 +9,6 @@ rowIndexField: sample_id             # The column name in RowDataTable that maps
 rowIndexArray: samples               # 1D Array in HDF5 that gives the value of RowIndexField for each row
 
 
-firstArrayDimension: column             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column'
-
 properties:
 - id: calldata/genotype                                 #Name of dataset in HDF5
   name: Call

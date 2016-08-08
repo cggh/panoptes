@@ -16,8 +16,6 @@ rowIndexArray: row_index             # 1D Array in HDF5 that gives the value of 
                                      # if this is missing then it is assumed that the HDF5 rows are in the same
                                      # order as the "RowDataTable" sorted by "RowIndexField"
 
-firstArrayDimension: column             # Either 'row' or 'column' to indicate the first dimension in the HDF5 array. Eg. array[1] == 'a row' or array[1] == 'a column' 'column' will generally perform better
-
 properties:
 - id: genotype                                 #Name of dataset in HDF5
   name: Call
