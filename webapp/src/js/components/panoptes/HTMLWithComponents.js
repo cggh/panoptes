@@ -11,6 +11,7 @@ import TableMapWidget from 'Map/Table/Widget';
 
 
 
+// <MapWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapWidget>,
 
 // TODO: Deprecate ItemMap template component in favour of TableMap
 
@@ -26,12 +27,9 @@ const components = {
     <PopupButton key={node.attribs.key} {...node.attribs} />,
   ItemMap: (node, children) =>
     <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  Map: (node, children) => {
-    console.log('Map node: %o', node);
-    console.log('Map children: %o', children);
-    return <MapWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapWidget>;
-  },
-  MapMarker: (node, children) =>
+  Map: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs}><MapMarkerWidget lat="0" lng="0" /><MapMarkerWidget lat="1" lng="1" /></MapWidget>,
+  Marker: (node, children) =>
     <MapMarkerWidget key={node.attribs.key} {...node.attribs} />,
   TableMap: (node, children) =>
     <TableMapWidget key={node.attribs.key} {...node.attribs} />,
@@ -39,7 +37,7 @@ const components = {
     <TableMapWidget key={node.attribs.key} {...node.attribs} />,
   BarChartMap: (node, children) =>
     <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  LayerMap: (node, children) =>
+  LayeredMap: (node, children) =>
     <MapWidget key={node.attribs.key} {...node.attribs} />,
   LayerGroup: (node, children) =>
     <MapWidget key={node.attribs.key} {...node.attribs} />,

@@ -12,12 +12,13 @@ let MapMarkerWidget = React.createClass({
 
   propTypes: {
     lat: React.PropTypes.string.isRequired,
-    lng: React.PropTypes.string.isRequired
+    lng: React.PropTypes.string.isRequired,
+    title: React.PropTypes.string
   },
 
   render() {
 
-    let {lat, lng} = this.props;
+    let {lat, lng, title} = this.props;
 
     if  (isNaN(lat)) {
       console.error('MapMarkerWidget lat is not a number');
@@ -29,7 +30,7 @@ let MapMarkerWidget = React.createClass({
     }
 
     return (
-      <Marker position={{lat: Number(lat), lng: Number(lng)}} />
+      <Marker position={{lat: Number(lat), lng: Number(lng)}} title={title} />
     );
 
   }

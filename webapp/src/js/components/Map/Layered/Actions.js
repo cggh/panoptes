@@ -24,13 +24,13 @@ import FilterButton from 'panoptes/FilterButton';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import LayerMapWidget from 'Map/Layer/Widget';
+import LayeredMapWidget from 'Map/Layered/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 
 import 'map.scss';
 
-let LayerMapActions = React.createClass({
+let LayeredMapActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -142,7 +142,7 @@ let LayerMapActions = React.createClass({
               : null}
           </div>
           <div className="vertical stack">
-            {table ? <LayerMapWidget {...this.props}  /> : 'Pick a table'}
+            {table ? <LayeredMapWidget {...this.props}  /> : 'Pick a table'}
           </div>
         </div>
       </Sidebar>
@@ -150,4 +150,4 @@ let LayerMapActions = React.createClass({
   }
 });
 
-module.exports = LayerMapActions;
+module.exports = LayeredMapActions;

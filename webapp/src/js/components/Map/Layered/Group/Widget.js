@@ -5,7 +5,7 @@ import {FeatureGroup} from 'react-leaflet';
 import FluxMixin from 'mixins/FluxMixin';
 
 
-let LayerMapLayerGroupWidget = React.createClass({
+let LayeredMapLayerGroupWidget = React.createClass({
 
   mixins: [
     FluxMixin
@@ -36,4 +36,4 @@ let LayerMapLayerGroupWidget = React.createClass({
 
 });
 
-module.exports = LayerMapLayerGroupWidget;
+module.exports = LayeredMapLayerGroupWidget;

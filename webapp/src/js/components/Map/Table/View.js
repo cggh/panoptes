@@ -11,8 +11,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
-import LayerMapWidget from 'Map/Layer/Widget';
-import LayerMapMarkerLayer from 'Map/Layer/MarkerLayer';
+import LayeredMapWidget from 'Map/Layered/Widget';
+import LayeredMapMarkerLayer from 'Map/Layered/MarkerLayer';
 
 // Lodash
 import _minBy from 'lodash/minBy';
@@ -36,9 +36,9 @@ let TableMapView = React.createClass({
 
     let TileLayerUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
     let TileLayerAttribution = '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
-
+console.log('TableMapView using LayeredMapWidget');
     return (
-      <LayerMapWidget
+      <LayeredMapWidget
         center={center}
         zoom={zoom}
       >
@@ -46,8 +46,8 @@ let TableMapView = React.createClass({
           url={TileLayerUrl}
           attribution={TileLayerAttribution}
         />
-        <LayerMapMarkerLayer markers={markers} />
-      </LayerMapWidget>
+        <LayeredMapMarkerLayer markers={markers} />
+      </LayeredMapWidget>
     );
 
   }

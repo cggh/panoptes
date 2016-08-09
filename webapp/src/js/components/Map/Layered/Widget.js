@@ -21,7 +21,7 @@ import DetectResize from 'utils/DetectResize';
 // CSS
 import 'leaflet.css';
 
-let LayerMapWidget = React.createClass({
+let LayeredMapWidget = React.createClass({
 
   mixins: [
     FluxMixin
@@ -33,7 +33,7 @@ let LayerMapWidget = React.createClass({
     title: React.PropTypes.string,
     hideLayersControl: React.PropTypes.bool,
     layersControlPosition: React.PropTypes.string,
-    children: React.PropTypes.array
+    children: React.PropTypes.node
   },
 
   getDefaultProps() {
@@ -59,8 +59,8 @@ let LayerMapWidget = React.createClass({
   render() {
     let {center, zoom, hideLayersControl, layersControlPosition, children} = this.props;
 
+console.log('LayeredMapWidget children (if from MapWidget wrapped in a LayeredMapMarkerLayer): %o', children);
 
-    const center2 = [50, 0];
 /*
 
 const rectangle = [
@@ -150,34 +150,23 @@ const center2 = [50, 0];
 
 */
 
+
+
+
 /*
-<div><span>Map...</span><div style="width:300px;height:300px"><Map centerLat="1" centerLng="2" zoom="3" /></div></div>
-<div><span>Map with Markers...</span><div style="width:300px;height:300px"><Map><MapMarker lat="0" lng="0" /><MapMarker lat="1" lng="1" /></Map></div></div>
+
+<FeatureGroup>
+  <Marker position={center2}>
+    <Popup>
+      <div>
+        <span>A pretty CSS3 popup. <br /> Easily customizable.</span>
+      </div>
+    </Popup>
+  </Marker>
+</FeatureGroup>
+
 */
 
-    let mapContents = null;
-
-    let layers = [];
-
-    layers.push(
-      <TileLayer
-        key={layers.length}
-        attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-      />
-    );
-
-
-console.log('LayerMapWidget children: %o', children);
-    if (children) {
-      //layers.concat(children);
-    }
-
-    if (layers.length > 1 && !hideLayersControl) {
-      mapContents = <LayersControl key="0" position={layersControlPosition}>{layers}</LayersControl>;
-    } else {
-      mapContents = layers;
-    }
 
     // NB: Widgets should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
 
@@ -188,16 +177,12 @@ console.log('LayerMapWidget children: %o', children);
           zoom={zoom}
           style={{height: '100%'}}
         >
-          {mapContents}
-          <FeatureGroup>
-            <Marker position={center2}>
-              <Popup>
-                <div>
-                  <span>A pretty CSS3 popup. <br /> Easily customizable.</span>
-                </div>
-              </Popup>
-            </Marker>
-          </FeatureGroup>
+          <MapLayers
+            hideLayersControl={hideLayersControl}
+            layersControlPosition={layersControlPosition}
+          >
+            {children}
+          </MapLayers>
         </Map>
       </DetectResize>
     );
@@ -206,4 +191,119 @@ console.log('LayerMapWidget children: %o', children);
 
 });
 
-module.exports = LayerMapWidget;
+
+let MapLayers = React.createClass({
+
+  mixins: [
+    FluxMixin
+  ],
+
+  propTypes: {
+    map: React.PropTypes.object,
+    layerContainer: React.PropTypes.object,
+    hideLayersControl: React.PropTypes.bool,
+    layersControlPosition: React.PropTypes.string,
+    children: React.PropTypes.node
+  },
+
+  render() {
+console.log('MapLayers props: %o', this.props);
+
+    // Supplied via the Map component
+    let {map, layerContainer} = this.props;
+
+    // Supplied via the LayeredMapWidget component
+    let {hideLayersControl, layersControlPosition, children} = this.props;
+
+
+    // FIXME:
+    // https://github.com/PaulLeCam/react-leaflet/issues/73
+
+    let mapLayers = null;
+
+    let bases = [];
+    let overlays = [];
+
+    let basesAsGroup = null;
+    let overlaysAsGroup = null;
+
+    // TODO: support multiple bases (distinct from overlays)
+
+    bases.push(
+      <TileLayer
+        key={bases.length}
+        attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+        map={map}
+        layerContainer={layerContainer}
+      />
+    );
+
+    if (bases.length > 1 && !hideLayersControl) {
+      basesAsGroup = (
+          <BaseLayer
+            name="TODO: BaseLayer names"
+            map={map}
+            layerContainer={layerContainer}
+          >
+            {bases}
+          </BaseLayer>
+      );
+    } else {
+      basesAsGroup = bases;
+    }
+
+    if (children) {
+      if (children.length) {
+        // We have an array of children
+        overlays = overlays.concat(children);
+      } else {
+        // We have one child, which might be a wrapper.
+        overlays.push(children);
+      }
+    }
+
+    if (overlays.length > 1 && !hideLayersControl) {
+      overlaysAsGroup = (
+        <Overlay
+          name="TODO: Overlay names"
+          map={map}
+          layerContainer={layerContainer}
+        >
+          {overlays}
+        </Overlay>
+      );
+    } else {
+      overlaysAsGroup = overlays;
+    }
+
+    if (!hideLayersControl) {
+console.log('Showing LayersControl');
+      mapLayers = (
+        <LayersControl
+          position={layersControlPosition}
+          map={map}
+          layerContainer={layerContainer}
+        >
+          {basesAsGroup}
+          {overlaysAsGroup}
+        </LayersControl>
+      );
+    } else {
+console.log('Hiding LayersControl');
+      mapLayers = bases.concat(overlays);
+    }
+
+    // return (
+    //   <Marker
+    //     map={map} /* pass down to Marker */
+    //     layerContainer={layerContainer} /* pass down to Marker */
+    //     position={[51.505, -0.09]}
+    //   />
+    // );
+
+    return mapLayers;
+  }
+});
+
+module.exports = LayeredMapWidget;

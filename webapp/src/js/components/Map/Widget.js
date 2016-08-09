@@ -4,8 +4,8 @@ import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import LayerMapWidget from 'Map/Layer/Widget';
-import MapMarkerWidget from 'Map/Marker/Widget';
+import LayeredMapWidget from 'Map/Layered/Widget';
+import LayeredMapMarkerLayer from 'Map/Layered/MarkerLayer';
 
 let MapWidget = React.createClass({
 
@@ -27,7 +27,7 @@ let MapWidget = React.createClass({
 
   render() {
     let {centerLat, centerLng, zoom, children} = this.props;
-
+console.log('MapWidget children: %o', children);
     let optionalProps = {};
 
     if (!isNaN(centerLat) && !isNaN(centerLng)) {
@@ -38,16 +38,10 @@ let MapWidget = React.createClass({
       optionalProps.zoom = Number(zoom);
     }
 
-    let optionalMarkerLayer = null;
-    if (children) {
-console.log('MapWidget children: %o', children);
-      //optionalMarkerLayer = <LayerMapMarkerLayer markers={markers} />;
-    }
-
     return (
-      <LayerMapWidget {...optionalProps}>
-        {children}
-      </LayerMapWidget>
+      <LayeredMapWidget {...optionalProps}>
+        {(children && children.length > 0)  ? <LayeredMapMarkerLayer>{children}</LayeredMapMarkerLayer> : null}
+      </LayeredMapWidget>
     );
 
   }
