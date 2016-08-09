@@ -109,7 +109,7 @@ let ChannelWithConfigDrawer = React.createClass({
                     name="cog" onClick={this.handleControlToggle}/>
             </div>
             : null }
-          {legendComponent ?
+          {legendComponent || true?
             <div className="legend button" ref="legendToggle">
               <Icon className={classnames({open: legendOpen})}
                     name="info" onClick={this.handleLegendToggle}/>

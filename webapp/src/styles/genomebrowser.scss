@@ -131,14 +131,14 @@
       bottom: 0;
     }
     .close {
-      top: calc(50% - 15px);
+      //top: calc(50% - 15px);
+      top: 0;
       left: 0;
     }
     .side-component {
       position: absolute;
       right: 0;
       left: 0;
-      padding: 5px 35px 5px 30px;
       text-overflow: ellipsis;
       overflow: auto;
       height: 100%;
@@ -284,11 +284,35 @@ svg.numerical-channel {
   }
 }
 
+.side-name {
+  padding: 5px 35px 5px 30px;
+}
+
 .genotypes-table {
   position: relative;
   * {
     position: absolute;
     top: 0;
     left: 0;
+  }
+}
+
+.genotypes-side {
+  width: 100%;
+  height: 100%;
+  text-overflow: ellipsis;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  .row-label {
+    padding: 10px 35px 5px 10px;
+
+  }
+  canvas {
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
 }

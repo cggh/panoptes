@@ -23,15 +23,14 @@ import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertySelector from 'panoptes/PropertySelector';
-import PropertyLegend from 'panoptes/PropertyLegend';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import {hatchRect} from 'util/CanvasDrawing';
 import FilterButton from 'panoptes/FilterButton';
 import GenotypesFan from 'panoptes/genome/tracks/GenotypesFan';
 import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
+import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import FlatButton from 'material-ui/FlatButton';
 
 import 'hidpi-canvas';
 import {propertyColour, categoryColours} from 'util/Colours';
@@ -87,6 +86,7 @@ let GenotypesChannel = React.createClass({
     columnQuery: React.PropTypes.string,
     rowQuery: React.PropTypes.string,
     rowLabel: React.PropTypes.string,
+    rowHeight: React.PropTypes.number,
     layoutMode: React.PropTypes.string,
     manualWidth: React.PropTypes.number,
     onChangeLoadStatus: React.PropTypes.func.isRequired
@@ -96,7 +96,8 @@ let GenotypesChannel = React.createClass({
     return {
       rowQuery: SQL.nullQuery,
       columnQuery: SQL.nullQuery,
-      layoutMode: 'auto'
+      layoutMode: 'auto',
+      rowHeight: 10
     };
   },
 
@@ -343,7 +344,7 @@ let GenotypesChannel = React.createClass({
     this.setState({
       rowData: dataBlocks.length > 0 ? {
         id: dataBlocks[0][`row_${rowTableConfig.primKey}`],
-        label: dataBlocks[0][`row_${rowLabel}`]
+        label: dataBlocks[0][`row_${rowLabel}`] || dataBlocks[0][`row_${rowTableConfig.primKey}`] //Fallback to primkey if no label was set
       } : null,
       dataBlocks,
       genomicPositions,
@@ -353,18 +354,20 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end} = this.props;
+    let {width, sideWidth, table, start, end, rowHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
         height={HEIGHT}
-        sideComponent={
-          <div className="side-name">
-            <span>{name || this.config.twoDTablesById[table].nameSingle}</span>
-          </div>
-        }
+        sideComponent={<GenotypesRowHeader
+          table={table}
+          width={sideWidth}
+          tableHeight={TABLE_HEIGHT}
+          rowData={rowData}
+          rowHeight={rowHeight}
+        />}
         //Override component update to get latest in case of skipped render
         configComponent={<GenotypesControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate}/>}
         legendComponent={<GenotypesLegend />}
@@ -389,7 +392,7 @@ let GenotypesChannel = React.createClass({
           end={end}
           colWidth={colWidth}
           cellColour="call"
-          rowHeight={15}
+          rowHeight={rowHeight}
         />
       </ChannelWithConfigDrawer>);
   }
