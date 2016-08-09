@@ -66,7 +66,7 @@ class Settings2Dtable(ImportSettings):
                          'children': OrderedDict((
                                       ('call', {
                                                'type': 'PropertyID',
-                                               'required': False,
+                                               'required': True,
                                                'description': 'Reference to the 2D data table property that contains call information'
                                                }),
                                       ('alleleDepth', {

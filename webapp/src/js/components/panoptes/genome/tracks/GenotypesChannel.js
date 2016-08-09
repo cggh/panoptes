@@ -379,6 +379,7 @@ let GenotypesChannel = React.createClass({
           end={end}
           colWidth={colWidth}/>
         <GenotypesTable
+          table={table}
           rowData={rowData}
           dataBlocks={dataBlocks}
           layoutBlocks={layoutBlocks}
@@ -388,7 +389,7 @@ let GenotypesChannel = React.createClass({
           end={end}
           colWidth={colWidth}
           cellColour="call"
-          rowHeight={1}
+          rowHeight={15}
         />
       </ChannelWithConfigDrawer>);
   }

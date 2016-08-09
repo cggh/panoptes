@@ -92,6 +92,7 @@
     "react-resizable": "^1.4.1",
     "react-sidebar": "^2.1.1",
     "react-tap-event-plugin": "^1.0.0",
+    "repeat-string": "^1.5.4",
     "scrollbar-size": "^1.0.4",
     "shallow-equals": "0.0.0",
     "striptags": "^2.1.1",

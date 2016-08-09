@@ -284,5 +284,11 @@ svg.numerical-channel {
   }
 }
 
-
-
+.genotypes-table {
+  position: relative;
+  * {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
