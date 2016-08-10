@@ -179,7 +179,7 @@ let GenotypesChannel = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (rowLabel && !this.config.tables[config.rowDataTable].propertiesById[rowLabel]) {
+    if (rowLabel && !this.config.tablesById[config.rowDataTable].propertiesById[rowLabel]) {
       ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${rowLabel} is not a valid property of ${config.rowDataTable}`);
       return;
     }
@@ -402,7 +402,9 @@ const GenotypesControls = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       check: [
-        'rowLabel'
+        'rowLabel',
+        'columnQuery',
+        'rowQuery',
       ],
       redirect: ['componentUpdate']
     }),
@@ -411,23 +413,27 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowLabel} = this.props;
+    let {table, columnQuery, rowQuery, rowLabel} = this.props;
+    const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
         <div className="control">
-          <FilterButton table={this.config.twoDTablesById[table].columnDataTable} query={columnQuery}
+          <FilterButton table={config.columnDataTable} query={columnQuery} name={this.config.tablesById[config.columnDataTable].capNamePlural}
                         onPick={(columnQuery) => this.redirectedProps.componentUpdate({columnQuery})}/>
         </div>
         <div className="control">
+          <FilterButton table={config.rowDataTable} query={rowQuery} name={this.config.tablesById[config.rowDataTable].capNamePlural}
+                        onPick={(rowQuery) => this.redirectedProps.componentUpdate({rowQuery})}/>
+        </div>
+        <div className="control">
           <div className="label">Row Label:</div>
-          <PropertySelector table={this.config.twoDTablesById[table].rowDataTable}
-                            value={rowLabel}
+          <PropertySelector table={config.rowDataTable}
+                            value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             onSelect={(rowLabel) => this.redirectedProps.componentUpdate({rowLabel})}/>
         </div>
       </div>
     );
   }
-
 });
 
 const GenotypesLegend = React.createClass({

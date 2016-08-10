@@ -29,11 +29,11 @@ let FilterButton = React.createClass({
   },
 
   render() {
-    const {query, table} = this.props;
+    const {query, table, name} = this.props;
     let decodedQuery = SQL.WhereClause.decode(query);
 
     return <div>
-      <FlatButton label={decodedQuery.isTrivial ? 'Add Filter' : 'Change Filter'}
+      <FlatButton label={decodedQuery.isTrivial ? `Add ${name || ''} Filter` : `Change ${name || ''} Filter`}
                   primary={true}
                   onClick={() => this.getFlux().actions.session.modalOpen('containers/QueryPicker',
                     {
@@ -45,7 +45,7 @@ let FilterButton = React.createClass({
       />
       {decodedQuery.isTrivial ? null :
         <FlatButton
-          label="Clear Filter"
+          label={`Clear ${name || ''} Filter`}
           primary={true}
           onClick={() => {
             this.handlePick(SQL.nullQuery);
