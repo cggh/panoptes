@@ -6,14 +6,38 @@ import TreeContainer from 'containers/TreeContainer';
 import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
 import MapWidget from 'Map/Widget';
-import MapMarkerWidget from 'Map/Marker/Widget';
-import TableMapWidget from 'Map/Table/Widget';
+import TileLayerWidget from 'Map/TileLayer/Widget';
+import BaseLayerWidget from 'Map/BaseLayer/Widget';
+import MarkerWidget from 'Map/Marker/Widget';
+import CircleWidget from 'Map/Circle/Widget';
+import RectangleWidget from 'Map/Rectangle/Widget';
+import OverlayWidget from 'Map/Overlay/Widget';
+import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import PopupWidget from 'Map/Popup/Widget';
+import LayersControlWidget from 'Map/LayersControl/Widget';
 
-
-
-// <MapWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapWidget>,
+// import MapBaseLayerWidget from 'Map/BaseLayer/Widget';
+// import MapOverLayerWidget from 'Map/OverLayer/Widget';
+// import TableMapWidget from 'Map/Table/Widget';
 
 // TODO: Deprecate ItemMap template component in favour of TableMap
+
+/*
+Marker: (node, children) =>
+  <MapMarkerWidget key={node.attribs.key} {...node.attribs} />,
+BaseLayer: (node, children) =>
+  <MapBaseLayerWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapBaseLayerWidget>,
+OverLayer: (node, children) =>
+  <MapOverLayerWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapOverLayerWidget>,
+TableMap: (node, children) =>
+  <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+PieChartMap: (node, children) =>
+  <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+BarChartMap: (node, children) =>
+  <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  ItemMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+*/
 
 /*eslint-disable react/display-name */
 const components = {
@@ -25,22 +49,27 @@ const components = {
     <PlotContainer key={node.attribs.key} {...node.attribs} />,
   PopupButton: (node, children) =>
     <PopupButton key={node.attribs.key} {...node.attribs} />,
-  ItemMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
   Map: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs}><MapMarkerWidget lat="0" lng="0" /><MapMarkerWidget lat="1" lng="1" /></MapWidget>,
+    <MapWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  LayersControl: (node, children) =>
+    <LayersControlWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  BaseLayer: (node, children) =>
+    <BaseLayerWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  TileLayer: (node, children) =>
+    <TileLayerWidget key={node.attribs.key} {...node.attribs} />,
+  FeatureGroup: (node, children) =>
+    <FeatureGroupWidget key={node.attribs.key} {...node.attribs} children={children} />,
   Marker: (node, children) =>
-    <MapMarkerWidget key={node.attribs.key} {...node.attribs} />,
-  TableMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  PieChartMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  BarChartMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  LayeredMap: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs} />,
-  LayerGroup: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs} />,
+    <MarkerWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Popup: (node, children) =>
+    <PopupWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Overlay: (node, children) =>
+    <OverlayWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Circle: (node, children) =>
+    <CircleWidget key={node.attribs.key} {...node.attribs} />,
+  Rectangle: (node, children) =>
+    <RectangleWidget key={node.attribs.key} {...node.attribs} />
+
 };
 /*eslint-enable react/display-name */
 
@@ -61,8 +90,7 @@ let HTMLWithComponents = React.createClass({
     let processingInstructions = [
       {
         shouldProcessNode: (node) => true,
-        processNode: (node, children) =>
-          (components[node.name] || defaultProcess)(node, children)
+        processNode: (node, children) => (components[node.name] || defaultProcess)(node, children)
       }
     ];
     let isValidNode = () => true;

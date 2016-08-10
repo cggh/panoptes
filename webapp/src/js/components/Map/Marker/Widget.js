@@ -4,37 +4,54 @@ import {Marker} from 'react-leaflet';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let MapMarkerWidget = React.createClass({
+let MarkerWidget = React.createClass({
 
   mixins: [
     FluxMixin
   ],
 
   propTypes: {
-    lat: React.PropTypes.string.isRequired,
-    lng: React.PropTypes.string.isRequired,
-    title: React.PropTypes.string
+    children: React.PropTypes.node,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    position: React.PropTypes.string.isRequired
   },
+
 
   render() {
 
-    let {lat, lng, title} = this.props;
+    let {children, layerContainer, map, position} = this.props;
 
-    if  (isNaN(lat)) {
-      console.error('MapMarkerWidget lat is not a number');
-      return null;
+console.log('MarkerWidget props: %o', this.props);
+
+    let adaptedPosition = undefined;
+
+    if (position instanceof Array) {
+      adaptedPosition = position;
     }
-    if  (isNaN(lng)) {
-      console.error('MapMarkerWidget lng is not a number');
-      return null;
+    if (typeof position === 'string') {
+      // TODO: check the string looks like "[0, 0]" before trying to parse.
+      let positionArrayFromString = JSON.parse(position);
+      if (positionArrayFromString instanceof Array) {
+        adaptedPosition = positionArrayFromString;
+      }
+    }
+
+    if (adaptedPosition === undefined || adaptedPosition === null) {
+      console.error('MarkerWidget failed to determine position');
     }
 
     return (
-      <Marker position={{lat: Number(lat), lng: Number(lng)}} title={title} />
+      <Marker
+        children={children}
+        layerContainer={layerContainer}
+        map={map}
+        position={adaptedPosition}
+      />
     );
 
   }
 
 });
 
-module.exports = MapMarkerWidget;
+module.exports = MarkerWidget;
