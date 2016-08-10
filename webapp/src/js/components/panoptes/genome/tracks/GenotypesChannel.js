@@ -4,11 +4,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-import Color from 'color';
 
-import _map from 'lodash/map';
-import _isEqual from 'lodash/isEqual';
-import _transform from 'lodash/transform';
 import _filter from 'lodash/filter';
 import _sumBy from 'lodash/sumBy';
 import _each from 'lodash/each';
@@ -18,6 +14,9 @@ import _sortBy from 'lodash/sortBy';
 import _last from 'lodash/last';
 import _takeRight from 'lodash/takeRight';
 import _unique from 'lodash/uniq';
+
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
@@ -56,7 +55,10 @@ let GenotypesChannel = React.createClass({
         'rowQuery',
         'rowLabel',
         'layoutMode',
-        'manualWidth'
+        'manualWidth',
+        'cellColour',
+        'cellAlpha',
+        'cellHeight'
       ]
     }),
     ConfigMixin,
@@ -69,7 +71,10 @@ let GenotypesChannel = React.createClass({
       'table',
       'columnQuery',
       'rowQuery',
-      'rowLabel'
+      'rowLabel',
+      'cellColour',
+      'cellAlpha',
+      'cellHeight'
     )
   ],
 
@@ -97,7 +102,8 @@ let GenotypesChannel = React.createClass({
       rowQuery: SQL.nullQuery,
       columnQuery: SQL.nullQuery,
       layoutMode: 'auto',
-      rowHeight: 10
+      rowHeight: 10,
+      cellColour: 'call'
     };
   },
 
@@ -123,31 +129,31 @@ let GenotypesChannel = React.createClass({
     const endIndex = _sortedLastIndex(genomicPositions, end);
     const visibleGenomicPositions = genomicPositions.subarray(startIndex, endIndex);
 
-    const maxGapCount = layoutMode === 'auto' ? 20 : 0 ;
+    const maxGapCount = layoutMode === 'auto' ? 20 : 0;
 
     //Get an array of all the gaps
     let gaps = []; //Pair of (index, gap before)
     gaps.push([0, visibleGenomicPositions[0] - start]);
-    for (let i = 1, iend = visibleGenomicPositions.length;i < iend; ++i) {
-      gaps.push([i, visibleGenomicPositions[i] - visibleGenomicPositions[i-1]]);
+    for (let i = 1, iEnd = visibleGenomicPositions.length; i < iEnd; ++i) {
+      gaps.push([i, visibleGenomicPositions[i] - visibleGenomicPositions[i - 1]]);
     }
     gaps.push([visibleGenomicPositions.length, end - _last(visibleGenomicPositions)]);
 
     //Filter to only those gaps more than three times the mean gap size
-    gaps = _filter(gaps, (gap) => gap[1] > 3*((end - start)/gaps.length));
+    gaps = _filter(gaps, (gap) => gap[1] > 3 * ((end - start) / gaps.length));
 
     //We then only take the biggest ones
     gaps = _takeRight(_sortBy(gaps, (gap) => gap[1]), maxGapCount);
 
     //Sum their sizes so we know how much total space to give to them
-    const gapSum = _sumBy(gaps, (gap) => gap[1])/2;
+    const gapSum = _sumBy(gaps, (gap) => gap[1]) / 2;
     //Calculate how many blank columns that is
     const spacingColumns = Math.floor((gapSum / ((end - start - gapSum) / visibleGenomicPositions.length)));
     const colWidth = (end - start) / (visibleGenomicPositions.length + spacingColumns);
 
     //Then allocate to the biggest one - subtracting the gap from it and allocating again.
     const gapSizes = new Uint32Array(visibleGenomicPositions.length + 1); //+1 to include gap between last pos and end
-    for(let i = 0;i < spacingColumns; ++i) {
+    for (let i = 0; i < spacingColumns; ++i) {
       const gap = _last(gaps); //Find the buggest gap
       gapSizes[gap[0]] += 1;   //And a skipped column to it
       gap[1] -= colWidth;      //Subtract the skipped column width so we don't always allocate to this gap
@@ -157,11 +163,11 @@ let GenotypesChannel = React.createClass({
     const layoutBlocks = [];
     let currentStart = 0; //Pos index
     let colStart = gapSizes[0];     //Actual starting column of this block, first value is number of skipped columns from start
-    for (let i = 0, iend = gapSizes.length - 1;i < iend; ++i) {
-      if (gapSizes[i+1] > 0 || i === gapSizes.length - 2) {
+    for (let i = 0, iend = gapSizes.length - 1; i < iend; ++i) {
+      if (gapSizes[i + 1] > 0 || i === gapSizes.length - 2) {
         layoutBlocks.push([currentStart + startIndex, i + 1 + startIndex, colStart]);  //[blockStart, blockEnd, colStart]
-        colStart = colStart + (i - currentStart + 1) + gapSizes[i+1];
-        currentStart = i+1;
+        colStart = colStart + (i - currentStart + 1) + gapSizes[i + 1];
+        currentStart = i + 1;
       }
     }
     return {colWidth, layoutBlocks};
@@ -169,11 +175,12 @@ let GenotypesChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel} = props;
+    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight} = props;
     let config = this.config.twoDTablesById[table];
     // console.log(this.config);
     // console.log(config);
-    if (this.props.chromosome !== chromosome) {
+    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel'];
+    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, {});
     }
     if (width - sideWidth < 1) {
@@ -183,12 +190,21 @@ let GenotypesChannel = React.createClass({
       ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${rowLabel} is not a valid property of ${config.rowDataTable}`);
       return;
     }
+    if (cellColour !== 'call' && cellColour !== 'fraction') {
+      ErrorReport(this.getFlux(), `Genotypes ${table} channel: cellColour must be call or fraction`);
+      return;
+    }
+    if (cellAlpha && !config.propertiesById[cellAlpha]) {
+      ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${cellAlpha} is not a valid property of ${config.id}`);
+      return;
+    }
+    if (cellHeight && !config.propertiesById[cellHeight]) {
+      ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${cellHeight} is not a valid property of ${config.id}`);
+      return;
+    }
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
-    if (this.props.chromosome !== chromosome ||
-      this.props.rowQuery !== rowQuery ||
-      this.props.columnQuery !== columnQuery ||
-      this.props.rowLabel !== rowLabel || !(this.blockLevel === blockLevel
+    if (dataInvlidatingProps.some((name) => this.props[name] !== props[name]) || !(this.blockLevel === blockLevel
       && this.blockIndex === blockIndex
       && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
@@ -203,6 +219,13 @@ let GenotypesChannel = React.createClass({
       if (rowLabel)
         rowProperties.push(rowLabel);
       rowProperties = _unique(rowProperties);
+      let twoDProperties = cellColour === 'call' ? [config.showInGenomeBrowser.call] : [config.showInGenomeBrowser.alleleDepth];
+      if (cellAlpha) {
+        twoDProperties.push(cellAlpha);
+      }
+      if (cellHeight) {
+        twoDProperties.push(cellHeight);
+      }
       columnQuery = SQL.WhereClause.decode(columnQuery);
       columnQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(columnTableConfig.chromosome, '=', chromosome),
         columnQuery]);
@@ -216,8 +239,7 @@ let GenotypesChannel = React.createClass({
         row_order: 'NULL',
         col_properties: colProperties.join('~'),
         row_properties: rowProperties.join('~'),
-        '2D_properties': 'genotype',
-        first_dimension: config.firstArrayDimension,
+        '2D_properties': twoDProperties.join('~'),
         col_only_on_limit: true
       };
       let cacheArgs = {
@@ -300,10 +322,10 @@ let GenotypesChannel = React.createClass({
           for (let allele = 1; allele < arity; allele++) {
             alt_count += depth_matrix_array[row * lcols * arity + col * arity + allele];
           }
-          let fraction = alt_count/(ref_count+alt_count);
-          fraction = Math.max(0,fraction);
-          fraction = Math.min(1,fraction);
-          fractional_matrix[row * lcols + col] = alt_count+ref_count > 0 ? 1 + 255 * fraction : 0;
+          let fraction = alt_count / (ref_count + alt_count);
+          fraction = Math.max(0, fraction);
+          fraction = Math.min(1, fraction);
+          fractional_matrix[row * lcols + col] = alt_count + ref_count > 0 ? 1 + 255 * fraction : 0;
         }
       }
       fractional_matrix = {
@@ -354,7 +376,7 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end, rowHeight, rowLabel} = this.props;
+    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
@@ -395,7 +417,9 @@ let GenotypesChannel = React.createClass({
           start={start}
           end={end}
           colWidth={colWidth}
-          cellColour="call"
+          cellColour={cellColour}
+          cellAlpha={cellAlpha}
+          cellHeight={cellHeight}
           rowHeight={rowHeight}
         />
       </ChannelWithConfigDrawer>);
@@ -409,6 +433,9 @@ const GenotypesControls = React.createClass({
         'rowLabel',
         'columnQuery',
         'rowQuery',
+        'cellColour',
+        'cellAlpha',
+        'cellHeight'
       ],
       redirect: ['componentUpdate']
     }),
@@ -417,23 +444,55 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowQuery, rowLabel} = this.props;
+    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
         <div className="control">
-          <FilterButton table={config.columnDataTable} query={columnQuery} name={this.config.tablesById[config.columnDataTable].capNamePlural}
+          <FilterButton table={config.columnDataTable} query={columnQuery}
+                        name={this.config.tablesById[config.columnDataTable].capNamePlural}
                         onPick={(columnQuery) => this.redirectedProps.componentUpdate({columnQuery})}/>
         </div>
         <div className="control">
-          <FilterButton table={config.rowDataTable} query={rowQuery} name={this.config.tablesById[config.rowDataTable].capNamePlural}
+          <FilterButton table={config.rowDataTable} query={rowQuery}
+                        name={this.config.tablesById[config.rowDataTable].capNamePlural}
                         onPick={(rowQuery) => this.redirectedProps.componentUpdate({rowQuery})}/>
         </div>
         <div className="control">
-          <div className="label">Row Label:</div>
           <PropertySelector table={config.rowDataTable}
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
+                            label="Row Label"
                             onSelect={(rowLabel) => this.redirectedProps.componentUpdate({rowLabel})}/>
+        </div>
+        <div className="control">
+          <SelectField style={{width: '140px'}}
+                       value={cellColour}
+                       autoWidth={true}
+                       floatingLabelText="Cell Colour"
+                       onChange={(e, i, cellColour) => this.redirectedProps.componentUpdate({cellColour})}>
+            <MenuItem value="call" primaryText="Call"/>
+            <MenuItem value="fraction" primaryText="Ref fraction"/>
+          </SelectField>
+        </div>
+        <div className="control">
+          <SelectField style={{width: '256px'}}
+                       value={cellAlpha}
+                       autoWidth={true}
+                       floatingLabelText="Cell Opacity"
+                       onChange={(e, i, cellAlpha) => this.redirectedProps.componentUpdate({cellAlpha})}>
+            <MenuItem value={undefined} primaryText="None"/>
+            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
+          </SelectField>
+        </div>
+        <div className="control">
+          <SelectField style={{width: '256px'}}
+                       value={cellHeight}
+                       autoWidth={true}
+                       floatingLabelText="Cell Height"
+                       onChange={(e, i, cellHeight) => this.redirectedProps.componentUpdate({cellHeight})}>
+            <MenuItem value={undefined} primaryText="None"/>
+            {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
+          </SelectField>
         </div>
       </div>
     );

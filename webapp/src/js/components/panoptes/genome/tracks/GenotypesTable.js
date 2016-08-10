@@ -51,7 +51,6 @@ let GenotypesTable = React.createClass({
     const colShape = block[`2D__${cellColour}`].shape;
     let alphaArray, alphaShape, alphaOffset, alphaScale;
     if (cellAlpha) {
-      if (!block[`2D__${cellAlpha}`]) throw Error(`${cellAlpha} is not a property of 2D table ${table}`);
       alphaArray = block[`2D_${cellAlpha}`].array;
       alphaShape = block[`2D_${cellAlpha}`].shape;
       alphaOffset = config.propertiesById[cellAlpha].minVal;
@@ -59,15 +58,14 @@ let GenotypesTable = React.createClass({
     }
     let heightArray, heightShape, heightOffset, heightScale;
     if (cellHeight) {
-      if (!block[`2D__${cellHeight}`]) throw Error(`${cellHeight} is not a property of 2D table ${table}`);
       heightArray = block[`2D_${cellHeight}`].array;
       heightShape = block[`2D_${cellHeight}`].shape;
       heightOffset = config.propertiesById[cellHeight].minVal;
       heightScale = config.propertiesById[cellHeight].maxVal - heightOffset;
     }
     if (colShape.length !== 2) throw Error(`Wrong array dimension for ${cellColour} must be 2D`);
-    if (alphaShape && alphaShape.length !== 2) throw Error(`Wrong array dimension for ${cellAlpha} must be 2D`);
-    if (heightShape && heightShape.length !== 2) throw Error(`Wrong array dimension for ${cellColour} must be 2D`);
+    if (alphaShape && alphaShape.length !== 2 && alphaShape[0] !== 0) throw Error(`Wrong array dimension for ${cellAlpha} must be 2D`);
+    if (heightShape && heightShape.length !== 2 && heightShape[0] !== 0) throw Error(`Wrong array dimension for ${cellHeight} must be 2D`);
 
     const cacheKey = JSON.stringify({
       cellColour,
@@ -212,10 +210,10 @@ let GenotypesTable = React.createClass({
             if (k < kEnd - 1)
               text += cellColour == 'call' ? ',' : '/';
           }
+          const x = (colStart + i + 0.5) * pixColWidth;
+          const y = (j + 0.5) * rowHeight;
           if (cellColour == 'call') {
             const callSummary = block['2D__call'].array[sourceIndex];
-            const x = (colStart + i + 0.5) * pixColWidth;
-            const y = (j + 0.5) * rowHeight;
             if (callSummary == -1 || callSummary == -2) {  //NULL
               if (style != 0) {
                 ctx.fillStyle = 'rgb(150,150,150)';

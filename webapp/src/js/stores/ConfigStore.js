@@ -50,8 +50,8 @@ const ConfigStore = Fluxxor.createStore({
     _each(config.twoDTablesById, (table, key) => {
       table.id = key;
       config.twoDTables.push(table);
-      table.propertiesMap = {};
-      _each(table.properties, (prop) => table.propertiesMap[prop.id] = prop)
+      table.propertiesById = {};
+      _each(table.properties, (prop) => table.propertiesById[prop.id] = prop)
     });
   },
 
