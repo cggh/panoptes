@@ -2,7 +2,7 @@ import React from "react";
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
-
+import Formatter from 'panoptes/Formatter';
 
 let GenotypesRowHeader = React.createClass({
   mixins: [
@@ -25,7 +25,9 @@ let GenotypesRowHeader = React.createClass({
   },
 
   paint(canvas) {
-    const {rowHeight, width, rowData} = this.props;
+    const {rowHeight, width, rowData, rowLabel, table} = this.props;
+    const config = this.config.twoDTablesById[table];
+    const rowConfig = this.config.tablesById[config.rowDataTable];
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = 'white';
@@ -84,7 +86,8 @@ let GenotypesRowHeader = React.createClass({
     var groupStartIndex = 0;
     for (let i = 0; i <= labelArray.length; i++) {
       let yPos = (i + 1) * (rowHeight);
-        if (showIndividualLines) {
+      const label = Formatter(rowConfig.propertiesById[rowLabel], labelArray[i]);
+      if (showIndividualLines) {
           // if (fncIsRowSelected(key))
           //   ctx.fillStyle = 'rgb(255,80,80)';
           // else
@@ -94,12 +97,12 @@ let GenotypesRowHeader = React.createClass({
           ctx.fill();
           ctx.stroke();
           ctx.fillStyle = 'rgb(0,0,0)';
-          ctx.fillText(labelArray[i], 13, yPos - 1 - (rowHeight - fontSize) / 2);
+          ctx.fillText(label, 13, yPos - 1 - (rowHeight - fontSize) / 2);
         }
         else {
-          if (labelArray[i] != groupLabel) {
+          if (label != groupLabel) {
             drawGroupLabel(groupLabel, groupStartIndex, i - 1);
-            groupLabel = labelArray[i];
+            groupLabel = label;
             groupStartIndex = i;
           }
         }
@@ -114,10 +117,7 @@ let GenotypesRowHeader = React.createClass({
     const rowConfig = this.config.tablesById[config.rowDataTable];
     return <div className="genotypes-side">
       <div className="side-name">{config.namePlural}</div>
-      <div className="row-label">{rowLabel ?
-        rowConfig.propertiesById[rowLabel].name :
-        rowConfig.propertiesById[rowConfig.primKey].name
-      }</div>
+      <div className="row-label">{rowConfig.propertiesById[rowLabel].name}</div>
       <canvas ref="canvas"
               width={width}
               height={tableHeight}/>

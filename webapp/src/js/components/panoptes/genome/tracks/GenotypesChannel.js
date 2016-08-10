@@ -354,8 +354,11 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end, rowHeight} = this.props;
+    let {width, sideWidth, table, start, end, rowHeight, rowLabel} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
+    const config = this.config.twoDTablesById[table];
+    const rowConfig = this.config.tablesById[config.rowDataTable];
+
     return (
       <ChannelWithConfigDrawer
         width={width}
@@ -367,6 +370,7 @@ let GenotypesChannel = React.createClass({
           tableHeight={TABLE_HEIGHT}
           rowData={rowData}
           rowHeight={rowHeight}
+          rowLabel={rowLabel || rowConfig.primKey}
         />}
         //Override component update to get latest in case of skipped render
         configComponent={<GenotypesControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate}/>}
