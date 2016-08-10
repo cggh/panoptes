@@ -4,6 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _transform from 'lodash/transform';
 import _forEach from 'lodash/forEach';
+import _filter from 'lodash/filter';
 import uid from 'uid';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -108,11 +109,30 @@ let GenomeBrowserWithActions = React.createClass({
         });
       }
     });
+    if (this.config.twoDTables.length > 0) {
+      groups[`_twoD`] = {
+        name: 'Genotypes',
+        icon: 'bitmap:genomebrowser.png',
+        items: _transform(_filter(this.config.twoDTables, 'showInGenomeBrowser'), (result, table) => {
+          result[table.id] = {
+            name: table.namePlural,
+            description: table.description,
+            icon: 'table',
+            payload: {
+              channel: 'GenotypesChannel',
+              props: {
+                table: table.id,
+              }
+            }
+          };
+        }, {})
+      };
+    }
 
     //Per-row based summaries
     _forEach(this.config.visibleTables, (table) => {
       if (table.tableBasedSummaryValues.length > 0) {
-        groups[`per_${table.id}`] = {
+        groups[`_per_${table.id}`] = {
           name: `Per ${table.capNameSingle}`,
           icon: table.icon,
           items: _transform(table.tableBasedSummaryValuesById, (result, channel) => {

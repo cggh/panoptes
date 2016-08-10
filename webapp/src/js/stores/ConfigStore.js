@@ -46,7 +46,10 @@ const ConfigStore = Fluxxor.createStore({
   },
 
   add2DConfig(config) {
-    _each(config.twoDTablesById, (table) => {
+    config.twoDTables = [];
+    _each(config.twoDTablesById, (table, key) => {
+      table.id = key;
+      config.twoDTables.push(table);
       table.propertiesMap = {};
       _each(table.properties, (prop) => table.propertiesMap[prop.id] = prop)
     });

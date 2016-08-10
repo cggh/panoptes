@@ -317,7 +317,6 @@ let GenomeBrowser = React.createClass({
                         }
                         ).toList()
                         }
-                        <GenotypesChannel {...trackProps} table="diploid"/>
                       </div>
                     </div>
                   );
