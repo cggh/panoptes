@@ -58,4 +58,7 @@ properties:
   description: An example categorical property
   dataType: Text
   showInBrowser: true
-  categoryColors: {A: 'rgb(255,255,200)', B: 'rgb(0,100,0)'}
+  categoryColors:                   # Specifies display colours for the categorical states of this property
+    A: rgb(255,128,60)
+    B: rgb(0,180,0)
+    _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
