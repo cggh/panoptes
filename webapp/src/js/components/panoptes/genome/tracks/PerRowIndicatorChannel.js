@@ -136,7 +136,7 @@ let PerRowIndicatorChannel = React.createClass({
         method: 'pageQuery',
         regionField: tableConfig.position,
         queryField: 'query',
-        limitField: 'end',
+        limitField: 'stop',
         start,
         end,
         blockLimit: 1000
@@ -162,7 +162,7 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   combineBlocks(blocks, property) {
-    return _transform(blocks, (sum, block) =>
+    return _transform(_filter(blocks, (block) => !block._tooBig), (sum, block) =>
       Array.prototype.push.apply(sum, block[property] || []),
     []);
   },
@@ -184,7 +184,6 @@ let PerRowIndicatorChannel = React.createClass({
     //Filter out big blocks and merge neighbouring ones.
     this.tooBigBlocks = _transform(_filter(blocks, {_tooBig: true}), (merged, block) => {
       const lastBlock = merged[merged.length - 1];
-      //if (lastBlock) console.log(lastBlock._blockStart + lastBlock._blockSize, block._blockStart);
       if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
         //Copy to avoid mutating the cache
         merged[merged.length - 1] = {...lastBlock, _blockSize: lastBlock._blockSize + block._blockSize};
