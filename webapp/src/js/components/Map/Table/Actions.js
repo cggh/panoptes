@@ -30,7 +30,7 @@ import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallbac
 
 import 'map.scss';
 
-let MapActions = React.createClass({
+let TableMapActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -141,13 +141,11 @@ let MapActions = React.createClass({
               </span>
               : null}
           </div>
-          <div className="vertical stack">
-            {table ? <TableMapWidget {...this.props}  /> : 'Pick a table'}
-          </div>
+          {table ? <TableMapWidget geoTable={table} {...this.props} /> : 'Pick a table'}
         </div>
       </Sidebar>
     );
   }
 });
 
-module.exports = MapActions;
+module.exports = TableMapActions;

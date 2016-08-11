@@ -21,6 +21,12 @@ let OverlayWidget = React.createClass({
     name: React.PropTypes.string
   },
 
+  getDefaultProps() {
+    return {
+      name: 'Overlay'
+    };
+  },
+
   render() {
     let {addOverlay, checked, children, layerContainer, map, name} = this.props;
 

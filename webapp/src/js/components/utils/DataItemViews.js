@@ -58,12 +58,6 @@ function getViews(dataItemViews, hasGeoCoord) {
             title: dataItemView.name
           }
         }),
-        LayeredMap: () => ({
-          component: 'Map/Layered',
-          props: {
-            title: dataItemView.name
-          }
-        }),
         FieldList: () => ({
           component: 'FieldList',
           props: {

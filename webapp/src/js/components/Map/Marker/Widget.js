@@ -14,16 +14,21 @@ let MarkerWidget = React.createClass({
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
+    onClickMarker: React.PropTypes.func,
     popupContainer: React.PropTypes.object,
     position: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]).isRequired,
+    title: React.PropTypes.string,
+    alt: React.PropTypes.string
   },
 
-
   render() {
+    window.force = this.forceUpdate.bind(this);
 
-    let {children, layerContainer, map, popupContainer, position} = this.props;
+    let {alt, children, layerContainer, map, onClickMarker, popupContainer, position, title} = this.props;
 
-console.log('MarkerWidget props: %o', this.props);
+    if (alt === undefined && title !== undefined) {
+      alt = title;
+    }
 
     let adaptedPosition = undefined;
 
@@ -44,11 +49,14 @@ console.log('MarkerWidget props: %o', this.props);
 
     return (
       <Marker
+        alt={alt}
         children={children}
         layerContainer={layerContainer}
         map={map}
         popupContainer={popupContainer}
         position={adaptedPosition}
+        title={title}
+        onClick={(e) => onClickMarker(e)}
       />
     );
 

@@ -21,7 +21,7 @@ let TileLayerWidget = React.createClass({
   getDefaultProps() {
     return {
       attribution: '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      url: 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
     };
   },
 

@@ -16,6 +16,7 @@ import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import PopupWidget from 'Map/Popup/Widget';
 import LayersControlWidget from 'Map/LayersControl/Widget';
 import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+import TableMapWidget from 'Map/Table/Widget';
 
 
 // import MapBaseLayerWidget from 'Map/BaseLayer/Widget';
@@ -72,9 +73,21 @@ const components = {
   Rectangle: (node, children) =>
     <RectangleWidget key={node.attribs.key} {...node.attribs} />,
   TableMap: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs}><LayersControlWidget hideLayersControl="true"><BaseLayerWidget><TileLayerWidget /></BaseLayerWidget><OverlayWidget><TableMarkersLayerWidget table={node.attribs.table} primKey={node.attribs.primKey} /></OverlayWidget></LayersControlWidget></MapWidget>,
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  PieChartMap: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs}><LayersControlWidget hideLayersControl="true"><BaseLayerWidget><TileLayerWidget /></BaseLayerWidget><OverlayWidget><TableMarkersLayerWidget geoTable={node.attribs.table} primKey={node.attribs.primKey} /></OverlayWidget></LayersControlWidget></MapWidget>,
 };
 /*eslint-enable react/display-name */
+
+/*
+
+<div>
+<p>A layered map:</p>
+<div style="width:300px;height:300px">
+<Map center="[0, 0]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Markers with popups"><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+</div>
+
+*/
 
 let HTMLWithComponents = React.createClass({
 

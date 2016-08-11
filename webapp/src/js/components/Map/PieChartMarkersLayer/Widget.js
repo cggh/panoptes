@@ -11,27 +11,26 @@ import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
-import MarkerWidget from 'Map/Marker/Widget';
+
+//tmp, instead of PieChart
+import HelloWorld from 'ui/HelloWorld';
+
 
 /* Example usage in template
 
-<p>A map of sampling sites:</p>
+<p>A map of pie charts:</p>
 <div style="position:relative;width:300px;height:300px">
-<TableMap geoTable="samplingsites" />
-</div>
-<p>A map of a sampling site:</p>
-<div style="position:relative;width:300px;height:300px">
-<TableMap geoTable="samplingsites" primKey="St04" />
+<PieChartMap geoTable="populations" pieTable="variants" primKey="SNP_00001" />
 </div>
 
 */
 
-let TableMarkersLayerWidget = React.createClass({
+let PieChartMarkersLayerWidget = React.createClass({
 
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('geoTable', 'primKey', 'highlight')
+    DataFetcherMixin('table', 'primKey', 'highlight')
   ],
 
   propTypes: {
@@ -47,35 +46,20 @@ let TableMarkersLayerWidget = React.createClass({
     onChangeLoadStatus: React.PropTypes.func
   },
 
-  childContextTypes: {
-    onClickMarker: React.PropTypes.func
-  },
-
-
   getInitialState() {
     return {
       markers: []
     };
   },
 
-  // Event handlers
-  handleClickMarker(e, marker) {
-console.log('e %o', e);
-console.log('marker %o', marker);
-
-    let {table, primKey} = marker;
-    const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
-    if (!middleClick) {
-      e.originalEvent.stopPropagation();
-    }
-    this.getFlux().actions.panoptes.dataItemPopup({table: table, primKey: primKey.toString(), switchTo: !middleClick});
-  },
 
   fetchData(props, requestContext) {
 //FIXME: Initial load from ListWithActions (default 1st selected) > DataItemWidget, isn't showing marker.
-    let {highlight, primKey, geoTable} = props;
+    let {highlight, primKey, table} = props;
     let {onChangeLoadStatus} = this.context;
-    let locationTableConfig = this.config.tablesById[geoTable];
+console.log('fetchData props: %o', props);
+console.log('fetchData context: %o', this.context);
+    let locationTableConfig = this.config.tablesById[table];
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -117,8 +101,8 @@ console.log('marker %o', marker);
           // Fetch the single record for the specified primKey value.
           let APIargs = {
             database: this.config.dataset,
-            table: geoTable,
-            primKeyField: this.config.tablesById[geoTable].primKey,
+            table: table,
+            primKeyField: this.config.tablesById[table].primKey,
             primKeyValue: primKey
           };
 
@@ -157,7 +141,7 @@ console.log('marker %o', marker);
         let markers = [];
 
         // Translate the fetched locationData into markers.
-        let locationTableConfig = this.config.tablesById[geoTable];
+        let locationTableConfig = this.config.tablesById[table];
         let locationPrimKeyProperty = locationTableConfig.primKey;
 
         // If a primKey value has been specified then expect data to contain a single record.
@@ -170,7 +154,7 @@ console.log('marker %o', marker);
             lat: parseFloat(data[locationTableConfig.latitude]),
             lng: parseFloat(data[locationTableConfig.longitude]),
             title: locationDataPrimKey,
-            table: geoTable,
+            table: table,
             primKey: locationDataPrimKey
           });
 
@@ -194,7 +178,7 @@ console.log('marker %o', marker);
               lat: parseFloat(data[i][locationTableConfig.latitude]),
               lng: parseFloat(data[i][locationTableConfig.longitude]),
               title: locationDataPrimKey,
-              table: geoTable,
+              table: table,
               primKey: locationDataPrimKey,
               isHighlighted: isHighlighted
             });
@@ -220,8 +204,16 @@ console.log('marker %o', marker);
 
   render() {
 
+    //FIXME
+    window.force = this.forceUpdate.bind(this);
+
     let {layerContainer, map} = this.props;
     let {markers} = this.state;
+
+console.log('PieChartMarkersLayerWidget props: %o', this.props);
+console.log('PieChartMarkersLayerWidget context: %o', this.context);
+console.log('PieChartMarkersLayerWidget markers: %o', markers);
+
 
     if (!markers.length) {
       return null;
@@ -233,35 +225,16 @@ console.log('marker %o', marker);
 
       let marker = markers[i];
 
-      if (marker.isHighlighted || len === 1) {
-
-        markerWidgets.push(
-          <MarkerWidget
-            key={i}
-            position={[marker.lat, marker.lng]}
-            layerContainer={layerContainer}
-            map={map}
-            title={marker.title}
-            onClickMarker={(e) => this.handleClickMarker(e, marker)}
-          />
-        );
-
-      } else {
-
-        markerWidgets.push(
-          <DivIcon
-            key={i}
-            position={[marker.lat, marker.lng]}
-            title={marker.title}
-            onClick={(e) => this.handleClickMarker(e, marker)}
-          >
-            <svg height="12" width="12">
-              <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
-            </svg>
-          </DivIcon>
-        );
-
-      }
+      markerWidgets.push(
+        <DivIcon
+          key={i}
+          layerContainer={layerContainer}
+          map={map}
+          position={[marker.lat, marker.lng]}
+        >
+          <HelloWorld msg="foobar" />
+        </DivIcon>
+      );
 
     }
 
@@ -277,4 +250,4 @@ console.log('marker %o', marker);
 
 });
 
-module.exports = TableMarkersLayerWidget;
+module.exports = PieChartMarkersLayerWidget;
