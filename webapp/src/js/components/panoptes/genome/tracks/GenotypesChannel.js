@@ -376,6 +376,10 @@ let GenotypesChannel = React.createClass({
         arrayPos += data.length;
       }
     });
+    //Don't pass any data if there are no rows
+    if (dataBlocks.length > 0 && dataBlocks[0][`row_${rowTableConfig.primKey}`].shape[0] === 0) {
+      dataBlocks = [];
+    }
     this.setState({
       rowData: dataBlocks.length > 0 ? {
         id: dataBlocks[0][`row_${rowTableConfig.primKey}`],
@@ -393,16 +397,16 @@ let GenotypesChannel = React.createClass({
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
-
+    const numRows = rowData ? rowData.id.shape[0] : 0;
     return (
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
-        height={(rowHeight * pageSize) + FAN_HEIGHT}
+        height={(rowHeight * numRows) + FAN_HEIGHT}
         sideComponent={<GenotypesRowHeader
           table={table}
           width={sideWidth}
-          tableHeight={rowHeight * pageSize}
+          tableHeight={rowHeight * numRows}
           rowData={rowData}
           rowHeight={rowHeight}
           rowLabel={rowLabel || rowConfig.primKey}
@@ -426,7 +430,7 @@ let GenotypesChannel = React.createClass({
           dataBlocks={dataBlocks}
           layoutBlocks={layoutBlocks}
           width={width - sideWidth}
-          height={rowHeight * pageSize}
+          height={rowHeight * numRows}
           start={start}
           end={end}
           colWidth={colWidth}
