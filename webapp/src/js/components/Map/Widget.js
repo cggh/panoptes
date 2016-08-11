@@ -33,7 +33,8 @@ let MapWidget = React.createClass({
   },
 
   childContextTypes: {
-    onChangeLoadStatus: React.PropTypes.func
+    onChangeLoadStatus: React.PropTypes.func,
+    onChangeBounds: React.PropTypes.func
   },
 
   title() {
@@ -51,29 +52,34 @@ let MapWidget = React.createClass({
 
   getInitialState() {
     return {
+      bounds: undefined,
       loadStatus: 'loaded'
     };
   },
 
   getChildContext() {
     return {
+      onChangeBounds: this.handleChangeBounds,
       onChangeLoadStatus: this.handleChangeLoadStatus
     };
   },
 
   // Event handlers
+  handleChangeBounds(bounds) {
+    this.setState({bounds});
+  },
+  handleChangeLoadStatus(loadStatus) {
+    this.setState({loadStatus});
+  },
   handleDetectResize() {
     if (this.map) {
       this.map.leafletElement.invalidateSize();
     }
   },
-  handleChangeLoadStatus(loadStatus) {
-    this.setState({loadStatus});
-  },
 
   render() {
     let {tileLayerAttribution, tileLayerURL, center, children, zoom} = this.props;
-    let {loadStatus} = this.state;
+    let {bounds, loadStatus} = this.state;
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
@@ -118,11 +124,11 @@ console.log('MapWidget props: %o', this.props);
 
 
     let commonMapProps = {
+      bounds: bounds,
       style: widgetStyle,
-      ref: (ref) => this.map = ref,
-      onChangeLoadStatus: (loadStatus) => this.handleChangeLoadStatus(loadStatus)
+      ref: (ref) => this.map = ref
     };
-console.log('MapWidget commonMapProps: %o', commonMapProps);
+
     let mapWidgetComponent = null;
 
     let defaultTileLayer = (
@@ -132,7 +138,11 @@ console.log('MapWidget commonMapProps: %o', commonMapProps);
       />
     );
 
+    // TODO: Tidy up this logic.
+
     if (children.length) {
+
+      // If children is iterable.
 
       // If the children are all MarkerWidgets, or only a FeatureGroup containing only MarkerWidgets, then insert the default TileLayer.
 
@@ -150,7 +160,9 @@ console.log('MapWidget commonMapProps: %o', commonMapProps);
       }
 
       if (nonMarkerChildrenCount === 0) {
-console.log('CCCC');
+
+        // If there are only Markers as children.
+
         let keyedDefaultTileLayer = _cloneDeep(defaultTileLayer);
         let keyedChildren = _cloneDeep(children);
 
@@ -168,7 +180,9 @@ console.log('CCCC');
         );
 
       } else {
-console.log('AAAA');
+
+        // Otherwise, pass everything to the Map component.
+
         mapWidgetComponent = (
           <Map
             children={children}
@@ -180,13 +194,13 @@ console.log('AAAA');
       }
 
     } else {
-console.log('BBBB');
+
+      // Otherwise, children does not have a length property.
 
       if (children !== null && typeof children === 'object') {
-console.log('DDDDD');
 
+        // If there is a single child.
 
-        // If the only child is a LayersControlWidget that only has a BaseLayerWidget child, then select that BaseLayer.
         if (
           children.type.displayName === 'LayersControlWidget'
           && children.props.children !== null
@@ -194,14 +208,11 @@ console.log('DDDDD');
           && typeof children.props.children === 'object'
           && children.props.children.type.displayName === 'BaseLayerWidget'
         ) {
-console.log('FFFFF');
+
+          // If the child is a LayersControlWidget that only has a BaseLayerWidget child, then select that BaseLayer.
+
           let augmentedChild = _cloneDeep(children);
-
-console.log('orig children: %o', children);
-console.log('augmentedChild: %o', augmentedChild);
-
           augmentedChild.props.children.props.checked = true;
-
           mapWidgetComponent = (
             <Map
               children={augmentedChild}
@@ -211,7 +222,9 @@ console.log('augmentedChild: %o', augmentedChild);
           );
 
         } else {
-console.log('GGGGG');
+
+          // Otherwise, pass everything to the Map component.
+
           mapWidgetComponent = (
             <Map
               children={children}
@@ -224,8 +237,8 @@ console.log('GGGGG');
 
 
       } else {
-console.log('EEEEE');
-        // Just show a plain map, with the default TileLayer
+
+        // Just show the default map with the default TileLayer
 
         mapWidgetComponent = (
           <Map

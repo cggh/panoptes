@@ -15,31 +15,15 @@ import OverlayWidget from 'Map/Overlay/Widget';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import PopupWidget from 'Map/Popup/Widget';
 import LayersControlWidget from 'Map/LayersControl/Widget';
-import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
 import TableMapWidget from 'Map/Table/Widget';
-
-
-// import MapBaseLayerWidget from 'Map/BaseLayer/Widget';
-// import MapOverLayerWidget from 'Map/OverLayer/Widget';
+import PieChartMapWidget from 'Map/Chart/Pie/Widget';
 
 
 // TODO: Deprecate ItemMap template component in favour of TableMap
 
-/*
-Marker: (node, children) =>
-  <MapMarkerWidget key={node.attribs.key} {...node.attribs} />,
-BaseLayer: (node, children) =>
-  <MapBaseLayerWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapBaseLayerWidget>,
-OverLayer: (node, children) =>
-  <MapOverLayerWidget key={node.attribs.key} {...node.attribs}>{node.children}</MapOverLayerWidget>,
-TableMap: (node, children) =>
-  <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-PieChartMap: (node, children) =>
-  <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+/* TODO:
 BarChartMap: (node, children) =>
   <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  ItemMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
 */
 
 /*eslint-disable react/display-name */
@@ -75,7 +59,7 @@ const components = {
   TableMap: (node, children) =>
     <TableMapWidget key={node.attribs.key} {...node.attribs} />,
   PieChartMap: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs}><LayersControlWidget hideLayersControl="true"><BaseLayerWidget><TileLayerWidget /></BaseLayerWidget><OverlayWidget><TableMarkersLayerWidget geoTable={node.attribs.table} primKey={node.attribs.primKey} /></OverlayWidget></LayersControlWidget></MapWidget>,
+    <PieChartMapWidget key={node.attribs.key} {...node.attribs} />
 };
 /*eslint-enable react/display-name */
 

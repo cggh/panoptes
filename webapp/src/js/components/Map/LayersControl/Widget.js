@@ -16,7 +16,7 @@ let LayersControlWidget = React.createClass({
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object
   },
-
+  // TODO: hideLayersControl has not been implemented (and is not implemented in leaflet)
 
   render() {
 
@@ -39,8 +39,8 @@ console.log('LayersControlWidget props: %o', this.props);
     }
 
 
-    let style = null;
     if (hideLayersControlBoolean) {
+      // TODO: implement
       //style = {display: 'none'};
     }
 
@@ -49,7 +49,6 @@ console.log('LayersControlWidget props: %o', this.props);
         children={children}
         layerContainer={layerContainer}
         map={map}
-        style={style}
       />
     );
 

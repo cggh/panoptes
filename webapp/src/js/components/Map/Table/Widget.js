@@ -1,7 +1,5 @@
 import React from 'react';
 
-import {Map} from 'react-leaflet';
-
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
@@ -10,6 +8,21 @@ import MapWidget from 'Map/Widget';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import TileLayerWidget from 'Map/TileLayer/Widget';
 import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+
+
+/* Example usage in templates
+
+<p>A map of sampling sites:</p>
+<div style="position:relative;width:300px;height:300px">
+<TableMap geoTable="samplingsites" />
+</div>
+
+<p>A map of a sampling site:</p>
+<div style="position:relative;width:300px;height:300px">
+<TableMap geoTable="samplingsites" primKey="St04" />
+</div>
+
+*/
 
 let TableMapWidget = React.createClass({
 

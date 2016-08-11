@@ -22,7 +22,7 @@ let MarkerWidget = React.createClass({
   },
 
   render() {
-    window.force = this.forceUpdate.bind(this);
+    //window.force = this.forceUpdate.bind(this);
 
     let {alt, children, layerContainer, map, onClickMarker, popupContainer, position, title} = this.props;
 

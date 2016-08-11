@@ -1,5 +1,6 @@
 import React from 'react';
-import DivIcon from 'react-leaflet-div-icon';
+//import DivIcon from 'react-leaflet-div-icon';
+import DivIcon from 'Map/DivIcon/Widget';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,18 +14,27 @@ import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 import MarkerWidget from 'Map/Marker/Widget';
 
-/* Example usage in template
+// Lodash
+import _minBy from 'lodash/minBy';
+import _maxBy from 'lodash/maxBy';
 
-<p>A map of sampling sites:</p>
-<div style="position:relative;width:300px;height:300px">
-<TableMap geoTable="samplingsites" />
-</div>
-<p>A map of a sampling site:</p>
-<div style="position:relative;width:300px;height:300px">
-<TableMap geoTable="samplingsites" primKey="St04" />
-</div>
+// TODO: This function is duplicated between TableMarkersLayer and PieChartMarkersLayer
+function calcBounds(markers) {
 
-*/
+  let L = window.L;
+  let bounds = undefined;
+
+  if (markers !== undefined && markers.length >= 1) {
+
+    let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
+    let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
+
+    bounds = L.latLngBounds(northWest, southEast);
+  }
+
+  return bounds;
+}
+
 
 let TableMarkersLayerWidget = React.createClass({
 
@@ -44,6 +54,7 @@ let TableMarkersLayerWidget = React.createClass({
   },
 
   contextTypes: {
+    onChangeBounds: React.PropTypes.func,
     onChangeLoadStatus: React.PropTypes.func
   },
 
@@ -74,8 +85,15 @@ console.log('marker %o', marker);
   fetchData(props, requestContext) {
 //FIXME: Initial load from ListWithActions (default 1st selected) > DataItemWidget, isn't showing marker.
     let {highlight, primKey, geoTable} = props;
-    let {onChangeLoadStatus} = this.context;
+
+    // TODO: Check highlight is being handled/supported properly?
+
+    let {onChangeBounds, onChangeLoadStatus} = this.context;
     let locationTableConfig = this.config.tablesById[geoTable];
+    if (locationTableConfig === undefined) {
+      console.error('locationTableConfig === undefined');
+      return null;
+    }
     // Check that the table specified for locations has geographic coordinates.
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
@@ -207,6 +225,7 @@ console.log('marker %o', marker);
           markers: markers
         });
 
+        onChangeBounds(calcBounds(markers));
         onChangeLoadStatus('loaded');
       })
       .catch(API.filterAborted)
