@@ -484,8 +484,8 @@ const GenotypesControls = React.createClass({
                        value={cellAlpha}
                        autoWidth={true}
                        floatingLabelText="Cell Opacity"
-                       onChange={(e, i, cellAlpha) => this.redirectedProps.componentUpdate({cellAlpha})}>
-            <MenuItem value={undefined} primaryText="None"/>
+                       onChange={(e, i, cellAlpha) => this.redirectedProps.componentUpdate({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
+            <MenuItem value='none' primaryText="None"/>
             {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
         </div>
@@ -494,8 +494,8 @@ const GenotypesControls = React.createClass({
                        value={cellHeight}
                        autoWidth={true}
                        floatingLabelText="Cell Height"
-                       onChange={(e, i, cellHeight) => this.redirectedProps.componentUpdate({cellHeight})}>
-            <MenuItem value={undefined} primaryText="None"/>
+                       onChange={(e, i, cellHeight) => this.redirectedProps.componentUpdate({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
+            <MenuItem value='none' primaryText="None"/>
             {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
         </div>
