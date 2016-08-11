@@ -53,6 +53,7 @@ let GenotypesChannel = React.createClass({
         'columnQuery',
         'rowQuery',
         'rowLabel',
+        'rowSort',
         'layoutGaps',
         'cellColour',
         'cellAlpha',
@@ -73,6 +74,7 @@ let GenotypesChannel = React.createClass({
       'columnQuery',
       'rowQuery',
       'rowLabel',
+      'rowSort',
       'cellColour',
       'cellAlpha',
       'cellHeight',
@@ -96,6 +98,7 @@ let GenotypesChannel = React.createClass({
     columnQuery: React.PropTypes.string,
     rowQuery: React.PropTypes.string,
     rowLabel: React.PropTypes.string,
+    rowSort: React.PropTypes.string,
     rowHeight: React.PropTypes.number,
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
@@ -111,7 +114,8 @@ let GenotypesChannel = React.createClass({
       rowHeight: 10,
       pageSize: 100,
       page: 0,
-      cellColour: 'call'
+      cellColour: 'call',
+      rowSort: 'NULL'
     };
   },
 
@@ -177,11 +181,11 @@ let GenotypesChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize} = props;
+    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize, rowSort} = props;
     let config = this.config.twoDTablesById[table];
     // console.log(this.config);
     // console.log(config);
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'layoutGaps'];
+    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, {});
     }
@@ -190,6 +194,10 @@ let GenotypesChannel = React.createClass({
     }
     if (rowLabel && !this.config.tablesById[config.rowDataTable].propertiesById[rowLabel]) {
       ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${rowLabel} is not a valid property of ${config.rowDataTable}`);
+      return;
+    }
+    if (rowSort && !this.config.tablesById[config.rowDataTable].propertiesById[rowSort] && rowSort != 'NULL') {
+      ErrorReport(this.getFlux(), `Genotypes ${table} channel: ${rowSort} is not a valid property of ${config.rowDataTable}`);
       return;
     }
     if (cellColour !== 'call' && cellColour !== 'fraction') {
@@ -238,7 +246,7 @@ let GenotypesChannel = React.createClass({
         col_qry: SQL.WhereClause.encode(columnQuery),
         col_order: columnTableConfig.position,
         row_qry: rowQuery,
-        row_order: 'NULL',
+        row_order: rowSort,
         row_offset: page * pageSize,
         row_limit: (page + 1) * pageSize,
         col_properties: colProperties.join('~'),
@@ -440,7 +448,8 @@ const GenotypesControls = React.createClass({
         'cellColour',
         'cellAlpha',
         'cellHeight',
-        'layoutGaps'
+        'layoutGaps',
+        'rowSort'
       ],
       redirect: ['componentUpdate']
     }),
@@ -449,7 +458,7 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight,layoutGaps} = this.props;
+    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort} = this.props;
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
@@ -468,6 +477,13 @@ const GenotypesControls = React.createClass({
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             label="Row Label"
                             onSelect={(rowLabel) => this.redirectedProps.componentUpdate({rowLabel})}/>
+        </div>
+        <div className="control">
+          <PropertySelector table={config.rowDataTable}
+                            value={rowSort}
+                            label="Row Sort"
+                            allowNull={true}
+                            onSelect={(rowSort) => this.redirectedProps.componentUpdate({rowSort})}/>
         </div>
         <div className="control">
           <SelectField style={{width: '140px'}}
