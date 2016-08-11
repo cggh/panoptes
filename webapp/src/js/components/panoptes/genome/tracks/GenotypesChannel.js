@@ -17,6 +17,7 @@ import _unique from 'lodash/uniq';
 
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Checkbox from 'material-ui/Checkbox';
 
 import SQL from 'panoptes/SQL';
 import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
@@ -35,8 +36,6 @@ import 'hidpi-canvas';
 import {propertyColour, categoryColours} from 'util/Colours';
 
 const FAN_HEIGHT = 60;
-const TABLE_HEIGHT = 500;
-const HEIGHT = 560;
 
 let GenotypesChannel = React.createClass({
   mixins: [
@@ -54,11 +53,13 @@ let GenotypesChannel = React.createClass({
         'columnQuery',
         'rowQuery',
         'rowLabel',
-        'layoutMode',
-        'manualWidth',
+        'layoutGaps',
         'cellColour',
         'cellAlpha',
-        'cellHeight'
+        'cellHeight',
+        'rowHeight',
+        'pageSize',
+        'page'
       ]
     }),
     ConfigMixin,
@@ -74,8 +75,12 @@ let GenotypesChannel = React.createClass({
       'rowLabel',
       'cellColour',
       'cellAlpha',
-      'cellHeight'
-    )
+      'cellHeight',
+      'layoutGaps',
+      'rowHeight',
+      'pageSize',
+      'page'
+    ),
   ],
 
   propTypes: {
@@ -92,8 +97,9 @@ let GenotypesChannel = React.createClass({
     rowQuery: React.PropTypes.string,
     rowLabel: React.PropTypes.string,
     rowHeight: React.PropTypes.number,
-    layoutMode: React.PropTypes.string,
-    manualWidth: React.PropTypes.number,
+    pageSize: React.PropTypes.number,
+    page: React.PropTypes.number,
+    layoutGaps: React.PropTypes.bool,
     onChangeLoadStatus: React.PropTypes.func.isRequired
   },
 
@@ -101,8 +107,10 @@ let GenotypesChannel = React.createClass({
     return {
       rowQuery: SQL.nullQuery,
       columnQuery: SQL.nullQuery,
-      layoutMode: 'auto',
+      layoutGaps: true,
       rowHeight: 10,
+      pageSize: 100,
+      page: 0,
       cellColour: 'call'
     };
   },
@@ -117,19 +125,13 @@ let GenotypesChannel = React.createClass({
     };
   },
 
-  componentWillMount() {
-  },
-
-  componentWillUpdate(props, {blocks}) {
-  },
-
   layoutColumns(props, genomicPositions) {
-    const {start, end, layoutMode} = props;
+    const {start, end, layoutGaps} = props;
     const startIndex = _sortedIndex(genomicPositions, start);
     const endIndex = _sortedLastIndex(genomicPositions, end);
     const visibleGenomicPositions = genomicPositions.subarray(startIndex, endIndex);
 
-    const maxGapCount = layoutMode === 'auto' ? 20 : 0;
+    const maxGapCount = layoutGaps ? 20 : 0;
 
     //Get an array of all the gaps
     let gaps = []; //Pair of (index, gap before)
@@ -175,11 +177,11 @@ let GenotypesChannel = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight} = props;
+    let {chromosome, start, end, width, sideWidth, table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, page, pageSize} = props;
     let config = this.config.twoDTablesById[table];
     // console.log(this.config);
     // console.log(config);
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel'];
+    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'layoutGaps'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, {});
     }
@@ -237,6 +239,8 @@ let GenotypesChannel = React.createClass({
         col_order: columnTableConfig.position,
         row_qry: rowQuery,
         row_order: 'NULL',
+        row_offset: page * pageSize,
+        row_limit: (page + 1) * pageSize,
         col_properties: colProperties.join('~'),
         row_properties: rowProperties.join('~'),
         '2D_properties': twoDProperties.join('~'),
@@ -347,7 +351,7 @@ let GenotypesChannel = React.createClass({
   },
 
   applyData(props, dataBlocks) {
-    const {table, start, end, rowLabel} = props;
+    const {table, rowLabel} = props;
     const config = this.config.twoDTablesById[table];
     const columnTableConfig = this.config.tablesById[config.columnDataTable];
     const rowTableConfig = this.config.tablesById[config.rowDataTable];
@@ -376,7 +380,7 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
+    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, pageSize} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
@@ -385,11 +389,11 @@ let GenotypesChannel = React.createClass({
       <ChannelWithConfigDrawer
         width={width}
         sideWidth={sideWidth}
-        height={HEIGHT}
+        height={(rowHeight * pageSize) + FAN_HEIGHT}
         sideComponent={<GenotypesRowHeader
           table={table}
           width={sideWidth}
-          tableHeight={TABLE_HEIGHT}
+          tableHeight={rowHeight * pageSize}
           rowData={rowData}
           rowHeight={rowHeight}
           rowLabel={rowLabel || rowConfig.primKey}
@@ -413,7 +417,7 @@ let GenotypesChannel = React.createClass({
           dataBlocks={dataBlocks}
           layoutBlocks={layoutBlocks}
           width={width - sideWidth}
-          height={TABLE_HEIGHT}
+          height={rowHeight * pageSize}
           start={start}
           end={end}
           colWidth={colWidth}
@@ -435,7 +439,8 @@ const GenotypesControls = React.createClass({
         'rowQuery',
         'cellColour',
         'cellAlpha',
-        'cellHeight'
+        'cellHeight',
+        'layoutGaps'
       ],
       redirect: ['componentUpdate']
     }),
@@ -444,7 +449,7 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
+    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight,layoutGaps} = this.props;
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
@@ -494,6 +499,15 @@ const GenotypesControls = React.createClass({
             {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
         </div>
+        <div className="control">
+          <div className="label">Space columns:</div>
+          <Checkbox
+            name="layoutGaps"
+            defaultChecked={layoutGaps}
+            style={{width: 'inherit'}}
+            onCheck={(e, checked) => this.redirectedProps.componentUpdate({layoutGaps: checked})}/>
+        </div>
+
       </div>
     );
   }

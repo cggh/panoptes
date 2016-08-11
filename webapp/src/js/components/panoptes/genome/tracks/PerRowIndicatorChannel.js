@@ -248,10 +248,10 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.restore();
     //Triangles/Lines
     psy = (HEIGHT / 2) - 6;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
+    ctx.strokeStyle = triangleMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)';
+    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
       if (psx > -6 && psx < width + 6) {
