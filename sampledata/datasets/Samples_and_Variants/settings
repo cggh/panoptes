@@ -4,27 +4,42 @@ name: Samples & Variants               # The displayed name of this dataset
 nameBanner: Samples and Variants       # Name as it appears in the top banner of the app
 
 # A description of the dataset that will appear on the start page
-description: 'This is the description of this sample dataset. <div style="color:rgb(0,128,0)">A
-  second line, html formatted</div> An <a href="http://panoptes.readthedocs.org/en/latest//"
+description: '
+  This is the description of this sample dataset. 
+  <div style="color:rgb(0,128,0)">
+  A second line, html formatted
+  </div>
+  An <a href="http://panoptes.readthedocs.org/en/latest//"
   target="_blank">external hyperlink</a> and a <a class="doclink" href="intro">link</a>
-  to documentation part of this deployment. <p>Some buttons that open popups:</p>
+  to documentation part of this deployment. 
+  <p>Some buttons that open popups:</p>
   <PopupButton label="Plot of Variants" icon="area-chart" component="Plot" plotType="scatter"
-  table="variants" horizontal="Value1" vertical="Value2" /> <PopupButton label="Map
-  of sites" icon="globe"  component="ItemMap" table="samplingsites" /> <PopupButton
+  table="variants" horizontal="Value1" vertical="Value2" /> 
+  <PopupButton label="Map
+  of sites" icon="globe"  component="ItemMap" table="samplingsites" /> 
+  <PopupButton
   label="Tree of samples" icon="tree" component="Tree" table="samples" tree="tree2"
-  /> <p>A tree of samples</p> <div style="position:relative;width:300px;height:300px"><Tree
-  table="samples" tree="tree2" /></div> <p>A plot of variants:</p> <div style="position:relative;width:300px;height:300px"><Plot
-  plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" /></div>
-  <p>A map of sampling sites:</p> <div style="position:relative;width:300px;height:300px"><ItemMap
-  table="samplingsites" /></div>
+  />
+  <p>A tree of samples</p> 
+  <div style="position:relative;width:300px;height:300px">
+  <Tree table="samples" tree="tree2" />
+  </div>
+  <p>A plot of variants:</p>
+  <div style="position:relative;width:300px;height:300px">
+  <Plot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
+  </div>
+  <p>A map of sampling sites:</p>
+  <div style="position:relative;width:300px;height:300px">
+  <TableMap table="samplingsites" />
+  </div>
   <div>
-  <span>A layered map:</span>
+  <p>A layered map:</p>
   <div style="width:300px;height:300px">
-  <Map center="[0, 0]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Markers with popups"><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span><HelloWorld msg="foobar" /></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span><HelloWorld msg="foobar2" /></div></Popup></Marker></FeatureGroup></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  <Map center="[0, 0]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Markers with popups"><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
   </div>
-  </div>
+  '
 
-  ' # Optional: a list of all the data table identifiers in the dataset
+# Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder names in [datatables]
 # This can be used to provide an explicit ordering of the data tables in the UI
 dataTables:

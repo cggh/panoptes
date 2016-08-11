@@ -15,10 +15,12 @@ import OverlayWidget from 'Map/Overlay/Widget';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import PopupWidget from 'Map/Popup/Widget';
 import LayersControlWidget from 'Map/LayersControl/Widget';
+import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+
 
 // import MapBaseLayerWidget from 'Map/BaseLayer/Widget';
 // import MapOverLayerWidget from 'Map/OverLayer/Widget';
-// import TableMapWidget from 'Map/Table/Widget';
+
 
 // TODO: Deprecate ItemMap template component in favour of TableMap
 
@@ -68,8 +70,9 @@ const components = {
   Circle: (node, children) =>
     <CircleWidget key={node.attribs.key} {...node.attribs} />,
   Rectangle: (node, children) =>
-    <RectangleWidget key={node.attribs.key} {...node.attribs} />
-
+    <RectangleWidget key={node.attribs.key} {...node.attribs} />,
+  TableMap: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs}><LayersControlWidget hideLayersControl="true"><BaseLayerWidget><TileLayerWidget /></BaseLayerWidget><OverlayWidget><TableMarkersLayerWidget table={node.attribs.table} primKey={node.attribs.primKey} /></OverlayWidget></LayersControlWidget></MapWidget>,
 };
 /*eslint-enable react/display-name */
 

@@ -14,13 +14,14 @@ let MarkerWidget = React.createClass({
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    position: React.PropTypes.string.isRequired
+    popupContainer: React.PropTypes.object,
+    position: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]).isRequired,
   },
 
 
   render() {
 
-    let {children, layerContainer, map, position} = this.props;
+    let {children, layerContainer, map, popupContainer, position} = this.props;
 
 console.log('MarkerWidget props: %o', this.props);
 
@@ -46,6 +47,7 @@ console.log('MarkerWidget props: %o', this.props);
         children={children}
         layerContainer={layerContainer}
         map={map}
+        popupContainer={popupContainer}
         position={adaptedPosition}
       />
     );

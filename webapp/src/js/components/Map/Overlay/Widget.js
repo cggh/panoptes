@@ -32,7 +32,9 @@ console.log('OverlayWidget props: %o', this.props);
       checkedBoolean = null;
     }
 
-    children = children[0];
+    if (children instanceof Array) {
+      children = children[0];
+    }
 
     return (
       <Overlay

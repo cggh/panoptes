@@ -34,10 +34,10 @@ console.log('TileLayerWidget props: %o', this.props);
     return (
       <TileLayer
         attribution={attribution}
-        url={url}
         children={null}
         layerContainer={layerContainer}
         map={map}
+        url={url}
       />
     );
 

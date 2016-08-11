@@ -24,7 +24,9 @@ let PopupWidget = React.createClass({
 
 console.log('PopupWidget props: %o', this.props);
 
-    children = children[0];
+    if (children instanceof Array) {
+      children = children[0];
+    }
 
     return (
       <Popup
