@@ -31,6 +31,7 @@ import GenotypesFan from 'panoptes/genome/tracks/GenotypesFan';
 import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
 import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+import NumericInput from 'ui/NumericInput';
 
 import 'hidpi-canvas';
 import {propertyColour, categoryColours} from 'util/Colours';
@@ -185,7 +186,7 @@ let GenotypesChannel = React.createClass({
     let config = this.config.twoDTablesById[table];
     // console.log(this.config);
     // console.log(config);
-    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps'];
+    const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
       this.applyData(props, {});
     }
@@ -449,7 +450,9 @@ const GenotypesControls = React.createClass({
         'cellAlpha',
         'cellHeight',
         'layoutGaps',
-        'rowSort'
+        'rowSort',
+        'pageSize',
+        'page'
       ],
       redirect: ['componentUpdate']
     }),
@@ -458,7 +461,7 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort} = this.props;
+    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
@@ -484,6 +487,12 @@ const GenotypesControls = React.createClass({
                             label="Row Sort"
                             allowNull={true}
                             onSelect={(rowSort) => this.redirectedProps.componentUpdate({rowSort})}/>
+        </div>
+        <div className="control">
+          <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.componentUpdate({pageSize})}/>
+        </div>
+        <div className="control">
+          <NumericInput value={page} onChange={(page) => this.redirectedProps.componentUpdate({page})}/>
         </div>
         <div className="control">
           <SelectField style={{width: '140px'}}
