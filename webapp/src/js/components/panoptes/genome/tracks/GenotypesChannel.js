@@ -419,6 +419,7 @@ let GenotypesChannel = React.createClass({
         <GenotypesFan
           genomicPositions={genomicPositions}
           layoutBlocks={layoutBlocks}
+          dataBlocks={dataBlocks}
           width={width - sideWidth}
           height={FAN_HEIGHT}
           start={start}

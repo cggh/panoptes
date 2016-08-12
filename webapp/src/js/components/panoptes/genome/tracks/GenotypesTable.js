@@ -189,7 +189,7 @@ let GenotypesTable = React.createClass({
     const rowLen = textArray.shape[1] || 0;
     textArray = textArray.array;
     ctx.save();
-    ctx.font = "" + rowHeight + "px sans-serif";
+    ctx.font = "" + rowHeight + "px Roboto";
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';

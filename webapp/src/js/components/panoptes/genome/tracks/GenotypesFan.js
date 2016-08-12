@@ -1,6 +1,9 @@
 import React from "react";
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import manualTween from 'util/manualTween';
+import _transform from 'lodash/transform';
+import _filter from 'lodash/filter';
+import {hatchRect} from 'util/CanvasDrawing';
 
 const HAT_HEIGHT = 20;
 
@@ -11,7 +14,6 @@ let GenotypesFan = React.createClass({
 
   propTypes: {
     genomicPositions: React.PropTypes.any,
-    colPositions: React.PropTypes.any,
     colWidth: React.PropTypes.number,
     start: React.PropTypes.number,
     end: React.PropTypes.number,
@@ -23,12 +25,27 @@ let GenotypesFan = React.createClass({
     this.paint(this.refs.canvas, this.props);
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.dataBlocks !== nextProps.dataBlocks) {
+      //Filter out big blocks and merge neighbouring ones.
+      this.tooBigBlocks = _transform(_filter(nextProps.dataBlocks, {_tooBig: true}), (merged, block) => {
+        const lastBlock = merged[merged.length - 1];
+        if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
+          //Copy to avoid mutating the cache
+          merged[merged.length - 1] = {...lastBlock, _blockSize: lastBlock._blockSize + block._blockSize};
+        } else {
+          merged.push(block);
+        }
+      });
+    }
+  },
+
   componentDidUpdate() {
     this.paint(this.refs.canvas, this.props);
   },
 
   paint(canvas, props) {
-    const {genomicPositions, layoutBlocks, start, end, width, height, colWidth} = props;
+    const {genomicPositions, dataBlocks, layoutBlocks, start, end, width, height, colWidth} = props;
     const ctx = canvas.getContext('2d');
     const scale =  width / (end - start);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -73,7 +90,7 @@ let GenotypesFan = React.createClass({
     }
     if (alpha > 0) {
       //Little hat and area fill
-      ctx.font = "12px sans-serif";
+      ctx.font = "12px Roboto";
       ctx.fillStyle = 'rgb(0,0,0)';
       ctx.strokeStyle = "rgba(0,0,0,0.2)";
       ctx.lineWidth = 1;
@@ -105,6 +122,28 @@ let GenotypesFan = React.createClass({
         }
       }
     }
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px Roboto';
+    let psy = (height / 2) - 12;
+    this.tooBigBlocks.forEach((block) => {
+      const pixelStart = scale * (block._blockStart - start);
+      const pixelSize = scale * ( block._blockSize);
+      const textPos = (pixelStart < 0 && pixelStart + pixelSize > width) ? width / 2 : pixelStart + (pixelSize / 2);
+      hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
+      if (pixelSize > 100) {
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 6;
+        ctx.lineJoin = 'miter'; //Prevent letters with tight angles making spikes
+        ctx.miterLimit = 2;
+        ctx.strokeText('Zoom in', textPos, psy + 12);
+        ctx.fillText('Zoom in', textPos, psy + 12);
+        ctx.restore();
+      }
+    });
   },
 
 
