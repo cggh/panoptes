@@ -30,7 +30,7 @@ let PieChartWidget = React.createClass({
     lng: React.PropTypes.number,
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
-    chartData: React.PropTypes.array,
+    chartData: React.PropTypes.object,
     crs: React.PropTypes.object
   },
 

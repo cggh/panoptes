@@ -12,6 +12,7 @@ import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
+import PieChartWidget from 'Chart/Pie/Widget'
 
 // Lodash
 import _maxBy from 'lodash/maxBy';
@@ -245,6 +246,12 @@ console.log('PieChartMarkersLayer Markers: %o', markers);
       return null;
     }
 
+
+    // FIXME
+console.log('this.context %o', this.context);
+    //let crs = this.context.map ? this.context.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
+    let crs = window.L.CRS.EPSG3857;
+
     let markerWidgets = [];
 
     for (let i = 0, len = markers.size; i < len; i++) {
@@ -252,6 +259,8 @@ console.log('PieChartMarkersLayer Markers: %o', markers);
       let marker = markers.get(i);
 console.log('marker: %o', marker);
       // TODO: Use PieChartWidget instead of svg
+
+//name, radius, chartData, onClick, crs, lat, lng, originalLat, originalLng
 
       markerWidgets.push(
         <ComponentMarkerWidget
@@ -261,6 +270,17 @@ console.log('marker: %o', marker);
           onClick={(e) => this.handleClickMarker(e, marker)}
         >
           <b style={{background: 'white', border: 'solid 1px black'}}>{i}</b>
+          <PieChartWidget
+            chartData={marker.get('chartData')}
+            crs={crs}
+            key={i}
+            lat={marker.get('lat')}
+            lng={marker.get('lng')}
+            name={marker.get('name')}
+            originalLat={marker.get('lat')}
+            originalLng={marker.get('lng')}
+            radius={marker.get('radius')}
+          />
         </ComponentMarkerWidget>
       );
 
