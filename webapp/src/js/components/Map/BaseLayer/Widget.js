@@ -16,8 +16,6 @@ let BaseLayerWidget = React.createClass({
     addBaseLayer: React.PropTypes.func,
     checked: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.bool]),
     children: React.PropTypes.node,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
     name: React.PropTypes.string.isRequired
   },
 
@@ -28,7 +26,7 @@ let BaseLayerWidget = React.createClass({
   },
 
   render() {
-    let {addBaseLayer, checked, children, layerContainer, layerOptions, map, name} = this.props;
+    let {addBaseLayer, checked, children, name} = this.props;
 console.log('BaseLayerWidget props: %o', this.props);
 
     let checkedBoolean = null;
@@ -54,8 +52,6 @@ console.log('BaseLayerWidget props: %o', this.props);
         checked={checkedBoolean}
         name={name}
         children={children}
-        layerContainer={layerContainer}
-        map={map}
         addBaseLayer={addBaseLayer}
       />
     );

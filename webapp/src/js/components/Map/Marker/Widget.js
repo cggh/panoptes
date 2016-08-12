@@ -10,21 +10,35 @@ let MarkerWidget = React.createClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props here rather than context (e.g. by ComponentMarker).
+  // So, copying the layerContainer and map into context...
+
   propTypes: {
+    alt: React.PropTypes.string,
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    onClickMarker: React.PropTypes.func,
-    popupContainer: React.PropTypes.object,
+    onClick: React.PropTypes.func,
     position: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]).isRequired,
     title: React.PropTypes.string,
-    alt: React.PropTypes.string
+
+  },
+
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer,
+      map: this.props.map
+    };
   },
 
   render() {
-    //window.force = this.forceUpdate.bind(this);
 
-    let {alt, children, layerContainer, map, onClickMarker, popupContainer, position, title} = this.props;
+    let {alt, children, onClick, position, title} = this.props;
 
     if (alt === undefined && title !== undefined) {
       alt = title;
@@ -51,12 +65,9 @@ let MarkerWidget = React.createClass({
       <Marker
         alt={alt}
         children={children}
-        layerContainer={layerContainer}
-        map={map}
-        popupContainer={popupContainer}
         position={adaptedPosition}
         title={title}
-        onClick={(e) => onClickMarker(e)}
+        onClick={(e) => onClick(e)}
       />
     );
 

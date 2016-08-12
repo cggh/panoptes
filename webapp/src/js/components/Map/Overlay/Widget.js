@@ -16,8 +16,6 @@ let OverlayWidget = React.createClass({
     addOverlay: React.PropTypes.func,
     checked: React.PropTypes.string,
     children: React.PropTypes.node,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
     name: React.PropTypes.string
   },
 
@@ -28,9 +26,10 @@ let OverlayWidget = React.createClass({
   },
 
   render() {
-    let {addOverlay, checked, children, layerContainer, map, name} = this.props;
+    let {addOverlay, checked, children, name} = this.props;
 
 console.log('OverlayWidget props: %o', this.props);
+console.log('OverlayWidget context: %o', this.context);
 
     let checkedBoolean = (checked === 'true');
 
@@ -46,8 +45,6 @@ console.log('OverlayWidget props: %o', this.props);
       <Overlay
         addOverlay={addOverlay}
         checked={checkedBoolean}
-        layerContainer={layerContainer}
-        map={map}
         name={name}
         children={children}
       />

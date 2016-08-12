@@ -42,8 +42,6 @@ let PieChartMapWidget = React.createClass({
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
 
-console.log('PieChartMarkersLayerWidget props: %o', this.props);
-
     return (
       <MapWidget style={widgetStyle}>
         <FeatureGroupWidget>

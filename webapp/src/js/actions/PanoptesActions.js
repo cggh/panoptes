@@ -4,13 +4,16 @@ const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
   dataItemPopup({table, primKey, switchTo = true}) {
-console.log('table %o', table);
-console.log('primKey %o', primKey);
-console.log('config.tablesById[table].dataItemViews %o', config.tablesById[table].dataItemViews);
-console.log('config.tablesById[table].hasGeoCoord %o', config.tablesById[table].hasGeoCoord);
+
+    let tableDataItemViews = config.tablesById[table].dataItemViews;
+
+    if (tableDataItemViews === undefined) {
+      console.error('PanoptesActions found no dataItemViews for table: %o', table);
+      return null;
+    }
 
     let views = DataItemViews.getViews(config.tablesById[table].dataItemViews, config.tablesById[table].hasGeoCoord);
-console.log('PanoptesActions views %o', views);
+
     this.dispatch(SESSION.POPUP_OPEN, {
       component: {
         component: 'DataItem/Widget',

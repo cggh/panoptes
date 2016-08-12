@@ -1,6 +1,5 @@
 import React from 'react';
-//import DivIcon from 'react-leaflet-div-icon';
-import DivIcon from 'Map/DivIcon/Widget';
+import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -39,27 +38,33 @@ let PieChartMarkersLayerWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('geoTable', 'primKey', 'highlight')
+    DataFetcherMixin('geoTable', 'pieTable', 'primKey', 'highlight')
   ],
+
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    onChangeBounds: React.PropTypes.func,
+    onChangeLoadStatus: React.PropTypes.func
+  },
 
   propTypes: {
     highlight: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
     onChangeLoadStatus: React.PropTypes.func,
-    primKey: React.PropTypes.string, // if not specified then all table records are used
-    geoTable: React.PropTypes.string
-  },
-
-  contextTypes: {
-    onChangeBounds: React.PropTypes.func,
-    onChangeLoadStatus: React.PropTypes.func
+    pieTable: React.PropTypes.string.isRequired,
+    primKey: React.PropTypes.string.isRequired,
+    geoTable: React.PropTypes.string.isRequired
   },
 
   childContextTypes: {
     onClickMarker: React.PropTypes.func
   },
 
+  getChildContext() {
+    return {
+      onClickMarker: this.handleClickMarker
+    };
+  },
 
   getInitialState() {
     return {
@@ -72,17 +77,17 @@ let PieChartMarkersLayerWidget = React.createClass({
 console.log('e %o', e);
 console.log('marker %o', marker);
 
-    let {table, primKey} = marker;
+    let {pieTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: table, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: pieTable, primKey: primKey.toString(), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
 
-    let {highlight, primKey, geoTable} = props;
+    let {highlight, geoTable, primKey, pieTable} = props;
 
     //FIXME
     primKey = undefined;
@@ -90,6 +95,7 @@ console.log('marker %o', marker);
 
     let {onChangeBounds, onChangeLoadStatus} = this.context;
 console.log('geoTable: ' + geoTable);
+console.log('pieTable: ' + pieTable);
     let locationTableConfig = this.config.tablesById[geoTable];
     if (locationTableConfig === undefined) {
       console.error('locationTableConfig === undefined');
@@ -186,11 +192,12 @@ console.log('geoTable: ' + geoTable);
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
           markers.push({
+            geoTable: geoTable,
             lat: parseFloat(data[locationTableConfig.latitude]),
             lng: parseFloat(data[locationTableConfig.longitude]),
+            pieTable: pieTable,
+            primKey: locationDataPrimKey,
             title: locationDataPrimKey,
-            table: geoTable,
-            primKey: locationDataPrimKey
           });
 
         } else {
@@ -210,12 +217,13 @@ console.log('geoTable: ' + geoTable);
             }
 
             markers.push({
+              isHighlighted: isHighlighted,
+              geoTable: geoTable,
               lat: parseFloat(data[i][locationTableConfig.latitude]),
               lng: parseFloat(data[i][locationTableConfig.longitude]),
-              title: locationDataPrimKey,
-              table: geoTable,
+              pieTable: pieTable,
               primKey: locationDataPrimKey,
-              isHighlighted: isHighlighted
+              title: locationDataPrimKey,
             });
 
           }
@@ -240,39 +248,41 @@ console.log('geoTable: ' + geoTable);
 
   render() {
 
-    let {layerContainer, map} = this.props;
+    let {layerContainer, map} = this.context;
     let {markers} = this.state;
 
     if (!markers.length) {
       return null;
     }
-console.log('PieChart Markers: %o', markers);
+console.log('PieChartMarkersLayer Markers: %o', markers);
     let markerWidgets = [];
 
     for (let i = 0, len = markers.length; i < len; i++) {
 
       let marker = markers[i];
 
+      // TODO: Use PieChartWidget instead of svg
+/*
+<svg height="24" width="24">
+  <circle cx="12" cy="12" r="10" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
+</svg>
+*/
       markerWidgets.push(
-        <DivIcon
+        <ComponentMarkerWidget
           key={i}
           position={[marker.lat, marker.lng]}
           title={marker.title}
           onClick={(e) => this.handleClickMarker(e, marker)}
-        >
-          <svg height="24" width="24">
-            <circle cx="12" cy="12" r="10" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
-          </svg>
-        </DivIcon>
+        />
       );
 
     }
 
     return (
       <FeatureGroupWidget
+        children={markerWidgets}
         layerContainer={layerContainer}
         map={map}
-        children={markerWidgets}
       />
     );
 

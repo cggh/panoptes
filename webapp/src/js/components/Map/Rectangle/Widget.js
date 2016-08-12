@@ -11,17 +11,15 @@ let RectangleWidget = React.createClass({
   ],
 
   propTypes: {
-    bounds: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    popupContainer: React.PropTypes.object
+    bounds: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array])
   },
 
   render() {
 
-    let {bounds, layerContainer, map, popupContainer} = this.props;
+    let {bounds} = this.props;
 
 console.log('RectangleWidget props: %o', this.props);
+console.log('RectangleWidget context: %o', this.context);
 
     let adaptedProps = {};
 
@@ -43,9 +41,6 @@ console.log('RectangleWidget props: %o', this.props);
     return (
       <Rectangle
         children={null}
-        layerContainer={layerContainer}
-        map={map}
-        popupContainer={popupContainer}
         {...adaptedProps}
       />
     );

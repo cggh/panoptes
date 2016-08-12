@@ -33,14 +33,20 @@ let MapWidget = React.createClass({
   },
 
   childContextTypes: {
-    onChangeLoadStatus: React.PropTypes.func,
-    onChangeBounds: React.PropTypes.func
+    onChangeBounds: React.PropTypes.func,
+    onChangeLoadStatus: React.PropTypes.func
   },
 
   title() {
     return this.props.title || 'Map';
   },
 
+  getChildContext() {
+    return {
+      onChangeBounds: this.handleChangeBounds,
+      onChangeLoadStatus: this.handleChangeLoadStatus
+    };
+  },
   getDefaultProps() {
     return {
       center: [0, 0],
@@ -49,18 +55,10 @@ let MapWidget = React.createClass({
       tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
     };
   },
-
   getInitialState() {
     return {
       bounds: undefined,
       loadStatus: 'loaded'
-    };
-  },
-
-  getChildContext() {
-    return {
-      onChangeBounds: this.handleChangeBounds,
-      onChangeLoadStatus: this.handleChangeLoadStatus
     };
   },
 
@@ -85,9 +83,12 @@ let MapWidget = React.createClass({
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
 
-console.log('MapWidget props: %o', this.props);
-
     let adaptedMapProps = {};
+
+    // Translate prop values from strings (used in templates)
+    // into the required primitive types.
+
+    // TODO: Could also support centerLat and centerLng props.
 
     if (center instanceof Array) {
       adaptedMapProps.center = center;
@@ -131,6 +132,8 @@ console.log('MapWidget props: %o', this.props);
 
     let mapWidgetComponent = null;
 
+    // Provide a default tile layer.
+    // Is there a situation where the user wants no tile layer?
     let defaultTileLayer = (
       <TileLayerWidget
         attribution={tileLayerAttribution}
@@ -181,7 +184,8 @@ console.log('MapWidget props: %o', this.props);
 
       } else {
 
-        // Otherwise, pass everything to the Map component.
+        // Otherwise, the children contain non-Markers
+        // pass everything to the Map component.
 
         mapWidgetComponent = (
           <Map

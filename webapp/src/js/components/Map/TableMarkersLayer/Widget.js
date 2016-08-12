@@ -1,6 +1,5 @@
 import React from 'react';
-//import DivIcon from 'react-leaflet-div-icon';
-import DivIcon from 'Map/DivIcon/Widget';
+import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -12,7 +11,6 @@ import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
-import MarkerWidget from 'Map/Marker/Widget';
 
 // Lodash
 import _minBy from 'lodash/minBy';
@@ -35,7 +33,6 @@ function calcBounds(markers) {
   return bounds;
 }
 
-
 let TableMarkersLayerWidget = React.createClass({
 
   mixins: [
@@ -44,24 +41,29 @@ let TableMarkersLayerWidget = React.createClass({
     DataFetcherMixin('geoTable', 'primKey', 'highlight')
   ],
 
-  propTypes: {
-    highlight: React.PropTypes.string,
+  contextTypes: {
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    onChangeLoadStatus: React.PropTypes.func,
-    primKey: React.PropTypes.string, // if not specified then all table records are used
-    geoTable: React.PropTypes.string
-  },
-
-  contextTypes: {
     onChangeBounds: React.PropTypes.func,
     onChangeLoadStatus: React.PropTypes.func
+  },
+
+  propTypes: {
+    highlight: React.PropTypes.string,
+    onChangeLoadStatus: React.PropTypes.func,
+    primKey: React.PropTypes.string, // if not specified then all geoTable records are used
+    geoTable: React.PropTypes.string.isRequired
   },
 
   childContextTypes: {
     onClickMarker: React.PropTypes.func
   },
 
+  getChildContext() {
+    return {
+      onClickMarker: this.handleClickMarker
+    };
+  },
 
   getInitialState() {
     return {
@@ -74,21 +76,20 @@ let TableMarkersLayerWidget = React.createClass({
 console.log('e %o', e);
 console.log('marker %o', marker);
 
-    let {table, primKey} = marker;
+    let {pieTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: table, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: pieTable, primKey: primKey.toString(), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
-//FIXME: Initial load from ListWithActions (default 1st selected) > DataItemWidget, isn't showing marker.
-    let {highlight, primKey, geoTable} = props;
 
-    // TODO: Check highlight is being handled/supported properly?
+    let {highlight, geoTable, primKey} = props;
 
     let {onChangeBounds, onChangeLoadStatus} = this.context;
+console.log('geoTable: ' + geoTable);
     let locationTableConfig = this.config.tablesById[geoTable];
     if (locationTableConfig === undefined) {
       console.error('locationTableConfig === undefined');
@@ -185,11 +186,11 @@ console.log('marker %o', marker);
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
           markers.push({
+            geoTable: geoTable,
             lat: parseFloat(data[locationTableConfig.latitude]),
             lng: parseFloat(data[locationTableConfig.longitude]),
+            primKey: locationDataPrimKey,
             title: locationDataPrimKey,
-            table: geoTable,
-            primKey: locationDataPrimKey
           });
 
         } else {
@@ -209,12 +210,12 @@ console.log('marker %o', marker);
             }
 
             markers.push({
+              isHighlighted: isHighlighted,
+              geoTable: geoTable,
               lat: parseFloat(data[i][locationTableConfig.latitude]),
               lng: parseFloat(data[i][locationTableConfig.longitude]),
-              title: locationDataPrimKey,
-              table: geoTable,
               primKey: locationDataPrimKey,
-              isHighlighted: isHighlighted
+              title: locationDataPrimKey,
             });
 
           }
@@ -239,13 +240,13 @@ console.log('marker %o', marker);
 
   render() {
 
-    let {layerContainer, map} = this.props;
+    let {layerContainer, map} = this.context;
     let {markers} = this.state;
 
     if (!markers.length) {
       return null;
     }
-
+console.log('TableMarkersLayer Markers: %o', markers);
     let markerWidgets = [];
 
     for (let i = 0, len = markers.length; i < len; i++) {
@@ -255,20 +256,18 @@ console.log('marker %o', marker);
       if (marker.isHighlighted || len === 1) {
 
         markerWidgets.push(
-          <MarkerWidget
+          <ComponentMarkerWidget
             key={i}
             position={[marker.lat, marker.lng]}
-            layerContainer={layerContainer}
-            map={map}
             title={marker.title}
-            onClickMarker={(e) => this.handleClickMarker(e, marker)}
+            onClick={(e) => this.handleClickMarker(e, marker)}
           />
         );
 
       } else {
 
         markerWidgets.push(
-          <DivIcon
+          <ComponentMarkerWidget
             key={i}
             position={[marker.lat, marker.lng]}
             title={marker.title}
@@ -277,7 +276,7 @@ console.log('marker %o', marker);
             <svg height="12" width="12">
               <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
             </svg>
-          </DivIcon>
+          </ComponentMarkerWidget>
         );
 
       }
@@ -286,9 +285,9 @@ console.log('marker %o', marker);
 
     return (
       <FeatureGroupWidget
+        children={markerWidgets}
         layerContainer={layerContainer}
         map={map}
-        children={markerWidgets}
       />
     );
 

@@ -11,18 +11,16 @@ let PopupWidget = React.createClass({
   ],
 
   propTypes: {
-    children: React.PropTypes.node,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    popupContainer: React.PropTypes.object
+    children: React.PropTypes.node
   },
 
 
   render() {
 
-    let {children, layerContainer, map, popupContainer} = this.props;
+    let {children} = this.props;
 
 console.log('PopupWidget props: %o', this.props);
+console.log('PopupWidget context: %o', this.context);
 
     if (children instanceof Array) {
       children = children[0];
@@ -31,9 +29,6 @@ console.log('PopupWidget props: %o', this.props);
     return (
       <Popup
         children={children}
-        layerContainer={layerContainer}
-        map={map}
-        popupContainer={popupContainer}
       />
     );
 

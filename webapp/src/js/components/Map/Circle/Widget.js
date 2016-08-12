@@ -12,15 +12,12 @@ let CircleWidget = React.createClass({
 
   propTypes: {
     center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
-    popupContainer: React.PropTypes.object,
     radius: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
   },
 
   render() {
 
-    let {center, layerContainer, map, popupContainer, radius} = this.props;
+    let {center, radius} = this.props;
 
 console.log('CircleWidget props: %o', this.props);
 
@@ -59,9 +56,6 @@ console.log('CircleWidget props: %o', this.props);
     return (
       <Circle
         children={null}
-        layerContainer={layerContainer}
-        map={map}
-        popupContainer={popupContainer}
         {...adaptedProps}
       />
     );

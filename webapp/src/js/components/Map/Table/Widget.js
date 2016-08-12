@@ -46,8 +46,6 @@ let TableMapWidget = React.createClass({
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
 
-console.log('TableMapWidget props: %o', this.props);
-
     return (
       <MapWidget style={widgetStyle}>
         <FeatureGroupWidget>

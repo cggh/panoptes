@@ -17,6 +17,8 @@ export default class Divicon extends MapLayer {
     const { map: _map, layerContainer: _lc, position, ...props } = this.props;
     this.icon = new DivIcon(props);
     this.leafletElement = marker(position, { icon: this.icon,  ...props });
+    this.leafletElement.on('add', this.renderContent.bind(this));
+    this.leafletElement.on('remove', this.removeContent.bind(this));
   }
   componentDidMount() {
     super.componentDidMount();
@@ -42,6 +44,7 @@ export default class Divicon extends MapLayer {
         this.leafletElement.dragging.disable();
       }
     }
+    //this.renderContent();
   }
 
   renderContent() {
@@ -55,7 +58,16 @@ export default class Divicon extends MapLayer {
 
   }
 
+  removeContent() {
+  	const container = this.leafletElement._icon;
+    if(container){
+  		unmountComponentAtNode(container);
+    }
+  }
+
   render() {
+console.log('DivIcon props: %o', this.props);
+console.log('DivIcon context: %o', this.context);
     return null;
   }
 }

@@ -11,10 +11,13 @@ let TileLayerWidget = React.createClass({
     FluxMixin
   ],
 
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
   propTypes: {
     attribution: React.PropTypes.string,
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object,
     url: React.PropTypes.string.isRequired
   },
 
@@ -26,8 +29,7 @@ let TileLayerWidget = React.createClass({
   },
 
   render() {
-    let {attribution, layerContainer, map, url} = this.props;
-console.log('TileLayerWidget props: %o', this.props);
+    let {attribution, url} = this.props;
 
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
@@ -35,8 +37,6 @@ console.log('TileLayerWidget props: %o', this.props);
       <TileLayer
         attribution={attribution}
         children={null}
-        layerContainer={layerContainer}
-        map={map}
         url={url}
       />
     );
