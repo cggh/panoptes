@@ -73,7 +73,7 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     return result
 
 
-def select_by_list(properties, row_idx, col_idx, first_dimension):
+def select_by_list(properties, row_idx, col_idx):
     num_cells = len(col_idx) * len(row_idx)
     arities = {}
     for prop, array in properties.items():
@@ -82,20 +82,11 @@ def select_by_list(properties, row_idx, col_idx, first_dimension):
         else:
             arities[prop] = array.shape[2]
     coords = {}
-    if first_dimension == 'row':
-        for arity in arities.values():
-            if arity == 1:
-                coords[arity] = [(row, col) for row in row_idx for col in col_idx]
-            else:
-                coords[arity] = [(row, col, i) for row in row_idx for col in col_idx for i in xrange(arity)]
-    elif first_dimension == 'column':
-        for arity in arities.values():
-            if arity == 1:
-                coords[arity] = [(col, row) for row in row_idx for col in col_idx]
-            else:
-                coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
-    else:
-        print "Bad first_dimension"
+    for arity in arities.values():
+        if arity == 1:
+            coords[arity] = [(col, row) for row in row_idx for col in col_idx]
+        else:
+            coords[arity] = [(col, row, i) for row in row_idx for col in col_idx for i in xrange(arity)]
 
     result = {}
     for prop, array in properties.items():
@@ -133,7 +124,7 @@ def response(request_data):
     return request_data
 
 
-def extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_properties):
+def extract2D(dataset, datatable, row_idx, col_idx, two_d_properties):
     hdf5_file = h5py.File(os.path.join(config.BASEDIR, '2D_data', dataset + '_' + datatable + '.hdf5'), 'r')
     two_d_properties = dict((prop, None) for prop in two_d_properties)
     for prop in two_d_properties.keys():
@@ -143,7 +134,7 @@ def extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_prope
         for prop in two_d_properties.keys():
             two_d_result[prop] = np.array([], dtype=two_d_properties[prop].id.dtype)
     else:
-        two_d_result = select_by_list(two_d_properties, row_idx, col_idx, first_dimension)
+        two_d_result = select_by_list(two_d_properties, row_idx, col_idx)
     return two_d_result
 
 def summarise_call(calls):
@@ -180,7 +171,6 @@ def handler(start_response, request_data):
         except KeyError:
             pass
         row_order = 'NULL'
-    first_dimension = request_data['first_dimension']
     try:
         col_limit = int(request_data['col_limit'])
     except KeyError:
@@ -214,6 +204,7 @@ def handler(start_response, request_data):
         sort_mode = request_data['sort_mode']
     except KeyError:
         sort_mode = None
+
 
 
     col_index_field = datatable + '_column_index'
@@ -261,12 +252,13 @@ def handler(start_response, request_data):
 
         col_idx = col_result[col_index_field]
         row_idx = row_result[row_index_field]
+        del col_result[col_index_field]
+        del row_result[row_index_field]
         if len(col_idx) == col_fail_limit:
             result_set = [('_over_col_limit', np.array([0], dtype='i1'))]
+            for name, array in row_result.items():
+                result_set.append((('row_'+name), array))
         else:
-            del col_result[col_index_field]
-            del row_result[row_index_field]
-
             if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
                 sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
@@ -280,7 +272,7 @@ def handler(start_response, request_data):
                 #Sort by the order specified - reverse so last clicked is major sort
                 sort_col_idx = list(reversed(map(lambda key: idx_for_col[key], row_order_columns)))
                 #grab the data needed to sort
-                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, first_dimension, [row_sort_property])
+                sort_data = extract2D(dataset, datatable, row_idx, sort_col_idx, [row_sort_property])
                 rows = zip(row_idx, sort_data[row_sort_property])
                 if sort_mode == 'call':
                     polyploid_key_func = lambda row: ''.join(summarise_call(calls) for calls in row[1])
@@ -306,7 +298,7 @@ def handler(start_response, request_data):
                 for name, array in row_result.items():
                     row_result[name] = array[[row_pos_for_idx[idx] for idx in row_idx]]
 
-            two_d_result = extract2D(dataset, datatable, row_idx, col_idx, first_dimension, two_d_properties)
+            two_d_result = extract2D(dataset, datatable, row_idx, col_idx, two_d_properties)
 
             result_set = []
             for name, array in col_result.items():
@@ -319,7 +311,9 @@ def handler(start_response, request_data):
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),
-                        ('Content-Encoding', 'gzip')]
+                        ('Content-Encoding', 'gzip'),
+                        ('Access-Control-Allow-Origin', '*')
+                        ]
     start_response(status, response_headers)
     yield data
 

@@ -126,7 +126,6 @@ CREATE TABLE `2D_tablecatalog` (
   `name` varchar(255),
   `col_table` varchar(255),
   `row_table` varchar(255),
-  `first_dimension` varchar(255),
   `settings` text,
   `ordr` int
 );

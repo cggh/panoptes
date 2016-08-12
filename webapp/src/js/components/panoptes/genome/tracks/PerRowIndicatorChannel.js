@@ -18,6 +18,7 @@ import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
+import {hatchRect} from 'util/CanvasDrawing';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
@@ -81,6 +82,10 @@ let PerRowIndicatorChannel = React.createClass({
     this.tooBigBlocks = [];
   },
 
+  componentDidMount() {
+    this.draw();
+  },
+
   componentDidUpdate() {
     this.draw();
   },
@@ -124,15 +129,20 @@ let PerRowIndicatorChannel = React.createClass({
         database: this.config.dataset,
         table,
         columns: columnspec,
-        query,
+        query: SQL.WhereClause.encode(query),
         transpose: false,
+      };
+      let cacheArgs = {
+        method: 'pageQuery',
         regionField: tableConfig.position,
+        queryField: 'query',
+        limitField: 'stop',
         start,
         end,
         blockLimit: 1000
       };
       requestContext.request((componentCancellation) =>
-        regionCacheGet(APIargs, componentCancellation)
+        regionCacheGet(APIargs, cacheArgs, componentCancellation)
           .then((blocks) => {
             this.props.onChangeLoadStatus('DONE');
             this.applyData(this.props, blocks);
@@ -145,14 +155,14 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
           this.applyData(this.props, {});
-          ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+          ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
         });
     }
     this.draw(props);
   },
 
   combineBlocks(blocks, property) {
-    return _transform(blocks, (sum, block) =>
+    return _transform(_filter(blocks, (block) => !block._tooBig), (sum, block) =>
       Array.prototype.push.apply(sum, block[property] || []),
     []);
   },
@@ -174,7 +184,6 @@ let PerRowIndicatorChannel = React.createClass({
     //Filter out big blocks and merge neighbouring ones.
     this.tooBigBlocks = _transform(_filter(blocks, {_tooBig: true}), (merged, block) => {
       const lastBlock = merged[merged.length - 1];
-      //if (lastBlock) console.log(lastBlock._blockStart + lastBlock._blockSize, block._blockStart);
       if (lastBlock && lastBlock._blockStart + lastBlock._blockSize === block._blockStart) {
         //Copy to avoid mutating the cache
         merged[merged.length - 1] = {...lastBlock, _blockSize: lastBlock._blockSize + block._blockSize};
@@ -223,7 +232,7 @@ let PerRowIndicatorChannel = React.createClass({
       const pixelStart = scaleFactor * (block._blockStart - start);
       const pixelSize = scaleFactor * ( block._blockSize);
       const textPos = (pixelStart < 0 && pixelStart + pixelSize > width - sideWidth) ? (width - sideWidth) / 2 : pixelStart + (pixelSize / 2);
-      this.hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
+      hatchRect(ctx, pixelStart, psy, pixelSize, 24, 8);
       if (pixelSize > 100) {
         ctx.save();
         ctx.fillStyle = 'black';
@@ -239,10 +248,10 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.restore();
     //Triangles/Lines
     psy = (HEIGHT / 2) - 6;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     const numPositions = positions.length;
     const triangleMode = numPositions < (width - sideWidth);
+    ctx.strokeStyle = triangleMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)';
+    ctx.fillStyle = 'rgba(214, 39, 40, 0.6)';
     for (let i = 0, l = numPositions; i < l; ++i) {
       const psx = scaleFactor * (positions[i] - start);
       if (psx > -6 && psx < width + 6) {

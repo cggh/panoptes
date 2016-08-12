@@ -96,16 +96,13 @@ class Import2DDataTable(BaseImport):
                 is_position = self._dao._execSqlQuery(sql)[0][0]
                 if not is_position:
                     raise Exception(table_settings['columnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
-            if table_settings['firstArrayDimension'] not in ['column', 'row']:
-                raise Exception("firstArrayDimension must be column or row")
-    
+
             # Add to tablecatalog
-            sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', {6})".format(
+            sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
                 tableid,
                 table_settings['namePlural'],
                 table_settings['columnDataTable'],
                 table_settings['rowDataTable'],
-                table_settings['firstArrayDimension'],
                 table_settings.serialize(),
                 self.tableOrder
             )
@@ -167,7 +164,7 @@ class Import2DDataTable(BaseImport):
                         if arity > 1:
                             chunks.append(arity)
                         prop_out = local_hdf5.create_dataset(prop['id'], prop_in.shape, prop_in.dtype, chunks=tuple(chunks), maxshape=prop_in.shape, compression='gzip', fletcher32=False, shuffle=False)
-                        self._hdf5_copy(prop_in, prop_out, limit=(None, max_line_count) if table_settings['firstArrayDimension'] == 'row' else (max_line_count, None))
+                        self._hdf5_copy(prop_in, prop_out, limit=(max_line_count, None))
                         print "done"
                     print "all copies complete"
                     local_hdf5.close()

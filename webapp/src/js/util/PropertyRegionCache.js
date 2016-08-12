@@ -18,23 +18,22 @@ export function findBlock({start, end}) {
   };
 }
 
-export function regionCacheGet(options, cancellation = null) {
-  assertRequired(options,
-    ['database', 'table', 'columns', 'query', 'regionField', 'start', 'end', 'blockLimit']);
-  const {database, table, columns, query, regionField, start, end, blockLimit} = options;
+export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
+  assertRequired(cacheArgs,
+    ['method', 'regionField', 'queryField', 'limitField', 'start', 'end', 'blockLimit']);
+  const {method, regionField, queryField, limitField, start, end, blockLimit} = cacheArgs;
   if (end < start) {
     throw Error('PropertyRegionCache, end must be >= start');
   }
-  const cacheKey = JSON.stringify({database, table, columns, query: SQL.WhereClause.encode(query), regionField, blockLimit});
+  const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   //Find the 2 blocks that encapsulate us
-  const {blockLevel, blockIndex, needNext} = findBlock(options);
+  const {blockLevel, blockIndex, needNext} = findBlock(cacheArgs);
   // const blockSize = Math.pow(2.0, blockLevel);
   // const blockStart = blockSize * blockIndex;
-
-  let blocks = [fetch(options, blockLevel, blockIndex, cancellation)
-                  .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation)),
-                fetch(options, blockLevel, blockIndex + 1, cancellation)
-                  .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex + 1, cancellation))];
+  let blocks = [fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
+                  .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
+                fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+                  .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))];
   //If end isn't in the second block then don't bother with it
   if (!needNext) {
     blocks = [blocks[0]];
@@ -52,45 +51,43 @@ export function regionCacheGet(options, cancellation = null) {
   let index2 = ~~(blockIndex + 1 / 2);
   for (let level = blockLevel + 1; level < seenBlocksForKey.length; ++level, index = ~~(index / 2), index2 = ~~(index2 / 2)) {
     if (seenBlocksForKey[level] && seenBlocksForKey[level][index] && seenBlocksForKey[level][index2]) {
-      return Promise.all((index === index2) ? [fetch(options, level, index, cancellation)]
-                                            : [fetch(options, level, index, cancellation),
-                                               fetch(options, level, index2, cancellation)])
-        .then(ifTooBigFetchDirectly(options, blockLevel, blockIndex, cancellation));
+      return Promise.all((index === index2) ? [fetch(APIArgs, cacheArgs, level, index, cancellation)]
+                                            : [fetch(APIArgs, cacheArgs, level, index, cancellation),
+                                               fetch(APIArgs, cacheArgs, level, index2, cancellation)])
+        .then(ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation));
     }
   }
   //Oh well, all the cached blocks were smaller or didn't contain us, might as well fetch
-  return Promise.all([fetch(options, blockLevel, blockIndex, cancellation)
-                        .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation)),
-                      fetch(options, blockLevel, blockIndex + 1, cancellation)
-                        .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex + 1, cancellation))])
+  return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
+                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
+                      fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
     .then(flatten);
 }
 
-function fetch(options, blockLevel, blockIndex, cancellation) {
-  const {database, table, columns, query, regionField, blockLimit} = options;
-  const cacheKey = JSON.stringify({database, table, columns, query: SQL.WhereClause.encode(query), regionField, blockLimit});
+function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
+  let {method, regionField, queryField, limitField, blockLimit, postProcessBlock, isBlockTooBig} = cacheArgs;
+  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].length <= blockLimit));
+  const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   const blockSize = Math.pow(2.0, blockLevel);
   const blockStart = blockSize * blockIndex;
-  const combinedQuery = SQL.WhereClause.AND([query,
+  const combinedQuery = SQL.WhereClause.AND([SQL.WhereClause.decode(APIArgs[queryField]),
     SQL.WhereClause.CompareFixed(regionField, '>=', blockStart),
     SQL.WhereClause.CompareFixed(regionField, '<', blockStart + blockSize)]);
-  let APIargs = {
-    database,
-    table,
-    columns,
-    query: SQL.WhereClause.encode(combinedQuery),
-    transpose: false,
-    stop: blockLimit + 1
+  APIArgs = {
+    ...APIArgs,
+    [queryField]: SQL.WhereClause.encode(combinedQuery),
+    [limitField]: blockLimit + 1
   };
   return LRUCache.get(
-    'propertyRegionCache' + JSON.stringify(APIargs),
+    'propertyRegionCache' + method + JSON.stringify(APIArgs),
     (cacheCancellation) =>
-      API.pageQuery({cancellation: cacheCancellation, ...APIargs})
+      API[method]({cancellation: cacheCancellation, ...APIArgs})
         .then((block) => {
-          if (block[_keys(block)[0]].length <= blockLimit) {
-            return {_blockStart: blockStart, _blockSize: blockSize, ...block};
+          if (isBlockTooBig(block, blockLimit)) {
+            return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true, ...block};
           } else {
-            return {_blockStart: blockStart, _blockSize: blockSize, _tooBig: true};
+            return {_blockStart: blockStart, _blockSize: blockSize, ...(postProcessBlock ? postProcessBlock(block) : block)};
           }
         }),
     cancellation
@@ -104,7 +101,7 @@ function fetch(options, blockLevel, blockIndex, cancellation) {
     });
 }
 
-function ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation) {
+function ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   return (block) => {
     if (block._tooBig) {
       const jump = 3  ;
@@ -114,20 +111,20 @@ function ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation) {
       for (let block = blockIndex * blockMultipler; block < (blockIndex + 1) * blockMultipler; ++block) {
         wantedBlocks.push(block);
       }
-      return Promise.all(_map(wantedBlocks, (index) => fetch(options, newLevel, index, cancellation)));
+      return Promise.all(_map(wantedBlocks, (index) => fetch(APIArgs, cacheArgs, newLevel, index, cancellation)));
     } else {
       return block;
     }
   };
 }
 
-function ifTooBigFetchDirectly(options, blockLevel, blockIndex, cancellation) {
+function ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   return (blocks) => {
     if (_some(blocks, (block) => block._tooBig)) {
-      return Promise.all([fetch(options, blockLevel, blockIndex, cancellation)
-                            .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex, cancellation)),
-                          fetch(options, blockLevel, blockIndex + 1, cancellation)
-                            .then(ifTooBigFetchSmaller(options, blockLevel, blockIndex + 1, cancellation))])
+      return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
+                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
+                          fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
         .then(flatten);
     } else {
       return blocks;

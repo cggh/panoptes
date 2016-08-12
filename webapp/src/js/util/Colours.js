@@ -49,10 +49,11 @@ export function booleanColours() {
 }
 
 export function propertyColour(propConfig, min = null, max = null) {
-  if (!propConfig)
+  if (!propConfig) {
     return () => 'inherit';
+  }
   if (propConfig.categoryColors)
-    return (value) => propConfig.categoryColors[value] || propConfig.categoryColors['_other_'] || 'inherit';
+    return (value) => propConfig.categoryColors[value] || propConfig.categoryColors['_other_'] || '#777777';
   if (propConfig.isBoolean)
     return booleanColours();
   if (propConfig.isCategorical) {

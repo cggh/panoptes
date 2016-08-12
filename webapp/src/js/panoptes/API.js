@@ -1,4 +1,5 @@
 import qajax from 'qajax';
+import arrayBufferDecode from 'panoptes/arrayBufferDecode';
 import _keys from 'lodash/keys';
 import LZString from 'lz-string';
 import _forEach from 'lodash/forEach';
@@ -48,7 +49,7 @@ function encodeQuery(query) {
   return st;
 }
 
-function requestJSON(options, method = 'GET', data = null) {
+function request(options, method = 'GET', data = null) {
   let defaults = {
     url: initialConfig.serverURL, //eslint-disable-line no-undef
     method: method,
@@ -56,16 +57,31 @@ function requestJSON(options, method = 'GET', data = null) {
     timeout: 60000,
     data: data
   };
-
+  //Remove null params
+  for (let key in options.params) {
+    if (options.params[key] === null) {
+      delete options.params[key];
+    }
+  }
   //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with qajax.
   return qajax(Object.assign(defaults, options))
-    .then(qajax.filterSuccess)
+    .then(qajax.filterSuccess);
+}
+
+function requestJSON(options, method = 'GET', data = null) {
+  return request(options, method, data)
     .then(qajax.toJSON)
     .then(_filterError);
 }
 
+function requestArrayBuffer(options, method = 'GET', data = null) {
+  options.responseType = "arraybuffer";
+  return request(options, method, data)
+    .then(({response}) => arrayBufferDecode(response));
+}
+
 function _decodeValList(columns) {
-  return function(jsonResponse) {
+  return function (jsonResponse) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
     _forEach(columns, (encoding, id) =>
@@ -76,19 +92,19 @@ function _decodeValList(columns) {
 }
 
 function _decodeSummaryList(columns) {
-  return function(jsonResponse) {
+  return function (jsonResponse) {
     let ret = {};
     _forEach(columns, (column, key) => {
-      let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
+        let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
         //For better or worse we imitate the original behaviour of passing on a lack of data
-      if (data)
-        ret[key] = {
-          data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
-          summariser: data.summariser
-        };
-      else
-        ret[key] = null;
-    }
+        if (data)
+          ret[key] = {
+            data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
+            summariser: data.summariser
+          };
+        else
+          ret[key] = null;
+      }
     );
     return ret;
   };
@@ -462,8 +478,59 @@ function modifyConfig(options) {
 
 
 
-// TODO: Maintain an order to this list?
+function twoDPageQuery(options) {
+  assertRequired(options, ['database', 'workspace', 'datatable']);
+  let defaults = {
+    col_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+    row_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+    col_order: 'NULL',
+    row_order: 'NULL',
+    col_properties: '',
+    row_properties: '',
+    '2D_properties': '',
+    sort_mode: null,
+    row_sort_property: null,
+    row_sort_cols: '',
+    col_key: null,
+    row_offset: null,
+    row_limit: null,
+    col_fail_limit: null,
+  };
+  const {
+    database, workspace, datatable, col_qry, row_qry, col_order, row_order, col_properties,
+    row_properties, sort_mode, row_sort_property, row_sort_cols, col_key,
+    row_offset, row_limit, col_fail_limit
+  } = {...defaults, ...options};
+  const twoD_properties = {...defaults, ...options}['2D_properties'];
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestArrayBuffer({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: '2d_query',
+      dataset: database,
+      datatable,
+      workspace,
+      col_qry: encodeQuery(col_qry),
+      row_qry: encodeQuery(row_qry),
+      col_order,
+      row_order,
+      col_properties,
+      row_properties,
+      '2D_properties': twoD_properties,
+      sort_mode,
+      row_sort_property,
+      row_sort_cols,
+      col_key,
+      row_offset,
+      row_limit,
+      col_fail_limit,
+    }
+  });
+}
 
+// TODO: Maintain an order to this list?
 module.exports = {
   serverURL: initialConfig.serverURL, //eslint-disable-line no-undef
   filterAborted,
@@ -484,5 +551,6 @@ module.exports = {
   importDataset,
   importDatasetConfig,
   truncatedRowsCount,
-  modifyConfig
+  modifyConfig,
+  twoDPageQuery
 };

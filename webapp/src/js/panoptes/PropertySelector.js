@@ -29,7 +29,8 @@ const PropertySelector = React.createClass({
     value: React.PropTypes.string,
     filter: React.PropTypes.func,
     onSelect: React.PropTypes.func,
-    label: React.PropTypes.string
+    label: React.PropTypes.string,
+    allowNull: React.PropTypes.bool
   },
 
   getDefaultProps() {
@@ -39,9 +40,9 @@ const PropertySelector = React.createClass({
   },
 
   render() {
-    const {table, value, label, filter} = this.props;
+    const {table, value, label, filter, allowNull} = this.props;
 
-    let propertyMenu = [];
+    let propertyMenu = allowNull ? [<MenuItem value='NULL' primaryText="None"/>] : [];
     let i = 0;
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;
@@ -61,7 +62,7 @@ const PropertySelector = React.createClass({
     }
 
     return (
-    <SelectField value={value}
+    <SelectField value={value === 'NULL' ? undefined : value}
                  autoWidth={true}
                  floatingLabelText={label}
                  onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>

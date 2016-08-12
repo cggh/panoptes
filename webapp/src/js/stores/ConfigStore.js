@@ -6,6 +6,7 @@ const APIConst = Constants.API;
 import _forEach from 'lodash/forEach';
 import SQL from 'panoptes/SQL';
 import _values from 'lodash/values';
+import _each from 'lodash/each';
 import _filter from 'lodash/filter';
 import _cloneDeep from 'lodash/cloneDeep';
 
@@ -40,7 +41,18 @@ const ConfigStore = Fluxxor.createStore({
     this.addTableConfig(newConfig);
     this.addPropertyConfig(newConfig);
     this.addRelationConfig(newConfig);
+    this.add2DConfig(newConfig);
     return newConfig;
+  },
+
+  add2DConfig(config) {
+    config.twoDTables = [];
+    _each(config.twoDTablesById, (table, key) => {
+      table.id = key;
+      config.twoDTables.push(table);
+      table.propertiesById = {};
+      _each(table.properties, (prop) => table.propertiesById[prop.id] = prop)
+    });
   },
 
   addRelationConfig(config) {

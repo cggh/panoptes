@@ -422,7 +422,6 @@ let PerRowNumericalTrackControls = React.createClass({
           <div className="label">Auto Y Scale:</div>
           <Checkbox
             name="autoYScale"
-            value="toggleValue1"
             defaultChecked={autoYScale}
             style={{width: 'inherit'}}
             onCheck={(e, checked) => this.redirectedProps.componentUpdate({autoYScale: checked})}/>

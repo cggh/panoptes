@@ -53,19 +53,6 @@ class Settings2Dtable(ImportSettings):
                          'required': False,
                          'description': '1D Array in the HDF5 source file that gives the value of ``rowIndexField`` for each row.\n  If this is omitted then it is assumed that the HDF5 columns are in the same\n  order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``'
                          }),
-                    ('firstArrayDimension', {
-                         'type': 'Text',
-                         'required': False,
-                         'description': "Either 'row' or 'column' to indicate the first dimension in the HDF5 array.\n  'column' will generally perform better",
-                         'values':  OrderedDict(( 
-                                     ('row', {
-                                                 'description': ''
-                                                 }),
-                                     ('column', {
-                                                 'description': ''
-                                                 })
-                                     ))
-                         }),
                     ('symlinkData', {
                          'type': 'Boolean',
                          'required': False,
@@ -79,7 +66,7 @@ class Settings2Dtable(ImportSettings):
                          'children': OrderedDict((
                                       ('call', {
                                                'type': 'PropertyID',
-                                               'required': False,
+                                               'required': True,
                                                'description': 'Reference to the 2D data table property that contains call information'
                                                }),
                                       ('alleleDepth', {

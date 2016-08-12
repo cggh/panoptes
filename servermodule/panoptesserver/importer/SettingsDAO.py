@@ -439,7 +439,7 @@ class SettingsDAO(object):
             except KeyError:
                 raise Exception("HDF5 doesn't contain {0} at the root".format(table_settings[indexArray]))
             for prop in table_settings['properties']:
-                if len(index) != remote_hdf5[prop['id']].shape[0 if table_settings['firstArrayDimension'] == dimension else 1]:
+                if len(index) != remote_hdf5[prop['id']].shape[0 if dimension =='column' else 1]:
                     raise Exception("Property {0} has a different row length to the row index".format(property))
                 
             self.dropTable(tempTable)
