@@ -1,20 +1,20 @@
 import React from 'react';
-import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 
 // Mixins
-import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
+import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 
 // Lodash
-import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
+import _minBy from 'lodash/minBy';
 
 // TODO: This function is duplicated between TableMarkersLayer and PieChartMarkersLayer
 function calcBounds(markers) {
@@ -44,15 +44,14 @@ let TableMarkersLayerWidget = React.createClass({
   contextTypes: {
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    onChangeBounds: React.PropTypes.func,
-    onChangeLoadStatus: React.PropTypes.func
+    setBounds: React.PropTypes.func,
+    setLoadStatus: React.PropTypes.func
   },
 
   propTypes: {
     highlight: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func,
     primKey: React.PropTypes.string, // if not specified then all geoTable records are used
-    geoTable: React.PropTypes.string.isRequired
+    locationDataTable: React.PropTypes.string.isRequired
   },
 
   childContextTypes: {
@@ -76,21 +75,21 @@ let TableMarkersLayerWidget = React.createClass({
 console.log('e %o', e);
 console.log('marker %o', marker);
 
-    let {pieTable, primKey} = marker;
+    let {locationDataTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: pieTable, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: locationDataTable, primKey: primKey.toString(), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
 
-    let {highlight, geoTable, primKey} = props;
+    let {highlight, locationDataTable, primKey} = props;
 
-    let {onChangeBounds, onChangeLoadStatus} = this.context;
-console.log('geoTable: ' + geoTable);
-    let locationTableConfig = this.config.tablesById[geoTable];
+    let {setBounds, setLoadStatus} = this.context; //FIXME
+
+    let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
       console.error('locationTableConfig === undefined');
       return null;
@@ -101,7 +100,7 @@ console.log('geoTable: ' + geoTable);
       return null;
     }
 
-    onChangeLoadStatus('loading');
+    setLoadStatus('loading'); //FIXME
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -136,8 +135,8 @@ console.log('geoTable: ' + geoTable);
           // Fetch the single record for the specified primKey value.
           let APIargs = {
             database: this.config.dataset,
-            table: geoTable,
-            primKeyField: this.config.tablesById[geoTable].primKey,
+            table: locationDataTable,
+            primKeyField: this.config.tablesById[locationDataTable].primKey,
             primKeyValue: primKey
           };
 
@@ -176,7 +175,7 @@ console.log('geoTable: ' + geoTable);
         let markers = [];
 
         // Translate the fetched locationData into markers.
-        let locationTableConfig = this.config.tablesById[geoTable];
+        let locationTableConfig = this.config.tablesById[locationDataTable];
         let locationPrimKeyProperty = locationTableConfig.primKey;
 
         // If a primKey value has been specified then expect data to contain a single record.
@@ -186,7 +185,7 @@ console.log('geoTable: ' + geoTable);
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
           markers.push({
-            geoTable: geoTable,
+            table: locationDataTable,
             lat: parseFloat(data[locationTableConfig.latitude]),
             lng: parseFloat(data[locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
@@ -211,7 +210,7 @@ console.log('geoTable: ' + geoTable);
 
             markers.push({
               isHighlighted: isHighlighted,
-              geoTable: geoTable,
+              table: locationDataTable,
               lat: parseFloat(data[i][locationTableConfig.latitude]),
               lng: parseFloat(data[i][locationTableConfig.longitude]),
               primKey: locationDataPrimKey,
@@ -222,19 +221,15 @@ console.log('geoTable: ' + geoTable);
 
         }
 
-        this.setState({
-          markers: markers
-        });
-
-        onChangeBounds(calcBounds(markers));
-        onChangeLoadStatus('loaded');
+        this.setState({markers});
+        setBounds(calcBounds(markers)); //FIXME
+        setLoadStatus('loaded'); //FIXME
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-
-        onChangeLoadStatus('error');
+        setLoadStatus('error'); //FIXME
       });
   },
 
@@ -246,7 +241,7 @@ console.log('geoTable: ' + geoTable);
     if (!markers.length) {
       return null;
     }
-console.log('TableMarkersLayer Markers: %o', markers);
+
     let markerWidgets = [];
 
     for (let i = 0, len = markers.length; i < len; i++) {

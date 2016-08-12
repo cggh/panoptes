@@ -14,7 +14,7 @@ import PieChartMarkersLayerWidget from 'Map/PieChartMarkersLayer/Widget';
 
 <p>A map of pie charts:</p>
 <div style="position:relative;width:300px;height:300px">
-<PieChartMap geoTable="populations" pieTable="variants" primKey="SNP_00001" />
+<PieChartMap locationDataTable="populations" chartDataTable="variants" primKey="SNP_00001" />
 </div>
 
 */
@@ -25,10 +25,14 @@ let PieChartMapWidget = React.createClass({
     FluxMixin
   ],
 
-  propTypes: {
-    geoTable: React.PropTypes.string,
-    pieTable: React.PropTypes.string,
+  propTypes: { // NB: componentColumns is not easy enough to supply via template
+    locationDataTable: React.PropTypes.string,
+    chartDataTable: React.PropTypes.string,
+    componentColumns: React.PropTypes.object,
+    locationNameProperty: React.PropTypes.string,
+    locationSizeProperty: React.PropTypes.string,
     primKey: React.PropTypes.string,
+    table: React.PropTypes.string,
     title: React.PropTypes.string
   },
 
@@ -37,6 +41,25 @@ let PieChartMapWidget = React.createClass({
   },
 
   render() {
+console.log('PieChartWidget props: %o', this.props);
+
+    let {
+      locationDataTable,
+      chartDataTable,
+      componentColumns,
+      locationNameProperty,
+      locationSizeProperty,
+      primKey,
+      table
+    } = this.props;
+
+    // NB: The table prop is passed by Panoptes, e.g. DataItem/Widget
+    // The chartDataTable prop is named to distinguish it from the locationDataTable.
+    // Either "table" or "chartDataTable" can be used in templates,
+    // with chartDataTable taking preference when both are specfied.
+    if (chartDataTable === undefined && table !== undefined) {
+      chartDataTable = table;
+    }
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
@@ -46,7 +69,14 @@ let PieChartMapWidget = React.createClass({
       <MapWidget style={widgetStyle}>
         <FeatureGroupWidget>
           <TileLayerWidget />
-          <PieChartMarkersLayerWidget geoTable={this.props.geoTable} pieTable={this.props.pieTable} primKey={this.props.primKey} />
+          <PieChartMarkersLayerWidget
+            locationDataTable={locationDataTable}
+            chartDataTable={chartDataTable}
+            componentColumns={componentColumns}
+            locationNameProperty={locationNameProperty}
+            locationSizeProperty={locationSizeProperty}
+            primKey={primKey}
+          />
         </FeatureGroupWidget>
       </MapWidget>
     );

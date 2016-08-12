@@ -33,40 +33,40 @@ let MapWidget = React.createClass({
   },
 
   childContextTypes: {
-    onChangeBounds: React.PropTypes.func,
-    onChangeLoadStatus: React.PropTypes.func
+    setBounds: React.PropTypes.func,
+    setLoadStatus: React.PropTypes.func
   },
 
   title() {
     return this.props.title || 'Map';
   },
 
-  getChildContext() {
+  getChildContext() { //FIXME
     return {
-      onChangeBounds: this.handleChangeBounds,
-      onChangeLoadStatus: this.handleChangeLoadStatus
+      setBounds: this.setBounds,
+      setLoadStatus: this.setLoadStatus,
     };
   },
   getDefaultProps() {
     return {
       center: [0, 0],
-      zoom: 0,
       tileLayerAttribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+      tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      zoom: 0
     };
   },
-  getInitialState() {
+  getInitialState() { //FIXME
     return {
       bounds: undefined,
-      loadStatus: 'loaded'
+      loadStatus: 'loaded',
     };
   },
 
   // Event handlers
-  handleChangeBounds(bounds) {
+  setBounds(bounds) { //FIXME
     this.setState({bounds});
   },
-  handleChangeLoadStatus(loadStatus) {
+  setLoadStatus(loadStatus) { //FIXME
     this.setState({loadStatus});
   },
   handleDetectResize() {
@@ -76,8 +76,8 @@ let MapWidget = React.createClass({
   },
 
   render() {
-    let {tileLayerAttribution, tileLayerURL, center, children, zoom} = this.props;
-    let {bounds, loadStatus} = this.state;
+    let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
+    let {bounds, loadStatus} = this.state; //FIXME
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.

@@ -15,7 +15,6 @@ let ComponentMarkerWidget = React.createClass({
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object
   },
-
   propTypes: {
     children: React.PropTypes.node,
     onClick: React.PropTypes.func,
@@ -34,10 +33,8 @@ let ComponentMarkerWidget = React.createClass({
     let {layerContainer, map} = this.context;
     let {alt, children, onClick, position, title} = this.props;
 
-console.log('ComponentMarkerWidget props: %o', this.props);
-console.log('ComponentMarkerWidget context: %o', this.context);
-
     if (alt === undefined && title !== undefined) {
+      // If not alt has been specified, then use the title.
       alt = title;
     }
 

@@ -1,27 +1,29 @@
 import React from 'react';
-import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
+import Immutable from 'immutable';
 
 // Mixins
-import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
+import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 
 // Lodash
-import _minBy from 'lodash/minBy';
 import _maxBy from 'lodash/maxBy';
+import _minBy from 'lodash/minBy';
+import _sumBy from 'lodash/sumBy';
 
 // TODO: This function is duplicated between TableMarkersLayer and PieChartMarkersLayer
 function calcBounds(markers) {
 
   let L = window.L;
   let bounds = undefined;
-
+console.log('calcBounds markers %o', markers);
   if (markers !== undefined && markers.length >= 1) {
 
     let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
@@ -38,24 +40,27 @@ let PieChartMarkersLayerWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('geoTable', 'pieTable', 'primKey', 'highlight')
+    DataFetcherMixin('locationDataTable', 'chartDataTable', 'primKey', 'highlight')
   ],
 
-  contextTypes: {
+  contextTypes: { //FIXME
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    onChangeBounds: React.PropTypes.func,
-    onChangeLoadStatus: React.PropTypes.func
+    setBounds: React.PropTypes.func,
+    setLoadStatus: React.PropTypes.func
   },
-
   propTypes: {
-    highlight: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func,
-    pieTable: React.PropTypes.string.isRequired,
+    defaultResidualFractionName: React.PropTypes.string,
+    defaultResidualSectorColor: React.PropTypes.string,
+    chartDataTable: React.PropTypes.string.isRequired,
+    componentColumns: React.PropTypes.object.isRequired,
     primKey: React.PropTypes.string.isRequired,
-    geoTable: React.PropTypes.string.isRequired
+    locationDataTable: React.PropTypes.string.isRequired,
+    locationNameProperty: React.PropTypes.string,
+    locationSizeProperty: React.PropTypes.string,
+    residualFractionName: React.PropTypes.string,
+    residualSectorColor: React.PropTypes.string
   },
-
   childContextTypes: {
     onClickMarker: React.PropTypes.func
   },
@@ -65,7 +70,12 @@ let PieChartMarkersLayerWidget = React.createClass({
       onClickMarker: this.handleClickMarker
     };
   },
-
+  getDefaultProps() {
+    return {
+      defaultResidualFractionName: 'Other',
+      defaultResidualSectorColor: 'rgb(191,191,191)'
+    };
+  },
   getInitialState() {
     return {
       markers: []
@@ -77,26 +87,32 @@ let PieChartMarkersLayerWidget = React.createClass({
 console.log('e %o', e);
 console.log('marker %o', marker);
 
-    let {pieTable, primKey} = marker;
+    let {chartDataTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: pieTable, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: chartDataTable, primKey: primKey.toString(), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
+console.log('fetchData props: %o', props);
+    let {
+      defaultResidualFractionName,
+      defaultResidualSectorColor,
+      locationDataTable,
+      locationNameProperty,
+      locationSizeProperty,
+      primKey,
+      chartDataTable,
+      componentColumns,
+      residualFractionName,
+      residualSectorColor
+    } = props;
 
-    let {highlight, geoTable, primKey, pieTable} = props;
+    let {setBounds, setLoadStatus} = this.context; //FIXME
 
-    //FIXME
-    primKey = undefined;
-
-
-    let {onChangeBounds, onChangeLoadStatus} = this.context;
-console.log('geoTable: ' + geoTable);
-console.log('pieTable: ' + pieTable);
-    let locationTableConfig = this.config.tablesById[geoTable];
+    let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
       console.error('locationTableConfig === undefined');
       return null;
@@ -107,7 +123,7 @@ console.log('pieTable: ' + pieTable);
       return null;
     }
 
-    onChangeLoadStatus('loading');
+    setLoadStatus('loading');
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -122,158 +138,130 @@ console.log('pieTable: ' + pieTable);
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
-    if (highlight) {
-      let [highlightField] = highlight.split(':');
-      if (highlightField) {
-        locationColumns.push(highlightField);
-      }
+    if (locationNameProperty) {
+      locationColumns.push(locationNameProperty);
+    }
+
+    if (locationSizeProperty) {
+      locationColumns.push(locationSizeProperty);
     }
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
 
+    let locationAPIargs = {
+      database: this.config.dataset,
+      table: locationTableConfig.fetchTableName,
+      columns: locationColumnsColumnSpec
+    };
+
+    let chartAPIargs = {
+      database: this.config.dataset,
+      table: chartDataTable,
+      primKeyField: this.config.tablesById[chartDataTable].primKey,
+      primKeyValue: primKey
+    };
+
     requestContext.request(
-      (componentCancellation) => {
-
-        // If a primKey value has been specified, then fetch that single record,
-        // Otherwise, do a page query.
-        if (primKey) {
-
-          // Fetch the single record for the specified primKey value.
-          let APIargs = {
-            database: this.config.dataset,
-            table: geoTable,
-            primKeyField: this.config.tablesById[geoTable].primKey,
-            primKeyValue: primKey
-          };
-
-          return LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(APIargs), (cacheCancellation) =>
-              API.fetchSingleRecord({
-                cancellation: cacheCancellation,
-                ...APIargs
-              }),
-            componentCancellation
-          );
-
-        } else {
-
-          // If no primKey is provided, then get all markers using the specified table.
-          let locationAPIargs = {
-            database: this.config.dataset,
-            table: locationTableConfig.fetchTableName,
-            columns: locationColumnsColumnSpec
-          };
-
-          return LRUCache.get(
+      (componentCancellation) =>
+        Promise.all([
+          LRUCache.get(
             'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
               API.pageQuery({
                 cancellation: cacheCancellation,
                 ...locationAPIargs
               }),
             componentCancellation
-          );
-
-        }
-
-      })
-      .then((data) => {
-
-        let markers = [];
-
-        // Translate the fetched locationData into markers.
-        let locationTableConfig = this.config.tablesById[geoTable];
+          ),
+          LRUCache.get(
+            'fetchSingleRecord' + JSON.stringify(chartAPIargs), (cacheCancellation) =>
+              API.fetchSingleRecord({
+                cancellation: cacheCancellation,
+                ...chartAPIargs
+              }),
+            componentCancellation
+          )
+        ])
+      )
+      .then(([locationData, chartData]) => {
+        let markers = Immutable.List();
+        // Translate the fetched locationData and chartData into markers.
+        let locationTableConfig = this.config.tablesById[locationDataTable];
         let locationPrimKeyProperty = locationTableConfig.primKey;
+console.log('locationData %o', locationData);
+console.log('componentColumns %o', componentColumns);
+        for (let i = 0; i < locationData.length; i++) {
+          let markerChartData = [];
+          let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
 
-        // If a primKey value has been specified then expect data to contain a single record.
-        // Otherwise data should contain an array of records.
-        if (primKey) {
-
-          let locationDataPrimKey = data[locationPrimKeyProperty];
-
-          markers.push({
-            geoTable: geoTable,
-            lat: parseFloat(data[locationTableConfig.latitude]),
-            lng: parseFloat(data[locationTableConfig.longitude]),
-            pieTable: pieTable,
-            primKey: locationDataPrimKey,
-            title: locationDataPrimKey,
-          });
-
-        } else {
-
-          let highlightField, highlightValue = null;
-          if (highlight) {
-            [highlightField, highlightValue] = highlight.split(':');
+          for (let j = 0; j < componentColumns.length; j++) {
+            let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
+            markerChartData.push({
+              name: componentColumns[j].name,
+              value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
+              color: componentColumns[j].color
+            });
           }
 
-          for (let i = 0; i < data.length; i++) {
-
-            let locationDataPrimKey = data[i][locationPrimKeyProperty];
-
-            let isHighlighted = false;
-            if (highlightField !== null && highlightValue !== null) {
-              isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
-            }
-
-            markers.push({
-              isHighlighted: isHighlighted,
-              geoTable: geoTable,
-              lat: parseFloat(data[i][locationTableConfig.latitude]),
-              lng: parseFloat(data[i][locationTableConfig.longitude]),
-              pieTable: pieTable,
-              primKey: locationDataPrimKey,
-              title: locationDataPrimKey,
+          // NB: undefined == null, undefined !== null
+          let sum = _sumBy(markerChartData, 'value');
+          if (sum < 1)
+            markerChartData.push({
+              name: residualFractionName != null ? residualFractionName : defaultResidualFractionName,
+              value: (1 - sum).toFixed(2),
+              color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
             });
 
-          }
-
+          markers = markers.push(Immutable.fromJS({
+            key: i,
+            lat: locationData[i][locationTableConfig.latitude],
+            lng: locationData[i][locationTableConfig.longitude],
+            name: locationData[i][locationNameProperty],
+            radius: Math.sqrt(locationData[i][locationSizeProperty]),
+            chartData: markerChartData,
+            locationTable: locationDataTable,
+            locationPrimKey: locationDataPrimKey
+          }));
         }
 
-        this.setState({
-          markers: markers
-        });
-
-        onChangeBounds(calcBounds(markers));
-        onChangeLoadStatus('loaded');
+        this.setState({markers});
+        setBounds(calcBounds(markers)); //FIXME
+        setLoadStatus('loaded');
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
-        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-
-        onChangeLoadStatus('error');
+        ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+        setLoadStatus('error');
       });
   },
 
   render() {
-
+console.log('PieChartMarkersLayer props: %o', this.props);
     let {layerContainer, map} = this.context;
     let {markers} = this.state;
-
-    if (!markers.length) {
+console.log('PieChartMarkersLayer Markers: %o', markers);
+    if (!markers.size) {
       return null;
     }
-console.log('PieChartMarkersLayer Markers: %o', markers);
+
     let markerWidgets = [];
 
-    for (let i = 0, len = markers.length; i < len; i++) {
+    for (let i = 0, len = markers.size; i < len; i++) {
 
-      let marker = markers[i];
-
+      let marker = markers.get(i);
+console.log('marker: %o', marker);
       // TODO: Use PieChartWidget instead of svg
-/*
-<svg height="24" width="24">
-  <circle cx="12" cy="12" r="10" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
-</svg>
-*/
+
       markerWidgets.push(
         <ComponentMarkerWidget
           key={i}
-          position={[marker.lat, marker.lng]}
-          title={marker.title}
+          position={[marker.get('lat'), marker.get('lng')]}
+          title={marker.get('title')}
           onClick={(e) => this.handleClickMarker(e, marker)}
-        />
+        >
+          <b style={{background: 'white', border: 'solid 1px black'}}>{i}</b>
+        </ComponentMarkerWidget>
       );
 
     }

@@ -34,15 +34,11 @@ let FeatureGroupWidget = React.createClass({
 
   render() {
     let {children} = this.props;
-console.log('FeatureGroupWidget props: %o', this.props);
-console.log('FeatureGroupWidget context: %o', this.context);
-
     return (
       <FeatureGroup
         children={children}
       />
     );
-
   }
 
 });

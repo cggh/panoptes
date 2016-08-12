@@ -32,20 +32,21 @@ function getViews(dataItemViews, hasGeoCoord) {
             title: 'Overview'
           }
         }),
-        PieChartMap: () => ({
+        PieChartMap: () => {
+          console.log('dataItemView: %o', dataItemView);
+
+          return {
           component: 'Map/Chart/Pie',
           props: {
+            center: [dataItemView.mapCenter.latitude, dataItemView.mapCenter.longitude],
+            componentColumns: dataItemView.componentColumns,
+            locationDataTable: dataItemView.locationDataTable,
+            locationNameProperty: dataItemView.locationNameProperty,
+            locationSizeProperty: dataItemView.locationSizeProperty,
             title: dataItemView.name,
-            chartConfig: dataItemView
+            residualFractionName: dataItemView.residualFractionName
           }
-        }),
-        BarChartMap: () => ({
-          component: 'Map/Chart/Bar',
-          props: {
-            title: dataItemView.name,
-            chartConfig: dataItemView
-          }
-        }),
+        };},
         ItemMap: () => ({
           view: 'Map/Table',
           props: {

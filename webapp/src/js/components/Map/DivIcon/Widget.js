@@ -26,7 +26,6 @@ export default class Divicon extends MapLayer {
   }
 
   componentDidUpdate(prevProps) {
-    this.renderContent();
     if (this.props.position !== prevProps.position) {
       this.leafletElement.setLatLng(this.props.position);
     }
@@ -44,7 +43,7 @@ export default class Divicon extends MapLayer {
         this.leafletElement.dragging.disable();
       }
     }
-    //this.renderContent();
+    this.renderContent();
   }
 
   renderContent() {
@@ -66,8 +65,6 @@ export default class Divicon extends MapLayer {
   }
 
   render() {
-console.log('DivIcon props: %o', this.props);
-console.log('DivIcon context: %o', this.context);
     return null;
   }
 }
