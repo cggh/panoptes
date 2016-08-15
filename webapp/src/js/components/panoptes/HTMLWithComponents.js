@@ -1,17 +1,28 @@
 import React from 'react';
 import HtmlToReact from 'html-to-react';
-import ItemMap from 'containers/item_views/ItemMap';
+
 import ItemLink from 'panoptes/ItemLink';
-// import ComponentWrapper from 'panoptes/ComponentWrapper';
 import TreeContainer from 'containers/TreeContainer';
 import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
+import MapWidget from 'Map/Widget';
+import TileLayerWidget from 'Map/TileLayer/Widget';
+import BaseLayerWidget from 'Map/BaseLayer/Widget';
+import MarkerWidget from 'Map/Marker/Widget';
+import CircleWidget from 'Map/Circle/Widget';
+import RectangleWidget from 'Map/Rectangle/Widget';
+import OverlayWidget from 'Map/Overlay/Widget';
+import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import PopupWidget from 'Map/Popup/Widget';
+import LayersControlWidget from 'Map/LayersControl/Widget';
+import TableMapWidget from 'Map/Table/Widget';
+import PieChartMapWidget from 'Map/Chart/Pie/Widget';
+
+
+// TODO: Deprecate ItemMap template component in favour of TableMap
 
 /*eslint-disable react/display-name */
 const components = {
-  ItemMap: (node, children) =>
-    //<ComponentWrapper key={node.attribs.key}><ItemMap {...node.attribs} key={null} /></ComponentWrapper>,
-    <ItemMap key={node.attribs.key} {...node.attribs} />,
   ItemLink: (node, children) =>
     <ItemLink key={node.attribs.key} {...node.attribs} />,
   Tree: (node, children) =>
@@ -19,7 +30,31 @@ const components = {
   Plot: (node, children) =>
     <PlotContainer key={node.attribs.key} {...node.attribs} />,
   PopupButton: (node, children) =>
-    <PopupButton key={node.attribs.key} {...node.attribs} />
+    <PopupButton key={node.attribs.key} {...node.attribs} />,
+  Map: (node, children) =>
+    <MapWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  LayersControl: (node, children) =>
+    <LayersControlWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  BaseLayer: (node, children) =>
+    <BaseLayerWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  TileLayer: (node, children) =>
+    <TileLayerWidget key={node.attribs.key} {...node.attribs} />,
+  FeatureGroup: (node, children) =>
+    <FeatureGroupWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Marker: (node, children) =>
+    <MarkerWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Popup: (node, children) =>
+    <PopupWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Overlay: (node, children) =>
+    <OverlayWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  Circle: (node, children) =>
+    <CircleWidget key={node.attribs.key} {...node.attribs} />,
+  Rectangle: (node, children) =>
+    <RectangleWidget key={node.attribs.key} {...node.attribs} />,
+  TableMap: (node, children) =>
+    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
+  PieChartMap: (node, children) =>
+    <PieChartMapWidget key={node.attribs.key} {...node.attribs} />
 };
 /*eslint-enable react/display-name */
 
@@ -40,8 +75,7 @@ let HTMLWithComponents = React.createClass({
     let processingInstructions = [
       {
         shouldProcessNode: (node) => true,
-        processNode: (node, children) =>
-          (components[node.name] || defaultProcess)(node, children)
+        processNode: (node, children) => (components[node.name] || defaultProcess)(node, children)
       }
     ];
     let isValidNode = () => true;
@@ -59,4 +93,3 @@ let HTMLWithComponents = React.createClass({
 });
 
 module.exports = HTMLWithComponents;
-

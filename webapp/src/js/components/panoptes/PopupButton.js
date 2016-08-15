@@ -4,8 +4,11 @@ import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 import RaisedButton from 'material-ui/RaisedButton';
 
+// TODO: Deprecate ItemMap in favour of TableMap or Map
+
 const componentTranslation = {
-  ItemMap: 'containers/MapWithActions',
+  ItemMap: 'Map/Table/Actions',
+  Map: 'Map/Table/Actions',
   Tree: 'containers/TreeWithActions',
   Plot: 'containers/PlotWithActions'
 };

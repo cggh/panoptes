@@ -141,6 +141,13 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
+
+    flux.setDispatchInterceptor((action, dispatch) =>
+      ReactDOM.unstable_batchedUpdates(() =>
+        dispatch(action)
+      )
+    );
+
     ReactDOM.render(
       <div>
         <Loading status="done"/>
@@ -184,6 +191,12 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     };
 
     let flux = new Fluxxor.Flux(stores, actions);
+
+    flux.setDispatchInterceptor((action, dispatch) =>
+      ReactDOM.unstable_batchedUpdates(() =>
+        dispatch(action)
+      )
+    );
 
     ReactDOM.render(
       <div>

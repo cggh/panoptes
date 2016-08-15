@@ -11,12 +11,12 @@ import ConfigMixin from 'mixins/ConfigMixin';
 // UI components
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
-import DataItemActions from 'panoptes/DataItemActions';
+import DataItemActions from 'DataItem/Actions';
 
-let dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./item_views/' + path);
+let dynreq = require.context('..', true);
+const dynamicRequire = (path) => dynreq('./' + path + '/Widget');
 
-let DataItem = React.createClass({
+let DataItemWidget = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -30,7 +30,7 @@ let DataItem = React.createClass({
     activeTab: React.PropTypes.string,
     views: ImmutablePropTypes.listOf(
       ImmutablePropTypes.contains({
-        view: React.PropTypes.string.isRequired,
+        component: React.PropTypes.string.isRequired,
         props: ImmutablePropTypes.map
       })).isRequired
   },
@@ -65,7 +65,7 @@ let DataItem = React.createClass({
                 <TabPane
                   compId={viewId}
                   key={viewId}>
-                  {React.createElement(dynamicRequire(view.view),
+                  {React.createElement(dynamicRequire(view.component),
                     Object.assign(props,
                       {table, primKey},
                       {
@@ -93,4 +93,4 @@ let DataItem = React.createClass({
 
 });
 
-module.exports = DataItem;
+module.exports = DataItemWidget;

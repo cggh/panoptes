@@ -40,7 +40,7 @@ let ViewList = React.createClass({
           <ListItem primaryText="Dataset Manager"
                     secondaryText="Import and configure datasets"
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'DatasetManager/Actions', {})}/>
+                    onClick={(e) => this.handleOpen(e, 'Dataset/Manager/Actions', {})}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Genome Browser"
@@ -60,7 +60,7 @@ let ViewList = React.createClass({
                     style={{opacity: hasGeo ? '1' : '0.5'}}
                     secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={hasGeo ? (e) => this.handleOpen(e, 'containers/MapWithActions', {}) : null }/>
+                    onClick={hasGeo ? (e) => this.handleOpen(e, 'Map/Table/Actions', {}) : null }/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Tree"

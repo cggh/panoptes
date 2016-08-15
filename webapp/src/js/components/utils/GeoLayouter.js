@@ -38,7 +38,6 @@ let GeoLayouter = React.createClass({
   getDefaultProps() {
     return {
       nodes: Immutable.List(),
-      positionOffsetFraction: 0, // TODO: Deprecate?
       zoom: 1
     };
   },
@@ -63,10 +62,6 @@ let GeoLayouter = React.createClass({
     // TODO: .size([width, height]) according to box size
     //let width = 1500, height = 1400;
     //this.force.size([width, height]); // Affects the gravitational center, i.e. [ x/2, y/2 ]
-
-    // tmp
-    this.force.on('start', this.onStarted);
-    this.force.on('end', this.onStopped);
 
   },
 
@@ -137,12 +132,6 @@ let GeoLayouter = React.createClass({
     _each(this.renderNodes, (node) =>
       q.visit(this.collide(node))
     );
-  },
-
-  onStarted() {
-  },
-
-  onStopped() {
   },
 
   onTick() {

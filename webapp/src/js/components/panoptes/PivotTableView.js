@@ -146,7 +146,7 @@ let DataTableView = React.createClass({
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
     let tableConfig = this.tableConfig();
     if (!tableConfig) {
-      console.log(`Table ${this.props.table} doesn't exist'`);
+      console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
     if (!dataByColumnRow)

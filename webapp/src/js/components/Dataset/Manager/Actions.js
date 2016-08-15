@@ -15,7 +15,7 @@ import ConfirmButton from 'ui/ConfirmButton';
 import Loading from 'ui/Loading';
 
 // Panoptes components
-import DatasetImportStatusListView from 'DatasetImportStatus/ListView';
+import DatasetImportStatusListView from 'Dataset/ImportStatus/ListView';
 import API from 'panoptes/API';
 
 let DatasetManagerActions = React.createClass({
