@@ -14,7 +14,7 @@ import TileLayerWidget from 'Map/TileLayer/Widget';
 import _cloneDeep from 'lodash/cloneDeep';
 
 // CSS
-import 'leaflet.css';
+import 'leaflet/dist/leaflet.css';
 
 /* TODO: Support
 
