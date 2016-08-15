@@ -39,7 +39,6 @@ const ConfigStore = Fluxxor.createStore({
     //These mutating methods were copied across, so just clone rather than fixing them up
     newConfig = _cloneDeep(newConfig);
     this.addTableConfig(newConfig);
-    this.addPropertyConfig(newConfig);
     this.addRelationConfig(newConfig);
     this.add2DConfig(newConfig);
     return newConfig;
@@ -85,7 +84,8 @@ const ConfigStore = Fluxxor.createStore({
         config.tables.push(config.tablesById[id]);
       });
     }
-    config.tables.forEach((table) => {
+
+    let processTable = (table) => {
       table.hasGenomePositions = table.isPositionOnGenome == '1';
       table.nameSingle = table.nameSingle || table.name;
       table.namePlural = table.namePlural || table.name;
@@ -112,6 +112,14 @@ const ConfigStore = Fluxxor.createStore({
       if (table.defaultQuery === '')
         table.defaultQuery = SQL.nullQuery;
       table.trees = table.trees || [];
+      this.addPropertyConfig(table);
+    };
+
+    config.tables.forEach(processTable);
+    _forEach(config.genome.summaryValues, (table, id) => {
+      table.id = id;
+      processTable(table);
+      config.tablesById[`__reference__${id}`] = table;
     });
     return config;
   },
@@ -136,176 +144,173 @@ const ConfigStore = Fluxxor.createStore({
 //  table = settings;
 //};
 
-  addPropertyConfig(config) {
-    config.tables.forEach((table) => {
-      table.properties = table.properties || [];
-      table.propertiesById = {};
-      table.properties.forEach((prop) => {
-        table.propertiesById[prop.id] = prop;
-        prop.tableId = table.id;
-        if (prop.dataType == 'Text')
-          prop.isText = true;
-        if ((prop.dataType == 'Value') || (prop.dataType == 'LowPrecisionValue') || (prop.dataType == 'HighPrecisionValue') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude') || (prop.dataType == 'Date'))
-          prop.isFloat = true;
-        if (prop.dataType == 'Boolean')
-          prop.isBoolean = true;
-        if (prop.dataType == 'Date')
-          prop.isDate = true;
-        if (!prop.name) prop.name = prop.id;
-        if (prop.isFloat) {
-          prop.minVal = prop.minVal || 0;
-          prop.maxVal = prop.maxVal || 1;
-          prop.decimDigits = prop.decimDigits || 2;
-        }
-        if (prop.dataType == 'GeoLongitude') {
-          prop.minVal = prop.minVal || 0;
-          prop.maxVal = prop.maxVal || 360;
-          prop.decimDigits = prop.decimDigits || 5;
-          table.longitude = prop.id;
-        }
-        if (prop.dataType == 'GeoLatitude') {
-          prop.minVal = prop.minVal || -90;
-          prop.maxVal = prop.maxVal || 90;
-          prop.decimDigits = prop.decimDigits || 5;
-          table.latitude = prop.id;
-        }
-        if (prop.id == table.primKey)
-          prop.isPrimKey = true;
-        prop.hasValueRange = !!prop.maxVal;
+  addPropertyConfig(table) {
+    table.properties = table.properties || [];
+    table.propertiesById = {};
+    table.properties.forEach((prop) => {
+      table.propertiesById[prop.id] = prop;
+      prop.tableId = table.id;
+      if (prop.dataType == 'Text')
+        prop.isText = true;
+      if ((prop.dataType == 'Value') || (prop.dataType == 'LowPrecisionValue') || (prop.dataType == 'HighPrecisionValue') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude') || (prop.dataType == 'Date'))
+        prop.isFloat = true;
+      if (prop.dataType == 'Boolean')
+        prop.isBoolean = true;
+      if (prop.dataType == 'Date')
+        prop.isDate = true;
+      if (!prop.name) prop.name = prop.id;
+      if (prop.isFloat) {
+        prop.minVal = prop.minVal || 0;
+        prop.maxVal = prop.maxVal || 1;
+        prop.decimDigits = prop.decimDigits || 2;
+      }
+      if (prop.dataType == 'GeoLongitude') {
+        prop.minVal = prop.minVal || 0;
+        prop.maxVal = prop.maxVal || 360;
+        prop.decimDigits = prop.decimDigits || 5;
+        table.longitude = prop.id;
+      }
+      if (prop.dataType == 'GeoLatitude') {
+        prop.minVal = prop.minVal || -90;
+        prop.maxVal = prop.maxVal || 90;
+        prop.decimDigits = prop.decimDigits || 5;
+        table.latitude = prop.id;
+      }
+      if (prop.id == table.primKey)
+        prop.isPrimKey = true;
+      prop.hasValueRange = !!prop.maxVal;
 
-        // Human friendly data type string
-        prop.dispDataType = 'Text';
-        prop.icon = 'font';
-        if (prop.isCategorical) {
-          prop.dispDataType = 'Categorical';
-          prop.icon = 'bar-chart';
-        }
-        if (prop.isFloat) {
-          prop.dispDataType = 'Value';
-          prop.icon = 'line-chart';
-        }
-        if (prop.isBoolean) {
-          prop.dispDataType = 'Boolean';
-          prop.icon = 'check-square-o';
-        }
-        if (prop.isDate) {
-          prop.dispDataType = 'Date';
-          prop.icon = 'calendar';
-        }
-        if (prop.dataType == 'GeoLongitude') {
-          prop.dispDataType = 'Longitude';
-          prop.icon = 'globe';
-        }
-        if (prop.dataType == 'GeoLatitude') {
-          prop.dispDataType = 'Latitude';
-          prop.icon = 'globe';
-        }
+      // Human friendly data type string
+      prop.dispDataType = 'Text';
+      prop.icon = 'font';
+      if (prop.isCategorical) {
+        prop.dispDataType = 'Categorical';
+        prop.icon = 'bar-chart';
+      }
+      if (prop.isFloat) {
+        prop.dispDataType = 'Value';
+        prop.icon = 'line-chart';
+      }
+      if (prop.isBoolean) {
+        prop.dispDataType = 'Boolean';
+        prop.icon = 'check-square-o';
+      }
+      if (prop.isDate) {
+        prop.dispDataType = 'Date';
+        prop.icon = 'calendar';
+      }
+      if (prop.dataType == 'GeoLongitude') {
+        prop.dispDataType = 'Longitude';
+        prop.icon = 'globe';
+      }
+      if (prop.dataType == 'GeoLatitude') {
+        prop.dispDataType = 'Latitude';
+        prop.icon = 'globe';
+      }
 
-        //Assign property group
-        if (prop.groupId)
-          if (table.propertyGroupsById[prop.groupId]) {
-            table.propertyGroupsById[prop.groupId].properties.push(prop);
-          }
-        if (!prop.groupId) {
-          if (!table.propertyGroupsById['_UNGROUPED_']) {
-            table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: []};
-            table.propertyGroups.push(table.propertyGroupsById['_UNGROUPED_']);
-          }
-          table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
+      //Assign property group
+      if (prop.groupId)
+        if (table.propertyGroupsById[prop.groupId]) {
+          table.propertyGroupsById[prop.groupId].properties.push(prop);
         }
+      if (!prop.groupId) {
+        if (!table.propertyGroupsById['_UNGROUPED_']) {
+          table.propertyGroupsById['_UNGROUPED_'] = {id: '_UNGROUPED_', name: 'Properties', properties: []};
+          table.propertyGroups.push(table.propertyGroupsById['_UNGROUPED_']);
+        }
+        table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
+      }
 
-        // Determine table name where the column is originally defined
-        if (prop.source == 'fixed') {
-          prop.originalTableName = table.id;
-        } else {
-          prop.originalTableName = table.id + 'INFO_' + initialConfig.workspace; //eslint-disable-line no-undef
-        }
+      // Determine table name where the column is originally defined
+      if (prop.source == 'fixed') {
+        prop.originalTableName = table.id;
+      } else {
+        prop.originalTableName = table.id + 'INFO_' + initialConfig.workspace; //eslint-disable-line no-undef
+      }
 
-        if (prop.isFloat) {
-          if (prop.decimDigits == 0)
-            prop.isInt = true;
-        }
+      if (prop.isFloat) {
+        if (prop.decimDigits == 0)
+          prop.isInt = true;
+      }
 
-        if (prop.isDate) {
-          table.hasDate = true;
-        }
+      if (prop.isDate) {
+        table.hasDate = true;
+      }
 
-        //Set a recommended encoder - legacy from 1.X
-        let encoding = 'String';
-        if (prop.dataType == 'Value') {
-          encoding = 'Float3';
-          if ((prop.decimDigits == 0 ) || (prop.isPrimKey))
-            encoding = 'Int';
-        }
-        if (prop.dataType == 'HighPrecisionValue') {
-          encoding = 'FloatH';
-        }
-        if ((prop.dataType == 'Value') && (prop.id == table.position) && (table.hasGenomePositions))
+      //Set a recommended encoder - legacy from 1.X
+      let encoding = 'String';
+      if (prop.dataType == 'Value') {
+        encoding = 'Float3';
+        if ((prop.decimDigits == 0 ) || (prop.isPrimKey))
           encoding = 'Int';
-        if (prop.dataType == 'Boolean')
-          encoding = 'Int';
-        if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude'))
-          encoding = 'Float4';
-        if ((prop.dataType == 'Date'))
-          encoding = 'Float4';
-        prop.encoding = encoding;
+      }
+      if (prop.dataType == 'HighPrecisionValue') {
+        encoding = 'FloatH';
+      }
+      if ((prop.dataType == 'Value') && (prop.id == table.position) && (table.hasGenomePositions))
+        encoding = 'Int';
+      if (prop.dataType == 'Boolean')
+        encoding = 'Int';
+      if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude'))
+        encoding = 'Float4';
+      if ((prop.dataType == 'Date'))
+        encoding = 'Float4';
+      prop.encoding = encoding;
 
-        let encodingTypes = {
-          'Generic': 'String',     //returns string data, also works for other data
-          'String': 'String',      //returns string data
-          'Float2': 'Float',       //returns floats in 2 base64 bytes
-          'Float3': 'Float',       //returns floats in 3 base64 bytes
-          'Float4': 'Float',       //returns floats in 4 base64 bytes
-          'FloatH': 'Float',       //returns floats as string
-          'Int': 'Integer',        //returns exact integers
-          'IntB64': 'Integer',     //returns exact integers, base64 encoded
-          'IntDiff': 'Integer'     //returns exact integers as differences with previous values
-        };
-        prop.encodingType = encodingTypes[prop.encoding];
-        let fetchEncodingTypes = {
-          'Generic': 'GN',
-          'String': 'ST',
-          'Float2': 'F2',
-          'Float3': 'F3',
-          'Float4': 'F4',
-          'FloatH': 'FH',
-          'Int': 'IN',
-          'IntB64': 'IB',
-          'IntDiff': 'ID'
-        };
-        let displayEncodingTypes = {
-          'Generic': 'GN',
-          'String': 'ST',
-          'Float2': 'FH',
-          'Float3': 'FH',
-          'Float4': 'FH',
-          'FloatH': 'FH',
-          'Int': 'IN',
-          'IntB64': 'IB',
-          'IntDiff': 'ID'
-        };
-        prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
-        prop.defaultDisplayEncoding = displayEncodingTypes[prop.encoding];
-        let alignment = {
-          Value: 'right',
-          HighPrecisionValue: 'right',
-          Boolean: 'center',
-          GeoLongitude: 'right',
-          GeoLatitude: 'right',
-          Date: 'center'
-        };
-        prop.alignment = alignment[prop.dataType] || 'left';
-        prop.description = prop.description || '';
-        prop.showBar = prop.ShowBar || (prop.barWidth > 0);
-        prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :
-        prop.isPrimKey ||
-        prop.id == table.chromosome ||
-        prop.id == table.position ||
-        false;
-      });
-      table.hasGeoCoord = !!(table.longitude && table.latitude);
+      let encodingTypes = {
+        'Generic': 'String',     //returns string data, also works for other data
+        'String': 'String',      //returns string data
+        'Float2': 'Float',       //returns floats in 2 base64 bytes
+        'Float3': 'Float',       //returns floats in 3 base64 bytes
+        'Float4': 'Float',       //returns floats in 4 base64 bytes
+        'FloatH': 'Float',       //returns floats as string
+        'Int': 'Integer',        //returns exact integers
+        'IntB64': 'Integer',     //returns exact integers, base64 encoded
+        'IntDiff': 'Integer'     //returns exact integers as differences with previous values
+      };
+      prop.encodingType = encodingTypes[prop.encoding];
+      let fetchEncodingTypes = {
+        'Generic': 'GN',
+        'String': 'ST',
+        'Float2': 'F2',
+        'Float3': 'F3',
+        'Float4': 'F4',
+        'FloatH': 'FH',
+        'Int': 'IN',
+        'IntB64': 'IB',
+        'IntDiff': 'ID'
+      };
+      let displayEncodingTypes = {
+        'Generic': 'GN',
+        'String': 'ST',
+        'Float2': 'FH',
+        'Float3': 'FH',
+        'Float4': 'FH',
+        'FloatH': 'FH',
+        'Int': 'IN',
+        'IntB64': 'IB',
+        'IntDiff': 'ID'
+      };
+      prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
+      prop.defaultDisplayEncoding = displayEncodingTypes[prop.encoding];
+      let alignment = {
+        Value: 'right',
+        HighPrecisionValue: 'right',
+        Boolean: 'center',
+        GeoLongitude: 'right',
+        GeoLatitude: 'right',
+        Date: 'center'
+      };
+      prop.alignment = alignment[prop.dataType] || 'left';
+      prop.description = prop.description || '';
+      prop.showBar = prop.ShowBar || (prop.barWidth > 0);
+      prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :
+      prop.isPrimKey ||
+      prop.id == table.chromosome ||
+      prop.id == table.position ||
+      false;
     });
-    return config;
+    table.hasGeoCoord = !!(table.longitude && table.latitude);
   }
 
 });

@@ -12,8 +12,9 @@ properties:
 - id: Pos
   name: Pos
   dataType: Value
-- id: Access
-  name: Access
+- id: Accessibility
+  name: Accessibility
+  description: Whether this base is accesible
   order: 4
   dataType: Text
   isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
@@ -21,18 +22,21 @@ properties:
     'False': rgb(230,80,80)
     'True': rgb(153,189,75)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+  showInBrowser: true
   summaryValues:
     blockSizeMin: 1
     blockSizeMax: 50000
   defaultVisible: false
 
-- id: Unique
-  name: Unique
+- id: Uniqueness
+  name: Uniqueness
+  description: How unique this region is compared to the rest of the genome
   order: 3
   channelColor: rgb(255,0,0)
   dataType: Value
   minVal: 0
   maxVal: 200
+  showInBrowser: true
   summaryValues:
     blockSizeMin: 20
     blockSizeMax: 50000

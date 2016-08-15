@@ -7,7 +7,6 @@ from SettingsGlobal import SettingsGlobal
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
-from SettingsSummary import SettingsSummary
 
 config = PanoptesConfig(None)
 baseFolder = join(config.getSourceDataDir(), 'datasets')
@@ -29,8 +28,7 @@ def readJSONConfig(datasetId):
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
-    # We currently have two ways of expressing this (single prop and datatable see ProcessFilterBank:471. I think we should simplify so punting this to later.
-    # genome['summaryValues'] = readSetOfSettings(join(datasetFolder, 'refgenome', 'summaryvalues'), SettingsSummary)
+    genome['summaryValues'] = readSetOfSettings(join(datasetFolder, 'refgenome', 'summaryvalues'), SettingsDataTable)
     return {
         'settings': settings,
         'chromosomes': chromosomes,
