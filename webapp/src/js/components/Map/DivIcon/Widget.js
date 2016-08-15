@@ -14,18 +14,14 @@ export default class Divicon extends MapLayer {
 
   componentWillMount() {
     super.componentWillMount();
-    const { map: _map, layerContainer: _lc, position, ...props } = this.props;
+    const { position, ...props } = this.props;
     this.icon = new DivIcon(props);
     this.leafletElement = marker(position, { icon: this.icon,  ...props });
     this.leafletElement.on('add', this.renderContent.bind(this));
     this.leafletElement.on('remove', this.removeContent.bind(this));
   }
-  componentDidMount() {
-    super.componentDidMount();
-    this.renderContent();
-  }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Object) {
     if (this.props.position !== prevProps.position) {
       this.leafletElement.setLatLng(this.props.position);
     }

@@ -18,9 +18,6 @@ let RectangleWidget = React.createClass({
 
     let {bounds} = this.props;
 
-console.log('RectangleWidget props: %o', this.props);
-console.log('RectangleWidget context: %o', this.context);
-
     let adaptedProps = {};
 
     if (bounds instanceof Array) {

@@ -1,6 +1,5 @@
 import React from 'react';
 import d3 from 'd3';
-import Point from 'point-geometry';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -13,7 +12,7 @@ import 'pie-chart.scss';
 
 // constants in this component
 // TODO: to go in config?
-const DEFAULT_OUTER_RADIUS = 25;
+const DEFAULT_OUTER_RADIUS = 5;
 
 let PieChartWidget = React.createClass({
 
@@ -25,7 +24,6 @@ let PieChartWidget = React.createClass({
   propTypes: {
     name: React.PropTypes.string,
     radius: React.PropTypes.number,
-    onClick: React.PropTypes.func,
     lat: React.PropTypes.number,
     lng: React.PropTypes.number,
     originalLat: React.PropTypes.number,
@@ -41,16 +39,18 @@ let PieChartWidget = React.createClass({
   },
 
   render() {
-    let {name, radius, chartData, onClick, crs, lat, lng, originalLat, originalLng} = this.props;
-console.log('PieChartWidget props: %o', this.props);
+    let {name, radius, chartData, crs, lat, lng, originalLat, originalLng} = this.props;
 
     let sectorsData = [];
     let pieData = [];
 
-    for (let i = 0, len = chartData.length; i < len; i++) {
-      sectorsData.push({color: chartData[i].color, title: name + '\n' + chartData[i].name + ': ' + chartData[i].value});
-      if (chartData[i].value !== undefined && chartData[i].value !== null && chartData[i].value !== '' && !isNaN(chartData[i].value)) {
-        pieData.push(chartData[i].value);
+    // FIXME: ???
+    let chartDataArray = chartData.toArray();
+
+    for (let i = 0, len = chartDataArray.length; i < len; i++) {
+      sectorsData.push({color: chartDataArray[i].get('color'), title: name + '\n' + chartDataArray[i].get('name') + ': ' + chartDataArray[i].get('value')});
+      if (chartDataArray[i].get('value') !== undefined && chartDataArray[i].get('value') !== null && chartDataArray[i].get('value') !== '' && !isNaN(chartDataArray[i].get('value'))) {
+        pieData.push(chartDataArray[i].get('value'));
       } else {
         pieData.push(0);
       }
@@ -63,6 +63,8 @@ console.log('PieChartWidget props: %o', this.props);
     if (radius) {
       outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
     }
+console.log('outerRadius: ' + outerRadius);
+
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSectorWidget
           key={i}
@@ -70,14 +72,8 @@ console.log('PieChartWidget props: %o', this.props);
           outerRadius={outerRadius}
           fillColor={sectorData.color}
           title={sectorData.title}
-          onClick={onClick}
         />
     );
-
-    let height = 50;
-    let width = 50;
-    let translateX = 0;
-    let translateY = 0;
 
     let location = crs.project({lat, lng});
 
@@ -95,8 +91,8 @@ console.log('PieChartWidget props: %o', this.props);
     }
 
     return (
-      <svg style={{overflow: 'visible'}} width={width} height={height}>
-        <g transform={'translate(' + translateX + ', ' + translateY + ')'}>
+      <svg style={{overflow: 'visible'}} width="50" height="50">
+        <g transform={'translate(0, 0)'}>
           {sectors}
         </g>
         {line}

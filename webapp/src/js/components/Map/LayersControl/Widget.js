@@ -20,8 +20,6 @@ let LayersControlWidget = React.createClass({
 
     let {children, hideLayersControl} = this.props;
 
-console.log('LayersControlWidget props: %o', this.props);
-
     let hideLayersControlBoolean = null;
     if (
       (typeof hideLayersControl === 'string' && hideLayersControl.toLowerCase() === 'true')

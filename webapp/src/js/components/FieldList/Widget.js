@@ -102,7 +102,7 @@ let FieldListWidget = React.createClass({
       if (typeof propertiesDataIndex !== 'undefined') {
         fieldListPropertiesData.push(propertiesData[propertiesDataIndex]);
       } else {
-        console.log('Foreign property: ' + field);
+        console.warn('Foreign property: ' + field);
       }
     });
 

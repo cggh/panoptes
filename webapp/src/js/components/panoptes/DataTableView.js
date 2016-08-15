@@ -212,7 +212,7 @@ let DataTableView = React.createClass({
     let {loadStatus, rows, width, height} = this.state;
     let tableConfig = this.config.tablesById[this.props.table];
     if (!tableConfig) {
-      console.log(`Table ${this.props.table} doesn't exist'`);
+      console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
     if (columns.size > 0)
@@ -232,7 +232,7 @@ let DataTableView = React.createClass({
             >
               {columns.map((column) => {
                 if (!tableConfig.propertiesById[column]) {
-                  console.log(`Column ${column} doesn't exist on ${this.props.table}.`);
+                  console.error(`Column ${column} doesn't exist on ${this.props.table}.`);
                   return;
                 }
                 let columnData = tableConfig.propertiesById[column];

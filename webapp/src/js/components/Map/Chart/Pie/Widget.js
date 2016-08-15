@@ -41,7 +41,6 @@ let PieChartMapWidget = React.createClass({
   },
 
   render() {
-console.log('PieChartWidget props: %o', this.props);
 
     let {
       locationDataTable,

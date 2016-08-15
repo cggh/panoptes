@@ -19,8 +19,6 @@ let CircleWidget = React.createClass({
 
     let {center, radius} = this.props;
 
-console.log('CircleWidget props: %o', this.props);
-
     let adaptedProps = {};
 
     if (center instanceof Array) {

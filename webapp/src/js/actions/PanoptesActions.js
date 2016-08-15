@@ -7,12 +7,8 @@ const PanoptesActions = (config) => ({
 
     let tableDataItemViews = config.tablesById[table].dataItemViews;
 
-    if (tableDataItemViews === undefined) {
-      console.error('PanoptesActions found no dataItemViews for table: %o', table);
-      return null;
-    }
-
-    let views = DataItemViews.getViews(config.tablesById[table].dataItemViews, config.tablesById[table].hasGeoCoord);
+    // NB: If tableDataItemViews is undefined or null, then default views (Overview and maybe Map) will be returned by getViews().
+    let views = DataItemViews.getViews(tableDataItemViews, config.tablesById[table].hasGeoCoord);
 
     this.dispatch(SESSION.POPUP_OPEN, {
       component: {

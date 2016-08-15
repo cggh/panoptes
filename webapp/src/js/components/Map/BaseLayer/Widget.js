@@ -27,7 +27,6 @@ let BaseLayerWidget = React.createClass({
 
   render() {
     let {addBaseLayer, checked, children, name} = this.props;
-console.log('BaseLayerWidget props: %o', this.props);
 
     let checkedBoolean = null;
     if (
@@ -44,6 +43,9 @@ console.log('BaseLayerWidget props: %o', this.props);
     }
 
     if (children instanceof Array) {
+      if (children.length > 1) {
+        console.warn('BaseLayerWidget received more than one child. Using first child.');
+      }
       children = children[0];
     }
 

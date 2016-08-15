@@ -28,9 +28,6 @@ let OverlayWidget = React.createClass({
   render() {
     let {addOverlay, checked, children, name} = this.props;
 
-console.log('OverlayWidget props: %o', this.props);
-console.log('OverlayWidget context: %o', this.context);
-
     let checkedBoolean = (checked === 'true');
 
     if (!checkedBoolean instanceof Boolean) {
@@ -38,6 +35,9 @@ console.log('OverlayWidget context: %o', this.context);
     }
 
     if (children instanceof Array) {
+      if (children.length > 1) {
+        console.warn('OverlayWidget received more than one child. Using first child.');
+      }
       children = children[0];
     }
 

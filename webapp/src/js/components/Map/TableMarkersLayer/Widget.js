@@ -1,4 +1,5 @@
 import React from 'react';
+import Immutable from 'immutable';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -11,34 +12,14 @@ import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
-
-// Lodash
-import _maxBy from 'lodash/maxBy';
-import _minBy from 'lodash/minBy';
-
-// TODO: This function is duplicated between TableMarkersLayer and PieChartMarkersLayer
-function calcBounds(markers) {
-
-  let L = window.L;
-  let bounds = undefined;
-
-  if (markers !== undefined && markers.length >= 1) {
-
-    let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
-    let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
-
-    bounds = L.latLngBounds(northWest, southEast);
-  }
-
-  return bounds;
-}
+import CalcMapBounds from 'utils/CalcMapBounds';
 
 let TableMarkersLayerWidget = React.createClass({
 
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('geoTable', 'primKey', 'highlight')
+    DataFetcherMixin('locationDataTable', 'primKey', 'highlight')
   ],
 
   contextTypes: {
@@ -66,21 +47,17 @@ let TableMarkersLayerWidget = React.createClass({
 
   getInitialState() {
     return {
-      markers: []
+      markers: Immutable.List()
     };
   },
 
   // Event handlers
   handleClickMarker(e, marker) {
-console.log('e %o', e);
-console.log('marker %o', marker);
-
-    let {locationDataTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: locationDataTable, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('table'), primKey: marker.get('primKey'), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
@@ -172,7 +149,7 @@ console.log('marker %o', marker);
       })
       .then((data) => {
 
-        let markers = [];
+        let markers = Immutable.List();
 
         // Translate the fetched locationData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
@@ -184,13 +161,13 @@ console.log('marker %o', marker);
 
           let locationDataPrimKey = data[locationPrimKeyProperty];
 
-          markers.push({
+          markers = markers.push(Immutable.fromJS({
             table: locationDataTable,
             lat: parseFloat(data[locationTableConfig.latitude]),
             lng: parseFloat(data[locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
             title: locationDataPrimKey,
-          });
+          }));
 
         } else {
 
@@ -208,21 +185,21 @@ console.log('marker %o', marker);
               isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
             }
 
-            markers.push({
+            markers = markers.push(Immutable.fromJS({
               isHighlighted: isHighlighted,
               table: locationDataTable,
               lat: parseFloat(data[i][locationTableConfig.latitude]),
               lng: parseFloat(data[i][locationTableConfig.longitude]),
               primKey: locationDataPrimKey,
               title: locationDataPrimKey,
-            });
+            }));
 
           }
 
         }
 
         this.setState({markers});
-        setBounds(calcBounds(markers)); //FIXME
+        setBounds(CalcMapBounds.calcMapBounds(markers)); //FIXME
         setLoadStatus('loaded'); //FIXME
       })
       .catch(API.filterAborted)
@@ -238,23 +215,23 @@ console.log('marker %o', marker);
     let {layerContainer, map} = this.context;
     let {markers} = this.state;
 
-    if (!markers.length) {
+    if (!markers.size) {
       return null;
     }
 
     let markerWidgets = [];
 
-    for (let i = 0, len = markers.length; i < len; i++) {
+    for (let i = 0, len = markers.size; i < len; i++) {
 
-      let marker = markers[i];
+      let marker = markers.get(i);
 
-      if (marker.isHighlighted || len === 1) {
+      if (marker.get('isHighlighted') || len === 1) {
 
         markerWidgets.push(
           <ComponentMarkerWidget
             key={i}
-            position={[marker.lat, marker.lng]}
-            title={marker.title}
+            position={[marker.get('lat'), marker.get('lng')]}
+            title={marker.get('title')}
             onClick={(e) => this.handleClickMarker(e, marker)}
           />
         );
@@ -264,8 +241,8 @@ console.log('marker %o', marker);
         markerWidgets.push(
           <ComponentMarkerWidget
             key={i}
-            position={[marker.lat, marker.lng]}
-            title={marker.title}
+            position={[marker.get('lat'), marker.get('lng')]}
+            title={marker.get('title')}
             onClick={(e) => this.handleClickMarker(e, marker)}
           >
             <svg height="12" width="12">

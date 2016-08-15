@@ -12,29 +12,13 @@ import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
-import PieChartWidget from 'Chart/Pie/Widget'
+import PieChartWidget from 'Chart/Pie/Widget';
+import CalcMapBounds from 'utils/CalcMapBounds';
+
 
 // Lodash
-import _maxBy from 'lodash/maxBy';
-import _minBy from 'lodash/minBy';
 import _sumBy from 'lodash/sumBy';
 
-// TODO: This function is duplicated between TableMarkersLayer and PieChartMarkersLayer
-function calcBounds(markers) {
-
-  let L = window.L;
-  let bounds = undefined;
-console.log('calcBounds markers %o', markers);
-  if (markers !== undefined && markers.length >= 1) {
-
-    let northWest = L.latLng(_maxBy(markers, 'lat').lat, _minBy(markers, 'lng').lng);
-    let southEast = L.latLng(_minBy(markers, 'lat').lat, _maxBy(markers, 'lng').lng);
-
-    bounds = L.latLngBounds(northWest, southEast);
-  }
-
-  return bounds;
-}
 
 let PieChartMarkersLayerWidget = React.createClass({
 
@@ -79,25 +63,21 @@ let PieChartMarkersLayerWidget = React.createClass({
   },
   getInitialState() {
     return {
-      markers: []
+      markers: Immutable.List()
     };
   },
 
   // Event handlers
   handleClickMarker(e, marker) {
-console.log('e %o', e);
-console.log('marker %o', marker);
-
-    let {chartDataTable, primKey} = marker;
     const middleClick =  e.originalEvent.button == 1 || e.originalEvent.metaKey || e.originalEvent.ctrlKey;
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: chartDataTable, primKey: primKey.toString(), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('chartDataTable'), primKey: marker.get('primKey'), switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
-console.log('fetchData props: %o', props);
+
     let {
       defaultResidualFractionName,
       defaultResidualSectorColor,
@@ -185,22 +165,26 @@ console.log('fetchData props: %o', props);
         ])
       )
       .then(([locationData, chartData]) => {
+
         let markers = Immutable.List();
+
         // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
         let locationPrimKeyProperty = locationTableConfig.primKey;
-console.log('locationData %o', locationData);
-console.log('componentColumns %o', componentColumns);
+
         for (let i = 0; i < locationData.length; i++) {
           let markerChartData = [];
           let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
 
-          for (let j = 0; j < componentColumns.length; j++) {
-            let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
+          // FIXME: ???
+          let componentColumnsArray = componentColumns.toArray();
+
+          for (let j = 0; j < componentColumnsArray.length; j++) {
+            let chartDataColumnIndex = componentColumnsArray[j].get('pattern').replace('{locid}', locationDataPrimKey);
             markerChartData.push({
-              name: componentColumns[j].name,
+              name: componentColumnsArray[j].get('name'),
               value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
-              color: componentColumns[j].color
+              color: componentColumnsArray[j].get('color')
             });
           }
 
@@ -214,6 +198,7 @@ console.log('componentColumns %o', componentColumns);
             });
 
           markers = markers.push(Immutable.fromJS({
+            chartDataTable: chartDataTable,
             key: i,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
@@ -221,12 +206,14 @@ console.log('componentColumns %o', componentColumns);
             radius: Math.sqrt(locationData[i][locationSizeProperty]),
             chartData: markerChartData,
             locationTable: locationDataTable,
-            locationPrimKey: locationDataPrimKey
+            locationPrimKey: locationDataPrimKey,
+            primKey: primKey
           }));
+
         }
 
         this.setState({markers});
-        setBounds(calcBounds(markers)); //FIXME
+        setBounds(CalcMapBounds.calcMapBounds(markers)); //FIXME
         setLoadStatus('loaded');
       })
       .catch(API.filterAborted)
@@ -238,17 +225,15 @@ console.log('componentColumns %o', componentColumns);
   },
 
   render() {
-console.log('PieChartMarkersLayer props: %o', this.props);
+
     let {layerContainer, map} = this.context;
     let {markers} = this.state;
-console.log('PieChartMarkersLayer Markers: %o', markers);
+
     if (!markers.size) {
       return null;
     }
 
-
     // FIXME
-console.log('this.context %o', this.context);
     //let crs = this.context.map ? this.context.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
     let crs = window.L.CRS.EPSG3857;
 
@@ -257,10 +242,6 @@ console.log('this.context %o', this.context);
     for (let i = 0, len = markers.size; i < len; i++) {
 
       let marker = markers.get(i);
-console.log('marker: %o', marker);
-      // TODO: Use PieChartWidget instead of svg
-
-//name, radius, chartData, onClick, crs, lat, lng, originalLat, originalLng
 
       markerWidgets.push(
         <ComponentMarkerWidget
@@ -269,7 +250,6 @@ console.log('marker: %o', marker);
           title={marker.get('title')}
           onClick={(e) => this.handleClickMarker(e, marker)}
         >
-          <b style={{background: 'white', border: 'solid 1px black'}}>{i}</b>
           <PieChartWidget
             chartData={marker.get('chartData')}
             crs={crs}

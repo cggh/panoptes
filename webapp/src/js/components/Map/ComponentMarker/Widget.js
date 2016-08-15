@@ -68,6 +68,9 @@ let ComponentMarkerWidget = React.createClass({
           />
       );
     } else if (children instanceof Array) {
+      if (children.length > 1) {
+        console.warn('ComponentMarkerWidget received more than one child. Using first child.');
+      }
       children = children[0];
     }
 

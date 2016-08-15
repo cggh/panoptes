@@ -4,22 +4,22 @@ function getViews(dataItemViews, hasGeoCoord) {
 
   let views = Immutable.List();
 
-  if (!dataItemViews) {
+  if (dataItemViews === undefined || dataItemViews === null) {
     // If there are no dataItemViews specified, then default to showing an Overview.
-    views.push({
+    views = views.push(Immutable.fromJS({
       component: 'Overview',
       props: {
         title: 'Overview'
       }
-    });
+    }));
     if (hasGeoCoord) {
       // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing a Map
-      views.push({
+      views = views.push(Immutable.fromJS({
         component: 'Map',
         props: {
           title: 'Location'
         }
-      });
+      }));
     }
   } else {
 
@@ -32,10 +32,7 @@ function getViews(dataItemViews, hasGeoCoord) {
             title: 'Overview'
           }
         }),
-        PieChartMap: () => {
-          console.log('dataItemView: %o', dataItemView);
-
-          return {
+        PieChartMap: () => ({
           component: 'Map/Chart/Pie',
           props: {
             center: [dataItemView.mapCenter.latitude, dataItemView.mapCenter.longitude],
@@ -46,15 +43,15 @@ function getViews(dataItemViews, hasGeoCoord) {
             title: dataItemView.name,
             residualFractionName: dataItemView.residualFractionName
           }
-        };},
+        }),
         ItemMap: () => ({
-          view: 'Map/Table',
+          component: 'Map/Table',
           props: {
             title: dataItemView.name
           }
         }),
         TableMap: () => ({
-          view: 'Map/Table',
+          component: 'Map/Table',
           props: {
             title: dataItemView.name
           }

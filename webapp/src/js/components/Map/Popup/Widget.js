@@ -19,10 +19,10 @@ let PopupWidget = React.createClass({
 
     let {children} = this.props;
 
-console.log('PopupWidget props: %o', this.props);
-console.log('PopupWidget context: %o', this.context);
-
     if (children instanceof Array) {
+      if (children.length > 1) {
+        console.warn('PopupWidget received more than one child. Using first child.');
+      }
       children = children[0];
     }
 

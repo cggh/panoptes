@@ -473,7 +473,13 @@
 
 /* div icon */
 
-/*.leaflet-div-icon {
-	background: #fff;
-	border: 1px solid #666;
-}*/
+/* TODO: Can we use inline styles instead? To handle cases where markers are not clickable. */
+
+.leaflet-div-icon {
+	/*background: #fff;
+	border: 1px solid #666;*/
+	cursor: pointer;
+}
+.leaflet-marker-icon {
+	cursor: pointer;
+}
