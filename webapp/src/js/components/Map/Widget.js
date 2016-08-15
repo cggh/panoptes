@@ -4,7 +4,6 @@ import {Map} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
-import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
@@ -16,6 +15,16 @@ import _cloneDeep from 'lodash/cloneDeep';
 
 // CSS
 import 'leaflet.css';
+
+/* TODO: Support
+
+  <p>A layered map:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[0, 0]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Markers with popups"><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  </div>
+
+*/
+
 
 let MapWidget = React.createClass({
 
@@ -135,6 +144,7 @@ let MapWidget = React.createClass({
 
     // NB: The bounds prop on the react-leaftlet Map component is equivalent to fitBounds
     // There is also a boundsOptions prop corresponding to http://leafletjs.com/reference.html#map-fitboundsoptions
+    // TODO: boundsOptions: {padding: [1, 1]},
 
     let commonMapProps = {
       bounds: bounds,
@@ -165,12 +175,13 @@ let MapWidget = React.createClass({
       let nonMarkerChildrenCount = 0;
 
       let childrenToInspect = children;
-      if (children.length === 1 && children[0].type.displayName === 'FeatureGroupWidget') {
+
+      if (children.length === 1 && children[0].type !== undefined && children[0].type.displayName === 'FeatureGroupWidget') {
         childrenToInspect = children[0].props.children;
       }
 
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
-        if (childrenToInspect[i].type.displayName !== 'MarkerWidget') {
+        if (children[0].type !== undefined && childrenToInspect[i].type.displayName !== 'MarkerWidget') {
           nonMarkerChildrenCount++;
         }
       }
@@ -219,10 +230,12 @@ let MapWidget = React.createClass({
         // If there is a single child.
 
         if (
-          children.type.displayName === 'LayersControlWidget'
+          children.type !== undefined
+          && children.type.displayName === 'LayersControlWidget'
           && children.props.children !== null
           && !children.props.children.length
           && typeof children.props.children === 'object'
+          && children.props.children.type !== undefined
           && children.props.children.type.displayName === 'BaseLayerWidget'
         ) {
 

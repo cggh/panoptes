@@ -9,16 +9,6 @@ import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import TileLayerWidget from 'Map/TileLayer/Widget';
 import PieChartMarkersLayerWidget from 'Map/PieChartMarkersLayer/Widget';
 
-
-/* Example usage in templates
-
-<p>A map of pie charts:</p>
-<div style="position:relative;width:300px;height:300px">
-<PieChartMap locationDataTable="populations" chartDataTable="variants" primKey="SNP_00001" />
-</div>
-
-*/
-
 let PieChartMapWidget = React.createClass({
 
   mixins: [
