@@ -4,12 +4,12 @@ import {Map} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
 import Loading from 'ui/Loading';
 import TileLayerWidget from 'Map/TileLayer/Widget';
-
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -24,15 +24,17 @@ let MapWidget = React.createClass({
   ],
 
   propTypes: {
-    tileLayerAttribution: React.PropTypes.string,
-    tileLayerURL: React.PropTypes.string,
     center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
     children: React.PropTypes.node,
+    componentUpdate: React.PropTypes.func,
+    tileLayerAttribution: React.PropTypes.string,
+    tileLayerURL: React.PropTypes.string,
     title: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
 
   childContextTypes: {
+    bounds: React.PropTypes.object,
     setBounds: React.PropTypes.func,
     setLoadStatus: React.PropTypes.func
   },
@@ -63,16 +65,24 @@ let MapWidget = React.createClass({
   },
 
   // Event handlers
+  handleDetectResize() {
+    if (this.map !== null) {
+      this.map.leafletElement.invalidateSize();
+    }
+  },
+  handleMapMoveEnd(e) {
+    //TODO: this event fires whenever the map's bounds, center or zoom change.
+    if (this.map !== null) {
+      // console.log('handleMapMoveEnd bounds %o', this.map.leafletElement.getBounds());
+      // console.log('handleMapMoveEnd center %o', this.map.leafletElement.getCenter());
+      // console.log('handleMapMoveEnd zoom %o', this.map.leafletElement.getZoom());
+    }
+  },
   setBounds(bounds) { //FIXME
     this.setState({bounds});
   },
   setLoadStatus(loadStatus) { //FIXME
     this.setState({loadStatus});
-  },
-  handleDetectResize() {
-    if (this.map) {
-      this.map.leafletElement.invalidateSize();
-    }
   },
 
   render() {
@@ -123,9 +133,12 @@ let MapWidget = React.createClass({
     // NB: JSX children will overwrite the passed prop, if any.
     // https://github.com/facebook/flow/issues/1355
 
+    // NB: The bounds prop on the react-leaftlet Map component is equivalent to fitBounds
+    // There is also a boundsOptions prop corresponding to http://leafletjs.com/reference.html#map-fitboundsoptions
 
     let commonMapProps = {
       bounds: bounds,
+      onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
       ref: (ref) => this.map = ref
     };

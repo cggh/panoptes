@@ -63,7 +63,6 @@ let PieChartWidget = React.createClass({
     if (radius) {
       outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
     }
-console.log('outerRadius: ' + outerRadius);
 
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSectorWidget

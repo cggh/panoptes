@@ -14,11 +14,11 @@ import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 import PieChartWidget from 'Chart/Pie/Widget';
 import CalcMapBounds from 'utils/CalcMapBounds';
-
+import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 
 // Lodash
+import _cloneDeep from 'lodash/cloneDeep';
 import _sumBy from 'lodash/sumBy';
-
 
 let PieChartMarkersLayerWidget = React.createClass({
 
@@ -76,6 +76,58 @@ let PieChartMarkersLayerWidget = React.createClass({
     this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('chartDataTable'), primKey: marker.get('primKey'), switchTo: !middleClick});
   },
 
+
+  // Functions
+  adaptMarkerRadii(markers, bounds) {
+
+    let adaptedMarkers = _cloneDeep(markers);
+
+    if (bounds && adaptedMarkers.size > 0) {
+
+      ////Now we have bounds we can set some sensible radii
+
+      //Filter pies to those in bounds and work out their area. (This is in lat/lng, but we only need to be rough.)
+      let nw = bounds.getNorthWest();
+      let se = bounds.getSouthEast();
+
+      //if the map starts to loop we need to correct the bounds so things don't get clipped
+      if (se.lng < nw.lng) {
+        se.lng = 180, nw.lng = -180;
+      }
+
+      // FIXME: pieAreaSum is always 0
+      let pieAreaSum = adaptedMarkers.filter(
+        (marker) =>
+          marker.get('lat') > se.lat &&
+          marker.get('lat') < nw.lat &&
+          marker.get('lng') > nw.lng &&
+          marker.get('lng') < se.lng
+      )
+      .map((marker) => marker.get('radius') * marker.get('radius') * 2 * Math.PI)
+      .reduce((sum, val) => sum + val, 0);
+
+      let fudge = 75; // FIXME: was 75
+
+      if (pieAreaSum > 0) {
+        nw = latlngToMercatorXY(nw);
+        se = latlngToMercatorXY(se);
+        let mapArea = (nw.y - se.y) * (se.x - nw.x);
+        let factor = fudge * Math.sqrt(mapArea / pieAreaSum);
+        this.lastFactor = factor;
+      }
+
+      if (this.lastFactor) {
+        adaptedMarkers = adaptedMarkers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
+      } else {
+        adaptedMarkers = Immutable.List();
+      }
+
+    } else {
+      adaptedMarkers = Immutable.List();
+    }
+
+    return adaptedMarkers;
+  },
   fetchData(props, requestContext) {
 
     let {
@@ -197,13 +249,15 @@ let PieChartMarkersLayerWidget = React.createClass({
               color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
             });
 
+          // TODO FIXME: base radius on locationData[i][locationSizeProperty], e.g. Math.sqrt(locationData[i][locationSizeProperty])
+
           markers = markers.push(Immutable.fromJS({
             chartDataTable: chartDataTable,
             key: i,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],
-            radius: Math.sqrt(locationData[i][locationSizeProperty]),
+            radius: 0.0005,
             chartData: markerChartData,
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey,
@@ -212,8 +266,14 @@ let PieChartMarkersLayerWidget = React.createClass({
 
         }
 
+        let bounds = CalcMapBounds.calcMapBounds(markers);
+        setBounds(bounds); //FIXME
+
+        // FIXME: adaptMarkerRadii always returns no markers.
+        //markers = this.adaptMarkerRadii(markers, bounds);
+
         this.setState({markers});
-        setBounds(CalcMapBounds.calcMapBounds(markers)); //FIXME
+
         setLoadStatus('loaded');
       })
       .catch(API.filterAborted)
