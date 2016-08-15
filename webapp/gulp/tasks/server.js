@@ -10,7 +10,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 gulp.task("webpack-dev-server", function(callback) {
   // modify some webpack config options
   var myConfig = Object.create(webpackConfig);
-  myConfig.devtool = "source-map";
+  myConfig.devtool = "eval";
   myConfig.debug = true;
   myConfig.plugins = [
     new HtmlWebpackPlugin( {
