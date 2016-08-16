@@ -40,7 +40,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         datasetFolder = os.path.join(baseFolder, datasetId)
 
-
         dao = SettingsDAO(calculationObject, datasetId)
         dao.removeDatasetMasterRef()
 

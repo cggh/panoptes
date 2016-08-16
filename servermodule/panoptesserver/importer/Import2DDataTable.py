@@ -62,8 +62,8 @@ class Import2DDataTable(BaseImport):
         with self._calculationObject.LogHeader('Importing 2D datatable {0}'.format(tableid)):
 
             DQXUtils.CheckValidTableIdentifier(tableid)
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, '2D_tablecatalog'))
-            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, '2D_propertycatalog'))
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId))
+            self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId))
             
             max_line_count = None
             if self._maxLineCount > 0:

@@ -241,11 +241,6 @@ class ImportSettingsTest(unittest.TestCase):
 									"dataType": "Text",
 									"isCategorical": True})
 		settingsLoaded.loadProps(testProps)
-		prop = settingsLoaded.serializeProperty("Test1")
-		propDict = simplejson.loads(prop, strict=False)
-		self.assertIn('search', propDict, 'Search default value should be set')
-		prop = settingsLoaded.serializeProperty("Test2")
-		propDict = simplejson.loads(prop, strict=False)
 
 	def walkSampleData(self, method):
 		import config

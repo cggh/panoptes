@@ -350,11 +350,6 @@ class LoadTable(threading.Thread):
         databaseid = self._datasetId
         tableid = self._tableId
         
-        if self._allowSubSampling:
-            with self._responder.LogHeader('Create subsampling table'):
-                self._dao.createSubSampleTable(tableid, self._loadSettings["primKey"], self._bulkLoad)
-
-
     def _preprocessFile(self, sourceFileName, tableid):
         
             self._destFileName = ImpUtils.GetTempFileName()

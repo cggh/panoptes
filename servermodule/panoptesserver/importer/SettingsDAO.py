@@ -14,7 +14,6 @@ from PanoptesConfig import PanoptesConfig
 import time
 import math
 import sqlparse
-import sys
 from _mysql import OperationalError, ProgrammingError
 from Numpy_to_SQL import Numpy_to_SQL
 
@@ -176,94 +175,9 @@ class SettingsDAO(object):
     
     
     def clearDatasetCatalogs(self):
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'propertycatalog'))
-        self._execSql('DELETE FROM propertycatalog')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'summaryvalues'))
-        self._execSql('DELETE FROM summaryvalues')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablecatalog'))
-        self._execSql('DELETE FROM tablecatalog')
         self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'settings'))
         self._execSql('DELETE FROM settings WHERE id<>"DBSchemaVersion"')
 
-       
-    def getTablesInfo(self, tableid = None):
-
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationRead(self._datasetId, 'settings'))
-        if tableid == None:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog'
-        else:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid)
-        rows = self._execSqlQuery(sql)
-        
-
-        tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in rows]
-        
-        if not tableid is None and len(tables) != 1:
-            raise Exception("Index Table " + tableid + " doesn't exist")
-            
-        for table in tables:
-            tableSettings = SettingsDataTable()
-            tableSettings.deserialize(table['settingsStr'])
-            table['settings'] = tableSettings
-            
-        return tables
-            
-    def insertTableCatalogEntry(self, tableid, tableSettings, tableOrder):
-        
-        self._checkPermissions('tablecatalog', tableid)
-
-        # Drop existing tablecatalog record
-        sql = "DELETE FROM tablecatalog WHERE id=%s"
-        self._execSql(sql, tableid)
-    # Add to tablecatalog
-        sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        
-        self._execSql(sql, tableid, 
-            tableSettings['namePlural'],
-            tableSettings['primKey'],
-            tableSettings['isPositionOnGenome'],
-            tableSettings.serialize(), 
-            "", #defaultQuery
-            tableOrder)
-
-    def deletePropertiesForTable(self, tableid):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        self._execSql("DELETE FROM propertycatalog WHERE tableid=%s",tableid)
-
-
-    def insertTableProperty(self, tableid, tableSettings, propid):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        sql = "INSERT INTO propertycatalog (`source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES('fixed', %s, %s, %s, %s, %s, %s)"
-        
-        self._execSql(sql, tableSettings.getPropertyValue(propid, 'dataType'),
-            propid, 
-            tableid, 
-            tableSettings.getPropertyValue(propid, 'name'),
-            0, 
-            tableSettings.serializeProperty(propid))
-
-    def deleteRelationsForTable(self, tableid):
-        self._checkPermissions('relations', tableid)
-        
-        self._execSql("DELETE FROM relations WHERE childtableid=%s", tableid)
-        
-    def insertTableRelation(self, tableid, tableSettings, propid):
-        self._checkPermissions('relations', tableid)
-        
-        if 'relation' in tableSettings.getProperty(propid):
-            relationSettings = tableSettings.getPropertyValue(propid, 'relation')
-            self._log('Creating relation: {} {} {}'.format(relationSettings['tableId'], relationSettings['forwardName'], relationSettings['reverseName']))
-            self._execSql("INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES (%s, %s, %s, %s, %s, %s)",
-                          tableid, 
-                          propid, 
-                          relationSettings['tableId'],
-                          '', 
-                          relationSettings['forwardName'],
-                          relationSettings['reverseName'])
-            
-            
     def insertGraphForTable(self, tableid, graphid, graphSettings):
         self._checkPermissions('graphs', tableid)
         crosslink = graphSettings['crossLink']
@@ -290,47 +204,7 @@ class SettingsDAO(object):
         
         self._execSql(sql)
     
-    def deleteSummaryValuesForTable(self, tableid):
-        self._checkPermissions('summaryvalues', tableid)
-        
-        self._execSql("DELETE FROM summaryvalues WHERE tableid=%s",tableid)
-            
-    def insertSummaryValues(self, tableid, tableSettings, propid, sourceid):
-        self._checkPermissions('summaryvalues', tableid)
-        summSettings = tableSettings.getPropertyValue(propid, 'summaryValues')
-        name = tableSettings.getPropertyValue(propid, 'name')
-
-        self._execSql("DELETE FROM summaryvalues WHERE (propid=%s) and (tableid=%s) and (source=%s)",propid, tableid, sourceid)
-
-        self._execSql("INSERT INTO summaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            sourceid, 
-            propid, 
-            tableid, 
-            name, 
-            tableSettings.getPropertyValue(propid, 'order'),
-            tableSettings.serializeSummaryValues(propid), 
-            tableSettings.getPropertyValue(propid, 'minVal'),
-            tableSettings.getPropertyValue(propid, 'maxVal'),
-            summSettings['blockSizeMin'])
-
-    def deleteTableBasedSummaryValuesForTable(self, tableid):
-        self._checkPermissions('tablebasedsummaryvalues', tableid)
-        self._execSql("DELETE FROM tablebasedsummaryvalues WHERE tableid=%s", tableid)
-
-
-    def insertTableBasedSummaryValues(self, tableid, tableSettings, summaryid):
-        self._checkPermissions('tablebasedsummaryvalues', tableid)
-        
-        self._execSql("INSERT INTO tablebasedsummaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, 0)", tableid, summaryid, 
-            tableSettings.getTableBasedSummaryValue(summaryid)['name'],
-            tableSettings.serializeTableBasedValue(summaryid), 
-            tableSettings.getTableBasedSummaryValue(summaryid)['minVal'],
-            tableSettings.getTableBasedSummaryValue(summaryid)['maxVal'],
-            tableSettings.getTableBasedSummaryValue(summaryid)['blockSizeMin'])
-
-
     def createIndex(self, indexName, tableid, columns, unique = False):
-        
         cols = columns.split(",")
         modifier = ''
         if unique:
@@ -338,31 +212,7 @@ class SettingsDAO(object):
 
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
             
-    def createSubSampleTable(self, tableid, primKey, bulkLoad = False):
-        self._log('Creating random data column')
-        if bulkLoad == False:
-            self._execSql("UPDATE %s SET _randomval_=RAND()",DBTBESC(tableid))
-        sortRandTable = tableid + '_SORTRAND'
-        self.dropTable(sortRandTable)
 
-        self._execSql("CREATE TABLE {} LIKE {}".format(DBTBESC(sortRandTable), DBTBESC(tableid)))
-        if primKey == "AutoKey":
-            self._log('Restructuring AutoKey')
-            self._execSql("alter table {} drop column AutoKey".format(DBTBESC(sortRandTable)))
-            self._execSql("alter table {} add column AutoKey int FIRST".format(DBTBESC(sortRandTable)))
-            self._execSql("create index idx_autokey on {}(AutoKey)".format(DBTBESC(sortRandTable)))
-        self._execSql("alter table {} add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(DBTBESC(sortRandTable)))
-        
-        # NOTE: there is little point in importing more than that!
-        self._execSql("insert into {} select *,0 from {} order by _randomval_ LIMIT 5000000".format(DBTBESC(sortRandTable), DBTBESC(tableid)))
-        
-    def checkForColumn(self, table, column):
-        try:
-            idx_field = self._execSqlQuery("SELECT {} FROM {} LIMIT 1".format(DBCOLESC(column), DBTBESC(table)) )
-        except:
-            #raise Exception(column + " column index field doesn't exist in table " + table)
-            raise
-        
     def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
@@ -471,10 +321,6 @@ class SettingsDAO(object):
         self._checkPermissions('settings', None)
         self._execSql("INSERT INTO settings VALUES (%s, %s)", token, st)
                 
-    def deleteChromosomes(self):
-        self._checkPermissions('chromosomes', None)
-        self._execSql('DELETE FROM chromosomes')
-        
     def registerDataset(self, name, configOnly):
         importtime = 0
         if not configOnly:
@@ -483,4 +329,3 @@ class SettingsDAO(object):
         self._datasetId = None
         self._execSql("INSERT INTO datasetindex VALUES (%s, %s, %s)", db, name, str(math.ceil(importtime)))
         self._datasetId = db
-        

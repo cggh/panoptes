@@ -620,54 +620,22 @@ class ImportSettings:
 
         return simplejson.dumps(tosave)
         
-    #For insertion into tablecatalog, graphs
+    #For putting down the wire
     def serialize(self):
-        
+
         return self._prepareSerialization(self._settings, self._settingsDef)
-    
+
     #Used to pick up table settings from the db
     def deserialize(self, settings):
-        
+
         parsed = simplejson.loads(settings, strict=False)
         #Have to not validate as stuff has been deleted when serializing
-        #Can't just remove from _settingsDef and Properties are missing     
-        self.loadProps(parsed, False)           
-    
+        #Can't just remove from _settingsDef and Properties are missing
+        self.loadProps(parsed, False)
+
     def getPropertyNames(self):
         return self._propidMap.keys()
        
-    #For insertion into propertycatalog              
-    def serializeProperty(self, key):    
-        return self._prepareSerialization(self.getProperty(key), self._settingsDef["properties"]["children"])
-
-    
-    def serializeSummaryValues(self, key):
-        props = self.getProperty(key)
-        saved = copy.deepcopy(props['summaryValues'])
-        
-        for val in props['summaryValues']:
-            defn = self._propertiesDefault['summaryValues']['children']
-            if val in defn and 'propName' in defn[val]:
-                name =  defn[val]['propName']
-                saved[name] = saved[val]
-                del saved[val] 
-
-        
-        for val in ['categoryColors', 'defaultVisible', 'isCategorical', 'categories', 'channelColor']:
-            if val in props:
-                if val in self._propertiesDefault and 'propName' in self._propertiesDefault[val]:
-                    name =  self._propertiesDefault[val]['propName']
-                else:
-                    name = val
-                saved[name] = props[val]
-
-        for val in ['minVal', 'maxVal', 'blockSizeMin', 'blockSizeMax', 'order', 'name']:
-            if val in saved:
-                del saved[val]
-
-        return simplejson.dumps(saved)
-
-
     def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
         if action not in ['replace', 'merge', 'delete']:
             raise ValueError("Action must be one of 'replace', 'merge', 'delete'")
