@@ -429,7 +429,7 @@ class ProcessFilterBank(BaseImport):
                 with self._logHeader('Creating summary values for custom data {0}'.format(tableid)):
                     
                     columns = [DBCOLESC(chromField), DBCOLESC(posField), propid ]
-                    outputdef = self._defineSettings(tableid, settings, propid, Utils.GetTableWorkspaceView(self._workspaceId, tableid), columns, sourceid = 'custom', useDB = True)
+                    outputdef = self._defineSettings(tableid, settings, propid, tableid, columns, sourceid = 'custom', useDB = True)
                     
                     if not isPositionOnGenome:
                         raise Exception('Summary values defined for non-position table')
@@ -664,12 +664,10 @@ if __name__ == "__main__":
                 'Process': processType
             }
         
-    workspaceId = None
-    
     if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
          #calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
-         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings)
          #Need to install openmpi in order to use this option
          #
          #Optional import - note not in REQUIREMENTS
@@ -694,5 +692,5 @@ if __name__ == "__main__":
  
     else:
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
-         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings)
          filterBanker.createAllSummaryValues()

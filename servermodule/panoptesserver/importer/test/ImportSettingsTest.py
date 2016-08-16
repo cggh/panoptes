@@ -5,9 +5,7 @@ import simplejson
 import yaml
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
-from SettingsWorkspace import SettingsWorkspace
 from SettingsGraph import SettingsGraph
-from SettingsCustomData import SettingsCustomData
 from SettingsDataset import SettingsDataset
 from __builtin__ import file
 
@@ -286,17 +284,11 @@ class ImportSettingsTest(unittest.TestCase):
 			if settingsType == "2D_datatables":
 				validateTestLoad = Settings2Dtable()
 				validateTestLoad.loadFile(file, True)
-			elif settingsType == 'customdata':
-				validateTestLoad = SettingsCustomData()
-				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'datasets':
 				validateTestLoad = SettingsDataset()
 				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'datatables':
 				validateTestLoad = SettingsDataTable()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == "workspaces":
-				validateTestLoad = SettingsWorkspace()
 				validateTestLoad.loadFile(file, True)
 			elif settingsType == "refgenome":
 				validateTestLoad = SettingsRefGenome()

@@ -8,12 +8,11 @@ from DQXDbTools import DBTBESC
 
 
 
-# Returns the number of data items in all subsets for a given workspace
+# Returns the number of data items in all subsets for a given table
 
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
 
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
         cur.credentials.VerifyCanDo(DQXDbTools.DbOperationRead(databaseName, 'storedsubsets'))
@@ -26,7 +25,7 @@ def response(returndata):
         resultInfo = {}
         for table in tableList:
             resultInfo[table] = {}
-            cur.execute('SELECT subsetid FROM storedsubsets WHERE tableid="{0}" and workspaceid="{1}"'.format(table, workspaceid))
+            cur.execute('SELECT subsetid FROM storedsubsets WHERE tableid="{0}"'.format(table))
             subsetList = [row[0] for row in cur.fetchall()]
             for subset in subsetList:
                 subsetMemberTable = table+'_subsets'

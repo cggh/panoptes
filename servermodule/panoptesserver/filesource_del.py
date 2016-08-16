@@ -19,7 +19,6 @@ def response(returndata):
 
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
@@ -54,14 +53,6 @@ def response(returndata):
             os.remove(path_join)
         except OSError:
             pass
-
-    if sourcetype == 'workspace':
-        dataFolder = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid)
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
-
-    if sourcetype == 'customdata':
-        dataFolder = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid)
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
 
     if dataFolder is None:
         returndata['Error'] = 'Invalid file source type'

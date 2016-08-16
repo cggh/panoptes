@@ -55,7 +55,6 @@ def CanDo(credInfo, operation):
     if authRules.Match(credInfo, operation.databaseName, PnAuthRule.manage):
         return DQXDbTools.DbAuthorization(True)
 
-
     return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to perform this change.')
 
 

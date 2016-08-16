@@ -34,7 +34,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     if not os.path.exists(folder):
         return False
 
-    dao = SettingsDAO(calculationObject, datasetId, None)
+    dao = SettingsDAO(calculationObject, datasetId)
             
     with calculationObject.LogHeader('Importing reference genome data'):
 

@@ -8,7 +8,6 @@ import DQXDbTools
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     id = DQXDbTools.ToSafeIdentifier(returndata['id'])
 
     #Obtain the settings from storeddata
@@ -20,7 +19,7 @@ def response(returndata):
         settings = therow[0]
         #todo: remove that record
 
-        sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}", "{3}")'.format(databaseName, workspaceid, id, settings)
+        sql = 'INSERT INTO storedviews VALUES ("{0}", "{1}", "{2}")'.format(databaseName, id, settings)
         cur.execute(sql)
         cur.commit()
 

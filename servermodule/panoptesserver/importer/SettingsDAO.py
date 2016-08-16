@@ -21,11 +21,10 @@ from Numpy_to_SQL import Numpy_to_SQL
 
 class SettingsDAO(object):
     
-    def __init__ (self, calculationObject, datasetId, workspaceId, logCache = None):
+    def __init__ (self, calculationObject, datasetId, logCache = None):
                
         self._calculationObject = calculationObject
         self._datasetId = datasetId
-        self._workspaceId = workspaceId
 
         self._config = PanoptesConfig(self._calculationObject)
         
@@ -153,13 +152,6 @@ class SettingsDAO(object):
                 self._log('DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid)))
                 cur.execute(stmt)
 
-    def dropView(self, tableid):
-        self._checkPermissions('', tableid)
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self._execSql('DROP VIEW IF EXISTS {}'.format(DBTBESC(tableid)))
-            
     #Check if the user has permission to write
     #The settingsTable is the global table
     #tableid is the name of a configured table in 'datatables'
@@ -192,9 +184,7 @@ class SettingsDAO(object):
         self._execSql('DELETE FROM tablecatalog')
         self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'settings'))
         self._execSql('DELETE FROM settings WHERE id<>"DBSchemaVersion"')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'customdatacatalog'))
-        self._execSql('DELETE FROM customdatacatalog')
-    
+
        
     def getTablesInfo(self, tableid = None):
 
@@ -245,7 +235,7 @@ class SettingsDAO(object):
     def insertTableProperty(self, tableid, tableSettings, propid):
         self._checkPermissions('propertycatalog', tableid)
         
-        sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO propertycatalog (`source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES('fixed', %s, %s, %s, %s, %s, %s)"
         
         self._execSql(sql, tableSettings.getPropertyValue(propid, 'dataType'),
             propid, 
@@ -291,16 +281,6 @@ class SettingsDAO(object):
         
         self._execSql("DELETE FROM graphs WHERE tableid=%s",tableid)
     
-    def deleteCustomDataCatalogEntry(self, sourceid, tableid):
-        self._checkPermissions('customdatacatalog', tableid)
-        self._execSql('DELETE FROM customdatacatalog WHERE tableid=%s and sourceid=%s',tableid, sourceid)
-
-
-    def insertCustomDataSettings(self, sourceid, tableid, settings):
-        self._checkPermissions('customdatacatalog', tableid)
-        self._execSql("INSERT INTO customdatacatalog VALUES (%s, %s, %s)",tableid, sourceid, settings.serialize())
-
-
     def dropColumns(self, table, columns):
         sql = "ALTER TABLE {0} ".format(DBTBESC(table))
         for prop in columns:
@@ -309,27 +289,6 @@ class SettingsDAO(object):
             sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
         
         self._execSql(sql)
-    
-    
-    def deleteFromWorkspacePropertyCatalog(self, tableid, prop = None):
-        self._checkPermissions('propertycatalog', tableid)
-        print 'Removing outdated information: {0} {1} {2}'.format(self._workspaceId, prop, tableid)
-        if prop != None:
-            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (propid=%s) and (tableid=%s)',self._workspaceId, prop, tableid)
-        else:
-            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (tableid=%s)',self._workspaceId, tableid)
-
-    def insertIntoWorkspacePropertyCatalog(self, tableid, propid, settings):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        self._execSql("INSERT INTO propertycatalog VALUES (%s, 'custom', %s, %s, %s, %s, %s, %s)",self._workspaceId, 
-            settings.getPropertyValue(propid, 'dataType'),
-            propid, 
-            tableid, 
-            settings.getPropertyValue(propid, 'name'),
-            0, 
-            settings.serializeProperty(propid))
-
     
     def deleteSummaryValuesForTable(self, tableid):
         self._checkPermissions('summaryvalues', tableid)
@@ -341,9 +300,9 @@ class SettingsDAO(object):
         summSettings = tableSettings.getPropertyValue(propid, 'summaryValues')
         name = tableSettings.getPropertyValue(propid, 'name')
 
-        self._execSql("DELETE FROM summaryvalues WHERE (propid=%s) and (tableid=%s) and (source=%s) and (workspaceid=%s)",propid, tableid, sourceid, self._workspaceId)
+        self._execSql("DELETE FROM summaryvalues WHERE (propid=%s) and (tableid=%s) and (source=%s)",propid, tableid, sourceid)
 
-        self._execSql("INSERT INTO summaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", self._workspaceId or '', 
+        self._execSql("INSERT INTO summaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
             sourceid, 
             propid, 
             tableid, 
@@ -370,19 +329,6 @@ class SettingsDAO(object):
             tableSettings.getTableBasedSummaryValue(summaryid)['blockSizeMin'])
 
 
-    def materializeView(self, tableSettings, indexedColumns, wstable):
-        tmptable = '_tmptable_'
-        self.dropTable(tmptable)
-        self._execSql('CREATE TABLE {} as SELECT * FROM {}'.format(tmptable, DBTBESC(wstable)))
-        for indexedColumn in indexedColumns:
-            self.createIndex(indexedColumn, tmptable, indexedColumn)
-        
-        if tableSettings['isPositionOnGenome']:
-            self._log('Indexing chromosome,position on materialised view')
-            self.createIndex('mt1_chrompos', tmptable, DBCOLESC(tableSettings['chromosome']) + "," + DBCOLESC(tableSettings['position']))
-        self.dropView(wstable)
-        self._execSql('RENAME TABLE {} TO {}'.format(tmptable, DBTBESC(wstable)))
-        
     def createIndex(self, indexName, tableid, columns, unique = False):
         
         cols = columns.split(",")

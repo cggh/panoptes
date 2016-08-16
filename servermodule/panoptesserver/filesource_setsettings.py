@@ -14,7 +14,6 @@ def response(returndata):
     credInfo = DQXDbTools.CredentialInformation(returndata)
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
@@ -36,12 +35,6 @@ def response(returndata):
     if sourcetype == '2D_datatable':
         settingsFile = os.path.join(baseFolder, databaseName, '2D_datatables', tableid, 'settings')
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
-    if sourcetype == 'workspace':
-        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'settings')
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
-    if sourcetype == 'customdata':
-        settingsFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'settings')
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
     if settingsFile is None:
         returndata['Error'] = 'Invalid file source type'
         return returndata

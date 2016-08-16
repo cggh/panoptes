@@ -15,7 +15,6 @@ def response(returndata):
     #!!! todo: check that the table is a valid storage repo
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tablename = DQXDbTools.ToSafeIdentifier(returndata['tablename'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     name = DQXDbTools.ToSafeIdentifier(returndata['name'])
@@ -27,8 +26,8 @@ def response(returndata):
 
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
         cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, tablename))
-        sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}', %s)".format(
-        DBTBESC(tablename), uid, name, tableid, workspaceid)
+        sql = "INSERT INTO {0} VALUES ('{1}', '{2}', '{3}', '{4}')".format(
+        DBTBESC(tablename), uid, name, tableid)
         cur.execute(sql, [content])
         cur.commit()
         return returndata

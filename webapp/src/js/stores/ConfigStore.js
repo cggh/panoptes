@@ -97,8 +97,8 @@ const ConfigStore = Fluxxor.createStore({
         table.icon = table.icon.substring(3);
       else
         table.icon = 'table';
-      table.fetchTableName = table.id + 'CMB_' + initialConfig.workspace;  //eslint-disable-line no-undef
-      table.fetchSubsamplingTableName = table.id + 'CMBSORTRAND_' + initialConfig.workspace; //eslint-disable-line no-undef
+      table.fetchTableName = table.id;  //eslint-disable-line no-undef
+      table.fetchSubsamplingTableName = table.id; //eslint-disable-line no-undef
       table.propertyGroupsById = {};
       table.propertyGroups.forEach((group) => {
         table.propertyGroupsById[group.id] = group;

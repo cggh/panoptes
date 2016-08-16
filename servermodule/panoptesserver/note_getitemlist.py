@@ -13,7 +13,6 @@ import datetime
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     itemid = DQXDbTools.ToSafeIdentifier(returndata['itemid'])
 

@@ -71,11 +71,6 @@ class SettingsDataTable(ImportSettings):
                                  }
                              }
                          }),
-                         ('cacheWorkspaceData', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'description': 'If set, a materialised table will be created in the relational database for this data in each workspace.\n  For large data tables (>1M records), this option is faster than the standard option, which uses a JOIN statement'
-                                }),
                          ('maxCountQueryRecords', {
                                    'type': 'Value',
                                    'required': False,

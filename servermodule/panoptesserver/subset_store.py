@@ -15,7 +15,6 @@ from DQXDbTools import DBTBESC
 def ResponseExecute(returndata, calculationObject):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     keyid = DQXDbTools.ToSafeIdentifier(returndata['keyid'])
     isNumericalKey = int(DQXDbTools.ToSafeIdentifier(returndata['isnumericalkey'])) > 0

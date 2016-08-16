@@ -82,7 +82,7 @@ class LoadTable(threading.Thread):
             
         self._rowIndexField = loadSettings['rowIndexField']
         
-        self._dao = SettingsDAO(responder, self._datasetId, None, logCache = self._logMessages)
+        self._dao = SettingsDAO(responder, self._datasetId, logCache = self._logMessages)
             
 
     #Keep the log messages so that they can be output in one go so that log is less confusing

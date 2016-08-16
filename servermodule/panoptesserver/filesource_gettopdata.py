@@ -13,19 +13,16 @@ def response(returndata):
     credInfo = DQXDbTools.CredentialInformation(returndata)
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
-    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
+    credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName))
 
     baseFolder = config.SOURCEDATADIR + '/datasets'
 
     dataFile = None
     if sourcetype == 'datatable':
         dataFile = os.path.join(baseFolder, databaseName, 'datatables', tableid, 'data')
-    if sourcetype == 'customdata':
-        dataFile = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid, 'data')
     if dataFile is None:
         returndata['Error'] = 'Invalid file source type'
         return returndata

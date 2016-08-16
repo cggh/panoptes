@@ -124,10 +124,6 @@ def get_table_ids(cur, dataset, datatable):
     return tableSettings['columnDataTable'], tableSettings['rowDataTable']
 
 
-def get_workspace_table_name(tableid, workspaceid):
-    return "{0}CMB_{1}".format(tableid, workspaceid)
-
-
 def response(request_data):
     return request_data
 
@@ -164,7 +160,6 @@ def summarise_call(calls):
 def handler(start_response, request_data):
     datatable = request_data['datatable']
     dataset = request_data['dataset']
-    workspace = request_data['workspace']
     two_d_properties = request_data['2D_properties'].split('~')
     col_properties = request_data['col_properties'].split('~')
     row_properties = request_data['row_properties'].split('~')
@@ -221,9 +216,7 @@ def handler(start_response, request_data):
     row_properties.append(row_index_field)
 
     with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
-        col_tableid, row_tableid = get_table_ids(cur, dataset, datatable)
-        col_tablename = get_workspace_table_name(col_tableid, workspace)
-        row_tablename = get_workspace_table_name(row_tableid, workspace)
+        col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
 
         col_result = index_table_query(cur,
                                        col_tablename,

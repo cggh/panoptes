@@ -47,11 +47,11 @@ class ImportDataTable(BaseImport):
                 
                 ranknr += 1    
  
-            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings)
                        
             importer.importData(tableid, createSubsets = True)
             
-            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings)
             filterBanker.createSummaryValues(tableid)
            
             importer.cleanUp()

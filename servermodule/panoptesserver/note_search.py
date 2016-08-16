@@ -13,7 +13,6 @@ import DQXDbTools
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     maxcount = int(returndata['maxcount'])
     sortby = DQXDbTools.ToSafeIdentifier(returndata['sortby'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
