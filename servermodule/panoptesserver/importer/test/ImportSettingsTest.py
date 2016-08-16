@@ -7,7 +7,6 @@ from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
 from SettingsWorkspace import SettingsWorkspace
 from SettingsGraph import SettingsGraph
-from SettingsSummary import SettingsSummary
 from SettingsCustomData import SettingsCustomData
 from SettingsDataset import SettingsDataset
 from __builtin__ import file
@@ -307,13 +306,8 @@ class ImportSettingsTest(unittest.TestCase):
 				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'summaryvalues':
 				parent = os.path.dirname(file)
-				if os.path.isfile(os.path.join(parent,'values')):
-					validateTestLoad = SettingsSummary()
-					propName = os.path.basename(parent)
-					validateTestLoad.loadPropsFile(propName ,file)
-				else:
-					validateTestLoad = SettingsDataTable()
-					validateTestLoad.loadFile(file, True)
+				validateTestLoad = SettingsDataTable()
+				validateTestLoad.loadFile(file, True)
 			elif settingsType == 'pre' or settingsType == 'post':
 				validateTestLoad = {}
 #			else:

@@ -49,6 +49,47 @@ let GenomeBrowserWithActions = React.createClass({
         items: {}
       }
     };
+    console.log(this.config);
+    _forEach(this.config.genome.summaryValues, (table, id) => {
+      _forEach(table.properties, (prop) => {
+          if (prop.showInBrowser && prop.summaryValues && (prop.isCategorical || prop.isBoolean)) {
+            groups['__reference__'].items[prop.id] = {
+              name: prop.name,
+              description: prop.description,
+              icon: prop.icon,
+              payload: {
+                channel: 'CategoricalChannel',
+                props: {
+                  name: prop.name,
+                  table: `__reference__${table.id}`,
+                  track: prop.id
+                }
+              }
+            };
+          }
+          if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
+            groups['__reference__'].items[prop.id] = {
+              name: prop.name,
+              description: prop.description,
+              icon: prop.icon,
+              payload: {
+                channel: 'NumericalTrackGroupChannel',
+                props: {
+                  tracks: [{
+                    track: 'NumericalSummaryTrack',
+                    name: prop.name,
+                    props: {
+                      table: `__reference__${table.id}`,
+                      track: prop.id
+                    }
+                  }]
+                }
+              }
+            };
+          }
+        }
+      )
+    });
 
     //Normal summaries
     _forEach(this.config.tables, (table) => {
@@ -206,7 +247,7 @@ let GenomeBrowserWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  />
+            />
           </div>
           <GenomeBrowser componentUpdate={componentUpdate} sideWidth={150} {...subProps} />
         </div>

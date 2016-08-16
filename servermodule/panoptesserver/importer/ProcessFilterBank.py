@@ -13,7 +13,6 @@ import shutil
 from DQXDbTools import DBCOLESC
 import customresponders.panoptesserver.Utils as Utils
 from SettingsDataTable import SettingsDataTable
-from SettingsSummary import SettingsSummary
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -229,7 +228,7 @@ class ProcessFilterBank(BaseImport):
 
 
     def _getTrackDest(self, propid):
-        destFolder = os.path.join(self._config.getBaseDir(), 'summaryTracks', self._datasetId, propid)
+        destFolder = os.path.join(self._config.getBaseDir(), 'SummaryTracks', self._datasetId, propid)
         if not os.path.exists(destFolder):
             os.makedirs(destFolder)
         dataFileName = os.path.join(destFolder, propid)
@@ -462,30 +461,12 @@ class ProcessFilterBank(BaseImport):
         
         tableid = '-'
         summaryid = os.path.basename(summaryFolder)
-        propertiesBased = False
         with self._logHeader('Importing reference genome summary data '+summaryid):
-
-            
-
-            settingsFile = os.path.join(summaryFolder, 'settings')
-            sourceFileName = os.path.join(summaryFolder, 'values')
-            
-            if os.path.isfile(sourceFileName):
-                settings = SettingsSummary()
-                settings.loadPropsFile(summaryid, settingsFile)
-                
-                values = self._defineSettings(tableid, settings, summaryid, sourceFileName, None)
-                if values != None:
-                    outputs.append(values)
-            else:
-                settings = SettingsDataTable()
-                settings.loadFile(settingsFile)
-                sourceFileName = os.path.join(summaryFolder, 'data')
-                propertiesBased = True
-                output = self._preparePropertiesBasedSummaryValues(sourceFileName, tableid, settings)
-                outputs = outputs + output
-
-        return outputs, propertiesBased
+            settings = SettingsDataTable()
+            settings.loadFile(os.path.join(summaryFolder, 'settings'))
+            output = self._preparePropertiesBasedSummaryValues(os.path.join(summaryFolder, 'data'), tableid, settings)
+            outputs = outputs + output
+        return outputs
          
     def createRefGenomeSummaryValues(self):
 
@@ -493,8 +474,8 @@ class ProcessFilterBank(BaseImport):
                 
         if not summaryids is None:
             for summaryid in summaryids:
-                outputs, propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
-                self._extractColumnsAndProcess(outputs, False, readHeader = propertiesBased, writeColumnFiles = False)
+                outputs = self._prepareRefGenomeSummaryValues(summaryid)
+                self._extractColumnsAndProcess(outputs, False, readHeader = True, writeColumnFiles = False)
             
     #Not actually used except below
     def createAllSummaryValues(self):
@@ -552,10 +533,10 @@ class ProcessFilterBank(BaseImport):
                     summaryids = self._getRefGenomeSummaryFolders()
                 
                     for summaryid in summaryids:
-                        outputs,propertiesBased = self._prepareRefGenomeSummaryValues(summaryid)
+                        outputs = self._prepareRefGenomeSummaryValues(summaryid)
                         print(str(outputs))
                         for out in outputs:
-                            out['readHeader'] = propertiesBased
+                            out['readHeader'] = True
                             tasks.append(out)
                     
                     task_index = 0
