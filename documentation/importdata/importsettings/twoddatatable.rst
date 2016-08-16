@@ -56,14 +56,6 @@ rowIndexArray
   If this is omitted then it is assumed that the HDF5 columns are in the same
   order as the ``rowDataTable`` data table, sorted by the ``rowIndexField property``.
 
-firstArrayDimension
-  *Text.* Either 'row' or 'column' to indicate the first dimension in the HDF5 array.
-  'column' will generally perform better.
-  Possible values:
-
-  - ``row``: .
-  - ``column``: .
-
 symlinkData
   *Boolean.*  Default:False.  If true then the HDF5 source file will not be copied but only symlinked. Note that if your HDF5 doesn’t have small enough chunking (max few MB per chunk) then performance will suffer. The default of False copies and rechunks the HDF5.
 
@@ -73,7 +65,7 @@ showInGenomeBrowser
   This key contains the following subkeys, Either 'Call' or 'AlleleDepth' or both must be present.
   The block can contain the following keys:
     call
-      *PropertyID.* Reference to the 2D data table property that contains call information.
+      *PropertyID (required).* Reference to the 2D data table property that contains call information.
 
     alleleDepth
       *PropertyID.* Reference to the 2D data table property that contains depth information.
