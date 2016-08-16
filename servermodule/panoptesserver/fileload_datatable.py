@@ -6,7 +6,6 @@ import asyncresponder
 
 from importer.ImportDataTable import ImportDataTable
 from importer.Import2DDataTable import Import2DDataTable
-from importer.ImportWorkspaces import ImportWorkspaces
 import importer.ImportError
 
 
@@ -33,8 +32,6 @@ def ResponseExecute(data, calculationObject):
             idt.ImportDataTable(tableid)
         except importer.ImportError.ImportException as e:
             calculationObject.fail(str(e))
-        iw = ImportWorkspaces(calculationObject, datasetid, importSettings, dataDir = 'workspaces')
-        iw.importAllWorkspaces(tableid)
 
     if importtype == '2D_datatable':
 

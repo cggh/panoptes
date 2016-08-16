@@ -82,7 +82,7 @@ class LoadTable(threading.Thread):
             
         self._rowIndexField = loadSettings['rowIndexField']
         
-        self._dao = SettingsDAO(responder, self._datasetId, None, logCache = self._logMessages)
+        self._dao = SettingsDAO(responder, self._datasetId, logCache = self._logMessages)
             
 
     #Keep the log messages so that they can be output in one go so that log is less confusing
@@ -350,11 +350,6 @@ class LoadTable(threading.Thread):
         databaseid = self._datasetId
         tableid = self._tableId
         
-        if self._allowSubSampling:
-            with self._responder.LogHeader('Create subsampling table'):
-                self._dao.createSubSampleTable(tableid, self._loadSettings["primKey"], self._bulkLoad)
-
-
     def _preprocessFile(self, sourceFileName, tableid):
         
             self._destFileName = ImpUtils.GetTempFileName()

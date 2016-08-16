@@ -13,7 +13,6 @@ from DQXDbTools import DBTBESC
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     name = DQXDbTools.ToSafeIdentifier(returndata['name'])
 
@@ -23,8 +22,8 @@ def response(returndata):
 
     with DQXDbTools.DBCursor(returndata, databaseName) as cur:
         cur.credentials.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'storedsubsets'))
-        sql = "INSERT INTO storedsubsets VALUES (0, '{0}', '{1}', '{2}', 0)".format(
-        name, tableid, workspaceid)
+        sql = "INSERT INTO storedsubsets VALUES (0, '{0}', '{1}', 0)".format(
+        name, tableid)
         cur.execute(sql)
         cur.commit()
 

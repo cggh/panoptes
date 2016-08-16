@@ -12,7 +12,6 @@ import customresponders.panoptesserver.schemaversion as schemaversion
 from ImportDataTable import ImportDataTable
 from Import2DDataTable import Import2DDataTable
 import ImportRefGenome
-from ImportWorkspaces import ImportWorkspaces
 from PluginLoader import PluginLoader
 
 
@@ -41,13 +40,12 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         datasetFolder = os.path.join(baseFolder, datasetId)
 
-
-        dao = SettingsDAO(calculationObject, datasetId, None)
+        dao = SettingsDAO(calculationObject, datasetId)
         dao.removeDatasetMasterRef()
 
         if not importSettings['ConfigOnly']:
             # Dropping existing database
-            dao = SettingsDAO(calculationObject, datasetId, None)
+            dao = SettingsDAO(calculationObject, datasetId)
             calculationObject.SetInfo('Dropping database')
             dao.createDatabase()
 
@@ -68,15 +66,14 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
         dao.clearDatasetCatalogs()
 
-        workspaceId = None
-        
-        modules = PluginLoader(calculationObject, datasetId, importSettings, workspaceId)
+
+        modules = PluginLoader(calculationObject, datasetId, importSettings)
         modules.importAll('pre')
         
-        importer = ImportDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder = baseFolder)
+        importer = ImportDataTable(calculationObject, datasetId, importSettings, baseFolder = baseFolder)
         importer.importAllDataTables()
 
-        import2D = Import2DDataTable(calculationObject, datasetId, importSettings, workspaceId, baseFolder, dataDir = '2D_datatables')
+        import2D = Import2DDataTable(calculationObject, datasetId, importSettings, baseFolder, dataDir = '2D_datatables')
         import2D.importAll2DTables()
 
         globalSettings = importer._globalSettings
@@ -85,9 +82,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             globalSettings['hasGenomeBrowser'] = True
         
         ImportDocs(calculationObject, datasetFolder, datasetId)
-
-        importWorkspaces = ImportWorkspaces(calculationObject, datasetId, importSettings, workspaceId, dataDir = 'workspaces')
-        importWorkspaces.importAllWorkspaces()
 
         # Global settings
         with calculationObject.LogHeader('Defining global settings'):

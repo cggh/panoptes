@@ -6,20 +6,17 @@ import sys
 from SettingsDAO import SettingsDAO
 from PanoptesConfig import PanoptesConfig
 from SettingsDataTable import SettingsDataTable
-from SettingsCustomData import SettingsCustomData
 from Settings2Dtable import Settings2Dtable
 from SettingsGlobal import SettingsGlobal
-from SettingsWorkspace import SettingsWorkspace
 
 class BaseImport(object):
     
-    def __init__ (self, calculationObject, datasetId, importSettings, workspaceId = None, baseFolder = None, dataDir = 'datatables'):
+    def __init__ (self, calculationObject, datasetId, importSettings, baseFolder = None, dataDir = 'datatables'):
         
         self._calculationObject = calculationObject
         self._config = PanoptesConfig(self._calculationObject)
         
         self._datasetId = datasetId
-        self._workspaceId = workspaceId
         self._importSettings = importSettings
         self._dataDir = dataDir
         
@@ -31,37 +28,24 @@ class BaseImport(object):
         if dataDir == 'datatables':
             self._tablesToken = 'DataTables'
             self._settingsLoader = SettingsDataTable()
-        elif dataDir == 'customdata':
-            self._tablesToken = 'CustomData'
-            self._settingsLoader = SettingsCustomData()
         elif dataDir == '2D_datatables':
             self._tablesToken = '2D_datatables'
             self._settingsLoader = Settings2Dtable()
-        elif dataDir == 'workspaces':
-            self._tablesToken = 'workspaces'
-            self._settingsLoader = SettingsWorkspace()
         else:
-            raise Exception('dataDir must be either datatables, customdata workspaces, or 2D_datatables')
+            raise Exception('dataDir must be either datatables or 2D_datatables')
       
         self._dataFile = 'data'
         
         
-        if dataDir == 'datatables' or dataDir == 'workspaces':  
+        if dataDir == 'datatables':
             datasetFolder = os.path.join(baseFolder, datasetId)
-        
-            self._datatablesFolder = os.path.join(datasetFolder, dataDir)
-        elif dataDir == 'workspaces':
-            datasetFolder = os.path.join(baseFolder,datasetId, self._workspaceId)
             self._datatablesFolder = os.path.join(datasetFolder, dataDir)
         elif dataDir == '2D_datatables':
             datasetFolder = os.path.join(baseFolder, datasetId)
         
             self._datatablesFolder = os.path.join(datasetFolder, dataDir)
             self._dataFile = 'data.hdf5'
-        elif dataDir == 'customdata':
-            self._datatablesFolder = os.path.join(baseFolder, self._workspaceId)           
-            self._datasetFolder = self._datatablesFolder
-            
+
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
             self._globalSettings = SettingsGlobal(settingsFile, False)
@@ -93,11 +77,7 @@ class BaseImport(object):
         #This allows the use of the python logging api
         self._logger = logging.getLogger()
         
-        self._dao = SettingsDAO(self._calculationObject, self._datasetId, self._workspaceId)
-
-    def setWorkspaceId(self, workspaceId):
-        self._workspaceId = workspaceId
-        self._dao._workspaceId = workspaceId
+        self._dao = SettingsDAO(self._calculationObject, self._datasetId)
 
     #This changes the message displayed in the Server calcuations section on the web page
     def setInfo(self, message):
@@ -107,7 +87,6 @@ class BaseImport(object):
         
         self._calculationObject = src._calculationObject
         self._datasetId = src._datasetId
-        self._workspaceId = src._workspaceId
         self._importSettings = src._importSettings
         self._dataDir = src._dataDir
         self._datasetFolder = src._datasetFolder
@@ -119,8 +98,8 @@ class BaseImport(object):
 
         
     def __str__(self):
-        return ("datasetFolder {} datatablesFolder {} datasetId {} workspaceId {} tablesToken {} dataDir {}".format(
-                self._datasetFolder, self._datatablesFolder,self._datasetId, self._workspaceId, self._tablesToken, self._dataDir))
+        return ("datasetFolder {} datatablesFolder {} datasetId {} tablesToken {} dataDir {}".format(
+                self._datasetFolder, self._datatablesFolder,self._datasetId, self._tablesToken, self._dataDir))
     
     def _getImportSetting(self, name):
         ret = None
@@ -163,7 +142,7 @@ class BaseImport(object):
         self._log(settings)
         self._log(str(self))
         if not os.path.isfile(settings):
-            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
+            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable))
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
         if not os.path.isfile(data):
@@ -171,7 +150,7 @@ class BaseImport(object):
             if os.path.isfile(data1):
                 self._dataFile = self._dataFile + '.gz'
             else:
-                self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable, self._workspaceId))
+                self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable))
 #                raise Exception("Missing data {}".format(data))
         
         return settings, data
@@ -184,7 +163,7 @@ class BaseImport(object):
 #        self._log("BaseImport._getDataFiles",settings)
 #        self._log("BaseImport._getDataFiles",str(self))
         if not os.path.isfile(settings):
-            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
+            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable))
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
         if not os.path.isfile(data):
@@ -192,22 +171,10 @@ class BaseImport(object):
             if os.path.isfile(data1):
                 self._dataFile = self._dataFile + '.gz'
             else:
-                self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable, self._workspaceId))
+                self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable))
 #                raise Exception("Missing data {}".format(data))
         
         return settings, data
-    
-    def _fetchCustomSettings(self, source, datatable):
-                
-        settings, data = self._getCustomSettings(source, datatable)
-        
-        tableSettings = None
-        if not os.path.isfile(settings):
-            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable, self._workspaceId))
-        else:
-            tableSettings = SettingsCustomData(settings)
-        
-        return tableSettings
     
     def _fetchSettings(self, datatable):
                 

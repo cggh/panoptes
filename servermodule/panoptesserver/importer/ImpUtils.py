@@ -3,17 +3,11 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-import numpy
-import re
 import config
 import uuid
 import DQXDbTools
 import DQXUtils
 import errno
-from DQXTableUtils import VTTable
-import customresponders.panoptesserver.Utils as Utils
-import simplejson
-import copy
 
 def convertToBooleanInt(vl):
     if vl is None:

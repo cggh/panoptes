@@ -14,7 +14,8 @@ import arraybuffer
 from gzipstream import gzip
 
 #curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=SnpName&row_order=ID' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
-
+from importer.SettingsDataTable import SettingsDataTable
+from importer.Settings2Dtable import Settings2Dtable
 CHUNK_SIZE = 400
 
 
@@ -109,15 +110,18 @@ def select_by_list(properties, row_idx, col_idx):
         result[prop].shape = (len(row_idx), len(col_idx)) if arities[prop] == 1 else (len(row_idx), len(col_idx), arity)
     return result
 
-def get_table_ids(cur, datatable):
-    sql = "SELECT col_table, row_table FROM 2D_tablecatalog WHERE id=%s"
-    cur.execute(sql, (datatable,))
-    result = cur.fetchall()[0]
-    return result
+def get_table_ids(cur, dataset, datatable):
+    tableSettings = Settings2Dtable()
+    tableSettings.loadFile(os.path.join(config.SOURCEDATADIR, 'datasets', dataset, '2D_datatables', datatable, 'settings'))
+    # rowTableSettings = SettingsDataTable()
+    # rowTableSettings.loadFile(
+    #     os.path.join(os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['rowDataTable'], 'settings'))
+    # columnTableSettings = SettingsDataTable()
+    # columnTableSettings.loadFile(
+    #     os.path.join(
+    #         os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['columnDataTable'], 'settings'))
 
-
-def get_workspace_table_name(tableid, workspaceid):
-    return "{0}CMB_{1}".format(tableid, workspaceid)
+    return tableSettings['columnDataTable'], tableSettings['rowDataTable']
 
 
 def response(request_data):
@@ -156,7 +160,6 @@ def summarise_call(calls):
 def handler(start_response, request_data):
     datatable = request_data['datatable']
     dataset = request_data['dataset']
-    workspace = request_data['workspace']
     two_d_properties = request_data['2D_properties'].split('~')
     col_properties = request_data['col_properties'].split('~')
     row_properties = request_data['row_properties'].split('~')
@@ -213,9 +216,7 @@ def handler(start_response, request_data):
     row_properties.append(row_index_field)
 
     with DQXDbTools.DBCursor(request_data, dataset, read_timeout=config.TIMEOUT) as cur:
-        col_tableid, row_tableid = get_table_ids(cur, datatable)
-        col_tablename = get_workspace_table_name(col_tableid, workspace)
-        row_tablename = get_workspace_table_name(row_tableid, workspace)
+        col_tablename, row_tablename = get_table_ids(cur, dataset, datatable)
 
         col_result = index_table_query(cur,
                                        col_tablename,

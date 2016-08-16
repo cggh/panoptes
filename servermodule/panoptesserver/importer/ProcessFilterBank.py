@@ -10,8 +10,6 @@ from BaseImport import BaseImport
 import gzip
 import shutil
 
-from DQXDbTools import DBCOLESC
-import customresponders.panoptesserver.Utils as Utils
 from SettingsDataTable import SettingsDataTable
 
 #Enable with logging.basicConfig(level=logging.DEBUG)
@@ -215,18 +213,6 @@ class ProcessFilterBank(BaseImport):
                 if writeColumnFiles:
                     output["destFile"].close()
 
-
-
-
-    def _replaceSummaryValuesDB(self, tableid, tableSettings, propid, sourceid):
-            
-        #Don't know why here when createSummaryValues has already deleted all
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            self._dao.insertSummaryValues(tableid, tableSettings, propid, sourceid)
-
-
-
-
     def _getTrackDest(self, propid):
         destFolder = os.path.join(self._config.getBaseDir(), 'SummaryTracks', self._datasetId, propid)
         if not os.path.exists(destFolder):
@@ -266,9 +252,6 @@ class ProcessFilterBank(BaseImport):
             updateDb = False
             self._log("Not creating summary values for:" + settings["name"] + str(settings))
         
-        if updateDb:
-            self._replaceSummaryValuesDB(tableid, tableSettings, propid, sourceid)
-            return values
         return None
 
     def _preparePropertiesBasedSummaryValues(self, sourceFileName, tableid, tableSettings):
@@ -289,11 +272,6 @@ class ProcessFilterBank(BaseImport):
  
 
     def _prepareSummaryValues(self, tableid):
-        
-        #See also _replaceSummaryValuesDB
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            self._dao.deleteSummaryValuesForTable(tableid)
-        
         settings, sourceFileName = self._getDataFiles(tableid)
         
         #self._log(("Preparing to create summary values for {} from {} using {}").format(tableid, sourceFileName, settings))
@@ -373,10 +351,7 @@ class ProcessFilterBank(BaseImport):
     def _prepareTableBasedSummaryValues(self, tableid):
            
         tableSettings = self._fetchSettings(tableid)
-           
-        if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-            sql = self._dao.deleteTableBasedSummaryValuesForTable(tableid)
-            
+
         output = []
         if tableSettings['tableBasedSummaryValues']:
             #self._log('Processing table-based summary values')
@@ -385,9 +360,6 @@ class ProcessFilterBank(BaseImport):
             for stt in tableSettings['tableBasedSummaryValues']:
                 summaryid = stt['id']
                 #with self._logHeader('Table based summary value {0}, {1}'.format(tableid, summaryid)):
-                
-                if self._getImportSetting('Process') == 'all' or self._getImportSetting('Process') == 'db':
-                    self._dao.insertTableBasedSummaryValues(tableid, tableSettings, summaryid)
                 
                 outputs = self._prepareSummaryFilterBank(tableid, tableSettings, summaryid)
                 output = output + outputs
@@ -408,37 +380,6 @@ class ProcessFilterBank(BaseImport):
             outputa = [ out ]
             self._extractColumnsAndProcess(outputa, False, readHeader, False)
 
-     
-    def createCustomSummaryValues(self, sourceid, tableid):
-    
-        settings = self._fetchCustomSettings(sourceid, tableid)
-        
-        tables = self._dao.getTablesInfo(tableid)
-        tableSettings = tables[0]["settings"]
-        
-        isPositionOnGenome = False
-        if tableSettings['isPositionOnGenome']:
-            isPositionOnGenome = True
-            chromField = tableSettings['chromosome']
-            posField = tableSettings['position']
-                
-        self._log('Creating custom summary values')
-        outputs = []
-        for propid in settings.getPropertyNames():
-            if settings.getPropertyValue(propid,'summaryValues'):
-                with self._logHeader('Creating summary values for custom data {0}'.format(tableid)):
-                    
-                    columns = [DBCOLESC(chromField), DBCOLESC(posField), propid ]
-                    outputdef = self._defineSettings(tableid, settings, propid, Utils.GetTableWorkspaceView(self._workspaceId, tableid), columns, sourceid = 'custom', useDB = True)
-                    
-                    if not isPositionOnGenome:
-                        raise Exception('Summary values defined for non-position table')
-
-                    outputs.append(outputdef)
-                            
-
-        self._extractColumnsAndProcess(outputs, writeHeader = False, readHeader = False, writeColumnFiles = False)
-        
     def _getRefGenomeSummaryFolders(self):
         summaryids = []
         
@@ -664,12 +605,10 @@ if __name__ == "__main__":
                 'Process': processType
             }
         
-    workspaceId = None
-    
     if len(sys.argv) > 4 and sys.argv[4] == 'mpi':
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
          #calc.logfilename = os.path.join(os.getcwd(),'filterbank.log')
-         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings)
          #Need to install openmpi in order to use this option
          #
          #Optional import - note not in REQUIREMENTS
@@ -694,5 +633,5 @@ if __name__ == "__main__":
  
     else:
          calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
-         filterBanker = ProcessFilterBank(calc, datasetid, importSettings, workspaceId)
+         filterBanker = ProcessFilterBank(calc, datasetid, importSettings)
          filterBanker.createAllSummaryValues()

@@ -19,7 +19,6 @@ def response(returndata):
 
     sourcetype = DQXDbTools.ToSafeIdentifier(returndata['sourcetype'])
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     sourceid = DQXDbTools.ToSafeIdentifier(returndata['sourceid'])
 
@@ -39,29 +38,16 @@ def response(returndata):
         dataFolder = os.path.join(baseFolder, databaseName, 'datatables', tableid)
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
         ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DROP TABLE IF EXISTS {0}'.format(DBTBESC(tableid)))
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM tablecatalog WHERE id="{0}"'.format(tableid))
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM propertycatalog WHERE tableid="{0}"'.format(tableid))
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM summaryvalues WHERE tableid="{0}"'.format(tableid))
 
     if sourcetype == '2D_datatable':
         dataFolder = os.path.join(baseFolder, databaseName, '2D_datatables', tableid)
         authorization.VerifyIsDataSetManager(credInfo, databaseName)
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM 2D_tablecatalog WHERE id="{0}"'.format(tableid))
-        ImpUtils.ExecuteSQL(calculationObject, databaseName, 'DELETE FROM 2D_propertycatalog WHERE tableid="{0}"'.format(tableid))
         ImpUtils.mkdir(os.path.join(config.BASEDIR, '2D_data'))
         path_join = os.path.join(config.BASEDIR, '2D_data', databaseName + '_' + tableid + '.hdf5')
         try:
             os.remove(path_join)
         except OSError:
             pass
-
-    if sourcetype == 'workspace':
-        dataFolder = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid)
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
-
-    if sourcetype == 'customdata':
-        dataFolder = os.path.join(baseFolder, databaseName, 'workspaces', workspaceid, 'customdata', tableid, sourceid)
-        credInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(databaseName, 'workspaces'))
 
     if dataFolder is None:
         returndata['Error'] = 'Invalid file source type'

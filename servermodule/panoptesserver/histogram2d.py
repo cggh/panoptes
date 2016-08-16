@@ -12,7 +12,6 @@ import config
 
 def response(returndata):
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     propidx = DQXDbTools.ToSafeIdentifier(returndata['propidx'])
     propidy = DQXDbTools.ToSafeIdentifier(returndata['propidy'])

@@ -20,5 +20,5 @@ class SettingsGlobal(SettingsDataset):
                 st = simplejson.dumps(st)
 
             from SettingsDAO import SettingsDAO                
-            dao = SettingsDAO(calculationObject, datasetId, None)
+            dao = SettingsDAO(calculationObject, datasetId)
             dao.saveSettings(token, st)

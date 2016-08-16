@@ -42,19 +42,7 @@ def response(returndata):
             datasets = {}
             for datasetid in os.listdir(baseFolder):
                 if os.path.isdir(os.path.join(baseFolder, datasetid)):
-                    if authorization.CanDo(cur.credentials, DQXDbTools.DbOperationWrite(datasetid, 'workspaces')).IsGranted():
-                        datasets[datasetid] = { 'workspaces': {} }
-                        if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces')):
-                            for wsid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces')):
-                                if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid)):
-                                    workspace = { 'sources': {} }
-                                    datasets[datasetid]['workspaces'][wsid] = workspace
-                                    if os.path.exists(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
-                                        for tableid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata')):
-                                            if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                                for sourceid in os.listdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid)):
-                                                    if os.path.isdir(os.path.join(baseFolder, datasetid, 'workspaces', wsid, 'customdata', tableid, sourceid)):
-                                                        workspace['sources'][sourceid] = { 'tableid': tableid }
+                    if authorization.CanDo(cur.credentials, DQXDbTools.DbOperationWrite(datasetid)).IsGranted():
                         # Fetch info about datatables
                         datatables = {}
                         if os.path.exists(os.path.join(baseFolder, datasetid, 'datatables')):

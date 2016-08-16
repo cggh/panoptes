@@ -14,18 +14,16 @@ from PanoptesConfig import PanoptesConfig
 import time
 import math
 import sqlparse
-import sys
 from _mysql import OperationalError, ProgrammingError
 from Numpy_to_SQL import Numpy_to_SQL
 
 
 class SettingsDAO(object):
     
-    def __init__ (self, calculationObject, datasetId, workspaceId, logCache = None):
+    def __init__ (self, calculationObject, datasetId, logCache = None):
                
         self._calculationObject = calculationObject
         self._datasetId = datasetId
-        self._workspaceId = workspaceId
 
         self._config = PanoptesConfig(self._calculationObject)
         
@@ -153,13 +151,6 @@ class SettingsDAO(object):
                 self._log('DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid)))
                 cur.execute(stmt)
 
-    def dropView(self, tableid):
-        self._checkPermissions('', tableid)
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self._execSql('DROP VIEW IF EXISTS {}'.format(DBTBESC(tableid)))
-            
     #Check if the user has permission to write
     #The settingsTable is the global table
     #tableid is the name of a configured table in 'datatables'
@@ -184,96 +175,9 @@ class SettingsDAO(object):
     
     
     def clearDatasetCatalogs(self):
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'propertycatalog'))
-        self._execSql('DELETE FROM propertycatalog')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'summaryvalues'))
-        self._execSql('DELETE FROM summaryvalues')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'tablecatalog'))
-        self._execSql('DELETE FROM tablecatalog')
         self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'settings'))
         self._execSql('DELETE FROM settings WHERE id<>"DBSchemaVersion"')
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'customdatacatalog'))
-        self._execSql('DELETE FROM customdatacatalog')
-    
-       
-    def getTablesInfo(self, tableid = None):
 
-        self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationRead(self._datasetId, 'settings'))
-        if tableid == None:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog'
-        else:
-            sql = 'SELECT id, primkey, settings FROM tablecatalog WHERE id="{0}"'.format(tableid)
-        rows = self._execSqlQuery(sql)
-        
-
-        tables = [ { 'id': row[0], 'primkey': row[1], 'settingsStr': row[2] } for row in rows]
-        
-        if not tableid is None and len(tables) != 1:
-            raise Exception("Index Table " + tableid + " doesn't exist")
-            
-        for table in tables:
-            tableSettings = SettingsDataTable()
-            tableSettings.deserialize(table['settingsStr'])
-            table['settings'] = tableSettings
-            
-        return tables
-            
-    def insertTableCatalogEntry(self, tableid, tableSettings, tableOrder):
-        
-        self._checkPermissions('tablecatalog', tableid)
-
-        # Drop existing tablecatalog record
-        sql = "DELETE FROM tablecatalog WHERE id=%s"
-        self._execSql(sql, tableid)
-    # Add to tablecatalog
-        sql = "INSERT INTO tablecatalog (`id`, `name`, `primkey`, `IsPositionOnGenome`, `settings`, `defaultQuery`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        
-        self._execSql(sql, tableid, 
-            tableSettings['namePlural'],
-            tableSettings['primKey'],
-            tableSettings['isPositionOnGenome'],
-            tableSettings.serialize(), 
-            "", #defaultQuery
-            tableOrder)
-
-    def deletePropertiesForTable(self, tableid):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        self._execSql("DELETE FROM propertycatalog WHERE tableid=%s",tableid)
-
-
-    def insertTableProperty(self, tableid, tableSettings, propid):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        sql = "INSERT INTO propertycatalog (`workspaceid`, `source`, `datatype`, `propid`, `tableid`, `name`, `ordr`, `settings`) VALUES ('', 'fixed', %s, %s, %s, %s, %s, %s)"
-        
-        self._execSql(sql, tableSettings.getPropertyValue(propid, 'dataType'),
-            propid, 
-            tableid, 
-            tableSettings.getPropertyValue(propid, 'name'),
-            0, 
-            tableSettings.serializeProperty(propid))
-
-    def deleteRelationsForTable(self, tableid):
-        self._checkPermissions('relations', tableid)
-        
-        self._execSql("DELETE FROM relations WHERE childtableid=%s", tableid)
-        
-    def insertTableRelation(self, tableid, tableSettings, propid):
-        self._checkPermissions('relations', tableid)
-        
-        if 'relation' in tableSettings.getProperty(propid):
-            relationSettings = tableSettings.getPropertyValue(propid, 'relation')
-            self._log('Creating relation: {} {} {}'.format(relationSettings['tableId'], relationSettings['forwardName'], relationSettings['reverseName']))
-            self._execSql("INSERT INTO relations (`childtableid`, `childpropid`, `parenttableid`, `parentpropid`, `forwardname`, `reversename`) VALUES (%s, %s, %s, %s, %s, %s)",
-                          tableid, 
-                          propid, 
-                          relationSettings['tableId'],
-                          '', 
-                          relationSettings['forwardName'],
-                          relationSettings['reverseName'])
-            
-            
     def insertGraphForTable(self, tableid, graphid, graphSettings):
         self._checkPermissions('graphs', tableid)
         crosslink = graphSettings['crossLink']
@@ -291,16 +195,6 @@ class SettingsDAO(object):
         
         self._execSql("DELETE FROM graphs WHERE tableid=%s",tableid)
     
-    def deleteCustomDataCatalogEntry(self, sourceid, tableid):
-        self._checkPermissions('customdatacatalog', tableid)
-        self._execSql('DELETE FROM customdatacatalog WHERE tableid=%s and sourceid=%s',tableid, sourceid)
-
-
-    def insertCustomDataSettings(self, sourceid, tableid, settings):
-        self._checkPermissions('customdatacatalog', tableid)
-        self._execSql("INSERT INTO customdatacatalog VALUES (%s, %s, %s)",tableid, sourceid, settings.serialize())
-
-
     def dropColumns(self, table, columns):
         sql = "ALTER TABLE {0} ".format(DBTBESC(table))
         for prop in columns:
@@ -310,81 +204,7 @@ class SettingsDAO(object):
         
         self._execSql(sql)
     
-    
-    def deleteFromWorkspacePropertyCatalog(self, tableid, prop = None):
-        self._checkPermissions('propertycatalog', tableid)
-        print 'Removing outdated information: {0} {1} {2}'.format(self._workspaceId, prop, tableid)
-        if prop != None:
-            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (propid=%s) and (tableid=%s)',self._workspaceId, prop, tableid)
-        else:
-            self._execSql('DELETE FROM propertycatalog WHERE (workspaceid=%s) and (tableid=%s)',self._workspaceId, tableid)
-
-    def insertIntoWorkspacePropertyCatalog(self, tableid, propid, settings):
-        self._checkPermissions('propertycatalog', tableid)
-        
-        self._execSql("INSERT INTO propertycatalog VALUES (%s, 'custom', %s, %s, %s, %s, %s, %s)",self._workspaceId, 
-            settings.getPropertyValue(propid, 'dataType'),
-            propid, 
-            tableid, 
-            settings.getPropertyValue(propid, 'name'),
-            0, 
-            settings.serializeProperty(propid))
-
-    
-    def deleteSummaryValuesForTable(self, tableid):
-        self._checkPermissions('summaryvalues', tableid)
-        
-        self._execSql("DELETE FROM summaryvalues WHERE tableid=%s",tableid)
-            
-    def insertSummaryValues(self, tableid, tableSettings, propid, sourceid):
-        self._checkPermissions('summaryvalues', tableid)
-        summSettings = tableSettings.getPropertyValue(propid, 'summaryValues')
-        name = tableSettings.getPropertyValue(propid, 'name')
-
-        self._execSql("DELETE FROM summaryvalues WHERE (propid=%s) and (tableid=%s) and (source=%s) and (workspaceid=%s)",propid, tableid, sourceid, self._workspaceId)
-
-        self._execSql("INSERT INTO summaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", self._workspaceId or '', 
-            sourceid, 
-            propid, 
-            tableid, 
-            name, 
-            tableSettings.getPropertyValue(propid, 'order'),
-            tableSettings.serializeSummaryValues(propid), 
-            tableSettings.getPropertyValue(propid, 'minVal'),
-            tableSettings.getPropertyValue(propid, 'maxVal'),
-            summSettings['blockSizeMin'])
-
-    def deleteTableBasedSummaryValuesForTable(self, tableid):
-        self._checkPermissions('tablebasedsummaryvalues', tableid)
-        self._execSql("DELETE FROM tablebasedsummaryvalues WHERE tableid=%s", tableid)
-
-
-    def insertTableBasedSummaryValues(self, tableid, tableSettings, summaryid):
-        self._checkPermissions('tablebasedsummaryvalues', tableid)
-        
-        self._execSql("INSERT INTO tablebasedsummaryvalues VALUES (%s, %s, %s, %s, %s, %s, %s, 0)", tableid, summaryid, 
-            tableSettings.getTableBasedSummaryValue(summaryid)['name'],
-            tableSettings.serializeTableBasedValue(summaryid), 
-            tableSettings.getTableBasedSummaryValue(summaryid)['minVal'],
-            tableSettings.getTableBasedSummaryValue(summaryid)['maxVal'],
-            tableSettings.getTableBasedSummaryValue(summaryid)['blockSizeMin'])
-
-
-    def materializeView(self, tableSettings, indexedColumns, wstable):
-        tmptable = '_tmptable_'
-        self.dropTable(tmptable)
-        self._execSql('CREATE TABLE {} as SELECT * FROM {}'.format(tmptable, DBTBESC(wstable)))
-        for indexedColumn in indexedColumns:
-            self.createIndex(indexedColumn, tmptable, indexedColumn)
-        
-        if tableSettings['isPositionOnGenome']:
-            self._log('Indexing chromosome,position on materialised view')
-            self.createIndex('mt1_chrompos', tmptable, DBCOLESC(tableSettings['chromosome']) + "," + DBCOLESC(tableSettings['position']))
-        self.dropView(wstable)
-        self._execSql('RENAME TABLE {} TO {}'.format(tmptable, DBTBESC(wstable)))
-        
     def createIndex(self, indexName, tableid, columns, unique = False):
-        
         cols = columns.split(",")
         modifier = ''
         if unique:
@@ -392,31 +212,7 @@ class SettingsDAO(object):
 
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
             
-    def createSubSampleTable(self, tableid, primKey, bulkLoad = False):
-        self._log('Creating random data column')
-        if bulkLoad == False:
-            self._execSql("UPDATE %s SET _randomval_=RAND()",DBTBESC(tableid))
-        sortRandTable = tableid + '_SORTRAND'
-        self.dropTable(sortRandTable)
 
-        self._execSql("CREATE TABLE {} LIKE {}".format(DBTBESC(sortRandTable), DBTBESC(tableid)))
-        if primKey == "AutoKey":
-            self._log('Restructuring AutoKey')
-            self._execSql("alter table {} drop column AutoKey".format(DBTBESC(sortRandTable)))
-            self._execSql("alter table {} add column AutoKey int FIRST".format(DBTBESC(sortRandTable)))
-            self._execSql("create index idx_autokey on {}(AutoKey)".format(DBTBESC(sortRandTable)))
-        self._execSql("alter table {} add column RandPrimKey int AUTO_INCREMENT PRIMARY KEY".format(DBTBESC(sortRandTable)))
-        
-        # NOTE: there is little point in importing more than that!
-        self._execSql("insert into {} select *,0 from {} order by _randomval_ LIMIT 5000000".format(DBTBESC(sortRandTable), DBTBESC(tableid)))
-        
-    def checkForColumn(self, table, column):
-        try:
-            idx_field = self._execSqlQuery("SELECT {} FROM {} LIMIT 1".format(DBCOLESC(column), DBTBESC(table)) )
-        except:
-            #raise Exception(column + " column index field doesn't exist in table " + table)
-            raise
-        
     def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
@@ -525,10 +321,6 @@ class SettingsDAO(object):
         self._checkPermissions('settings', None)
         self._execSql("INSERT INTO settings VALUES (%s, %s)", token, st)
                 
-    def deleteChromosomes(self):
-        self._checkPermissions('chromosomes', None)
-        self._execSql('DELETE FROM chromosomes')
-        
     def registerDataset(self, name, configOnly):
         importtime = 0
         if not configOnly:
@@ -537,4 +329,3 @@ class SettingsDAO(object):
         self._datasetId = None
         self._execSql("INSERT INTO datasetindex VALUES (%s, %s, %s)", db, name, str(math.ceil(importtime)))
         self._datasetId = db
-        

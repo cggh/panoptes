@@ -11,8 +11,7 @@ from BaseImport import BaseImport
 from SettingsGraph import SettingsGraph
 
 class ImportDataTable(BaseImport):
-    tableOrder = 0
-      
+
     #Retrieve and validate settings
     def getSettings(self, tableid):
         tableSettings = self._fetchSettings(tableid)    
@@ -27,31 +26,12 @@ class ImportDataTable(BaseImport):
         with self._logHeader('Importing datatable {0}'.format(tableid)):
    
             tableSettings = self.getSettings(tableid)
-    
-            self._dao.insertTableCatalogEntry(tableid, tableSettings, self.tableOrder)
-            self.tableOrder += 1
-       
-            self._dao.deletePropertiesForTable(tableid)
-            
-            self._dao.deleteRelationsForTable(tableid)
 
-            ranknr = 0
-            for propid in tableSettings.getPropertyNames():
-                
-                if not tableSettings.getPropertyValue(propid,'readData'):
-                    continue
-                
-                self._dao.insertTableProperty(tableid, tableSettings, propid)
-                
-                self._dao.insertTableRelation(tableid, tableSettings, propid)
-                
-                ranknr += 1    
- 
-            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+            importer = ProcessDatabase(self._calculationObject, self._datasetId, self._importSettings)
                        
             importer.importData(tableid, createSubsets = True)
             
-            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings, self._workspaceId)
+            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings)
             filterBanker.createSummaryValues(tableid)
            
             importer.cleanUp()

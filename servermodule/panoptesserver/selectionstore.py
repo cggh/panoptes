@@ -15,26 +15,16 @@ from DQXDbTools import DBTBESC
 def ResponseExecute(returndata, calculationObject):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     keyid = DQXDbTools.ToSafeIdentifier(returndata['keyid'])
     propid = DQXDbTools.ToSafeIdentifier(returndata['propid'])
     dataid = DQXDbTools.ToSafeIdentifier(returndata['dataid'])
     iscustom = int(returndata['iscustom']) > 0
     hassubsampling = int(returndata['hassubsampling']) > 0
-    cachedworkspace = int(returndata['cachedworkspace']) > 0
 
     tableList = []
 
-    if not cachedworkspace:
-        if not iscustom:
-            tableList.append(tableid)
-        else:
-            tableList.append(Utils.GetTableWorkspaceProperties(workspaceid, tableid))
-    else:
-        tableList.append(Utils.GetTableWorkspaceView(workspaceid, tableid))
-        if hassubsampling:
-            tableList.append(Utils.GetTableWorkspaceViewSubSampling(workspaceid, tableid))
+    tableList.append(tableid)
 
     #calculationObject.Log('==== storing selection '+dataid)
 

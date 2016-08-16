@@ -3,11 +3,8 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
-from DQXTableUtils import VTTable
 import ImpUtils
 import shutil
-import customresponders.panoptesserver.Utils as Utils
-import sys
 from ProcessFilterBank import ProcessFilterBank
 from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
@@ -34,7 +31,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     if not os.path.exists(folder):
         return False
 
-    dao = SettingsDAO(calculationObject, datasetId, None)
+    dao = SettingsDAO(calculationObject, datasetId)
             
     with calculationObject.LogHeader('Importing reference genome data'):
 
@@ -68,27 +65,6 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                     ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, [str_maxbasecount, 'refsequence.fa'])
             else:
                 calculationObject.Log('WARNING: missing reference sequence file')
-
-
-        # Import chromosomes
-        with calculationObject.LogHeader('Loading chromosomes'):
-            tb = VTTable.VTTable()
-            tb.allColumnsText = True
-            try:
-                tb.LoadFile(os.path.join(folder, 'chromosomes'))
-            except Exception as e:
-                raise Exception('Error while reading chromosomes file: '+str(e))
-            tb.RequireColumnSet(['chrom', 'length'])
-            tb.RenameCol('chrom','id')
-            tb.RenameCol('length','len')
-            tb.ConvertColToValue('len')
-            with calculationObject.LogDataDump():
-                tb.PrintRows(0, 99)
-            sqlfile = ImpUtils.GetTempFileName()
-            tb.SaveSQLDump(sqlfile, 'chromosomes')
-            dao.deleteChromosomes()
-            dao.loadFile(sqlfile)
-            os.remove(sqlfile)
 
         # Import annotation
         if not(importSettings['ConfigOnly']):

@@ -71,11 +71,6 @@ class SettingsDataTable(ImportSettings):
                                  }
                              }
                          }),
-                         ('cacheWorkspaceData', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'description': 'If set, a materialised table will be created in the relational database for this data in each workspace.\n  For large data tables (>1M records), this option is faster than the standard option, which uses a JOIN statement'
-                                }),
                          ('maxCountQueryRecords', {
                                    'type': 'Value',
                                    'required': False,
@@ -387,7 +382,7 @@ containing the relative size of that specific pie'''
                                    'required': False,
                                    'default': 'chrom',
                                    'settingRequired': [{ 'name': 'isPositionOnGenome', 'value': True}, { 'name': 'isRegionOnGenome', 'value': True}],
-                                   'description': 'Specifies the table column ID that contains the chromosome\n  (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).\n  Note that the values in this column should correspond to the content of the ``chromosomes`` source file\n  (see :ref:`def-source-referencegenome`)'
+                                   'description': 'Specifies the table column ID that contains the chromosome\n  (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).\n  Note that the values in this column should correspond to the content of fasta file\n  (see :ref:`def-source-referencegenome`)'
                                 }),
                          ('position', {
                                    'type': 'PropertyID',
@@ -579,11 +574,6 @@ The key *Type* for member of the data table settings key *DataItemViews* can hav
             detail = tableSettings[key]
             self._printProperty(key, detail, f)
         f.close()
-        
-        #For insertion into tablebasedsummaryvalues
-    def serializeTableBasedValue(self, key):
-        return self._prepareSerialization(self.getTableBasedSummaryValue(key), self.getSettings()['tableBasedSummaryValues']['children'])
-   
-        
+
         
         

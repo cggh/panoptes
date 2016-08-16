@@ -55,16 +55,6 @@ def CanDo(credInfo, operation):
     if authRules.Match(credInfo, operation.databaseName, PnAuthRule.manage):
         return DQXDbTools.DbAuthorization(True)
 
-    # Allow some more restricted stuff for uploading custom data
-    if authRules.Match(credInfo, operation.databaseName, PnAuthRule.edit):
-        if operation.tableName is not None:
-            allowedTables = ['propertycatalog', 'workspaces', 'summaryvalues']
-            for allowedTable in allowedTables:
-                if operation.OnTable(allowedTable):
-                    return DQXDbTools.DbAuthorization(True)
-                if operation.tableName.find('INFO_')>0:# todo: implement better mechanism
-                    return DQXDbTools.DbAuthorization(True)
-
     return DQXDbTools.DbAuthorization(False, 'The login used does not allow you to perform this change.')
 
 

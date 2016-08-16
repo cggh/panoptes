@@ -9,7 +9,7 @@ class BasePlugin:
         self._dirPath = dirPath
         self._calculationObject = calculationObject
         self._config = PanoptesConfig(calculationObject)
-        self._dao = SettingsDAO(calculationObject, datasetId, None) 
+        self._dao = SettingsDAO(calculationObject, datasetId)
         self._datasetId = datasetId
         settingsDef = self.getSettings()
         self._log("Loading plugin settings from " + settings)

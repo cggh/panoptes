@@ -13,7 +13,6 @@ from DQXDbTools import DBTBESC
 def response(returndata):
 
     databaseName = DQXDbTools.ToSafeIdentifier(returndata['database'])
-    workspaceid = DQXDbTools.ToSafeIdentifier(returndata['workspaceid'])
     tableid = DQXDbTools.ToSafeIdentifier(returndata['tableid'])
     subsetid = DQXDbTools.ToSafeIdentifier(returndata['subsetid'])
 

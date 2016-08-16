@@ -242,7 +242,6 @@ let GenotypesChannel = React.createClass({
         columnQuery]);
       let APIargs = {
         database: this.config.dataset,
-        workspace: initialConfig.workspace,
         datatable: table,
         col_qry: SQL.WhereClause.encode(columnQuery),
         col_order: columnTableConfig.position,
