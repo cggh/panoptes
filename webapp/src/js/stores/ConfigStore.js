@@ -116,11 +116,13 @@ const ConfigStore = Fluxxor.createStore({
     };
 
     config.tables.forEach(processTable);
-    _forEach(config.genome.summaryValues, (table, id) => {
-      table.id = id;
-      processTable(table);
-      config.tablesById[`__reference__${id}`] = table;
-    });
+    if (config.genome && config.genome.summaryValues) {
+      _forEach(config.genome.summaryValues, (table, id) => {
+        table.id = id;
+        processTable(table);
+        config.tablesById[`__reference__${id}`] = table;
+      });
+    }
     return config;
   },
 
