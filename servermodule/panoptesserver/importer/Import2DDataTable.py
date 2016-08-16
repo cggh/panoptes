@@ -8,17 +8,12 @@ import DQXDbTools
 import DQXUtils
 import h5py
 import ImpUtils
-import copy
 import arraybuffer
-import customresponders.panoptesserver.Utils as Utils
 from BaseImport import BaseImport
-from Settings2Dtable import Settings2Dtable
+from SettingsDataTable import SettingsDataTable
 
 class Import2DDataTable(BaseImport):
 
-    property_order = 0
-    tableOrder = 0
-       
     def _hdf5_copy(self, src, dest, func = None, limit=None):
             #Process in chunk sized (at least on the primary dimension) pieces
             try:
@@ -75,58 +70,31 @@ class Import2DDataTable(BaseImport):
                 max_line_count = self._maxLineCount
                 
             table_settings = self.getSettings(tableid)
- 
-            
-    
+
+
             settingsFile, dataFile = self._getDataFiles(tableid)
             remote_hdf5 = h5py.File(dataFile, 'r')
             #Check that the referenced tables exist and have the primary key specified.
-            if table_settings['columnDataTable']:
-                tables = self._dao.getTablesInfo(table_settings['columnDataTable'])
-                cat_id = tables[0]["id"]
-                self._dao.checkForColumn(table_settings['columnDataTable'], table_settings['columnIndexField'])
-            if table_settings['rowDataTable']:
-                tables = self._dao.getTablesInfo(table_settings['rowDataTable'])
-                cat_id = tables[0]["id"]
 
-                self._dao.checkForColumn(table_settings['rowDataTable'], table_settings['rowIndexField'])
+            if table_settings['columnDataTable']:
+                columnTableSettings = SettingsDataTable()
+                columnTableSettings.loadFile(
+                    os.path.join(self._datasetFolder, 'datatables', table_settings['columnDataTable'], 'settings'))
+                columnProperties = [prop['id'] for prop in columnTableSettings['properties']]
+                if table_settings['columnIndexField'] not in columnProperties:
+                    raise Exception(table_settings['columnDataTable'] + ' does not have property ' + table_settings['columnIndexField'])
+            if table_settings['rowDataTable']:
+                rowTableSettings = SettingsDataTable()
+                rowTableSettings.loadFile(
+                    os.path.join(self._datasetFolder, 'datatables', table_settings['rowDataTable'], 'settings'))
+                rowProperties = [prop['id'] for prop in rowTableSettings['properties']]
+                if table_settings['rowIndexField'] not in rowProperties:
+                    raise Exception(table_settings['rowDataTable'] + ' does not have property ' + table_settings['rowIndexField'])
     
             if table_settings['showInGenomeBrowser']:
-                sql = "SELECT IsPositionOnGenome FROM tablecatalog WHERE id='{0}' ".format(table_settings['columnDataTable'])
-                is_position = self._dao._execSqlQuery(sql)[0][0]
-                if not is_position:
+                if not columnTableSettings['isPositionOnGenome']:
                     raise Exception(table_settings['columnDataTable'] + ' is not a genomic position based table (IsPositionOnGenome in config), but you have asked to use this table as a column index on a genome browseable 2D array.')
 
-            # Add to tablecatalog
-            sql = "INSERT INTO 2D_tablecatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(
-                tableid,
-                table_settings['namePlural'],
-                table_settings['columnDataTable'],
-                table_settings['rowDataTable'],
-                table_settings.serialize(),
-                self.tableOrder
-            )
-            self._dao._execSql(sql)
-            self.tableOrder += 1
-    
-            for propname in table_settings.getPropertyNames():
-                propid = table_settings.getPropertyValue(propname,'id')
-                dtype = arraybuffer._strict_dtype_string(remote_hdf5[propid].dtype)
-                arity = 1 if len(remote_hdf5[propid].shape) == 2 else remote_hdf5[propid].shape[2]
-                sql = "INSERT INTO 2D_propertycatalog VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', {5}, '{6}', '{7}', {8})".format(
-                    propid,
-                    tableid,
-                    table_settings['columnDataTable'],
-                    table_settings['rowDataTable'],
-                    table_settings.getPropertyValue(propname,'name'),
-                    self.property_order,
-                    dtype,
-                    table_settings.serializeProperty(propname),
-                    arity
-                )
-                self._dao._execSql(sql)
-                self.property_order += 1
-    
             if not self._importSettings['ConfigOnly']:
                 #Insert an index column into the index tables
                 if table_settings['columnDataTable']:
