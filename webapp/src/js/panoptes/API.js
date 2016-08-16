@@ -479,7 +479,7 @@ function modifyConfig(options) {
 
 
 function twoDPageQuery(options) {
-  assertRequired(options, ['database', 'workspace', 'datatable']);
+  assertRequired(options, ['database', 'datatable']);
   let defaults = {
     col_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
     row_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
@@ -497,7 +497,7 @@ function twoDPageQuery(options) {
     col_fail_limit: null,
   };
   const {
-    database, workspace, datatable, col_qry, row_qry, col_order, row_order, col_properties,
+    database, datatable, col_qry, row_qry, col_order, row_order, col_properties,
     row_properties, sort_mode, row_sort_property, row_sort_cols, col_key,
     row_offset, row_limit, col_fail_limit
   } = {...defaults, ...options};
@@ -511,7 +511,6 @@ function twoDPageQuery(options) {
       respid: '2d_query',
       dataset: database,
       datatable,
-      workspace,
       col_qry: encodeQuery(col_qry),
       row_qry: encodeQuery(row_qry),
       col_order,

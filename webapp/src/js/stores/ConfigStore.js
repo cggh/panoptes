@@ -223,13 +223,6 @@ const ConfigStore = Fluxxor.createStore({
         table.propertyGroupsById['_UNGROUPED_'].properties.push(prop);
       }
 
-      // Determine table name where the column is originally defined
-      if (prop.source == 'fixed') {
-        prop.originalTableName = table.id;
-      } else {
-        prop.originalTableName = table.id + 'INFO_' + initialConfig.workspace; //eslint-disable-line no-undef
-      }
-
       if (prop.isFloat) {
         if (prop.decimDigits == 0)
           prop.isInt = true;
