@@ -220,9 +220,9 @@ class LoadTable(threading.Thread):
                             "cut out this column with 'cut -f %s data --complement'" % (tableid, cols, positions, positions))
         #Table order has to be file order
         for col in header_names:
-            name = self._loadSettings.getPropertyValue(col,'Id')
-            typedefn = self._loadSettings.getPropertyValue(col,'DataType')
-            maxlen = self._loadSettings.getPropertyValue(col,'MaxLen')
+            name = self._loadSettings.getPropertyValue(col,'id')
+            typedefn = self._loadSettings.getPropertyValue(col,'dataType')
+            maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
             st = DBCOLESC(name)
             typestr = ''
             if typedefn == 'Text':

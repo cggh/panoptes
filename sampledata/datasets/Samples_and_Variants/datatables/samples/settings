@@ -66,11 +66,11 @@ properties:
   showInTable: true
 
 - id: Value2
-  Name: Value 2
+  name: Value 2
   description: An example of a numerical value
   dataType: Value
-  MinVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
-  MaxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
+  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
+  maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
   showInTable: true
 
@@ -94,7 +94,6 @@ properties:
   description: An example of a comment string
   dataType: Text
   showInTable: true
-  maxColumnWidth: 120               # Specifies the maximum pixel width used for the column representing this property in a table
   search: Pattern
 
 
