@@ -1,8 +1,13 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
+nameSingle: nucleotide     # Display name referring to a table item (single, no capital)
+namePlural: nucleotides    # Display name referring to a table item (plural, no capital)
+description: A table containing a row for each base in the sequence     # A description of this data table
+
+
 isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 chromosome: Chrom            # Speficies the table column ID that contains the chromosome
 position: Pos
-nameSingle: combined
-namePlural: combined
 primKey: AutoKey
 
 properties:
@@ -14,7 +19,7 @@ properties:
   dataType: Value
 - id: Accessibility
   name: Accessibility
-  description: Whether this base is accesible
+  description: Whether this base is accessible
   order: 4
   dataType: Text
   isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
@@ -22,11 +27,6 @@ properties:
     'False': rgb(230,80,80)
     'True': rgb(153,189,75)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  showInBrowser: true
-  summaryValues:
-    blockSizeMin: 1
-    blockSizeMax: 50000
-  defaultVisible: false
 
 - id: Uniqueness
   name: Uniqueness
@@ -36,8 +36,3 @@ properties:
   dataType: Value
   minVal: 0
   maxVal: 200
-  showInBrowser: true
-  summaryValues:
-    blockSizeMin: 20
-    blockSizeMax: 50000
-  defaultVisible: true

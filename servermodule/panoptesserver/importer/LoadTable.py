@@ -245,7 +245,7 @@ class LoadTable(threading.Thread):
 
         if self._loadSettings["primKey"] == "AutoKey":
             self._dao._execSql("ALTER TABLE %s ADD COLUMN %s int AUTO_INCREMENT PRIMARY KEY" % (DBTBESC(self._tableId),
-                                                                                            DBCOLESC(self._loadSettings["PrimKey"])))
+                                                                                            DBCOLESC(self._loadSettings["primKey"])))
         #
         # #This is connected to Import2DDataTable - it's much quicker to add it now rather than
         # #when doing the import
