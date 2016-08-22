@@ -8,8 +8,6 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes components
 import PieChartSectorWidget from 'Chart/Pie/Sector/Widget';
 
-import 'pie-chart.scss';
-
 // constants in this component
 // TODO: to go in config?
 const DEFAULT_OUTER_RADIUS = 5;
@@ -71,6 +69,7 @@ let PieChartWidget = React.createClass({
           outerRadius={outerRadius}
           fillColor={sectorData.color}
           title={sectorData.title}
+          className="panoptes-chart-pie-sector"
         />
     );
 
