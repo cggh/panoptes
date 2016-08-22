@@ -78,6 +78,7 @@ let ComponentMarkerWidget = React.createClass({
       <DivIcon
         alt={alt}
         children={children}
+        className="panoptes-map-componentmarker"
         onClick={(e) => onClick(e, this)}
         position={position}
         title={title}
