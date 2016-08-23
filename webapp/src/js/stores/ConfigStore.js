@@ -248,7 +248,7 @@ const ConfigStore = Fluxxor.createStore({
       if ((prop.dataType == 'Value') && (prop.id == table.position) && (table.hasGenomePositions))
         encoding = 'Int';
       if (prop.dataType == 'Boolean')
-        encoding = 'Int';
+        encoding = 'String';  //Temp till arraybuffer
       if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude'))
         encoding = 'Float4';
       if ((prop.dataType == 'Date'))

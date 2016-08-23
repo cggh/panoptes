@@ -35,7 +35,7 @@ let PropertyCell = React.createClass({
         ))}
       </span>);
     } else if (prop.dispDataType == 'Boolean' && value !== '') {
-      let val = (value == '1');
+      let val = (value == 'True');
       return <Icon className={(val ? 'prop bool true' : 'prop bool false')}
                    fixedWidth={false}
                    name={val ? 'check' : 'times'} />;
