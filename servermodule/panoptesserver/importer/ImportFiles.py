@@ -83,10 +83,6 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         
         ImportDocs(calculationObject, datasetFolder, datasetId)
 
-        # Global settings
-        with calculationObject.LogHeader('Defining global settings'):
-            globalSettings.saveGlobalSettings(calculationObject, datasetId)
-
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
             dao.registerDataset(globalSettings['name'], importSettings['ConfigOnly'])

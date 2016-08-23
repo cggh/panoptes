@@ -7,7 +7,7 @@ from SettingsDAO import SettingsDAO
 from PanoptesConfig import PanoptesConfig
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
-from SettingsGlobal import SettingsGlobal
+from SettingsDataset import SettingsDataset
 
 class BaseImport(object):
     
@@ -48,7 +48,7 @@ class BaseImport(object):
 
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = SettingsGlobal(settingsFile, False)
+            self._globalSettings = SettingsDataset(settingsFile, False)
         else:
             self._globalSettings = None
             
