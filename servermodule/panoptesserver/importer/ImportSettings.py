@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+
+import os
+
 import yaml
 import copy
 from collections import OrderedDict
@@ -282,7 +285,7 @@ class ImportSettings:
             if self._logLevel:
                 self._log('Loading settings from: '+fileName)
 
-            with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
+            with open(self.fileName, 'r') as configfile:
                 try:
                     self._settings = yaml.load(configfile.read())
                     
@@ -701,12 +704,15 @@ class ImportSettings:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
         #We now write the change to the YAML - we reload as the load on constuction adds defaults etc and strips comments.
-        with portalocker.Lock(self.fileName, mode="r+", timeout=5, truncate=None) as configfile:
+        with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
             config = ruamel.yaml.load(configfile.read(), ruamel.yaml.RoundTripLoader)
             config = updateConfig(config)
-            configfile.seek(0)
-            configfile.truncate(0)
-            configfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+            with open(self.fileName+'_tmp', 'w') as tempfile:
+                tempfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+                tempfile.flush()
+                os.fsync(tempfile.fileno())
+            os.rename(self.fileName+'_tmp', self.fileName)
+
 
     def __getitem__(self, key):
         
