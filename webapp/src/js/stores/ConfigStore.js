@@ -86,6 +86,9 @@ const ConfigStore = Fluxxor.createStore({
     }
 
     let processTable = (table) => {
+      if (table.primKey === 'AutoKey') {
+        table.properties.unshift({id: 'AutoKey', name:'AutoKey', dataType: 'Value'});
+      }
       table.hasGenomePositions = table.isPositionOnGenome == '1';
       table.nameSingle = table.nameSingle || table.name;
       table.namePlural = table.namePlural || table.name;
