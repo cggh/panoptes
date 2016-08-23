@@ -208,7 +208,7 @@ class SettingsDAO(object):
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
             
 
-    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
+    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, primKey, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
 
