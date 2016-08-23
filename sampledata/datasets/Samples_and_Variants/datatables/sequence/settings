@@ -21,12 +21,7 @@ properties:
   name: Accessibility
   description: Whether this base is accessible
   order: 4
-  dataType: Text
-  isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
-  categoryColors:                   # Specifies display colours for the categorical states of this property
-    'False': rgb(230,80,80)
-    'True': rgb(153,189,75)
-    _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+  dataType: Boolean
 
 - id: Uniqueness
   name: Uniqueness
