@@ -59,12 +59,7 @@ let DatasetImportStatusItemView = React.createClass({
       logId: this.props.logId
     };
     requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'fetchImportStatusLog' + JSON.stringify(APIargs),
-          (cacheCancellation) =>
-            API.fetchImportStatusLog({cancellation: cacheCancellation, ...APIargs}),
-          componentCancellation
-        )
+        API.fetchImportStatusLog({cancellation: componentCancellation, ...APIargs}),
       )
       .then((data) => {
         this.setState({
