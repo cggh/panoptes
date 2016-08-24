@@ -32,4 +32,4 @@ properties:
 - id: SampleCount
   name: Sample count
   description: Number of samples in the population
-  dataType: Value
+  dataType: Int32

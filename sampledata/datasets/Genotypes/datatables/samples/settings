@@ -28,6 +28,6 @@ properties:
 
 - id: Value1
   name: Value 1
-  dataType: Value
+  dataType: Float
   decimDigits: 4
 

@@ -39,17 +39,17 @@ properties:
 
 - id: regionstart
   name: Start position
-  dataType: Value
+  dataType: Int32
   decimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
 
 - id: regionstop
   name: Stop position
-  dataType: Value
+  dataType: Int32
   decimDigits: 0
 
 - id: length
   name: Length
-  dataType: Value
+  dataType: Int32
   decimDigits: 0
 
 - id: name
@@ -57,7 +57,7 @@ properties:
   dataType: Text
 
 - id: Value1, Value2, Value3  # Properties sharing the same settings can also be defined in group
-  dataType: Value
+  dataType: Float
 
 - id: type
   name: Feature type

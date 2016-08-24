@@ -106,54 +106,6 @@ class LoadTable(threading.Thread):
             if colname not in self._fileColIndex:
                 if not colname == "AutoKey":
                     raise Exception('File is missing column '+colname)
-    
-    #Used if not bulk loading to encode the data for an insert statement
-    def _encodeCell(self, icontent, col):
-        content = icontent
-        if col['dataType'] == 'Text':
-            if len(icontent) == 0:
-                content = "''"
-            else:
-                try:
-                    content = content.encode('ascii', 'ignore')
-                except UnicodeDecodeError:
-                    print('Unable to encode '+content)
-                    content='*failed encoding*'
-                content = content.replace("\x92", "'")
-                content = content.replace("\xC2", "'")
-                content = content.replace("\x91", "'")
-                #filter(lambda x: x in string.printable, val)
-                content = content.replace("'", "\\'")
-                content = content.replace('\r\n', '\\n')
-                content = content.replace('\n\r', '\\n')
-                content = '\'' + content + '\''
-
-        if ImpUtils.IsValueDataTypeIdenfifier(col['dataType']):
-            if (content == 'NA') or (content == '') or (content == 'None') or (content == 'NULL') or (content == 'null') or (content == 'inf') or (content == '-' or content == 'nan'):
-                content = 'NULL'
-
-        if ImpUtils.IsDateDataTypeIdenfifier(col['dataType']):
-            if len(content)>=5:
-                try:
-                    dt = dateutil.parser.parse(content)
-                    tmdiff  =(dt - datetime.datetime(1970, 1, 1)).days
-                    tmdiff += 2440587.5 +0.5 # note: extra 0.5 because we set datestamp at noon
-                    content = str(tmdiff)
-                except:
-                    print('ERROR: date parsing string '+content)
-                    content = 'NULL'
-            else:
-                content = 'NULL'
-
-        if col['dataType'] == 'Boolean':
-            vl = content
-            content = 'NULL'
-            if (vl.lower() == 'true') or (vl.lower() == 'yes') or (vl.lower() == 'y') or (vl == '1'):
-                content = '1'
-            if (vl.lower() == 'false') or (vl.lower() == 'no') or (vl.lower() == 'n') or (vl == '0'):
-                content = '0'
-
-        return content
 
     def _parseLine(self, line):
         
@@ -168,13 +120,6 @@ class LoadTable(threading.Thread):
             if name in self._fileColIndex:
                 content = sourceCells[self._fileColIndex[name]]
 #                content = self._encodeCell(content, col)
-                
-            
-            if self._loadSettings.getPropertyValue(col,'dataType') == 'Text':
-                maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
-                #self._log("{} {}".format(content, len(content)))
-                self._loadSettings.setPropertyValue(col,'maxLen',max(maxlen, len(content)))
-                
             writeCells.append(content)
             
         return writeCells
@@ -220,18 +165,8 @@ class LoadTable(threading.Thread):
                             "cut out this column with 'cut -f %s data --complement'" % (tableid, cols, positions, positions))
         #Table order has to be file order
         for col in header_names:
-            name = self._loadSettings.getPropertyValue(col,'id')
-            typedefn = self._loadSettings.getPropertyValue(col,'dataType')
-            maxlen = self._loadSettings.getPropertyValue(col,'maxLen')
-            st = DBCOLESC(name)
-            typestr = ''
-            if typedefn == 'Text':
-                typestr = 'varchar({0})'.format(max(1, maxlen))
-            if len(typestr) == 0:
-                typestr = ImpUtils.GetSQLDataType(typedefn)
-            if len(typestr) == 0:
-                raise Exception('Invalid property data type ' + typedefn)
-            st += ' ' + typestr
+            st = DBCOLESC(self._loadSettings.getPropertyValue(col,'id'))
+            st += ' ' + ImpUtils.GetSQLDataType(self._loadSettings.getPropertyValue(col,'dataType'))
             colTokens.append(st)
         
         sql += ', '.join(colTokens)
@@ -301,12 +236,6 @@ class LoadTable(threading.Thread):
                         
                     skipParse = True
                     
-                    for col in self._loadSettings.getPropertyNames():
-                        if self._loadSettings.getPropertyValue(col,'maxLen') == 0:
-                            self._log('maxLen not set for column:' + col)
-                            skipParse = False
-                            
-                          
                     if (self._maxLineCount > 0):
                         hfp.write(header)
                     self._parseHeader(header)

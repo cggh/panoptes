@@ -45,14 +45,14 @@ properties:
 
 - id: NumProp1
   name: Numerical 1
-  dataType: Value
+  dataType: Float
   minVal: -10
   maxVal: 10
   showBar: true
 
 - id: NumProp2
   name: Numerical 2
-  dataType: Value
+  dataType: Float
   minVal: -10
   maxVal: 10
   showBar: true

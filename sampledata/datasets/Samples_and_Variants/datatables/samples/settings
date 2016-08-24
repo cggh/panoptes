@@ -59,7 +59,7 @@ properties:
 - id: Value1
   name: Value 1
   description: An example of a numerical value
-  dataType: Value
+  dataType: Float
   minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
   maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
@@ -68,7 +68,7 @@ properties:
 - id: Value2
   name: Value 2
   description: An example of a numerical value
-  dataType: Value
+  dataType: Float
   minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
   maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value

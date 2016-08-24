@@ -19,31 +19,20 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
-def IsValidDataTypeIdenfifier(datatypeIdentifier):
-    return datatypeIdentifier in ['Text', 'Value', 'LowPrecisionValue', 'HighPrecisionValue', 'Boolean', 'GeoLongitude', 'GeoLatitude', 'Date']
-
-def IsValueDataTypeIdenfifier(datatypeIdentifier):
-    return (datatypeIdentifier == 'Value') or \
-           (datatypeIdentifier == 'GeoLongitude') or\
-           (datatypeIdentifier == 'GeoLatitude') or\
-           (datatypeIdentifier == 'LowPrecisionValue') or\
-           (datatypeIdentifier == 'HighPrecisionValue')
-
-def IsDateDataTypeIdenfifier(datatypeIdentifier):
-    return (datatypeIdentifier == 'Date')
-
-
-def GetSQLDataType(datatypeIdentifier):
-    datatypestr = 'varchar(50)'
-    if IsValueDataTypeIdenfifier(datatypeIdentifier):
-        datatypestr = 'double'
-    if (datatypeIdentifier == 'LowPrecisionValue'):
-        datatypestr = 'float'
-    if datatypeIdentifier == 'Boolean':
-        datatypestr = 'boolean'
-    if IsDateDataTypeIdenfifier(datatypestr):
-        datatypestr = 'TIMESTAMP'
-    return datatypestr
+def GetSQLDataType(dataType):
+    return {
+        'Text': 'text',
+        'Float': 'real',
+        'Double': 'double',
+        'Int8': 'tinyint',
+        'Int16': 'smallint',
+        'Int32': 'int',
+        'Int64': 'bigint',
+        'Boolean': 'boolean',
+        'GeoLatitude': 'real',
+        'GeoLongitude': 'real',
+        'Date': 'timestamp'
+    }[dataType]
 
 def GetTempFileName():
     #Check the temp dir exists and then return a new file name in it

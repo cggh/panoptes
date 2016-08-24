@@ -16,7 +16,7 @@ properties:
   dataType: Text
 - id: Pos
   name: Pos
-  dataType: Value
+  dataType: Int32
 - id: Accessibility
   name: Accessibility
   description: Whether this base is accessible
@@ -28,6 +28,6 @@ properties:
   description: How unique this region is compared to the rest of the genome
   order: 3
   channelColor: rgb(255,0,0)
-  dataType: Value
+  dataType: Int16
   minVal: 0
   maxVal: 200

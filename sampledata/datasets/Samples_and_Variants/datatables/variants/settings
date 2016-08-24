@@ -50,8 +50,7 @@ properties:
   name: Position
   groupId: Info
   description: Genomic position of the variant on the chromosome (1-based)
-  dataType: Value
-  decimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+  dataType: Int32
 
 - id: SnpName
   name: Variant name
@@ -80,7 +79,7 @@ properties:
 
 - id: Value1
   name: Value 1
-  dataType: HighPrecisionValue
+  dataType: Float
   description: The first numerical value
   showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
   channelColor: rgb(0,80,200)    # Colour used to display this property
@@ -89,14 +88,14 @@ properties:
 
 - id: Value2
   name: Value 2
-  dataType: Value
+  dataType: Float
   description: The second numerical value
   channelColor: rgb(200,80,0)
   connectLines: true
 
 - id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
   name: Value 3
-  dataType: Value
+  dataType: Float
   description: The third numerical value
   browserDefaultVisible: true
   summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
@@ -122,7 +121,7 @@ properties:
   browserDefaultVisible: true
 
 - id: NRAF_WAF, NRAF_EAF, NRAF_SAF
-  dataType: Value
+  dataType: Float
   groupId: AlleleFreq
   minVal: 0
   maxVal: 1
