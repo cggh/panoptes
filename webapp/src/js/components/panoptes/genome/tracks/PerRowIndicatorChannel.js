@@ -12,7 +12,7 @@ import _transform from 'lodash/transform';
 import _filter from 'lodash/filter';
 
 import SQL from 'panoptes/SQL';
-import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
@@ -120,20 +120,20 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [tableConfig.primKey, tableConfig.position];
       if (colourProperty)
         columns.push(colourProperty);
-      let columnspec = {};
-      columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
+      // let columnspec = {};
+      // columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
       query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome),
         query]);
       let APIargs = {
         database: this.config.dataset,
         table,
-        columns: columnspec,
+        columns: columns,
         query: SQL.WhereClause.encode(query),
         transpose: false,
       };
       let cacheArgs = {
-        method: 'pageQuery',
+        method: 'query',
         regionField: tableConfig.position,
         queryField: 'query',
         limitField: 'stop',
@@ -161,18 +161,12 @@ let PerRowIndicatorChannel = React.createClass({
     this.draw(props);
   },
 
-  combineBlocks(blocks, property) {
-    return _transform(_filter(blocks, (block) => !block._tooBig), (sum, block) =>
-      Array.prototype.push.apply(sum, block[property] || []),
-    []);
-  },
-
   applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tablesById[table];
-    this.positions = this.combineBlocks(blocks, tableConfig.position);
+    this.positions = combineBlocks(blocks, tableConfig.position);
     if (colourProperty) {
-      this.colourData = this.combineBlocks(blocks, colourProperty);
+      this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
       this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());

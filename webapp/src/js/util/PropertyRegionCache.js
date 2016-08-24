@@ -5,6 +5,10 @@ import SQL from 'panoptes/SQL';
 import _keys from 'lodash/keys';
 import _map from 'lodash/map';
 import _some from 'lodash/some';
+import _filter from 'lodash/filter';
+import _sumBy from 'lodash/sumBy';
+import _each from 'lodash/each';
+import _transform from 'lodash/transform';
 
 const seenBlocks = {};
 
@@ -67,7 +71,7 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
 
 function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   let {method, regionField, queryField, limitField, blockLimit, postProcessBlock, isBlockTooBig} = cacheArgs;
-  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].length <= blockLimit));
+  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].shape[0] <= blockLimit));
   const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   const blockSize = Math.pow(2.0, blockLevel);
   const blockStart = blockSize * blockIndex;
@@ -142,4 +146,26 @@ function flatten(data) {
     }
   });
   return flattened;
+}
+
+export function combineBlocks(blocks, property) {
+  blocks = _filter(blocks, (block) => !block._tooBig);
+  if (blocks.length == 0)
+    return [];
+  if (blocks[0][property].array.set) {
+    let result = new blocks[0][property].array.constructor(
+      _sumBy(blocks, (block) => block[property].array.length)
+    );
+    let arrayPos = 0;
+    _each(blocks, (block) => {
+      let data = block[property].array;
+      result.set(data, arrayPos);
+      arrayPos += data.length;
+    });
+    return result
+  } else {
+    return _transform(blocks, (sum, block) =>
+        Array.prototype.push.apply(sum, block[property] || []),
+      []);
+  }
 }

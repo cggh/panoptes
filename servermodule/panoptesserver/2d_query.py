@@ -15,22 +15,9 @@ from gzipstream import gzip
 #curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=SnpName&row_order=ID' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
 from importer.SettingsDataTable import SettingsDataTable
 from importer.Settings2Dtable import Settings2Dtable
+from DQXDbTools import desciptionToDType
 CHUNK_SIZE = 400
 
-
-def desc_to_dtype(desc):
-    col_type = desc[1]
-    dtype = {
-        'boolean': '?',
-        'tinyint': 'i1',
-        'char': 'u1',
-        'int': 'i4',
-        'bigint': 'i8',
-        'double': 'f8',
-        'float': 'f8',
-        'real': 'f4',
-    }
-    return dtype.get(col_type,None)
 
 
 def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field):
@@ -45,11 +32,12 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     if len(where.querystring_params) > 0:
         query = "WHERE " + where.querystring_params + ' AND ' + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
     else:
-        query = "WHERE " + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
+        query = "WHERE " + DQXDbTools.DBCOLESC(index_field) + ' IS NOT NULL'
     fields_string = ','.join('"'+DQXDbTools.ToSafeIdentifier(f)+'"' for f in fields)
     table = DQXDbTools.ToSafeIdentifier(table)
-    order = DQXDbTools.ToSafeIdentifier(order)
-    sqlquery = 'SELECT {fields_string} FROM "{table}" {query} ORDER BY "{order}"'.format(**locals())
+    sqlquery = 'SELECT {fields_string} FROM "{table}" {query}'.format(**locals())
+    if order:
+         sqlquery += ' ORDER BY "{0}"'.format(DQXDbTools.ToSafeIdentifier(order))
     params = where.queryparams
     #Set the limit to one past the req
     limit = limit or fail_limit
@@ -65,7 +53,7 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     rows = cur.fetchall()
     result = {}
     for i, (field, desc) in enumerate(zip(fields, cur.description)):
-        dtype = desc_to_dtype(desc)
+        dtype = desciptionToDType(desc)
         result[field] = np.array([row[i] for row in rows], dtype=dtype)
     return result
 
@@ -147,7 +135,7 @@ def summarise_call(calls):
     return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
 
 def handler(start_response, request_data):
-    datatable = request_data['datatable']
+    datatable = request_data['table']
     dataset = request_data['dataset']
     two_d_properties = request_data['2D_properties'].split('~')
     col_properties = request_data['col_properties'].split('~')
@@ -155,14 +143,14 @@ def handler(start_response, request_data):
     col_qry = request_data['col_qry']
     col_order = request_data['col_order']
     row_qry = request_data['row_qry']
-    row_order = request_data['row_order']
+    row_order = request_data.get('row_order', None)
     row_order_columns = []
     if row_order == 'columns':
         try:
             row_order_columns = request_data['row_sort_cols'].split('~')
         except KeyError:
             pass
-        row_order = 'NULL'
+        row_order = None
     try:
         col_limit = int(request_data['col_limit'])
     except KeyError:

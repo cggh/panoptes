@@ -20,7 +20,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
 
 import SQL from 'panoptes/SQL';
-import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertySelector from 'panoptes/PropertySelector';
 import API from 'panoptes/API';
@@ -116,7 +116,7 @@ let GenotypesChannel = React.createClass({
       pageSize: 100,
       page: 0,
       cellColour: 'call',
-      rowSort: 'NULL'
+      rowSort: null
     };
   },
 
@@ -241,8 +241,8 @@ let GenotypesChannel = React.createClass({
       columnQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(columnTableConfig.chromosome, '=', chromosome),
         columnQuery]);
       let APIargs = {
-        database: this.config.dataset,
-        datatable: table,
+        dataset: this.config.dataset,
+        table,
         col_qry: SQL.WhereClause.encode(columnQuery),
         col_order: columnTableConfig.position,
         row_qry: rowQuery,
@@ -278,7 +278,7 @@ let GenotypesChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
+          this.applyData(this.props, null);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
           throw error;
         });
@@ -359,22 +359,24 @@ let GenotypesChannel = React.createClass({
   },
 
   applyData(props, dataBlocks) {
+    if (!dataBlocks) {
+      this.setState({
+        rowData: {
+          id: {array:[], shape:[0]},
+          label: {array:[], shape:[0]},
+        },
+        dataBlocks: [],
+        layoutBlocks: [],
+        genomicPositions: new Int32Array(0)
+      });
+      return;
+    }
     const {table, rowLabel} = props;
     const config = this.config.twoDTablesById[table];
     const columnTableConfig = this.config.tablesById[config.columnDataTable];
     const rowTableConfig = this.config.tablesById[config.rowDataTable];
     //Concatenate all the positions for quick reference
-    let genomicPositions = new Float64Array(
-      _sumBy(_filter(dataBlocks, (block) => !block._tooBig),
-        (block) => block[`col_${columnTableConfig.position}`].array.length));
-    let arrayPos = 0;
-    _each(dataBlocks, (block) => {
-      if (!block._tooBig) {
-        let data = block[`col_${columnTableConfig.position}`].array;
-        genomicPositions.set(data, arrayPos);
-        arrayPos += data.length;
-      }
-    });
+    let genomicPositions = combineBlocks(dataBlocks, `col_${columnTableConfig.position}`);
     //Don't pass any data if there are no rows
     if (dataBlocks.length > 0 && dataBlocks[0][`row_${rowTableConfig.primKey}`].shape[0] === 0) {
       dataBlocks = [];

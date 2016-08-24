@@ -37,7 +37,10 @@ let GenotypesFan = React.createClass({
           merged.push(block);
         }
       });
+    } else {
+      this.tooBigBlocks = [];
     }
+
   },
 
   componentDidUpdate() {

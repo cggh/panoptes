@@ -479,12 +479,12 @@ function modifyConfig(options) {
 
 
 function twoDPageQuery(options) {
-  assertRequired(options, ['database', 'datatable']);
+  assertRequired(options, ['dataset', 'table']);
   let defaults = {
     col_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
     row_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-    col_order: 'NULL',
-    row_order: 'NULL',
+    col_order: null,
+    row_order: null,
     col_properties: '',
     row_properties: '',
     '2D_properties': '',
@@ -497,7 +497,7 @@ function twoDPageQuery(options) {
     col_fail_limit: null,
   };
   const {
-    database, datatable, col_qry, row_qry, col_order, row_order, col_properties,
+    dataset, table, col_qry, row_qry, col_order, row_order, col_properties,
     row_properties, sort_mode, row_sort_property, row_sort_cols, col_key,
     row_offset, row_limit, col_fail_limit
   } = {...defaults, ...options};
@@ -509,8 +509,8 @@ function twoDPageQuery(options) {
       datatype: 'custom',
       respmodule: 'panoptesserver',
       respid: '2d_query',
-      dataset: database,
-      datatable,
+      dataset,
+      table,
       col_qry: encodeQuery(col_qry),
       row_qry: encodeQuery(row_qry),
       col_order,
@@ -527,6 +527,56 @@ function twoDPageQuery(options) {
       col_fail_limit,
     }
   });
+}
+
+function query(options) {
+  assertRequired(options, ['database', 'table', 'columns']);
+  let defaults = {
+    query: SQL.nullQuery,
+    order: null,
+    groupBy: null,
+    ascending: true,
+    start: 0,
+    stop: 1000000,
+    distinct: false,
+    transpose: true
+  };
+  let {database, table, columns, query, order, groupBy,
+    ascending, start, stop, distinct, transpose} = {...defaults, ...options};
+  let args = options.cancellation ? {cancellation: options.cancellation} : {};
+  return requestArrayBuffer({
+    ...args,
+    params: {
+      datatype: 'custom',
+      respmodule: 'panoptesserver',
+      respid: 'query',
+    }
+  }, 'POST',
+  JSON.stringify({
+    database,
+    table,
+    query: query,
+    columns: JSON.stringify(columns),
+    sortReverse: ascending ? 'false' : 'true',
+    limit: `${start}~${stop}`,
+    distinct: distinct ? 'true' : 'false',
+    order,
+    groupBy: groupBy ? groupBy.join('~') : null
+  }));
+    //Transpose into rows if needed
+    // .then((columns) => {
+    //   if (transpose) {
+    //     let rows = [];
+    //     for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
+    //       let row = {};
+    //       _forEach(columns, (array, id) => row[id] = array[i]);
+    //       rows.push(row);
+    //     }
+    //     return rows;
+    //   } else {
+    //     return columns;
+    //   }
+    // });
 }
 
 // TODO: Maintain an order to this list?
@@ -551,5 +601,6 @@ module.exports = {
   importDatasetConfig,
   truncatedRowsCount,
   modifyConfig,
-  twoDPageQuery
+  twoDPageQuery,
+  query
 };
