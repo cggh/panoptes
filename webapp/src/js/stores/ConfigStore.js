@@ -87,7 +87,7 @@ const ConfigStore = Fluxxor.createStore({
 
     let processTable = (table) => {
       if (table.primKey === 'AutoKey') {
-        table.properties.unshift({id: 'AutoKey', name:'AutoKey', dataType: 'Value'});
+        table.properties.unshift({id: 'AutoKey', name:'AutoKey', dataType: 'Int32'});
       }
       table.hasGenomePositions = table.isPositionOnGenome == '1';
       table.nameSingle = table.nameSingle || table.name;
@@ -157,17 +157,22 @@ const ConfigStore = Fluxxor.createStore({
       prop.tableId = table.id;
       if (prop.dataType == 'Text')
         prop.isText = true;
-      if ((prop.dataType == 'Value') || (prop.dataType == 'LowPrecisionValue') || (prop.dataType == 'HighPrecisionValue') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude') || (prop.dataType == 'Date'))
+      if ((prop.dataType == 'Float') || (prop.dataType == 'Double') || (prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude')) {
         prop.isFloat = true;
+        prop.decimDigits = prop.decimDigits || 2;
+      }
+      if ((prop.dataType == 'Int8') || (prop.dataType == 'Int16') || (prop.dataType == 'Int32') || (prop.dataType == 'Int64')) {
+        prop.isInt = true;
+      }
       if (prop.dataType == 'Boolean')
         prop.isBoolean = true;
       if (prop.dataType == 'Date')
         prop.isDate = true;
+      prop.isNumerical = (prop.isFloat || prop.isInt || prop.isDate);
       if (!prop.name) prop.name = prop.id;
-      if (prop.isFloat) {
+      if (prop.isNumerical) {
         prop.minVal = prop.minVal || 0;
         prop.maxVal = prop.maxVal || 1;
-        prop.decimDigits = prop.decimDigits || 2;
       }
       if (prop.dataType == 'GeoLongitude') {
         prop.minVal = prop.minVal || 0;
@@ -185,14 +190,14 @@ const ConfigStore = Fluxxor.createStore({
         prop.isPrimKey = true;
       prop.hasValueRange = !!prop.maxVal;
 
-      // Human friendly data type string
+      // Human friendly data type string  - this is legacy and can be removed as all using sites have type info available
       prop.dispDataType = 'Text';
       prop.icon = 'font';
       if (prop.isCategorical) {
         prop.dispDataType = 'Categorical';
         prop.icon = 'bar-chart';
       }
-      if (prop.isFloat) {
+      if (prop.isFloat || prop.isInt) {
         prop.dispDataType = 'Value';
         prop.icon = 'line-chart';
       }
@@ -236,24 +241,19 @@ const ConfigStore = Fluxxor.createStore({
       }
 
       //Set a recommended encoder - legacy from 1.X
-      let encoding = 'String';
-      if (prop.dataType == 'Value') {
-        encoding = 'Float3';
-        if ((prop.decimDigits == 0 ) || (prop.isPrimKey))
-          encoding = 'Int';
-      }
-      if (prop.dataType == 'HighPrecisionValue') {
-        encoding = 'FloatH';
-      }
-      if ((prop.dataType == 'Value') && (prop.id == table.position) && (table.hasGenomePositions))
-        encoding = 'Int';
-      if (prop.dataType == 'Boolean')
-        encoding = 'String';  //Temp till arraybuffer
-      if ((prop.dataType == 'GeoLongitude') || (prop.dataType == 'GeoLatitude'))
-        encoding = 'Float4';
-      if ((prop.dataType == 'Date'))
-        encoding = 'Float4';
-      prop.encoding = encoding;
+      prop.encoding = {
+        'Text': 'String',
+        'Float': 'FloatH',
+        'Double': 'FloatH',
+        'Int8': 'Int',
+        'Int16': 'Int',
+        'Int32': 'Int',
+        'Int64': 'Int',
+        'Boolean': 'String',
+        'GeoLatitude': 'FloatH',
+        'GeoLongitude': 'FloatH',
+        'Date': 'FloatH'
+      }[prop.dataType];
 
       let encodingTypes = {
         'Generic': 'String',     //returns string data, also works for other data
@@ -291,15 +291,19 @@ const ConfigStore = Fluxxor.createStore({
       };
       prop.defaultFetchEncoding = fetchEncodingTypes[prop.encoding];
       prop.defaultDisplayEncoding = displayEncodingTypes[prop.encoding];
-      let alignment = {
-        Value: 'right',
-        HighPrecisionValue: 'right',
-        Boolean: 'center',
-        GeoLongitude: 'right',
-        GeoLatitude: 'right',
-        Date: 'center'
-      };
-      prop.alignment = alignment[prop.dataType] || 'left';
+      prop.alignment = {
+        'Text': 'left',
+        'Float': 'right',
+        'Double': 'right',
+        'Int8': 'right',
+        'Int16': 'right',
+        'Int32': 'right',
+        'Int64': 'right',
+        'Boolean': 'center',
+        'GeoLatitude': 'right',
+        'GeoLongitude': 'right',
+        'Date': 'center'
+      }[prop.dataType];
       prop.description = prop.description || '';
       prop.showBar = prop.ShowBar || (prop.barWidth > 0);
       prop.showByDefault = 'tableDefaultVisible' in prop ? prop.tableDefaultVisible :

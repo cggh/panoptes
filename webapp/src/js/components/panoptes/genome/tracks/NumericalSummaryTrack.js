@@ -82,7 +82,7 @@ let NumericalSummaryTrack = React.createClass({
     if (!this.config.tablesById[props.table] ||
       !this.config.tablesById[props.table].propertiesById[props.track] ||
       !this.config.tablesById[props.table].propertiesById[props.track].showInBrowser ||
-      !this.config.tablesById[props.table].propertiesById[props.track].isFloat ||
+      !this.config.tablesById[props.table].propertiesById[props.track].isNumerical ||
       !this.config.tablesById[props.table].propertiesById[props.track].summaryValues
     ) {
       ErrorReport(this.getFlux(), `${props.table}/${props.track} is not a valid numerical summary track`);

@@ -31,5 +31,16 @@ module.exports = function(property, string) {
         return value.toFixed(property.decimDigits);
     }
   }
+  if (property.isInt) {
+    if ((string == ''))
+      return '';
+    else {
+      let value = parseInt(string);
+      if (isNaN(value))
+        return '';
+      else
+        return value;
+    }
+  }
   return string;
 };

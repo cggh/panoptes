@@ -165,7 +165,7 @@ let NumericalTrackGroupControls = React.createClass({
           items: {}
         };
         _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.isFloat && prop.summaryValues) {
+          if (prop.showInBrowser && prop.isNumerical && prop.summaryValues) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,

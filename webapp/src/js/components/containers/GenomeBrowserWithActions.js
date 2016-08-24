@@ -67,7 +67,7 @@ let GenomeBrowserWithActions = React.createClass({
               }
             };
           }
-          else if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
+          else if (prop.showInBrowser && prop.summaryValues && prop.isNumerical) {
             groups['__reference__'].items[prop.id] = {
               name: prop.name,
               description: prop.description,
@@ -127,7 +127,7 @@ let GenomeBrowserWithActions = React.createClass({
               }
             };
           }
-          else if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
+          else if (prop.showInBrowser && prop.summaryValues && prop.isNumerical) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
