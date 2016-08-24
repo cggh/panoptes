@@ -8,13 +8,14 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
+import CalcMapBounds from 'utils/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import GeoLayouter from 'utils/GeoLayouter';
+import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
 import PieChartWidget from 'Chart/Pie/Widget';
-import CalcMapBounds from 'utils/CalcMapBounds';
-import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -297,41 +298,40 @@ let PieChartMarkersLayerWidget = React.createClass({
     //let crs = this.context.map ? this.context.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
     let crs = window.L.CRS.EPSG3857;
 
-    let markerWidgets = [];
-
-    for (let i = 0, len = markers.size; i < len; i++) {
-
-      let marker = markers.get(i);
-
-      markerWidgets.push(
-        <ComponentMarkerWidget
-          key={i}
-          position={[marker.get('lat'), marker.get('lng')]}
-          title={marker.get('title')}
-          onClick={(e) => this.handleClickMarker(e, marker)}
-        >
-          <PieChartWidget
-            chartData={marker.get('chartData')}
-            crs={crs}
-            key={i}
-            lat={marker.get('lat')}
-            lng={marker.get('lng')}
-            name={marker.get('name')}
-            originalLat={marker.get('lat')}
-            originalLng={marker.get('lng')}
-            radius={marker.get('radius')}
-          />
-        </ComponentMarkerWidget>
-      );
-
-    }
-
     return (
-      <FeatureGroupWidget
-        children={markerWidgets}
-        layerContainer={layerContainer}
-        map={map}
-      />
+      <GeoLayouter nodes={markers}>
+        {
+          (renderNodes) =>
+          <FeatureGroupWidget
+            layerContainer={layerContainer}
+            map={map}
+          >
+          {
+            renderNodes.map(
+              (marker, i) =>
+              <ComponentMarkerWidget
+                key={i}
+                position={[marker.lat, marker.lng]}
+                title={marker.title}
+                onClick={(e) => this.handleClickMarker(e, marker)}
+              >
+                <PieChartWidget
+                  chartData={marker.chartData}
+                  crs={crs}
+                  key={i}
+                  lat={marker.lat}
+                  lng={marker.lng}
+                  name={marker.name}
+                  originalLat={marker.lat}
+                  originalLng={marker.lng}
+                  radius={marker.radius}
+                />
+              </ComponentMarkerWidget>
+            )
+          }
+          </FeatureGroupWidget>
+        }
+      </GeoLayouter>
     );
 
   }

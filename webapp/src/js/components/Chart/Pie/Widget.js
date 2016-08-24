@@ -26,7 +26,7 @@ let PieChartWidget = React.createClass({
     lng: React.PropTypes.number,
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
-    chartData: React.PropTypes.object,
+    chartData: React.PropTypes.array,
     crs: React.PropTypes.object
   },
 
@@ -42,13 +42,10 @@ let PieChartWidget = React.createClass({
     let sectorsData = [];
     let pieData = [];
 
-    // FIXME: ???
-    let chartDataArray = chartData.toArray();
-
-    for (let i = 0, len = chartDataArray.length; i < len; i++) {
-      sectorsData.push({color: chartDataArray[i].get('color'), title: name + '\n' + chartDataArray[i].get('name') + ': ' + chartDataArray[i].get('value')});
-      if (chartDataArray[i].get('value') !== undefined && chartDataArray[i].get('value') !== null && chartDataArray[i].get('value') !== '' && !isNaN(chartDataArray[i].get('value'))) {
-        pieData.push(chartDataArray[i].get('value'));
+    for (let i = 0, len = chartData.length; i < len; i++) {
+      sectorsData.push({color: chartData[i].color, title: name + '\n' + chartData[i].name + ': ' + chartData[i].value});
+      if (chartData[i].value !== undefined && chartData[i].value !== null && chartData[i].value !== '' && !isNaN(chartData[i].value)) {
+        pieData.push(chartData[i].value);
       } else {
         pieData.push(0);
       }
