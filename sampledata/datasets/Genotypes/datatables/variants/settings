@@ -36,10 +36,6 @@ properties:
   minVal: 0
   maxVal: 2
   decimDigits: 2
-  summaryValues:
-    blockSizeMin: 20
-    blockSizeMax: 50000
-    channelColor: rgb(0,100,0)
 - id: Value1
   name: Value 1
   description: The first numerical value

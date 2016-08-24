@@ -67,7 +67,8 @@ let NumericalSummaryTrack = React.createClass({
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
-    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth} = props;
+    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table, track} = props;
+    const tableConfig = this.config.tablesById[table];
     if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
       this.data = {
         dataStart: 0,
@@ -79,40 +80,39 @@ let NumericalSummaryTrack = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (!this.config.tablesById[props.table] ||
-      !this.config.tablesById[props.table].propertiesById[props.track] ||
-      !this.config.tablesById[props.table].propertiesById[props.track].showInBrowser ||
-      !this.config.tablesById[props.table].propertiesById[props.track].isNumerical ||
-      !this.config.tablesById[props.table].propertiesById[props.track].summaryValues
+    if (!tableConfig ||
+      !tableConfig.propertiesById[track] ||
+      !tableConfig.propertiesById[track].showInBrowser ||
+      !tableConfig.propertiesById[track].isNumerical
     ) {
-      ErrorReport(this.getFlux(), `${props.table}/${props.track} is not a valid numerical summary track`);
+      ErrorReport(this.getFlux(), `${table}/${track} is not a valid numerical summary track`);
       return;
     }
     this.props.onChangeLoadStatus('LOADING');
     requestContext.request(
       (componentCancellation) =>
         SummarisationCache.fetch({
-          columns: {
-            avg: {
-              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
-              config: 'Summ',
-              name: `${props.track}_avg`
+          dataset: this.config.dataset,
+          table,
+          columns: [
+            {
+              expr: ['avg', [track]],
+              as: 'avg'
             },
-            max: {
-              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
-              config: 'Summ',
-              name: `${props.track}_max`
+            {
+              expr: ['min', [track]],
+              as: 'min'
             },
-            min: {
-              folder: `SummaryTracks/${this.config.dataset}/${props.track}`,
-              config: 'Summ',
-              name: `${props.track}_min`
+            {
+              expr: ['max', [track]],
+              as: 'max'
             }
-          },
-          minBlockSize: this.tableConfig().propertiesById[props.track].summaryValues.blockSizeMin,
+          ],
           chromosome: chromosome,
           start: blockStart,
           end: blockEnd,
+          chromosomeField: tableConfig.chromosome,
+          positionField: tableConfig.position,
           targetPointCount: blockPixelWidth,
           cancellation: componentCancellation
         })

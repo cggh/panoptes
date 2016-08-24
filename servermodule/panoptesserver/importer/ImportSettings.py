@@ -172,12 +172,6 @@ class ImportSettings:
                                                                 })
                                                 ))
                                    }),
-                            ('canUpdate', {
-                                   'type': 'Boolean',
-                                   'default': False,
-                                   'required': False,
-                                   'description': ' If set to true, this property can be modified by the user. (*NOTE: under construction*)'
-                                   }),
                             ('showInTable', {
                                    'type': 'Boolean',
                                    'required': False,
@@ -187,7 +181,7 @@ class ImportSettings:
                             ('showInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'default': False,
+                                   'default': True,
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
                                    }),
                             ('tableDefaultVisible', {
@@ -228,43 +222,6 @@ class ImportSettings:
                                                 'default': True,
                                                 'description': ''
                                                 }),
-                            ('order', {
-                                       'type': 'Value',
-                                       'required': False,
-                                       'default': -1,
-                                       'description': 'Only used for reference genome tracks'
-                                       }),
-                            ('summaryValues', {
-                                   'type': 'Block',
-                                   'required': False,
-                                   'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
-                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True},
-
-                                   'children': OrderedDict((
-                                                ('blockSizeMin', {
-                                                             'type': 'Value',
-                                                             'required': False,
-                                                             'default': 1,
-                                                             'description': 'Minimum summary block size (in bp)'
-                                                             }),
-                                                ('blockSizeMax', {
-                                                                'type': 'Value',
-                                                                'required': True,
-                                                                'description': 'Maximum summary block size (in bp)'
-                                                                }),
-                                                ('channelColor', {
-                                                                'type': 'Text',
-                                                                'required': False,
-                                                                'default': 'rgb(0,0,180)',
-                                                                'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
-                                                                }),
-                                                ('maxDensity', {
-                                                                'type': 'Value',
-                                                                'required': False,
-                                                                'description': 'For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp'
-                                                                })
-                                            ))
-                                   })
                           ))
 
 

@@ -98,10 +98,6 @@ properties:
   dataType: Float
   description: The third numerical value
   browserDefaultVisible: true
-  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-    blockSizeMin: 20                # Minimum summary block size (in bp)
-    blockSizeMax: 50000             # Maximum summary block size (in bp)
-    channelColor: rgb(0,100,0)      # Colour of the channel
 
 - id: Extra_1
   name: Extra 1
@@ -114,10 +110,6 @@ properties:
     A: rgb(255,128,60)
     B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-    blockSizeMin: 20
-    blockSizeMax: 50000
-    maxDensity: 0.2
   browserDefaultVisible: true
 
 - id: NRAF_WAF, NRAF_EAF, NRAF_SAF

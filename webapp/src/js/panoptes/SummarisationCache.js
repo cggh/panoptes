@@ -5,15 +5,13 @@ import _map from 'lodash/map';
 import _transform from 'lodash/transform';
 import _reduce from 'lodash/reduce';
 import _forEach from 'lodash/forEach';
+import SQL from 'panoptes/SQL';
 
 const FETCH_SIZE = 10000;
 
-let findOptimalBlockSize = (start, end, desiredCount, minBlockSize) => {
+let findOptimalBlockSize = (start, end, desiredCount) => {
   let desiredBlockSize = (end - start) / desiredCount;
-  let blockSize = Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize / minBlockSize) / Math.log(2)))) * minBlockSize;
-  //Maximum replicates original behaviour - I'm guessing the summary generation code must stop at this size too?
-  blockSize = Math.min(blockSize, 1.0e9);
-  return blockSize;
+  return Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize) / Math.log(2))));
 };
 
 let blockStartEnd = (start, end, blockSize) => {
@@ -36,36 +34,44 @@ let intervalsFromRange = (start, end, size) => {
 let SummarisationCache = {
   fetch(options) {
     assertRequired(options, [
+      'dataset',
+      'table',
       'columns',
-      'minBlockSize',
       'chromosome',
       'start',
       'end',
-      'targetPointCount'
+      'targetPointCount',
+      'chromosomeField',
+      'positionField'
     ]);
-    let {columns, minBlockSize, chromosome, start, end, targetPointCount, cancellation} = options;
-    let optimalBlockSize = findOptimalBlockSize(start, end, targetPointCount, minBlockSize);
+    let {dataset, table, columns, chromosome, start, end, chromosomeField, positionField, targetPointCount, cancellation} = options;
+    let optimalBlockSize = findOptimalBlockSize(start, end, targetPointCount);
     let [blockStart, blockEnd] = blockStartEnd(start, end, optimalBlockSize);
-
+    //Breakup the fetching so we are cache friendly
+    columns = columns.concat({expr:['/', [positionField, optimalBlockSize]], as:'block'});
     let promises = _map(intervalsFromRange(blockStart, blockEnd, FETCH_SIZE), (sliceStart) => {
-      let summaryAPIargs = {
-        chromosome: chromosome,
+      let APIargs = {
+        database: dataset,
+        table,
         columns: columns,
-        blocksize: optimalBlockSize,
-        blockstart: sliceStart,
-        blockcount: FETCH_SIZE
+        query: SQL.WhereClause.encode(SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(chromosomeField, '=', chromosome),
+        SQL.WhereClause.CompareFixed(positionField, '>=', sliceStart*optimalBlockSize),
+        SQL.WhereClause.CompareFixed(positionField, '<', (sliceStart+FETCH_SIZE)*optimalBlockSize)])),
+        groupBy: ['block']
       };
+      //select max("AF_1"), min("AF_1"), avg("AF_1"), p/512 as b from variants where "CHROM"='2L' and p between 512*1000 and 512*2001 group by b ;
       return LRUCache.get(
-        'summarisation' + JSON.stringify(summaryAPIargs),
+        'summarisation' + JSON.stringify(APIargs),
         (cacheCancellation) =>
-          API.summaryData({
+          API.query({
             cancellation: cacheCancellation,
-            ...summaryAPIargs
+            ...APIargs
           }),
         cancellation
       );
     });
     let trimAndConcat = (slices) => {
+      debugger;
       if (slices.length > 0) {
         let sliceStart = blockStart - (Math.floor(blockStart / FETCH_SIZE) * FETCH_SIZE);
         let sliceEnd = blockEnd - (Math.floor(blockEnd / FETCH_SIZE) * FETCH_SIZE);

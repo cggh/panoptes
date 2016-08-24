@@ -139,7 +139,8 @@ let PerRowIndicatorChannel = React.createClass({
         limitField: 'stop',
         start,
         end,
-        blockLimit: 1000
+        blockLimit: 1000,
+        useWiderBlocksIfInCache: true
       };
       requestContext.request((componentCancellation) =>
         regionCacheGet(APIargs, cacheArgs, componentCancellation)
