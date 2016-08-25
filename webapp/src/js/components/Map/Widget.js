@@ -12,6 +12,8 @@ import TileLayerWidget from 'Map/TileLayer/Widget';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
+import _isEqual from 'lodash/isEqual';
+import _isFunction from 'lodash/isFunction';
 
 // CSS
 import 'leaflet/dist/leaflet.css';
@@ -33,9 +35,9 @@ let MapWidget = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
+    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
     children: React.PropTypes.node,
-    componentUpdate: React.PropTypes.func,
+    componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     tileLayerAttribution: React.PropTypes.string,
     tileLayerURL: React.PropTypes.string,
     title: React.PropTypes.string,
@@ -43,7 +45,7 @@ let MapWidget = React.createClass({
   },
 
   childContextTypes: {
-    bounds: React.PropTypes.object,
+    crs: React.PropTypes.object,
     setBounds: React.PropTypes.func,
     setLoadStatus: React.PropTypes.func
   },
@@ -52,18 +54,19 @@ let MapWidget = React.createClass({
     return this.props.title || 'Map';
   },
 
-  getChildContext() { //FIXME
+  getChildContext() {
     return {
+      crs: this.map !== undefined ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
       setBounds: this.setBounds,
-      setLoadStatus: this.setLoadStatus,
+      setLoadStatus: this.setLoadStatus
     };
   },
   getDefaultProps() {
     return {
       center: [0, 0],
+      zoom: 0,
       tileLayerAttribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-      zoom: 0
     };
   },
   getInitialState() { //FIXME
@@ -81,22 +84,27 @@ let MapWidget = React.createClass({
   },
   handleMapMoveEnd(e) {
     //TODO: this event fires whenever the map's bounds, center or zoom change.
-    if (this.map !== null) {
-      // console.log('handleMapMoveEnd bounds %o', this.map.leafletElement.getBounds());
-      // console.log('handleMapMoveEnd center %o', this.map.leafletElement.getCenter());
-      // console.log('handleMapMoveEnd zoom %o', this.map.leafletElement.getZoom());
+    if (this.map !== null && this.props.componentUpdate !== undefined) {
+
+      let newCenter = this.map.leafletElement.getCenter();
+      let newZoom = this.map.leafletElement.getZoom();
+
+      if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {
+console.log('componentUpdate');
+        this.props.componentUpdate({center: newCenter, zoom: newZoom});
+      }
     }
   },
-  setBounds(bounds) { //FIXME
+  setBounds(bounds) {
     this.setState({bounds});
   },
-  setLoadStatus(loadStatus) { //FIXME
+  setLoadStatus(loadStatus) {
     this.setState({loadStatus});
   },
 
   render() {
     let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
-    let {bounds, loadStatus} = this.state; //FIXME
+    let {bounds, loadStatus} = this.state;
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
@@ -107,12 +115,22 @@ let MapWidget = React.createClass({
     // Translate prop values from strings (used in templates)
     // into the required primitive types.
 
-    // TODO: Could also support centerLat and centerLng props.
+    // TODO: Could also support individual centerLat and centerLng props.
 
     if (center instanceof Array) {
+      // TODO: check the array looks like [0, 0]
       adaptedMapProps.center = center;
-    }
-    if (typeof center === 'string') {
+    } else if (center !== null && typeof center === 'object') {
+      // TODO: check the object looks like {lat: 50, lng: 30} or {lat: 50, lon: 30}
+      if (center.lat !== undefined) {
+        adaptedMapProps.center = center;
+      } else if (_isFunction(center.get)) {
+        // TODO: check the object is a Map
+        adaptedMapProps.center = {lat: center.get('lat'), lng: center.get('lng')};
+      } else {
+        console.error('center is an unhandled object: %o', center);
+      }
+    } else if (typeof center === 'string') {
       // TODO: check the string looks like "[0, 0]" before trying to parse.
       let centerArrayFromString = JSON.parse(center);
       if (centerArrayFromString instanceof Array) {
@@ -122,8 +140,7 @@ let MapWidget = React.createClass({
 
     if (typeof zoom === 'number') {
       adaptedMapProps.zoom = zoom;
-    }
-    if (typeof zoom === 'string') {
+    } else if (typeof zoom === 'string') {
       // TODO: check the string looks like "0" before trying to parse.
       let zoomNumberFromString = Number(zoom);
       if (typeof zoomNumberFromString === 'number') {

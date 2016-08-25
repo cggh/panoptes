@@ -31,10 +31,12 @@ let TableMapWidget = React.createClass({
   ],
 
   propTypes: {
+    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
     locationDataTable: React.PropTypes.string,
     primKey: React.PropTypes.string,
     table: React.PropTypes.string,
-    title: React.PropTypes.string
+    title: React.PropTypes.string,
+    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
   },
 
   title() {
@@ -43,7 +45,13 @@ let TableMapWidget = React.createClass({
 
   render() {
 
-    let {locationDataTable, primKey, table} = this.props;
+    let {
+      center,
+      locationDataTable,
+      primKey,
+      table,
+      zoom
+    } = this.props;
 
     // NB: The table prop is passed by Panoptes, e.g. DataItem/Widget
     // The locationDataTable prop is named to distinguish it from the chartDataTable.
@@ -58,7 +66,11 @@ let TableMapWidget = React.createClass({
     let widgetStyle = {height: '100%'};
 
     return (
-      <MapWidget style={widgetStyle}>
+      <MapWidget
+        center={center}
+        style={widgetStyle}
+        zoom={zoom}
+      >
         <FeatureGroupWidget>
           <TileLayerWidget />
           <TableMarkersLayerWidget locationDataTable={locationDataTable} primKey={primKey} />

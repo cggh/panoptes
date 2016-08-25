@@ -26,10 +26,11 @@ let PieChartMarkersLayerWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'chartDataTable', 'primKey', 'highlight')
+    DataFetcherMixin('locationDataTable', 'chartDataTable', 'primKey')
   ],
 
-  contextTypes: { //FIXME
+  contextTypes: {
+    crs: React.PropTypes.object,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     setBounds: React.PropTypes.func,
@@ -74,7 +75,7 @@ let PieChartMarkersLayerWidget = React.createClass({
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('chartDataTable'), primKey: marker.get('primKey'), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.chartDataTable, primKey: marker.primKey, switchTo: !middleClick});
   },
 
 
@@ -174,11 +175,11 @@ let PieChartMarkersLayerWidget = React.createClass({
 
     if (locationNameProperty) {
       locationColumns.push(locationNameProperty);
-    }
+    } // Otherwise, the pie charts will remain nameless (prop default)
 
     if (locationSizeProperty) {
       locationColumns.push(locationSizeProperty);
-    }
+    } // Otherwise, the pie charts will have a fixed size (prop default)
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
@@ -267,15 +268,20 @@ let PieChartMarkersLayerWidget = React.createClass({
 
         }
 
+
+        //FIXME: only calc and set the bounds if they are not already stored in the session.
+
+
         let bounds = CalcMapBounds.calcMapBounds(markers);
-        setBounds(bounds); //FIXME
+console.log('setBounds: %o', _cloneDeep(bounds));
 
         // FIXME: adaptMarkerRadii always returns no markers.
         //markers = this.adaptMarkerRadii(markers, bounds);
 
         this.setState({markers});
-
+        setBounds(bounds);
         setLoadStatus('loaded');
+
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
@@ -287,16 +293,12 @@ let PieChartMarkersLayerWidget = React.createClass({
 
   render() {
 
-    let {layerContainer, map} = this.context;
+    let {crs, layerContainer, map} = this.context;
     let {markers} = this.state;
 
     if (!markers.size) {
       return null;
     }
-
-    // FIXME
-    //let crs = this.context.map ? this.context.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
-    let crs = window.L.CRS.EPSG3857;
 
     return (
       <GeoLayouter nodes={markers}>
@@ -312,7 +314,6 @@ let PieChartMarkersLayerWidget = React.createClass({
               <ComponentMarkerWidget
                 key={i}
                 position={[marker.lat, marker.lng]}
-                title={marker.title}
                 onClick={(e) => this.handleClickMarker(e, marker)}
               >
                 <PieChartWidget

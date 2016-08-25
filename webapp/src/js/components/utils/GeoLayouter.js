@@ -137,19 +137,6 @@ let GeoLayouter = React.createClass({
     this.force.start();
 
   },
-  componentWillReceiveProps(nextProps) {
-
-console.log('GeoLayouter nextProps %o', nextProps);
-
-    //Before we do anything check to see if there are any meaningful changes
-    if (this.props.nodes === nextProps.nodes)
-      return;
-
-    this.force.stop();
-    this.initForceUsingProps();
-    this.force.start();
-
-  },
   componentWillUnmount() {
     this.force.stop();
   },
@@ -194,9 +181,8 @@ console.log('GeoLayouter nextProps %o', nextProps);
 
   render() {
 
-    // this.forceUpdate() called by this.handleTick() causes a re-render
-    // after the (x, y) of this.renderNodes has been updated by this.force()
-    // and this.detectCollisions()
+    // NB: this.forceUpdate(), which is called by this.handleTick(), causes a re-render,
+    // in case the (x, y) of this.renderNodes has been updated by this.force() and this.detectCollisions()
 
     // Update the (lng, lat) of each renderNode using its (x, y)
     _each(this.renderNodes, updateLngLatUsingXY);
