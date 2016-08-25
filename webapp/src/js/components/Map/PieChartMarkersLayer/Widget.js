@@ -1,5 +1,5 @@
-import React from 'react';
 import Immutable from 'immutable';
+import React from 'react';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -145,7 +145,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       residualSectorColor
     } = props;
 
-    let {setBounds, setLoadStatus} = this.context; //FIXME
+    let {setBounds, setLoadStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
@@ -269,18 +269,17 @@ let PieChartMarkersLayerWidget = React.createClass({
         }
 
 
-        //FIXME: only calc and set the bounds if they are not already stored in the session.
-
-
-        let bounds = CalcMapBounds.calcMapBounds(markers);
-console.log('setBounds: %o', _cloneDeep(bounds));
-
         // FIXME: adaptMarkerRadii always returns no markers.
         //markers = this.adaptMarkerRadii(markers, bounds);
 
         this.setState({markers});
-        setBounds(bounds);
         setLoadStatus('loaded');
+
+
+        //FIXME: only calc and set the bounds if they are not already stored in the session.
+        let bounds = CalcMapBounds.calcMapBounds(markers);
+console.log('setBounds: %o', _cloneDeep(bounds));
+        setBounds(bounds);
 
       })
       .catch(API.filterAborted)

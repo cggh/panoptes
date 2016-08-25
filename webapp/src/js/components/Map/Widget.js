@@ -1,6 +1,6 @@
-import React from 'react';
-
+import Immutable from 'immutable';
 import {Map} from 'react-leaflet';
+import React from 'react';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -69,10 +69,10 @@ let MapWidget = React.createClass({
       tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
     };
   },
-  getInitialState() { //FIXME
+  getInitialState() {
     return {
       bounds: undefined,
-      loadStatus: 'loaded',
+      loadStatus: 'loaded'
     };
   },
 
@@ -83,12 +83,20 @@ let MapWidget = React.createClass({
     }
   },
   handleMapMoveEnd(e) {
-    //TODO: this event fires whenever the map's bounds, center or zoom change.
+
+    // NB: this event fires whenever the map's bounds, center or zoom change.
+    // this.map is not available on the first render (it's a callback ref attached to the Map component; no DOM yet)
+    // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
+
     if (this.map !== null && this.props.componentUpdate !== undefined) {
 
-      let newCenter = this.map.leafletElement.getCenter();
+      let leafletCenter = this.map.leafletElement.getCenter();
+      let newCenter = Immutable.Map({lat: leafletCenter.lat, lng: leafletCenter.lng});
       let newZoom = this.map.leafletElement.getZoom();
-
+console.log('oldCenter: ' + this.props.center);
+console.log('newCenter: ' + newCenter);
+console.log('oldZoom: ' + this.props.zoom);
+console.log('newZoom: ' + newZoom);
       if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {
 console.log('componentUpdate');
         this.props.componentUpdate({center: newCenter, zoom: newZoom});
@@ -170,7 +178,7 @@ console.log('componentUpdate');
       ref: (ref) => this.map = ref
     };
 
-    let mapWidgetComponent = null;
+    let mapComponent = null;
 
     // Provide a default tile layer.
     // Is there a situation where the user wants no tile layer?
@@ -213,7 +221,7 @@ console.log('componentUpdate');
         keyedDefaultTileLayer.key = 0;
         keyedChildren[0].key = 1;
 
-        mapWidgetComponent = (
+        mapComponent = (
           <Map
             {...commonMapProps}
             {...adaptedMapProps}
@@ -228,7 +236,7 @@ console.log('componentUpdate');
         // Otherwise, the children contain non-Markers
         // pass everything to the Map component.
 
-        mapWidgetComponent = (
+        mapComponent = (
           <Map
             children={children}
             {...commonMapProps}
@@ -260,7 +268,7 @@ console.log('componentUpdate');
 
           let augmentedChild = _cloneDeep(children);
           augmentedChild.props.children.props.checked = true;
-          mapWidgetComponent = (
+          mapComponent = (
             <Map
               children={augmentedChild}
               {...commonMapProps}
@@ -272,7 +280,7 @@ console.log('componentUpdate');
 
           // Otherwise, pass everything to the Map component.
 
-          mapWidgetComponent = (
+          mapComponent = (
             <Map
               children={children}
               {...commonMapProps}
@@ -287,7 +295,7 @@ console.log('componentUpdate');
 
         // Just show the default map with the default TileLayer
 
-        mapWidgetComponent = (
+        mapComponent = (
           <Map
             {...commonMapProps}
             {...adaptedMapProps}
@@ -303,7 +311,9 @@ console.log('componentUpdate');
     return (
       <DetectResize onResize={this.handleDetectResize}>
         <div style={widgetStyle}>
-          {mapWidgetComponent}
+          <div style={widgetStyle}>
+            {mapComponent}
+          </div>
           <Loading status={loadStatus}/>
         </div>
       </DetectResize>

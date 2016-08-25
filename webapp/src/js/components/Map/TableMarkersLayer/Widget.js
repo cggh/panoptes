@@ -64,7 +64,7 @@ let TableMarkersLayerWidget = React.createClass({
 
     let {highlight, locationDataTable, primKey} = props;
 
-    let {setBounds, setLoadStatus} = this.context; //FIXME
+    let {setBounds, setLoadStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
