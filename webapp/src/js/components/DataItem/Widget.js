@@ -14,9 +14,10 @@ import TabPane from 'ui/TabPane';
 import DataItemActions from 'DataItem/Actions';
 
 let dynreq = require.context('..', true);
-const dynamicRequire = (path) => dynreq('./' + path + '/Widget');
+const dynamicRequire = (path) => dynreq('./' + path);
 
 let DataItemWidget = React.createClass({
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -80,7 +81,6 @@ let DataItemWidget = React.createClass({
                 </TabPane>
               );
             })}
-
           </TabbedArea>
         </div>
         <div>
