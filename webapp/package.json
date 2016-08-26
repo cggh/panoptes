@@ -67,6 +67,7 @@
     "javascript-detect-element-resize": "git+https://github.com/sdecima/javascript-detect-element-resize.git",
     "keymirror": "^0.1.1",
     "leaflet": "^1.0.0-rc.2",
+    "leaflet-loading": "git+https://github.com/benjeffery/Leaflet.loading.git",
     "lodash": "^4.15.0",
     "lz-string": "git+https://github.com/benjeffery/lz-string.git",
     "material-ui": "^0.15.4",
