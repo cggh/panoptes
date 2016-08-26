@@ -96,18 +96,18 @@ let PieChartMarkersLayerWidget = React.createClass({
         se.lng = 180, nw.lng = -180;
       }
 
-      // FIXME: pieAreaSum is always 0
+      // NB: the markers' positions match the bounds exactly here,
+      // since the bounds have been determined automatically using the marker positions.
       let pieAreaSum = adaptedMarkers.filter(
-        (marker) =>
-          marker.get('lat') > se.lat &&
-          marker.get('lat') < nw.lat &&
-          marker.get('lng') > nw.lng &&
-          marker.get('lng') < se.lng
+        (marker) => marker.get('lat') >= se.lat &&
+          marker.get('lat') <= nw.lat &&
+          marker.get('lng') >= nw.lng &&
+          marker.get('lng') <= se.lng
       )
       .map((marker) => marker.get('radius') * marker.get('radius') * 2 * Math.PI)
       .reduce((sum, val) => sum + val, 0);
 
-      let fudge = 75; // FIXME: was 75
+      let fudge = 0.01; // FIXME: was 75
 
       if (pieAreaSum > 0) {
         nw = latlngToMercatorXY(nw);
@@ -250,15 +250,13 @@ let PieChartMarkersLayerWidget = React.createClass({
               color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
             });
 
-          // TODO FIXME: base radius on locationData[i][locationSizeProperty], e.g. Math.sqrt(locationData[i][locationSizeProperty])
-
           markers = markers.push(Immutable.fromJS({
             chartDataTable: chartDataTable,
             key: i,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],
-            radius: 0.0005,
+            radius: Math.sqrt(locationData[i][locationSizeProperty]),
             chartData: markerChartData,
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey,
@@ -268,11 +266,12 @@ let PieChartMarkersLayerWidget = React.createClass({
         }
 
 
-        // FIXME: adaptMarkerRadii always returns no markers.
-        //markers = this.adaptMarkerRadii(markers, bounds);
+        let bounds = CalcMapBounds.calcMapBounds(markers);
+
+        markers = this.adaptMarkerRadii(markers, bounds);
 
         this.setState({markers});
-        changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
+        changeLayerStatus({loadStatus: 'loaded', bounds: bounds});
 
       })
       .catch(API.filterAborted)
