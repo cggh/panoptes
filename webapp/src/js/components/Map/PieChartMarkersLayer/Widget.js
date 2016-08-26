@@ -33,8 +33,7 @@ let PieChartMarkersLayerWidget = React.createClass({
     crs: React.PropTypes.object,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    setBounds: React.PropTypes.func,
-    setLoadStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func
   },
   propTypes: {
     defaultResidualFractionName: React.PropTypes.string,
@@ -145,7 +144,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       residualSectorColor
     } = props;
 
-    let {setBounds, setLoadStatus} = this.context;
+    let {changeLayerStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
@@ -158,7 +157,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       return null;
     }
 
-    setLoadStatus('loading');
+    changeLayerStatus({loadStatus: 'loading'});
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -273,20 +272,14 @@ let PieChartMarkersLayerWidget = React.createClass({
         //markers = this.adaptMarkerRadii(markers, bounds);
 
         this.setState({markers});
-        setLoadStatus('loaded');
-
-
-        //FIXME: only calc and set the bounds if they are not already stored in the session.
-        let bounds = CalcMapBounds.calcMapBounds(markers);
-console.log('setBounds: %o', _cloneDeep(bounds));
-        setBounds(bounds);
+        changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
 
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-        setLoadStatus('error');
+        changeLayerStatus({loadStatus: 'error'});
       });
   },
 
@@ -307,28 +300,28 @@ console.log('setBounds: %o', _cloneDeep(bounds));
             layerContainer={layerContainer}
             map={map}
           >
-          {
-            renderNodes.map(
-              (marker, i) =>
-              <ComponentMarkerWidget
-                key={i}
-                position={[marker.lat, marker.lng]}
-                onClick={(e) => this.handleClickMarker(e, marker)}
-              >
-                <PieChartWidget
-                  chartData={marker.chartData}
-                  crs={crs}
+            {
+              renderNodes.map(
+                (marker, i) =>
+                <ComponentMarkerWidget
                   key={i}
-                  lat={marker.lat}
-                  lng={marker.lng}
-                  name={marker.name}
-                  originalLat={marker.lat}
-                  originalLng={marker.lng}
-                  radius={marker.radius}
-                />
-              </ComponentMarkerWidget>
-            )
-          }
+                  position={[marker.lat, marker.lng]}
+                  onClick={(e) => this.handleClickMarker(e, marker)}
+                >
+                  <PieChartWidget
+                    chartData={marker.chartData}
+                    crs={crs}
+                    key={i}
+                    lat={marker.lat}
+                    lng={marker.lng}
+                    name={marker.name}
+                    originalLat={marker.lat}
+                    originalLng={marker.lng}
+                    radius={marker.radius}
+                  />
+                </ComponentMarkerWidget>
+              )
+            }
           </FeatureGroupWidget>
         }
       </GeoLayouter>

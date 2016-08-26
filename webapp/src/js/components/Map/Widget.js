@@ -14,11 +14,13 @@ import TileLayerWidget from 'Map/TileLayer/Widget';
 import _cloneDeep from 'lodash/cloneDeep';
 import _isEqual from 'lodash/isEqual';
 import _isFunction from 'lodash/isFunction';
+import _max from 'lodash/max';
+import _min from 'lodash/min';
 
 // CSS
 import 'leaflet/dist/leaflet.css';
 
-/* TODO: Support
+/* TODO: Support complex maps in templates
 
   <p>A layered map:</p>
   <div style="width:300px;height:300px">
@@ -46,8 +48,7 @@ let MapWidget = React.createClass({
 
   childContextTypes: {
     crs: React.PropTypes.object,
-    setBounds: React.PropTypes.func,
-    setLoadStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func
   },
 
   title() {
@@ -57,19 +58,21 @@ let MapWidget = React.createClass({
   getChildContext() {
     return {
       crs: this.map !== undefined ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
-      setBounds: this.setBounds,
-      setLoadStatus: this.setLoadStatus
+      changeLayerStatus: this.handleChangeLayerStatus
     };
   },
   getDefaultProps() {
+    // NB: Don't define a center or zoom here,
+    // because render() relies on undefined to indicate that they have not already been set in the session (then decide a default).
     return {
-      center: [0, 0],
-      zoom: 0,
+      center: undefined,
+      zoom: undefined,
       tileLayerAttribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
     };
   },
   getInitialState() {
+    // NB: undefined is different to null in that bounds={undefined} will not be regarded as a specified (invalid) prop.
     return {
       bounds: undefined,
       loadStatus: 'loaded'
@@ -77,42 +80,85 @@ let MapWidget = React.createClass({
   },
 
   // Event handlers
+  handleChangeLayerStatus(payload) {
+
+    let {loadStatus, bounds} = payload;
+
+
+    if (this.state.bounds === undefined && bounds !== undefined)  {
+      this.setState({bounds});
+    } else if (this.state.bounds !== undefined && bounds !== undefined) {
+
+      // Determine whether Map bounds need to be increased to accommodate new Layer bounds.
+
+      let mapNorthEast = this.state.bounds.getNorthEast();
+      let mapSouthWest = this.state.bounds.getSouthWest();
+      let layerNorthEast = bounds.getNorthEast();
+      let layerSouthWest = bounds.getSouthWest();
+
+      let maxNorthEastLat = _max([mapNorthEast.lat, layerNorthEast.lat]);
+      let maxNorthEastLng = _max([mapNorthEast.lng, layerNorthEast.lng]);
+      let minSouthWestLat = _min([mapSouthWest.lat, layerSouthWest.lat]);
+      let minSouthWestLng = _min([mapSouthWest.lng, layerSouthWest.lng]);
+
+      if (
+        maxNorthEastLat !== mapNorthEast.lat
+        || maxNorthEastLng !== mapNorthEast.lng
+        || minSouthWestLat !== mapSouthWest.lat
+        || minSouthWestLng !== mapSouthWest.lng
+      ) {
+
+        let newSouthWest = window.L.latLng(40.712, -74.227);
+        let newNorthEast = window.L.latLng(40.774, -74.125);
+        let newBounds = window.L.latLngBounds(newSouthWest, newNorthEast);
+
+        this.setState({newBounds});
+
+      }
+
+    }
+
+    // TODO: spinner on map (allow map interaction while other layers load)
+    this.setState({loadStatus});
+
+  },
   handleDetectResize() {
     if (this.map !== null) {
       this.map.leafletElement.invalidateSize();
     }
   },
-  handleMapMoveEnd(e) {
+  handleMapMoveEnd(e) { // e is not being used
 
     // NB: this event fires whenever the map's bounds, center or zoom change.
-    // this.map is not available on the first render (it's a callback ref attached to the Map component; no DOM yet)
+    // this.map is not available on the first render; it's a callback ref attached to the Map component; no DOM yet.
+    // However, this event, handleMapMoveEnd(e), will not be triggered on the first render.
+    // Importantly, this.map is not available when the Map component is not visible, e.g. on an unselected tab.
     // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
 
     if (this.map !== null && this.props.componentUpdate !== undefined) {
 
       let leafletCenter = this.map.leafletElement.getCenter();
+
       let newCenter = Immutable.Map({lat: leafletCenter.lat, lng: leafletCenter.lng});
       let newZoom = this.map.leafletElement.getZoom();
-console.log('oldCenter: ' + this.props.center);
-console.log('newCenter: ' + newCenter);
-console.log('oldZoom: ' + this.props.zoom);
-console.log('newZoom: ' + newZoom);
+
       if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {
-console.log('componentUpdate');
         this.props.componentUpdate({center: newCenter, zoom: newZoom});
       }
+
     }
   },
-  setBounds(bounds) {
-    this.setState({bounds});
-  },
-  setLoadStatus(loadStatus) {
-    this.setState({loadStatus});
-  },
+
 
   render() {
     let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
     let {bounds, loadStatus} = this.state;
+
+    if (bounds === undefined && center === undefined && zoom === undefined) {
+      // NB: The center/zoom props may have been set by the session or determined by bounds.
+      center = [0, 0];
+      zoom = 0;
+    }
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
@@ -128,7 +174,7 @@ console.log('componentUpdate');
     if (center instanceof Array) {
       // TODO: check the array looks like [0, 0]
       adaptedMapProps.center = center;
-    } else if (center !== null && typeof center === 'object') {
+    } else if (center !== undefined && typeof center === 'object') {
       // TODO: check the object looks like {lat: 50, lng: 30} or {lat: 50, lon: 30}
       if (center.lat !== undefined) {
         adaptedMapProps.center = center;
@@ -138,7 +184,7 @@ console.log('componentUpdate');
       } else {
         console.error('center is an unhandled object: %o', center);
       }
-    } else if (typeof center === 'string') {
+    } else if (center !== undefined && typeof center === 'string') {
       // TODO: check the string looks like "[0, 0]" before trying to parse.
       let centerArrayFromString = JSON.parse(center);
       if (centerArrayFromString instanceof Array) {
@@ -156,26 +202,29 @@ console.log('componentUpdate');
       }
     }
 
-    if (adaptedMapProps.center === undefined || adaptedMapProps.center === null) {
-      console.error('MapWidget failed to determine center');
+    if (bounds === undefined && (adaptedMapProps.center === undefined || adaptedMapProps.center === null)) {
+      console.error('MapWidget failed to determine center or bounds');
     }
 
-    if (adaptedMapProps.zoom === undefined || adaptedMapProps.zoom === null) {
-      console.error('MapWidget failed to determine zoom');
+    if (bounds === undefined && (adaptedMapProps.zoom === undefined || adaptedMapProps.zoom === null)) {
+      console.error('MapWidget failed to determine zoom or bounds');
     }
 
     // NB: JSX children will overwrite the passed prop, if any.
     // https://github.com/facebook/flow/issues/1355
 
-    // NB: The bounds prop on the react-leaftlet Map component is equivalent to fitBounds
+    // NB: The bounds prop on the react-leaflet Map component is equivalent to fitBounds
     // There is also a boundsOptions prop corresponding to http://leafletjs.com/reference.html#map-fitboundsoptions
     // TODO: boundsOptions: {padding: [1, 1]},
 
+    // NB: if bounds is undefined then it will not be regarded as a prop (and therefore not an invalid prop).
     let commonMapProps = {
-      bounds: bounds,
+      bounds: center && (zoom !== undefined) ? undefined : bounds,
+      center: center,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
-      ref: (ref) => this.map = ref
+      ref: (ref) => this.map = ref,
+      zoom: zoom
     };
 
     let mapComponent = null;
