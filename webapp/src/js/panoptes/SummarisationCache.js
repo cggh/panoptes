@@ -9,11 +9,6 @@ import SQL from 'panoptes/SQL';
 
 const FETCH_SIZE = 10000;
 
-let findOptimalBlockSize = (start, end, desiredCount) => {
-  let desiredBlockSize = (end - start) / desiredCount;
-  return Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize) / Math.log(2))));
-};
-
 let blockStartEnd = (start, end, blockSize) => {
   let blockStart = Math.max(0, Math.floor(start / blockSize) - 1);
   return [blockStart,

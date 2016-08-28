@@ -1,40 +1,46 @@
 import React from 'react';
 
-import d3 from 'd3';
 import _min from 'lodash/min';
 import _max from 'lodash/max';
 import _debounce from 'lodash/debounce';
+import _sortedIndex from 'lodash/sortedIndex';
+import _sortedLastIndex from 'lodash/sortedLastIndex';
 import _isFinite from 'lodash/isFinite';
 
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import SummarisationCache from 'panoptes/SummarisationCache';
+import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
+import SQL from 'panoptes/SQL';
 
 
 let NumericalSummaryTrack = React.createClass({
   mixins: [
+    PureRenderWithRedirectedProps({
+      check: [
+        'width',
+        'height'
+      ]
+    }),
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('chromosome', 'blockStart', 'blockEnd', 'table,', 'track', 'width', 'sideWidth')
+    DataFetcherMixin('chromosome', 'start', 'end', 'table,', 'track', 'width', 'height', 'yMin', 'yMax', 'autoYScale')
   ],
 
   propTypes: {
     chromosome: React.PropTypes.string.isRequired,
-    blockStart: React.PropTypes.number, //Provided by ScaledSVGChannel
-    blockEnd: React.PropTypes.number, //Provided by ScaledSVGChannel
-    blockPixelWidth: React.PropTypes.number, //Provided by ScaledSVGChannel
+    start: React.PropTypes.number, //Provided by ScaledSVGChannel
+    end: React.PropTypes.number, //Provided by ScaledSVGChannel
+    height: React.PropTypes.number,
     width: React.PropTypes.number,
-    sideWidth: React.PropTypes.number,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
-    tension: React.PropTypes.number,
+    yMin: React.PropTypes.number,
+    yMax: React.PropTypes.number,
     onYLimitChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
@@ -46,38 +52,27 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   componentWillMount() {
+    this.blocks = [];
     this.debouncedYScale = _debounce(this.calculateYScale, 200);
   },
   componentWillUnmount() {
     this.props.onYLimitChange({dataYMin: null, dataYMax: null});
   },
 
-  componentWillReceiveProps(nextProps) {
-    //We apply data if there is a change in interpolation params to redraw the line
-    if (['interpolation', 'tension'].some((name) => this.props[name] !== nextProps[name]))
-      this.applyData(nextProps);
-    //If there is a change in start or end we need to recalc y limits
-    if (['start', 'end'].some((name) => Math.round(this.props[name]) !== Math.round(nextProps[name])))
-      this.debouncedYScale(nextProps);
-  },
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.area !== nextState.area || this.state.line !== nextState.line;
+  componentDidUpdate() {
+    this.draw(this.props, this.blocks)
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
-  fetchData(props, requestContext) {
-    let {chromosome, blockStart, blockEnd, blockPixelWidth, width, sideWidth, table, track} = props;
+  fetchData(nextProps, requestContext) {
+    let {chromosome, start, end, width, table, track, autoYScale} = nextProps;
     const tableConfig = this.config.tablesById[table];
-    if (this.state.chromosome && (this.state.chromosome !== chromosome)) {
-      this.data = {
-        dataStart: 0,
-        dataStep: 0,
-        columns: {}
-      };
-      this.applyData(props);
+    if (this.props.chromosome !== chromosome ||
+      this.props.track !== track ||
+      this.props.table !== table) {
+      this.applyData(nextProps, []);
     }
-    if (width - sideWidth < 1) {
+    if (width < 1) {
       return;
     }
     if (!tableConfig ||
@@ -88,39 +83,54 @@ let NumericalSummaryTrack = React.createClass({
       ErrorReport(this.getFlux(), `${table}/${track} is not a valid numerical summary track`);
       return;
     }
-    this.props.onChangeLoadStatus('LOADING');
-    requestContext.request(
-      (componentCancellation) =>
-        SummarisationCache.fetch({
-          dataset: this.config.dataset,
-          table,
-          columns: [
-            {
-              expr: ['avg', [track]],
-              as: 'avg'
-            },
-            {
-              expr: ['min', [track]],
-              as: 'min'
-            },
-            {
-              expr: ['max', [track]],
-              as: 'max'
-            }
-          ],
-          chromosome: chromosome,
-          start: blockStart,
-          end: blockEnd,
-          chromosomeField: tableConfig.chromosome,
-          positionField: tableConfig.position,
-          targetPointCount: blockPixelWidth,
-          cancellation: componentCancellation
-        })
-          .then((data) => {
+    const {blockLevel, blockIndex, needNext, summaryWindow} = findBlock({start, end, width});
+    //If we already at this block then don't change it!
+    if (this.props.chromosome !== chromosome ||
+       this.props.track !== track ||
+       this.props.table !== table ||
+       !(this.blockLevel === blockLevel
+         && this.blockIndex === blockIndex
+         && this.needNext === needNext
+         && this.requestSummaryWindow === summaryWindow
+       )) {
+      //Current block was unacceptable so choose best one
+      this.blockLevel = blockLevel;
+      this.blockIndex = blockIndex;
+      this.needNext = needNext;
+      this.requestSummaryWindow = summaryWindow;
+      this.props.onChangeLoadStatus('LOADING');
+      const columns = [
+        {expr: ['/', [tableConfig.position, summaryWindow]], as: 'window'},
+        {expr: ['count', ['*']], as: 'count'},
+        {expr: ['avg', [track]], as: 'avg'},
+        {expr: ['min', [track]], as: 'min'},
+        {expr: ['max', [track]], as: 'max'}
+      ];
+      const query = SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome);
+      let APIargs = {
+        database: this.config.dataset,
+        table,
+        columns: columns,
+        query: SQL.WhereClause.encode(query),
+        groupBy: ['window'],
+        order: ['window'],
+        transpose: false,
+      };
+      let cacheArgs = {
+        method: 'query',
+        regionField: tableConfig.position,
+        queryField: 'query',
+        start,
+        end,
+        useWiderBlocksIfInCache: false,
+        isBlockTooBig: () => false
+      };
+
+      requestContext.request((componentCancellation) =>
+        regionCacheGet(APIargs, cacheArgs, componentCancellation)
+          .then((blocks) => {
             this.props.onChangeLoadStatus('DONE');
-            this.data = data;
-            this.applyData(props);
-            this.calculateYScale(props);
+            this.applyData(this.props, blocks, summaryWindow);
           })
           .catch((err) => {
             this.props.onChangeLoadStatus('DONE');
@@ -129,76 +139,152 @@ let NumericalSummaryTrack = React.createClass({
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+            this.applyData(this.props, []);
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(nextProps, requestContext));
+            throw error;
           })
-    );
-  },
-
-  applyData(props) {
-    if (this.data) {
-      let {dataStart, dataStep, columns} = this.data;
-      let {interpolation, tension} = props;
-
-      let avg = columns ? columns.avg.data || [] : [];
-      let max = columns ? columns.max.data || [] : [];
-      let min = columns ? columns.min.data || [] : [];
-
-      let line = d3.svg.line()
-        .interpolate(interpolation)
-        .tension(tension)
-        .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep) )
-        .y((d) => d)(avg);
-      let area = d3.svg.area()
-        .interpolate(interpolation)
-        .tension(tension)
-        .defined(_isFinite)
-        .x((d, i) => dataStart + (i * dataStep))
-        .y1((d) => d)
-        .y0((d, i) => min[i])(max);
-
-      this.setState({
-        area: area,
-        line: line
-      });
+      );
+    }
+    //If we fetched or not, still draw if props have changed
+    if (['start', 'end', 'yMin', 'yMax'].some((name) => this.props[name] !== nextProps[name])) {
+      this.draw(nextProps);
+    }
+    if (autoYScale && ['start', 'end,', 'autoYScale'].some((name) => this.props[name] !== nextProps[name])) {
+      this.debouncedYScale(nextProps);
     }
   },
 
+  applyData(props, blocks, summaryWindow) {
+    this.blocks = blocks;
+    this.summaryWindow = summaryWindow;
+    this.draw(props);
+    this.debouncedYScale(props);
+  },
+
+  draw(props) {
+    const { yMin, yMax, height, start, end, width } = props;
+    if (!this.refs.canvas) {
+      return;
+    }
+    const canvas = this.refs.canvas;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!this.summaryWindow || !this.blocks || this.blocks.length < 1 ||
+        !_isFinite(yMin) || !_isFinite(yMax)
+    ) {
+      return;
+    }
+
+    const nullVal = API.nullValues[this.blocks[0].min.type];
+    const windowSize = this.summaryWindow;
+    const xScaleFactor = width / (end - start);
+    const yScaleFactor = height / (yMax - yMin);
+    const pixelWindowSize = windowSize * xScaleFactor;
+    //Max and min
+    ctx.beginPath();
+    this.blocks.forEach((block) => {
+      const window = block.window.array;
+      const min = block.min.array;
+      const max = block.max.array;
+      for (let i=0, iEnd = window.length; i < iEnd; i++) {
+        if (min[i] !== nullVal && min[i] == +min[i]) {  //If min is null then max, avg should be
+          const xPixel = xScaleFactor * (window[i]*windowSize - start);
+          const yMinPixel = height - (yScaleFactor * (min[i] - yMin));
+          const yMaxPixel = height - (yScaleFactor * (max[i] - yMin));
+          ctx.moveTo(xPixel, yMinPixel);
+          ctx.lineTo(xPixel + pixelWindowSize, yMinPixel);
+          ctx.lineTo(xPixel + pixelWindowSize, yMaxPixel);
+          ctx.lineTo(xPixel, yMaxPixel);
+        }
+        lastPointNull = (min[i] === nullVal || min[i] != +min[i]);
+        lastWindow = window[i]
+      }
+    });
+    ctx.fillStyle = 'rgba(61, 139, 213, 0.3)';
+    ctx.fill();
+    let lastPointNull = true;
+    let lastWindow = null;
+    //Avg line
+    ctx.beginPath();
+    this.blocks.forEach((block) => {
+      const window = block.window.array;
+      const avg = block.avg.array;
+      for (let i=0, iEnd = window.length; i < iEnd; i++) {
+        if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
+          const xPixel = xScaleFactor * (window[i]*windowSize - start);
+          const yPixel = height - (yScaleFactor * (avg[i] - yMin));
+          if (lastPointNull || window[i] !== lastWindow + 1) {
+            ctx.moveTo(xPixel, yPixel);
+          } else {
+            ctx.lineTo(xPixel, yPixel);
+          }
+          ctx.lineTo(xPixel + pixelWindowSize, yPixel);
+        }
+        lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
+        lastWindow = window[i]
+      }
+    });
+    ctx.strokeStyle = '#3d8bd5';
+    ctx.stroke();
+    // Circles for single data points
+    ctx.beginPath();
+    this.blocks.forEach((block) => {
+      const window = block.window.array;
+      const avg = block.avg.array;
+      const count = block.count.array;
+      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
+        if (count[i] === 1 && avg[i] !== nullVal && avg[i] == +avg[i]) {
+          const xPixel = xScaleFactor * (window[i] * windowSize - start);
+          const yPixel = height - (yScaleFactor * (avg[i] - yMin));
+          ctx.moveTo(xPixel, yPixel);
+          ctx.arc(xPixel + (pixelWindowSize / 2), yPixel, Math.max(1, Math.min(pixelWindowSize - 4, 4)), 0, 2 * Math.PI, false);
+        }
+      }
+    });
+    ctx.fillStyle = '#222222';
+    ctx.fill();
+  },
+
   calculateYScale(props) {
-    if (this.data) {
+    const {table, track} = props;
+    if (this.blocks && this.summaryWindow) {
       let {start, end} = props;
-      let {dataStart, dataStep, columns} = this.data;
-
-      let max = columns ? columns.max.data || [] : [];
-      let min = columns ? columns.min.data || [] : [];
-
-      let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
-      let endIndex = Math.min(max.length - 1, Math.ceil((end - dataStart) / dataStep));
-      let minVal = _min(min.slice(startIndex, endIndex));
-      let maxVal = _max(max.slice(startIndex, endIndex));
-      if (minVal === maxVal) {
-        minVal = minVal - 0.1 * minVal;
-        maxVal = maxVal + 0.1 * maxVal;
+      let min = [];
+      let max = [];
+      this.blocks.forEach((block) => {
+        const startIndex = _sortedIndex(block.window.array, start/this.summaryWindow);
+        const endIndex = _sortedLastIndex(block.window.array, end/this.summaryWindow);
+        min.push(_min(block.min.array.subarray(startIndex, endIndex)));
+        max.push(_max(block.max.array.subarray(startIndex, endIndex)));
+      });
+      min = _min(min);
+      max = _max(max);
+      if (min === max) {
+        min = min - 0.1 * min;
+        max = max + 0.1 * max;
       } else {
-        let margin = 0.1 * (maxVal - minVal);
-        minVal = minVal - margin;
-        maxVal = maxVal + margin;
+        let margin = 0.1 * (max - min);
+        min = min - margin;
+        max = max + margin;
       }
       this.props.onYLimitChange({
-        dataYMin: minVal,
-        dataYMax: maxVal
+        dataYMin: min,
+        dataYMax: max
+      });
+    } else {
+      const config = this.config.tablesById[table].propertiesById[track];
+      this.props.onYLimitChange({
+        dataYMin: config.minVal,
+        dataYMax: config.maxVal
       });
     }
   },
 
 
   render() {
-    let {area, line} = this.state;
+    const {width, height} = this.props;
     return (
-      <g className="numerical-track">
-        <path className="area" d={area}/>
-        <path className="line" d={line}/>
-      </g>
+      <canvas ref="canvas" width={width} height={height}/>
     );
   }
 

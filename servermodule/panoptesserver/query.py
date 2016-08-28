@@ -31,7 +31,7 @@ def handler(start_response, requestData):
     
     tableId = content['table']
     query = content['query']
-    order = content.get('order', None)
+    order = content.get('orderBy', None)
     sortReverse = content.get('sortReverse', 'false') == 'true'
     distinct = content.get('distinct', 'false') == 'true'
     columns = map(decode, json.loads(content['columns']))

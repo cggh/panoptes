@@ -261,29 +261,6 @@ div.scale {
   }
 }
 
-svg.numerical-channel {
-  .origin-shifter {
-    fill: none;
-  }
-  g.categorical-track {
-    stroke: none;
-    opacity: 0.8;
-  }
-  g.numerical-track {
-    * {
-      vector-effect: non-scaling-stroke;
-    }
-    fill: none;
-    .line {
-      stroke: $primary-color;
-    }
-    .area {
-      stroke: none;
-      fill: rgba(61, 139, 213, 0.3);
-    }
-  }
-}
-
 .side-name {
   padding: 5px 35px 5px 30px;
 }
@@ -314,5 +291,13 @@ svg.numerical-channel {
     position: absolute;
     bottom: 0;
     right: 0;
+  }
+}
+
+.numerical-channel-canvas-holder {
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }

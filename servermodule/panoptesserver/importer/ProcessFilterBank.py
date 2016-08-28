@@ -244,7 +244,7 @@ class ProcessFilterBank(BaseImport):
         if tableSettings.getPropertyValue(propid, 'isCategorical'): #                with calculationObject.LogHeader('Creating categorical summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating categorical summary values for {0}.{1}'.format(tableid,propid))
             values.update({'Categories': tableSettings.getPropertyValue(propid,'categories')})
-        elif settings['dataType'] in ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Int64']:
+        elif settings['dataType'] in ['Float', 'Double', 'Int8', 'Int16', 'Int32']:
     #                with calculationObject.LogHeader('Creating summary values for {0}.{1}'.format(tableid,propid)):
             self._log('Creating summary values for {0}.{1}'.format(tableid,propid))
             values.update({'minval':float(tableSettings.getPropertyValue(propid,"minVal")), 'maxval':float(tableSettings.getPropertyValue(propid,"maxVal"))})

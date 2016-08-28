@@ -27,7 +27,6 @@ def GetSQLDataType(dataType):
         'Int8': 'tinyint',
         'Int16': 'smallint',
         'Int32': 'int',
-        'Int64': 'bigint',
         'Boolean': 'boolean',
         'GeoLatitude': 'real',
         'GeoLongitude': 'real',

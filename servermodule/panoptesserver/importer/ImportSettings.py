@@ -16,7 +16,7 @@ class ImportSettings:
 
     __metaclass__ = ABCMeta
 
-    _valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Int64']
+    _valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32']
     _propertiesDefault = OrderedDict((
                             ('id', {
                                    'type': 'Text',
@@ -47,9 +47,6 @@ class ImportSettings:
                                                       }),
                                                ('Int32', {
                                                    'description': '32 bit signed integer between -2147483647 and 2147483647'
-                                                      }),
-                                               ('Int64', {
-                                                   'description': '64 bit signed integer between -9223372036854775807 and 9223372036854775807'
                                                       }),
                                                ('GeoLatitude', {
                                                     'description': 'latitude part of a geographical coordinates (in decimal degrees).'

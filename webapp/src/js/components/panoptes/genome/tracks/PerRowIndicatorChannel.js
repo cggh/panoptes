@@ -93,35 +93,35 @@ let PerRowIndicatorChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-    if (this.props.chromosome !== chromosome) {
-      this.applyData(props, {});
+    const tableConfig = this.config.tablesById[table];
+    if (this.props.chromosome !== chromosome ||
+      this.props.table !== table) {
+      this.applyData(props, []);
     }
     if (width - sideWidth < 1) {
       return;
     }
-    if (colourProperty && !this.config.tablesById[table].propertiesById[colourProperty]) {
+    if (colourProperty && !tableConfig[table].propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
+        this.props.table !== table ||
         this.props.query !== query ||
         this.props.colourProperty !== colourProperty ||
         !(this.blockLevel === blockLevel
-        && this.blockIndex === blockIndex
-        && this.needNext === needNext)) {
+          && this.blockIndex === blockIndex
+          && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
       this.blockLevel = blockLevel;
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let tableConfig = this.config.tablesById[table];
       let columns = [tableConfig.primKey, tableConfig.position];
       if (colourProperty)
         columns.push(colourProperty);
-      // let columnspec = {};
-      // columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
       query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome),
         query]);
@@ -155,8 +155,9 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
+          this.applyData(this.props, []);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
+          throw error;
         });
     }
     this.draw(props);

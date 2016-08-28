@@ -533,7 +533,7 @@ function query(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
     query: SQL.nullQuery,
-    order: null,
+    orderBy: null,
     groupBy: null,
     ascending: true,
     start: 0,
@@ -541,7 +541,7 @@ function query(options) {
     distinct: false,
     transpose: true
   };
-  let {database, table, columns, query, order, groupBy,
+  let {database, table, columns, query, orderBy, groupBy,
     ascending, start, stop, distinct, transpose} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
@@ -560,7 +560,7 @@ function query(options) {
     sortReverse: ascending ? 'false' : 'true',
     limit: `${start}~${stop}`,
     distinct: distinct ? 'true' : 'false',
-    order,
+    orderBy: orderBy ? orderBy.join('~') : null,
     groupBy: groupBy ? groupBy.join('~') : null
   }));
     //Transpose into rows if needed
@@ -578,6 +578,12 @@ function query(options) {
     //   }
     // });
 }
+
+const nullValues = {
+  i1: -128,
+  i2: -32768,
+  i4: -2147483648,
+};
 
 // TODO: Maintain an order to this list?
 module.exports = {
@@ -602,5 +608,6 @@ module.exports = {
   truncatedRowsCount,
   modifyConfig,
   twoDPageQuery,
-  query
+  query,
+  nullValues
 };

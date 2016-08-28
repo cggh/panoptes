@@ -4,13 +4,12 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import _isFinite from 'lodash/isFinite';
 import _forEach from 'lodash/forEach';
-import _map from 'lodash/map';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
-import ScaledSVGChannel from 'panoptes/genome/tracks/ScaledSVGChannel';
+import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -20,26 +19,11 @@ import FlatButton from 'material-ui/FlatButton';
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./' + path);
 
-
-const INTERPOLATIONS = [
-  {payload: 'linear', text: 'Linear'},
-  {payload: 'step', text: 'Step'},
-  {payload: 'basis', text: 'Basis'},
-  {payload: 'bundle', text: 'Bundle'},
-  {payload: 'cardinal', text: 'Cardinal'},
-  {payload: 'monotone', text: 'Monotone'}
-];
-const INTERPOLATION_HAS_TENSION = {
-  cardinal: true
-};
-
-
 let NumericalTrackGroupChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
         'componentUpdate',
-        'onYLimitChange',
         'onClose'
       ]
     })
@@ -59,41 +43,15 @@ let NumericalTrackGroupChannel = React.createClass({
 
   getDefaultProps() {
     return {
-      interpolation: 'step',
       autoYScale: true,
-      tension: 0.5
     };
   },
 
-  componentWillMount() {
-    this.yLimits = {};
-  },
-
-  handleYLimitChange(index, dataLimits) {
-    this.yLimits[index] = dataLimits;
-    let allDataYMin = null;
-    let allDataYMax = null;
-    _map(this.yLimits, ({dataYMin, dataYMax}) => {
-      if (!_isFinite(allDataYMin) || (dataYMin && dataYMin < allDataYMin)) {
-        allDataYMin = dataYMin;
-      }
-      if (!_isFinite(allDataYMax) || (dataYMax && dataYMax > allDataYMax)) {
-        allDataYMax = dataYMax;
-      }
-    });
-    if (_isFinite(allDataYMin) && _isFinite(allDataYMax)) {
-      this.setState({dataYMin: allDataYMin, dataYMax: allDataYMax});
-    }
-  },
-
   render() {
-    let {tracks} = this.props;
-    let {dataYMin, dataYMax} = this.state;
+    let {tracks, width, sideWidth} = this.props;
 
     return (
-      <ScaledSVGChannel {...this.props}
-        dataYMin={dataYMin}
-        dataYMax={dataYMax}
+      <CanvasGroupChannel {...this.props}
         side={
           <span>
             {tracks.map((track) => track.get('name')).join(', ')}
@@ -105,14 +63,14 @@ let NumericalTrackGroupChannel = React.createClass({
         {tracks.map((track, index) => React.createElement(dynamicRequire(track.get('track')), Object.assign(
             {},
             this.props,
+            {width: width - sideWidth},
             track.get('props').toObject(),
           {
-            onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
             key: index
           }
           ))
         )}
-      </ScaledSVGChannel>
+      </CanvasGroupChannel>
     );
   }
 });
@@ -217,27 +175,6 @@ let NumericalTrackGroupControls = React.createClass({
                           onPick: this.handleTrackChange
                         })}/>
         </div>
-        <div className="control">
-          <div className="label">Interpolation:</div>
-          <DropDownMenu className="dropdown"
-                        value={interpolation}
-                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({interpolation: v})}>
-            {INTERPOLATIONS.map((interpolation) =>
-              <MenuItem key={interpolation.payload} value={interpolation.payload} primaryText={interpolation.text}/>)}
-          </DropDownMenu>
-        </div>
-        {INTERPOLATION_HAS_TENSION[interpolation] ?
-          <div className="control">
-            <div className="label">Tension:</div>
-            <Slider className="slider"
-                    style={{marginBottom: '0', marginTop: '0'}}
-                    name="tension"
-                    value={tension}
-                    defaultValue={tension}
-                    onChange={(e, value) => this.redirectedProps.componentUpdate({tension: value})}/>
-          </div>
-          : null
-        }
 
         <div className="control">
           <div className="label">Auto Y Scale:</div>

@@ -12,13 +12,14 @@ import _transform from 'lodash/transform';
 
 const seenBlocks = {};
 
-export function findBlock({start, end}) {
+export function findBlock({start, end, width}) {
   const blockLevel = Math.ceil(Math.log(end - start) / Math.log(2));
   const blockIndex = Math.floor(start / Math.pow(2.0, blockLevel));
   return {
     blockLevel,
     blockIndex,
-    needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex
+    needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex,
+    summaryWindow: Math.max(1, Math.pow(2.0, Math.ceil(Math.log(Math.pow(2.0, blockLevel) / width) / Math.log(2))))
   };
 }
 

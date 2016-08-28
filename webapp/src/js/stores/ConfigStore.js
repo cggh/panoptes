@@ -161,7 +161,7 @@ const ConfigStore = Fluxxor.createStore({
         prop.isFloat = true;
         prop.decimDigits = prop.decimDigits || 2;
       }
-      if ((prop.dataType == 'Int8') || (prop.dataType == 'Int16') || (prop.dataType == 'Int32') || (prop.dataType == 'Int64')) {
+      if ((prop.dataType == 'Int8') || (prop.dataType == 'Int16') || (prop.dataType == 'Int32')) {
         prop.isInt = true;
       }
       if (prop.dataType == 'Boolean')
@@ -248,7 +248,6 @@ const ConfigStore = Fluxxor.createStore({
         'Int8': 'Int',
         'Int16': 'Int',
         'Int32': 'Int',
-        'Int64': 'Int',
         'Boolean': 'String',
         'GeoLatitude': 'FloatH',
         'GeoLongitude': 'FloatH',
@@ -298,7 +297,6 @@ const ConfigStore = Fluxxor.createStore({
         'Int8': 'right',
         'Int16': 'right',
         'Int32': 'right',
-        'Int64': 'right',
         'Boolean': 'center',
         'GeoLatitude': 'right',
         'GeoLongitude': 'right',
