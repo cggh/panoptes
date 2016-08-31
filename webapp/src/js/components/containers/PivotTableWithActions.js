@@ -34,6 +34,8 @@ let PivotTableWithActions = React.createClass({
     query: React.PropTypes.string,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
+    instantFilter: React.PropTypes.string,
+    instantFilterValue: React.PropTypes.string,
   },
 
   getDefaultProps() {
@@ -53,13 +55,29 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, query, columnProperty, rowProperty, setProps} = this.props;
-
+    const {sidebar, table, query, columnProperty, rowProperty, instantFilterValue, instantFilter, setProps} = this.props;
+    
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
         <SidebarHeader icon={this.icon()} description={`Summary and aggregates of the ${this.tableConfig().namePlural} table`}/>
         <div className="pivot-controls vertical stack">
+		{(typeof instantFilter == 'undefined' ) ? 
           <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
+		:
+          <PropertyValueSelector table={table}
+                            key="instantFilter"
+                            propid={instantFilter}
+                            value={typeof instantFilterValue != 'undefined' ? instantFilterValue : null}
+                            label={instantFilter}
+                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+                            onSelect={(v) => {
+                            	let v2 = {"whcClass":"comparefixed","isCompound":false,"ColName":instantFilter,"CompValue":v,"isRoot":true,"Tpe":"="} ;
+                            	let query = JSON.stringify(v2) ;
+                            	this.props.setProps({query})
+                            	}
+                            }/>
+		}
+
           <PropertySelector table={table}
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}

@@ -15,20 +15,26 @@ let PopupButton = React.createClass({
   propTypes: {
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
+    openingMode: React.PropTypes.string,
   },
 
   getDefaultProps() {
     return {
       label: 'Untitled',
-      icon: 'circle'
+      icon: 'circle',
+      openingMode: 'tab'
     };
   },
 
   handleClick(e) {
-    let {children} = this.props;
+    let {children, openingMode} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
+    if (openingMode === 'tab') {
+        this.getFlux().actions.session.tabOpen(filterChildren(this, children), !middleClick);
+    } else {
+        this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
+    }
   },
 
   render() {
