@@ -34,6 +34,8 @@ let PivotTableWithActions = React.createClass({
     query: React.PropTypes.string,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
+    columnLabel: React.PropTypes.string,
+    rowLabel: React.PropTypes.string,
     instantFilter: React.PropTypes.string,
     instantFilterValue: React.PropTypes.string,
   },
@@ -55,7 +57,7 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, query, columnProperty, rowProperty, instantFilterValue, instantFilter, setProps} = this.props;
+    const {sidebar, table, query, columnProperty, rowProperty, instantFilterValue, instantFilter, columnLabel, rowLabel, setProps} = this.props;
     
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
@@ -78,18 +80,22 @@ let PivotTableWithActions = React.createClass({
                             }/>
 		}
 
+        {(columnLabel=='hide')?'':
           <PropertySelector table={table}
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
-                            label="Column"
                             allowNull={true}
+                            label={(typeof columnLabel=='undefined')?"Column":columnLabel}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => setProps({columnProperty: v})}/>
+        }
+                            
+        {(rowLabel=='hide')?'':
           <PropertySelector table={table}
                             key="rowProperty"
                             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
-                            label="Row"
                             allowNull={true}
+                            label={(typeof rowLabel=='undefined')?"Row":rowLabel}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => setProps({rowProperty: v})}/>
         </div>

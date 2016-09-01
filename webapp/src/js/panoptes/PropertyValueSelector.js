@@ -109,8 +109,8 @@ const PropertyValueSelector = React.createClass({
 
     let propertyMenu = [] ; //allowNull ? [<MenuItem value='NULL' primaryText="None"/>] : [];
     
-    _each ( data , (country) => {
-    	propertyMenu.push(<MenuItem value={country} key={country} primaryText={country}/>);
+    _each ( data , (entry) => {
+    	propertyMenu.push(<MenuItem value={entry} key={entry} primaryText={entry}/>);
     } ) ;
 
     return (
