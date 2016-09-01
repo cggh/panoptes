@@ -533,16 +533,15 @@ function query(options) {
   assertRequired(options, ['database', 'table', 'columns']);
   let defaults = {
     query: SQL.nullQuery,
-    orderBy: null,
-    groupBy: null,
-    ascending: true,
+    orderBy: [],
+    groupBy: [],
     start: 0,
     stop: 1000000,
     distinct: false,
     transpose: true
   };
   let {database, table, columns, query, orderBy, groupBy,
-    ascending, start, stop, distinct, transpose} = {...defaults, ...options};
+    start, stop, distinct, transpose} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -557,11 +556,10 @@ function query(options) {
     table,
     query: query,
     columns: JSON.stringify(columns),
-    sortReverse: ascending ? 'false' : 'true',
     limit: `${start}~${stop}`,
     distinct: distinct ? 'true' : 'false',
-    orderBy: orderBy ? orderBy.join('~') : null,
-    groupBy: groupBy ? groupBy.join('~') : null
+    orderBy: JSON.stringify(orderBy),
+    groupBy: groupBy.join('~')
   }));
     //Transpose into rows if needed
     // .then((columns) => {

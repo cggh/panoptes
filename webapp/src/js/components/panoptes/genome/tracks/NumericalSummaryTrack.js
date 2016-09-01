@@ -113,7 +113,7 @@ let NumericalSummaryTrack = React.createClass({
         columns: columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['window'],
-        order: ['window'],
+        orderBy: [['asc','window']],
         transpose: false,
       };
       let cacheArgs = {

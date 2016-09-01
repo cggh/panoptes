@@ -220,18 +220,6 @@
     //will-change: transform;
     transform-origin: top left;
   }
-  .blocky {
-    image-rendering: optimizeSpeed;
-    image-rendering: pixelated;
-  }
-
-  svg {
-    position: absolute;
-    text {
-      text-anchor: middle;
-      alignment-baseline: central;
-    }
-  }
 }
 
 .side-name {

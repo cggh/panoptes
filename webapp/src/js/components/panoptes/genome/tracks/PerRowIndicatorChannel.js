@@ -83,11 +83,11 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   componentDidMount() {
-    this.draw();
+    this.draw(this.props);
   },
 
   componentDidUpdate() {
-    this.draw();
+    this.draw(this.props);
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -205,7 +205,7 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   draw(props) {
-    const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
+    const {table, width, sideWidth, start, end, colourProperty} = props;
     const positions = this.positions;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;

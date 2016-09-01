@@ -31,8 +31,7 @@ def handler(start_response, requestData):
     
     tableId = content['table']
     query = content['query']
-    order = content.get('orderBy', None)
-    sortReverse = content.get('sortReverse', 'false') == 'true'
+    orderBy = json.loads(content.get('orderBy', '[]'))
     distinct = content.get('distinct', 'false') == 'true'
     columns = map(decode, json.loads(content['columns']))
     groupBy = content.get('groupBy', None)
@@ -60,11 +59,10 @@ def handler(start_response, requestData):
         sqlQuery += "{0} FROM {1}".format(','.join(columns), DBTBESC(tableId))
         if len(whereClause.querystring_params) > 0:
             sqlQuery += " WHERE {0}".format(whereClause.querystring_params)
-        if order and len(order) > 0 and order != 'null':
-            sqlQuery += " ORDER BY {0}".format(DQXDbTools.CreateOrderByStatement(order, sortReverse))
-
         if groupBy and len(groupBy) > 0:
             sqlQuery += " GROUP BY " + ','.join(map(DBCOLESC, groupBy.split('~')))
+        if len(orderBy) > 0:
+            sqlQuery += " ORDER BY {0}".format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
         if startRow and endRow:
             sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
 

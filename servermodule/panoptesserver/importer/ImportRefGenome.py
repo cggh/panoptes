@@ -3,6 +3,8 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 import os
+import uuid
+
 import ImpUtils
 import shutil
 from ProcessFilterBank import ProcessFilterBank
@@ -10,6 +12,7 @@ from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
 from SettingsRefGenome import SettingsRefGenome
 import json
+from Bio import SeqIO
 
 def flattenarglist(arg):
     if isinstance(arg, list):
@@ -57,12 +60,15 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
-                    destfolder = conf.getBaseDir() + '/SummaryTracks/' + datasetId + '/Sequence'
-                    if not os.path.exists(destfolder):
-                        os.makedirs(destfolder)
-                    tempfastafile = destfolder + '/refsequence.fa'
-                    shutil.copyfile(refsequencefile, tempfastafile)
-                    ImpUtils.RunConvertor(calculationObject, 'Fasta2FilterBankData', destfolder, [str_maxbasecount, 'refsequence.fa'])
+                    tempFile = os.path.join(conf.getBaseDir(), str(uuid.uuid4()))
+                    with open(refsequencefile, "rU") as f, open(tempFile, 'w') as o:
+                        for record in SeqIO.parse(f, "fasta"):
+                            chrom = record.id
+                            for i, base in enumerate(record.seq):
+                                o.write('\t'.join([chrom, str(i), str(ord(base.lower()))])+'\n')
+                dao._execSql('CREATE TABLE "_sequence_" ("chrom" text, "pos" int, "base" tinyint);')
+                dao._execSql("COPY INTO _sequence_ from '%s' USING DELIMITERS '\t','\n' NULL AS '' LOCKED" % (tempFile))
+                os.remove(tempFile)
             else:
                 calculationObject.Log('WARNING: missing reference sequence file')
 

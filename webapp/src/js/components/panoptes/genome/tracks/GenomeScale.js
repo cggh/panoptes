@@ -62,9 +62,11 @@ let GenomeScale = React.createClass({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     for (let pos = start; pos < end; pos += smallTickWidth) {
-      const x = scale(pos);
-      ctx.moveTo(x, 34);
-      ctx.lineTo(x, 40);
+      if (!(pos / smallTickWidth % 5 === 0)) {
+        const x = scale(pos);
+        ctx.moveTo(x, 34);
+        ctx.lineTo(x, 40);
+      }
     }
     ctx.stroke();
     ctx.beginPath();
