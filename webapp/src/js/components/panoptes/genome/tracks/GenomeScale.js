@@ -16,11 +16,35 @@ let GenomeScale = React.createClass({
     sideWidth: React.PropTypes.number
   },
 
+  componentDidMount() {
+    this.paint();
+  },
+
+  componentDidUpdate() {
+    this.paint();
+  },
+
   render() {
+    const {width, sideWidth} = this.props;
+    return (
+      <div className="channel-container">
+        <div className="channel-side" style={{width: `${sideWidth}px`, height: HEIGHT}}>
+        </div>
+        <div className="channel-stack">
+          <div className="channel-data scale" >
+            <canvas className="scale" ref="canvas" width={width - sideWidth} height={HEIGHT}/>
+          </div>
+        </div>
+      </div>
+    );
+  },
+
+  paint() {
     let {start, end, width, sideWidth} = this.props;
+    const canvas = this.refs.canvas;
+
     let scale = d3.scale.linear().domain([start, end]).range([0, width - sideWidth]);
-    if (width == 0)
-      return null;
+
     //Make a small tick be close to this many pixels:
     let SMALL_TICK = 50;
     let smallTickWidth = Math.max(tickWidth(end - start, width, SMALL_TICK), 1);
@@ -28,41 +52,33 @@ let GenomeScale = React.createClass({
     start = Math.floor(start / smallTickWidth) * smallTickWidth;
     end = Math.max(start, end);
     let format = scale.tickFormat((end - start) / (smallTickWidth * 5), end - start > 5000 ? 's' : null);
-    let smallTicks = [];
-    let largeTicks = [];
+
+    const ctx = canvas.getContext('2d', {alpha: false});
+    ctx.lineWidth = 0.25;
+    ctx.strokeStyle = 'darkgrey';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Roboto,sans-serif';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
     for (let pos = start; pos < end; pos += smallTickWidth) {
-      let x = scale(pos);
+      const x = scale(pos);
+      ctx.moveTo(x, 34);
+      ctx.lineTo(x, 40);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    for (let pos = start; pos < end; pos += smallTickWidth) {
       if (pos / smallTickWidth % 5 === 0) {
-        largeTicks.push(
-          <g className="major x tick" key={pos}>
-            <line x1={x} x2={x} y1={26} y2={40}/>
-            <text x={pos == 0 && start == 0 ? x + 10 : x} y={10}>{format(pos)}</text>
-          </g>
-        );
-      } else {
-        smallTicks.push(
-          <g className="minor x tick" key={pos}>
-            <line x1={x} x2={x} y1={34} y2={40}/>
-          </g>
-        );
+        const x = scale(pos);
+        ctx.moveTo(x, 26);
+        ctx.lineTo(x, 40);
+        ctx.fillText(format(pos), pos == 0 && start == 0 ? x + 10 : x, 10);
       }
     }
-    return (
-      <div className="channel-container">
-          <div className="channel-side" style={{width: `${sideWidth}px`, height: HEIGHT}}>
-          </div>
-          <div className="channel-stack">
-          <div className="channel-data scale" >
-              <svg className="scale" width={width - sideWidth} height={HEIGHT}>
-                {smallTicks}
-                {largeTicks}
-              </svg>
-          </div>
-        </div>
-      </div>
-    );
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
   }
-
 });
 
 module.exports = GenomeScale;

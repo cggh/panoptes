@@ -212,33 +212,6 @@
     }
   }
 }
-div.scale {
-  background: white;
-}
-.tick {
-  line {
-    stroke: darkgrey;
-    stroke-width: 0.25px;
-  }
-}
-.x {
-  text {
-    text-anchor: middle;
-    alignment-baseline: text-before-edge;
-  }
-}
-.y {
-  text {
-    text-anchor: end;
-    alignment-baseline: central;
-    font-size: 12px;
-  }
-}
-.major {
-  line {
-    stroke-width: 0.5px;
-  }
-}
 
 .sequence {
   position: relative;

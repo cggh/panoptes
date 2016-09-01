@@ -38,7 +38,8 @@ let YScale = React.createClass({
     ctx.lineWidth = 0.25;
     ctx.strokeStyle = 'darkgrey';
     ctx.textAlign = 'end';
-    ctx.textBaseline = 'middle'
+    ctx.textBaseline = 'middle';
+    ctx.font = '12px Roboto,sans-serif';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     scale.ticks(n).forEach((y) => {
