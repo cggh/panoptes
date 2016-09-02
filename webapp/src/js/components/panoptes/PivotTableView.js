@@ -152,14 +152,6 @@ let DataTableView = React.createClass({
     if (!dataByColumnRow)
       return null;
 
-	// Descriptions do now show. Why??      
-    let desc = '' ;
-    if ( typeof tableConfig.propertiesById[columnProperty].description != 'undefined' && tableConfig.propertiesById[columnProperty].description != null ) 
-        desc += "<div><h3>Columns</h3><div>" + tableConfig.propertiesById[columnProperty].description + "</div></div>" ;
-    if ( typeof tableConfig.propertiesById[rowProperty].description != 'undefined' && tableConfig.propertiesById[rowProperty].description != null ) 
-        desc += "<div><h3>Rows</h3><div>" + tableConfig.propertiesById[rowProperty].description + "</div></div>" ;
-
-      
     return (
       <DetectResize onResize={this.handleResize}>
         <div className={classNames('datatable', className)}>

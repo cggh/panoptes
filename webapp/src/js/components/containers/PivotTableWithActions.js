@@ -119,6 +119,10 @@ let PivotTableWithActions = React.createClass({
           <div className="grow">
             {(columnProperty && rowProperty) ? <PivotTableView {...this.props}/> : 'Pick properties'}
           </div>
+          <div>
+          	<div>{(columnLabel=='hide')?'':this.config.tablesById[table].propertiesById[columnProperty].description}</div>
+          	<div>{(rowLabel=='hide')?'':this.config.tablesById[table].propertiesById[rowProperty].description}</div>
+          </div>
         </div>
       </Sidebar>
     );
