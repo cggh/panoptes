@@ -211,11 +211,11 @@ let ReferenceSequence = React.createClass({
       if (block.cache) {
         const source = block.cache;
         ctx.drawImage(source, 0, 0, source.width, source.height, //Source params
-          xScaleFactor * (block._blockStart - start), 0, source.width * pixelWindowSize, HEIGHT); //Destination params
+          xScaleFactor * (block._blockStart + 0.5 - start), 0, source.width * pixelWindowSize, HEIGHT); //Destination params
         if (pixelWindowSize >= 15) {
           const base = block.base.array;
           for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
-            const x = xScaleFactor * (block._blockStart - start) + ((i+0.5) * pixelWindowSize);
+            const x = xScaleFactor * (block._blockStart - start) + ((i+1) * pixelWindowSize);
             if (x > 0 && x < maxDraw) {
               ctx.fillText(lookup[base[i]] || '', x, HEIGHT/2);
             }

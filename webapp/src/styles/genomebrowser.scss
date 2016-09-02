@@ -256,9 +256,13 @@
 }
 
 .numerical-channel-canvas-holder {
+  position: relative;
   canvas {
     position: absolute;
     top: 0;
     left: 0;
+  }
+  .categorical {
+    opacity: 0.7;
   }
 }

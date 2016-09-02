@@ -188,7 +188,7 @@ let NumericalSummaryTrack = React.createClass({
       const max = block.max.array;
       for (let i=0, iEnd = window.length; i < iEnd; i++) {
         if (min[i] !== nullVal && min[i] == +min[i]) {  //If min is null then max, avg should be
-          const xPixel = xScaleFactor * (window[i]*windowSize - start);
+          const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
           const yMinPixel = height - (yScaleFactor * (min[i] - yMin));
           const yMaxPixel = height - (yScaleFactor * (max[i] - yMin));
           ctx.moveTo(xPixel, yMinPixel);
@@ -211,7 +211,7 @@ let NumericalSummaryTrack = React.createClass({
       const avg = block.avg.array;
       for (let i=0, iEnd = window.length; i < iEnd; i++) {
         if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
-          const xPixel = xScaleFactor * (window[i]*windowSize - start);
+          const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
           const yPixel = height - (yScaleFactor * (avg[i] - yMin));
           if (lastPointNull || window[i] !== lastWindow + 1) {
             ctx.moveTo(xPixel, yPixel);
@@ -234,7 +234,7 @@ let NumericalSummaryTrack = React.createClass({
       const count = block.count.array;
       for (let i = 0, iEnd = window.length; i < iEnd; i++) {
         if (count[i] === 1 && avg[i] !== nullVal && avg[i] == +avg[i]) {
-          const xPixel = xScaleFactor * (window[i] * windowSize - start);
+          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
           const yPixel = height - (yScaleFactor * (avg[i] - yMin));
           ctx.moveTo(xPixel, yPixel);
           ctx.arc(xPixel + (pixelWindowSize / 2), yPixel, Math.max(1, Math.min(pixelWindowSize - 4, 4)), 0, 2 * Math.PI, false);

@@ -11,9 +11,6 @@ import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps'
 
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import Checkbox from 'material-ui/Checkbox';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
-import Slider from 'material-ui/Slider';
 import FlatButton from 'material-ui/FlatButton';
 
 let dynreq = require.context('.', true);

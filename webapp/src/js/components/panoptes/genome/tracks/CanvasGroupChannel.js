@@ -125,7 +125,6 @@ let CanvasGroupChannel = React.createClass({
                 height,
                 onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
                   }))}
-
               </div>;
             }}
           </Motion>
