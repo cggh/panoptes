@@ -47,7 +47,7 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
       blocks.push(fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
         .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)));
     }
-    return Promise.all(blocks);
+    return Promise.all(blocks).then(flatten);
   }
   //So by now we know that we have seen blocks, but not the smallest encompassing block
   //So if wanted, iterate through the blocks bigger (wider) than us that also contain us, if any of those exist then return them
@@ -68,7 +68,8 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
   return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
                         .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
                       fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
-                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))]);
+                        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
+    .then(flatten);
 }
 
 function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
@@ -133,7 +134,8 @@ function ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cance
       return Promise.all([fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
                             .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
                           fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
-                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))]);
+                            .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))])
+        .then(flatten);
     } else {
       return blocks;
     }
@@ -167,3 +169,14 @@ export function optimalSummaryWindow(start, end, desiredCount) {
   return Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize) / Math.log(2))));
 };
 
+function flatten(data) {
+  const flattened = [];
+  data.forEach((block) => {
+    if (Array.isArray(block)) {
+      Array.prototype.push.apply(flattened, block);
+    } else {
+      flattened.push(block);
+    }
+  });
+  return flattened;
+}
