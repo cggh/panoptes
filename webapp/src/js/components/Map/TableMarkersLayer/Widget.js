@@ -25,8 +25,7 @@ let TableMarkersLayerWidget = React.createClass({
   contextTypes: {
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    setBounds: React.PropTypes.func,
-    setLoadStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func
   },
 
   propTypes: {
@@ -64,7 +63,7 @@ let TableMarkersLayerWidget = React.createClass({
 
     let {highlight, locationDataTable, primKey} = props;
 
-    let {setBounds, setLoadStatus} = this.context;
+    let {changeLayerStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
@@ -77,7 +76,7 @@ let TableMarkersLayerWidget = React.createClass({
       return null;
     }
 
-    setLoadStatus('loading'); //FIXME
+    changeLayerStatus({loadStatus: 'loading'});
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -199,14 +198,13 @@ let TableMarkersLayerWidget = React.createClass({
         }
 
         this.setState({markers});
-        setBounds(CalcMapBounds.calcMapBounds(markers)); //FIXME
-        setLoadStatus('loaded'); //FIXME
+        changeLayerStatus({loadStatus: 'loaded', bounds: CalcMapBounds.calcMapBounds(markers)});
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props));
-        setLoadStatus('error'); //FIXME
+        changeLayerStatus({loadStatus: 'error'});
       });
   },
 
