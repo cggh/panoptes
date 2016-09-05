@@ -84,9 +84,9 @@ let MapWidget = React.createClass({
 
     let {loadStatus, bounds} = payload;
 
-
     if (this.state.bounds === undefined && bounds !== undefined)  {
       this.setState({bounds});
+
     } else if (this.state.bounds !== undefined && bounds !== undefined) {
 
       // Determine whether Map bounds need to be increased to accommodate new Layer bounds.
@@ -107,13 +107,11 @@ let MapWidget = React.createClass({
         || minSouthWestLat !== mapSouthWest.lat
         || minSouthWestLng !== mapSouthWest.lng
       ) {
-
-        let newSouthWest = window.L.latLng(40.712, -74.227);
-        let newNorthEast = window.L.latLng(40.774, -74.125);
+        let newSouthWest = window.L.latLng(minSouthWestLat, minSouthWestLng);
+        let newNorthEast = window.L.latLng(maxNorthEastLat, maxNorthEastLng);
         let newBounds = window.L.latLngBounds(newSouthWest, newNorthEast);
 
-        this.setState({newBounds});
-
+        this.setState({bounds: newBounds});
       }
 
     }
@@ -134,6 +132,7 @@ let MapWidget = React.createClass({
     // However, this event, handleMapMoveEnd(e), will not be triggered on the first render.
     // Importantly, this.map is not available when the Map component is not visible, e.g. on an unselected tab.
     // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
+    // FIXME: this.props.componentUpdate is not available when the widget is mounted through DataItem/Actions
 
     if (this.map !== null && this.props.componentUpdate !== undefined) {
 
