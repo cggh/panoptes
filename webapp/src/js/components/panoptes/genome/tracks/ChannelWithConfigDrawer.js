@@ -32,43 +32,6 @@ let ChannelWithConfigDrawer = React.createClass({
     };
   },
 
-  componentDidMount() {
-    this.updateControlsHeight = _debounce(this.updateControlsHeight, 500);
-  },
-
-  componentDidUpdate(prevProps, prevState) {
-    if (['width', 'sideWidth', 'height', 'configComponent', 'legendComponent'].some((name) => prevProps[name] !== this.props[name]) ||
-      ['controlsOpen', 'legendOpen'].some((name) => prevState[name] !== this.state[name])
-    )
-      this.updateControlsHeight();
-    if (prevState.controlsOpen !== this.state.controlsOpen)
-      this.visibilityHack();
-
-  },
-
-  updateControlsHeight() {
-    if (this.refs.controls) {
-      let height = offset(ReactDOM.findDOMNode(this.refs.controls)).height + 'px';
-      this.refs.controlsContainer.style.height = this.state.controlsOpen ? height : 0;
-    }
-    if (this.refs.legend) {
-      let height = offset(ReactDOM.findDOMNode(this.refs.legend)).height + 'px';
-      this.refs.legendContainer.style.height = this.state.legendOpen ? height : 0;
-      this.refs.legendToggle.style.bottom = this.state.legendOpen ? height : 0;
-    }
-  },
-
-
-  //Ugly hack to ensure that dropdown boxes don't get snipped, I'm so sorry.
-  visibilityHack() {
-    if (!this.state.controlsOpen) {
-      this.refs.controlsContainer.style.overflow = 'hidden';
-      clearTimeout(this.controlOverFlowTimeout);
-    } else {
-      this.controlOverFlowTimeout = setTimeout(() => this.refs.controlsContainer.style.overflow = 'visible', 500);
-    }
-  },
-
   handleControlToggle(e) {
     this.setState({controlsOpen: !this.state.controlsOpen});
     e.stopPropagation();
@@ -109,7 +72,7 @@ let ChannelWithConfigDrawer = React.createClass({
                     name="cog" onClick={this.handleControlToggle}/>
             </div>
             : null }
-          {legendComponent || true?
+          {legendComponent ?
             <div className="legend button" ref="legendToggle">
               <Icon className={classnames({open: legendOpen})}
                     name="info" onClick={this.handleLegendToggle}/>
@@ -118,7 +81,7 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
         <div className="channel-stack">
           {configComponent ?
-            <div className="tray-container config-container" ref="controlsContainer">
+            <div className={classnames({open: controlsOpen, 'tray-container':true, 'config-container':true})} ref="controlsContainer">
               <div ref="controls" style={{width: `${effWidth}px`}}>
                 {configComponent}
               </div>
@@ -127,7 +90,7 @@ let ChannelWithConfigDrawer = React.createClass({
             {this.props.children}
           </div>
           {legendComponent ?
-            <div className="tray-container legend-container" ref="legendContainer">
+            <div className={classnames({open: legendOpen, 'tray-container':true, 'legend-container':true})} ref="legendContainer">
               <div ref="legend" style={{width: `${effWidth}px`}}>
                 {legendComponent}
               </div>

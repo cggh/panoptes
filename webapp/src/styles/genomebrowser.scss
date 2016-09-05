@@ -158,6 +158,9 @@
         display: block;
       }
     }
+    .tray-container.open {
+      height: inherit;
+    }
     .tray-container {
       position: relative;
       //box-shadow: $z-1-shadow;
