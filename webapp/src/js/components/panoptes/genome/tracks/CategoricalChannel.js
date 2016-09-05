@@ -1,9 +1,9 @@
 import React from 'react';
 import _isFinite from 'lodash/isFinite';
 import _debounce from 'lodash/debounce';
-import _min from 'lodash/min';
 import _map from 'lodash/map';
 import _max from 'lodash/max';
+import _uniq from 'lodash/uniq';
 import _sum from 'lodash/sum';
 import _sortedIndex from 'lodash/sortedIndex';
 import _sortedLastIndex from 'lodash/sortedLastIndex';
@@ -20,6 +20,7 @@ import SQL from 'panoptes/SQL';
 import API from 'panoptes/API';
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
+import PropertyLegend from 'panoptes/PropertyLegend';
 import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
 
 import Checkbox from 'material-ui/Checkbox';
@@ -54,7 +55,9 @@ let CategoricalChannel = React.createClass({
   },
 
   getInitialState() {
-    return {};
+    return {
+      knownValues: []
+    };
   },
 
   getDefaultProps() {
@@ -65,14 +68,16 @@ let CategoricalChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, name} = this.props;
+    const {table, track, width, sideWidth, name} = this.props;
+    const {knownValues} = this.state;
     return (
       <CanvasGroupChannel {...this.props}
                           side={<span>{name}</span>}
                           onClose={this.redirectedProps.onClose}
                           controls={<CategoricalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+                          legend={<PropertyLegend table={table} property={track} knownValues={knownValues} />}
       >
-        <CategoricalTrack {...this.props} width={width - sideWidth} />
+        <CategoricalTrack {...this.props} width={width - sideWidth} onChangeKnownValues={(knownValues) => this.setState({knownValues})}/>
       </CanvasGroupChannel>
     );
   }
@@ -102,7 +107,8 @@ let CategoricalTrack = React.createClass({
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
     table: React.PropTypes.string.isRequired,
-    track: React.PropTypes.string.isRequired
+    track: React.PropTypes.string.isRequired,
+    onChangeKnownValues: React.PropTypes.func.isRequired
   },
 
   componentWillMount() {
@@ -299,11 +305,13 @@ let CategoricalTrack = React.createClass({
     if (this.blocks && this.summaryWindow) {
       let {start, end} = props;
       let max = [];
+      let knownValues = [];
       this.blocks.forEach((block) => {
 
         const startIndex = _sortedIndex(block._windows_, start / this.summaryWindow);
         const endIndex = _sortedLastIndex(block._windows_, end / this.summaryWindow);
         max.push(_max(_map(block._counts_.slice(startIndex, endIndex), _sum)));
+        Array.prototype.push.apply(knownValues, block._values_.slice(startIndex, endIndex));
       });
       let min = 0;
       max = _max(max);
@@ -319,6 +327,7 @@ let CategoricalTrack = React.createClass({
         dataYMin: min,
         dataYMax: max
       });
+      this.props.onChangeKnownValues(_uniq(knownValues));
     }
   },
 

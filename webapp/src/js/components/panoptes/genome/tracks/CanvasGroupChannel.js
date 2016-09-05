@@ -132,8 +132,6 @@ let CanvasGroupChannel = React.createClass({
   }
 });
 
-//                <YScale min={yMin} max={yMax} width={effWidth} height={height}/>
-
 
 module.exports = CanvasGroupChannel;
 
