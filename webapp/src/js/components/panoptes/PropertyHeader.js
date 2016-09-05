@@ -21,6 +21,7 @@ let PropertyHeader = React.createClass({
   propTypes: {
     prefix: React.PropTypes.node,
     name: React.PropTypes.string.isRequired,
+    html: React.PropTypes.string,
     description: React.PropTypes.string.isRequired,
     tooltipPlacement: React.PropTypes.string.isRequired,
     tooltipTrigger: React.PropTypes.arrayOf(React.PropTypes.string),
@@ -30,7 +31,7 @@ let PropertyHeader = React.createClass({
 
   render: function() {
 
-    let {name, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
+    let {name, html, description, tooltipPlacement, tooltipTrigger, prefix, onClick, ...other} = this.props;
     delete other.columnKey;
 
     let tooltip = '';
@@ -48,9 +49,12 @@ let PropertyHeader = React.createClass({
         if (onClick && event.target.className.indexOf('info') == -1)
           onClick(event);
       }}
+		style={{cursor:(onClick?"pointer":"auto")}}
         {...other}>
         {prefix}
-        <TooltipEllipsis className="label">{name}</TooltipEllipsis>
+        <TooltipEllipsis className="label">
+	        { typeof html != 'undefined' && html != '' ? <span dangerouslySetInnerHTML={{__html:html}}></span> : name }
+        </TooltipEllipsis>
         {tooltip}
       </span>
     );
