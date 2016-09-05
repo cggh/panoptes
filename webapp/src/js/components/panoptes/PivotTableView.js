@@ -18,6 +18,7 @@ import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
+import PropertyHeader from 'panoptes/PropertyHeader';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -29,6 +30,17 @@ const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 // const SCROLLBAR_HEIGHT = 15;
 const COLUMN_WIDTH = 100;
+
+
+const componentTranslation = {
+  ItemMap: 'Map/Table/Actions',
+  Map: 'Map/Table/Actions',
+  Tree: 'containers/TreeWithActions',
+  Plot: 'containers/PlotWithActions',
+  PivotTable: 'containers/PivotTableWithActions'
+};
+
+
 
 let DataTableView = React.createClass({
   mixins: [
@@ -141,6 +153,28 @@ let DataTableView = React.createClass({
     this.setState(size);
   },
 
+  onClickHeader(ev,property,key) {
+  	let tableConfig = this.tableConfig();
+  	console.log ( tableConfig.propertiesById[property] ) ;
+  	if ( typeof tableConfig.propertiesById[property].relation == 'undefined' ) return false ;
+  	let r = tableConfig.propertiesById[property].relation ;
+  	if ( typeof r.parentTable == 'undefined' ) return false ;
+  	
+	ev.stopPropagation();
+	let switchTo = true;
+	let openingMode = 'tab' ;
+	let component = r.parentTable.dataItemViews[0].type ;
+
+	if ( openingMode=='tab' ) {
+		this.getFlux().actions.session.tabOpen(componentTranslation[component], {table:r.tableId,sidebar:true}, switchTo)
+	} else { // Default: Popup
+//		this.getFlux().actions.session.popupOpen(componentTranslation[component], {}, switchTo)
+	}
+  	
+  	
+  	return false ;
+  },
+
   render() {
     let {className, columnProperty, rowProperty} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
@@ -156,7 +190,7 @@ let DataTableView = React.createClass({
 	if ( typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
 		distinctValuesCol = JSON.parse ( tableConfig.propertiesById[columnProperty].distinctValues ) ;
 	}
-
+//console.log ( tableConfig.propertiesById[rowProperty] ) ;
 
     return (
       <DetectResize onResize={this.handleResize}>
@@ -188,8 +222,16 @@ let DataTableView = React.createClass({
                          //background: background
                        }}>
                     {
-                      uniqueRows[rowIndex] == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[rowProperty]} value={uniqueRows[rowIndex]}/>
+                       uniqueRows[rowIndex] == '_all_' ? 'All' :
+                      	(
+
+                        <PropertyHeader 
+                        	name={uniqueRows[rowIndex]} 
+                        	html={(distinctValuesCol[uniqueRows[rowIndex]]||{}).html} 
+                        	description={((distinctValuesCol[uniqueRows[rowIndex]]||{}).description)} 
+                        	onClick={(e) => this.onClickHeader(e, rowProperty, uniqueRows[rowIndex])}
+                        	tooltipPlacement={"right"} />
+                        )
                     }
                   </div>
                 }
@@ -209,15 +251,17 @@ let DataTableView = React.createClass({
                            height: HEADER_HEIGHT + 'px',
                            background: ((distinctValuesCol[columnValue]||{})['header-background']||'inherit')
                          }}>
-                      { columnValue == '_all_' ? 'All' :
+                      {
+                       columnValue == '_all_' ? 'All' :
                       	(
-                      	typeof (distinctValuesCol[columnValue]||{}).html == 'undefined' ?
-                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> :
-                        <span dangerouslySetInnerHTML={{__html:((distinctValuesCol[columnValue]||{}).html)}}></span>
+                        <PropertyHeader 
+                        	name={columnValue} 
+                        	html={(distinctValuesCol[columnValue]||{}).html} 
+                        	description={((distinctValuesCol[columnValue]||{}).description)} 
+                        	onClick={(e) => this.onClickHeader(e, columnProperty, columnValue)}
+                        	tooltipPlacement={"right"} />
                         )
                     	}
-                      <br/>
-                      <small title={((distinctValuesCol[columnValue]||{}).description||'')}>{((distinctValuesCol[columnValue]||{}).description||'')}</small>
                     </div>
                 }
                 cell={({rowIndex}) =>
