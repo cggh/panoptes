@@ -169,6 +169,13 @@ class ImportSettings:
                                                 ))
                                    }),
                           
+                            ('distinctValues', {
+                                   'type': 'Text',
+                                   'required': False,
+                                   'description': 'A list of distinct data values and their properties, as JSON. Used for PivotTable.'
+                                   }),
+                          
+                          
                             ('readData', {
                                    'type': 'Boolean',
                                    'required': False,

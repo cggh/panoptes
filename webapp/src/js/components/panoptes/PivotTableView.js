@@ -18,6 +18,7 @@ import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import SQL from 'panoptes/SQL';
 import PropertyCell from 'panoptes/PropertyCell';
+import PropertyHeader from 'panoptes/PropertyHeader';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -29,6 +30,17 @@ const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 // const SCROLLBAR_HEIGHT = 15;
 const COLUMN_WIDTH = 100;
+
+
+const componentTranslation = {
+  ItemMap: 'Map/Table/Actions',
+  Map: 'Map/Table/Actions',
+  Tree: 'containers/TreeWithActions',
+  Plot: 'containers/PlotWithActions',
+  PivotTable: 'containers/PivotTableWithActions'
+};
+
+
 
 let DataTableView = React.createClass({
   mixins: [
@@ -141,6 +153,15 @@ let DataTableView = React.createClass({
     this.setState(size);
   },
 
+  onClickHeader(ev,property,primKey) {
+  	let tableConfig = this.tableConfig();
+  	if ( typeof tableConfig.propertiesById[property].relation == 'undefined' ) return false ;
+  	let r = tableConfig.propertiesById[property].relation ;
+	ev.stopPropagation();
+	this.getFlux().actions.panoptes.dataItemPopup({table: r.tableId, primKey: primKey.toString(), switchTo: false});
+  	return false ;
+  },
+
   render() {
     let {className, columnProperty, rowProperty} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
@@ -151,6 +172,11 @@ let DataTableView = React.createClass({
     }
     if (!dataByColumnRow)
       return null;
+
+	let distinctValuesCol = {} ;
+	if ( typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
+		distinctValuesCol = JSON.parse ( tableConfig.propertiesById[columnProperty].distinctValues ) ;
+	}
     return (
       <DetectResize onResize={this.handleResize}>
         <div className={classNames('datatable', className)}>
@@ -181,8 +207,16 @@ let DataTableView = React.createClass({
                          //background: background
                        }}>
                     {
-                      uniqueRows[rowIndex] == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[rowProperty]} value={uniqueRows[rowIndex]}/>
+                       uniqueRows[rowIndex] == '_all_' ? 'All' :
+                      	(
+
+                        <PropertyHeader 
+                        	name={uniqueRows[rowIndex]} 
+                        	html={(distinctValuesCol[uniqueRows[rowIndex]]||{}).html} 
+                        	description={((distinctValuesCol[uniqueRows[rowIndex]]||{}).description)} 
+                        	onClick={(e) => this.onClickHeader(e, rowProperty, uniqueRows[rowIndex])}
+                        	tooltipPlacement={"right"} />
+                        )
                     }
                   </div>
                 }
@@ -200,10 +234,19 @@ let DataTableView = React.createClass({
                            textAlign: columnValue == '_all_' ? 'center' : tableConfig.propertiesById[columnProperty].alignment,
                            width: COLUMN_WIDTH,
                            height: HEADER_HEIGHT + 'px',
-                           //background: background
+                           background: ((distinctValuesCol[columnValue]||{})['header-background']||'inherit')
                          }}>
-                      { columnValue == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
+                      {
+                       columnValue == '_all_' ? 'All' :
+                      	(
+                        <PropertyHeader 
+                        	name={columnValue} 
+                        	html={(distinctValuesCol[columnValue]||{}).html} 
+                        	description={((distinctValuesCol[columnValue]||{}).description)} 
+                        	onClick={(e) => this.onClickHeader(e, columnProperty, columnValue)}
+                        	tooltipPlacement={"right"} />
+                        )
+                    	}
                     </div>
                 }
                 cell={({rowIndex}) =>
@@ -212,7 +255,7 @@ let DataTableView = React.createClass({
                            textAlign: 'right',
                            width: COLUMN_WIDTH,
                            height: ROW_HEIGHT + 'px',
-                           //background: background
+                           background: ((distinctValuesCol[columnValue]||{})['cell-background']||'inherit')
                          }}>
                       {dataByColumnRow[columnValue][uniqueRows[rowIndex]]}
                     </div>

@@ -10,7 +10,8 @@ const componentTranslation = {
   ItemMap: 'Map/Table/Actions',
   Map: 'Map/Table/Actions',
   Tree: 'containers/TreeWithActions',
-  Plot: 'containers/PlotWithActions'
+  Plot: 'containers/PlotWithActions',
+  PivotTable: 'containers/PivotTableWithActions'
 };
 
 let PopupButton = React.createClass({
@@ -26,12 +27,13 @@ let PopupButton = React.createClass({
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
     //Optional - if not specified will launch new popup instead of replacing
-    componentUpdate: React.PropTypes.func
+    componentUpdate: React.PropTypes.func,
+    openingMode: React.PropTypes.string,
     //rest of proptypes depend on component
   },
 
   handleClick(e) {
-    const {component,  componentPath, componentUpdate, ...others} = this.props;
+    const {component,  componentPath, componentUpdate, openingMode, ...others} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
     if (middleClick) {
       let switchTo = false;
@@ -39,7 +41,13 @@ let PopupButton = React.createClass({
     } else if (!componentUpdate) {
       e.stopPropagation();
       let switchTo = true;
-      this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo);
+      
+      if ( openingMode=='tab' ) {
+      	this.getFlux().actions.session.tabOpen(componentTranslation[component] || componentPath, others, switchTo)
+      } else { // Default: Popup
+      	this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo)
+      }
+      
     } else {
       this.props.componentUpdate(others, componentTranslation[component] || componentPath);
     }
