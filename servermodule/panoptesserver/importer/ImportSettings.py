@@ -169,6 +169,24 @@ class ImportSettings:
                                                                 })
                                                 ))
                                    }),
+                            ('distinctValues', {
+                                'type': 'Text',
+                                'required': False,
+                                'description': 'A list of distinct data values and their properties, as JSON. Used for PivotTable.'
+                                }),
+
+                            ('readData', {
+                                   'type': 'Boolean',
+                                   'required': False,
+                                   'default': True,
+                                   'description': 'If set to false, this property will not be imported from the TAB-delimited source file'
+                                   }),
+                            ('canUpdate', {
+                                   'type': 'Boolean',
+                                   'default': False,
+                                   'required': False,
+                                   'description': ' If set to true, this property can be modified by the user. (*NOTE: under construction*)'
+                                   }),
                             ('showInTable', {
                                    'type': 'Boolean',
                                    'required': False,
