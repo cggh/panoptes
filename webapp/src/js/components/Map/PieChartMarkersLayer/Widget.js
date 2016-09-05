@@ -266,6 +266,7 @@ let PieChartMarkersLayerWidget = React.createClass({
         }
 
 
+        // NB: calcMapBounds is only based on lat lng positions, not radii.
         let bounds = CalcMapBounds.calcMapBounds(markers);
 
         markers = this.adaptMarkerRadii(markers, bounds);
