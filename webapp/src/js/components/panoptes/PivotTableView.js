@@ -152,6 +152,12 @@ let DataTableView = React.createClass({
     if (!dataByColumnRow)
       return null;
 
+	let distinctValuesCol = {} ;
+	if ( typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
+		distinctValuesCol = JSON.parse ( tableConfig.propertiesById[columnProperty].distinctValues ) ;
+	}
+
+
     return (
       <DetectResize onResize={this.handleResize}>
         <div className={classNames('datatable', className)}>
@@ -201,10 +207,12 @@ let DataTableView = React.createClass({
                            textAlign: columnValue == '_all_' ? 'center' : tableConfig.propertiesById[columnProperty].alignment,
                            width: COLUMN_WIDTH,
                            height: HEADER_HEIGHT + 'px',
-                           //background: background
+                           background: ((distinctValuesCol[columnValue]||{})['header-background']||'inherit')
                          }}>
                       { columnValue == '_all_' ? 'All' :
                         <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
+                      <br/>
+                      <small title={((distinctValuesCol[columnValue]||{}).description||'')}>{((distinctValuesCol[columnValue]||{}).description||'')}</small>
                     </div>
                 }
                 cell={({rowIndex}) =>
@@ -213,7 +221,7 @@ let DataTableView = React.createClass({
                            textAlign: 'right',
                            width: COLUMN_WIDTH,
                            height: ROW_HEIGHT + 'px',
-                           //background: background
+                           background: ((distinctValuesCol[columnValue]||{})['cell-background']||'inherit')
                          }}>
                       {dataByColumnRow[columnValue][uniqueRows[rowIndex]]}
                     </div>
