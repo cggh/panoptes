@@ -145,25 +145,12 @@ let PivotTableView = React.createClass({
     this.setState(size);
   },
 
-  onClickHeader(ev,property,key) {
+  onClickHeader(ev,property,primKey) {
   	let tableConfig = this.tableConfig();
-  	console.log ( tableConfig.propertiesById[property] ) ;
   	if ( typeof tableConfig.propertiesById[property].relation == 'undefined' ) return false ;
   	let r = tableConfig.propertiesById[property].relation ;
-  	if ( typeof r.parentTable == 'undefined' ) return false ;
-  	
 	ev.stopPropagation();
-	let switchTo = true;
-	let openingMode = 'tab' ;
-	let component = r.parentTable.dataItemViews[0].type ;
-
-	if ( openingMode=='tab' ) {
-		this.getFlux().actions.session.tabOpen(componentTranslation[component], {table:r.tableId,sidebar:true}, switchTo)
-	} else { // Default: Popup
-//		this.getFlux().actions.session.popupOpen(componentTranslation[component], {}, switchTo)
-	}
-  	
-  	
+	this.getFlux().actions.panoptes.dataItemPopup({table: r.tableId, primKey: primKey.toString(), switchTo: false});
   	return false ;
   },
 
@@ -182,7 +169,6 @@ let PivotTableView = React.createClass({
 	if ( typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
 		distinctValuesCol = JSON.parse ( tableConfig.propertiesById[columnProperty].distinctValues ) ;
 	}
-
 
     return (
       <DetectResize onResize={this.handleResize}>
