@@ -263,7 +263,7 @@ class SettingsDAO(object):
 
             #We have a datatable - add an index to it then copy that index across to the data table
             self._execSql('alter table "{}" add column "index" int auto_increment;'.format(tempTable))
-            sql = """UPDATE "{0}" SET "{2}_{4}_index" = (select "{3}"."index" from "{3}" where "{0}"."{1}" = "{3}"."{1}") ;
+            sql = """UPDATE "{0}" SET "{2}_{4}_index" = (select "{3}"."index"-1 from "{3}" where "{0}"."{1}" = "{3}"."{1}") ;
                      """.format(
                 table_settings[dataTable],
                 table_settings[indexField],
@@ -292,7 +292,7 @@ class SettingsDAO(object):
             self._execSql(sql)
 
             #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
-            sql = 'create table "index" as select "{5}", row_number() over (order by "{1}") as "rowNum" from "{0}" with data;' \
+            sql = 'create table "index" as select "{5}", row_number() over (order by "{1}")-1 as "rowNum" from "{0}" with data;' \
                   'update "{0}" set {2}_{3}_index=(select "rowNum" from "index" where "index"."{5}"="{0}"."{5}");' \
                   'drop table "index";'
             #
