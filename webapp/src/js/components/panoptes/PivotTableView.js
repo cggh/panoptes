@@ -213,7 +213,12 @@ let PivotTableView = React.createClass({
                            background: ((distinctValuesCol[columnValue]||{})['header-background']||'inherit')
                          }}>
                       { columnValue == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
+                      	(
+                      	typeof (distinctValuesCol[columnValue]||{}).html == 'undefined' ?
+                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> :
+                        <span dangerouslySetInnerHTML={{__html:((distinctValuesCol[columnValue]||{}).html)}}></span>
+                        )
+                    	}
                       <br/>
                       <small title={((distinctValuesCol[columnValue]||{}).description||'')}>{((distinctValuesCol[columnValue]||{}).description||'')}</small>
                     </div>
