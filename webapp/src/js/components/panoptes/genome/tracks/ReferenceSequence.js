@@ -47,7 +47,7 @@ let ReferenceSequence = React.createClass({
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth} = props;
     if (this.props.chromosome !== chromosome) {
-      this.applyData(nextProps, []);
+      this.applyData(props, []);
     }
     if (width - sideWidth < 1) {
       return;
@@ -107,7 +107,7 @@ let ReferenceSequence = React.createClass({
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
             this.applyData(this.props, []);
-            ErrorReport(this.getFlux(), error.message, () => this.fetchData(nextProps, requestContext));
+            ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
             throw error;
           })
       );
