@@ -20,11 +20,41 @@ import _min from 'lodash/min';
 // CSS
 import 'leaflet/dist/leaflet.css';
 
-/* TODO: Support complex maps in templates
+/* To use maps in templates
 
-  <p>A layered map:</p>
+  <p>A simple map:</p>
   <div style="width:300px;height:300px">
-  <Map center="[0, 0]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Markers with popups"><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  <Map center="[1, -1.1]" zoom="2" />
+  </div>
+
+  <p>A map with a tilelayer and markers:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[0, 0]" zoom="4"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></Map>
+  </div>
+
+  <p>A map with two different base layers:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[1, -1.1]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /></BaseLayer></LayersControl></Map>
+  </div>
+
+  <p>A map with two different base layers and two markers on one base layer:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[0, 0]" zoom="4"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></FeatureGroup></BaseLayer></LayersControl></Map>
+  </div>
+
+  <p>A map with markers and popups:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[0, 0]" zoom="4"><Marker position="[2, -2.1]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></Map>
+  </div>
+
+  <p>A map with markers from a table:</p>
+  <div style="width:300px;height:300px">
+  <Map><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><TableMarkersLayer table="samplingsites" /></Map>
+  </div>
+
+  <p>A complex map:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[1, -1.1]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
   </div>
 
 */
@@ -237,11 +267,12 @@ let MapWidget = React.createClass({
       />
     );
 
-    // TODO: Tidy up this logic.
+    // TODO: Tidy up this logic. Maybe extract into functions?
+    // Is similar logic needed elsewhere?
 
-    if (children.length) {
+    if (children.length !== undefined && children.length > 0) {
 
-      // If children is iterable.
+      // If children is iterable and not empty (i.e. MapWidget has real children).
 
       // If the children are all MarkerWidgets, or only a FeatureGroup containing only MarkerWidgets, then insert the default TileLayer.
 
@@ -253,10 +284,14 @@ let MapWidget = React.createClass({
         childrenToInspect = children[0].props.children;
       }
 
+      let keyedChildren = [];
+
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
         if (children[0].type !== undefined && childrenToInspect[i].type.displayName !== 'MarkerWidget') {
           nonMarkerChildrenCount++;
         }
+        keyedChildren[i] = _cloneDeep(children[i]);
+        keyedChildren[i].key = i;
       }
 
       if (nonMarkerChildrenCount === 0) {
@@ -264,10 +299,7 @@ let MapWidget = React.createClass({
         // If there are only Markers as children.
 
         let keyedDefaultTileLayer = _cloneDeep(defaultTileLayer);
-        let keyedChildren = _cloneDeep(children);
-
         keyedDefaultTileLayer.key = 0;
-        keyedChildren[0].key = 1;
 
         mapComponent = (
           <Map
@@ -296,11 +328,16 @@ let MapWidget = React.createClass({
 
     } else {
 
-      // Otherwise, children does not have a length property.
+      // Otherwise, children either does not have a length property or it has a zero length property.
 
-      if (children !== null && typeof children === 'object') {
+      if (
+        children !== null
+        && children.length === undefined
+        && !(children instanceof Array)
+        && typeof children === 'object'
+      ) {
 
-        // If there is a single child.
+        // If there is a child that is an object (and not an array).
 
         if (
           children.type !== undefined
@@ -341,6 +378,7 @@ let MapWidget = React.createClass({
 
       } else {
 
+        // MapWidget has no real children.
         // Just show the default map with the default TileLayer
 
         mapComponent = (

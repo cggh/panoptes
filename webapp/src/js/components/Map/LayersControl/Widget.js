@@ -10,35 +10,33 @@ let LayersControlWidget = React.createClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
   propTypes: {
     children: React.PropTypes.node,
-    hideLayersControl: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.bool])
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
   },
-  // TODO: hideLayersControl has not been implemented (and is not implemented in leaflet)
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
+  },
 
   render() {
 
-    let {children, hideLayersControl} = this.props;
-
-    let hideLayersControlBoolean = null;
-    if (
-      (typeof hideLayersControl === 'string' && hideLayersControl.toLowerCase() === 'true')
-      || (typeof hideLayersControl === 'boolean' && hideLayersControl === true)
-    ) {
-      hideLayersControl = true;
-    } else {
-      hideLayersControl = false;
-    }
-
-    if (hideLayersControl === null) {
-      console.error('LayersControlWidget could not determine hideLayersControl status');
-    }
-
-
-    if (hideLayersControlBoolean) {
-      // TODO: implement
-      //style = {display: 'none'};
-    }
+    let {children} = this.props;
 
     return (
       <LayersControl

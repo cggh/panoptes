@@ -19,27 +19,35 @@ let TableMarkersLayerWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'primKey', 'highlight')
+    DataFetcherMixin('highlight', 'locationDataTable', 'primKey', 'table')
   ],
+
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
 
   contextTypes: {
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     changeLayerStatus: React.PropTypes.func
   },
-
   propTypes: {
     highlight: React.PropTypes.string,
+    layerContainer: React.PropTypes.object,
+    locationDataTable: React.PropTypes.string,
+    map: React.PropTypes.object,
     primKey: React.PropTypes.string, // if not specified then all geoTable records are used
-    locationDataTable: React.PropTypes.string.isRequired
+    table: React.PropTypes.string // An alias for locationDataTable
   },
-
   childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
     onClickMarker: React.PropTypes.func
   },
 
   getChildContext() {
     return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map,
       onClickMarker: this.handleClickMarker
     };
   },
@@ -61,7 +69,14 @@ let TableMarkersLayerWidget = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, locationDataTable, primKey} = props;
+    let {highlight, locationDataTable, primKey, table} = props;
+
+    // NB: The locationDataTable prop is named to distinguish it from the chartDataTable.
+    // Either "table" or "locationDataTable" can be used in templates,
+    // with locationDataTable taking preference when both are specfied.
+    if (locationDataTable === undefined && table !== undefined) {
+      locationDataTable = table;
+    }
 
     let {changeLayerStatus} = this.context;
 
