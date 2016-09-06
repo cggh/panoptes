@@ -276,7 +276,7 @@ let CategoricalTrack = React.createClass({
       for (let i=0, iEnd = window.length; i < iEnd; i++) {
         const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
         if (xPixel > -pixelWindowSize && xPixel < width + pixelWindowSize) {
-          let currentY = height;
+          let currentY = height - (yScaleFactor * (0 - yMin));
           const iCounts = counts[i];
           const iValues = values[i];
           const sum = fractional ? _sum(iCounts) : 1;
