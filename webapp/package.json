@@ -62,7 +62,7 @@
     "handlebars": "^4.0.5",
     "hidpi-canvas": "git+https://github.com/benjeffery/hidpi-canvas-polyfill.git",
     "history": "^4.0.0-1",
-    "html-to-react": "git+https://github.com/benjeffery/html-to-react.git#persistent-keys-and-options",
+    "html-to-react": "^1.0.0",
     "immutable": "^3.8.1",
     "javascript-detect-element-resize": "git+https://github.com/sdecima/javascript-detect-element-resize.git",
     "keymirror": "^0.1.1",
