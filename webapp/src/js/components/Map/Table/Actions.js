@@ -4,31 +4,35 @@ import Sidebar from 'react-sidebar';
 
 // Lodash
 import _map from 'lodash/map';
-import _each from 'lodash/map';
 import _filter from 'lodash/filter';
 
 // Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
+import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Material UI
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
 import Divider from 'material-ui/Divider';
+import MenuItem from 'material-ui/MenuItem';
+import SelectField from 'material-ui/SelectField';
 
 // Panoptes UI
-import SidebarHeader from 'ui/SidebarHeader';
-import Icon from 'ui/Icon';
 import FilterButton from 'panoptes/FilterButton';
+import Icon from 'ui/Icon';
+import SidebarHeader from 'ui/SidebarHeader';
 
 // Panoptes
-import SQL from 'panoptes/SQL';
-import TableMapWidget from 'Map/Table/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import SQL from 'panoptes/SQL';
+import TableMapWidget from 'Map/Table/Widget';
 
 import 'map.scss';
+// TODO: Map/Table/actions-styles.scss
+
+import 'leaflet-providers/leaflet-providers.js';
+
 
 let TableMapActions = React.createClass({
   mixins: [
@@ -39,11 +43,13 @@ let TableMapActions = React.createClass({
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
-    title: React.PropTypes.string,
+    query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
-    query: React.PropTypes.string,
-    column: React.PropTypes.string
+    tileLayerAttribution: React.PropTypes.string,
+    tileLayerProviderName: React.PropTypes.string,
+    tileLayerURL: React.PropTypes.string,
+    title: React.PropTypes.string
   },
 
   getDefaultProps() {
@@ -63,17 +69,17 @@ let TableMapActions = React.createClass({
 
   },
 
+  // Event handlers
   handleQueryPick(query) {
     this.props.componentUpdate({query: query});
   },
-
   handleChangeTable(table) {
     this.props.componentUpdate({table});
   },
 
   render() {
-    let {sidebar, table, query, column, componentUpdate} = this.props;
-
+    let {componentUpdate, query, sidebar, table, tileLayerAttribution, tileLayerProviderName, tileLayerURL} = this.props;
+console.log('TableMapActions props %o', this.props);
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
         value: table.id,
@@ -82,21 +88,55 @@ let TableMapActions = React.createClass({
       })
     );
 
-    let propertyMenu = [];
-    let i = 0;
-    if (table) {
-      const propertyGroups = this.config.tablesById[table].propertyGroups;
-      _each(propertyGroups, (group) => {
-        if (propertyMenu.length) {
-          propertyMenu.push(<Divider key={i++}/>);
+
+    // https://github.com/leaflet-extras/leaflet-providers
+    // https://leaflet-extras.github.io/leaflet-providers/preview/
+    let tileLayerProviderMenu = [];
+
+console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Provider.providers);
+
+    if (table && window.L.TileLayer.Provider.providers) {
+
+      let providerNames = Object.keys(window.L.TileLayer.Provider.providers);
+      providerNames.sort();
+
+      for (let i = 0, len = providerNames.length; i < len; i++) {
+        let providerName = providerNames[i];
+        let providerObj = window.L.TileLayer.Provider.providers[providerName];
+        providerObj.name = providerName;
+
+        let subMenuItems = undefined;
+        let rightIcon = undefined;
+        if (providerObj.variants) {
+
+          rightIcon = <ArrowDropRight />;
+
+          let variantNames = Object.keys(providerObj.variants);
+          variantNames.sort();
+
+          subMenuItems = [];
+          for (let j = 0, len = variantNames.length; j < len; j++) {
+
+            let variantName = variantNames[i];
+            let variantObj = providerObj.variants[variantName];
+
+            if (variantObj !== undefined && typeof variantObj === 'object') {
+              variantObj.name = variantName;
+            } else {
+              variantObj = {name: variantObj};
+            }
+
+            subMenuItems.push(<MenuItem key={i + '_' + j} primaryText={variantName} value={variantObj} />);
+          }
         }
-        let {id, name} = group;
-        propertyMenu.push(<MenuItem disabled value={id} key={id} primaryText={name}/>);
-        _each(group.properties, (property) => {
-          let {id, name} = property;
-          propertyMenu.push(<MenuItem value={id} key={id} primaryText={name}/>);
-        });
-      });
+
+        tileLayerProviderMenu.push(<MenuItem key={i} menuItems={subMenuItems} primaryText={providerName} rightIcon={rightIcon} value={providerObj} />);
+
+
+
+
+      }
+
     }
 
     let sidebarContent = (
@@ -104,20 +144,22 @@ let TableMapActions = React.createClass({
         <SidebarHeader icon={this.icon()} description="View table data geographically"/>
         <div className="map-controls vertical stack">
           <SelectFieldWithNativeFallback
-            value={table}
             autoWidth={true}
             floatingLabelText="Geographic table:"
             onChange={this.handleChangeTable}
             options={tableOptions}
+            value={table}
           />
           {table ? <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
             : null}
           {table ?
-              <SelectField value={this.config.tablesById[table].propertiesById[column] ? column : null}
-                           autoWidth={true}
-                           floatingLabelText="Column"
-                           onChange={(e, i, v) => componentUpdate({column: v})}>
-                {propertyMenu}
+              <SelectField
+                autoWidth={true}
+                floatingLabelText="Map tiles:"
+                onChange={(e, i, v) => componentUpdate({tileLayerAttribution: v.options.attribution, tileLayerProviderName: v.name, tileLayerURL: v.url})}
+                value={tileLayerProviderName}
+              >
+                {tileLayerProviderMenu}
               </SelectField>
             : null }
         </div>
@@ -141,7 +183,9 @@ let TableMapActions = React.createClass({
               </span>
               : null}
           </div>
-          {table ? <TableMapWidget geoTable={table} {...this.props} /> : 'Pick a table'}
+          <div className="grow">
+            {table ? <TableMapWidget geoTable={table} {...this.props} /> : null}
+          </div>
         </div>
       </Sidebar>
     );

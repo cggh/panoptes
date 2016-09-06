@@ -87,7 +87,7 @@ let MapWidget = React.createClass({
 
   getChildContext() {
     return {
-      crs: this.map !== undefined ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
+      crs: (this.map !== undefined && this.map !== null) ? this.map.leafletElement.options.crs : window.L.CRS.EPSG3857,
       changeLayerStatus: this.handleChangeLayerStatus
     };
   },
@@ -182,7 +182,7 @@ let MapWidget = React.createClass({
   render() {
     let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
     let {bounds, loadStatus} = this.state;
-
+console.log('MapWidget props: %o', this.props);
     if (bounds === undefined && center === undefined && zoom === undefined) {
       // NB: The center/zoom props may have been set by the session or determined by bounds.
       center = [0, 0];

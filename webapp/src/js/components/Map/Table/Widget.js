@@ -36,6 +36,8 @@ let TableMapWidget = React.createClass({
     primKey: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
+    tileLayerAttribution: React.PropTypes.string,
+    tileLayerURL: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
   },
 
@@ -50,6 +52,8 @@ let TableMapWidget = React.createClass({
       locationDataTable,
       primKey,
       table,
+      tileLayerAttribution,
+      tileLayerURL,
       zoom
     } = this.props;
 
@@ -72,7 +76,10 @@ let TableMapWidget = React.createClass({
         zoom={zoom}
       >
         <FeatureGroupWidget>
-          <TileLayerWidget />
+          <TileLayerWidget
+            attribution={tileLayerAttribution}
+            url={tileLayerURL}
+           />
           <TableMarkersLayerWidget locationDataTable={locationDataTable} primKey={primKey} />
         </FeatureGroupWidget>
       </MapWidget>

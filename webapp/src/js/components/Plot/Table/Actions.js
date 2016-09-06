@@ -140,7 +140,7 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            <TablePlotWidget {...this.props} />
+            {table ? <TablePlotWidget {...this.props} /> : null}
           </div>
         </div>
       </Sidebar>

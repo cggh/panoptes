@@ -68,6 +68,7 @@
     "keymirror": "^0.1.1",
     "leaflet": "^1.0.0-rc.2",
     "leaflet-loading": "git+https://github.com/benjeffery/Leaflet.loading.git",
+    "leaflet-providers": "^1.1.15",
     "lodash": "^4.15.0",
     "lz-string": "git+https://github.com/benjeffery/lz-string.git",
     "material-ui": "^0.15.4",
