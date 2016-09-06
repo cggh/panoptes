@@ -6,6 +6,17 @@ import RaisedButton from 'material-ui/RaisedButton';
 import filterChildren from 'util/filterChildren';
 import _isArray from 'lodash/isArray';
 
+// TODO: Deprecate ItemMap in favour of TableMap or Map
+
+const componentTranslation = {
+  ItemMap: 'Map/Table/Actions',
+  Map: 'Map/Table/Actions',
+  Tree: 'containers/TreeWithActions',
+  Plot: 'containers/PlotWithActions',
+  PivotTable: 'containers/PivotTableWithActions',
+  DataTable: 'containers/DataTableWithActions'
+};
+
 let PopupButton = React.createClass({
   mixins: [
     PureRenderMixin,

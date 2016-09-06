@@ -63,7 +63,7 @@ let PivotTableWithActions = React.createClass({
       <div className="sidebar pivot-sidebar">
         <SidebarHeader icon={this.icon()} description={`Summary and aggregates of the ${this.tableConfig().namePlural} table`}/>
         <div className="pivot-controls vertical stack">
-		{(typeof instantFilter == 'undefined' ) ? 
+		{(typeof instantFilter == 'undefined' || instantFilter == null ) ? 
           <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
 		:
           <PropertyValueSelector table={table}
