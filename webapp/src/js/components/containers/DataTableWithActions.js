@@ -30,6 +30,7 @@ import SQL from 'panoptes/SQL';
 import DataDownloader from 'utils/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
+import PropertyValueSelector from 'panoptes/PropertyValueSelector';
 
 // Constants
 const MAX_ROWS_COUNT = 100000;
@@ -49,6 +50,8 @@ let DataTableWithActions = React.createClass({
     initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool,
     initialSearchFocus: React.PropTypes.bool,
+    instantFilter: React.PropTypes.string,
+    instantFilterValue: React.PropTypes.string,
     searchText: React.PropTypes.string
   },
 
@@ -237,7 +240,7 @@ let DataTableWithActions = React.createClass({
 
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
+    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, instantFilter, instantFilterValue, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalTruncatedRowsCount} = this.state;
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
@@ -289,7 +292,25 @@ let DataTableWithActions = React.createClass({
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
+        
+		{(typeof instantFilter == 'undefined' || instantFilter == null ) ? 
         <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+        :
+          <PropertyValueSelector table={table}
+                            key="instantFilter"
+                            propid={instantFilter}
+                            value={typeof instantFilterValue != 'undefined' ? instantFilterValue : null}
+                            label={instantFilter}
+                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+                            onSelect={(v) => {
+                            	let v2 = {"whcClass":"comparefixed","isCompound":false,"ColName":instantFilter,"CompValue":v,"isRoot":true,"Tpe":"="} ;
+                            	let query = JSON.stringify(v2) ;
+                            	this.props.componentUpdate({query})
+                            	}
+                            }/>
+        
+        }
+        
         <FlatButton label="Add/Remove Columns"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',

@@ -11,7 +11,8 @@ const componentTranslation = {
   Map: 'Map/Table/Actions',
   Tree: 'containers/TreeWithActions',
   Plot: 'containers/PlotWithActions',
-  PivotTable: 'containers/PivotTableWithActions'
+  PivotTable: 'containers/PivotTableWithActions',
+  DataTable: 'containers/DataTableWithActions'
 };
 
 let PopupButton = React.createClass({
