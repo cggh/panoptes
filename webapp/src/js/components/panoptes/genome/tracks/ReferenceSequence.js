@@ -212,7 +212,7 @@ let ReferenceSequence = React.createClass({
         const source = block.cache;
         ctx.drawImage(source, 0, 0, source.width, source.height, //Source params
           xScaleFactor * (block._blockStart + 0.5 - start), 0, source.width * pixelWindowSize, HEIGHT); //Destination params
-        if (pixelWindowSize >= 15) {
+        if (pixelWindowSize >= 15 && this.summaryWindow === 1) {
           const base = block.base.array;
           for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
             const x = xScaleFactor * (block._blockStart - start) + ((i+1) * pixelWindowSize);
