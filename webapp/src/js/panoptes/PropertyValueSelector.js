@@ -49,7 +49,9 @@ const PropertyValueSelector = React.createClass({
   },
   
     getInitialState() {
+    const { value } = this.props ;
     return {
+      value : value ,
       data: [],
       loadStatus: 'loading'
     };
@@ -100,12 +102,15 @@ const PropertyValueSelector = React.createClass({
 
   } ,
 
-
+  handleChange (event, index, value) {
+	this.setState({value:value}) ;
+	this.redirectedProps.onSelect(value);
+  } ,
 
   render() {
-    const {table, value, label, propid, filter, allowNull} = this.props;
+    const {table, label, propid, filter, allowNull} = this.props;
 
-    let {loadStatus, data} = this.state;
+    let {loadStatus, data, value } = this.state;
 
     let propertyMenu = [] ; //allowNull ? [<MenuItem value='NULL' primaryText="None"/>] : [];
     
@@ -117,7 +122,8 @@ const PropertyValueSelector = React.createClass({
     <SelectField value={value === 'NULL' ? undefined : value}
                  autoWidth={true}
                  floatingLabelText={label}
-                 onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>
+                 onChange={this.handleChange}
+>
       {propertyMenu}
     </SelectField>
     );
