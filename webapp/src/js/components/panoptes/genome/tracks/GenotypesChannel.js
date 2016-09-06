@@ -134,7 +134,7 @@ let GenotypesChannel = React.createClass({
     const {start, end, layoutGaps} = props;
     const startIndex = _sortedIndex(genomicPositions, start);
     const endIndex = _sortedLastIndex(genomicPositions, end);
-    const visibleGenomicPositions = genomicPositions.subarray(startIndex, endIndex);
+    const visibleGenomicPositions = genomicPositions.subarray ? genomicPositions.subarray(startIndex, endIndex) : genomicPositions.slice(startIndex, endIndex);
 
     const maxGapCount = layoutGaps ? 20 : 0;
 
@@ -363,7 +363,7 @@ let GenotypesChannel = React.createClass({
       this.setState({
         rowData: {
           id: {array:[], shape:[0]},
-          label: {array:[], shape:[0]},
+          label: {array:[], shape:[0]}
         },
         dataBlocks: [],
         layoutBlocks: [],
