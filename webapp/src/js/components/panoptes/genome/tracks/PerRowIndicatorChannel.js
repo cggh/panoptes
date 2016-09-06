@@ -101,7 +101,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (colourProperty && !tableConfig[table].propertiesById[colourProperty]) {
+    if (colourProperty && !tableConfig.propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
