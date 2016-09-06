@@ -59,7 +59,7 @@ let TableMapActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Map';
+    return this.props.title || 'Table Mapper';
 
   },
 
@@ -101,12 +101,12 @@ let TableMapActions = React.createClass({
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
-        <SidebarHeader icon={this.icon()} description="Something here"/>
+        <SidebarHeader icon={this.icon()} description="View table data geographically"/>
         <div className="map-controls vertical stack">
           <SelectFieldWithNativeFallback
             value={table}
             autoWidth={true}
-            floatingLabelText="Table:"
+            floatingLabelText="Geographic table:"
             onChange={this.handleChangeTable}
             options={tableOptions}
           />

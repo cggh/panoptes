@@ -7,7 +7,6 @@ import DetectResize from 'utils/DetectResize';
 
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 
-
 let Plot = React.createClass({
   mixins: [
     PureRenderMixin

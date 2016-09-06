@@ -11,12 +11,12 @@ import MapWidget from 'Map/Widget';
 import MarkerWidget from 'Map/Marker/Widget';
 import OverlayWidget from 'Map/Overlay/Widget';
 import PieChartMapWidget from 'Map/Chart/Pie/Widget';
-import PlotContainer from 'containers/PlotContainer';
 import PopupButton from 'panoptes/PopupButton';
 import PopupWidget from 'Map/Popup/Widget';
 import RectangleWidget from 'Map/Rectangle/Widget';
 import TableMapWidget from 'Map/Table/Widget';
 import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+import TablePlotWidget from 'Plot/Table/Widget';
 import TileLayerWidget from 'Map/TileLayer/Widget';
 import TreeContainer from 'containers/TreeContainer';
 
@@ -45,7 +45,7 @@ const components = {
   PieChartMap: (node, children) =>
     <PieChartMapWidget key={node.attribs.key} {...node.attribs} />,
   Plot: (node, children) =>
-    <PlotContainer key={node.attribs.key} {...node.attribs} />,
+    <TablePlotWidget key={node.attribs.key} {...node.attribs} />,
   Popup: (node, children) =>
     <PopupWidget key={node.attribs.key} {...node.attribs} children={children} />,
   PopupButton: (node, children) =>

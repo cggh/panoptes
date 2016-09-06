@@ -23,7 +23,7 @@ import PropertySelector from 'panoptes/PropertySelector';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import PlotContainer from 'containers/PlotContainer';
+import TablePlotWidget from 'Plot/Table/Widget';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
@@ -31,7 +31,10 @@ import FilterButton from 'panoptes/FilterButton';
 
 import 'plot.scss';
 
-let PlotWithActions = React.createClass({
+// CSS
+//TODO: import 'Plot/Table/actions-styles.scss';
+
+let TablePlotActions = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
@@ -64,7 +67,7 @@ let PlotWithActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Plot';
+    return this.props.title || 'Table Plotter';
   },
 
   handleQueryPick(query) {
@@ -88,7 +91,7 @@ let PlotWithActions = React.createClass({
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
-        <SidebarHeader icon={this.icon()} description="Something here"/>
+        <SidebarHeader icon={this.icon()} description="View table data graphically"/>
         <div className="plot-controls vertical stack">
           <SelectFieldWithNativeFallback
             value={table}
@@ -137,7 +140,7 @@ let PlotWithActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            <PlotContainer {...this.props} />
+            <TablePlotWidget {...this.props} />
           </div>
         </div>
       </Sidebar>
@@ -145,4 +148,4 @@ let PlotWithActions = React.createClass({
   }
 });
 
-module.exports = PlotWithActions;
+module.exports = TablePlotActions;
