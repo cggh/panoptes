@@ -182,7 +182,7 @@ let MapWidget = React.createClass({
   render() {
     let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
     let {bounds, loadStatus} = this.state;
-console.log('MapWidget props: %o', this.props);
+
     if (bounds === undefined && center === undefined && zoom === undefined) {
       // NB: The center/zoom props may have been set by the session or determined by bounds.
       center = [0, 0];

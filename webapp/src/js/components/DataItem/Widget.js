@@ -56,8 +56,10 @@ let DataItemWidget = React.createClass({
     return (
       <div className="vertical stack" style={{position: 'absolute'}}>
         <div className="grow">
-          <TabbedArea activeTab={activeTab}
-                      onSwitch={(id) => componentUpdate({activeTab: id})} >
+          <TabbedArea
+            activeTab={activeTab}
+            onSwitch={(id) => componentUpdate({activeTab: id})}
+           >
             {views.map((view, i) => {
               view = view.toObject();
               let viewId = `view_${i}`;
@@ -65,7 +67,8 @@ let DataItemWidget = React.createClass({
               return (
                 <TabPane
                   compId={viewId}
-                  key={viewId}>
+                  key={viewId}
+                >
                   {React.createElement(dynamicRequire(view.component),
                     Object.assign(props,
                       {table, primKey},

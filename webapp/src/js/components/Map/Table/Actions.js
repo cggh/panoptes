@@ -79,7 +79,7 @@ let TableMapActions = React.createClass({
 
   render() {
     let {componentUpdate, query, sidebar, table, tileLayerAttribution, tileLayerProviderName, tileLayerURL} = this.props;
-console.log('TableMapActions props %o', this.props);
+
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
         value: table.id,
@@ -184,7 +184,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
               : null}
           </div>
           <div className="grow">
-            {table ? <TableMapWidget geoTable={table} {...this.props} /> : null}
+            {table ? <TableMapWidget geoTable={table} tileLayerAttribution={tileLayerAttribution} tileLayerURL={tileLayerURL} {...this.props} /> : null}
           </div>
         </div>
       </Sidebar>

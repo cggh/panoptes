@@ -15,7 +15,7 @@ function getViews(dataItemViews, hasGeoCoord) {
     if (hasGeoCoord) {
       // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing a Map
       views = views.push(Immutable.fromJS({
-        component: 'Map/Widget',
+        component: 'Map/Table/Widget',
         props: {
           title: 'Location'
         }

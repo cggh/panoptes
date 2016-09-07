@@ -106,10 +106,20 @@ let TableMarkersLayerWidget = React.createClass({
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
-    if (highlight) {
+    // If no highlight has been specified, but a primKey has beem then convert primKey to a highlight.
+    if (highlight === undefined && primKey !== undefined) {
+      highlight =  locationPrimKeyProperty + ':' + primKey;
+    }
+
+    // TODO: check highlight looks like "highlightField:highlightValue"
+    if (highlight !== undefined && typeof highlight === 'string' && highlight !== '') {
       let [highlightField] = highlight.split(':');
-      if (highlightField) {
-        locationColumns.push(highlightField);
+      if (highlightField !== undefined) {
+        if (locationTableConfig.propertiesById[highlightField] === undefined) {
+          console.error('The specified highlight field ' + highlightField + ' was not found in the table ' + locationDataTable);
+        } else {
+          locationColumns.push(highlightField);
+        }
       }
     }
 
@@ -119,46 +129,21 @@ let TableMarkersLayerWidget = React.createClass({
     requestContext.request(
       (componentCancellation) => {
 
-        // If a primKey value has been specified, then fetch that single record,
-        // Otherwise, do a page query.
-        if (primKey) {
+        // Get all markers using the specified table.
+        let locationAPIargs = {
+          database: this.config.dataset,
+          table: locationTableConfig.fetchTableName,
+          columns: locationColumnsColumnSpec
+        };
 
-          // Fetch the single record for the specified primKey value.
-          let APIargs = {
-            database: this.config.dataset,
-            table: locationDataTable,
-            primKeyField: this.config.tablesById[locationDataTable].primKey,
-            primKeyValue: primKey
-          };
-
-          return LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(APIargs), (cacheCancellation) =>
-              API.fetchSingleRecord({
-                cancellation: cacheCancellation,
-                ...APIargs
-              }),
-            componentCancellation
-          );
-
-        } else {
-
-          // If no primKey is provided, then get all markers using the specified table.
-          let locationAPIargs = {
-            database: this.config.dataset,
-            table: locationTableConfig.fetchTableName,
-            columns: locationColumnsColumnSpec
-          };
-
-          return LRUCache.get(
-            'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
-              API.pageQuery({
-                cancellation: cacheCancellation,
-                ...locationAPIargs
-              }),
-            componentCancellation
-          );
-
-        }
+        return LRUCache.get(
+          'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+            API.pageQuery({
+              cancellation: cacheCancellation,
+              ...locationAPIargs
+            }),
+          componentCancellation
+        );
 
       })
       .then((data) => {
@@ -169,46 +154,30 @@ let TableMarkersLayerWidget = React.createClass({
         let locationTableConfig = this.config.tablesById[locationDataTable];
         let locationPrimKeyProperty = locationTableConfig.primKey;
 
-        // If a primKey value has been specified then expect data to contain a single record.
-        // Otherwise data should contain an array of records.
-        if (primKey) {
+        let highlightField, highlightValue = null;
 
-          let locationDataPrimKey = data[locationPrimKeyProperty];
+        // TODO: check highlight looks like "highlightField:highlightValue"
+        if (highlight !== undefined && typeof highlight === 'string' && highlight !== '') {
+          [highlightField, highlightValue] = highlight.split(':');
+        }
+
+        for (let i = 0; i < data.length; i++) {
+
+          let locationDataPrimKey = data[i][locationPrimKeyProperty];
+
+          let isHighlighted = false;
+          if (highlightField !== null && highlightValue !== null) {
+            isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
+          }
 
           markers = markers.push(Immutable.fromJS({
+            isHighlighted: isHighlighted,
             table: locationDataTable,
-            lat: parseFloat(data[locationTableConfig.latitude]),
-            lng: parseFloat(data[locationTableConfig.longitude]),
+            lat: parseFloat(data[i][locationTableConfig.latitude]),
+            lng: parseFloat(data[i][locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
             title: locationDataPrimKey,
           }));
-
-        } else {
-
-          let highlightField, highlightValue = null;
-          if (highlight) {
-            [highlightField, highlightValue] = highlight.split(':');
-          }
-
-          for (let i = 0; i < data.length; i++) {
-
-            let locationDataPrimKey = data[i][locationPrimKeyProperty];
-
-            let isHighlighted = false;
-            if (highlightField !== null && highlightValue !== null) {
-              isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
-            }
-
-            markers = markers.push(Immutable.fromJS({
-              isHighlighted: isHighlighted,
-              table: locationDataTable,
-              lat: parseFloat(data[i][locationTableConfig.latitude]),
-              lng: parseFloat(data[i][locationTableConfig.longitude]),
-              primKey: locationDataPrimKey,
-              title: locationDataPrimKey,
-            }));
-
-          }
 
         }
 

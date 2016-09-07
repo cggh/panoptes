@@ -17,9 +17,14 @@ import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
 <TableMap table="samplingsites" />
 </div>
 
-<p>A map of a sampling site:</p>
+<p>A map highlighting a sampling site:</p>
 <div style="position:relative;width:300px;height:300px">
 <TableMap table="samplingsites" primKey="St04" />
+</div>
+
+<p>A map highlighting UK sampling sites:</p>
+<div style="position:relative;width:300px;height:300px">
+<TableMap table="samplingsites" highlight="Country:UK" />
 </div>
 
 */
@@ -32,6 +37,7 @@ let TableMapWidget = React.createClass({
 
   propTypes: {
     center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
+    highlight: React.PropTypes.string,
     locationDataTable: React.PropTypes.string,
     primKey: React.PropTypes.string,
     table: React.PropTypes.string,
@@ -49,6 +55,7 @@ let TableMapWidget = React.createClass({
 
     let {
       center,
+      highlight,
       locationDataTable,
       primKey,
       table,
@@ -80,7 +87,7 @@ let TableMapWidget = React.createClass({
             attribution={tileLayerAttribution}
             url={tileLayerURL}
            />
-          <TableMarkersLayerWidget locationDataTable={locationDataTable} primKey={primKey} />
+          <TableMarkersLayerWidget highlight={highlight} locationDataTable={locationDataTable} primKey={primKey} />
         </FeatureGroupWidget>
       </MapWidget>
     );
