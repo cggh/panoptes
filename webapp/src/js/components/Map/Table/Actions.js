@@ -12,8 +12,6 @@ import FluxMixin from 'mixins/FluxMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 // Material UI
-import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
-import Divider from 'material-ui/Divider';
 import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 
@@ -47,7 +45,7 @@ let TableMapActions = React.createClass({
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
     tileLayerAttribution: React.PropTypes.string,
-    tileLayerProviderName: React.PropTypes.string,
+    tileLayerName: React.PropTypes.string,
     tileLayerURL: React.PropTypes.string,
     title: React.PropTypes.string
   },
@@ -78,7 +76,7 @@ let TableMapActions = React.createClass({
   },
 
   render() {
-    let {componentUpdate, query, sidebar, table, tileLayerAttribution, tileLayerProviderName, tileLayerURL} = this.props;
+    let {componentUpdate, query, sidebar, table, tileLayerAttribution, tileLayerName, tileLayerURL} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -91,7 +89,7 @@ let TableMapActions = React.createClass({
 
     // https://github.com/leaflet-extras/leaflet-providers
     // https://leaflet-extras.github.io/leaflet-providers/preview/
-    let tileLayerProviderMenu = [];
+    let tileLayerMenu = [];
 
 console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Provider.providers);
 
@@ -101,43 +99,207 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
       providerNames.sort();
 
       for (let i = 0, len = providerNames.length; i < len; i++) {
+
         let providerName = providerNames[i];
         let providerObj = window.L.TileLayer.Provider.providers[providerName];
-        providerObj.name = providerName;
 
-        let subMenuItems = undefined;
-        let rightIcon = undefined;
-        if (providerObj.variants) {
-
-          rightIcon = <ArrowDropRight />;
-
-          let variantNames = Object.keys(providerObj.variants);
-          variantNames.sort();
-
-          subMenuItems = [];
-          for (let j = 0, len = variantNames.length; j < len; j++) {
-
-            let variantName = variantNames[i];
-            let variantObj = providerObj.variants[variantName];
-
-            if (variantObj !== undefined && typeof variantObj === 'object') {
-              variantObj.name = variantName;
-            } else {
-              variantObj = {name: variantObj};
-            }
-
-            subMenuItems.push(<MenuItem key={i + '_' + j} primaryText={variantName} value={variantObj} />);
-          }
+        // TODO: Support providers requiring registration
+        // Skip providers requiring registration
+        if (providerName === 'HERE' || providerName === 'MapBox') {
+          continue;
         }
 
-        tileLayerProviderMenu.push(<MenuItem key={i} menuItems={subMenuItems} primaryText={providerName} rightIcon={rightIcon} value={providerObj} />);
+        // FIXME: Providers not working
+        // Skip providers not working
+        // BasemapAT requires {format} -- trying but failing
+        // NASAGIBS requires {time}, {tilematrixset}, {maxZoom}, {format}
+        if (providerName === 'BasemapAT' || providerName === 'NASAGIBS') {
+          continue;
+        }
 
+        if (
+          providerObj.variants !== undefined
+          && typeof providerObj.variants === 'object'
+          && Object.keys(providerObj.variants).length > 0
+        ) {
 
+          // If this provider has variants...
+
+          let variantTemplateUrl = undefined;
+          let defaultUrl = undefined;
+          let defaultFormat = providerObj.options.format;
+
+          if (
+            providerObj.options.variant !== undefined
+            && !providerObj.url.includes('{variant}')
+            && providerObj.url.includes(`/${providerObj.options.variant}/`)
+          ) {
+            // If this provider has a default variant, but its URL doesn't have the variant placeholder
+            // but the default variant does appear in the URL
+            // Then replace the first occurrence of the default variant with the variant placeholder
+            // to make the _variantTemplateUrl
+            variantTemplateUrl = providerObj.url.replace(`/${providerObj.options.variant}/`, '/{variant}/');
+            defaultUrl = providerObj.url;
+          } else if (
+            providerObj.options.variant !== undefined
+            && providerObj.url.includes('{variant}')
+          ) {
+            // If this provider has a default variant, and its URL has the variant placeholder
+            variantTemplateUrl = providerObj.url;
+            defaultUrl = providerObj.url.replace('/{variant}/', `/${providerObj.options.variant}/`);
+          } else if (
+            providerObj.options.variant === undefined
+            && providerObj.url.includes('{variant}')
+          ) {
+            // If this provider has no default variant, but its URL has the variant placeholder
+            variantTemplateUrl = providerObj.url;
+            defaultUrl = null;
+          } else if (
+            providerObj.options.variant === undefined
+            && providerObj.url !== undefined
+            && !providerObj.url.includes('{variant}')
+          ) {
+            // If this provider has no default variant and its URL does not have the variant placeholder
+            // but it does have a URL, and its variants *might* have a URL
+            variantTemplateUrl = null;
+            defaultUrl = providerObj.url;
+          } else {
+            console.warn('Unhandled map tile provider variants: %o', providerObj);
+            continue;
+          }
+
+          if (variantTemplateUrl !== undefined && variantTemplateUrl !== null) {
+            if (variantTemplateUrl.includes('{ext}')) {
+              variantTemplateUrl = variantTemplateUrl.replace('{ext}', 'png');
+            }
+          }
+
+          if (defaultUrl !== undefined && defaultUrl !== null) {
+
+            if (defaultUrl.includes('{format}') && defaultFormat !== undefined) {
+              defaultUrl = defaultUrl.replace('{format}', defaultFormat);
+            }
+
+            if (defaultUrl.includes('{ext}')) {
+              defaultUrl = defaultUrl.replace('{ext}', 'png');
+            }
+
+            // If there is no defaultUrl (perhaps only variant URLs)
+            // then don't create a default menu option for this tile provider.
+
+            // If this provider has a default variant, then show the variant name in the menu option.
+            // Otherwise, just show the provider name.
+
+            let defaultTileLayerObj = {
+              tileLayerAttribution: providerObj.options.attribution,
+              tileLayerName: providerObj.options.variant ? `${providerName} (${providerObj.options.variant})` : providerName,
+              tileLayerURL: defaultUrl
+            };
+
+            tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerName} value={defaultTileLayerObj} />);
+          }
+
+          //// Convert each variant into a tileLayerMenu with a tileLayerObj as a value.
+
+          let variantKeyNames = Object.keys(providerObj.variants);
+          variantKeyNames.sort();
+
+          for (let j = 0, len = variantKeyNames.length; j < len; j++) {
+
+            let variantKeyName = variantKeyNames[j];
+            let variantObj = providerObj.variants[variantKeyName];
+
+            let tileLayerObj = {
+              tileLayerAttribution: providerObj.options.attribution,
+              tileLayerName: providerName + '.' + variantKeyName
+            };
+
+            // NB: Variants either have their own URL specified in options,
+            // or their URL is composed using the variantTemplateUrl and the variant name.
+
+            // NB: The value of a variant is either a string, specifying the variant name
+            // or the value is an object with options.
+
+            if (variantObj === undefined) {
+              // Skip if the variant object is undefined (i.e. we only have the key name)
+              continue;
+            }
+
+            if (typeof variantObj === 'string' && variantObj !== '') {
+
+              if (variantTemplateUrl !== undefined && variantTemplateUrl !== null) {
+                tileLayerObj.tileLayerURL = variantTemplateUrl.replace('{variant}', variantObj);
+
+                if (tileLayerObj.tileLayerURL.includes('{format}')) {
+                  if (defaultFormat !== undefined && defaultFormat !== null) {
+                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', defaultFormat);
+                  }
+                }
+
+              } else {
+                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerName + ': ' + variantObj);
+              }
+
+            } else if (typeof variantObj === 'object') {
+
+              if (
+                variantTemplateUrl !== undefined
+                && variantTemplateUrl !== null
+                && variantObj.options !== undefined
+                && variantObj.options !== null
+                && variantObj.options.variant !== undefined
+                && variantObj.options.variant !== null
+              ) {
+
+                tileLayerObj.tileLayerURL = variantTemplateUrl.replace('{variant}', variantObj.options.variant);
+
+                if (tileLayerObj.tileLayerURL.includes('{format}')) {
+                  if (variantObj.options.format !== undefined && variantObj.options.format !== null) {
+                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', variantObj.options.format);
+                  } else if (defaultFormat !== undefined && defaultFormat !== null) {
+                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', defaultFormat);
+                  }
+                }
+
+              } else if (
+                variantObj.url !== undefined
+                && variantObj.url !== null
+              ) {
+                tileLayerObj.tileLayerURL = variantObj.url;
+              } else {
+                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
+              }
+
+            } else {
+              console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
+            }
+
+            if (tileLayerObj.tileLayerURL !== undefined && tileLayerObj.tileLayerURL !== null) {
+              tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
+            } else {
+              // Already warn
+              //console.warn('tileLayerURL was not defined for option ' + tileLayerObj.tileLayerName + ': %o', tileLayerObj);
+            }
+
+          }
+        } else {
+
+          let tileLayerObj = {
+            tileLayerAttribution: providerObj.options.attribution,
+            tileLayerName: providerName,
+            tileLayerURL: providerObj.url
+          };
+
+          tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
+        }
 
 
       }
 
     }
+
+    // TODO: Auto select table when there is only one.
+    // FIXME: Show selected tile layer.
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
@@ -156,10 +318,10 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
               <SelectField
                 autoWidth={true}
                 floatingLabelText="Map tiles:"
-                onChange={(e, i, v) => componentUpdate({tileLayerAttribution: v.options.attribution, tileLayerProviderName: v.name, tileLayerURL: v.url})}
-                value={tileLayerProviderName}
+                onChange={(e, i, v) => componentUpdate({tileLayerAttribution: v.tileLayerAttribution, tileLayerName: v.tileLayerName, tileLayerURL: v.tileLayerURL})}
+                value={tileLayerName}
               >
-                {tileLayerProviderMenu}
+                {tileLayerMenu}
               </SelectField>
             : null }
         </div>
