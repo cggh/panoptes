@@ -66,41 +66,41 @@ let DataTableView = React.createClass({
   fetchData(props, requestContext) {
     let {table, query, columnProperty, rowProperty} = props;
     let tableConfig = this.config.tablesById[table];
-    let columnspec = {
-      'count(*)': 'IN'  //Possible encoding values are at ConfigStore:265
-    };
-    let groupby = [];
+    let columns = [
+      {expr: ['count', ['*']], as: 'count'}
+    ];
+    let groupBy = [];
     if (columnProperty) {
-      columnspec[columnProperty] = tableConfig.propertiesById[columnProperty].defaultDisplayEncoding;
-      groupby.push(columnProperty);
+      columns.push(columnProperty);
+      groupBy.push(columnProperty);
     }
     if (rowProperty) {
-      columnspec[rowProperty] = tableConfig.propertiesById[rowProperty].defaultDisplayEncoding;
-      groupby.push(rowProperty);
+      columns.push(rowProperty);
+      groupBy.push(rowProperty);
     }
     this.setState({loadStatus: 'loading', dataByColumnRow: null, uniqueColumns: null, uniqueRows: null});
 
-    let pageQueryAPIargs = {
+    let queryAPIargs = {
       database: this.config.dataset,
       table: tableConfig.fetchTableName,
-      columns: columnspec,
+      columns: columns,
       query: query,
-      groupby,
+      groupBy,
       transpose: false
     };
 
     requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'pageQuery' + JSON.stringify(pageQueryAPIargs),
+          'query' + JSON.stringify(queryAPIargs),
           (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
+            API.query({cancellation: cacheCancellation, ...queryAPIargs}),
           componentCancellation
         )
     )
     .then((data) => {
-      let columnData = data[columnProperty];
-      let rowData = data[rowProperty];
-      let countData = data['count(*)'];
+      let columnData = data[columnProperty].array;
+      let rowData = data[rowProperty].array;
+      let countData = data['count'].array;
       let uniqueColumns = _uniq(columnData);
       uniqueColumns.push('_all_');
       let uniqueRows = _uniq(rowData);
