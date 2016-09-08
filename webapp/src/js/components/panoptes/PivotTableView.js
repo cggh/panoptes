@@ -98,27 +98,27 @@ let DataTableView = React.createClass({
         )
     )
     .then((data) => {
-      let columnData = data[columnProperty].array;
-      let rowData = data[rowProperty].array;
-      let countData = data['count'].array;
-      let uniqueColumns = _uniq(columnData);
+      let columnData = data[columnProperty];
+      let rowData = data[rowProperty];
+      let countData = data['count'];
+      let uniqueColumns = columnData ? _uniq(columnData.array) : [];
       uniqueColumns.push('_all_');
-      let uniqueRows = _uniq(rowData);
+      let uniqueRows = rowData ? _uniq(rowData.array) : [];
       uniqueRows.push('_all_');
       let dataByColumnRow = {};
       uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
       dataByColumnRow['_all_'] = {};
       uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
-      for (let i = 0; i < countData.length; ++i) {
-        dataByColumnRow['_all_']['_all_'] += countData[i];
+      for (let i = 0; i < countData.shape[0]; ++i) {
+        dataByColumnRow['_all_']['_all_'] += countData.array[i];
         if (columnProperty) {
-          dataByColumnRow[columnData[i]]['_all_'] += countData[i];
+          dataByColumnRow[columnData.array[i]]['_all_'] += countData.array[i];
         }
         if (rowProperty) {
-          dataByColumnRow['_all_'][rowData[i]] += countData[i];
+          dataByColumnRow['_all_'][rowData.array[i]] += countData.array[i];
         }
         if (columnProperty && rowProperty) {
-          dataByColumnRow[columnData[i]][rowData[i]] = countData[i];
+          dataByColumnRow[columnData.array[i]][rowData.array[i]] = countData.array[i];
         }
       }
       this.setState({
