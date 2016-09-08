@@ -19,7 +19,7 @@ let ImageOverlayWidget = React.createClass({
     map: React.PropTypes.object
   },
   propTypes: {
-    imageBounds: React.PropTypes.string,
+    imageBounds: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
     imageUrl: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object
@@ -46,10 +46,23 @@ let ImageOverlayWidget = React.createClass({
     let {imageBounds, imageUrl} = this.props;
 console.log('ImageOverlay props: %o', this.props);
 
+    let adaptedProps = {};
+
+    if (imageBounds instanceof Array) {
+      // TODO: check the array looks like [[40.712216, -74.22655], [40.773941, -74.12544]]
+      adaptedProps.imageBounds = imageBounds;
+    } else if (imageBounds !== undefined && typeof imageBounds === 'string') {
+      // TODO: check the string looks like "[[40.712216, -74.22655], [40.773941, -74.12544]]" before trying to parse.
+      let arrayFromString = JSON.parse(adaptedProps);
+      if (arrayFromString instanceof Array) {
+        adaptedProps.imageBounds = arrayFromString;
+      }
+    }
+
     return (
       <ImageOverlay
+        {...adaptedProps}
         children={undefined}
-        imageBounds={imageBounds}
         imageUrl={imageUrl}
       />
     );
