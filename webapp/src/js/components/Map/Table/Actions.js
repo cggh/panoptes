@@ -14,6 +14,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 // Material UI
 import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
+import TextField from 'material-ui/TextField';
 
 // Panoptes UI
 import FilterButton from 'panoptes/FilterButton';
@@ -73,6 +74,9 @@ let TableMapActions = React.createClass({
   },
   handleChangeTable(table) {
     this.props.componentUpdate({table});
+  },
+  handleChangeTemplateCode() {
+console.log('neep');
   },
 
   render() {
@@ -195,7 +199,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
               tileLayerName: providerObj.options.variant ? `${providerName} (${providerObj.options.variant})` : providerName,
               tileLayerURL: defaultUrl
             };
-
+console.log(defaultTileLayerObj.tileLayerAttribution);
             tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerName} value={defaultTileLayerObj} />);
           }
 
@@ -273,7 +277,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             } else {
               console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
             }
-
+console.log(tileLayerObj.tileLayerAttribution);
             if (tileLayerObj.tileLayerURL !== undefined && tileLayerObj.tileLayerURL !== null) {
               tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
             } else {
@@ -289,7 +293,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             tileLayerName: providerName,
             tileLayerURL: providerObj.url
           };
-
+console.log(tileLayerObj.tileLayerAttribution);
           tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
         }
 
@@ -299,7 +303,15 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
     }
 
     // TODO: Auto select table when there is only one.
+    // TODO: Persist current tile layer through marker onClick event?
+
+    // FIXME: attribution replacement not working as per:
+    // https://github.com/leaflet-extras/leaflet-providers/blob/c5bdc5f30629215c5c9c189cd2cccd533515383a/leaflet-providers.js#L73
+
     // FIXME: Show selected tile layer.
+
+    let templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + tileLayerAttribution + '" tileLayerURL="' + tileLayerURL + '" /></div>';
+
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
@@ -312,9 +324,14 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             options={tableOptions}
             value={table}
           />
-          {table ? <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
-            : null}
-          {table ?
+          {
+            table ?
+              <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+            :
+              null
+          }
+          {
+            table ?
               <SelectField
                 autoWidth={true}
                 floatingLabelText="Map tiles:"
@@ -323,10 +340,26 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
               >
                 {tileLayerMenu}
               </SelectField>
-            : null }
+            :
+              null
+          }
+          {
+            tileLayerName ?
+              <TextField
+                floatingLabelText="Template code"
+                multiLine={true}
+                onChange={this.handleChangeTemplateCode}
+                TODOstyle={{fontFamily: '"Courier New", Courier, monospace', fontSize: '8pt'}}
+                value={templateCode}
+              />
+            :
+              null
+          }
         </div>
       </div>
     );
+
+
     return (
       <Sidebar
         docked={sidebar}
@@ -338,7 +371,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{table ? `Map of ${this.config.tablesById[table].capNamePlural}` : 'Map'}</span>
+            <span className="text">{table ? `Map of ${this.config.tablesById[table].namePlural}` : 'Map'}</span>
             {table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>
