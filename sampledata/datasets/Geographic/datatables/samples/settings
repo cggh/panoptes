@@ -9,7 +9,6 @@ quickFindFields: ID,CatId,RegionId
 
 maxCountQueryRecords: 250000
 maxCountQueryAggregated: 500000
-allowSubSampling: Yes
 
 #DisableNotes: Yes
 #DisableSubsets: Yes
@@ -56,16 +55,6 @@ properties:
   minVal: -10
   maxVal: 10
   showBar: true
-
-- id: Filtrd
-  name: Filtered
-  dataType: Boolean
-  readData: false
-  canUpdate: true
-  categoryColors:
-    No: rgb(255,128,60)
-    Yes: rgb(0,180,0)
-    _other_: rgb(128, 128, 128)
 
 
 

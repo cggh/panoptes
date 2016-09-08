@@ -28,7 +28,6 @@ def readJSONConfig(datasetId):
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
-    genome['summaryValues'] = readSetOfSettings(join(datasetFolder, 'refgenome', 'summaryvalues'), SettingsDataTable)
     return {
         'settings': settings,
         'chromosomes': chromosomes,

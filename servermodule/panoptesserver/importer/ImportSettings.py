@@ -206,13 +206,6 @@ class ImportSettings:
                                    'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
                                    'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('connectLines', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'default': False,
-                                   'description': 'Indicate that the points will be connected with lines in the genome browser\n  ',
-                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
-                                   }),
                             ('defaultVisible', {
                                                 'type': 'Boolean',
                                                 'required': False,
@@ -242,7 +235,7 @@ class ImportSettings:
 
             with open(self.fileName, 'r') as configfile:
                 try:
-                    self._settings = yaml.load(configfile.read())
+                    self._settings = yaml.load(configfile.read()) or {}
 
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
@@ -268,13 +261,12 @@ class ImportSettings:
 
 
     def _addDefaultProperties(self):
-
         if ('primKey' in self._settings and (self._settings['primKey'] == 'AutoKey')):
             propid = 'AutoKey'
             self._propidMap[propid] = {
                                           'id': propid,
                                           'name': propid,
-                                          'dataType': 'Value',
+                                          'dataType': 'Int32',
                                           'decimDigits': 0
                                           }
 

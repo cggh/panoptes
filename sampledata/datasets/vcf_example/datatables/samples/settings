@@ -7,5 +7,4 @@ primKey: sample_id
 properties:
 - dataType: Text
   id: sample_id
-  maxLen: 7
   name: sample_id

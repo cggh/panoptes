@@ -290,9 +290,7 @@ let GenomeBrowser = React.createClass({
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
-                        { settings.refSequenceSumm ?
-                          <ReferenceSequence {...trackProps}/> :
-                          null }
+                        <ReferenceSequence {...trackProps}/> :
                         { settings.annotation ?
                           <AnnotationChannel {...trackProps} /> :
                           null }

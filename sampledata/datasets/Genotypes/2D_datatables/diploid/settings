@@ -45,5 +45,3 @@ showInGenomeBrowser:                 # Requires that ColumnDataTable "IsPosition
   extraProperties:
   - gq                               # Properties that will be available to map to display properties
   - total_depth
-
-genomeMaxViewportSizeX: 5000

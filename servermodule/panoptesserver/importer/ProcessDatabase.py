@@ -1,8 +1,3 @@
-import os
-import datetime
-import SimpleFilterBankData
-import MultiCategoryDensityFilterBankData
-import ImpUtils
 import logging
 import linecache
 from BaseImport import BaseImport
@@ -43,7 +38,7 @@ class ProcessDatabase(BaseImport):
             data = inputFile
             
                    
-        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets, allowSubSampling = None)
+        self._dbloader = LoadTable(self._calculationObject, data, self._datasetId, tableid, loadSettings, self._importSettings, createSubsets)
         
         if not self._importSettings['ConfigOnly']:
             self._log(("Preparing to load {} to {}.{}").format(data, self._datasetId, tableid))

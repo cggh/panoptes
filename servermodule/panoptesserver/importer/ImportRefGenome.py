@@ -7,7 +7,6 @@ import uuid
 
 import ImpUtils
 import shutil
-from ProcessFilterBank import ProcessFilterBank
 from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
 from SettingsRefGenome import SettingsRefGenome
@@ -20,13 +19,6 @@ def flattenarglist(arg):
     else:
         return arg
 
-def ImportRefGenomeSummaryData(calculationObject, datasetId, folder, importSettings):
-
-    filterBanker = ProcessFilterBank(calculationObject, datasetId, importSettings, baseFolder = folder)
-
-    filterBanker.createRefGenomeSummaryValues()
-
-
 def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     
     datasetFolder = os.path.join(baseFolder, datasetId)
@@ -37,8 +29,6 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     dao = SettingsDAO(calculationObject, datasetId)
             
     with calculationObject.LogHeader('Importing reference genome data'):
-
-        ImportRefGenomeSummaryData(calculationObject, datasetId, baseFolder, importSettings)
 
         settings = SettingsRefGenome(os.path.join(folder, 'settings'), validate=True)
         print('Settings: '+str(settings))
@@ -52,11 +42,11 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
         conf = PanoptesConfig(calculationObject)
         # Import reference genome
         if not(importSettings['ConfigOnly']):
-            str_maxbasecount = 'all'
+            maxBaseCount = slice(0,None)
             if importSettings['ScopeStr'] != 'all':
-                str_maxbasecount = '10000'
+                maxBaseCount = slice(0,10000)
             if importSettings['ScopeStr'] == '100k':
-                str_maxbasecount = '1000000'
+                maxBaseCount = slice(0,1000000)
             refsequencefile = os.path.join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
@@ -64,7 +54,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                     with open(refsequencefile, "rU") as f, open(tempFile, 'w') as o:
                         for record in SeqIO.parse(f, "fasta"):
                             chrom = record.id
-                            for i, base in enumerate(record.seq):
+                            for i, base in enumerate(record.seq[maxBaseCount]):
                                 o.write('\t'.join([chrom, str(i), str(ord(base.lower()))])+'\n')
                 dao._execSql('CREATE TABLE "_sequence_" ("chrom" text, "pos" int, "base" tinyint);')
                 dao._execSql("COPY INTO _sequence_ from '%s' USING DELIMITERS '\t','\n' NULL AS '' LOCKED" % (tempFile))
@@ -126,8 +116,6 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
     return True
 
 if __name__ == "__main__":
-
-
     import sys
     import customresponders.panoptesserver.asyncresponder as asyncresponder
 

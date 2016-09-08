@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class LoadTable(threading.Thread):
     
-    def __init__(self, responder, sourceFileName, datasetId, tableId, loadSettings, importSettings, createSubsets = False, allowSubSampling = None):
+    def __init__(self, responder, sourceFileName, datasetId, tableId, loadSettings, importSettings, createSubsets = False):
         
         threading.Thread.__init__(self)
         
@@ -59,28 +59,16 @@ class LoadTable(threading.Thread):
         self._blockNr = 0
             
         #Defaults in case loadSettings is a dict
-        self._columnIndexField = None
-        self._rowIndexField = None
-        self._allowSubSampling = allowSubSampling
         self._isPositionOnGenome = False
           
         if type(loadSettings) is dict:
             return
         
-        if allowSubSampling == None:
-            self._allowSubSampling = loadSettings['allowSubSampling']
-      
         if  loadSettings['isPositionOnGenome']:
             self._isPositionOnGenome = True
-                     
             self._chrom = loadSettings['chromosome']
             self._pos = loadSettings['position']
             
-        #Settings connected to 2D data tables - add columns if present ColumnIndexField
-        self._columnIndexField = loadSettings['columnIndexField']
-            
-        self._rowIndexField = loadSettings['rowIndexField']
-        
         self._dao = SettingsDAO(responder, self._datasetId, logCache = self._logMessages)
             
 
@@ -181,17 +169,6 @@ class LoadTable(threading.Thread):
         if self._loadSettings["primKey"] == "AutoKey":
             self._dao._execSql("ALTER TABLE %s ADD COLUMN %s int AUTO_INCREMENT PRIMARY KEY" % (DBTBESC(self._tableId),
                                                                                             DBCOLESC(self._loadSettings["primKey"])))
-        #
-        # #This is connected to Import2DDataTable - it's much quicker to add it now rather than
-        # #when doing the import
-        # #Note - not the same table
-        # if self._columnIndexField is not None:
-        #     colTokens.append('"{}_column_index" INT '.format(self._columnIndexField))
-        # if self._rowIndexField is not None:
-        #     colTokens.append('"{}_row_index" INT  '.format(self._rowIndexField))
-
-
-        
 
     def _addIndexes(self):
         
@@ -209,11 +186,6 @@ class LoadTable(threading.Thread):
         if self._isPositionOnGenome:
             self._log('Indexing chromosome')
             self._dao.createIndex(tableid + '_chrompos', tableid, self._chrom + "," + self._pos)
-
-    def _createSubSampleTables(self):
-        
-        databaseid = self._datasetId
-        tableid = self._tableId
 
     def _preprocessFile(self, sourceFileName, tableid):
         
@@ -305,8 +277,6 @@ class LoadTable(threading.Thread):
         
             sourceFileName = self._preprocessFile(sourceFileName, tableid)
                           
-            self._log('Column sizes: '+str({col: self._loadSettings.getPropertyValue(col, 'maxLen') for col in self._loadSettings.getPropertyNames()}))
-        
             self._log('Creating schema')
             try:
                 self._dao.dropTable(tableid)
@@ -329,10 +299,6 @@ class LoadTable(threading.Thread):
                 os.remove(self._destFileName)           
             
             self._addIndexes()
-            
-            self._createSubSampleTables()
-        
-            
             
             if self._createSubsets:
                 self._addSubsets()

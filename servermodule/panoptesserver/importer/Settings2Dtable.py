@@ -81,11 +81,6 @@ class Settings2Dtable(ImportSettings):
                                                })
                                       ))
                          }),
-                    ('genomeMaxViewportSizeX', {
-                         'type': 'Value',
-                         'required': False,
-                         'description': 'Maximum size of the genome browser viewport (in bp) for which genotype calls will be displayed'
-                         }),
                     ('properties', {
                          'type': 'List',
                          'required': True,

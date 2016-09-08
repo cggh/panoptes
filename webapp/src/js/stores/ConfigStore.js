@@ -129,26 +129,6 @@ const ConfigStore = Fluxxor.createStore({
     return config;
   },
 
-//let augment2DTableInfo = function(table) {
-//  table.tableNameSingle = table.name;
-//  table.tableNamePlural = table.name;
-//  if (table.NameSingle)
-//    table.tableNameSingle = table.NameSingle;
-//  if (table.NamePlural)
-//    table.tableNamePlural = table.NamePlural;
-//  table.capNameSingle = table.tableNameSingle.charAt(0).toUpperCase() + table.tableNameSingle.slice(1);
-//  table.capNamePlural = table.tableNamePlural.charAt(0).toUpperCase() + table.tableNamePlural.slice(1);
-//
-//  table.col_table = MetaData.tablesByID[table.col_table];
-//  table.row_table = MetaData.tablesByID[table.row_table];
-//  table.hasGenomePositions = table.col_table.hasGenomePositions;
-//  let settings = {};
-//  if (table)
-//    settings = _.extend(settings, JSON.parse(table));
-//  settings.GenomeMaxViewportSizeX = parseInt(settings.GenomeMaxViewportSizeX);
-//  table = settings;
-//};
-
   addPropertyConfig(table) {
     table.properties = table.properties || [];
     table.propertiesById = {};
