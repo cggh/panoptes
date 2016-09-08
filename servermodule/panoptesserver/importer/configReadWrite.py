@@ -3,7 +3,7 @@ from os.path import join
 from simplejson import loads, dumps
 from Bio import SeqIO
 from PanoptesConfig import PanoptesConfig
-from SettingsGlobal import SettingsGlobal
+from SettingsDataset import SettingsDataset
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
@@ -22,13 +22,12 @@ def readSetOfSettings(dirPath, loader, wanted_names=None):
 def readJSONConfig(datasetId):
     datasetFolder = join(baseFolder, datasetId)
     settingsFile = join(datasetFolder, 'settings')
-    settings = loads(SettingsGlobal(settingsFile, validate=True).serialize())
+    settings = loads(SettingsDataset(settingsFile, validate=True).serialize())
     with open(join(datasetFolder, 'refgenome', 'refsequence.fa')) as fastaFile:
         chromosomes = {fasta.id: len(fasta.seq) for fasta in SeqIO.parse(fastaFile, 'fasta')}
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
-    genome['summaryValues'] = readSetOfSettings(join(datasetFolder, 'refgenome', 'summaryvalues'), SettingsDataTable)
     return {
         'settings': settings,
         'chromosomes': chromosomes,

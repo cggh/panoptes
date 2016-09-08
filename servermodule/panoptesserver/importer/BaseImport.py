@@ -7,7 +7,7 @@ from SettingsDAO import SettingsDAO
 from PanoptesConfig import PanoptesConfig
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
-from SettingsGlobal import SettingsGlobal
+from SettingsDataset import SettingsDataset
 
 class BaseImport(object):
     
@@ -48,7 +48,7 @@ class BaseImport(object):
 
         settingsFile = os.path.join(self._datasetFolder, 'settings')
         if os.path.isfile(settingsFile):
-            self._globalSettings = SettingsGlobal(settingsFile, False)
+            self._globalSettings = SettingsDataset(settingsFile, False)
         else:
             self._globalSettings = None
             
@@ -163,7 +163,7 @@ class BaseImport(object):
 #        self._log("BaseImport._getDataFiles",settings)
 #        self._log("BaseImport._getDataFiles",str(self))
         if not os.path.isfile(settings):
-            self._log("Missing settings file {} from {} {} {}".format(settings, self._datatablesFolder, datatable))
+            self._log("Missing settings file {} from {} {} ".format(settings, self._datatablesFolder, datatable))
 #            raise Exception("Missing settings {}".format(settings))
         data = os.path.join(folder, self._dataFile)
         if not os.path.isfile(data):
@@ -171,7 +171,7 @@ class BaseImport(object):
             if os.path.isfile(data1):
                 self._dataFile = self._dataFile + '.gz'
             else:
-                self._log("Missing data file {} from {} {} {}".format(data, self._datatablesFolder, datatable))
+                self._log("Missing data file {} from {} {} ".format(data, self._datatablesFolder, datatable))
 #                raise Exception("Missing data {}".format(data))
         
         return settings, data

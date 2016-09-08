@@ -27,6 +27,7 @@ properties:
   name: Sample key                 # Display name of the property
   description: Sample identifier   # Description of the property
   dataType: Text                   # Data type of the values in the property. This can be Text, Value, Boolean,  GeoLongitude, GeoLatitude, Date
+  showInTable: true
   search: StartPattern             # Indicates that this field can be used for text search in the find data item wizard. Possible values: StartPattern, Pattern, Match
 
 - id: Site_ID
@@ -34,6 +35,7 @@ properties:
   description: Identifier of the site the sample was collected from
   dataType: Text
   index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  showInTable: true
   relation:                         # This block defines a many-to-one foreign relation to a parent table
     tableId: samplingsites          # Datatable id of the parent table
     forwardName: is sampled from    # Display name of the relation from child to parent
@@ -44,6 +46,7 @@ properties:
   description: Identifier of the contributing entity
   dataType: Text
   index: true                       # Instructs Panoptes to create a database index for this property. For large data tables, this massively speeds up queries based on this field
+  showInTable: true
   relation:                         # This block defines a many-to-one foreign relation to a parent table
     tableId: contributors           # Data table id of the parent table
     forwardName: is contributed by  # Display name of the relation from child to parent
@@ -51,23 +54,36 @@ properties:
 
 - id: SampleDate
   dataType: Date
+  showInTable: true
 
 - id: Value1
   name: Value 1
   description: An example of a numerical value
-  dataType: Value
-  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached. 
+  dataType: Float
+  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
   maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
+  showInTable: true
+
+- id: Value2
+  name: Value 2
+  description: An example of a numerical value
+  dataType: Float
+  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
+  maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
+  decimDigits: 5                # For Value types, specifies the number of decimal digits that should be used to display the value
+  showInTable: true
 
 - id: InUse
   name: Used
   description: Flag determining if sample is used for analysis
   dataType: Boolean
+  showInTable: true
 
 - id: SampleTypeID
   name: Sample type ID
   dataType: Text
+  showInTable: true
   relation:
     tableId: sampletypes
     forwardName: is
@@ -77,12 +93,15 @@ properties:
   name: Comment
   description: An example of a comment string
   dataType: Text
+  showInTable: true
   search: Pattern
+
 
 - id: ExternalRef
   name: External Reference
   description: Reference on some other site with a link
   dataType: Text
+  showInTable: true
   externalUrl: http://en.wikipedia.org/wiki/{value}
 
 

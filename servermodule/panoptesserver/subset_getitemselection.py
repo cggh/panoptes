@@ -18,7 +18,7 @@ def response(returndata):
     primkey = DQXDbTools.ToSafeIdentifier(returndata['primkey'])
     isNumericalKey = int(DQXDbTools.ToSafeIdentifier(returndata['isnumericalkey'])) > 0
 
-    statement = 'SELECT subsetid FROM {membertable} WHERE {primkey}="{itemid}"'
+    statement = "SELECT subsetid FROM {membertable} WHERE {primkey}='{itemid}'"
     if isNumericalKey:
         statement = 'SELECT subsetid FROM {membertable} WHERE {primkey}={itemid}'
 

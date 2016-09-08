@@ -98,10 +98,6 @@ relation
     reverseName
       *Text (required).*  Default:has.  Display name of the relation from parent to child.
 
-
-readData
-  *Boolean.*  Default:True.  If set to false, this property will not be imported from the TAB-delimited source file.
-
 canUpdate
   *Boolean.*  Default:False.   If set to true, this property can be modified by the user. (*NOTE: under construction*).
 

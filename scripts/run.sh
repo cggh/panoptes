@@ -12,6 +12,9 @@ cd `dirname ${SCRIPT_PATH}`
 #We are now at the dir of the script go one up to project
 cd ..
 PROJECT_ROOT=`pwd`;
+BASEDIR=`python -c "import config;print config.BASEDIR"`
+monetdbd start $BASEDIR/monetdb || true  #Fails if already started
+
 source build/panoptes_virtualenv/bin/activate
 cd build/DQXServer
 rm -rf cache
@@ -22,4 +25,4 @@ else
 	BIND=${1}
 fi  
 echo -e "${green}Serving PANOPTES on http://${BIND}/index.html${NC}"
-../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application
+../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application

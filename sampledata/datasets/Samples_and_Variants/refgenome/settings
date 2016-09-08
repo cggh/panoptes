@@ -1,6 +1,5 @@
 # For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/refgenome.html
 
-refSequenceSumm: Yes          # Include a summary track displaying the reference sequence
 
 annotation:                                # Directives for parsing the annotation file (annotation.gff)
   format: GFF                              # Format: GFF = Version 3 GFF file ; GTF = Version 2 GTF file

@@ -1,0 +1,31 @@
+# For more information about this file, see: http://panoptes.readthedocs.org/en/latest/importdata/importsettings/datatable.html
+
+nameSingle: nucleotide     # Display name referring to a table item (single, no capital)
+namePlural: nucleotides    # Display name referring to a table item (plural, no capital)
+description: A table containing a row for each base in the sequence     # A description of this data table
+
+
+isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
+chromosome: Chrom            # Speficies the table column ID that contains the chromosome
+position: Pos
+primKey: AutoKey
+
+properties:
+- id: Chrom
+  name: Chrom
+  dataType: Text
+- id: Pos
+  name: Pos
+  dataType: Int32
+- id: Accessibility
+  name: Accessibility
+  description: Whether this base is accessible
+  dataType: Boolean
+
+- id: Uniqueness
+  name: Uniqueness
+  description: How unique this region is compared to the rest of the genome
+  channelColor: rgb(255,0,0)
+  dataType: Int16
+  minVal: 0
+  maxVal: 200

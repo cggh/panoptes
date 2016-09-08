@@ -14,9 +14,8 @@ from PanoptesConfig import PanoptesConfig
 import time
 import math
 import sqlparse
-from _mysql import OperationalError, ProgrammingError
 from Numpy_to_SQL import Numpy_to_SQL
-
+import monetdb.control
 
 class SettingsDAO(object):
     
@@ -36,14 +35,15 @@ class SettingsDAO(object):
             #self._calculationObject.Log(message)
             self._calculationObject.LogSQLCommand(message)
                 
-    def __updateConnectionSettings(self, dbCursor, local_file = 0, db = None):
-        dbCursor.db_args = self._config.getImportConnectionSettings(db)
-        dbCursor.db_args.update({'local_infile': local_file})
+    def __updateConnectionSettings(self, dbCursor, local_file = 0, database = None):
+        dbCursor.db_args = self._config.getImportConnectionSettings(database)
+        #local_file option not supported by monet
+        # dbCursor.db_args.update({'local_infile': local_file})
     
     #Think carefully before using outside this class
     def getDBCursor(self, local_files = 0):
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = local_files, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = local_files, database = self._datasetId)
         
         return dbCursor
         
@@ -55,22 +55,13 @@ class SettingsDAO(object):
             return cur.fetchall()
     
     def _execSql(self, sql, *args):
-        self._log('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args)
+        self._log(repr('SQL:' + (self._datasetId or 'no dataset') +';'+sql % args))
 
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = 0, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
         
         with self.getDBCursor() as cur:
-            cur.db.autocommit(True)
-            cur.execute(sql, args)
-        
-
-    #Function specifically for LOAD DATA LOCAL INFILE
-    def _execSqlLoad(self, sql, *args):
-        self._log('SQL:' + self._datasetId+';'+sql % args)
-
-        with self.getDBCursor(local_files = 1) as cur:
-            cur.db.autocommit(True)
+            cur.db.set_autocommit(True)
             cur.execute(sql, args)
 
     def createDatabase(self):
@@ -79,21 +70,29 @@ class SettingsDAO(object):
         self._datasetId = None
         
         DQXUtils.CheckValidDatabaseIdentifier(db)
-                
+        control = monetdb.control.Control(passphrase='monetdb')
         try:
-            self._execSql('DROP DATABASE IF EXISTS {}'.format(db))
-        except:
+            control.stop(db)
+        except monetdb.exceptions.OperationalError:
             pass
-        self._execSql('CREATE DATABASE {}'.format(db))
+        try:
+            control.destroy(db)
+        except monetdb.exceptions.OperationalError:
+            pass
+        control.create(db)
+        control.release(db)
         self._datasetId = db
-            
+        self._execSql('CREATE SCHEMA "%s"' % db)
+        self._execSql('ALTER USER "monetdb" SET SCHEMA "%s"' % db)
+        self._execSql('SET SCHEMA "%s"' % db)
+
     def setDatabaseVersion(self, major, minor):
         self._checkPermissions('settings', None)
-        self._execSql('INSERT INTO `settings` VALUES ("DBSchemaVersion", %s)', str(major) + "." + str(minor))
+        self._execSql("INSERT INTO settings VALUES ('DBSchemaVersion', %s)", str(major) + "." + str(minor))
     
     def getCurrentSchemaVersion(self):
         self._checkPermissions('settings', None)
-        rs = self._execSqlQuery('SELECT `content` FROM `settings` WHERE `id`="DBSchemaVersion"')
+        rs = self._execSqlQuery('SELECT content FROM settings WHERE id="DBSchemaVersion"')
         if len(rs) > 0:
             majorversion = int(rs[0][0].split('.')[0])
             minorversion = int(rs[0][0].split('.')[1])
@@ -115,10 +114,10 @@ class SettingsDAO(object):
     def _multiStatementExecSql(self, commands):
         
         dbCursor = DQXDbTools.DBCursor(self._calculationObject.credentialInfo, self._datasetId)
-        self.__updateConnectionSettings(dbCursor, local_file = 0, db = self._datasetId)
+        self.__updateConnectionSettings(dbCursor, local_file = 0, database = self._datasetId)
         
         with dbCursor as cur:
-            cur.db.autocommit(False)
+            cur.db.set_autocommit(False)
             
             sql_parts = sqlparse.split(commands)
             i = 0
@@ -135,21 +134,16 @@ class SettingsDAO(object):
                 
     #Use with care!
     def loadFile(self, filename):
-        #Can't use source as it's part of the mysql client not the API
         sql = open(filename).read()
         self._multiStatementExecSql(sql)
                 
     def dropTable(self, tableid, cur = None):
         self._checkPermissions('', tableid)
         
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            stmt = 'DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid))
-            if cur is None:
-                self._execSql(stmt)
-            else:
-                self._log('DROP TABLE IF EXISTS {}'.format(DBTBESC(tableid)))
-                cur.execute(stmt)
+        try:
+            self._execSql('DROP TABLE {}'.format(DBTBESC(tableid)))
+        except:
+            pass
 
     #Check if the user has permission to write
     #The settingsTable is the global table
@@ -170,20 +164,20 @@ class SettingsDAO(object):
         db = self._datasetId
         self._datasetId = indexDb
     # Remove current reference in the index first: if import fails, nothing will show up
-        self._execSql('DELETE FROM datasetindex WHERE id="{0}"'.format(db))
+        self._execSql('DELETE FROM datasetindex WHERE id=%s', db)
         self._datasetId = db
     
     
     def clearDatasetCatalogs(self):
         self._calculationObject.credentialInfo.VerifyCanDo(DQXDbTools.DbOperationWrite(self._datasetId, 'settings'))
-        self._execSql('DELETE FROM settings WHERE id<>"DBSchemaVersion"')
+        self._execSql("DELETE FROM settings WHERE id<>'DBSchemaVersion'")
 
     def insertGraphForTable(self, tableid, graphid, graphSettings):
         self._checkPermissions('graphs', tableid)
         crosslink = graphSettings['crossLink']
 
-        self._execSql("INSERT INTO graphs (`graphid`, `tableid`, `tpe`, `dispname`, `settings`, `crosslnk`, `ordr`) VALUES (%s, %s, %s, %s, %s, %s, 0)", graphid, 
-            tableid, 
+        self._execSql("INSERT INTO graphs (graphid, tableid, tpe, dispname, settings, crosslnk) VALUES (%s, %s, %s, %s, %s, %s)", graphid,
+            tableid,
             'tree', 
             graphSettings['name'],
             graphSettings.serialize(), 
@@ -194,7 +188,7 @@ class SettingsDAO(object):
         self._checkPermissions('graphs', tableid)
         
         self._execSql("DELETE FROM graphs WHERE tableid=%s",tableid)
-    
+
     def dropColumns(self, table, columns):
         sql = "ALTER TABLE {0} ".format(DBTBESC(table))
         for prop in columns:
@@ -203,7 +197,7 @@ class SettingsDAO(object):
             sql += "DROP COLUMN {0}".format(DBCOLESC(prop))
         
         self._execSql(sql)
-    
+
     def createIndex(self, indexName, tableid, columns, unique = False):
         cols = columns.split(",")
         modifier = ''
@@ -213,7 +207,7 @@ class SettingsDAO(object):
         self._execSql('create ' + modifier + ' index {} ON {}({})'.format(DBCOLESC(indexName), DBTBESC(tableid), ",".join(map(DBCOLESC, cols))))
             
 
-    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, max_line_count):
+    def insert2DIndexes(self, remote_hdf5, dimension, tableid, table_settings, primKey, max_line_count):
         
         DQXUtils.CheckValidTableIdentifier(tableid)
 
@@ -259,21 +253,16 @@ class SettingsDAO(object):
             self._log("Created table using Numpy_to_SQL")
     
             #Add an index to the table - catch the exception if it exists.
-            sql = "ALTER TABLE `{0}` ADD `{2}_{3}_index` INT DEFAULT NULL;".format(
+            sql = 'ALTER TABLE "{0}" ADD "{2}_{3}_index" INT DEFAULT NULL;'.format(
                 table_settings[dataTable],
                 table_settings[indexField],
                 tableid,
                 dimension)
-            try:
-                self._execSql(sql)
-            except OperationalError as e:
-                if e[0] != 1060:
-                    raise e
-                    
+            self._execSql(sql)
+
             #We have a datatable - add an index to it then copy that index across to the data table
-            self._execSql("ALTER TABLE {} ADD `index` INT DEFAULT NULL;".format(DBTBESC(tempTable)))
-            self._execSql("SELECT @i:=-1;UPDATE {} SET `index` = @i:=@i+1;".format(DBTBESC(tempTable)))
-            sql = """UPDATE `{0}` INNER JOIN `{3}` ON `{0}`.`{1}` = `{3}`.`{1}` SET `{0}`.`{2}_{4}_index` = `{3}`.`index`;
+            self._execSql('alter table "{}" add column "index" int auto_increment;'.format(tempTable))
+            sql = """UPDATE "{0}" SET "{2}_{4}_index" = (select "{3}"."index"-1 from "{3}" where "{0}"."{1}" = "{3}"."{1}") ;
                      """.format(
                 table_settings[dataTable],
                 table_settings[indexField],
@@ -284,7 +273,7 @@ class SettingsDAO(object):
             self.dropTable(tempTable)
             #Now check we have no NULLS
     
-            sql = "SELECT `{1}_{2}_index` from `{0}` where `{1}_{2}_index` IS NULL".format(
+            sql = 'SELECT "{1}_{2}_index" from "{0}" where "{1}_{2}_index" IS NULL'.format(
                 table_settings[dataTable],
                 tableid,
                 dimension)
@@ -294,33 +283,28 @@ class SettingsDAO(object):
 
         else:
             #Add an index to the table - catch the exception if it exists.
-            sql = "ALTER TABLE `{0}` ADD `{2}_{3}_index` INT DEFAULT NULL;".format(
+            sql = 'ALTER TABLE "{0}" ADD "{2}_{3}_index" INT DEFAULT NULL;'.format(
                 table_settings[dataTable],
                 table_settings[indexField],
                 tableid,
                 dimension)
-            try:
-                self._execSql(sql)
-            except OperationalError as e:
-                if e[0] != 1060:
-                    raise e
+            self._execSql(sql)
 
             #We don't have an array of keys into a column so we are being told the data in HDF5 is in the same order as sorted "ColumnIndexField" so we index by that column in order
-            if max_line_count:
-                sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_{3}_index` = @i:=@i+1 ORDER BY `{1}` LIMIT {4};"
-            else:
-                sql = "SELECT @i:=-1;UPDATE `{0}` SET `{2}_{3}_index` = @i:=@i+1 ORDER BY `{1}`;"
-
+            sql = 'create table "index" as select "{5}", row_number() over (order by "{1}")-1 as "rowNum" from "{0}" with data;' \
+                  'update "{0}" set {2}_{3}_index=(select "rowNum" from "index" where "index"."{5}"="{0}"."{5}");' \
+                  'drop table "index";'
+            #
             sql = sql.format(
                 table_settings[dataTable],
                 table_settings[indexField],
-                tableid, dimension, max_line_count)
+                tableid, dimension, max_line_count, primKey)
             self._execSql(sql)
-    
+
     def saveSettings(self, token, st):
         self._checkPermissions('settings', None)
         self._execSql("INSERT INTO settings VALUES (%s, %s)", token, st)
-                
+
     def registerDataset(self, name, configOnly):
         importtime = 0
         if not configOnly:

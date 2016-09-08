@@ -49,47 +49,46 @@ let GenomeBrowserWithActions = React.createClass({
         items: {}
       }
     };
-    console.log(this.config);
-    _forEach(this.config.genome.summaryValues, (table, id) => {
-      _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.summaryValues && (prop.isCategorical || prop.isBoolean)) {
-            groups['__reference__'].items[prop.id] = {
-              name: prop.name,
-              description: prop.description,
-              icon: prop.icon,
-              payload: {
-                channel: 'CategoricalChannel',
-                props: {
-                  name: prop.name,
-                  table: `__reference__${table.id}`,
-                  track: prop.id
-                }
-              }
-            };
-          }
-          else if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
-            groups['__reference__'].items[prop.id] = {
-              name: prop.name,
-              description: prop.description,
-              icon: prop.icon,
-              payload: {
-                channel: 'NumericalTrackGroupChannel',
-                props: {
-                  tracks: [{
-                    track: 'NumericalSummaryTrack',
-                    name: prop.name,
-                    props: {
-                      table: `__reference__${table.id}`,
-                      track: prop.id
-                    }
-                  }]
-                }
-              }
-            };
-          }
-        }
-      )
-    });
+    // _forEach(this.config.genome.summaryValues, (table, id) => {
+    //   _forEach(table.properties, (prop) => {
+    //       if (prop.showInBrowser && prop.summaryValues && (prop.isCategorical || prop.isBoolean)) {
+    //         groups['__reference__'].items[prop.id] = {
+    //           name: prop.name,
+    //           description: prop.description,
+    //           icon: prop.icon,
+    //           payload: {
+    //             channel: 'CategoricalChannel',
+    //             props: {
+    //               name: prop.name,
+    //               table: `__reference__${table.id}`,
+    //               track: prop.id
+    //             }
+    //           }
+    //         };
+    //       }
+    //       else if (prop.showInBrowser && prop.summaryValues && prop.isNumerical) {
+    //         groups['__reference__'].items[prop.id] = {
+    //           name: prop.name,
+    //           description: prop.description,
+    //           icon: prop.icon,
+    //           payload: {
+    //             channel: 'NumericalTrackGroupChannel',
+    //             props: {
+    //               tracks: [{
+    //                 track: 'NumericalSummaryTrack',
+    //                 name: prop.name,
+    //                 props: {
+    //                   table: `__reference__${table.id}`,
+    //                   track: prop.id
+    //                 }
+    //               }]
+    //             }
+    //           }
+    //         };
+    //       }
+    //     }
+    //   )
+    // });
 
     //Normal summaries
     _forEach(this.config.tables, (table) => {
@@ -112,7 +111,7 @@ let GenomeBrowserWithActions = React.createClass({
           }
         };
         _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.summaryValues && (prop.isCategorical || prop.isBoolean)) {
+          if (prop.showInBrowser && (prop.isCategorical || prop.isBoolean)) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
@@ -127,7 +126,7 @@ let GenomeBrowserWithActions = React.createClass({
               }
             };
           }
-          else if (prop.showInBrowser && prop.summaryValues && prop.isFloat) {
+          else if (prop.showInBrowser && prop.isNumerical) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,

@@ -42,7 +42,7 @@ const PropertySelector = React.createClass({
   render() {
     const {table, value, label, filter, allowNull} = this.props;
 
-    let propertyMenu = allowNull ? [<MenuItem value='NULL' primaryText="None"/>] : [];
+    let propertyMenu = allowNull ? [<MenuItem value='__NULL__' primaryText="None"/>] : [];
     let i = 0;
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;
@@ -62,10 +62,10 @@ const PropertySelector = React.createClass({
     }
 
     return (
-    <SelectField value={value === 'NULL' ? undefined : value}
+    <SelectField value={value === '__NULL__' ? undefined : value}
                  autoWidth={true}
                  floatingLabelText={label}
-                 onChange={(e, i, v) => this.redirectedProps.onSelect(v)}>
+                 onChange={(e, i, v) => this.redirectedProps.onSelect(v === '__NULL__' ? null : v)}>
       {propertyMenu}
     </SelectField>
     );

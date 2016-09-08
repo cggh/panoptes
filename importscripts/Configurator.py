@@ -49,8 +49,6 @@ class Configurator(object):
             i = i + 1
             idx = name
             
-            config[idx]['maxLen'] = max(config[idx].get('maxLen', 0), len(content))
-
             #It's just too slow....
             if lineCount > 10000 and 'dataType' in config[idx]:
                 if config[idx]['dataType'] == 'value' and config[idx]['decimDigits'] > 0 and '.' in content:

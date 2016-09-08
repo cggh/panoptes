@@ -48,7 +48,7 @@ class ImportSettingsTest(unittest.TestCase):
 										},
 										{"id": "TestA",
 										"name": "TestA",
-										"dataType": "Value"
+										"dataType": "Float"
 										}]}
 	
 	def testMergeProperties(self):
@@ -191,7 +191,7 @@ class ImportSettingsTest(unittest.TestCase):
 		
 		testProps['properties'].append({ "id": "TestSV",
 									"name": "TestSV",
-									"dataType": "Value",
+									"dataType": "Float",
 									"showBar": True})
 		
 		settingsLoaded.loadProps(testProps)
@@ -235,7 +235,7 @@ class ImportSettingsTest(unittest.TestCase):
 		testProps = self._testProps
 		testProps['properties'].append({ "id": "Test1",
 									"name": "Test1",
-									"dataType": "Value"})
+									"dataType": "Float"})
 		testProps['properties'].append({ "id": "Test2",
 									"name": "Test2",
 									"dataType": "Text",

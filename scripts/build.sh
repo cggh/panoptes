@@ -45,7 +45,7 @@ git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
 echo -e "${green}    Python dependancies${NC}"
 cd ..
 if [ ! -d panoptes_virtualenv ]
-then 
+then
   virtualenv panoptes_virtualenv
 fi
 source panoptes_virtualenv/bin/activate
@@ -78,20 +78,6 @@ cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
 echo mysqlcommand = \'`which mysql`\' >> config.py
 
-if [ -z ${SKIP_SQL} ]; then
-    echo -e "${green}  Creating skeleton DB - if needed${NC}"
-        DBSRV=`python -c "import config;print config.DBSRV"`
-        DBUSER=`python -c "import config;print config.DBUSER"`
-        DBPASS=`python -c "import config;print config.DBPASS"`
-        DB=`python -c "import config;print config.DB"`
-        mysql -h$DBSRV -u$DBUSER -p$DBPASS <<- EOF
-CREATE DATABASE IF NOT EXISTS ${DB};
-EOF
-    mysql -h$DBSRV -u$DBUSER -p$DBPASS ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
-else
-    echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
-fi
-
 BASEDIR=`python -c "import config;print config.BASEDIR"`
 echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
 mkdir -p $BASEDIR
@@ -121,6 +107,33 @@ if ! [ -w $BASEDIR/Graphs ]; then
 fi
 if ! [ -w $BASEDIR/2D_data ]; then
     echo -e "${red}  WARNING ${BASEDIR}/2D_data is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+
+if [ -z ${SKIP_SQL} ]; then
+    echo -e "${green}  Creating skeleton DB - if needed${NC}"
+    cat << EOF > $PROJECT_ROOT/.monetdb
+user=monetdb
+password=monetdb
+EOF
+    DB=datasets
+    if [ -d $BASEDIR/monetdb ]; then
+        echo -e "${green}  dbfarm exists"
+    else
+        monetdbd create $BASEDIR/monetdb
+    fi
+    if [ -f $BASEDIR/monetdb/merovingian.pid ]; then
+        echo -e "${green}  db server already running"
+    else
+        monetdbd start $BASEDIR/monetdb
+    fi
+    monetdbd set control=True $BASEDIR/monetdb
+    monetdbd set passphrase=monetdb $BASEDIR/monetdb
+    if monetdb create $DB ; then
+        monetdb release $DB
+        DOTMONETDBFILE=$PROJECT_ROOT/.monetdb mclient -d ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+    fi
+else
+    echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
 echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
@@ -165,4 +178,3 @@ echo -e "${green}Done!${NC}"
 #tar xjvf phantomjs-1.9.2-linux-x86_64.tar.bz2
 
 popd  > /dev/null
-

@@ -1,7 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import d3 from 'd3';
-import uid from 'uid';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -9,11 +8,13 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';
-import SummarisationCache from 'panoptes/SummarisationCache';
+import SQL from 'panoptes/SQL';
+
 import ErrorReport from 'panoptes/ErrorReporter';
 import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import findBlocks from 'panoptes/genome/FindBlocks';
+import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
+
 
 const HEIGHT = 26;
 
@@ -34,79 +35,198 @@ let ReferenceSequence = React.createClass({
     onChangeLoadStatus: React.PropTypes.func
   },
 
-  getInitialState() {
-    return {};
-  },
-
   componentWillMount() {
-    this.id = uid(10);
+    this.blocks = [];
   },
 
-  applyData(data) {
-    this.setState(data);
+  componentDidUpdate() {
+    this.draw(this.props, this.blocks)
   },
 
   //Called by DataFetcherMixin on prop change
   fetchData(props, requestContext) {
-    let {chromosome, start, end, width, sideWidth, onChangeLoadStatus} = props;
-    if (this.state.chromosome && (this.state.chromosome !== chromosome))
-      this.setState({columns: null});
+    let {chromosome, start, end, width, sideWidth} = props;
+    if (this.props.chromosome !== chromosome) {
+      this.applyData(props, []);
+    }
     if (width - sideWidth < 1) {
       return;
     }
 
-    let [[block1Start, block1End], [block2Start, block2End]] = findBlocks(start, end);
-    let targetPointCount = (((width - sideWidth) / 1) / (end - start)) * (block1End - block1Start);
-    //If we already have the data for an acceptable block then stop.
-    if (this.targetPointCount > targetPointCount * 0.5 &&
-      this.targetPointCount < targetPointCount * 2 &&
-      ((this.blockEnd === block1End && this.blockStart === block1Start) ||
-      (this.blockEnd === block2End && this.blockStart === block2Start)))
-      return;
+    const {blockLevel, blockIndex, needNext, summaryWindow} = findBlock({start, end, width});
+    //If we already at this block then don't change it!
+    if (this.props.chromosome !== chromosome ||
+      !(this.blockLevel === blockLevel
+        && this.blockIndex === blockIndex
+        && this.needNext === needNext
+        && this.requestSummaryWindow === summaryWindow
+      )) {
+      //Current block was unacceptable so choose best one
+      this.blockLevel = blockLevel;
+      this.blockIndex = blockIndex;
+      this.needNext = needNext;
+      this.requestSummaryWindow = summaryWindow;
+      this.props.onChangeLoadStatus('LOADING');
+      const columns = [
+        {expr: ['/', ['pos', summaryWindow]], as: 'window'},
+        {expr: ['count', ['*']], as: 'count'},
+        'base'
+      ];
+      const query = SQL.WhereClause.CompareFixed('chrom', '=', chromosome);
+      let APIargs = {
+        database: this.config.dataset,
+        table: '_sequence_',
+        columns: columns,
+        query: SQL.WhereClause.encode(query),
+        groupBy: ['base', 'window'],
+        orderBy: [['asc','window'], ['desc','count']],
+        transpose: false,
+      };
+      let cacheArgs = {
+        method: 'query',
+        regionField: 'pos',
+        queryField: 'query',
+        start,
+        end,
+        useWiderBlocksIfInCache: false,
+        isBlockTooBig: () => false,
+        postProcessBlock: this.cacheDraw
+      };
 
-    this.blockStart = block1Start;
-    this.blockEnd = block1End;
-    this.targetPointCount = targetPointCount;
-    if (onChangeLoadStatus) onChangeLoadStatus('LOADING');
-    requestContext.request(
-      (componentCancellation) =>
-        SummarisationCache.fetch({
-          columns: {
-            sequence: {
-              folder: `SummaryTracks/${this.config.dataset}/Sequence`,
-              config: 'Summ',
-              name: 'Base_avg'
-            }
-          },
-          minBlockSize: 1,
-          chromosome: chromosome,
-          start: block1Start,
-          end: block1End,
-          targetPointCount: targetPointCount,
-          cancellation: componentCancellation
-        })
-          .then((data) => {
-            this.applyData(data);
-            if (onChangeLoadStatus) onChangeLoadStatus('DONE');
+      requestContext.request((componentCancellation) =>
+        regionCacheGet(APIargs, cacheArgs, componentCancellation)
+          .then((blocks) => {
+            this.props.onChangeLoadStatus('DONE');
+            this.applyData(this.props, blocks, summaryWindow);
           })
           .catch((err) => {
-            if (onChangeLoadStatus) onChangeLoadStatus('DONE');
+            this.props.onChangeLoadStatus('DONE');
             throw err;
           })
           .catch(API.filterAborted)
           .catch(LRUCache.filterCancelled)
           .catch((error) => {
+            this.applyData(this.props, []);
             ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
+            throw error;
           })
-    );
+      );
+    }
+    this.draw(props)
+  },
+
+  cacheDraw(block) {
+    let base = block.base.array;
+    let window = block.window.array;
+    const sequence = [];
+    //The returned array includes all bases in the window - trim to the modal which is the first due to sorting
+    let lastWindow = null;
+    for (let i=0, iEnd = base.length; i < iEnd; ++i) {
+      if (window[i] !== lastWindow) {
+        sequence.push(base[i]);
+        lastWindow = window[i]
+      }
+    }
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = sequence.length;
+    offscreenCanvas.height = 1;
+    if (sequence.length < 1)
+      return;
+    let ctx = offscreenCanvas.getContext('2d', {alpha: false});
+    let imageData = ctx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+    let data = imageData.data;
+    //It is safe to assume the sequence data has no gaps as we inserted it on import
+    for (let i=0, iEnd = sequence.length; i < iEnd; ++i) {
+      data[i * 4 + 3] = 255;
+      switch (sequence[i]) {
+        case 97: //a
+          data[i * 4] = 255;
+          data[i * 4 + 1] = 50;
+          data[i * 4 + 2] = 50;
+          break;
+        case 116: //t
+          data[i * 4] = 255;
+          data[i * 4 + 1] = 170;
+          data[i * 4 + 2] = 0;
+          break;
+        case 99: //c
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 128;
+          data[i * 4 + 2] = 192;
+          break;
+        case 103: //g
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 192;
+          data[i * 4 + 2] = 120;
+          break;
+        default:
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 0;
+          data[i * 4 + 2] = 0;
+          break;
+      }
+    }
+    ctx.putImageData(imageData, 0, 0);
+    block.cache = offscreenCanvas;
+    return block;
+  },
+
+  applyData(props, blocks, summaryWindow) {
+    this.blocks = blocks;
+    this.summaryWindow = summaryWindow;
+    this.draw(props);
+  },
+
+  draw(props) {
+    const {start, end, width, sideWidth } = props;
+    if (!this.refs.canvas) {
+      return;
+    }
+    const xScaleFactor = (width - sideWidth) / (end - start);
+    const pixelWindowSize = this.summaryWindow * xScaleFactor;
+    const canvas = this.refs.canvas;
+    const ctx = canvas.getContext('2d', {alpha: false});
+    //Squares
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!this.summaryWindow || !this.blocks || this.blocks.length < 1) {
+      return;
+    }
+    const pix = pixelWindowSize < 1;
+    ctx.mozImageSmoothingEnabled = pix;
+    ctx.webkitImageSmoothingEnabled = pix;
+    ctx.msImageSmoothingEnabled = pix;
+    ctx.oImageSmoothingEnabled = pix;
+    ctx.imageSmoothingEnabled = pix;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px Roboto,sans-serif';
+    const lookup = {
+      97: 'A',
+      116: 'T',
+      99: 'C',
+      103: 'G'
+    };
+    const maxDraw = canvas.width + 15;
+    this.blocks.forEach((block) => {
+      if (block.cache) {
+        const source = block.cache;
+        ctx.drawImage(source, 0, 0, source.width, source.height, //Source params
+          xScaleFactor * (block._blockStart + 0.5 - start), 0, source.width * pixelWindowSize, HEIGHT); //Destination params
+        if (pixelWindowSize >= 15 && this.summaryWindow === 1) {
+          const base = block.base.array;
+          for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
+            const x = xScaleFactor * (block._blockStart - start) + ((i+1) * pixelWindowSize);
+            if (x > 0 && x < maxDraw) {
+              ctx.fillText(lookup[base[i]] || '', x, HEIGHT/2);
+            }
+          }
+        }
+      }
+    });
   },
 
   render() {
-    let {start, end, width, sideWidth} = this.props;
-    let {dataStart, dataStep, columns} = this.state;
-    let sequence = columns ? columns.sequence.data || [] : [];
-    if (width == 0)
-      return null;
+    let {width, sideWidth} = this.props;
     return (
       <ChannelWithConfigDrawer
         height={HEIGHT}
@@ -115,146 +235,12 @@ let ReferenceSequence = React.createClass({
         sideComponent={<div className="side-name">Ref. Seq.</div>}
         legendComponent={<Legend/>}
       >
-        <div className="sequence">
-          <SequenceSquares
-            width={width - sideWidth}
-            height={HEIGHT}
-            start={start}
-            end={end}
-            dataStart={dataStart}
-            dataStep={dataStep}
-            sequence={sequence}/>
-          <SequenceText
-            width={width - sideWidth}
-            height={HEIGHT}
-            start={start}
-            end={end}
-            dataStart={dataStart}
-            dataStep={dataStep}
-            sequence={sequence}/>
-        </div>
+        <canvas ref="canvas" width={width - sideWidth} height={HEIGHT}/>
       </ChannelWithConfigDrawer>
     );
   }
 
 });
-
-let SequenceText = React.createClass({
-  mixins: [
-    PureRenderMixin
-  ],
-
-  propTypes: {
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    dataStart: React.PropTypes.number,
-    dataStep: React.PropTypes.number,
-    sequence: React.PropTypes.array
-  },
-
-  render() {
-    let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
-    if (!sequence)
-      return null;
-    let startIndex = Math.max(0, Math.floor((start - dataStart) / dataStep));
-    let endIndex = Math.min(sequence.length - 1, Math.ceil((end - dataStart) / dataStep));
-    let scale = d3.scale.linear().domain([start, end]).range([0, width]);
-    //Don't draw text if no room
-    if (scale(1) - scale(0) < 15)
-      return null;
-    return <svg  viewBox={`0 ${-height / 2} ${width} ${height}`} width={width} height={height}>
-      {sequence.slice(startIndex, endIndex).map(
-        (char, i) => {
-          let pos = dataStart + ((i + startIndex) * dataStep) + 1;
-          return <text key={pos} x={scale(pos)}>{char}</text>;
-        }
-      )}
-    </svg>;
-  }
-});
-
-
-let SequenceSquares = React.createClass({
-  mixins: [
-    PureRenderMixin
-  ],
-
-  propTypes: {
-    start: React.PropTypes.number,
-    end: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    dataStart: React.PropTypes.number,
-    dataStep: React.PropTypes.number,
-    sequence: React.PropTypes.array
-  },
-
-  componentDidMount() {
-    this.paint(this.refs.canvas);
-  },
-
-  componentDidUpdate(prevProps) {
-    //We paint the canvas after render as any changes to canvas width and height clear the canvas.
-    if (this.props.sequence !== prevProps.sequence)
-      this.paint(this.refs.canvas);
-  },
-
-  paint(canvas) {
-    let {sequence} = this.props;
-    canvas.width = sequence.length;
-    canvas.height = 1;
-    if (canvas.width !== sequence.length)
-      console.log('Unequal lengths');
-    if (sequence.length < 1)
-      return;
-    let ctx = canvas.getContext('2d');
-    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    let data = imageData.data;
-    sequence.forEach((base, i) => {
-      base = base.toLowerCase();
-      data[i * 4 + 3] = 255;
-      if (base === 'a') {
-        data[i * 4] = 255;
-        data[i * 4 + 1] = 50;
-        data[i * 4 + 2] = 50;
-      } else if (base === 't') {
-        data[i * 4] = 255;
-        data[i * 4 + 1] = 170;
-        data[i * 4 + 2] = 0;
-      } else if (base === 'c') {
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 128;
-        data[i * 4 + 2] = 192;
-      } else if (base === 'g') {
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 192;
-        data[i * 4 + 2] = 120;
-      } else {
-        data[i * 4] = 0;
-        data[i * 4 + 1] = 0;
-        data[i * 4 + 2] = 0;
-      }
-    });
-    ctx.putImageData(imageData, 0, 0);
-
-  },
-
-
-  render() {
-    let {width, height, start, end, dataStart, dataStep, sequence} = this.props;
-    let scale = d3.scale.linear().domain([start, end]).range([0, width]);
-    let stepWidth = scale(dataStep) - scale(0);
-    let offset = scale(dataStart + 0.5) - scale(start);
-    return <canvas ref="canvas"
-                   style={{transform: `translateX(${offset}px) scale(${stepWidth},${height})`}}
-                   className={stepWidth < 1 ? '' : 'blocky'}
-                   width={sequence.length}
-                   height={1}/>;
-  }
-});
-
 
 let Legend = () =>
   <div className="legend">

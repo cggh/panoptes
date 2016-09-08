@@ -26,7 +26,8 @@ function decode_single_array(stream) {
       return;
   }
   let array;
-  switch (dtype.substring(1)) {
+  const type = dtype.substring(1);
+  switch (type) {
     case 'u1':
       array = stream.readUint8Array(array_len);
       break;
@@ -58,13 +59,14 @@ function decode_single_array(stream) {
       }
       break;
     default:
-      throw Error("unsupported dtype");
+      throw Error("unsupported dtype:" + dtype);
       return;
   }
   //Firefox is a PITA and won't let us set properties on TypedArrays, so we have to wrap them in an object
   return {
-    array: array,
-    shape: shape
+    array,
+    shape,
+    type
   };
 }
 

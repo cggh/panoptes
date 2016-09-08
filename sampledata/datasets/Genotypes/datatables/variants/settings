@@ -22,8 +22,7 @@ properties:
 - id: pos
   name: Position
   description: Genomic position of the variant on the chromosome (1-based)
-  dataType: Value
-  decimDigits: 0
+  dataType: Int32
 
 - id: SnpName
   name: Variant name
@@ -31,16 +30,12 @@ properties:
   dataType: Text
 
 - id: Value1, Value2, Value3
-  dataType: Value
+  dataType: Float
   index: true
   showInBrowser: true
   minVal: 0
   maxVal: 2
   decimDigits: 2
-  summaryValues:
-    blockSizeMin: 20
-    blockSizeMax: 50000
-    channelColor: rgb(0,100,0)
 - id: Value1
   name: Value 1
   description: The first numerical value

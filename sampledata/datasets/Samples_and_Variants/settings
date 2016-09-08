@@ -45,5 +45,6 @@ dataTables:
 - sampletypes
 - populations
 - repeats
+- sequence
 
 googleAnalyticsId: UA-56388755-1

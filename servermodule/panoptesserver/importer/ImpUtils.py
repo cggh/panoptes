@@ -8,6 +8,7 @@ import uuid
 import DQXDbTools
 import DQXUtils
 import errno
+import monetdb.control
 
 def convertToBooleanInt(vl):
     if vl is None:
@@ -18,30 +19,19 @@ def convertToBooleanInt(vl):
         return 0
     return None
 
-def IsValidDataTypeIdenfifier(datatypeIdentifier):
-    return datatypeIdentifier in ['Text', 'Value', 'LowPrecisionValue', 'HighPrecisionValue', 'Boolean', 'GeoLongitude', 'GeoLatitude', 'Date']
-
-def IsValueDataTypeIdenfifier(datatypeIdentifier):
-    return (datatypeIdentifier == 'Value') or \
-           (datatypeIdentifier == 'GeoLongitude') or\
-           (datatypeIdentifier == 'GeoLatitude') or\
-           (datatypeIdentifier == 'LowPrecisionValue') or\
-           (datatypeIdentifier == 'HighPrecisionValue') or\
-           (datatypeIdentifier == 'Date')
-
-def IsDateDataTypeIdenfifier(datatypeIdentifier):
-    return (datatypeIdentifier == 'Date')
-
-
-def GetSQLDataType(datatypeIdentifier):
-    datatypestr = 'varchar(50)'
-    if IsValueDataTypeIdenfifier(datatypeIdentifier):
-        datatypestr = 'double'
-    if (datatypeIdentifier == 'LowPrecisionValue'):
-        datatypestr = 'float'
-    if datatypeIdentifier == 'Boolean':
-        datatypestr = 'int'
-    return datatypestr
+def GetSQLDataType(dataType):
+    return {
+        'Text': 'text',
+        'Float': 'real',
+        'Double': 'double',
+        'Int8': 'tinyint',
+        'Int16': 'smallint',
+        'Int32': 'int',
+        'Boolean': 'boolean',
+        'GeoLatitude': 'real',
+        'GeoLongitude': 'real',
+        'Date': 'timestamp'
+    }[dataType]
 
 def GetTempFileName():
     #Check the temp dir exists and then return a new file name in it
@@ -70,7 +60,6 @@ def mkdir(name):
 
 
 def IsDatasetPresentInServer(credInfo, datasetId):
-    with DQXDbTools.DBCursor(credInfo, datasetId) as cur:
-        cur.execute('SELECT count(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "{0}"'.format(datasetId))
-        return cur.fetchone()[0] > 0
-
+    control = monetdb.control.Control(passphrase='monetdb')
+    datasets = [db['name'] for db in control.status()]
+    return datasetId in datasets

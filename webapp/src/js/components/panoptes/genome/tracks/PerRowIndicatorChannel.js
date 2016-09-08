@@ -12,7 +12,7 @@ import _transform from 'lodash/transform';
 import _filter from 'lodash/filter';
 
 import SQL from 'panoptes/SQL';
-import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet, combineBlocks} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertySelector from 'panoptes/PropertySelector';
 import PropertyLegend from 'panoptes/PropertyLegend';
@@ -83,63 +83,64 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   componentDidMount() {
-    this.draw();
+    this.draw(this.props);
   },
 
   componentDidUpdate() {
-    this.draw();
+    this.draw(this.props);
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-    if (this.props.chromosome !== chromosome) {
-      this.applyData(props, {});
+    const tableConfig = this.config.tablesById[table];
+    if (this.props.chromosome !== chromosome ||
+      this.props.table !== table) {
+      this.applyData(props, []);
     }
     if (width - sideWidth < 1) {
       return;
     }
-    if (colourProperty && !this.config.tablesById[table].propertiesById[colourProperty]) {
+    if (colourProperty && !tableConfig.propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
+        this.props.table !== table ||
         this.props.query !== query ||
         this.props.colourProperty !== colourProperty ||
         !(this.blockLevel === blockLevel
-        && this.blockIndex === blockIndex
-        && this.needNext === needNext)) {
+          && this.blockIndex === blockIndex
+          && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
       this.blockLevel = blockLevel;
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let tableConfig = this.config.tablesById[table];
       let columns = [tableConfig.primKey, tableConfig.position];
       if (colourProperty)
         columns.push(colourProperty);
-      let columnspec = {};
-      columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
       query = SQL.WhereClause.decode(query);
       query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome),
         query]);
       let APIargs = {
         database: this.config.dataset,
         table,
-        columns: columnspec,
+        columns: columns,
         query: SQL.WhereClause.encode(query),
         transpose: false,
       };
       let cacheArgs = {
-        method: 'pageQuery',
+        method: 'query',
         regionField: tableConfig.position,
         queryField: 'query',
         limitField: 'stop',
         start,
         end,
-        blockLimit: 1000
+        blockLimit: 1000,
+        useWiderBlocksIfInCache: true
       };
       requestContext.request((componentCancellation) =>
         regionCacheGet(APIargs, cacheArgs, componentCancellation)
@@ -154,25 +155,20 @@ let PerRowIndicatorChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
+          this.applyData(this.props, []);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(this.props, requestContext));
+          throw error;
         });
     }
     this.draw(props);
   },
 
-  combineBlocks(blocks, property) {
-    return _transform(_filter(blocks, (block) => !block._tooBig), (sum, block) =>
-      Array.prototype.push.apply(sum, block[property] || []),
-    []);
-  },
-
   applyData(props, blocks) {
     let {table, colourProperty} = props;
     let tableConfig = this.config.tablesById[table];
-    this.positions = this.combineBlocks(blocks, tableConfig.position);
+    this.positions = combineBlocks(blocks, tableConfig.position);
     if (colourProperty) {
-      this.colourData = this.combineBlocks(blocks, colourProperty);
+      this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
         propertyColour(this.config.tablesById[table].propertiesById[colourProperty]));
       this.colourVals = _map(this.colourVals, (colour) => Color(colour).clearer(0.2).rgbString());
@@ -209,7 +205,7 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   draw(props) {
-    const {table, width, sideWidth, start, end, colourProperty} = props || this.props;
+    const {table, width, sideWidth, start, end, colourProperty} = props;
     const positions = this.positions;
     const colours = this.colourVals;
     const coloursTranslucent = this.colourValsTranslucent;

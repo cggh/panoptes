@@ -7,11 +7,6 @@ class SettingsRefGenome(ImportSettings):
     
     def getSettings(self):
         refGenomeSettings = OrderedDict((
-                         ('refSequenceSumm', {
-                                                  'type': 'Boolean',
-                                                  'required': False,
-                                                  'description': 'If set, a summary track displaying the reference sequence with be included in the genome browser'
-                                                  }),
                          ('annotation', {
                                         'type': 'Block',
                                         'required': False,

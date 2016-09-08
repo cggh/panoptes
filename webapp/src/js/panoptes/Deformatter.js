@@ -7,7 +7,7 @@ let DateTime2JD = function(date) {
 
 module.exports = function(property, string) {
   if (property.isBoolean) {
-    return _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1 ? '1' : '0';
+    return _indexOf(['Yes', 'yes', '1', 'true', 'True'], string) !== -1;
   }
 
   if (property.isDate) {
@@ -29,6 +29,17 @@ module.exports = function(property, string) {
         return '';
       else
         return value.toFixed(property.decimDigits);
+    }
+  }
+  if (property.isInt) {
+    if ((string == ''))
+      return '';
+    else {
+      let value = parseInt(string);
+      if (isNaN(value))
+        return '';
+      else
+        return value;
     }
   }
   return string;

@@ -115,7 +115,6 @@ let Criterion = React.createClass({
     ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
       this.setState({[name]: ''});
     });
-
     // Swap the specified component for the new component.
     Object.assign(component, newComponent);
 
@@ -239,7 +238,7 @@ let Criterion = React.createClass({
       if (property.propCategories) {
         component.CompValue = property.propCategories[0];
       } else if (property.isBoolean) {
-        component.CompValue = 1;
+        component.CompValue = true;
       }
     }
 
@@ -404,12 +403,12 @@ let Criterion = React.createClass({
                     value={component.CompValue}
                     onChange={this.handleValueChange}>
               <option key="true"
-                      value="1">
-                Yes
+                      value={true}>
+                True
               </option>
               <option key="false"
-                      value="0">
-                No
+                      value={false}>
+                False
               </option>
             </select>
           </div>

@@ -7,14 +7,12 @@ isPositionOnGenome: true
 chromosome: CHROM
 position: POS
 
-allowSubSampling: true
-
 
 properties:
 - dataType: Text
   id: CHROM
   name: CHROM
-- dataType: Value
+- dataType: Int32
   decimDigits: 0
   id: POS
   name: POS
@@ -27,13 +25,13 @@ properties:
 - dataType: Text
   id: ALT
   name: ALT
-- dataType: Value
+- dataType: Float
   id: QUAL
   name: QUAL
 - dataType: Boolean
   id: FILTER_PASS
   name: FILTER_PASS
-- dataType: Value
+- dataType: Int16
   id: num_alleles
   name: num_alleles
 - dataType: Boolean
@@ -45,7 +43,7 @@ properties:
 - dataType: Text
   id: AA
   name: AA
-- dataType: Value
+- dataType: Int32
   id: DP
   name: DP
 - dataType: Boolean

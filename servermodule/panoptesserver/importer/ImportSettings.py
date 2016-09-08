@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+
+import os
+
 import yaml
 import copy
 from collections import OrderedDict
@@ -10,9 +13,10 @@ import ruamel.yaml
 import portalocker
 
 class ImportSettings:
-           
+
     __metaclass__ = ABCMeta
-    
+
+    _valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32']
     _propertiesDefault = OrderedDict((
                             ('id', {
                                    'type': 'Text',
@@ -22,29 +26,38 @@ class ImportSettings:
                             ('dataType', {
                                    'type': 'Text',
                                    'required': True,
-                                   'description': 'Data type of the values in the property',
+                                   'description': 'Data type of the values in the property. Absent values can be coded by an empty string.',
                                    'values':  OrderedDict(( ('Text', {
                                                      'description': 'text strings'
                                                      }),
-                                               ('Value', {
-                                                     'description': 'numerical values (integer of decimal; the distinction is made by the key *DecimDigits*).\n    Absent values can be coded by an empty string, "NA", "None", "NULL", "null", "inf" or "-"'
+                                               ('Float', {
+                                                     'description': '32 bit floating point approximate number'
                                                      }),
-                                               ('HighPrecisionValue', {
-                                                     'description': 'same as ``Value``, with higher precision'
+                                               ('Double', {
+                                                     'description': '64 bit floating point approximate number'
                                                      }),
                                                ('Boolean', {
-                                                     'description': 'Yes/No binary states. Possible values according to YAML: y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF.\n    Absent values are coded by an empty string'
+                                                     'description': 'True/False binary states. Possible values 0,1,true,false'
                                                      }),
-                                               ('GeoLongitude', {
-                                                     'description': 'longitude part of a geographical coordinates (in decimal degrees).\n    Absent values are coded by an empty string'
-                                                     }),
+                                               ('Int8', {
+                                                   'description': '8 bit signed integer between -127 and 127'
+                                                      }),
+                                               ('Int16', {
+                                                   'description': '16 bit signed integer between -32767 and 32767'
+                                                      }),
+                                               ('Int32', {
+                                                   'description': '32 bit signed integer between -2147483647 and 2147483647'
+                                                      }),
                                                ('GeoLatitude', {
-                                                     'description': 'latitude part of a geographical coordinates (in decimal degrees).\n    Absent values are coded by an empty string'
-                                                     }),
+                                                    'description': 'latitude part of a geographical coordinates (in decimal degrees).'
+                                                      }),
+                                               ('GeoLongitude', {
+                                                    'description': 'longitude part of a geographical coordinates (in decimal degrees).'
+                                                      }),
                                                ('Date', {
-                                                     'description': 'calendar dates, ISO formatted (i.e. YYYY-MM-DD).\n    Absent values are coded by an empty string'
-                                                     })
-                                                ))
+                                                    'description': 'calendar dates, ISO formatted (i.e. YYYY-MM-DD).'
+                                                      })
+                                               ))
                                           }),
                             ('name', {
                                    'type': 'Text',
@@ -82,43 +95,31 @@ class ImportSettings:
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'Sets the deafult column width in pixels.',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
                                    }),
                             ('showBar', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *minVal* & *maxVal* to be defined.',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
                                    }),
                             ('minVal', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, upper extent of scale',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
                                    }),
                             ('maxVal', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, lower extent of scale',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
-                                   }),
-                            ('maxLen', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'default': 0,
-                                   'description': 'If present used to specify the maximum size of the database column - otherwise it is calculated'
+                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
                                    }),
                             ('decimDigits', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
-                                   }),
-                            ('maxDecimDigits', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'description': '(Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database',
-                                   'siblingOptional': { 'name': 'dataType', 'value': ['Value','HighPrecisionValue']}
+                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
                                    }),
                             ('index', {
                                    'type': 'Boolean',
@@ -168,19 +169,6 @@ class ImportSettings:
                                                                 })
                                                 ))
                                    }),
-                          
-                            ('readData', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'default': True,
-                                   'description': 'If set to false, this property will not be imported from the TAB-delimited source file'
-                                   }),
-                            ('canUpdate', {
-                                   'type': 'Boolean',
-                                   'default': False,
-                                   'required': False,
-                                   'description': ' If set to true, this property can be modified by the user. (*NOTE: under construction*)'
-                                   }),
                             ('showInTable', {
                                    'type': 'Boolean',
                                    'required': False,
@@ -190,7 +178,7 @@ class ImportSettings:
                             ('showInBrowser', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'default': False,
+                                   'default': True,
                                    'description': 'If set, this property will automatically appear as a track in the genome browser\n  (only applies if *IsPositionOnGenome* is specified in database settings)'
                                    }),
                             ('tableDefaultVisible', {
@@ -218,115 +206,70 @@ class ImportSettings:
                                    'description': 'Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``\n  ',
                                    'siblingOptional': { 'name': 'showInBrowser', 'value': True}
                                    }),
-                            ('connectLines', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'default': False,
-                                   'description': 'Indicate that the points will be connected with lines in the genome browser\n  ',
-                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True}
-                                   }),
                             ('defaultVisible', {
                                                 'type': 'Boolean',
                                                 'required': False,
                                                 'default': True,
                                                 'description': ''
                                                 }),
-                            ('order', {
-                                       'type': 'Value',
-                                       'required': False,
-                                       'default': -1,
-                                       'description': 'Only used for reference genome tracks'
-                                       }),
-                            ('summaryValues', {
-                                   'type': 'Block',
-                                   'required': False,
-                                   'description': 'Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property\n  in the genome browser at any zoom level',
-                                   'siblingOptional': { 'name': 'showInBrowser', 'value': True},
-                                   
-                                   'children': OrderedDict(( 
-                                                ('blockSizeMin', {
-                                                             'type': 'Value',
-                                                             'required': False,
-                                                             'default': 1,
-                                                             'description': 'Minimum summary block size (in bp)'
-                                                             }),
-                                                ('blockSizeMax', {
-                                                                'type': 'Value',
-                                                                'required': True,
-                                                                'description': 'Maximum summary block size (in bp)'
-                                                                }),
-                                                ('channelColor', {
-                                                                'type': 'Text',
-                                                                'required': False,
-                                                                'default': 'rgb(0,0,180)',
-                                                                'description': 'Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``'
-                                                                }),
-                                                ('maxDensity', {
-                                                                'type': 'Value',
-                                                                'required': False,
-                                                                'description': 'For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp'
-                                                                })
-                                            ))
-                                   })
                           ))
 
-       
+
     def __init__(self, fileName = None, log = True, validate = True):
         self._logLevel = log
-                
+
         self.loadFile(fileName, validate)
-    
+
     def __str__(self):
         return str(self._propidMap)
-    
+
     def _log(self, message):
         if (self._logLevel):
             print(message)
-                
+
     def loadFile(self, fileName, validate = True):
         if fileName is not None:
             self.fileName = fileName
             if self._logLevel:
                 self._log('Loading settings from: '+fileName)
 
-            with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
+            with open(self.fileName, 'r') as configfile:
                 try:
-                    self._settings = yaml.load(configfile.read())
-                    
+                    self._settings = yaml.load(configfile.read()) or {}
+
                 except Exception as e:
                     print('ERROR: yaml parsing error: ' + str(e))
                     raise ImportError.ImportException('Error while parsing yaml file {0}'.format(fileName))
-                
+
             self._load(validate)
 #            if self._logLevel:
 #                self._log('Settings: '+str(self._settings))
         else:
             self.fileName = ''
             self._settings = {}
-            
 
 
-            
+
+
     def loadProps(self, props, validate = True):
- 
+
         if props is None:
             return
-        
+
         self._settings.update(copy.deepcopy(props))
         self._load(validate)
-         
-            
+
+
     def _addDefaultProperties(self):
-        
         if ('primKey' in self._settings and (self._settings['primKey'] == 'AutoKey')):
             propid = 'AutoKey'
             self._propidMap[propid] = {
                                           'id': propid,
                                           'name': propid,
-                                          'dataType': 'Value',
+                                          'dataType': 'Int32',
                                           'decimDigits': 0
                                           }
-        
+
     def _setDefaultValues(self):
 
         for key in self._propidMap:
@@ -337,7 +280,7 @@ class ImportSettings:
                 self._propidMap[key]['index'] = True
             if 'search' in values and values['search'] in ['StartPattern', 'Pattern', 'Match']:
                 self._propidMap[key]['index'] = True # Use index to speed up search
-        
+
         if 'sortDefault' in self._settings:
             sd = self._settings['sortDefault']
             if sd in self._propidMap:
@@ -347,7 +290,7 @@ class ImportSettings:
     def _checkSiblingRequired(self, testDict, pkey, srdef, siblings):
 
         message = None
-        
+
         siblingValue = srdef['value']
         siblingName = srdef['name']
         if testDict[siblingName] != siblingValue:
@@ -356,21 +299,21 @@ class ImportSettings:
         else:
             if testDict[siblingName] == siblingValue and not pkey in testDict:
                 message = "Missing required value {} for {} because {} == {}".format(pkey, str(testDict), siblingName, siblingValue)
-                
+
         return message
-                    
+
     def _checkSettingRequired(self, testDict, pkey, srdef):
         settingValue = srdef['value']
         settingName = srdef['name']
-        
+
         if (settingName in self._settings and self[settingName] == settingValue):
             if not pkey in testDict:
                 self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
-        
+
 
     def _hasOptionalSibling(self, testDict, pkey, pdef):
         ret = False
-        
+
         sibName = pdef['siblingOptional']['name']
         sibValue = pdef['siblingOptional']['value']
         for valkey in testDict:
@@ -386,11 +329,11 @@ class ImportSettings:
         return ret
 
     def _checkProperty(self, testDict, pkey, pdef, siblings = None):
-        
-        #print("Checking {} {}".format(str(testDict), str(pdef)))        
+
+        #print("Checking {} {}".format(str(testDict), str(pdef)))
         if pdef['type'] == 'documentation':
             return
-        
+
         #print "Checking property {} {} {}".format(str(testDict), pkey, pdef)
         if 'required' in pdef and pdef['required']:
             if not pkey in testDict:
@@ -400,8 +343,8 @@ class ImportSettings:
                 else:
                     self._errors.append("Missing required value {} for {}".format(pkey, str(testDict)))
                 #print "Missing failed - Checking {} for {} using {}".format(str(testDict),pkey,str(pdef))
-                
-                   
+
+
         if 'children' in pdef and pkey in testDict:
             pcvalues = pdef['children']
             for pckey in pcvalues:
@@ -418,7 +361,7 @@ class ImportSettings:
             if 'values' in pdef:
                 if value not in pdef['values']:
                     self._errors.append("Invalid value {} for key {}".format(value, pkey))
-        
+
         #Make sure Booleans are bool
             if pdef['type'] == 'Boolean':
                 if not type(value) is bool:
@@ -461,13 +404,13 @@ class ImportSettings:
         if 'siblingOptional' in pdef:
             if siblings and pkey in testDict:
                 self._hasOptionalSibling(testDict, pkey, pdef)
-                
+
         if 'siblingRequired' in pdef:
             if type(pdef['siblingRequired']) == list:
                 valid = False
                 options = []
                 #List is OR
-                for srdef in pdef['siblingRequired']: 
+                for srdef in pdef['siblingRequired']:
                     msg = self._checkSiblingRequired(testDict, pkey, srdef, siblings)
                     if msg == None:
                         valid = True
@@ -475,19 +418,19 @@ class ImportSettings:
                         options.append(msg)
                 if not valid:
                     self._errors.append("When " + pkey + " one of following must be set " + ",".join(map(lambda x: x['name'] + "=" + x['value'], pdef['siblingRequired'])) + " for " + str(testDict))
-                    
+
             else:
                 msg = self._checkSiblingRequired(testDict, pkey, pdef['siblingRequired'], siblings)
                 if msg:
                     self._errors.append(msg)
-            
+
         if 'settingRequired' in pdef:
             if type(pdef['settingRequired']) == list:
-                for srdef in pdef['settingRequired']: 
+                for srdef in pdef['settingRequired']:
                     self._checkSettingRequired(testDict, pkey, srdef)
             else:
                 self._checkSettingRequired(testDict, pkey, pdef['settingRequired'])
-               
+
     def _validate(self, toValidate, definition):
 
         if type(toValidate) == list:
@@ -495,15 +438,15 @@ class ImportSettings:
                 self._validate(item, definition)
         elif type(toValidate) == dict:
             for key in toValidate:
-                                
+
                 value = toValidate[key]
 
                 if key not in definition:
                     self._errors.append("Unknown property key {} in {}".format(key, str(toValidate)))
                     continue
-                
+
                 defn = definition[key]
-                
+
                 if 'children' in defn:
                     self._validate(value, defn["children"])
                 elif key in definition:
@@ -511,7 +454,7 @@ class ImportSettings:
                         self._checkProperty(value, key, defn)
                 else:
                     self._errors.append("Unknown configuration item: {}".format(key))
-                     
+
         if type(definition) == list:
             for item in definition:
                 self._validate(toValidate, item)
@@ -525,8 +468,8 @@ class ImportSettings:
                 else:
                     self._checkProperty(toValidate, key, value)
         else:
-            print ("definition not a list or dict" + str(type(definition)))           
-                
+            print ("definition not a list or dict" + str(type(definition)))
+
 
     def _mergeProperties(self):
         if 'properties' in self._settings:
@@ -548,7 +491,7 @@ class ImportSettings:
                         self._propidMap[propid]['id'] = propid
                     except Exception as e:
                         raise Exception('Invalid property "{0}": {1}'.format(propid, str(e)))
-            
+
             #Now we need to update the original so it can be validated
             propsList = copy.deepcopy(self._settings["properties"])
             #Do it backwards so can deleted without changing the index
@@ -561,7 +504,7 @@ class ImportSettings:
 
     #Set any implied values here
     def _postProcess(self):
-        
+
         for propid in self.getPropertyNames():
             cc = self.getPropertyValue(propid, 'categoryColors')
             if cc:
@@ -579,23 +522,23 @@ class ImportSettings:
         return self._settings
 
     def _load(self, validate = True):
-        
+
         self._propidMap = OrderedDict()
         self._errors = []
-                
+
         self._addDefaultProperties()
-        
+
         self._mergeProperties()
-                   
+
         self._setDefaultValues()
-        
+
         self._settingsDef = self.getSettings()
-            
-        if validate:   
+
+        if validate:
             self._validate(self._settings, self._settingsDef)
-        
+
         self._postProcess()
-        
+
         if len(self._errors) > 0:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
@@ -619,7 +562,7 @@ class ImportSettings:
         setDefaults(tosave, defn)
 
         return simplejson.dumps(tosave)
-        
+
     #For putting down the wire
     def serialize(self):
 
@@ -635,7 +578,7 @@ class ImportSettings:
 
     def getPropertyNames(self):
         return self._propidMap.keys()
-       
+
     def updateAndWriteBack(self, action, updatePath, newConfig, validate=True):
         if action not in ['replace', 'merge', 'delete']:
             raise ValueError("Action must be one of 'replace', 'merge', 'delete'")
@@ -708,21 +651,24 @@ class ImportSettings:
             raise ValueError(self.__class__.__name__ + ":" + ";".join(self._errors))
 
         #We now write the change to the YAML - we reload as the load on constuction adds defaults etc and strips comments.
-        with portalocker.Lock(self.fileName, mode="r+", timeout=5, truncate=None) as configfile:
+        with portalocker.Lock(self.fileName, mode="r", timeout=5, truncate=None) as configfile:
             config = ruamel.yaml.load(configfile.read(), ruamel.yaml.RoundTripLoader)
             config = updateConfig(config)
-            configfile.seek(0)
-            configfile.truncate(0)
-            configfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+            with open(self.fileName+'_tmp', 'w') as tempfile:
+                tempfile.write(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+                tempfile.flush()
+                os.fsync(tempfile.fileno())
+            os.rename(self.fileName+'_tmp', self.fileName)
+
 
     def __getitem__(self, key):
-        
+
         settings = self._settings
-        
+
         #So default is used
         if settings is None:
             settings = {}
-            
+
         if self._settingsDef and key in self._settingsDef and 'default' in self._settingsDef[key]:
             return settings.get(key, self._settingsDef[key]['default'])
         else:
@@ -730,7 +676,7 @@ class ImportSettings:
                 return (settings[key])
             else:
                 return None
- 
+
     def __setitem__(self, key, value):
         if key in self._settingsDef:
             self._settings[key] = value
@@ -738,20 +684,20 @@ class ImportSettings:
             self._settings[key] = value
             #Only a warning as sometimes (e.g. 'hasGenomeBrowser') a value can be set in the code that can't be in the settings
             self._log("Attempting to set an undefined key:" + key)
-           
+
     def getProperty(self, propid):
         if propid in self._propidMap:
             return self._propidMap[propid]
         else:
             return None
-            
+
     def getPropertyValue(self, propid, key):
-        
+
         prop = self.getProperty(propid)
         if key == 'name':
             if key not in prop:
                 key = 'id'
-                
+
         if key in self._settingsDef["properties"]["children"] and 'default' in self._settingsDef["properties"]["children"][key]:
             return prop.get(key, self._settingsDef["properties"]["children"][key]['default'])
         else:
@@ -759,22 +705,22 @@ class ImportSettings:
                 return (prop[key])
             else:
                 return None
-    
+
     def setPropertyValue(self, propid, key, value):
         self._propidMap[propid][key] = value
-        
+
     def getTableBasedSummaryValue(self, key):
         for defn in self._settings['tableBasedSummaryValues']:
             if defn['id'] == key:
                 return defn
         return None
-    
+
     def _printProperty(self, key, detail, f, indent = ''):
-        
+
         if detail['type'] == 'documentation':
             print (detail['description'], file = f)
             return
-        
+
         print(indent + key, file = f)
         line = indent + "  *" + detail['type']
         if 'required' in detail and detail['required']:
@@ -786,16 +732,16 @@ class ImportSettings:
         line = line + ".* "
         if 'default' in detail:
             line = line + " Default:" + str (detail['default']) + ".  "
-        line = line + detail['description'] 
+        line = line + detail['description']
         if 'siblingOptional' in detail:
             line = line + "(only applies if *" + detail['siblingOptional']['name'] + "* is " + str(detail['siblingOptional']['value']) + ")"
         if 'siblingRequired' in detail:
             if type(detail['siblingRequired']) == list:
                 line = line + "(only applies if one of the following is true:"
                 for sr in detail['siblingRequired']:
-                    line = line + "(*" + sr['name'] + "* is " + str(sr['value']) + ")" 
+                    line = line + "(*" + sr['name'] + "* is " + str(sr['value']) + ")"
                 line = line + ")"
-                    
+
             else:
                 line = line + "(only applies if *" + detail['siblingRequired']['name'] + "* is " + str(detail['siblingRequired']['value']) + ")"
         print(line + ".", file = f)
@@ -810,22 +756,22 @@ class ImportSettings:
             print(indent + "  The block can contain the following keys:", file = f)
             for val in detail['children']:
                 self._printProperty(val, detail['children'][val], f, '    ')
-        print('', file = f)        
-    
+        print('', file = f)
+
     def _getDocFilename(self):
         return ""
-    
+
     def _getDocHeader(self):
         return ""
-        
+
     def _getDocFooter(self):
         return ""
-    
+
     def _getDocSettings(self):
         return self.getSettings()
-    
+
     def generateDocs(self):
-        
+
         #This will be done several times but I don't think that really matters....
         f = open('documentation/importdata/importsettings/datatable_properties.rst', 'w')
         print('''.. _def-settings-datatable-properties:
@@ -839,8 +785,8 @@ the *Properties* block of the data table settings.
             detail = self._propertiesDefault[key]
             self._printProperty(key, detail, f)
         f.close()
-          
-        #This does the work 
+
+        #This does the work
         f = open(self._getDocFilename(), 'w')
         print (self._getDocHeader(), file = f)
         settings = self._getDocSettings()
@@ -850,28 +796,28 @@ the *Properties* block of the data table settings.
 
         print (self._getDocFooter(), file = f)
         f.close()
-        
+
 if __name__ == '__main__':
 
     from Settings2Dtable import Settings2Dtable
     from SettingsRefGenome import SettingsRefGenome
     from SettingsDataTable import SettingsDataTable
     from SettingsDataset import SettingsDataset
-    from SettingsGraph import SettingsGraph    
+    from SettingsGraph import SettingsGraph
 
     #Settings Global is the same as dataset so no need to generateDocs
-    
+
     settings = Settings2Dtable()
     settings.generateDocs()
-    
+
     settings = SettingsRefGenome()
     settings.generateDocs()
-    
+
     settings = SettingsDataTable()
     settings.generateDocs()
 
     settings = SettingsDataset()
     settings.generateDocs()
-    
+
     settings = SettingsGraph()
     settings.generateDocs()

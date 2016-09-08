@@ -5,8 +5,6 @@
 import os
 import shutil
 from ProcessDatabase import ProcessDatabase
-from ProcessFilterBank import ProcessFilterBank
-
 from BaseImport import BaseImport
 from SettingsGraph import SettingsGraph
 
@@ -31,15 +29,11 @@ class ImportDataTable(BaseImport):
                        
             importer.importData(tableid, createSubsets = True)
             
-            filterBanker = ProcessFilterBank(self._calculationObject, self._datasetId, self._importSettings)
-            filterBanker.createSummaryValues(tableid)
-           
             importer.cleanUp()
-    
-            filterBanker.createTableBasedSummaryValues(tableid)
+
+            #Disabled till implemented in monet
+            # filterBanker.createTableBasedSummaryValues(tableid)
                 
-            filterBanker.printLog()
-            
             self.importGraphs(tableid)
 
 

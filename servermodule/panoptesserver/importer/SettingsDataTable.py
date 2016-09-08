@@ -94,11 +94,6 @@ class SettingsDataTable(ImportSettings):
                                    'required': False,
                                    'description': 'The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s)'
                                 }),
-                         ('columnIndexField', {
-                                   'type': 'Text',
-                                   'required': False,
-                                   'description': 'When this table is linked to a 2D data table setting this value to the same as that in the 2D settings provides a performance improvement for large data sets'
-                                }),                                         
                          ('disableSubsets', {
                                    'type': 'Boolean',
                                    'required': False,
@@ -130,10 +125,6 @@ class SettingsDataTable(ImportSettings):
                                                                 'description': 'a display name'
                                                                 }
                                                 }
-                                }),
-                         ('autoScanProperties', {
-                                   'type': 'documentation',
-                                   'description': 'AutoScanProperties - deprecated - please use scripts/mksettings.sh to generate a skeleton settings.gen file and use that to create a settings file'
                                 }),
                          ('docProps', {
                                        'type': 'documentation',
@@ -372,11 +363,6 @@ containing the relative size of that specific pie'''
                                    'default': False,
                                    'description': 'Instructs Panoptes that records in this datatable should be interpreted as genomic regions.\n  In this case, the *Chromosome*, *RegionStart* and *RegionStop* keys should be defined'
                                 }),
-                         ('browserTrackHeightFactor', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'description': 'Specifies a relative size factor for the genome browser track height (only applicable if *IsPositionOnGenome* or *IsRegionOnGenome* is set)'
-                                }),
                          ('chromosome', {
                                    'type': 'PropertyID',
                                    'required': False,
@@ -405,21 +391,10 @@ containing the relative size of that specific pie'''
                                    'settingRequired': { 'name': 'isRegionOnGenome', 'value': True},
                                    'description': 'Specifies the table column ID that contains the end position of the region\n  (only to be used if *IsRegionOnGenome* is set)'
                                 }),
-                         ('genomeMaxViewportSizeX', {
-                                   'type': 'Value',
-                                   'required': False,
-                                   'description': 'Specifies the maximum genome browser viewport size (in bp)\n  for which individual data points from this table will be displayed in the tracks.\n  (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set)'
-                                }),
                          ('browserDefaultVisible', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'description': 'For genomic regions: specifies the default visibility status of this data table in the genome browser\n  (only to be used if *IsRegionOnGenome* is set).\n  Note that, for genomic position, default visibility is specified on a per-property basis'
-                                }),
-                         ('allowSubSampling', {
-                                   'type': 'Boolean',
-                                   'required': False,
-                                   'default': False,
-                                   'description': ''
                                 }),
                          ('maxTableSize', {
                                    'type': 'Value',

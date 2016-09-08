@@ -6,8 +6,7 @@ let JD2DateTime = function(JD) {
 
 module.exports = function(property, value) {
   if (property.isBoolean) {
-    if (value == 'Yes') return value;
-    return parseInt(value) ? 'Yes' : 'No';
+    return value ? 'True' : 'False';
   }
 
   if (property.isDate) {

@@ -4,6 +4,8 @@
 
 import DQXDbTools
 import config
+#As the db is local to panoptes set this here:
+config.DB = "datasets"
 import re
 import os
 

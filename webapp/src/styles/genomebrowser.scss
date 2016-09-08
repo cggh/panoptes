@@ -158,6 +158,9 @@
         display: block;
       }
     }
+    .tray-container.open {
+      height: inherit;
+    }
     .tray-container {
       position: relative;
       //box-shadow: $z-1-shadow;
@@ -212,33 +215,6 @@
     }
   }
 }
-div.scale {
-  background: white;
-}
-.tick {
-  line {
-    stroke: darkgrey;
-    stroke-width: 0.25px;
-  }
-}
-.x {
-  text {
-    text-anchor: middle;
-    alignment-baseline: text-before-edge;
-  }
-}
-.y {
-  text {
-    text-anchor: end;
-    alignment-baseline: central;
-    font-size: 12px;
-  }
-}
-.major {
-  line {
-    stroke-width: 0.5px;
-  }
-}
 
 .sequence {
   position: relative;
@@ -246,41 +222,6 @@ div.scale {
     position: absolute;
     //will-change: transform;
     transform-origin: top left;
-  }
-  .blocky {
-    image-rendering: optimizeSpeed;
-    image-rendering: pixelated;
-  }
-
-  svg {
-    position: absolute;
-    text {
-      text-anchor: middle;
-      alignment-baseline: central;
-    }
-  }
-}
-
-svg.numerical-channel {
-  .origin-shifter {
-    fill: none;
-  }
-  g.categorical-track {
-    stroke: none;
-    opacity: 0.8;
-  }
-  g.numerical-track {
-    * {
-      vector-effect: non-scaling-stroke;
-    }
-    fill: none;
-    .line {
-      stroke: $primary-color;
-    }
-    .area {
-      stroke: none;
-      fill: rgba(61, 139, 213, 0.3);
-    }
   }
 }
 
@@ -314,5 +255,17 @@ svg.numerical-channel {
     position: absolute;
     bottom: 0;
     right: 0;
+  }
+}
+
+.numerical-channel-canvas-holder {
+  position: relative;
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .categorical {
+    opacity: 0.7;
   }
 }

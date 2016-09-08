@@ -5,23 +5,28 @@ import SQL from 'panoptes/SQL';
 import _keys from 'lodash/keys';
 import _map from 'lodash/map';
 import _some from 'lodash/some';
+import _filter from 'lodash/filter';
+import _sumBy from 'lodash/sumBy';
+import _each from 'lodash/each';
+import _transform from 'lodash/transform';
 
 const seenBlocks = {};
 
-export function findBlock({start, end}) {
+export function findBlock({start, end, width}) {
   const blockLevel = Math.ceil(Math.log(end - start) / Math.log(2));
   const blockIndex = Math.floor(start / Math.pow(2.0, blockLevel));
   return {
     blockLevel,
     blockIndex,
-    needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex
+    needNext: end >= Math.pow(2.0, blockLevel) + Math.pow(2.0, blockLevel) * blockIndex,
+    summaryWindow: Math.max(1, Math.pow(2.0, Math.ceil(Math.log(Math.pow(2.0, blockLevel) / width) / Math.log(2))))
   };
 }
 
 export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
   assertRequired(cacheArgs,
-    ['method', 'regionField', 'queryField', 'limitField', 'start', 'end', 'blockLimit']);
-  const {method, regionField, queryField, limitField, start, end, blockLimit} = cacheArgs;
+    ['method', 'regionField', 'queryField', 'start', 'end']);
+  const {method, regionField, queryField, limitField, start, end, blockLimit, useWiderBlocksIfInCache} = cacheArgs;
   if (end < start) {
     throw Error('PropertyRegionCache, end must be >= start');
   }
@@ -30,31 +35,33 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
   const {blockLevel, blockIndex, needNext} = findBlock(cacheArgs);
   // const blockSize = Math.pow(2.0, blockLevel);
   // const blockStart = blockSize * blockIndex;
-  let blocks = [fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
-                  .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)),
-                fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
-                  .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation))];
-  //If end isn't in the second block then don't bother with it
-  if (!needNext) {
-    blocks = [blocks[0]];
-  }
+
   //If we haven't seen any fetches with this key, or if we have seen those exact blocks then just fetch those blocks
   let seenBlocksForKey = seenBlocks[cacheKey];
   if (!seenBlocksForKey ||
     (seenBlocksForKey[blockLevel] && seenBlocksForKey[blockLevel][blockIndex] && seenBlocksForKey[blockLevel][blockIndex + 1])) {
-    return Promise.all(blocks)
-      .then(flatten);
+    let blocks = [fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation)
+      .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation))];
+    //If end isn't in the second block then don't bother with it
+    if (needNext) {
+      blocks.push(fetch(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)
+        .then(ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex + 1, cancellation)));
+    }
+    return Promise.all(blocks).then(flatten);
   }
-  //So by now we know that we have seen blocks, but not the nearest encompassing block
-  //So iterate through the blocks bigger than us that also contain us, if any of those exist then return them
-  let index = ~~(blockIndex / 2); //Using "~~" for integer DIV
-  let index2 = ~~(blockIndex + 1 / 2);
-  for (let level = blockLevel + 1; level < seenBlocksForKey.length; ++level, index = ~~(index / 2), index2 = ~~(index2 / 2)) {
-    if (seenBlocksForKey[level] && seenBlocksForKey[level][index] && seenBlocksForKey[level][index2]) {
-      return Promise.all((index === index2) ? [fetch(APIArgs, cacheArgs, level, index, cancellation)]
-                                            : [fetch(APIArgs, cacheArgs, level, index, cancellation),
-                                               fetch(APIArgs, cacheArgs, level, index2, cancellation)])
-        .then(ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation));
+  //So by now we know that we have seen blocks, but not the smallest encompassing block
+  //So if wanted, iterate through the blocks bigger (wider) than us that also contain us, if any of those exist then return them
+  if (useWiderBlocksIfInCache) {
+    let index = ~~(blockIndex / 2); //Using "~~" for integer DIV
+    let index2 = ~~(blockIndex + 1 / 2);
+    for (let level = blockLevel + 1; level < seenBlocksForKey.length; ++level, index = ~~(index / 2), index2 = ~~(index2 / 2)) {
+      if (seenBlocksForKey[level] && seenBlocksForKey[level][index] && seenBlocksForKey[level][index2]) {
+        return Promise.all((index === index2) ? [fetch(APIArgs, cacheArgs, level, index, cancellation)]
+          : [fetch(APIArgs, cacheArgs, level, index, cancellation),
+          fetch(APIArgs, cacheArgs, level, index2, cancellation)])
+          .then(ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation));
+      } else {
+      }
     }
   }
   //Oh well, all the cached blocks were smaller or didn't contain us, might as well fetch
@@ -67,7 +74,7 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
 
 function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   let {method, regionField, queryField, limitField, blockLimit, postProcessBlock, isBlockTooBig} = cacheArgs;
-  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].length <= blockLimit));
+  isBlockTooBig = isBlockTooBig || ((block, blockLimit) => !(block[_keys(block)[0]].shape[0] <= blockLimit));
   const cacheKey = JSON.stringify({method, regionField, queryField, limitField, blockLimit, APIArgs});
   const blockSize = Math.pow(2.0, blockLevel);
   const blockStart = blockSize * blockIndex;
@@ -77,8 +84,11 @@ function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   APIArgs = {
     ...APIArgs,
     [queryField]: SQL.WhereClause.encode(combinedQuery),
-    [limitField]: blockLimit + 1
   };
+  if (limitField && blockLimit) {
+    APIArgs[limitField] = blockLimit + 1;
+  }
+
   return LRUCache.get(
     'propertyRegionCache' + method + JSON.stringify(APIArgs),
     (cacheCancellation) =>
@@ -131,6 +141,33 @@ function ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cance
     }
   };
 }
+
+export function combineBlocks(blocks, property) {
+  blocks = _filter(blocks, (block) => !block._tooBig);
+  if (blocks.length == 0)
+    return [];
+  if (blocks[0][property].array.set) {
+    let result = new blocks[0][property].array.constructor(
+      _sumBy(blocks, (block) => block[property].array.length)
+    );
+    let arrayPos = 0;
+    _each(blocks, (block) => {
+      let data = block[property].array;
+      result.set(data, arrayPos);
+      arrayPos += data.length;
+    });
+    return result
+  } else {
+    return _transform(blocks, (sum, block) =>
+        Array.prototype.push.apply(sum, block[property] || []),
+      []);
+  }
+}
+
+export function optimalSummaryWindow(start, end, desiredCount) {
+  let desiredBlockSize = (end - start) / desiredCount;
+  return Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize) / Math.log(2))));
+};
 
 function flatten(data) {
   const flattened = [];

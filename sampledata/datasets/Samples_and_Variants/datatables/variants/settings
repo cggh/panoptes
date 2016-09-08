@@ -22,8 +22,6 @@ maxCountQueryAggregated: 1000000  # Defines the maximum number of records that w
 isPositionOnGenome: true          # Tells Panoptes that this should be interpreted as genomic positions
 chromosome: chromosome            # Speficies the table column ID that contains the chromosome
 position: position                # Specifies the table column ID that contains the position on the chromosome
-browserTrackHeightFactor: 0.75    # Specifies a relative size factor for the genome browser track height
-genomeMaxViewportSizeX: 10000000  # Specifies the maximum genome browser viewport size (in bp) for which this will be displayed as a track
 
 
 # The following list of properties will be used by some tools that allow the user to quickly find a (set of) item(s)
@@ -50,8 +48,7 @@ properties:
   name: Position
   groupId: Info
   description: Genomic position of the variant on the chromosome (1-based)
-  dataType: Value
-  decimDigits: 0                # For Value types, specifies the number of decmimal digits that should be used to display the value
+  dataType: Int32
 
 - id: SnpName
   name: Variant name
@@ -80,29 +77,23 @@ properties:
 
 - id: Value1
   name: Value 1
-  dataType: HighPrecisionValue
+  dataType: Float
   description: The first numerical value
   showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
   channelColor: rgb(0,80,200)    # Colour used to display this property
-  connectLines: true              # Indicate that the points will be connected with lines
   browserDefaultVisible: true
 
 - id: Value2
   name: Value 2
-  dataType: Value
+  dataType: Float
   description: The second numerical value
   channelColor: rgb(200,80,0)
-  connectLines: true
 
 - id: Value_three                   # NOTE: datatable file column headers can contain whitespaces, but these will be replaced by underscores during import. The identifiers in the settings files should also replace the whitespaces by underscores.
   name: Value 3
-  dataType: Value
+  dataType: Float
   description: The third numerical value
   browserDefaultVisible: true
-  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-    blockSizeMin: 20                # Minimum summary block size (in bp)
-    blockSizeMax: 50000             # Maximum summary block size (in bp)
-    channelColor: rgb(0,100,0)      # Colour of the channel
 
 - id: Extra_1
   name: Extra 1
@@ -115,14 +106,10 @@ properties:
     A: rgb(255,128,60)
     B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
-  summaryValues:                    # Optional: Instructs Panoptes to apply a multiresolution summary algorithm for fast display in the genome browser at any zoom level
-    blockSizeMin: 20
-    blockSizeMax: 50000
-    maxDensity: 0.2
   browserDefaultVisible: true
 
 - id: NRAF_WAF, NRAF_EAF, NRAF_SAF
-  dataType: Value
+  dataType: Float
   groupId: AlleleFreq
   minVal: 0
   maxVal: 1

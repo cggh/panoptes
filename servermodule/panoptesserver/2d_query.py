@@ -5,7 +5,6 @@
 import DQXDbTools
 from operator import itemgetter
 import os
-import MySQLdb
 import h5py
 import itertools
 import numpy as np
@@ -16,25 +15,9 @@ from gzipstream import gzip
 #curl 'http://localhost:8000/app01?datatype=custom&respmodule=2d_server&respid=2d_query&dataset=Genotypes&col_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&row_qry=eyJ3aGNDbGFzcyI6InRyaXZpYWwiLCJpc0NvbXBvdW5kIjpmYWxzZSwiVHBlIjoiIiwiaXNUcml2aWFsIjp0cnVlfQ==&datatable=genotypes&property=first_allele&col_order=SnpName&row_order=ID' -H 'Pragma: no-cache' -H 'Accept-Encoding: gzip,deflate,sdch' --compressed
 from importer.SettingsDataTable import SettingsDataTable
 from importer.Settings2Dtable import Settings2Dtable
+from DQXDbTools import desciptionToDType
 CHUNK_SIZE = 400
 
-
-def desc_to_dtype(desc):
-    col_type = desc[1]
-    if col_type in MySQLdb.STRING:
-        #Returning none lets numpy figure it out
-        return None
-    dtype = {
-        MySQLdb.FIELD_TYPE.BIT: '?',
-        MySQLdb.FIELD_TYPE.SHORT: 'i1',
-        MySQLdb.FIELD_TYPE.CHAR: 'u1',
-        MySQLdb.FIELD_TYPE.LONG: 'i4',
-        MySQLdb.FIELD_TYPE.LONGLONG: 'i8',
-        MySQLdb.FIELD_TYPE.TINY: 'i1',
-        MySQLdb.FIELD_TYPE.DOUBLE: 'f8',
-        MySQLdb.FIELD_TYPE.FLOAT: 'f4'
-    }
-    return dtype[col_type]
 
 
 def index_table_query(cur, table, fields, query, order, limit, offset, fail_limit, index_field):
@@ -49,11 +32,12 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     if len(where.querystring_params) > 0:
         query = "WHERE " + where.querystring_params + ' AND ' + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
     else:
-        query = "WHERE " + DQXDbTools.ToSafeIdentifier(index_field) + ' IS NOT NULL'
-    fields_string = ','.join('`'+DQXDbTools.ToSafeIdentifier(f)+'`' for f in fields)
+        query = "WHERE " + DQXDbTools.DBCOLESC(index_field) + ' IS NOT NULL'
+    fields_string = ','.join('"'+DQXDbTools.ToSafeIdentifier(f)+'"' for f in fields)
     table = DQXDbTools.ToSafeIdentifier(table)
-    order = DQXDbTools.ToSafeIdentifier(order)
-    sqlquery = "SELECT {fields_string} FROM {table} {query} ORDER BY {order}".format(**locals())
+    sqlquery = 'SELECT {fields_string} FROM "{table}" {query}'.format(**locals())
+    if order:
+         sqlquery += ' ORDER BY "{0}"'.format(DQXDbTools.ToSafeIdentifier(order))
     params = where.queryparams
     #Set the limit to one past the req
     limit = limit or fail_limit
@@ -69,7 +53,7 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     rows = cur.fetchall()
     result = {}
     for i, (field, desc) in enumerate(zip(fields, cur.description)):
-        dtype = desc_to_dtype(desc)
+        dtype = desciptionToDType(desc)
         result[field] = np.array([row[i] for row in rows], dtype=dtype)
     return result
 
@@ -113,13 +97,6 @@ def select_by_list(properties, row_idx, col_idx):
 def get_table_ids(cur, dataset, datatable):
     tableSettings = Settings2Dtable()
     tableSettings.loadFile(os.path.join(config.SOURCEDATADIR, 'datasets', dataset, '2D_datatables', datatable, 'settings'))
-    # rowTableSettings = SettingsDataTable()
-    # rowTableSettings.loadFile(
-    #     os.path.join(os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['rowDataTable'], 'settings'))
-    # columnTableSettings = SettingsDataTable()
-    # columnTableSettings.loadFile(
-    #     os.path.join(
-    #         os.path.join(config.SOURCEDATADIR, dataset, 'datatables', tableSettings['columnDataTable'], 'settings'))
 
     return tableSettings['columnDataTable'], tableSettings['rowDataTable']
 
@@ -158,7 +135,7 @@ def summarise_call(calls):
     return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
 
 def handler(start_response, request_data):
-    datatable = request_data['datatable']
+    datatable = request_data['table']
     dataset = request_data['dataset']
     two_d_properties = request_data['2D_properties'].split('~')
     col_properties = request_data['col_properties'].split('~')
@@ -166,14 +143,14 @@ def handler(start_response, request_data):
     col_qry = request_data['col_qry']
     col_order = request_data['col_order']
     row_qry = request_data['row_qry']
-    row_order = request_data['row_order']
+    row_order = request_data.get('row_order', None)
     row_order_columns = []
     if row_order == 'columns':
         try:
             row_order_columns = request_data['row_sort_cols'].split('~')
         except KeyError:
             pass
-        row_order = 'NULL'
+        row_order = None
     try:
         col_limit = int(request_data['col_limit'])
     except KeyError:
@@ -262,7 +239,7 @@ def handler(start_response, request_data):
         else:
             if len(row_order_columns) > 0 and len(row_idx) > 0:
                 #Translate primkeys to idx
-                sqlquery = "SELECT {col_field}, {idx_field} FROM {table} WHERE {col_field} IN ({params})".format(
+                sqlquery = 'SELECT "{col_field}", "{idx_field}" FROM "{table}" WHERE "{col_field}" IN ({params})'.format(
                     idx_field=DQXDbTools.ToSafeIdentifier(col_index_field),
                     table=DQXDbTools.ToSafeIdentifier(col_tablename),
                     params="'"+"','".join(map(DQXDbTools.ToSafeIdentifier, row_order_columns))+"'",

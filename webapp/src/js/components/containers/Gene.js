@@ -160,10 +160,11 @@
         <div>
           <div className="vertical stack">
             <GenomeScale {...trackProps}/>
-            { this.config.genome.refSequenceSumm ?
-              <ReferenceSequence {...trackProps}/> :
-              null }
-            <AnnotationChannel name="Structure" {...trackProps} />
+            <ReferenceSequence {...trackProps}/> :
+            { settings.annotation ?
+              <AnnotationChannel name="Structure" {...trackProps} /> : null
+            }
+
             <div className="grow">
               <table className="table-col">
                 <tbody>
