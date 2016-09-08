@@ -160,9 +160,9 @@ let ReferenceSequence = React.createClass({
           data[i * 4 + 2] = 120;
           break;
         default:
-          data[i * 4] = 255;
-          data[i * 4 + 1] = 255;
-          data[i * 4 + 2] = 255;
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 0;
+          data[i * 4 + 2] = 0;
           break;
       }
     }
