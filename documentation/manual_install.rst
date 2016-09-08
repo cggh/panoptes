@@ -27,7 +27,7 @@ Short debain/ubuntu guide for the temporarly challenged
 -------------------------------------------------------
 ::
 
-    sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
+    sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
     wget https://github.com/cggh/panoptes/archive/master.zip
     unzip master.zip
     cd panoptes-master
@@ -56,7 +56,7 @@ Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from the
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
-	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
+	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
 
 Build

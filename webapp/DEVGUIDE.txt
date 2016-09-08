@@ -1,6 +1,6 @@
 #Getting started - a little rough at the mo until we come to fix up the build and deploy system
 
-sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libmysqlclient-dev libhdf5-serial-dev
+sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
 sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
 wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
