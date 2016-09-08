@@ -5,14 +5,16 @@ import {WMSTileLayer} from 'react-leaflet';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-/* To use Weather Map Service Tile Layer in templates:
+/* To use Web Map Service Tile Layer in templates:
 
   <p>WMS Tile Layer:</p>
   <div style="width:300px;height:300px">
-  <Map center="[37, -97]" zoom="2"><TileLayer /><WMSTileLayer /></Map>
+  <Map center="[37, -97]" zoom="5"><TileLayer /><WMSTileLayer /></Map>
   </div>
 
 */
+
+// TODO: Is crs passed on to WMSTileLayer automatically (from MapWidget) via context?
 
 let WMSTileLayerWidget = React.createClass({
 
@@ -31,10 +33,11 @@ let WMSTileLayerWidget = React.createClass({
     attribution: React.PropTypes.string,
     format: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
-    layers: React.PropTypes.string,
+    layers: React.PropTypes.string, // Comma-separated list of WMS layers to show
     map: React.PropTypes.object,
     transparent: React.PropTypes.bool,
-    url: React.PropTypes.string.isRequired
+    url: React.PropTypes.string.isRequired,
+    version: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,

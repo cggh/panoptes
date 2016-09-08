@@ -75,14 +75,9 @@ let MapWidget = React.createClass({
     title: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
-
   childContextTypes: {
     crs: React.PropTypes.object,
     changeLayerStatus: React.PropTypes.func
-  },
-
-  title() {
-    return this.props.title || 'Map';
   },
 
   getChildContext() {
@@ -178,6 +173,9 @@ let MapWidget = React.createClass({
     }
   },
 
+  title() {
+    return this.props.title || 'Map';
+  },
 
   render() {
     let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
