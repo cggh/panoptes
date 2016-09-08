@@ -132,7 +132,7 @@ let TablePlotActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} Plot of ${this.config.tablesById[table].capNamePlural}` : 'Plot'}</span>
+            <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {plotType && table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>

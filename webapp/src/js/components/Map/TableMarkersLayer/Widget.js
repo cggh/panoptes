@@ -35,7 +35,7 @@ let TableMarkersLayerWidget = React.createClass({
     layerContainer: React.PropTypes.object,
     locationDataTable: React.PropTypes.string,
     map: React.PropTypes.object,
-    primKey: React.PropTypes.string, // if not specified then all geoTable records are used
+    primKey: React.PropTypes.string, // if not specified then all locationDataTable records are used
     table: React.PropTypes.string // An alias for locationDataTable
   },
   childContextTypes: {

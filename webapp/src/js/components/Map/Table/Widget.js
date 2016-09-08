@@ -52,7 +52,7 @@ let TableMapWidget = React.createClass({
   },
 
   render() {
-
+console.log('TableMapWidget props: %o', this.props);
     let {
       center,
       highlight,

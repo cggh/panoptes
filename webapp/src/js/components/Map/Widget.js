@@ -252,6 +252,8 @@ let MapWidget = React.createClass({
       center: center,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
+      tileLayerAttribution: tileLayerAttribution,
+      tileLayerURL: tileLayerURL,
       ref: (ref) => this.map = ref,
       zoom: zoom
     };
@@ -270,7 +272,7 @@ let MapWidget = React.createClass({
     // TODO: Tidy up this logic. Maybe extract into functions?
     // Is similar logic needed elsewhere?
 
-    if (children.length !== undefined && children.length > 0) {
+    if (children !== undefined && children.length !== undefined && children.length > 0) {
 
       // If children is iterable and not empty (i.e. MapWidget has real children).
 
@@ -331,7 +333,8 @@ let MapWidget = React.createClass({
       // Otherwise, children either does not have a length property or it has a zero length property.
 
       if (
-        children !== null
+        children !== undefined
+        && children !== null
         && children.length === undefined
         && !(children instanceof Array)
         && typeof children === 'object'

@@ -1,3 +1,5 @@
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
@@ -16,45 +18,44 @@ import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
 
-// Panoptes UI
+// Panoptes
 import FilterButton from 'panoptes/FilterButton';
 import Icon from 'ui/Icon';
-import SidebarHeader from 'ui/SidebarHeader';
-
-// Panoptes
+import MapWidget from 'Map/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
+import SidebarHeader from 'ui/SidebarHeader';
 import SQL from 'panoptes/SQL';
 import TableMapWidget from 'Map/Table/Widget';
 
 import 'map.scss';
-// TODO: Map/Table/actions-styles.scss
+
+//import 'Map/Table/actions-styles.css';
 
 import 'leaflet-providers/leaflet-providers.js';
 
 
 let TableMapActions = React.createClass({
   mixins: [
-    PureRenderMixin,
     ConfigMixin,
-    FluxMixin
+    FluxMixin,
+    PureRenderMixin
   ],
 
   propTypes: {
     componentUpdate: React.PropTypes.func.isRequired,
+    mapProviderName: React.PropTypes.string,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
-    tileLayerAttribution: React.PropTypes.string,
-    tileLayerName: React.PropTypes.string,
-    tileLayerURL: React.PropTypes.string,
+    selectedTileLayerObj: ImmutablePropTypes.map,
     title: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      componentUpdate: null,
+      selectedTileLayerObj: Immutable.Map(),
       sidebar: true
     };
   },
@@ -75,12 +76,13 @@ let TableMapActions = React.createClass({
   handleChangeTable(table) {
     this.props.componentUpdate({table});
   },
-  handleChangeTemplateCode() {
-console.log('neep');
+  handleChangeTileLayer(tileLayerObj) {
+console.log('handleChangeTileLayer tileLayerObj: %o', tileLayerObj);
+    this.props.componentUpdate({selectedTileLayerObj: Immutable.fromJS(tileLayerObj)});
   },
 
   render() {
-    let {componentUpdate, query, sidebar, table, tileLayerAttribution, tileLayerName, tileLayerURL} = this.props;
+    let {componentUpdate, query, sidebar, selectedTileLayerObj, table} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -99,17 +101,17 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
 
     if (table && window.L.TileLayer.Provider.providers) {
 
-      let providerNames = Object.keys(window.L.TileLayer.Provider.providers);
-      providerNames.sort();
+      let mapProviderNames = Object.keys(window.L.TileLayer.Provider.providers);
+      mapProviderNames.sort();
 
-      for (let i = 0, len = providerNames.length; i < len; i++) {
+      for (let i = 0, len = mapProviderNames.length; i < len; i++) {
 
-        let providerName = providerNames[i];
-        let providerObj = window.L.TileLayer.Provider.providers[providerName];
+        let mapProviderName = mapProviderNames[i];
+        let providerObj = window.L.TileLayer.Provider.providers[mapProviderName];
 
         // TODO: Support providers requiring registration
         // Skip providers requiring registration
-        if (providerName === 'HERE' || providerName === 'MapBox') {
+        if (mapProviderName === 'HERE' || mapProviderName === 'MapBox') {
           continue;
         }
 
@@ -117,7 +119,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
         // Skip providers not working
         // BasemapAT requires {format} -- trying but failing
         // NASAGIBS requires {time}, {tilematrixset}, {maxZoom}, {format}
-        if (providerName === 'BasemapAT' || providerName === 'NASAGIBS') {
+        if (mapProviderName === 'BasemapAT' || mapProviderName === 'NASAGIBS') {
           continue;
         }
 
@@ -195,11 +197,13 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             // Otherwise, just show the provider name.
 
             let defaultTileLayerObj = {
+              mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
-              tileLayerName: providerObj.options.variant ? `${providerName} (${providerObj.options.variant})` : providerName,
+              tileLayerName: providerObj.options.variant !== undefined ? `${mapProviderName} (${providerObj.options.variant})` : mapProviderName,
+              tileLayerVariantName: mapProviderName,
               tileLayerURL: defaultUrl
             };
-console.log(defaultTileLayerObj.tileLayerAttribution);
+
             tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerName} value={defaultTileLayerObj} />);
           }
 
@@ -214,8 +218,10 @@ console.log(defaultTileLayerObj.tileLayerAttribution);
             let variantObj = providerObj.variants[variantKeyName];
 
             let tileLayerObj = {
+              mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
-              tileLayerName: providerName + '.' + variantKeyName
+              tileLayerName: mapProviderName + '.' + variantKeyName,
+              tileLayerVariantName: variantKeyName
             };
 
             // NB: Variants either have their own URL specified in options,
@@ -277,7 +283,7 @@ console.log(defaultTileLayerObj.tileLayerAttribution);
             } else {
               console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
             }
-console.log(tileLayerObj.tileLayerAttribution);
+
             if (tileLayerObj.tileLayerURL !== undefined && tileLayerObj.tileLayerURL !== null) {
               tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
             } else {
@@ -289,11 +295,13 @@ console.log(tileLayerObj.tileLayerAttribution);
         } else {
 
           let tileLayerObj = {
+            mapProviderName: mapProviderName,
             tileLayerAttribution: providerObj.options.attribution,
-            tileLayerName: providerName,
+            tileLayerName: mapProviderName,
+            tileLayerVariantName: mapProviderName,
             tileLayerURL: providerObj.url
           };
-console.log(tileLayerObj.tileLayerAttribution);
+
           tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
         }
 
@@ -310,7 +318,7 @@ console.log(tileLayerObj.tileLayerAttribution);
 
     // FIXME: Show selected tile layer.
 
-    let templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + tileLayerAttribution + '" tileLayerURL="' + tileLayerURL + '" /></div>';
+    let templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
 
 
     let sidebarContent = (
@@ -334,9 +342,9 @@ console.log(tileLayerObj.tileLayerAttribution);
             table ?
               <SelectField
                 autoWidth={true}
-                floatingLabelText="Map tiles:"
-                onChange={(e, i, v) => componentUpdate({tileLayerAttribution: v.tileLayerAttribution, tileLayerName: v.tileLayerName, tileLayerURL: v.tileLayerURL})}
-                value={tileLayerName}
+                floatingLabelText="Map tile layer:"
+                onChange={(e, i, v) => this.handleChangeTileLayer(v)}
+                value={selectedTileLayerObj.get('tileLayerName')}
               >
                 {tileLayerMenu}
               </SelectField>
@@ -344,12 +352,11 @@ console.log(tileLayerObj.tileLayerAttribution);
               null
           }
           {
-            tileLayerName ?
+            selectedTileLayerObj.get('tileLayerName') ?
               <TextField
-                floatingLabelText="Template code"
+                floatingLabelText="Template code:"
                 multiLine={true}
-                onChange={this.handleChangeTemplateCode}
-                TODOstyle={{fontFamily: '"Courier New", Courier, monospace', fontSize: '8pt'}}
+                textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt'}}
                 value={templateCode}
               />
             :
@@ -359,6 +366,26 @@ console.log(tileLayerObj.tileLayerAttribution);
       </div>
     );
 
+    // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerName') instead
+    let mapTitle = 'Map';
+    if (table !== undefined) {
+      mapTitle = selectedTileLayerObj.get('tileLayerVariantName') !== undefined ? `${selectedTileLayerObj.get('tileLayerVariantName')} map of ${this.config.tablesById[table].namePlural}` : `Map of ${this.config.tablesById[table].namePlural}`;
+    }
+console.log('sidebar: ' + sidebar);
+
+console.log('selectedTileLayerObj tileLayerAttribution: %o', selectedTileLayerObj.get('tileLayerAttribution'));
+
+
+    let mapWidget = <MapWidget />;
+    if (table !== undefined) {
+      mapWidget = (
+        <TableMapWidget
+          locationDataTable={table}
+          tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
+          tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
+        />
+      );
+    }
 
     return (
       <Sidebar
@@ -371,7 +398,7 @@ console.log(tileLayerObj.tileLayerAttribution);
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => componentUpdate({sidebar: !sidebar})}/>
-            <span className="text">{table ? `Map of ${this.config.tablesById[table].namePlural}` : 'Map'}</span>
+            <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">
                 <QueryString prepend="Filter:" table={table} query={query}/>
@@ -379,7 +406,7 @@ console.log(tileLayerObj.tileLayerAttribution);
               : null}
           </div>
           <div className="grow">
-            {table ? <TableMapWidget geoTable={table} tileLayerAttribution={tileLayerAttribution} tileLayerURL={tileLayerURL} {...this.props} /> : null}
+            {mapWidget}
           </div>
         </div>
       </Sidebar>
