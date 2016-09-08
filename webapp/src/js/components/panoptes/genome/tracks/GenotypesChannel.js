@@ -450,6 +450,7 @@ const GenotypesControls = React.createClass({
     PureRenderWithRedirectedProps({
       check: [
         'rowLabel',
+        'rowHeight',
         'columnQuery',
         'rowQuery',
         'cellColour',
@@ -467,7 +468,7 @@ const GenotypesControls = React.createClass({
   ],
 
   render() {
-    let {table, columnQuery, rowQuery, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
+    let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;
     const config = this.config.twoDTablesById[table];
     return (
       <div className="channel-controls">
@@ -493,6 +494,9 @@ const GenotypesControls = React.createClass({
                             label="Row Sort"
                             allowNull={true}
                             onSelect={(rowSort) => this.redirectedProps.componentUpdate({rowSort})}/>
+        </div>
+        <div className="control">
+          <NumericInput value={rowHeight} onChange={(rowHeight) => this.redirectedProps.componentUpdate({rowHeight})}/>
         </div>
         <div className="control">
           <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.componentUpdate({pageSize})}/>
