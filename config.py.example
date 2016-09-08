@@ -1,23 +1,6 @@
 #Title bar text
 TITLE = 'Panoptes'
 
-###########################################################################################################
-# Configuration parameters for connecting to the MySQL database
-###########################################################################################################
-
-# MySQL Hostname
-DBSRV = 'localhost'
-
-# MySQL User
-DBUSER = 'root'
-
-# MySQL Pass
-#todo: for production server data that also includes confidential information, this should be moved to a safer place outside the source code.
-DBPASS = '1234'
-
-# Name to use for the central panoptes MySQL DB
-DB='datasetindex'
-
 #Timeout for db queries
 TIMEOUT = 30
 

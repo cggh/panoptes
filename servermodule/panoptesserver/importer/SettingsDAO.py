@@ -134,7 +134,6 @@ class SettingsDAO(object):
                 
     #Use with care!
     def loadFile(self, filename):
-        #Can't use source as it's part of the mysql client not the API
         sql = open(filename).read()
         self._multiStatementExecSql(sql)
                 

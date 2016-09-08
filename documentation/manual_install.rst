@@ -9,7 +9,6 @@ e.g. on an EC2 virtual machine.
 A script is provided that performs a fully automatic installation, including
 
 - Installation of all dependencies
-- Deployment and configuration of MySQL
 - Deployment and configuration of Apache2
 
 .. caution::
@@ -48,13 +47,12 @@ Download the code from the GitHub repository::
     unzip master.zip
     cd panoptes-master
 
-Panoptes needs a running MySQL version **5.6 or later** with permission to create and remove databases. The MySQL client tools also have to be installed on the machine running Panoptes. Install MySQL if you don't have it E.g. for debian-based Linuxes::
+Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from their repository. See instructions at https://www.monetdb.org/downloads For ubuntu this is:
 
-    sudo apt-get install mysql-server-5.6 mysql-client-5.6
-
-.. caution::
-  Note that if there are tables from other apps that name-collide with Panoptes dataset names then there will be data loss.
-  **Use a separate MySQL install or set your MySQL permissions carefully!**
+    sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
+    wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install -y --allow-unauthenticated monetdb5-sql monetdb-client
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
@@ -66,7 +64,6 @@ Build
 In the directory where the code was unzipped, copy 'config.py.example' to 'config.py'.
 Edit the file and specify the following components:
 
-- MySQL setup (DBSRV, DBUSER, DBPASS).
 - A directory Panoptes can use for storing files (BASEDIR, see further).
 - A directory that will contain the source data files (SOURCEDATADIR, see further)
 - Title of the deployment (TITLE)
