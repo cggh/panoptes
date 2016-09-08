@@ -5,6 +5,7 @@ import HtmlToReact from 'html-to-react';
 import BaseLayerWidget from 'Map/BaseLayer/Widget';
 import CircleWidget from 'Map/Circle/Widget';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import ImageOverlayWidget from 'Map/ImageOverlay/Widget';
 import ItemLink from 'panoptes/ItemLink';
 import LayersControlWidget from 'Map/LayersControl/Widget';
 import MapWidget from 'Map/Widget';
@@ -19,6 +20,7 @@ import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
 import TablePlotWidget from 'Plot/Table/Widget';
 import TileLayerWidget from 'Map/TileLayer/Widget';
 import TreeContainer from 'containers/TreeContainer';
+import WMSTileLayerWidget from 'Map/TileLayer/WMS/Widget';
 
 
 
@@ -32,6 +34,8 @@ const components = {
     <CircleWidget key={node.attribs.key} {...node.attribs} />,
   FeatureGroup: (node, children) =>
     <FeatureGroupWidget key={node.attribs.key} {...node.attribs} children={children} />,
+  ImageOverlay: (node, children) =>
+    <ImageOverlayWidget key={node.attribs.key} {...node.attribs} />,
   ItemLink: (node, children) =>
     <ItemLink key={node.attribs.key} {...node.attribs} />,
   LayersControl: (node, children) =>
@@ -59,7 +63,9 @@ const components = {
   TileLayer: (node, children) =>
     <TileLayerWidget key={node.attribs.key} {...node.attribs} />,
   Tree: (node, children) =>
-    <TreeContainer key={node.attribs.key} {...node.attribs} />
+    <TreeContainer key={node.attribs.key} {...node.attribs} />,
+  WMSTileLayer: (node, children) =>
+    <WMSTileLayerWidget key={node.attribs.key} {...node.attribs} />
 };
 /*eslint-enable react/display-name */
 
