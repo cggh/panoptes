@@ -47,8 +47,8 @@ let TableMapActions = React.createClass({
     mapProviderName: React.PropTypes.string,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
-    table: React.PropTypes.string,
     selectedTileLayerObj: ImmutablePropTypes.map,
+    table: React.PropTypes.string,
     title: React.PropTypes.string
   },
 
@@ -71,7 +71,7 @@ let TableMapActions = React.createClass({
 
   // Event handlers
   handleQueryPick(query) {
-    this.props.componentUpdate({query: query});
+    this.props.componentUpdate({query});
   },
   handleChangeTable(table) {
     this.props.componentUpdate({table});
@@ -99,7 +99,7 @@ console.log('handleChangeTileLayer tileLayerObj: %o', tileLayerObj);
 
 console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Provider.providers);
 
-    if (table && window.L.TileLayer.Provider.providers) {
+    if (window.L.TileLayer.Provider.providers !== undefined) {
 
       let mapProviderNames = Object.keys(window.L.TileLayer.Provider.providers);
       mapProviderNames.sort();
@@ -316,10 +316,19 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
     // FIXME: attribution replacement not working as per:
     // https://github.com/leaflet-extras/leaflet-providers/blob/c5bdc5f30629215c5c9c189cd2cccd533515383a/leaflet-providers.js#L73
 
-    // FIXME: Show selected tile layer.
+    // FIXME: Show selected tile layer in SelectField.
 
-    let templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
-
+    let templateCode = '<div style="width:300px;height:300px"><Map /></div>';
+    if (table !== undefined && selectedTileLayerObj.size !== 0) {
+      // A table and a tileLayer have been specified.
+      templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+    } else if (table !== undefined) {
+      // Only a table has been specified.
+      templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" /></div>';
+    } else if (selectedTileLayerObj.size !== 0) {
+      // Only a tileLayer has been specified.
+      templateCode = '<div style="width:300px;height:300px"><Map tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+    }
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
@@ -338,38 +347,31 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             :
               null
           }
-          {
-            table ?
-              <SelectField
-                autoWidth={true}
-                floatingLabelText="Map tile layer:"
-                onChange={(e, i, v) => this.handleChangeTileLayer(v)}
-                value={selectedTileLayerObj.get('tileLayerName')}
-              >
-                {tileLayerMenu}
-              </SelectField>
-            :
-              null
-          }
-          {
-            selectedTileLayerObj.get('tileLayerName') ?
-              <TextField
-                floatingLabelText="Template code:"
-                multiLine={true}
-                textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt'}}
-                value={templateCode}
-              />
-            :
-              null
-          }
+          <SelectField
+            autoWidth={true}
+            floatingLabelText="Map tile layer:"
+            onChange={(e, i, v) => this.handleChangeTileLayer(v)}
+            value={selectedTileLayerObj.get('tileLayerName')}
+          >
+            {tileLayerMenu}
+          </SelectField>
+          <TextField
+            floatingLabelText="Template code:"
+            multiLine={true}
+            textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt', lineHeight: '8pt'}}
+            value={templateCode}
+          />
         </div>
       </div>
     );
 
     // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerName') instead
     let mapTitle = 'Map';
+    if (selectedTileLayerObj.get('tileLayerVariantName') !== undefined) {
+      mapTitle = selectedTileLayerObj.get('tileLayerVariantName') + ' map';
+    }
     if (table !== undefined) {
-      mapTitle = selectedTileLayerObj.get('tileLayerVariantName') !== undefined ? `${selectedTileLayerObj.get('tileLayerVariantName')} map of ${this.config.tablesById[table].namePlural}` : `Map of ${this.config.tablesById[table].namePlural}`;
+      mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
     }
 console.log('sidebar: ' + sidebar);
 
