@@ -1,5 +1,5 @@
 import _debounce from 'lodash/debounce';
-import {createHistory} from 'history';
+import createHistory from 'history/createBrowserHistory'
 const history = createHistory();
 
 //Needed for JSX
@@ -112,10 +112,7 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
       if (!lastState.equals(newState)) {
         lastState = newState;
         API.storeData(newState.toJS()).then((resp) => {
-          history.push({
-            state: newState.toJS(),
-            pathname: `/${resp}`
-          });
+          history.push(`/${resp}`, newState.toJS());
         });
       }
 
@@ -123,8 +120,8 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     storeState = _debounce(storeState, 250);
     stores.SessionStore.on('change', storeState);
 
-    history.listen((location) => {
-      if (location.action === 'POP') {
+    history.listen((location, action) => {
+      if (action === 'POP') {
         let newState = Immutable.fromJS((location.state ? location.state.session : null) || getAppState(location.pathname).session);
         if (!newState.equals(stores.SessionStore.state)) {
           stores.SessionStore.state = newState;
