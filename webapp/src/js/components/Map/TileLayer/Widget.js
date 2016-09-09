@@ -44,7 +44,7 @@ let TileLayerWidget = React.createClass({
 
   render() {
     let {attribution, url} = this.props;
-console.log('TileLayer props: %o', this.props);
+
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
     return (

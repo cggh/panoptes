@@ -43,13 +43,14 @@ let TableMapActions = React.createClass({
   ],
 
   propTypes: {
+    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
     componentUpdate: React.PropTypes.func.isRequired,
-    mapProviderName: React.PropTypes.string,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     selectedTileLayerObj: ImmutablePropTypes.map,
     table: React.PropTypes.string,
-    title: React.PropTypes.string
+    title: React.PropTypes.string,
+    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
 
   getDefaultProps() {
@@ -65,7 +66,7 @@ let TableMapActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Datatable Mapper';
+    return this.props.title || 'Table Mapper';
 
   },
 
@@ -76,13 +77,17 @@ let TableMapActions = React.createClass({
   handleChangeTable(table) {
     this.props.componentUpdate({table});
   },
-  handleChangeTileLayer(tileLayerObj) {
-console.log('handleChangeTileLayer tileLayerObj: %o', tileLayerObj);
-    this.props.componentUpdate({selectedTileLayerObj: Immutable.fromJS(tileLayerObj)});
+  handleChangeTileLayer(event, selectedIndex, selectedValue) {
+    // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
+    this.props.componentUpdate({selectedTileLayerObj: this.tileLayerObjects[selectedValue]});
+  },
+  handleChangeMap(payload) {
+    let {center, zoom} = payload;
+    this.props.componentUpdate({center, zoom});
   },
 
   render() {
-    let {componentUpdate, query, sidebar, selectedTileLayerObj, table} = this.props;
+    let {center, componentUpdate, query, selectedTileLayerObj, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -95,9 +100,8 @@ console.log('handleChangeTileLayer tileLayerObj: %o', tileLayerObj);
 
     // https://github.com/leaflet-extras/leaflet-providers
     // https://leaflet-extras.github.io/leaflet-providers/preview/
+    this.tileLayerObjects = {};
     let tileLayerMenu = [];
-
-console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Provider.providers);
 
     if (window.L.TileLayer.Provider.providers !== undefined) {
 
@@ -199,12 +203,13 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             let defaultTileLayerObj = {
               mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
-              tileLayerName: providerObj.options.variant !== undefined ? `${mapProviderName} (${providerObj.options.variant})` : mapProviderName,
+              tileLayerUniqueName: providerObj.options.variant !== undefined ? `${mapProviderName} (${providerObj.options.variant})` : mapProviderName,
               tileLayerVariantName: mapProviderName,
               tileLayerURL: defaultUrl
             };
 
-            tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerName} value={defaultTileLayerObj} />);
+            this.tileLayerObjects[defaultTileLayerObj.tileLayerUniqueName] = Immutable.fromJS(defaultTileLayerObj);
+            tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerUniqueName} value={defaultTileLayerObj.tileLayerUniqueName} />);
           }
 
           //// Convert each variant into a tileLayerMenu with a tileLayerObj as a value.
@@ -220,7 +225,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
             let tileLayerObj = {
               mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
-              tileLayerName: mapProviderName + '.' + variantKeyName,
+              tileLayerUniqueName: mapProviderName + '.' + variantKeyName,
               tileLayerVariantName: variantKeyName
             };
 
@@ -247,7 +252,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
                 }
 
               } else {
-                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerName + ': ' + variantObj);
+                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerUniqueName + ': ' + variantObj);
               }
 
             } else if (typeof variantObj === 'object') {
@@ -277,18 +282,19 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
               ) {
                 tileLayerObj.tileLayerURL = variantObj.url;
               } else {
-                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
+                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerUniqueName + ': %o', variantObj);
               }
 
             } else {
-              console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerName + ': %o', variantObj);
+              console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerUniqueName + ': %o', variantObj);
             }
 
             if (tileLayerObj.tileLayerURL !== undefined && tileLayerObj.tileLayerURL !== null) {
-              tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
+              this.tileLayerObjects[tileLayerObj.tileLayerUniqueName] = Immutable.fromJS(tileLayerObj);
+              tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerUniqueName} value={tileLayerObj.tileLayerUniqueName} />);
             } else {
               // Already warn
-              //console.warn('tileLayerURL was not defined for option ' + tileLayerObj.tileLayerName + ': %o', tileLayerObj);
+              //console.warn('tileLayerURL was not defined for option ' + tileLayerObj.tileLayerUniqueName + ': %o', tileLayerObj);
             }
 
           }
@@ -297,12 +303,13 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
           let tileLayerObj = {
             mapProviderName: mapProviderName,
             tileLayerAttribution: providerObj.options.attribution,
-            tileLayerName: mapProviderName,
+            tileLayerUniqueName: mapProviderName,
             tileLayerVariantName: mapProviderName,
             tileLayerURL: providerObj.url
           };
 
-          tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerName} value={tileLayerObj} />);
+          this.tileLayerObjects[tileLayerObj.tileLayerUniqueName] = Immutable.fromJS(tileLayerObj);
+          tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerUniqueName} value={tileLayerObj.tileLayerUniqueName} />);
         }
 
 
@@ -316,33 +323,41 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
     // FIXME: attribution replacement not working as per:
     // https://github.com/leaflet-extras/leaflet-providers/blob/c5bdc5f30629215c5c9c189cd2cccd533515383a/leaflet-providers.js#L73
 
-    // FIXME: Show selected tile layer in SelectField.
+    // TODO: make pretty
 
-    let templateCode = '<div style="width:300px;height:300px"><Map /></div>';
+    // TODO: truncate center lat & lng decimals to fewer places.
+
+    let adaptedCenterForTemplate = center !== undefined ? ' center=\'' + JSON.stringify(center) + '\'' : '';
+    let adaptedZoomForTemplate = zoom !== undefined ? ' zoom="' + zoom.toString() + '"' : '';
+
+    let templateWrap = '<div style="width:300px;height:300px">';
+
+    let templateCode = templateWrap + '<Map /></div>';
     if (table !== undefined && selectedTileLayerObj.size !== 0) {
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table, a query and a tileLayer have been specified.
-        templateCode = '<div style="width:300px;height:300px"><TableMap query=\'' + query + '\' table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' query=\'' + query + '\' table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
       } else {
         // A table and a tileLayer have been specified.
-        templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + '  table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
       }
 
     } else if (table !== undefined) {
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table and a query have been specified.
-        templateCode = '<div style="width:300px;height:300px"><TableMap query=\'' + query + '\' table="' + table + '" /></div>';
+        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' query=\'' + query + '\' table="' + table + '" /></div>';
       } else {
         // Only a table has been specified.
-        templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" /></div>';
+        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' table="' + table + '" /></div>';
       }
 
     } else if (selectedTileLayerObj.size !== 0) {
       // Only a tileLayer has been specified.
-      templateCode = '<div style="width:300px;height:300px"><Map tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+      templateCode = templateWrap + '<Map' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
     }
+
 
     let sidebarContent = (
       <div className="sidebar map-sidebar">
@@ -364,8 +379,8 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
           <SelectField
             autoWidth={true}
             floatingLabelText="Map tile layer:"
-            onChange={(e, i, v) => this.handleChangeTileLayer(v)}
-            value={selectedTileLayerObj.get('tileLayerName')}
+            onChange={(e, i, v) => this.handleChangeTileLayer(e, i, v)}
+            value={selectedTileLayerObj.get('tileLayerUniqueName')}
           >
             {tileLayerMenu}
           </SelectField>
@@ -379,7 +394,7 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
       </div>
     );
 
-    // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerName') instead
+    // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerUniqueName') instead
     let mapTitle = 'Map';
     if (selectedTileLayerObj.get('tileLayerVariantName') !== undefined) {
       mapTitle = selectedTileLayerObj.get('tileLayerVariantName') + ' map';
@@ -388,17 +403,29 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
     }
 
-console.log('selectedTileLayerObj tileLayerAttribution: %o', selectedTileLayerObj.get('tileLayerAttribution'));
+    // If no table has been selected, just show a map with the selected tileLayer (if any).
+    let mapWidget = (
+      <MapWidget
+        center={center}
+        componentUpdate={componentUpdate}
+        onChange={this.handleChangeMap}
+        tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
+        tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
+        zoom={zoom}
+      />
+    );
 
-
-    let mapWidget = <MapWidget />;
     if (table !== undefined) {
       mapWidget = (
         <TableMapWidget
+          center={center}
+          componentUpdate={componentUpdate}
           locationDataTable={table}
+          onChange={this.handleChangeMap}
           query={query}
           tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
           tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
+          zoom={zoom}
         />
       );
     }

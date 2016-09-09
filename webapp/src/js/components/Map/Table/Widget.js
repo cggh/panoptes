@@ -37,8 +37,10 @@ let TableMapWidget = React.createClass({
 
   propTypes: {
     center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
+    componentUpdate: React.PropTypes.func,
     highlight: React.PropTypes.string,
     locationDataTable: React.PropTypes.string,
+    onChange: React.PropTypes.func,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
     table: React.PropTypes.string,
@@ -53,11 +55,13 @@ let TableMapWidget = React.createClass({
   },
 
   render() {
-console.log('TableMapWidget props: %o', this.props);
+
     let {
       center,
+      componentUpdate,
       highlight,
       locationDataTable,
+      onChange,
       primKey,
       query,
       table,
@@ -81,6 +85,8 @@ console.log('TableMapWidget props: %o', this.props);
     return (
       <MapWidget
         center={center}
+        componentUpdate={componentUpdate}
+        onChange={onChange}
         style={widgetStyle}
         zoom={zoom}
       >

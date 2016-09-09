@@ -62,7 +62,7 @@ let WMSTileLayerWidget = React.createClass({
 
   render() {
     let {attribution, format, layers, transparent, url} = this.props;
-console.log('WMSTileLayerWidget props: %o', this.props);
+
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
     return (

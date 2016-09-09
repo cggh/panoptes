@@ -44,7 +44,6 @@ let ImageOverlayWidget = React.createClass({
 
   render() {
     let {imageBounds, imageUrl} = this.props;
-console.log('ImageOverlay props: %o', this.props);
 
     let adaptedProps = {};
 

@@ -49,13 +49,13 @@ let ViewList = React.createClass({
                     onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})}/>
           : null}
         {hasShowableTables ?
-          <ListItem primaryText="Datatable Plotter"
+          <ListItem primaryText="Table Plotter"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
                     onClick={(e) => this.handleOpen(e, 'Plot/Table/Actions', {})}/>
           : null}
         {hasShowableTables ?
-          <ListItem primaryText="Datatable Mapper"
+          <ListItem primaryText="Table Mapper"
                     disabled={!hasGeo}
                     style={{opacity: hasGeo ? '1' : '0.5'}}
                     secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}

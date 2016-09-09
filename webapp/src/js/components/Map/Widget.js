@@ -66,10 +66,13 @@ let MapWidget = React.createClass({
     FluxMixin
   ],
 
+  // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
+
   propTypes: {
     center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
     children: React.PropTypes.node,
     componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
+    onChange: React.PropTypes.func,
     tileLayerAttribution: React.PropTypes.string,
     tileLayerURL: React.PropTypes.string,
     title: React.PropTypes.string,
@@ -153,24 +156,37 @@ let MapWidget = React.createClass({
   handleMapMoveEnd(e) { // e is not being used
 
     // NB: this event fires whenever the map's bounds, center or zoom change.
+
     // this.map is not available on the first render; it's a callback ref attached to the Map component; no DOM yet.
     // However, this event, handleMapMoveEnd(e), will not be triggered on the first render.
     // Importantly, this.map is not available when the Map component is not visible, e.g. on an unselected tab.
-    // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
-    // FIXME: this.props.componentUpdate is not available when the widget is mounted through DataItem/Actions
 
-    if (this.map !== null && this.props.componentUpdate !== undefined) {
+    if (this.map !== null) {
 
       let leafletCenter = this.map.leafletElement.getCenter();
-
       let newCenter = Immutable.Map({lat: leafletCenter.lat, lng: leafletCenter.lng});
       let newZoom = this.map.leafletElement.getZoom();
 
       if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {
-        this.props.componentUpdate({center: newCenter, zoom: newZoom});
+
+        if (this.props.onChange !== undefined) {
+          this.props.onChange({
+            center: this.map.leafletElement.getCenter(),
+            zoom: this.map.leafletElement.getZoom()
+          });
+        }
+
+        // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
+        // FIXME: this.props.componentUpdate is not available when the widget is mounted through DataItem/Actions
+
+        if (this.props.componentUpdate !== undefined) {
+          this.props.componentUpdate({center: newCenter, zoom: newZoom});
+        }
+
       }
 
     }
+
   },
 
   title() {
@@ -287,10 +303,10 @@ let MapWidget = React.createClass({
       let keyedChildren = [];
 
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
-        if (children[0].type !== undefined && childrenToInspect[i].type.displayName !== 'MarkerWidget') {
+        if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'MarkerWidget') {
           nonMarkerChildrenCount++;
         }
-        keyedChildren[i] = _cloneDeep(children[i]);
+        keyedChildren[i] = _cloneDeep(childrenToInspect[i]);
         keyedChildren[i].key = i;
       }
 

@@ -67,7 +67,7 @@ let TablePlotActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Datatable Plotter';
+    return this.props.title || 'Table Plotter';
   },
 
   handleQueryPick(query) {
