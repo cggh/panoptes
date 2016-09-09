@@ -101,8 +101,8 @@ let DataTableView = React.createClass({
       let columnData = data[columnProperty];
       let rowData = data[rowProperty];
       let countData = data['count'];
-      let uniqueColumns = ['_all_'].concat(columnData) ? ['_all_'].concat(_uniq(columnData.array)) : [];
-      let uniqueRows = ['_all_'].concat(rowData) ? ['_all_'].concat(_uniq(rowData.array)) : [];
+      let uniqueColumns = columnData ? ['_all_'].concat(_uniq(columnData.array)) : [];
+      let uniqueRows = rowData ? ['_all_'].concat(_uniq(rowData.array)) : [];
       let dataByColumnRow = {};
       uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
       dataByColumnRow['_all_'] = {};
