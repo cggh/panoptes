@@ -8,18 +8,19 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
+import CalcMapBounds from 'utils/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
-import CalcMapBounds from 'utils/CalcMapBounds';
+import SQL from 'panoptes/SQL';
 
 let TableMarkersLayerWidget = React.createClass({
 
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'locationDataTable', 'primKey', 'table')
+    DataFetcherMixin('highlight', 'locationDataTable', 'primKey', 'query', 'table')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -36,6 +37,7 @@ let TableMarkersLayerWidget = React.createClass({
     locationDataTable: React.PropTypes.string,
     map: React.PropTypes.object,
     primKey: React.PropTypes.string, // if not specified then all locationDataTable records are used
+    query: React.PropTypes.string,
     table: React.PropTypes.string // An alias for locationDataTable
   },
   childContextTypes: {
@@ -69,7 +71,9 @@ let TableMarkersLayerWidget = React.createClass({
 
   fetchData(props, requestContext) {
 
-    let {highlight, locationDataTable, primKey, table} = props;
+    let {highlight, locationDataTable, primKey, query, table} = props;
+
+    let adaptedQuery = query !== undefined ? query : SQL.nullQuery;
 
     // NB: The locationDataTable prop is named to distinguish it from the chartDataTable.
     // Either "table" or "locationDataTable" can be used in templates,
@@ -131,9 +135,10 @@ let TableMarkersLayerWidget = React.createClass({
 
         // Get all markers using the specified table.
         let locationAPIargs = {
+          columns: locationColumnsColumnSpec,
           database: this.config.dataset,
-          table: locationTableConfig.fetchTableName,
-          columns: locationColumnsColumnSpec
+          query: adaptedQuery,
+          table: locationTableConfig.fetchTableName
         };
 
         return LRUCache.get(

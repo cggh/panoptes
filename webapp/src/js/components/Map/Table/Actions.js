@@ -65,7 +65,7 @@ let TableMapActions = React.createClass({
   },
 
   title() {
-    return this.props.title || 'Table Mapper';
+    return this.props.title || 'Datatable Mapper';
 
   },
 
@@ -320,11 +320,25 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
 
     let templateCode = '<div style="width:300px;height:300px"><Map /></div>';
     if (table !== undefined && selectedTileLayerObj.size !== 0) {
-      // A table and a tileLayer have been specified.
-      templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+
+      if (query !== undefined && query !== SQL.nullQuery) {
+        // A table, a query and a tileLayer have been specified.
+        templateCode = '<div style="width:300px;height:300px"><TableMap query=\'' + query + '\' table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+      } else {
+        // A table and a tileLayer have been specified.
+        templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+      }
+
     } else if (table !== undefined) {
-      // Only a table has been specified.
-      templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" /></div>';
+
+      if (query !== undefined && query !== SQL.nullQuery) {
+        // A table and a query have been specified.
+        templateCode = '<div style="width:300px;height:300px"><TableMap query=\'' + query + '\' table="' + table + '" /></div>';
+      } else {
+        // Only a table has been specified.
+        templateCode = '<div style="width:300px;height:300px"><TableMap table="' + table + '" /></div>';
+      }
+
     } else if (selectedTileLayerObj.size !== 0) {
       // Only a tileLayer has been specified.
       templateCode = '<div style="width:300px;height:300px"><Map tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
@@ -373,7 +387,6 @@ console.log('window.L.TileLayer.Provider.providers: %o', window.L.TileLayer.Prov
     if (table !== undefined) {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
     }
-console.log('sidebar: ' + sidebar);
 
 console.log('selectedTileLayerObj tileLayerAttribution: %o', selectedTileLayerObj.get('tileLayerAttribution'));
 
@@ -383,6 +396,7 @@ console.log('selectedTileLayerObj tileLayerAttribution: %o', selectedTileLayerOb
       mapWidget = (
         <TableMapWidget
           locationDataTable={table}
+          query={query}
           tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
           tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
         />

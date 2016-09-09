@@ -40,6 +40,7 @@ let TableMapWidget = React.createClass({
     highlight: React.PropTypes.string,
     locationDataTable: React.PropTypes.string,
     primKey: React.PropTypes.string,
+    query: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
     tileLayerAttribution: React.PropTypes.string,
@@ -58,6 +59,7 @@ console.log('TableMapWidget props: %o', this.props);
       highlight,
       locationDataTable,
       primKey,
+      query,
       table,
       tileLayerAttribution,
       tileLayerURL,
@@ -87,7 +89,7 @@ console.log('TableMapWidget props: %o', this.props);
             attribution={tileLayerAttribution}
             url={tileLayerURL}
            />
-          <TableMarkersLayerWidget highlight={highlight} locationDataTable={locationDataTable} primKey={primKey} />
+          <TableMarkersLayerWidget highlight={highlight} locationDataTable={locationDataTable} primKey={primKey} query={query} />
         </FeatureGroupWidget>
       </MapWidget>
     );
