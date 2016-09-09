@@ -10,7 +10,7 @@ import YScale from 'panoptes/genome/tracks/YScale';
 
 import {Motion, spring} from 'react-motion';
 
-import findBlocks from 'panoptes/genome/FindBlocks';
+import findBlocks from 'panoptes/FindBlocks';
 
 let ScaledSVGChannel = React.createClass({
   mixins: [

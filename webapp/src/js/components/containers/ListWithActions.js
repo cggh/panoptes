@@ -19,9 +19,9 @@ import Icon from 'ui/Icon';
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
 import DataItemWidget from 'DataItem/Widget';
-import DataDownloader from 'utils/DataDownloader';
+import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
-import DataItemViews from 'utils/DataItemViews';
+import DataItemViews from 'panoptes/DataItemViews';
 
 // Constants
 const MAX_ROWS_COUNT = 10000;

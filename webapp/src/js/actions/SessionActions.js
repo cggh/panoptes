@@ -1,6 +1,6 @@
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-import memoize from 'utils/Memoize';
+import memoize from 'util/Memoize';
 
 
 let SessionActions = {

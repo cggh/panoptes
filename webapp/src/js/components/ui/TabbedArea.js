@@ -1,5 +1,5 @@
 import React from 'react';
-import ValidComponentChildren from '../utils/ValidComponentChildren';
+import ValidComponentChildren from 'util/ValidComponentChildren';
 import classNames from 'classnames';
 import _isEqual from 'lodash/isEqual';
 import _forEach from 'lodash/forEach';

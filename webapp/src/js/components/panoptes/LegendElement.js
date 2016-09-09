@@ -1,7 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
-let ReferenceSequence = React.createClass({
+let LegendElement = React.createClass({
   mixins: [
     PureRenderMixin
   ],
@@ -26,4 +26,4 @@ let ReferenceSequence = React.createClass({
   }
 });
 
-export default ReferenceSequence;
+export default LegendElement;

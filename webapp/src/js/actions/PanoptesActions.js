@@ -1,5 +1,5 @@
 import Constants from '../constants/Constants';
-import DataItemViews from 'utils/DataItemViews';
+import DataItemViews from 'panoptes/DataItemViews';
 const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({

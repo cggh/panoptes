@@ -9,7 +9,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
 import ErrorReport from 'panoptes/ErrorReporter';
-import findBlocks from 'panoptes/genome/FindBlocks';
+import findBlocks from 'panoptes/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 

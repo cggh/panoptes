@@ -12,7 +12,7 @@ import CalcMapBounds from 'utils/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
-import GeoLayouter from 'utils/GeoLayouter';
+import GeoLayouter from 'util/GeoLayouter';
 import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
 import PieChartWidget from 'Chart/Pie/Widget';

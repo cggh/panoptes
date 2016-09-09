@@ -5,6 +5,8 @@ const history = createHistory();
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
+import 'components/ComponentRegistry';
+
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 import Panoptes from 'components/Panoptes.js';

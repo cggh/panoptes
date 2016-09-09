@@ -27,7 +27,7 @@ import Icon from 'ui/Icon';
 import DataTableView from 'panoptes/DataTableView';
 import QueryString from 'panoptes/QueryString';
 import SQL from 'panoptes/SQL';
-import DataDownloader from 'utils/DataDownloader';
+import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
 

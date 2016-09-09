@@ -7,8 +7,9 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
+// Panoptes
 import API from 'panoptes/API';
-import CalcMapBounds from 'utils/CalcMapBounds';
+import CalcMapBounds from 'util/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';

@@ -10,7 +10,7 @@ let NumericInput = React.createClass({
   ],
 
   propTypes: {
-    value: React.PropTypes.func.number,
+    value: React.PropTypes.number,
     onChange: React.PropTypes.func.isRequired
   },
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import ValidComponentChildren from '../utils/ValidComponentChildren';
+import ValidComponentChildren from 'util/ValidComponentChildren';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 
 let Popups = React.createClass({
