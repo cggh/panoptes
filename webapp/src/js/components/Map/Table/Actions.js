@@ -57,7 +57,8 @@ let TableMapActions = React.createClass({
     return {
       query: SQL.nullQuery,
       selectedTileLayerObj: Immutable.Map(),
-      sidebar: true
+      sidebar: true,
+      table: '_NONE_'
     };
   },
 
@@ -96,6 +97,11 @@ let TableMapActions = React.createClass({
         label: table.capNamePlural
       })
     );
+
+    // Add a "no table" option
+    // NB: The value cannot be undefined or null or '',
+    // because that apparently causes a problem with the SelectField presentation (label superimposed on floating label).
+    tableOptions = [{value: '_NONE_', leftIcon: undefined, label: '— None —'}].concat(tableOptions);
 
 
     // https://github.com/leaflet-extras/leaflet-providers
@@ -333,7 +339,7 @@ let TableMapActions = React.createClass({
     let templateWrap = '<div style="width:300px;height:300px">';
 
     let templateCode = templateWrap + '<Map /></div>';
-    if (table !== undefined && selectedTileLayerObj.size !== 0) {
+    if (table !== undefined && table !== '_NONE_' && selectedTileLayerObj.size !== 0) {
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table, a query and a tileLayer have been specified.
@@ -343,9 +349,9 @@ let TableMapActions = React.createClass({
         templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + '  table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
       }
 
-    } else if (table !== undefined) {
+    } else if (table !== undefined && table !== '_NONE_') {
 
-      if (query !== undefined && query !== SQL.nullQuery) {
+      if (query !== undefined && table !== '_NONE_' && query !== SQL.nullQuery) {
         // A table and a query have been specified.
         templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' query=\'' + query + '\' table="' + table + '" /></div>';
       } else {
@@ -399,7 +405,7 @@ let TableMapActions = React.createClass({
     if (selectedTileLayerObj.get('tileLayerVariantName') !== undefined) {
       mapTitle = selectedTileLayerObj.get('tileLayerVariantName') + ' map';
     }
-    if (table !== undefined) {
+    if (table !== undefined && table !== '_NONE_') {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
     }
 
@@ -415,7 +421,7 @@ let TableMapActions = React.createClass({
       />
     );
 
-    if (table !== undefined) {
+    if (table !== undefined && table !== '_NONE_') {
       mapWidget = (
         <TableMapWidget
           center={center}
