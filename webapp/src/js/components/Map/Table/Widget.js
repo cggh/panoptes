@@ -46,6 +46,8 @@ let TableMapWidget = React.createClass({
     table: React.PropTypes.string,
     title: React.PropTypes.string,
     tileLayerAttribution: React.PropTypes.string,
+    tileLayerMaxZoom: React.PropTypes.number,
+    tileLayerMinZoom: React.PropTypes.number,
     tileLayerURL: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
   },
@@ -66,6 +68,8 @@ let TableMapWidget = React.createClass({
       query,
       table,
       tileLayerAttribution,
+      tileLayerMaxZoom,
+      tileLayerMinZoom,
       tileLayerURL,
       zoom
     } = this.props;
@@ -93,6 +97,9 @@ let TableMapWidget = React.createClass({
         <FeatureGroupWidget>
           <TileLayerWidget
             attribution={tileLayerAttribution}
+            tileLayerMaxZoom
+            maxZoom={tileLayerMaxZoom}
+            minZoom={tileLayerMinZoom}
             url={tileLayerURL}
            />
           <TableMarkersLayerWidget highlight={highlight} locationDataTable={locationDataTable} primKey={primKey} query={query} />

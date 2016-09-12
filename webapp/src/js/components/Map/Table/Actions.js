@@ -5,6 +5,7 @@ import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
 // Lodash
+import _cloneDeep from 'lodash/cloneDeep';
 import _map from 'lodash/map';
 import _filter from 'lodash/filter';
 
@@ -36,6 +37,8 @@ import 'leaflet-providers/leaflet-providers.js';
 
 const DEFAULT_TILE_LAYER_OBJ = Immutable.Map(Immutable.fromJS({
   tileLayerAttribution: undefined,
+  tileLayerMaxZoom: undefined,
+  tileLayerMinZoom: undefined,
   tileLayerUniqueName: '— Default —',
   tileLayerURL: undefined
 }));
@@ -85,7 +88,25 @@ let TableMapActions = React.createClass({
   },
   handleChangeTileLayer(event, selectedIndex, selectedValue) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
-    this.props.componentUpdate({selectedTileLayerObj: this.tileLayerObjects[selectedValue]});
+
+    let selectedTileLayerObj = _cloneDeep(this.tileLayerObjects[selectedValue]);
+
+    let adaptedZoom = this.props.zoom;
+    if (
+      selectedTileLayerObj.get('tileLayerMaxZoom') !== undefined
+      && this.props.zoom > selectedTileLayerObj.get('tileLayerMaxZoom')
+    ) {
+      adaptedZoom = selectedTileLayerObj.get('tileLayerMaxZoom');
+    }
+
+    if (
+      selectedTileLayerObj.get('tileLayerMinZoom') !== undefined
+      && this.props.zoom < selectedTileLayerObj.get('tileLayerMinZoom')
+    ) {
+      adaptedZoom = selectedTileLayerObj.get('tileLayerMinZoom');
+    }
+
+    this.props.componentUpdate({selectedTileLayerObj: selectedTileLayerObj, zoom: adaptedZoom});
   },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
@@ -164,6 +185,8 @@ let TableMapActions = React.createClass({
             // but the default variant does appear in the URL
             // Then replace the first occurrence of the default variant with the variant placeholder
             // to make the _variantTemplateUrl
+            // TODO: Use a more Leaflet-esque method, i.e. http://leafletjs.com/reference.html#url-template
+
             variantTemplateUrl = providerObj.url.replace(`/${providerObj.options.variant}/`, '/{variant}/');
             defaultUrl = providerObj.url;
           } else if (
@@ -219,6 +242,8 @@ let TableMapActions = React.createClass({
             let defaultTileLayerObj = {
               mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
+              tileLayerMaxZoom: providerObj.options.maxZoom,
+              tileLayerMinZoom: providerObj.options.minZoom,
               tileLayerUniqueName: providerObj.options.variant !== undefined ? `${mapProviderName} (${providerObj.options.variant})` : mapProviderName,
               tileLayerVariantName: mapProviderName,
               tileLayerURL: defaultUrl
@@ -241,6 +266,8 @@ let TableMapActions = React.createClass({
             let tileLayerObj = {
               mapProviderName: mapProviderName,
               tileLayerAttribution: providerObj.options.attribution,
+              tileLayerMaxZoom: providerObj.options.maxZoom,
+              tileLayerMinZoom: providerObj.options.minZoom,
               tileLayerUniqueName: mapProviderName + '.' + variantKeyName,
               tileLayerVariantName: variantKeyName
             };
@@ -272,6 +299,18 @@ let TableMapActions = React.createClass({
               }
 
             } else if (typeof variantObj === 'object') {
+
+
+              if (variantObj.options !== undefined && variantObj.options !== null) {
+
+                if (variantObj.options.maxZoom !== undefined && variantObj.options.maxZoom !== null) {
+                  tileLayerObj.tileLayerMaxZoom = variantObj.options.maxZoom;
+                }
+                if (variantObj.options.minZoom !== undefined && variantObj.options.minZoom !== null) {
+                  tileLayerObj.tileLayerMinZoom = variantObj.options.minZoom;
+                }
+              }
+
 
               if (
                 variantTemplateUrl !== undefined
@@ -309,7 +348,7 @@ let TableMapActions = React.createClass({
               this.tileLayerObjects[tileLayerObj.tileLayerUniqueName] = Immutable.fromJS(tileLayerObj);
               tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerUniqueName} value={tileLayerObj.tileLayerUniqueName} />);
             } else {
-              // Already warn
+              // Already warned, "Could not determine URL for map tile option"
               //console.warn('tileLayerURL was not defined for option ' + tileLayerObj.tileLayerUniqueName + ': %o', tileLayerObj);
             }
 
@@ -319,6 +358,8 @@ let TableMapActions = React.createClass({
           let tileLayerObj = {
             mapProviderName: mapProviderName,
             tileLayerAttribution: providerObj.options.attribution,
+            tileLayerMaxZoom: providerObj.options.maxZoom,
+            tileLayerMinZoom: providerObj.options.minZoom,
             tileLayerUniqueName: mapProviderName,
             tileLayerVariantName: mapProviderName,
             tileLayerURL: providerObj.url
@@ -426,6 +467,8 @@ let TableMapActions = React.createClass({
         componentUpdate={componentUpdate}
         onChange={this.handleChangeMap}
         tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
+        tileLayerMaxZoom={selectedTileLayerObj.get('tileLayerMaxZoom')}
+        tileLayerMinZoom={selectedTileLayerObj.get('tileLayerMinZoom')}
         tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
         zoom={zoom}
       />
@@ -440,6 +483,8 @@ let TableMapActions = React.createClass({
           onChange={this.handleChangeMap}
           query={query}
           tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
+          tileLayerMaxZoom={selectedTileLayerObj.get('tileLayerMaxZoom')}
+          tileLayerMinZoom={selectedTileLayerObj.get('tileLayerMinZoom')}
           tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
           zoom={zoom}
         />

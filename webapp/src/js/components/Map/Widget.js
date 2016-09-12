@@ -74,6 +74,8 @@ let MapWidget = React.createClass({
     componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
     tileLayerAttribution: React.PropTypes.string,
+    tileLayerMaxZoom: React.PropTypes.number,
+    tileLayerMinZoom: React.PropTypes.number,
     tileLayerURL: React.PropTypes.string,
     title: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
@@ -164,8 +166,13 @@ let MapWidget = React.createClass({
     if (this.map !== null) {
 
       let leafletCenter = this.map.leafletElement.getCenter();
+      let maxZoom = this.map.leafletElement.getMaxZoom();
       let newCenter = Immutable.Map({lat: leafletCenter.lat, lng: leafletCenter.lng});
       let newZoom = this.map.leafletElement.getZoom();
+
+      if (newZoom > maxZoom) {
+        console.warn('Zooming beyond maxZoom:' + newZoom + '>' + maxZoom);
+      }
 
       if (!_isEqual(newCenter, this.props.center) || newZoom !== this.props.zoom) {
 
@@ -194,7 +201,7 @@ let MapWidget = React.createClass({
   },
 
   render() {
-    let {center, children, tileLayerAttribution, tileLayerURL, zoom} = this.props;
+    let {center, children, tileLayerAttribution, tileLayerMaxZoom, tileLayerMinZoom, tileLayerURL, zoom} = this.props;
     let {bounds, loadStatus} = this.state;
 
     if (bounds === undefined && center === undefined && zoom === undefined) {
@@ -279,6 +286,8 @@ let MapWidget = React.createClass({
     let defaultTileLayer = (
       <TileLayerWidget
         attribution={tileLayerAttribution}
+        maxZoom={tileLayerMaxZoom}
+        minZoom={tileLayerMinZoom}
         url={tileLayerURL}
       />
     );
