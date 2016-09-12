@@ -34,6 +34,11 @@ import 'map.scss';
 
 import 'leaflet-providers/leaflet-providers.js';
 
+const DEFAULT_TILE_LAYER_OBJ = Immutable.Map(Immutable.fromJS({
+  tileLayerAttribution: undefined,
+  tileLayerUniqueName: '— Default —',
+  tileLayerURL: undefined
+}));
 
 let TableMapActions = React.createClass({
   mixins: [
@@ -56,7 +61,7 @@ let TableMapActions = React.createClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      selectedTileLayerObj: Immutable.Map(),
+      selectedTileLayerObj: DEFAULT_TILE_LAYER_OBJ,
       sidebar: true,
       table: '_NONE_'
     };
@@ -108,6 +113,11 @@ let TableMapActions = React.createClass({
     // https://leaflet-extras.github.io/leaflet-providers/preview/
     this.tileLayerObjects = {};
     let tileLayerMenu = [];
+
+    // Add the default tileLayer options, so it can be re-selected.
+
+    this.tileLayerObjects['— Default —'] = DEFAULT_TILE_LAYER_OBJ;
+    tileLayerMenu.push(<MenuItem key="__DEFAULT__" primaryText={"— Default —"} value={"— Default —"} />);
 
     if (window.L.TileLayer.Provider.providers !== undefined) {
 
@@ -323,7 +333,6 @@ let TableMapActions = React.createClass({
 
     }
 
-    // TODO: Auto select table when there is only one.
     // TODO: Persist current tile layer through marker onClick event?
 
     // FIXME: attribution replacement not working as per:
@@ -400,6 +409,7 @@ let TableMapActions = React.createClass({
       </div>
     );
 
+    // This title appears above the map, in the blue bar.
     // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerUniqueName') instead
     let mapTitle = 'Map';
     if (selectedTileLayerObj.get('tileLayerVariantName') !== undefined) {
