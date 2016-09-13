@@ -65,7 +65,9 @@ let ReferenceSequence = React.createClass({
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.requestSummaryWindow = summaryWindow;
-      this.props.onChangeLoadStatus('LOADING');
+      if (this.props.onChangeLoadStatus) {
+        this.props.onChangeLoadStatus('LOADING');
+      }
       const columns = [
         {expr: ['/', ['pos', summaryWindow]], as: 'window'},
         {expr: ['count', ['*']], as: 'count'},
@@ -95,11 +97,15 @@ let ReferenceSequence = React.createClass({
       requestContext.request((componentCancellation) =>
         regionCacheGet(APIargs, cacheArgs, componentCancellation)
           .then((blocks) => {
-            this.props.onChangeLoadStatus('DONE');
+            if (this.props.onChangeLoadStatus) {
+              this.props.onChangeLoadStatus('DONE');
+            }
             this.applyData(this.props, blocks, summaryWindow);
           })
           .catch((err) => {
-            this.props.onChangeLoadStatus('DONE');
+            if (this.props.onChangeLoadStatus) {
+              this.props.onChangeLoadStatus('DONE');
+            }
             throw err;
           })
           .catch(API.filterAborted)
