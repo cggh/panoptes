@@ -113,7 +113,7 @@ function fetch(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
 function ifTooBigFetchSmaller(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation) {
   return (block) => {
     if (block._tooBig) {
-      const jump = 3  ;
+      const jump = 2  ;
       const newLevel = blockLevel - jump;
       const wantedBlocks = [];
       const blockMultipler = Math.pow(2, jump);
