@@ -137,51 +137,51 @@ def summarise_call(calls):
 def handler(start_response, request_data):
     datatable = request_data['table']
     dataset = request_data['dataset']
-    two_d_properties = request_data['2D_properties'].split('~')
-    col_properties = request_data['col_properties'].split('~')
-    row_properties = request_data['row_properties'].split('~')
-    col_qry = request_data['col_qry']
-    col_order = request_data['col_order']
-    row_qry = request_data['row_qry']
-    row_order = request_data.get('row_order', None)
+    two_d_properties = request_data['2DProperties'].split('~')
+    col_properties = request_data['colProperties'].split('~')
+    row_properties = request_data['rowProperties'].split('~')
+    col_qry = request_data['colQry']
+    col_order = request_data['colOrder']
+    row_qry = request_data['rowQry']
+    row_order = request_data.get('rowOrder', None)
     row_order_columns = []
     if row_order == 'columns':
         try:
-            row_order_columns = request_data['row_sort_cols'].split('~')
+            row_order_columns = request_data['rowSortCols'].split('~')
         except KeyError:
             pass
         row_order = None
     try:
-        col_limit = int(request_data['col_limit'])
+        col_limit = int(request_data['colLimit'])
     except KeyError:
         col_limit = None
     try:
-        row_limit = int(request_data['row_limit'])
+        row_limit = int(request_data['rowLimit'])
     except KeyError:
         row_limit = None
     try:
-        col_offset = int(request_data['col_offset'])
+        col_offset = int(request_data['colOffset'])
     except KeyError:
         col_offset = None
     try:
-        row_offset = int(request_data['row_offset'])
+        row_offset = int(request_data['rowOffset'])
     except KeyError:
         row_offset = None
     #Set fail limit to one past so we know if we hit it
     try:
-        col_fail_limit = int(request_data['col_fail_limit'])+1
+        col_fail_limit = int(request_data['colFailLimit'])+1
     except KeyError:
         col_fail_limit = None
     try:
-        row_sort_property = request_data['row_sort_property']
+        row_sort_property = request_data['rowSortProperty']
     except KeyError:
         row_sort_property = None
     try:
-        col_key = request_data['col_key']
+        col_key = request_data['colKey']
     except KeyError:
         col_key = None
     try:
-        sort_mode = request_data['sort_mode']
+        sort_mode = request_data['sortMode']
     except KeyError:
         sort_mode = None
 

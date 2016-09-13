@@ -1,8 +1,6 @@
 import React from 'react';
 import repeatString from 'repeat-string';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import _sumBy from 'lodash/sumBy';
-import _filter from 'lodash/filter';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
@@ -20,6 +18,7 @@ let GenotypesTable = React.createClass({
   ],
 
   propTypes: {
+    table: React.PropTypes.string,
     genomicPositions: React.PropTypes.any,
     colPositions: React.PropTypes.any,
     blocks: React.PropTypes.array,
@@ -28,6 +27,12 @@ let GenotypesTable = React.createClass({
     end: React.PropTypes.number,
     width: React.PropTypes.number,
     height: React.PropTypes.number,
+    rowHeight: React.PropTypes.number,
+    cellColour: React.PropTypes.string,
+    cellAlpha: React.PropTypes.string,
+    cellHeight: React.PropTypes.string,
+    layoutBlocks: React.PropTypes.array,
+    dataBlocks: React.PropTypes.array
   },
 
   componentDidMount() {
@@ -124,7 +129,7 @@ let GenotypesTable = React.createClass({
   },
 
   paint(gridCanvas, overlayCanvas) {
-    const {rowData, dataBlocks, layoutBlocks, width, height, start, end, colWidth} = this.props;
+    const {dataBlocks, layoutBlocks, width, start, end, colWidth} = this.props;
     const pixColWidth = colWidth * (width / (end - start));
 
     const gCtx = gridCanvas.getContext('2d');
@@ -139,7 +144,7 @@ let GenotypesTable = React.createClass({
     gCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
     oCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-    if (!layoutBlocks || !dataBlocks || !rowData) {
+    if (!layoutBlocks || !dataBlocks) {
       return;
     }
     dataBlocks.forEach(this.drawOffscreenIfNeeded);
@@ -148,7 +153,7 @@ let GenotypesTable = React.createClass({
     let dataBlockIndex = 0;
     for (let i = 0; i < layoutBlocks.length; i++) {
       let [blockStart, blockEnd, colStart] = layoutBlocks[i];
-      while (true) {
+      while (true) { //eslint-disable-line no-constant-condition
         const currentDataBlock = dataBlocks[dataBlockIndex];
         if (dataBlockOffset + currentDataBlock.len <= blockStart ) {
           dataBlockIndex += 1;
@@ -244,9 +249,9 @@ let GenotypesTable = React.createClass({
   },
 
   render() {
-    const {rowData, dataBlocks, layoutBlocks, rowHeight, width, height, colWidth} = this.props;
+    const {dataBlocks, layoutBlocks, width, height} = this.props;
 
-    if (!layoutBlocks || !dataBlocks || !rowData) {
+    if (!layoutBlocks || !dataBlocks) {
       return <div>
         <canvas ref="gridCanvas"
                      width={width}
@@ -257,9 +262,6 @@ let GenotypesTable = React.createClass({
         </div>;
     }
 
-    const numPositions = _sumBy(layoutBlocks,
-      ([blockStart, blockEnd, colStart]) => blockEnd - blockStart);
-    const numRows = rowData.id.array.length;
     return <div className="genotypes-table">
       <canvas ref="gridCanvas"
               width={width}

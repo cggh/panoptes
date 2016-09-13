@@ -1,9 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
-import offset from 'bloody-offset';
 import classnames from 'classnames';
-import _debounce from 'lodash/debounce';
 import Icon from 'ui/Icon';
 
 

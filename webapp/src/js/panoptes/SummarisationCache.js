@@ -9,6 +9,14 @@ import SQL from 'panoptes/SQL';
 
 const FETCH_SIZE = 10000;
 
+let findOptimalBlockSize = (start, end, desiredCount, minBlockSize) => {
+  let desiredBlockSize = (end - start) / desiredCount;
+  let blockSize = Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize / minBlockSize) / Math.log(2)))) * minBlockSize;
+  //Maximum replicates original behaviour - I'm guessing the summary generation code must stop at this size too?
+  blockSize = Math.min(blockSize, 1.0e9);
+  return blockSize;
+};
+
 let blockStartEnd = (start, end, blockSize) => {
   let blockStart = Math.max(0, Math.floor(start / blockSize) - 1);
   return [blockStart,
@@ -66,7 +74,6 @@ let SummarisationCache = {
       );
     });
     let trimAndConcat = (slices) => {
-      debugger;
       if (slices.length > 0) {
         let sliceStart = blockStart - (Math.floor(blockStart / FETCH_SIZE) * FETCH_SIZE);
         let sliceEnd = blockEnd - (Math.floor(blockEnd / FETCH_SIZE) * FETCH_SIZE);

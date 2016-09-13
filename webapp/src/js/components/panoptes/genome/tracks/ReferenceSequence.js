@@ -1,6 +1,5 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import d3 from 'd3';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
@@ -13,7 +12,7 @@ import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import LegendElement from 'panoptes/LegendElement';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
-import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 
 
 const HEIGHT = 26;

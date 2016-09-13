@@ -179,14 +179,14 @@ let GenomeBrowser = React.createClass({
   handleDoubleTap(e) {
     if (!this.isEventInPanningArea(e))
       return;
-    this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.rootHammer)).left, -100);
+    this.handleZoom(e.center.x - offset(ReactDOM.findDOMNode(this.rootHammer)).left, -100); //eslint-disable-line react/no-find-dom-node
   },
   handlePan(e) {
     if (!this.isEventInPanningArea(e))
       return;
     let start = this.actualStart;
     let end = this.actualEnd;
-    let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.rootHammer)).left;
+    let panStartPixel = (e.center.x - e.deltaX) - offset(ReactDOM.findDOMNode(this.rootHammer)).left; //eslint-disable-line react/no-find-dom-node
     if (this.panStartPixel !== panStartPixel) {
       this.panStartPixel = panStartPixel;
       this.panStartGenome = [start, end];
@@ -290,7 +290,7 @@ let GenomeBrowser = React.createClass({
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
-                        <ReferenceSequence {...trackProps}/> :
+                        <ReferenceSequence {...trackProps}/>
                         { settings.annotation ?
                           <AnnotationChannel {...trackProps} /> :
                           null }

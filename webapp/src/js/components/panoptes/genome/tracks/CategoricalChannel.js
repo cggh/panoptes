@@ -21,7 +21,7 @@ import API from 'panoptes/API';
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import ErrorReport from 'panoptes/ErrorReporter';
 import PropertyLegend from 'panoptes/PropertyLegend';
-import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 
 import Checkbox from 'material-ui/Checkbox';
 
@@ -102,13 +102,16 @@ let CategoricalTrack = React.createClass({
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
     autoYScale: React.PropTypes.bool,
     fractional: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
-    onChangeKnownValues: React.PropTypes.func.isRequired
+    onChangeKnownValues: React.PropTypes.func.isRequired,
+    onChangeLoadStatus: React.PropTypes.func.isRequired,
+    onYLimitChange: React.PropTypes.func.isRequired
   },
 
   componentWillMount() {
@@ -128,7 +131,7 @@ let CategoricalTrack = React.createClass({
   },
 
   fetchData(nextProps, requestContext) {
-    let {chromosome, start, end, width, table, track, autoYScale, fractional} = nextProps;
+    let {chromosome, start, end, width, table, track, autoYScale} = nextProps;
     const tableConfig = this.config.tablesById[table];
     if (this.props.chromosome !== chromosome ||
       this.props.track !== track ||

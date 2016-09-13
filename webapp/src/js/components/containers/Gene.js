@@ -102,7 +102,7 @@
     render() {
       const {componentUpdate} = this.props;
       const {geneData, loadStatus} = this.state;
-      
+      const {annotation} = this.config.genome;
       if (!geneData) return null;
 
       let genomePositionTableButtons = [];
@@ -161,7 +161,7 @@
           <div className="vertical stack">
             <GenomeScale {...trackProps}/>
             <ReferenceSequence {...trackProps}/> :
-            { settings.annotation ?
+            { annotation ?
               <AnnotationChannel name="Structure" {...trackProps} /> : null
             }
 

@@ -12,8 +12,12 @@ let GenotypesRowHeader = React.createClass({
   ],
 
   propTypes: {
+    table: React.PropTypes.string,
     height: React.PropTypes.number,
     width: React.PropTypes.number,
+    rowLabel: React.PropTypes.string,
+    rowHeight: React.PropTypes.number,
+    rowData: React.PropTypes.array
   },
 
   componentDidMount() {
@@ -77,9 +81,9 @@ let GenotypesRowHeader = React.createClass({
           let textYPos = (yposBottom + yposTop) / 2 - 1 + fontSize / 2;
           ctx.fillText(labelName, 2, textYPos);
         }
-      }
-      else
+      } else {
         bottomLineDrawn = false;
+      }
     };
 
     let groupLabel = null;
@@ -98,8 +102,7 @@ let GenotypesRowHeader = React.createClass({
         ctx.stroke();
         ctx.fillStyle = 'rgb(0,0,0)';
         ctx.fillText(label, 13, yPos - 1 - (rowHeight - fontSize) / 2);
-      }
-      else {
+      } else {
         if (label != groupLabel) {
           drawGroupLabel(groupLabel, groupStartIndex, i - 1);
           groupLabel = label;
@@ -112,7 +115,7 @@ let GenotypesRowHeader = React.createClass({
   },
 
   render() {
-    let {tableHeight, width, table, rowLabel} = this.props;
+    let {height, width, table, rowLabel} = this.props;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
     return <div className="genotypes-side">
@@ -120,7 +123,7 @@ let GenotypesRowHeader = React.createClass({
       <div className="row-label">{rowConfig.propertiesById[rowLabel].name}</div>
       <canvas ref="canvas"
               width={width}
-              height={tableHeight}/>
+              height={height}/>
     </div>;
   }
 });

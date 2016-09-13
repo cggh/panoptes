@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import classNames from 'classnames';
 import Icon from 'ui/Icon';
@@ -37,7 +36,7 @@ let Modal = React.createClass({
     this.componentDidUpdate();
   },
 
-  /*eslint-disable react/no-did-update-set-state */   //It's pk here as it won't lead to thrashing and is the only way to do this
+  /*eslint-disable react/no-did-update-set-state */   //It's ok here as it won't lead to thrashing and is the only way to do this
   componentDidUpdate() {
     let {child} = this.refs;
     if (child) {
@@ -56,7 +55,7 @@ let Modal = React.createClass({
   },
 
   handleOverlayClick(e) {
-    if (e.target === ReactDOM.findDOMNode(this.refs.overlay) && !this.props.uncloseable) {
+    if (e.target === this.overlay && !this.props.uncloseable) {
       e.preventDefault();
       e.stopPropagation();
       if (this.props.onClose)
@@ -89,7 +88,7 @@ let Modal = React.createClass({
     return (
       <HotKeys keyMap={hotKeysKeyMap} handlers={hotKeysHandlers}>
         <div className={classNames(classes)}
-             ref="overlay"
+             ref={(node) => this.overlay = node}
              onClick={this.handleOverlayClick}>
           <div className="popup"
             {...other}>

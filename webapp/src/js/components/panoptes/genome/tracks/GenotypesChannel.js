@@ -7,7 +7,6 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
 import _filter from 'lodash/filter';
 import _sumBy from 'lodash/sumBy';
-import _each from 'lodash/each';
 import _sortedIndex from 'lodash/sortedIndex';
 import _sortedLastIndex from 'lodash/sortedLastIndex';
 import _sortBy from 'lodash/sortBy';
@@ -25,7 +24,6 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import PropertySelector from 'panoptes/PropertySelector';
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
-import {hatchRect} from 'util/CanvasDrawing';
 import FilterButton from 'panoptes/FilterButton';
 import GenotypesFan from 'panoptes/genome/tracks/GenotypesFan';
 import GenotypesTable from 'panoptes/genome/tracks/GenotypesTable';
@@ -34,7 +32,6 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import NumericInput from 'ui/NumericInput';
 
 import 'hidpi-canvas';
-import {propertyColour, categoryColours} from 'util/Colours';
 
 const FAN_HEIGHT = 60;
 
@@ -101,6 +98,9 @@ let GenotypesChannel = React.createClass({
     rowLabel: React.PropTypes.string,
     rowSort: React.PropTypes.string,
     rowHeight: React.PropTypes.number,
+    cellColour: React.PropTypes.string,
+    cellAlpha: React.PropTypes.string,
+    cellHeight: React.PropTypes.string,
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
@@ -243,22 +243,22 @@ let GenotypesChannel = React.createClass({
       let APIargs = {
         dataset: this.config.dataset,
         table,
-        col_qry: SQL.WhereClause.encode(columnQuery),
-        col_order: columnTableConfig.position,
-        row_qry: rowQuery,
-        row_order: rowSort,
-        row_offset: page * pageSize,
-        row_limit: (page + 1) * pageSize,
-        col_properties: colProperties.join('~'),
-        row_properties: rowProperties.join('~'),
-        '2D_properties': twoDProperties.join('~'),
-        col_only_on_limit: true
+        colQry: SQL.WhereClause.encode(columnQuery),
+        colOrder: columnTableConfig.position,
+        rowQry: rowQuery,
+        rowOrder: rowSort,
+        rowOffset: page * pageSize,
+        rowLimit: (page + 1) * pageSize,
+        colProperties: colProperties.join('~'),
+        rowProperties: rowProperties.join('~'),
+        '2DProperties': twoDProperties.join('~'),
+        colOnlyOnLimit: true
       };
       let cacheArgs = {
         method: 'twoDPageQuery',
         regionField: columnTableConfig.position,
-        queryField: 'col_qry',
-        limitField: 'col_fail_limit',
+        queryField: 'colQry',
+        limitField: 'colFailLimit',
         start,
         end,
         blockLimit: 1000,
@@ -288,15 +288,15 @@ let GenotypesChannel = React.createClass({
   calculatedDerivedProperties(block) {
     let config = this.config.twoDTablesById[this.props.table].showInGenomeBrowser;
     if (config.call && block['2D_' + config.call]) {
-      let call_matrix = block['2D_' + config.call];
-      let call_matrix_array = call_matrix.array;
-      let ploidy = call_matrix.shape[2] || 1;
-      let call_summary_matrix = new Int8Array(call_matrix_array.length / ploidy);
-      for (let row = 0, lrows = call_matrix.shape[0]; row < lrows; row++) {
-        for (let col = 0, lcols = call_matrix.shape[1]; col < lcols; col++) {
+      let callMatrix = block['2D_' + config.call];
+      let callMatrixArray = callMatrix.array;
+      let ploidy = callMatrix.shape[2] || 1;
+      let callSummaryMatrix = new Int8Array(callMatrixArray.length / ploidy);
+      for (let row = 0, lrows = callMatrix.shape[0]; row < lrows; row++) {
+        for (let col = 0, lcols = callMatrix.shape[1]; col < lcols; col++) {
           let call = -2; //init
           for (let allele = 0; allele < ploidy; allele++) {
-            let c = call_matrix_array[row * lcols * ploidy + col * ploidy + allele];
+            let c = callMatrixArray[row * lcols * ploidy + col * ploidy + allele];
 
             c = c > 0 ? 1 : c;
             if (c == -1) { //Missing
@@ -313,38 +313,38 @@ let GenotypesChannel = React.createClass({
             }
             call = c;
           }
-          call_summary_matrix[row * lcols + col] = call;
+          callSummaryMatrix[row * lcols + col] = call;
         }
       }
-      call_summary_matrix = {
-        array: call_summary_matrix,
-        shape: [call_matrix.shape[0], call_matrix.shape[1]]
+      callSummaryMatrix = {
+        array: callSummaryMatrix,
+        shape: [callMatrix.shape[0], callMatrix.shape[1]]
       };
-      block['2D__call'] = call_summary_matrix;
+      block['2D__call'] = callSummaryMatrix;
     }
     if (config.alleleDepth && block['2D_' + config.alleleDepth]) {
-      let depth_matrix = block['2D_' + config.alleleDepth];
-      let depth_matrix_array = depth_matrix.array;
-      let arity = depth_matrix.shape[2] || 1;
-      let fractional_matrix = new Uint8ClampedArray(depth_matrix_array.length / arity);
-      for (let row = 0, lrows = depth_matrix.shape[0]; row < lrows; row++) {
-        for (let col = 0, lcols = depth_matrix.shape[1]; col < lcols; col++) {
-          let ref_count = depth_matrix_array[row * lcols * arity + col * arity];
-          let alt_count = 0;
+      let depthMatrix = block['2D_' + config.alleleDepth];
+      let depthMatrixArray = depthMatrix.array;
+      let arity = depthMatrix.shape[2] || 1;
+      let fractionalMatrix = new Uint8ClampedArray(depthMatrixArray.length / arity);
+      for (let row = 0, lrows = depthMatrix.shape[0]; row < lrows; row++) {
+        for (let col = 0, lcols = depthMatrix.shape[1]; col < lcols; col++) {
+          let refCount = depthMatrixArray[row * lcols * arity + col * arity];
+          let altCount = 0;
           for (let allele = 1; allele < arity; allele++) {
-            alt_count += depth_matrix_array[row * lcols * arity + col * arity + allele];
+            altCount += depthMatrixArray[row * lcols * arity + col * arity + allele];
           }
-          let fraction = alt_count / (ref_count + alt_count);
+          let fraction = altCount / (refCount + altCount);
           fraction = Math.max(0, fraction);
           fraction = Math.min(1, fraction);
-          fractional_matrix[row * lcols + col] = alt_count + ref_count > 0 ? 1 + 255 * fraction : 0;
+          fractionalMatrix[row * lcols + col] = altCount + refCount > 0 ? 1 + 255 * fraction : 0;
         }
       }
-      fractional_matrix = {
-        array: fractional_matrix,
-        shape: [depth_matrix.shape[0], depth_matrix.shape[1]]
+      fractionalMatrix = {
+        array: fractionalMatrix,
+        shape: [depthMatrix.shape[0], depthMatrix.shape[1]]
       };
-      block['2D__fraction'] = fractional_matrix;
+      block['2D__fraction'] = fractionalMatrix;
     }
     return block;
   },
@@ -394,7 +394,7 @@ let GenotypesChannel = React.createClass({
 
 
   render() {
-    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, pageSize} = this.props;
+    let {width, sideWidth, table, start, end, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight} = this.props;
     const {rowData, dataBlocks, layoutBlocks, genomicPositions, colWidth} = this.state;
     const config = this.config.twoDTablesById[table];
     const rowConfig = this.config.tablesById[config.rowDataTable];
@@ -407,7 +407,7 @@ let GenotypesChannel = React.createClass({
         sideComponent={<GenotypesRowHeader
           table={table}
           width={sideWidth}
-          tableHeight={rowHeight * numRows}
+          height={rowHeight * numRows}
           rowData={rowData}
           rowHeight={rowHeight}
           rowLabel={rowLabel || rowConfig.primKey}
@@ -466,6 +466,22 @@ const GenotypesControls = React.createClass({
     FluxMixin,
     ConfigMixin
   ],
+
+  propTypes: {
+    table: React.PropTypes.string.isRequired,
+    columnQuery: React.PropTypes.string,
+    rowQuery: React.PropTypes.string,
+    rowLabel: React.PropTypes.string,
+    rowSort: React.PropTypes.string,
+    rowHeight: React.PropTypes.number,
+    cellColour: React.PropTypes.string,
+    cellAlpha: React.PropTypes.string,
+    cellHeight: React.PropTypes.string,
+    pageSize: React.PropTypes.number,
+    page: React.PropTypes.number,
+    layoutGaps: React.PropTypes.bool,
+  },
+
 
   render() {
     let {table, columnQuery, rowQuery, rowHeight, rowLabel, cellColour, cellAlpha, cellHeight, layoutGaps, rowSort, pageSize, page} = this.props;

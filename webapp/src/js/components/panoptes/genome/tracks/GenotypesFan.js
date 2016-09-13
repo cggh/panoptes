@@ -19,6 +19,8 @@ let GenotypesFan = React.createClass({
     end: React.PropTypes.number,
     width: React.PropTypes.number,
     height: React.PropTypes.number,
+    layoutBlocks: React.PropTypes.array,
+    dataBlocks: React.PropTypes.array
   },
 
   componentDidMount() {
@@ -48,7 +50,7 @@ let GenotypesFan = React.createClass({
   },
 
   paint(canvas, props) {
-    const {genomicPositions, dataBlocks, layoutBlocks, start, end, width, height, colWidth} = props;
+    const {genomicPositions, layoutBlocks, start, end, width, height, colWidth} = props;
     const ctx = canvas.getContext('2d');
     const scale =  width / (end - start);
     ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -60,7 +60,6 @@ export function regionCacheGet(APIArgs, cacheArgs, cancellation = null) {
           : [fetch(APIArgs, cacheArgs, level, index, cancellation),
           fetch(APIArgs, cacheArgs, level, index2, cancellation)])
           .then(ifTooBigFetchDirectly(APIArgs, cacheArgs, blockLevel, blockIndex, cancellation));
-      } else {
       }
     }
   }

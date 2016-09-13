@@ -2,7 +2,7 @@
 https://github.com/jgimbel/react-leaflet-div-icon/blob/master/div-icon.js
 */
 import {PropTypes, Children} from 'react';
-import {render} from 'react-dom';
+import {render, unmountComponentAtNode} from 'react-dom';
 import {DivIcon, marker} from 'leaflet';
 import {MapLayer} from 'react-leaflet';
 
@@ -37,8 +37,7 @@ export default class Divicon extends MapLayer {
     if (this.props.draggable !== prevProps.draggable) {
       if (this.props.draggable) {
         this.leafletElement.dragging.enable();
-      }
-      else {
+      } else {
         this.leafletElement.dragging.disable();
       }
     }
@@ -53,13 +52,12 @@ export default class Divicon extends MapLayer {
         container
       );
     }
-
   }
 
   removeContent() {
-  	                    const container = this.leafletElement._icon;
+    const container = this.leafletElement._icon;
     if (container) {
-  		                                        unmountComponentAtNode(container);
+      unmountComponentAtNode(container);
     }
   }
 

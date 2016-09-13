@@ -11,15 +11,15 @@ let DetectResize = React.createClass({
 
   componentDidMount: function() {
     this._onResize();
-    detectResize.addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
+    detectResize.addResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
   },
 
   componentWillUnmount: function() {
-    detectResize.removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize);
+    detectResize.removeResizeListener(ReactDOM.findDOMNode(this).parentNode, this._onResize); //eslint-disable-line react/no-find-dom-node
   },
 
   _onResize: function() {
-    let node = ReactDOM.findDOMNode(this);
+    let node = ReactDOM.findDOMNode(this); //eslint-disable-line react/no-find-dom-node
     if (this.props.onResize)
       this.props.onResize({
         width: node.offsetWidth,

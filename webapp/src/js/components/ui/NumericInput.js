@@ -1,6 +1,4 @@
 import _isFinite from 'lodash/isFinite';
-import _map from 'lodash/map';
-import _has from 'lodash/has';
 import classnames from 'classnames';
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -53,7 +51,6 @@ let NumericInput = React.createClass({
   },
 
   render() {
-    let {minWidth} = this.props;
     let {text, valid} = this.state;
     return (
           <input className={classnames({wide: true, invalid: !valid})}

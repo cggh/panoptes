@@ -125,8 +125,7 @@ let GenomeBrowserWithActions = React.createClass({
                 }
               }
             };
-          }
-          else if (prop.showInBrowser && prop.isNumerical) {
+          } else if (prop.showInBrowser && prop.isNumerical) {
             groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,

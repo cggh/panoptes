@@ -481,27 +481,27 @@ function modifyConfig(options) {
 function twoDPageQuery(options) {
   assertRequired(options, ['dataset', 'table']);
   let defaults = {
-    col_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-    row_qry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
-    col_order: null,
-    row_order: null,
-    col_properties: '',
-    row_properties: '',
-    '2D_properties': '',
-    sort_mode: null,
-    row_sort_property: null,
-    row_sort_cols: '',
-    col_key: null,
-    row_offset: null,
-    row_limit: null,
-    col_fail_limit: null,
+    colQry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+    rowQry: SQL.WhereClause.encode(SQL.WhereClause.Trivial()),
+    colOrder: null,
+    rowOrder: null,
+    colProperties: '',
+    rowProperties: '',
+    '2DProperties': '',
+    sortMode: null,
+    rowSortProperty: null,
+    rowSortCols: '',
+    colKey: null,
+    rowOffset: null,
+    rowLimit: null,
+    colFailLimit: null,
   };
   const {
-    dataset, table, col_qry, row_qry, col_order, row_order, col_properties,
-    row_properties, sort_mode, row_sort_property, row_sort_cols, col_key,
-    row_offset, row_limit, col_fail_limit
+    dataset, table, colQry, rowQry, colOrder, rowOrder, colProperties,
+    rowProperties, sortMode, rowSortProperty, rowSortCols, colKey,
+    rowOffset, rowLimit, colFailLimit
   } = {...defaults, ...options};
-  const twoD_properties = {...defaults, ...options}['2D_properties'];
+  const twoDProperties = {...defaults, ...options}['2DProperties'];
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -511,20 +511,20 @@ function twoDPageQuery(options) {
       respid: '2d_query',
       dataset,
       table,
-      col_qry: encodeQuery(col_qry),
-      row_qry: encodeQuery(row_qry),
-      col_order,
-      row_order,
-      col_properties,
-      row_properties,
-      '2D_properties': twoD_properties,
-      sort_mode,
-      row_sort_property,
-      row_sort_cols,
-      col_key,
-      row_offset,
-      row_limit,
-      col_fail_limit,
+      colQry: encodeQuery(colQry),
+      rowQry: encodeQuery(rowQry),
+      colOrder,
+      rowOrder,
+      colProperties,
+      rowProperties,
+      '2DProperties': twoDProperties,
+      sortMode,
+      rowSortProperty,
+      rowSortCols,
+      colKey,
+      rowOffset,
+      rowLimit,
+      colFailLimit,
     }
   });
 }
@@ -541,7 +541,7 @@ function query(options) {
     transpose: true
   };
   let {database, table, columns, query, orderBy, groupBy,
-    start, stop, distinct, transpose} = {...defaults, ...options};
+    start, stop, distinct} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,

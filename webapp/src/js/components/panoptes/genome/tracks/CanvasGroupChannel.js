@@ -1,5 +1,4 @@
 import React from 'react';
-import d3 from 'd3';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
 

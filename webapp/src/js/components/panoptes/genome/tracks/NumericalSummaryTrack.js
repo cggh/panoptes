@@ -12,7 +12,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
 
-import {findBlock, regionCacheGet, combineBlocks, optimalSummaryWindow} from 'util/PropertyRegionCache';
+import {findBlock, regionCacheGet} from 'util/PropertyRegionCache';
 import ErrorReport from 'panoptes/ErrorReporter';
 import LRUCache from 'util/LRUCache';
 import API from 'panoptes/API';

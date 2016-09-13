@@ -27,6 +27,8 @@ let NumericalTrackGroupChannel = React.createClass({
   ],
 
   propTypes: {
+    width: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number.isRequired,
     tracks: ImmutablePropTypes.listOf(
       ImmutablePropTypes.contains({
         track: React.PropTypes.string.isRequired,
@@ -149,7 +151,7 @@ let NumericalTrackGroupControls = React.createClass({
   },
 
   render() {
-    let {interpolation, tension, autoYScale, yMin, yMax, tracks} = this.props;
+    let {autoYScale, yMin, yMax, tracks} = this.props;
     let actions = this.getFlux().actions;
     tracks = tracks.map((track) => Immutable.Map({
       groupId: track.getIn(['props', 'table']),

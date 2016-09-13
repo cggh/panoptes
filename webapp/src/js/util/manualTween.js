@@ -1,14 +1,14 @@
 import tween from 'tween.js';
 
-export default function(val, start, stop, func, out_start, out_stop) {
+export default function(val, start, stop, func, outStart, outStop) {
   func = func || tween.Easing.Quadratic.InOut;
-  if (out_start == undefined)
-    out_start = 0;
-  if (out_stop == undefined)
-    out_stop = 1;
+  if (outStart == undefined)
+    outStart = 0;
+  if (outStop == undefined)
+    outStop = 1;
   if ((val <= start && start <= stop) || (val >= start && start >= stop))
-    return out_start;
+    return outStart;
   if ((val >= stop && start <= stop) || (val <= stop && start >= stop))
-    return out_stop;
-  return out_start + (func((val - start) / (stop - start)) * (out_stop - out_start));
+    return outStop;
+  return outStart + (func((val - start) / (stop - start)) * (outStop - outStart));
 }
