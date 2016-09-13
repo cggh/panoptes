@@ -55,7 +55,8 @@ let DataTableView = React.createClass({
 
   getInitialState() {
     return {
-      data: [],
+      uniqueColumns: [],
+      uniqueRows: [],
       loadStatus: 'loaded',
       width: 0,
       height: 0,
@@ -78,7 +79,9 @@ let DataTableView = React.createClass({
       columns.push(rowProperty);
       groupBy.push(rowProperty);
     }
-    this.setState({loadStatus: 'loading', dataByColumnRow: null, uniqueColumns: null, uniqueRows: null});
+    columns = _uniq(columns);
+    groupBy = _uniq(groupBy);
+    this.setState({loadStatus: 'loading', dataByColumnRow: null, uniqueColumns: [], uniqueRows: []});
 
     let queryAPIargs = {
       database: this.config.dataset,
@@ -86,6 +89,8 @@ let DataTableView = React.createClass({
       columns: columns,
       query: query,
       groupBy,
+      start: 0,
+      stop: 1000,
       transpose: false
     };
 
@@ -101,8 +106,8 @@ let DataTableView = React.createClass({
       let columnData = data[columnProperty];
       let rowData = data[rowProperty];
       let countData = data['count'];
-      let uniqueColumns = columnData ? ['_all_'].concat(_uniq(columnData.array)) : [];
-      let uniqueRows = rowData ? ['_all_'].concat(_uniq(rowData.array)) : [];
+      let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData.array) : []);
+      let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData.array) : []);
       let dataByColumnRow = {};
       uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
       dataByColumnRow['_all_'] = {};
@@ -147,8 +152,6 @@ let DataTableView = React.createClass({
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    if (!dataByColumnRow)
-      return null;
     return (
       <DetectResize onResize={this.handleResize}>
         <div className={classNames('datatable', className)}>
@@ -212,7 +215,7 @@ let DataTableView = React.createClass({
                            height: ROW_HEIGHT + 'px',
                            //background: background
                          }}>
-                      {dataByColumnRow[columnValue][uniqueRows[rowIndex]]}
+                      {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
                     </div>
                   }
               />)

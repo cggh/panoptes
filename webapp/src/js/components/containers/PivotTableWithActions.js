@@ -64,12 +64,14 @@ let PivotTableWithActions = React.createClass({
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
                             label="Column"
+                            allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => componentUpdate({columnProperty: v})}/>
           <PropertySelector table={table}
                             key="rowProperty"
                             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
                             label="Row"
+                            allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
                             onSelect={(v) => componentUpdate({rowProperty: v})}/>
         </div>
@@ -89,7 +91,7 @@ let PivotTableWithActions = React.createClass({
             <span className="text"><QueryString prepend="Filter:" table={table} query={query}/></span>
           </div>
           <div className="grow">
-            {(columnProperty || rowProperty) ? <PivotTableView {...this.props}/> : 'Pick properties'}
+            <PivotTableView {...this.props}/>
           </div>
         </div>
       </Sidebar>
