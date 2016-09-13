@@ -74,9 +74,6 @@ showInGenomeBrowser
       *PropertyIDList.* A list of the extra 2D data table properties that are displayed in the genotype channel. This will populate options for alpha and height control.
 
 
-genomeMaxViewportSizeX
-  *Value.* Maximum size of the genome browser viewport (in bp) for which genotype calls will be displayed.
-
 properties
   *List (required).* Contains a list of all properties defined for each cell of the 2D data table.
   The block can contain the following keys:

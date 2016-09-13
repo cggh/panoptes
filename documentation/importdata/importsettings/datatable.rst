@@ -61,10 +61,6 @@ storedQueries
       *Text (required).* a display name for this query.
 
 
-cacheWorkspaceData
-  *Boolean.* If set, a materialised table will be created in the relational database for this data in each workspace.
-  For large data tables (>1M records), this option is faster than the standard option, which uses a JOIN statement.
-
 maxCountQueryRecords
   *Value.*  Default:200000.  Defines the maximum number of records that will be downloaded to the client.
   This limit influences views that display individual data items, such as scatter plots and geographical map views.
@@ -80,9 +76,6 @@ fetchRecordCount
 
 quickFindFields
   *PropertyIDs.* The list of properties will be used by some tools in the software that allow the user to quickly find a (set of) item(s).
-
-columnIndexField
-  *Text.* When this table is linked to a 2D data table setting this value to the same as that in the 2D settings provides a performance improvement for large data sets.
 
 disableSubsets
   *Boolean.* If set, there will be no subsets options for this data table.
@@ -104,7 +97,6 @@ propertyGroups
       *Text (required).* a display name.
 
 
-AutoScanProperties - deprecated - please use scripts/mksettings.sh to generate a skeleton settings.gen file and use that to create a settings file
 .. _Properties:
 properties
   *List (required).* Each list item defines a :ref:`property<dataconcept_property>`, linked to a column in the TAB-delimited source file ``data``.
@@ -143,13 +135,10 @@ isRegionOnGenome
   *Boolean.*  Default:False.  Instructs Panoptes that records in this datatable should be interpreted as genomic regions.
   In this case, the *Chromosome*, *RegionStart* and *RegionStop* keys should be defined.
 
-browserTrackHeightFactor
-  *Value.* Specifies a relative size factor for the genome browser track height (only applicable if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
-
 chromosome
   *PropertyID.*  Default:chrom.  Specifies the table column ID that contains the chromosome
   (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
-  Note that the values in this column should correspond to the content of the ``chromosomes`` source file
+  Note that the values in this column should correspond to the content of fasta file
   (see :ref:`def-source-referencegenome`).
 
 position
@@ -164,18 +153,10 @@ regionStop
   *PropertyID.*  Default:stop.  Specifies the table column ID that contains the end position of the region
   (only to be used if *IsRegionOnGenome* is set).
 
-genomeMaxViewportSizeX
-  *Value.* Specifies the maximum genome browser viewport size (in bp)
-  for which individual data points from this table will be displayed in the tracks.
-  (only to be used if *IsPositionOnGenome* or *IsRegionOnGenome* is set).
-
 browserDefaultVisible
   *Boolean.* For genomic regions: specifies the default visibility status of this data table in the genome browser
   (only to be used if *IsRegionOnGenome* is set).
   Note that, for genomic position, default visibility is specified on a per-property basis.
-
-allowSubSampling
-  *Boolean.*  Default:False.  .
 
 maxTableSize
   *Value.*  Default:None.  .

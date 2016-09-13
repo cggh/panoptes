@@ -16,9 +16,6 @@ Possible keys
 .............
 
 
-refSequenceSumm
-  *Boolean.* If set, a summary track displaying the reference sequence with be included in the genome browser.
-
 annotation
   *Block.* Directives for parsing the annotation file (annotation.gff).
   The block can contain the following keys:

@@ -9,21 +9,19 @@ id
   *Text (required).* Identifier of the property, equal to the corresponding column header in the TAB-delimited source file ``data``.
 
 dataType
-  *Text (required).* Data type of the values in the property.
+  *Text (required).* Data type of the values in the property. Absent values can be coded by an empty string..
   Possible values:
 
   - ``Text``: text strings.
-  - ``Value``: numerical values (integer of decimal; the distinction is made by the key *DecimDigits*).
-    Absent values can be coded by an empty string, "NA", "None", "NULL", "null", "inf" or "-".
-  - ``HighPrecisionValue``: same as ``Value``, with higher precision.
-  - ``Boolean``: Yes/No binary states. Possible values according to YAML: y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF.
-    Absent values are coded by an empty string.
-  - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees).
-    Absent values are coded by an empty string.
-  - ``GeoLatitude``: latitude part of a geographical coordinates (in decimal degrees).
-    Absent values are coded by an empty string.
-  - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD).
-    Absent values are coded by an empty string.
+  - ``Float``: 32 bit floating point approximate number.
+  - ``Double``: 64 bit floating point approximate number.
+  - ``Boolean``: True/False binary states. Possible values 0,1,true,false.
+  - ``Int8``: 8 bit signed integer between -127 and 127.
+  - ``Int16``: 16 bit signed integer between -32767 and 32767.
+  - ``Int32``: 32 bit signed integer between -2147483647 and 2147483647.
+  - ``GeoLatitude``: latitude part of a geographical coordinates (in decimal degrees)..
+  - ``GeoLongitude``: longitude part of a geographical coordinates (in decimal degrees)..
+  - ``Date``: calendar dates, ISO formatted (i.e. YYYY-MM-DD)..
 
 name
   *Text (required).* Display name of the property.
@@ -51,26 +49,20 @@ categoryColors
   The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
 
 defaultWidth
-  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
+  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
 
 showBar
   *Boolean.* Draws a bar in the background of the table, indicating the value.
-  Requires *minVal* & *maxVal* to be defined.(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
+  Requires *minVal* & *maxVal* to be defined.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
 
 minVal
-  *Value.* For *Value* types, upper extent of scale(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
+  *Value.* For *Value* types, upper extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
 
 maxVal
-  *Value.* For *Value* types, lower extent of scale(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
-
-maxLen
-  *Value.*  Default:0.  If present used to specify the maximum size of the database column - otherwise it is calculated.
+  *Value.* For *Value* types, lower extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
 
 decimDigits
-  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
-
-maxDecimDigits
-  *Value.* (Not currently used) For *Value* types, specifies the number of decimal digits used to store the value in the database(only applies if *dataType* is ['Value', 'HighPrecisionValue']).
+  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
 
 index
   *Boolean.*  Default:False.  If set, instructs Panoptes to create an index for this property in the relational database.
@@ -98,14 +90,12 @@ relation
     reverseName
       *Text (required).*  Default:has.  Display name of the relation from parent to child.
 
-canUpdate
-  *Boolean.*  Default:False.   If set to true, this property can be modified by the user. (*NOTE: under construction*).
 
 showInTable
   *Boolean.*  Default:True.  If set to false this property will not be available to be shown in tables in the application.
 
 showInBrowser
-  *Boolean.*  Default:False.  If set, this property will automatically appear as a track in the genome browser
+  *Boolean.*  Default:True.  If set, this property will automatically appear as a track in the genome browser
   (only applies if *IsPositionOnGenome* is specified in database settings).
 
 tableDefaultVisible
@@ -122,30 +112,6 @@ channelColor
   *Text.*  Default:rgb(0,0,0).  Colour used to display this property in the genome browser. Formatted as ``"rgb(r,g,b)"``
   (only applies if *showInBrowser* is True).
 
-connectLines
-  *Boolean.*  Default:False.  Indicate that the points will be connected with lines in the genome browser
-  (only applies if *showInBrowser* is True).
-
 defaultVisible
   *Boolean.*  Default:True.  .
-
-order
-  *Value.*  Default:-1.  Only used for reference genome tracks.
-
-summaryValues
-  *Block.* Instructs Panoptes to apply a multiresolution summary algorithm for fast display of this property
-  in the genome browser at any zoom level(only applies if *showInBrowser* is True).
-  The block can contain the following keys:
-    blockSizeMin
-      *Value.*  Default:1.  Minimum summary block size (in bp).
-
-    blockSizeMax
-      *Value (required).* Maximum summary block size (in bp).
-
-    channelColor
-      *Text.*  Default:rgb(0,0,180).  Colour of the channel, for numerical channels. Formatted as ``"rgb(r,g,b)"``.
-
-    maxDensity
-      *Value.* For categorical properties this set the scale for the summary track in rows/bp. Defaults to 1/bp.
-
 
