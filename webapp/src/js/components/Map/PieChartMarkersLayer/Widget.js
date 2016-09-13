@@ -8,11 +8,11 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
-import CalcMapBounds from 'utils/CalcMapBounds';
+import CalcMapBounds from 'util/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
-import GeoLayouter from 'util/GeoLayouter';
+import GeoLayouter from 'utils/GeoLayouter';
 import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
 import PieChartWidget from 'Chart/Pie/Widget';

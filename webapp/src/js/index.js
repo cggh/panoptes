@@ -5,7 +5,6 @@ const history = createHistory();
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
-import 'components/ComponentRegistry';
 
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
@@ -46,7 +45,7 @@ function getAppState(location) {
     session: {
       components: {
         FirstTab: {
-          component: 'containers/StartTab',
+          type: 'StartTab',
           props: {}
         }
       },

@@ -105,8 +105,6 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
     } else {
-      if (!component.component)
-        component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
       let id = uid(10);
       this.state = this.state.setIn(['components', id], component);
@@ -159,8 +157,6 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.updateIn(['tabs', 'components'],
         (list) => list.filter((tabId) => tabId !== compId).push(compId));
     else {
-      if (!component.component)
-        component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
       compId = uid(10);
       this.state = this.state.setIn(['components', compId], component);

@@ -13,10 +13,14 @@ let TabPane = React.createClass({
   },
 
   icon() {
-    return this.refs.child.icon ? this.refs.child.icon() : null;
+    return (this.child.icon ? this.child.icon() : null) ||
+           (this.props.children.props ? this.props.children.props.icon : null) ||
+            "circle";
   },
   title() {
-    return this.refs.child.title ? this.refs.child.title() : null;
+    return (this.child.title ? this.child.title() : null) ||
+      (this.props.children.props ? this.props.children.props.title : null) ||
+      "Untitled";
   },
 
   render() {
@@ -31,7 +35,7 @@ let TabPane = React.createClass({
 
     return (
       <div {...divProps} className={classNames(this.props.className, classes)}>
-        {React.cloneElement(this.props.children, {ref: 'child'})}
+        {React.cloneElement(this.props.children, {ref: (node) => this.child = node})}
       </div>
     );
   }

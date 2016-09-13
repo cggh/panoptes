@@ -1,6 +1,7 @@
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
 import memoize from 'util/Memoize';
+import serialiseComponent from 'util/serialiseComponent';
 
 
 let SessionActions = {
@@ -34,9 +35,9 @@ let SessionActions = {
   popupClose(compId) {
     this.dispatch(SESSION.POPUP_CLOSE, {compId});
   },
-  popupOpen(component = null, props = {}, switchTo = true) {
+  popupOpen(component, switchTo = true) {
     this.dispatch(SESSION.POPUP_OPEN, {
-      component: {component, props},
+      component,
       switchTo
     });
   },
@@ -55,9 +56,9 @@ let SessionActions = {
   tabClose(compId) {
     this.dispatch(SESSION.TAB_CLOSE, {compId});
   },
-  tabOpen(component = null, props = {}, switchTo = true) {
+  tabOpen(component, switchTo = true) {
     this.dispatch(SESSION.TAB_OPEN, {
-      component: {component, props},
+      component: serialiseComponent(component),
       switchTo
     });
   },
