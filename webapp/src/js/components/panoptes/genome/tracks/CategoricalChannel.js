@@ -117,7 +117,7 @@ let CategoricalTrack = React.createClass({
   },
 
   componentDidUpdate() {
-    this.draw(this.props, this.blocks)
+    this.draw(this.props, this.blocks);
   },
 
   getDefaultProps() {
@@ -174,7 +174,7 @@ let CategoricalTrack = React.createClass({
         columns: columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['window', track],
-        orderBy: [['asc','window'], ['asc', track]],
+        orderBy: [['asc', 'window'], ['asc', track]],
         transpose: false,
       };
       let cacheArgs = {
@@ -273,16 +273,16 @@ let CategoricalTrack = React.createClass({
       const counts = block._counts_;
       const values = block._values_;
       const window = block._windows_;
-      for (let i=0, iEnd = window.length; i < iEnd; i++) {
-        const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
+      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
+        const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
         if (xPixel > -pixelWindowSize && xPixel < width + pixelWindowSize) {
           let currentY = height - (yScaleFactor * (0 - yMin));
           const iCounts = counts[i];
           const iValues = values[i];
           const sum = fractional ? _sum(iCounts) : 1;
-          for (let j=0, jEnd = iCounts.length; j < jEnd; j++) {
+          for (let j = 0, jEnd = iCounts.length; j < jEnd; j++) {
             ctx.fillStyle = colours(iValues[j]);
-            const countHeight = yScaleFactor * (iCounts[j]/sum);
+            const countHeight = yScaleFactor * (iCounts[j] / sum);
             ctx.fillRect(Math.floor(xPixel), currentY, Math.ceil(pixelWindowSize), -countHeight);
             currentY -= countHeight;
           }

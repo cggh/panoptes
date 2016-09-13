@@ -12,55 +12,55 @@ function decode_single_array(stream) {
   const array_len = stream.readUint32();
   let endian;
   switch (dtype[0]) {
-    case '<':
-      endian = DataStream.LITTLE_ENDIAN;
-      break;
-    case '>':
-      endian = DataStream.BIG_ENDIAN;
-      break;
-    case '|':
-      endian = DataStream.LITTLE_ENDIAN;
-      break;
-    default:
-      throw Error("dtype doesn't start with endianness");
-      return;
+  case '<':
+    endian = DataStream.LITTLE_ENDIAN;
+    break;
+  case '>':
+    endian = DataStream.BIG_ENDIAN;
+    break;
+  case '|':
+    endian = DataStream.LITTLE_ENDIAN;
+    break;
+  default:
+    throw Error("dtype doesn't start with endianness");
+    return;
   }
   let array;
   const type = dtype.substring(1);
   switch (type) {
-    case 'u1':
-      array = stream.readUint8Array(array_len);
-      break;
-    case 'u2':
-      array = stream.readUint16Array(array_len, endian);
-      break;
-    case 'u4':
-      array = stream.readUint32Array(array_len, endian);
-      break;
-    case 'i1':
-      array = stream.readInt8Array(array_len);
-      break;
-    case 'i2':
-      array = stream.readInt16Array(array_len, endian);
-      break;
-    case 'i4':
-      array = stream.readInt32Array(array_len, endian);
-      break;
-    case 'f4':
-      array = stream.readFloat32Array(array_len, endian);
-      break;
-    case 'f8':
-      array = stream.readFloat64Array(array_len, endian);
-      break;
-    case 'S':
-      array = [];
-      for (let i = 0; i < array_len; ++i) {
-          array.push(stream.readCString());
-      }
-      break;
-    default:
-      throw Error("unsupported dtype:" + dtype);
-      return;
+  case 'u1':
+    array = stream.readUint8Array(array_len);
+    break;
+  case 'u2':
+    array = stream.readUint16Array(array_len, endian);
+    break;
+  case 'u4':
+    array = stream.readUint32Array(array_len, endian);
+    break;
+  case 'i1':
+    array = stream.readInt8Array(array_len);
+    break;
+  case 'i2':
+    array = stream.readInt16Array(array_len, endian);
+    break;
+  case 'i4':
+    array = stream.readInt32Array(array_len, endian);
+    break;
+  case 'f4':
+    array = stream.readFloat32Array(array_len, endian);
+    break;
+  case 'f8':
+    array = stream.readFloat64Array(array_len, endian);
+    break;
+  case 'S':
+    array = [];
+    for (let i = 0; i < array_len; ++i) {
+      array.push(stream.readCString());
+    }
+    break;
+  default:
+    throw Error('unsupported dtype:' + dtype);
+    return;
   }
   //Firefox is a PITA and won't let us set properties on TypedArrays, so we have to wrap them in an object
   return {

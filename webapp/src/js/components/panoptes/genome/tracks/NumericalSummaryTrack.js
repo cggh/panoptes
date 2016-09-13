@@ -60,7 +60,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   componentDidUpdate() {
-    this.draw(this.props, this.blocks)
+    this.draw(this.props, this.blocks);
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -113,7 +113,7 @@ let NumericalSummaryTrack = React.createClass({
         columns: columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['window'],
-        orderBy: [['asc','window']],
+        orderBy: [['asc', 'window']],
         transpose: false,
       };
       let cacheArgs = {
@@ -162,7 +162,7 @@ let NumericalSummaryTrack = React.createClass({
   },
 
   draw(props) {
-    const { yMin, yMax, height, start, end, width } = props;
+    const {yMin, yMax, height, start, end, width} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -186,9 +186,9 @@ let NumericalSummaryTrack = React.createClass({
       const window = block.window.array;
       const min = block.min.array;
       const max = block.max.array;
-      for (let i=0, iEnd = window.length; i < iEnd; i++) {
+      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
         if (min[i] !== nullVal && min[i] == +min[i]) {  //If min is null then max, avg should be
-          const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
+          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
           const yMinPixel = height - (yScaleFactor * (min[i] - yMin));
           const yMaxPixel = height - (yScaleFactor * (max[i] - yMin));
           ctx.moveTo(xPixel, yMinPixel);
@@ -197,7 +197,7 @@ let NumericalSummaryTrack = React.createClass({
           ctx.lineTo(xPixel, yMaxPixel);
         }
         lastPointNull = (min[i] === nullVal || min[i] != +min[i]);
-        lastWindow = window[i]
+        lastWindow = window[i];
       }
     });
     ctx.fillStyle = 'rgba(61, 139, 213, 0.3)';
@@ -209,9 +209,9 @@ let NumericalSummaryTrack = React.createClass({
     this.blocks.forEach((block) => {
       const window = block.window.array;
       const avg = block.avg.array;
-      for (let i=0, iEnd = window.length; i < iEnd; i++) {
+      for (let i = 0, iEnd = window.length; i < iEnd; i++) {
         if (avg[i] !== nullVal && avg[i] == +avg[i]) {  //If min is null then max, avg should be, check also for NaN as that is the NULL value for float types
-          const xPixel = xScaleFactor * (-0.5 + window[i]*windowSize - start);
+          const xPixel = xScaleFactor * (-0.5 + window[i] * windowSize - start);
           const yPixel = height - (yScaleFactor * (avg[i] - yMin));
           if (lastPointNull || window[i] !== lastWindow + 1) {
             ctx.moveTo(xPixel, yPixel);
@@ -221,7 +221,7 @@ let NumericalSummaryTrack = React.createClass({
           ctx.lineTo(xPixel + pixelWindowSize, yPixel);
         }
         lastPointNull = (avg[i] === nullVal || avg[i] != +avg[i]);
-        lastWindow = window[i]
+        lastWindow = window[i];
       }
     });
     ctx.strokeStyle = '#3d8bd5';
@@ -252,8 +252,8 @@ let NumericalSummaryTrack = React.createClass({
       let min = [];
       let max = [];
       this.blocks.forEach((block) => {
-        const startIndex = _sortedIndex(block.window.array, start/this.summaryWindow);
-        const endIndex = _sortedLastIndex(block.window.array, end/this.summaryWindow);
+        const startIndex = _sortedIndex(block.window.array, start / this.summaryWindow);
+        const endIndex = _sortedLastIndex(block.window.array, end / this.summaryWindow);
         min.push(_min(block.min.array.subarray(startIndex, endIndex)));
         max.push(_max(block.max.array.subarray(startIndex, endIndex)));
       });

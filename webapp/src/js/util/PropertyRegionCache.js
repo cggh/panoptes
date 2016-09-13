@@ -156,7 +156,7 @@ export function combineBlocks(blocks, property) {
       result.set(data, arrayPos);
       arrayPos += data.length;
     });
-    return result
+    return result;
   } else {
     return _transform(blocks, (sum, block) =>
         Array.prototype.push.apply(sum, block[property] || []),
@@ -167,7 +167,7 @@ export function combineBlocks(blocks, property) {
 export function optimalSummaryWindow(start, end, desiredCount) {
   let desiredBlockSize = (end - start) / desiredCount;
   return Math.max(1, Math.pow(2.0, Math.round(Math.log(desiredBlockSize) / Math.log(2))));
-};
+}
 
 function flatten(data) {
   const flattened = [];

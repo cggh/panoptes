@@ -1,6 +1,6 @@
 import tween from 'tween.js';
 
-export default function (val, start, stop, func, out_start, out_stop) {
+export default function(val, start, stop, func, out_start, out_stop) {
   func = func || tween.Easing.Quadratic.InOut;
   if (out_start == undefined)
     out_start = 0;
@@ -10,5 +10,5 @@ export default function (val, start, stop, func, out_start, out_stop) {
     return out_start;
   if ((val >= stop && start <= stop) || (val <= stop && start >= stop))
     return out_stop;
-  return out_start+(func((val-start) / (stop-start)) * (out_stop - out_start))
-};
+  return out_start + (func((val - start) / (stop - start)) * (out_stop - out_start));
+}

@@ -40,7 +40,7 @@ let ReferenceSequence = React.createClass({
   },
 
   componentDidUpdate() {
-    this.draw(this.props, this.blocks)
+    this.draw(this.props, this.blocks);
   },
 
   //Called by DataFetcherMixin on prop change
@@ -79,7 +79,7 @@ let ReferenceSequence = React.createClass({
         columns: columns,
         query: SQL.WhereClause.encode(query),
         groupBy: ['base', 'window'],
-        orderBy: [['asc','window'], ['desc','count']],
+        orderBy: [['asc', 'window'], ['desc', 'count']],
         transpose: false,
       };
       let cacheArgs = {
@@ -112,7 +112,7 @@ let ReferenceSequence = React.createClass({
           })
       );
     }
-    this.draw(props)
+    this.draw(props);
   },
 
   cacheDraw(block) {
@@ -121,10 +121,10 @@ let ReferenceSequence = React.createClass({
     const sequence = [];
     //The returned array includes all bases in the window - trim to the modal which is the first due to sorting
     let lastWindow = null;
-    for (let i=0, iEnd = base.length; i < iEnd; ++i) {
+    for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
       if (window[i] !== lastWindow) {
         sequence.push(base[i]);
-        lastWindow = window[i]
+        lastWindow = window[i];
       }
     }
     const offscreenCanvas = document.createElement('canvas');
@@ -136,34 +136,34 @@ let ReferenceSequence = React.createClass({
     let imageData = ctx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
     let data = imageData.data;
     //It is safe to assume the sequence data has no gaps as we inserted it on import
-    for (let i=0, iEnd = sequence.length; i < iEnd; ++i) {
+    for (let i = 0, iEnd = sequence.length; i < iEnd; ++i) {
       data[i * 4 + 3] = 255;
       switch (sequence[i]) {
-        case 97: //a
-          data[i * 4] = 255;
-          data[i * 4 + 1] = 50;
-          data[i * 4 + 2] = 50;
-          break;
-        case 116: //t
-          data[i * 4] = 255;
-          data[i * 4 + 1] = 170;
-          data[i * 4 + 2] = 0;
-          break;
-        case 99: //c
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 128;
-          data[i * 4 + 2] = 192;
-          break;
-        case 103: //g
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 192;
-          data[i * 4 + 2] = 120;
-          break;
-        default:
-          data[i * 4] = 0;
-          data[i * 4 + 1] = 0;
-          data[i * 4 + 2] = 0;
-          break;
+      case 97: //a
+        data[i * 4] = 255;
+        data[i * 4 + 1] = 50;
+        data[i * 4 + 2] = 50;
+        break;
+      case 116: //t
+        data[i * 4] = 255;
+        data[i * 4 + 1] = 170;
+        data[i * 4 + 2] = 0;
+        break;
+      case 99: //c
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 128;
+        data[i * 4 + 2] = 192;
+        break;
+      case 103: //g
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 192;
+        data[i * 4 + 2] = 120;
+        break;
+      default:
+        data[i * 4] = 0;
+        data[i * 4 + 1] = 0;
+        data[i * 4 + 2] = 0;
+        break;
       }
     }
     ctx.putImageData(imageData, 0, 0);
@@ -178,7 +178,7 @@ let ReferenceSequence = React.createClass({
   },
 
   draw(props) {
-    const {start, end, width, sideWidth } = props;
+    const {start, end, width, sideWidth} = props;
     if (!this.refs.canvas) {
       return;
     }
@@ -215,9 +215,9 @@ let ReferenceSequence = React.createClass({
         if (pixelWindowSize >= 15 && this.summaryWindow === 1) {
           const base = block.base.array;
           for (let i = 0, iEnd = base.length; i < iEnd; ++i) {
-            const x = xScaleFactor * (block._blockStart - start) + ((i+1) * pixelWindowSize);
+            const x = xScaleFactor * (block._blockStart - start) + ((i + 1) * pixelWindowSize);
             if (x > 0 && x < maxDraw) {
-              ctx.fillText(lookup[base[i]] || '', x, HEIGHT/2);
+              ctx.fillText(lookup[base[i]] || '', x, HEIGHT / 2);
             }
           }
         }

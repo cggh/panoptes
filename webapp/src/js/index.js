@@ -1,5 +1,5 @@
 import _debounce from 'lodash/debounce';
-import createHistory from 'history/createBrowserHistory'
+import createHistory from 'history/createBrowserHistory';
 const history = createHistory();
 
 //Needed for JSX

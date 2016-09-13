@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import manualTween from 'util/manualTween';
 import _transform from 'lodash/transform';
@@ -68,7 +68,7 @@ let GenotypesFan = React.createClass({
     let lastDrawn = null;
     for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
       const [blockStart, blockEnd, colStart] = layoutBlocks[i];
-      for (let j = blockStart, jCol = colStart+0.5; j < blockEnd; ++j, ++jCol) {
+      for (let j = blockStart, jCol = colStart + 0.5; j < blockEnd; ++j, ++jCol) {
         // var key = col_primary_key[i];
         const columnPixel = jCol * pixColWidth;
         const genomicPixel = (genomicPositions[j] - start) * scale;
@@ -93,15 +93,15 @@ let GenotypesFan = React.createClass({
     }
     if (alpha > 0) {
       //Little hat and area fill
-      ctx.font = "12px Roboto";
+      ctx.font = '12px Roboto';
       ctx.fillStyle = 'rgb(0,0,0)';
-      ctx.strokeStyle = "rgba(0,0,0,0.2)";
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
       ctx.lineWidth = 1;
       for (let i = 0, iend = layoutBlocks.length; i < iend; ++i) {
         const [blockStart, blockEnd, colStart] = layoutBlocks[i];
-        for (let j = blockStart, jCol = colStart+0.5; j < blockEnd; ++j, ++jCol) {
+        for (let j = blockStart, jCol = colStart + 0.5; j < blockEnd; ++j, ++jCol) {
           // var key = col_primary_key[i];
-          var colour = 'rgba(190,190,190, 0.75)';
+          let colour = 'rgba(190,190,190, 0.75)';
           ctx.strokeStyle = 'rgba(120,120,120, 0.75)';
           // if (fncIsColSelected(key)) {
           //   var colour = 'rgba(190,80,80, 0.75)';
@@ -109,7 +109,7 @@ let GenotypesFan = React.createClass({
           // }
           ctx.fillStyle = colour;
           const spos = jCol * pixColWidth;
-          var middle = pixColWidth / 2;
+          let middle = pixColWidth / 2;
 
           ctx.save();
           ctx.translate(spos - middle, height);

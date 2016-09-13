@@ -42,7 +42,7 @@ const PropertySelector = React.createClass({
   render() {
     const {table, value, label, filter, allowNull} = this.props;
 
-    let propertyMenu = allowNull ? [<MenuItem value='__NULL__' primaryText="None"/>] : [];
+    let propertyMenu = allowNull ? [<MenuItem value="__NULL__" primaryText="None"/>] : [];
     let i = 0;
     if (table) {
       const propertyGroups = this.config.tablesById[table].propertyGroups;

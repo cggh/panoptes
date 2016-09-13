@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import repeatString from 'repeat-string';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import _sumBy from 'lodash/sumBy';
@@ -7,7 +7,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 const FRACTIONAL_COLOURMAP = [];
-for (var i = 0; i < 255; i++) {
+for (let i = 0; i < 255; i++) {
   FRACTIONAL_COLOURMAP[i + 1] = 'hsla(' + Math.round(240 + ((i / 256) * 120)) + ',100%,35%,';
 }
 FRACTIONAL_COLOURMAP[0] = 'hsl(0,50%,0%)';
@@ -94,20 +94,20 @@ let GenotypesTable = React.createClass({
           //Decide a colour for this genotype
           if (cellColour === 'call') {
             switch (colArray[index]) {
-              case 0:  //REF
-                ctx.fillStyle = 'rgba(0,128,192,' + alpha + ')';
-                break;
-              case 1:  //ALT
-                ctx.fillStyle = 'rgba(255,50,50,' + alpha + ')';
-                break;
-              case 2:  //HET
-                ctx.fillStyle = 'rgba(0,192,120,' + alpha + ')';
-                break;
-              default: //NO CALL
-                height = 0.2;
-                alpha = 0.2;
-                ctx.fillStyle = 'rgb(230,230,230)';
-                break;
+            case 0:  //REF
+              ctx.fillStyle = 'rgba(0,128,192,' + alpha + ')';
+              break;
+            case 1:  //ALT
+              ctx.fillStyle = 'rgba(255,50,50,' + alpha + ')';
+              break;
+            case 2:  //HET
+              ctx.fillStyle = 'rgba(0,192,120,' + alpha + ')';
+              break;
+            default: //NO CALL
+              height = 0.2;
+              alpha = 0.2;
+              ctx.fillStyle = 'rgb(230,230,230)';
+              break;
             }
           } else if (cellColour === 'fraction') {
             const fraction = colArray[index];
@@ -153,8 +153,8 @@ let GenotypesTable = React.createClass({
         if (dataBlockOffset + currentDataBlock.len <= blockStart ) {
           dataBlockIndex += 1;
           dataBlockOffset += currentDataBlock.len;
-        } else if (dataBlockOffset > blockEnd){
-          throw Error("Datablocks not in order? Data is ahead of layout");
+        } else if (dataBlockOffset > blockEnd) {
+          throw Error('Datablocks not in order? Data is ahead of layout');
         } else {
           const source = currentDataBlock.cache;
           const sourceStart = blockStart - dataBlockOffset;
@@ -189,7 +189,7 @@ let GenotypesTable = React.createClass({
     const rowLen = textArray.shape[1] || 0;
     textArray = textArray.array;
     ctx.save();
-    ctx.font = "" + rowHeight + "px Roboto";
+    ctx.font = '' + rowHeight + 'px Roboto';
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
@@ -198,13 +198,13 @@ let GenotypesTable = React.createClass({
     if (pixColWidth > textWidth + 15 && rowHeight >= 6) {
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       for (let i = 0; i < sourceWidth; ++i) {
-        ctx.fillRect(((colStart + i + 0.5) * pixColWidth) - textWidth/2, 0, textWidth, colLen * rowHeight)
+        ctx.fillRect(((colStart + i + 0.5) * pixColWidth) - textWidth / 2, 0, textWidth, colLen * rowHeight);
       }
       ctx.fillStyle = 'rgb(40,40,40)';
       for (let i = 0; i < sourceWidth; ++i) {
         for (let j = 0; j < colLen; ++j) {
           const sourceIndex = (j * rowLen) + i + sourceStart;
-          var text = '';
+          let text = '';
           for (let k = sourceIndex * arity, kEnd = (sourceIndex * arity) + arity; k < kEnd; ++k) {
             text += textArray[k];
             if (k < kEnd - 1)

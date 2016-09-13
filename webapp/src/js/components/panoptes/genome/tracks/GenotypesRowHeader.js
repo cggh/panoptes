@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
@@ -41,9 +41,9 @@ let GenotypesRowHeader = React.createClass({
 
     const showIndividualLines = rowHeight > 10;
     const fontSize = Math.min(14, rowHeight - 1);
-    ctx.font = "" + (fontSize) + "px Roboto";
+    ctx.font = '' + (fontSize) + 'px Roboto';
     ctx.fillStyle = 'rgb(0,0,0)';
-    ctx.strokeStyle = "rgba(0,0,0,0.2)";
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.lineWidth = 1;
     if (showIndividualLines) {
       ctx.beginPath();
@@ -59,8 +59,8 @@ let GenotypesRowHeader = React.createClass({
     let drawGroupLabel = (labelName, startIndex, endIndex) => {
       if (endIndex < startIndex)
         return;
-      var yposTop = startIndex * rowHeight;
-      var yposBottom = (endIndex + 1) * rowHeight;
+      let yposTop = startIndex * rowHeight;
+      let yposBottom = (endIndex + 1) * rowHeight;
       if (yposBottom > yposTop + 3) {
         ctx.beginPath();
         if (!bottomLineDrawn) {
@@ -72,9 +72,9 @@ let GenotypesRowHeader = React.createClass({
         ctx.stroke();
         bottomLineDrawn = true;
         if (yposBottom > yposTop + 5) {
-          var fontSize = Math.min(12, yposBottom - yposTop - 1);
-          ctx.font = "" + (fontSize) + "px Roboto";
-          var textYPos = (yposBottom + yposTop) / 2 - 1 + fontSize / 2;
+          let fontSize = Math.min(12, yposBottom - yposTop - 1);
+          ctx.font = '' + (fontSize) + 'px Roboto';
+          let textYPos = (yposBottom + yposTop) / 2 - 1 + fontSize / 2;
           ctx.fillText(labelName, 2, textYPos);
         }
       }
@@ -82,8 +82,8 @@ let GenotypesRowHeader = React.createClass({
         bottomLineDrawn = false;
     };
 
-    var groupLabel = null;
-    var groupStartIndex = 0;
+    let groupLabel = null;
+    let groupStartIndex = 0;
     for (let i = 0; i <= labelArray.length; i++) {
       let yPos = (i + 1) * (rowHeight);
       const label = Formatter(rowConfig.propertiesById[rowLabel], labelArray[i]);
@@ -92,20 +92,20 @@ let GenotypesRowHeader = React.createClass({
           //   ctx.fillStyle = 'rgb(255,80,80)';
           // else
           //   ctx.fillStyle = 'rgb(255,255,255)';
-          ctx.beginPath();
-          ctx.rect(1.5, yPos - rowHeight + 2.5, 10, rowHeight - 4);
-          ctx.fill();
-          ctx.stroke();
-          ctx.fillStyle = 'rgb(0,0,0)';
-          ctx.fillText(label, 13, yPos - 1 - (rowHeight - fontSize) / 2);
+        ctx.beginPath();
+        ctx.rect(1.5, yPos - rowHeight + 2.5, 10, rowHeight - 4);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = 'rgb(0,0,0)';
+        ctx.fillText(label, 13, yPos - 1 - (rowHeight - fontSize) / 2);
+      }
+      else {
+        if (label != groupLabel) {
+          drawGroupLabel(groupLabel, groupStartIndex, i - 1);
+          groupLabel = label;
+          groupStartIndex = i;
         }
-        else {
-          if (label != groupLabel) {
-            drawGroupLabel(groupLabel, groupStartIndex, i - 1);
-            groupLabel = label;
-            groupStartIndex = i;
-          }
-        }
+      }
     }
     if (groupLabel != null)
       drawGroupLabel(groupLabel, groupStartIndex, idArray.length - 1);

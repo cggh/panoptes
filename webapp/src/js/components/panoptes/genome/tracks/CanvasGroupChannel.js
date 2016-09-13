@@ -120,11 +120,11 @@ let CanvasGroupChannel = React.createClass({
               return <div className="numerical-channel-canvas-holder">
                 <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
                 {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
-                yMin,
-                yMax,
-                height,
-                onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
-                  }))}
+                  yMin,
+                  yMax,
+                  height,
+                  onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
+                }))}
               </div>;
             }}
           </Motion>

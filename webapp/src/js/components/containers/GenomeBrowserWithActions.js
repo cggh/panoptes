@@ -150,7 +150,7 @@ let GenomeBrowserWithActions = React.createClass({
       }
     });
     if (this.config.twoDTables.length > 0) {
-      groups[`_twoD`] = {
+      groups['_twoD'] = {
         name: 'Genotypes',
         icon: 'bitmap:genomebrowser.png',
         items: _transform(_filter(this.config.twoDTables, 'showInGenomeBrowser'), (result, table) => {

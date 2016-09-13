@@ -43,15 +43,15 @@ let SummarisationCache = {
     let optimalBlockSize = findOptimalBlockSize(start, end, targetPointCount);
     let [blockStart, blockEnd] = blockStartEnd(start, end, optimalBlockSize);
     //Breakup the fetching so we are cache friendly
-    columns = columns.concat({expr:['/', [positionField, optimalBlockSize]], as:'block'});
+    columns = columns.concat({expr: ['/', [positionField, optimalBlockSize]], as: 'block'});
     let promises = _map(intervalsFromRange(blockStart, blockEnd, FETCH_SIZE), (sliceStart) => {
       let APIargs = {
         database: dataset,
         table,
         columns: columns,
         query: SQL.WhereClause.encode(SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(chromosomeField, '=', chromosome),
-        SQL.WhereClause.CompareFixed(positionField, '>=', sliceStart*optimalBlockSize),
-        SQL.WhereClause.CompareFixed(positionField, '<', (sliceStart+FETCH_SIZE)*optimalBlockSize)])),
+        SQL.WhereClause.CompareFixed(positionField, '>=', sliceStart * optimalBlockSize),
+        SQL.WhereClause.CompareFixed(positionField, '<', (sliceStart + FETCH_SIZE) * optimalBlockSize)])),
         groupBy: ['block']
       };
       //select max("AF_1"), min("AF_1"), avg("AF_1"), p/512 as b from variants where "CHROM"='2L' and p between 512*1000 and 512*2001 group by b ;

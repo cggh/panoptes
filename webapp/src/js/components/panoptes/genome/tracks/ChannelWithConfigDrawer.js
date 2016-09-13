@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import offset from 'bloody-offset';
 import classnames from 'classnames';
-import _debounce from 'lodash/debounce'
+import _debounce from 'lodash/debounce';
 import Icon from 'ui/Icon';
 
 
@@ -81,7 +81,7 @@ let ChannelWithConfigDrawer = React.createClass({
         </div>
         <div className="channel-stack">
           {configComponent ?
-            <div className={classnames({open: controlsOpen, 'tray-container':true, 'config-container':true})} ref="controlsContainer">
+            <div className={classnames({open: controlsOpen, 'tray-container': true, 'config-container': true})} ref="controlsContainer">
               <div ref="controls" style={{width: `${effWidth}px`}}>
                 {configComponent}
               </div>
@@ -90,7 +90,7 @@ let ChannelWithConfigDrawer = React.createClass({
             {this.props.children}
           </div>
           {legendComponent ?
-            <div className={classnames({open: legendOpen, 'tray-container':true, 'legend-container':true})} ref="legendContainer">
+            <div className={classnames({open: legendOpen, 'tray-container': true, 'legend-container': true})} ref="legendContainer">
               <div ref="legend" style={{width: `${effWidth}px`}}>
                 {legendComponent}
               </div>

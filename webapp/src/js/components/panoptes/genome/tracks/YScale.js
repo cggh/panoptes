@@ -45,12 +45,12 @@ let YScale = React.createClass({
     scale.ticks(n).forEach((y) => {
       const Y = scale(y);
       if (Y > 12 && Y < height - 12) {
-        ctx.fillText(format(y), width-5, Y);
+        ctx.fillText(format(y), width - 5, Y);
         ctx.moveTo(0, Y);
         ctx.lineTo(width, Y);
       }
     });
-    ctx.stroke()
+    ctx.stroke();
   }
 });
 

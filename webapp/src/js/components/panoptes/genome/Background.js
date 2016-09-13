@@ -52,9 +52,9 @@ let Background = React.createClass({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     for (let pos = start; pos < end; pos += smallTickWidth) {
-        let x = scale(pos);
-        ctx.moveTo(x, 40);
-        ctx.lineTo(x, height);
+      let x = scale(pos);
+      ctx.moveTo(x, 40);
+      ctx.lineTo(x, height);
     }
     ctx.stroke();
     ctx.beginPath();

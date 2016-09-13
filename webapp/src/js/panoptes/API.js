@@ -75,13 +75,13 @@ function requestJSON(options, method = 'GET', data = null) {
 }
 
 function requestArrayBuffer(options, method = 'GET', data = null) {
-  options.responseType = "arraybuffer";
+  options.responseType = 'arraybuffer';
   return request(options, method, data)
     .then(({response}) => arrayBufferDecode(response));
 }
 
 function _decodeValList(columns) {
-  return function (jsonResponse) {
+  return function(jsonResponse) {
     let vallistdecoder = DataDecoders.ValueListDecoder();
     let ret = {};
     _forEach(columns, (encoding, id) =>
@@ -92,19 +92,19 @@ function _decodeValList(columns) {
 }
 
 function _decodeSummaryList(columns) {
-  return function (jsonResponse) {
+  return function(jsonResponse) {
     let ret = {};
     _forEach(columns, (column, key) => {
-        let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
+      let data = jsonResponse.results[`${column.folder}_${column.config}_${column.name}`];
         //For better or worse we imitate the original behaviour of passing on a lack of data
-        if (data)
-          ret[key] = {
-            data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
-            summariser: data.summariser
-          };
-        else
+      if (data)
+        ret[key] = {
+          data: DataDecoders.Encoder.Create(data.encoder).decodeArray(data.data),
+          summariser: data.summariser
+        };
+      else
           ret[key] = null;
-      }
+    }
     );
     return ret;
   };

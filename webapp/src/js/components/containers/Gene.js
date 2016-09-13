@@ -102,7 +102,7 @@
     render() {
       const {componentUpdate} = this.props;
       const {geneData, loadStatus} = this.state;
-
+      
       if (!geneData) return null;
 
       let genomePositionTableButtons = [];
