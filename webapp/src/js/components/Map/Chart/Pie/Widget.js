@@ -16,14 +16,17 @@ let PieChartMapWidget = React.createClass({
   ],
 
   propTypes: { // NB: componentColumns is not easy enough to supply via template
-    locationDataTable: React.PropTypes.string,
     chartDataTable: React.PropTypes.string,
+    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
     componentColumns: React.PropTypes.object,
+    componentUpdate: React.PropTypes.func.isRequired,
+    locationDataTable: React.PropTypes.string,
     locationNameProperty: React.PropTypes.string,
     locationSizeProperty: React.PropTypes.string,
     primKey: React.PropTypes.string,
     table: React.PropTypes.string,
-    title: React.PropTypes.string
+    title: React.PropTypes.string,
+    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
 
   title() {
@@ -33,13 +36,16 @@ let PieChartMapWidget = React.createClass({
   render() {
 
     let {
-      locationDataTable,
+      center,
       chartDataTable,
       componentColumns,
+      componentUpdate,
+      locationDataTable,
       locationNameProperty,
       locationSizeProperty,
       primKey,
-      table
+      table,
+      zoom,
     } = this.props;
 
     // NB: The table prop is passed by Panoptes, e.g. DataItem/Widget
@@ -55,7 +61,12 @@ let PieChartMapWidget = React.createClass({
     let widgetStyle = {height: '100%'};
 
     return (
-      <MapWidget style={widgetStyle}>
+      <MapWidget
+        center={center}
+        componentUpdate={componentUpdate}
+        style={widgetStyle}
+        zoom={zoom}
+      >
         <FeatureGroupWidget>
           <TileLayerWidget />
           <PieChartMarkersLayerWidget

@@ -1,58 +1,128 @@
-import React from 'react';
 import d3 from 'd3';
+import React from 'react';
+
+// Lodash
 import _cloneDeep from 'lodash/cloneDeep';
 import _each from 'lodash/each';
-import _zip from 'lodash/zip';
 import _keyBy from 'lodash/keyBy';
-import {latlngToMercatorXY, mercatorXYtolatlng} from 'util/WebMercator';
+import _zip from 'lodash/zip';
 
+// Panoptes
+import {latlngToMercatorXY, mercatorXYtolatlng} from 'util/WebMercator';
 
 // Mixins
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-// TODO: How to best name and place such helper functions?
-function updateXYUsingLngLat(node) {
-  let {x, y} = latlngToMercatorXY(node);
-  node.x = x;
-  node.y = y;
+// External functions
+function collide(node) {
+  let r = node.collisionRadius + 16,
+    nx1 = node.x - r,
+    nx2 = node.x + r,
+    ny1 = node.y - r,
+    ny2 = node.y + r;
+  return (quad, x1, y1, x2, y2) => {
+    if (quad.point && (quad.point !== node)) {
+      let x = node.x - quad.point.x,
+        y = node.y - quad.point.y,
+        l = Math.sqrt(x * x + y * y),
+        r = node.collisionRadius + quad.point.collisionRadius;
+      if (l < r) {
+        l = (l - r) / l * .5;
+        node.x -= x *= l * 0.15;
+        node.y -= y *= l * 0.15;
+        quad.point.x += x;
+        quad.point.y += y;
+      }
+    }
+    return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+  };
+}
+function createFixedAndNextRenderNodes(payload) {
+
+  let {propNodes, prevRenderNodes} = payload;
+
+  // The next set of nodes to render will be based on the nodes provided as props.
+  let nextRenderNodes = _cloneDeep(propNodes);
+
+  // The propNodes don't have an (x, y), but we can derive from their (lng, lat).
+  nextRenderNodes.forEach(updateXYUsingLngLat);
+
+  // The propNodes don't have radii suited for the -1 - 1 mercator projection,
+  // but we can derive from their radii in degrees.
+  nextRenderNodes.forEach(setCollisionRadius);
+
+  // The fixedNodes will be at the coordinates of the original propNodes.
+  let fixedNodes = _cloneDeep(propNodes);
+
+  // Create the relationship between each fixedNode (which won't be rendered)
+  // and its associated renderNode, and configure each fixedNode as fixed.
+  _zip(fixedNodes, nextRenderNodes).forEach(
+    ([fixedNode, nextRenderNode]) => {
+      fixedNode.fixed = true;
+      nextRenderNode.fixed = false;
+        //Assign the fixed node so that the nextRenderNode knows where it came from.
+      nextRenderNode.originalNode = fixedNode;
+    }
+  );
+
+  // Copy all of the position data (x, y, lat, lng)
+  // from the previous renderNodes (prevRenderNodes)
+  // to the new set of renderNodes (nextRenderNodes).
+  let existingRenderNodesByKey = _keyBy(prevRenderNodes, 'key');
+  nextRenderNodes.forEach((node) => {
+    if (existingRenderNodesByKey[node.key])
+      ['x', 'y', 'lat', 'lng'].forEach((val) => node[val] = existingRenderNodesByKey[node.key][val]);
+  });
+
+  return {fixedNodes, nextRenderNodes};
+}
+function setCollisionRadius(node) {
+  //Convert the radius from degrees to the -1 - 1 mercator projection.
+  node.collisionRadius = latlngToMercatorXY({lat: 0, lng: node.radius}).x;
 }
 function updateLngLatUsingXY(node) {
   let {lat, lng} = mercatorXYtolatlng(node);
   node.lng = lng;
   node.lat = lat;
 }
-function setRadius(node) {
-  //Convert the radius from degress to the -1 - 1 mercator projection.
-  node.collisionRadius = latlngToMercatorXY({lat: 0, lng: node.radius}).x;
+function updateXYUsingLngLat(node) {
+  let {x, y} = latlngToMercatorXY(node);
+  node.x = x;
+  node.y = y;
 }
 
 
 let GeoLayouter = React.createClass({
 
+  // NB: GeoLayouter is given nodes an Immutable List, but d3's force requires a simple array.
+  // .toArray() is shallow, .toJS() is deep.
+  // GeoLayouter returns its children ("renderNodes") as a simple array.
   propTypes: {
-    nodes: ImmutablePropTypes.list,
-    children: React.PropTypes.func
+    nodes: ImmutablePropTypes.list.isRequired,
+    children: React.PropTypes.func.isRequired
   },
 
   getDefaultProps() {
     return {
-      nodes: Immutable.List(),
-      zoom: 1
+      nodes: Immutable.List()
     };
   },
 
+  // Lifecycle methods
   componentWillMount() {
 
-    // Invoked once, both on the client and server, immediately before the initial rendering occurs.
-    //  If you call setState within this method, render() will see the updated state and will be executed only once despite the state change.
-
+    // NB: renderNodes is a simple array, not immutable.
     this.renderNodes = [];
 
-    // Since this.force.stop() needs to occur in componentWillUnmount(), this.force is also initialized here.
+    // Since this.force.stop() will occur in componentWillUnmount(), this.force is initialized here.
     this.force = d3.layout.force();
-    this.force.on('tick', this.onTick);
 
+    // On every tick event triggered by d3's layout force, this.handleTick will be called.
+    // The (x, y) of every force-applied node will be updated (potentially) on every tick.
+    this.force.on('tick', this.handleTick);
+
+    // Set up force options.
     this.force.gravity(0); // 0 is gravityless
     this.force.friction(0.1); // 1 is frictionless
     this.force.linkStrength(0.9); // 1 is rigid
@@ -63,85 +133,60 @@ let GeoLayouter = React.createClass({
     //let width = 1500, height = 1400;
     //this.force.size([width, height]); // Affects the gravitational center, i.e. [ x/2, y/2 ]
 
-  },
+    this.initForceUsingProps();
+    this.force.start();
 
+  },
   componentWillUnmount() {
     this.force.stop();
   },
 
-  componentWillReceiveProps(nextProps) {
-    //Before we do anything check to see if there are any meaningful changes
-    if (this.props.nodes === nextProps.nodes)
-      return;
-    let nodes = nextProps.nodes.toJS();
-    nodes.forEach(updateXYUsingLngLat);
-    nodes.forEach(setRadius);
 
-    let fixedNodes = _cloneDeep(nodes);
-    _zip(fixedNodes, nodes).forEach(([fixedNode, renderNode]) => {
-      fixedNode.fixed = true;
-      renderNode.fixed = false;
-        //Assign the fixed node so that the renderNode knows where it came from.
-      renderNode.originalNode = fixedNode;
-    }
-    );
-
-    //Copy over existing positions
-    let existingRenderNodesByKey = _keyBy(this.renderNodes, 'key');
-    nodes.forEach((node) => {
-      if (existingRenderNodesByKey[node.key])
-        ['x', 'y', 'lat', 'lng'].forEach((val) => node[val] = existingRenderNodesByKey[node.key][val]);
-    });
-
-    this.force.nodes(fixedNodes.concat(nodes));
-    let forceLinks = [];
-    for (let i = 0; i < nodes.length; i++) {
-      forceLinks.push({source: i, target: nodes.length + i});
-    }
-    this.force.links(forceLinks);
-    this.renderNodes = nodes;
-    this.force.start();
-  },
-
-  collide(node) {
-    let r = node.collisionRadius + 16,
-      nx1 = node.x - r,
-      nx2 = node.x + r,
-      ny1 = node.y - r,
-      ny2 = node.y + r;
-    return (quad, x1, y1, x2, y2) => {
-      if (quad.point && (quad.point !== node)) {
-        let x = node.x - quad.point.x,
-          y = node.y - quad.point.y,
-          l = Math.sqrt(x * x + y * y),
-          r = node.collisionRadius + quad.point.collisionRadius;
-        if (l < r) {
-          l = (l - r) / l * .5;
-          node.x -= x *= l * 0.15;
-          node.y -= y *= l * 0.15;
-          quad.point.x += x;
-          quad.point.y += y;
-        }
-      }
-      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-    };
-  },
-
-  detectCollisions() {
-    let q = d3.geom.quadtree(this.renderNodes);
-    _each(this.renderNodes, (node) =>
-      q.visit(this.collide(node))
-    );
-  },
-
-  onTick() {
+  // Event handlers
+  handleTick() {
     this.detectCollisions();
     this.forceUpdate();
   },
 
+  // Internal functions
+  detectCollisions() {
+    let q = d3.geom.quadtree(this.renderNodes);
+    _each(this.renderNodes, (node) =>
+      q.visit(collide(node))
+    );
+  },
+  initForceUsingProps() {
+
+    // Convert the prop nodes from an Immutable List to a simple array.
+    // .toArray() is shallow, .toJS() is deep.
+    let propNodesAsArray = this.props.nodes.toJS();
+
+    // Derive the fixedNodes and nextRenderNodes from the propNodes and previous renderNodes.
+    let {fixedNodes, nextRenderNodes} = createFixedAndNextRenderNodes({propNodes: propNodesAsArray, prevRenderNodes: this.renderNodes});
+
+    // Provide the force engine with all the nodes.
+    this.force.nodes(fixedNodes.concat(nextRenderNodes));
+
+    // Provide the force engine with all the links between the fixedNodes and their renderNodes
+    // known by preceding .concat(nextRenderNodes)
+    let forceLinks = [];
+    for (let i = 0; i < fixedNodes.size; i++) {
+      forceLinks.push({source: i, target: fixedNodes.size + i});
+    }
+    this.force.links(forceLinks);
+
+    // Remember the new renderNodes (to render them on the next render).
+    this.renderNodes = nextRenderNodes;
+  },
+
   render() {
-    // Extract the renderNodes from the forceNodes
+
+    // NB: this.forceUpdate(), which is called by this.handleTick(), causes a re-render,
+    // in case the (x, y) of this.renderNodes has been updated by this.force() and this.detectCollisions()
+
+    // Update the (lng, lat) of each renderNode using its (x, y)
     _each(this.renderNodes, updateLngLatUsingXY);
+
     return this.props.children(this.renderNodes);
   }
 });

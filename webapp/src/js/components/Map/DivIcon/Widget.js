@@ -6,6 +6,9 @@ import { render } from 'react-dom';
 import { DivIcon, marker } from 'leaflet';
 import { MapLayer } from 'react-leaflet';
 
+// CSS
+import 'Map/DivIcon/widget-styles.css';
+
 export default class Divicon extends MapLayer {
   static propTypes = {
     opacity: PropTypes.number,

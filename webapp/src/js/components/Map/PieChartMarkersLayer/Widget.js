@@ -1,5 +1,5 @@
-import React from 'react';
 import Immutable from 'immutable';
+import React from 'react';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -8,13 +8,14 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
+import CalcMapBounds from 'utils/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import GeoLayouter from 'utils/GeoLayouter';
+import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
 import PieChartWidget from 'Chart/Pie/Widget';
-import CalcMapBounds from 'utils/CalcMapBounds';
-import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -25,14 +26,14 @@ let PieChartMarkersLayerWidget = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('locationDataTable', 'chartDataTable', 'primKey', 'highlight')
+    DataFetcherMixin('locationDataTable', 'chartDataTable', 'primKey')
   ],
 
-  contextTypes: { //FIXME
+  contextTypes: {
+    crs: React.PropTypes.object,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    setBounds: React.PropTypes.func,
-    setLoadStatus: React.PropTypes.func
+    changeLayerStatus: React.PropTypes.func
   },
   propTypes: {
     defaultResidualFractionName: React.PropTypes.string,
@@ -73,7 +74,7 @@ let PieChartMarkersLayerWidget = React.createClass({
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('chartDataTable'), primKey: marker.get('primKey'), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.chartDataTable, primKey: marker.primKey, switchTo: !middleClick});
   },
 
 
@@ -95,18 +96,18 @@ let PieChartMarkersLayerWidget = React.createClass({
         se.lng = 180, nw.lng = -180;
       }
 
-      // FIXME: pieAreaSum is always 0
+      // NB: the markers' positions match the bounds exactly here,
+      // since the bounds have been determined automatically using the marker positions.
       let pieAreaSum = adaptedMarkers.filter(
-        (marker) =>
-          marker.get('lat') > se.lat &&
-          marker.get('lat') < nw.lat &&
-          marker.get('lng') > nw.lng &&
-          marker.get('lng') < se.lng
+        (marker) => marker.get('lat') >= se.lat &&
+          marker.get('lat') <= nw.lat &&
+          marker.get('lng') >= nw.lng &&
+          marker.get('lng') <= se.lng
       )
       .map((marker) => marker.get('radius') * marker.get('radius') * 2 * Math.PI)
       .reduce((sum, val) => sum + val, 0);
 
-      let fudge = 75; // FIXME: was 75
+      let fudge = 0.01; // FIXME: was 75
 
       if (pieAreaSum > 0) {
         nw = latlngToMercatorXY(nw);
@@ -143,7 +144,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       residualSectorColor
     } = props;
 
-    let {setBounds, setLoadStatus} = this.context; //FIXME
+    let {changeLayerStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
@@ -156,7 +157,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       return null;
     }
 
-    setLoadStatus('loading');
+    changeLayerStatus({loadStatus: 'loading'});
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -173,11 +174,11 @@ let PieChartMarkersLayerWidget = React.createClass({
 
     if (locationNameProperty) {
       locationColumns.push(locationNameProperty);
-    }
+    } // Otherwise, the pie charts will remain nameless (prop default)
 
     if (locationSizeProperty) {
       locationColumns.push(locationSizeProperty);
-    }
+    } // Otherwise, the pie charts will have a fixed size (prop default)
 
     let locationColumnsColumnSpec = {};
     locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
@@ -249,15 +250,13 @@ let PieChartMarkersLayerWidget = React.createClass({
               color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
             });
 
-          // TODO FIXME: base radius on locationData[i][locationSizeProperty], e.g. Math.sqrt(locationData[i][locationSizeProperty])
-
           markers = markers.push(Immutable.fromJS({
             chartDataTable: chartDataTable,
             key: i,
             lat: locationData[i][locationTableConfig.latitude],
             lng: locationData[i][locationTableConfig.longitude],
             name: locationData[i][locationNameProperty],
-            radius: 0.0005,
+            radius: Math.sqrt(locationData[i][locationSizeProperty]),
             chartData: markerChartData,
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey,
@@ -266,72 +265,66 @@ let PieChartMarkersLayerWidget = React.createClass({
 
         }
 
-        let bounds = CalcMapBounds.calcMapBounds(markers);
-        setBounds(bounds); //FIXME
 
-        // FIXME: adaptMarkerRadii always returns no markers.
-        //markers = this.adaptMarkerRadii(markers, bounds);
+        // NB: calcMapBounds is only based on lat lng positions, not radii.
+        let bounds = CalcMapBounds.calcMapBounds(markers);
+
+        markers = this.adaptMarkerRadii(markers, bounds);
 
         this.setState({markers});
+        changeLayerStatus({loadStatus: 'loaded', bounds: bounds});
 
-        setLoadStatus('loaded');
       })
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
-        setLoadStatus('error');
+        changeLayerStatus({loadStatus: 'error'});
       });
   },
 
   render() {
 
-    let {layerContainer, map} = this.context;
+    let {crs, layerContainer, map} = this.context;
     let {markers} = this.state;
 
     if (!markers.size) {
       return null;
     }
 
-    // FIXME
-    //let crs = this.context.map ? this.context.map.leafletElement.options.crs : window.L.CRS.EPSG3857;
-    let crs = window.L.CRS.EPSG3857;
-
-    let markerWidgets = [];
-
-    for (let i = 0, len = markers.size; i < len; i++) {
-
-      let marker = markers.get(i);
-
-      markerWidgets.push(
-        <ComponentMarkerWidget
-          key={i}
-          position={[marker.get('lat'), marker.get('lng')]}
-          title={marker.get('title')}
-          onClick={(e) => this.handleClickMarker(e, marker)}
-        >
-          <PieChartWidget
-            chartData={marker.get('chartData')}
-            crs={crs}
-            key={i}
-            lat={marker.get('lat')}
-            lng={marker.get('lng')}
-            name={marker.get('name')}
-            originalLat={marker.get('lat')}
-            originalLng={marker.get('lng')}
-            radius={marker.get('radius')}
-          />
-        </ComponentMarkerWidget>
-      );
-
-    }
-
     return (
-      <FeatureGroupWidget
-        children={markerWidgets}
-        layerContainer={layerContainer}
-        map={map}
-      />
+      <GeoLayouter nodes={markers}>
+        {
+          (renderNodes) =>
+          <FeatureGroupWidget
+            layerContainer={layerContainer}
+            map={map}
+          >
+            {
+              renderNodes.map(
+                (marker, i) =>
+                <ComponentMarkerWidget
+                  key={i}
+                  position={[marker.lat, marker.lng]}
+                  onClick={(e) => this.handleClickMarker(e, marker)}
+                >
+                  <PieChartWidget
+                    chartData={marker.chartData}
+                    crs={crs}
+                    key={i}
+                    lat={marker.lat}
+                    lng={marker.lng}
+                    name={marker.name}
+                    originalLat={marker.lat}
+                    originalLng={marker.lng}
+                    radius={marker.radius}
+                  />
+                </ComponentMarkerWidget>
+              )
+            }
+          </FeatureGroupWidget>
+        }
+      </GeoLayouter>
     );
 
   }

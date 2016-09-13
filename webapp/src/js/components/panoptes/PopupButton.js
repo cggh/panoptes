@@ -10,7 +10,7 @@ const componentTranslation = {
   ItemMap: 'Map/Table/Actions',
   Map: 'Map/Table/Actions',
   Tree: 'containers/TreeWithActions',
-  Plot: 'containers/PlotWithActions'
+  Plot: 'Plot/Table/Actions'
 };
 
 let PopupButton = React.createClass({

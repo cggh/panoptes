@@ -14,9 +14,10 @@ import TabPane from 'ui/TabPane';
 import DataItemActions from 'DataItem/Actions';
 
 let dynreq = require.context('..', true);
-const dynamicRequire = (path) => dynreq('./' + path + '/Widget');
+const dynamicRequire = (path) => dynreq('./' + path);
 
 let DataItemWidget = React.createClass({
+
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -55,8 +56,10 @@ let DataItemWidget = React.createClass({
     return (
       <div className="vertical stack" style={{position: 'absolute'}}>
         <div className="grow">
-          <TabbedArea activeTab={activeTab}
-                      onSwitch={(id) => componentUpdate({activeTab: id})} >
+          <TabbedArea
+            activeTab={activeTab}
+            onSwitch={(id) => componentUpdate({activeTab: id})}
+           >
             {views.map((view, i) => {
               view = view.toObject();
               let viewId = `view_${i}`;
@@ -64,7 +67,8 @@ let DataItemWidget = React.createClass({
               return (
                 <TabPane
                   compId={viewId}
-                  key={viewId}>
+                  key={viewId}
+                >
                   {React.createElement(dynamicRequire(view.component),
                     Object.assign(props,
                       {table, primKey},
@@ -80,7 +84,6 @@ let DataItemWidget = React.createClass({
                 </TabPane>
               );
             })}
-
           </TabbedArea>
         </div>
         <div>

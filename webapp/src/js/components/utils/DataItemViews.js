@@ -7,7 +7,7 @@ function getViews(dataItemViews, hasGeoCoord) {
   if (dataItemViews === undefined || dataItemViews === null) {
     // If there are no dataItemViews specified, then default to showing an Overview.
     views = views.push(Immutable.fromJS({
-      component: 'Overview',
+      component: 'Overview/Widget',
       props: {
         title: 'Overview'
       }
@@ -15,7 +15,7 @@ function getViews(dataItemViews, hasGeoCoord) {
     if (hasGeoCoord) {
       // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing a Map
       views = views.push(Immutable.fromJS({
-        component: 'Map',
+        component: 'Map/Table/Widget',
         props: {
           title: 'Location'
         }
@@ -27,15 +27,15 @@ function getViews(dataItemViews, hasGeoCoord) {
       // Compose a tabPane for each of the specified dataItemViews
       const viewTypes = {
         Overview: () => ({
-          component: 'Overview',
+          component: 'Overview/Widget',
           props: {
             title: 'Overview'
           }
         }),
         PieChartMap: () => ({
-          component: 'Map/Chart/Pie',
+          component: 'Map/Chart/Pie/Widget',
           props: {
-            center: [dataItemView.mapCenter.latitude, dataItemView.mapCenter.longitude],
+            initCenter: [dataItemView.mapCenter.latitude, dataItemView.mapCenter.longitude],
             componentColumns: dataItemView.componentColumns,
             locationDataTable: dataItemView.locationDataTable,
             locationNameProperty: dataItemView.locationNameProperty,
@@ -45,33 +45,33 @@ function getViews(dataItemViews, hasGeoCoord) {
           }
         }),
         ItemMap: () => ({
-          component: 'Map/Table',
+          component: 'Map/Table/Widget',
           props: {
             title: dataItemView.name
           }
         }),
         TableMap: () => ({
-          component: 'Map/Table',
+          component: 'Map/Table/Widget',
           props: {
             title: dataItemView.name
           }
         }),
         FieldList: () => ({
-          component: 'FieldList',
+          component: 'FieldList/Widget',
           props: {
             title: dataItemView.name,
             fields: dataItemView.fields
           }
         }),
         PropertyGroup: () => ({
-          component: 'PropertyGroup',
+          component: 'PropertyGroup/Widget',
           props: {
             title: dataItemView.name || dataItemView.groupId, //TODO This should be name from group config
             propertyGroupId: dataItemView.groupId
           }
         }),
         Template: () => ({
-          component: 'Template',
+          component: 'Template/Widget',
           props: {
             title: dataItemView.name, //TODO This should be name from group config
             content: dataItemView.content

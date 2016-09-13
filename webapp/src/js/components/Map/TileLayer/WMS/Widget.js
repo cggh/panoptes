@@ -1,11 +1,22 @@
 import React from 'react';
 
-import {TileLayer} from 'react-leaflet';
+import {WMSTileLayer} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let TileLayerWidget = React.createClass({
+/* To use Web Map Service Tile Layer in templates:
+
+  <p>WMS Tile Layer:</p>
+  <div style="width:300px;height:300px">
+  <Map center="[37, -97]" zoom="5"><TileLayer /><WMSTileLayer /></Map>
+  </div>
+
+*/
+
+// TODO: Is crs passed on to WMSTileLayer automatically (from MapWidget) via context?
+
+let WMSTileLayerWidget = React.createClass({
 
   mixins: [
     FluxMixin
@@ -20,11 +31,13 @@ let TileLayerWidget = React.createClass({
   },
   propTypes: {
     attribution: React.PropTypes.string,
+    format: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
+    layers: React.PropTypes.string, // Comma-separated list of WMS layers to show
     map: React.PropTypes.object,
-    maxZoom: React.PropTypes.number,
-    minZoom: React.PropTypes.number,
-    url: React.PropTypes.string.isRequired
+    transparent: React.PropTypes.bool,
+    url: React.PropTypes.string.isRequired,
+    version: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -39,22 +52,26 @@ let TileLayerWidget = React.createClass({
   },
   getDefaultProps() {
     return {
-      attribution: '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+      attribution: 'Weather data © 2012 IEM Nexrad',
+      format: 'image/png',
+      layers: 'nexrad-n0r-900913',
+      transparent: true,
+      url: 'http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi'
     };
   },
 
   render() {
-    let {attribution, maxZoom, minZoom, url} = this.props;
+    let {attribution, format, layers, transparent, url} = this.props;
 
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
     return (
-      <TileLayer
+      <WMSTileLayer
         attribution={attribution}
         children={undefined}
-        maxZoom={maxZoom}
-        minZoom={minZoom}
+        format={format}
+        layers={layers}
+        transparent={transparent}
         url={url}
       />
     );
@@ -63,4 +80,4 @@ let TileLayerWidget = React.createClass({
 
 });
 
-module.exports = TileLayerWidget;
+module.exports = WMSTileLayerWidget;

@@ -12,13 +12,32 @@ let BaseLayerWidget = React.createClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
   propTypes: {
     addBaseLayer: React.PropTypes.func,
     checked: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.bool]),
     children: React.PropTypes.node,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
     name: React.PropTypes.string.isRequired
   },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
 
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
+  },
   getDefaultProps() {
     return {
       name: 'Base Layer'
@@ -45,6 +64,8 @@ let BaseLayerWidget = React.createClass({
     if (children instanceof Array) {
       if (children.length > 1) {
         console.warn('BaseLayerWidget received more than one child. Using first child.');
+        // NB: <BaseLayer><Marker /><Marker /></BaseLayer> would error,
+        // whereas <BaseLayer><FeatureGroup><Marker /><Marker /></FeatureGroup></BaseLayer> is valid.
       }
       children = children[0];
     }

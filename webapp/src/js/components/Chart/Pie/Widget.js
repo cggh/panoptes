@@ -1,5 +1,5 @@
-import React from 'react';
 import d3 from 'd3';
+import React from 'react';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -7,12 +7,6 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
 import PieChartSectorWidget from 'Chart/Pie/Sector/Widget';
-
-import 'pie-chart.scss';
-
-// constants in this component
-// TODO: to go in config?
-const DEFAULT_OUTER_RADIUS = 5;
 
 let PieChartWidget = React.createClass({
 
@@ -22,35 +16,34 @@ let PieChartWidget = React.createClass({
   ],
 
   propTypes: {
-    name: React.PropTypes.string,
-    radius: React.PropTypes.number,
+    chartData: React.PropTypes.array,
+    crs: React.PropTypes.object,
     lat: React.PropTypes.number,
     lng: React.PropTypes.number,
+    name: React.PropTypes.string,
     originalLat: React.PropTypes.number,
     originalLng: React.PropTypes.number,
-    chartData: React.PropTypes.object,
-    crs: React.PropTypes.object
+    radius: React.PropTypes.number
   },
 
   getDefaultProps() {
     return {
-      residualFractionName: 'Other'
+      name: '',
+      residualFractionName: 'Other',
+      radius: 5
     };
   },
 
   render() {
-    let {name, radius, chartData, crs, lat, lng, originalLat, originalLng} = this.props;
+    let {chartData, crs, lat, lng, name, originalLat, originalLng, radius} = this.props;
 
     let sectorsData = [];
     let pieData = [];
 
-    // FIXME: ???
-    let chartDataArray = chartData.toArray();
-
-    for (let i = 0, len = chartDataArray.length; i < len; i++) {
-      sectorsData.push({color: chartDataArray[i].get('color'), title: name + '\n' + chartDataArray[i].get('name') + ': ' + chartDataArray[i].get('value')});
-      if (chartDataArray[i].get('value') !== undefined && chartDataArray[i].get('value') !== null && chartDataArray[i].get('value') !== '' && !isNaN(chartDataArray[i].get('value'))) {
-        pieData.push(chartDataArray[i].get('value'));
+    for (let i = 0, len = chartData.length; i < len; i++) {
+      sectorsData.push({color: chartData[i].color, title: (name === '' ? '' : name + '\n') + chartData[i].name + ': ' + chartData[i].value});
+      if (chartData[i].value !== undefined && chartData[i].value !== null && chartData[i].value !== '' && !isNaN(chartData[i].value)) {
+        pieData.push(chartData[i].value);
       } else {
         pieData.push(0);
       }
@@ -58,11 +51,7 @@ let PieChartWidget = React.createClass({
 
     let pie = d3.layout.pie().sort(null);
     let arcDescriptors = pie(pieData);
-
-    let outerRadius = DEFAULT_OUTER_RADIUS;
-    if (radius) {
-      outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
-    }
+    let outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
 
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSectorWidget
@@ -71,6 +60,7 @@ let PieChartWidget = React.createClass({
           outerRadius={outerRadius}
           fillColor={sectorData.color}
           title={sectorData.title}
+          className="panoptes-chart-pie-sector"
         />
     );
 
