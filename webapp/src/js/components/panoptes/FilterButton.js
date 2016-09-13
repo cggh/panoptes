@@ -15,7 +15,7 @@ let FilterButton = React.createClass({
     query: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     onPick: React.PropTypes.func.isRequired,
-    name: React.PropTypes.name
+    name: React.PropTypes.string
   },
 
   getDefaultProps() {
