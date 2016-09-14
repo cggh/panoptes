@@ -63,7 +63,7 @@ def handler(start_response, requestData):
             sqlQuery += " GROUP BY " + ','.join(map(DBCOLESC, groupBy.split('~')))
         if len(orderBy) > 0:
             sqlQuery += " ORDER BY {0}".format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
-        if startRow and endRow:
+        if startRow is not None and endRow is not None:
             sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
 
         if DQXDbTools.LogRequests:
