@@ -20,11 +20,14 @@ let TileLayerWidget = React.createClass({
   },
   propTypes: {
     attribution: React.PropTypes.string,
+    ext: React.PropTypes.string,
+    format: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     maxZoom: React.PropTypes.number,
     minZoom: React.PropTypes.number,
-    url: React.PropTypes.string.isRequired
+    url: React.PropTypes.string.isRequired,
+    variant: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -40,17 +43,18 @@ let TileLayerWidget = React.createClass({
   getDefaultProps() {
     return {
       attribution: '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      ext: 'png',
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
     };
   },
 
   render() {
-    let {attribution, maxZoom, minZoom, url} = this.props;
+    let {attribution, ext, format, maxZoom, minZoom, url, variant} = this.props;
 
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
     // NB: Only the props url, opacity and zIndex are dynamic.
-    // The props attribution, maxZoom, minZoom will not update automatically.
+    // The props attribution, maxZoom, minZoom, etc. will not update automatically.
     /* https://github.com/PaulLeCam/react-leaflet/blob/master/docs/Components.md
 
       The properties documented as dynamic properties are updated using the relevant Leaflet setter, other properties will not update the component when they are changed after the component is mounted.
@@ -64,12 +68,15 @@ let TileLayerWidget = React.createClass({
 
     return (
       <TileLayer
-        key={JSON.stringify({attribution, maxZoom, minZoom})}
+        key={JSON.stringify({attribution, maxZoom, minZoom, variant})}
         attribution={attribution}
         children={undefined}
+        ext={ext}
+        format={format}
         maxZoom={maxZoom}
         minZoom={minZoom}
         url={url}
+        variant={variant}
       />
     );
 

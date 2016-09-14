@@ -1,5 +1,8 @@
 import React from 'react';
 
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
@@ -44,11 +47,8 @@ let TableMapWidget = React.createClass({
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
     table: React.PropTypes.string,
+    tileLayerProps: React.PropTypes.oneOfType([React.PropTypes.string, ImmutablePropTypes.map]),
     title: React.PropTypes.string,
-    tileLayerAttribution: React.PropTypes.string,
-    tileLayerMaxZoom: React.PropTypes.number,
-    tileLayerMinZoom: React.PropTypes.number,
-    tileLayerURL: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
   },
 
@@ -67,10 +67,7 @@ let TableMapWidget = React.createClass({
       primKey,
       query,
       table,
-      tileLayerAttribution,
-      tileLayerMaxZoom,
-      tileLayerMinZoom,
-      tileLayerURL,
+      tileLayerProps,
       zoom
     } = this.props;
 
@@ -80,6 +77,19 @@ let TableMapWidget = React.createClass({
     // with locationDataTable taking preference when both are specfied.
     if (locationDataTable === undefined && table !== undefined) {
       locationDataTable = table;
+    }
+
+    let adaptedTileLayerProps = Immutable.Map();
+
+    if (tileLayerProps !== undefined && typeof tileLayerProps === 'object') {
+      // TODO: check the object looks OK before accepting it
+      adaptedTileLayerProps = tileLayerProps;
+    } else if (tileLayerProps !== undefined && typeof tileLayerProps === 'string') {
+      // TODO: check the string looks OK before trying to parse
+      let tileLayerPropsFromString = Immutable.fromJS(JSON.parse(tileLayerProps));
+      if (typeof tileLayerPropsFromString === 'object') {
+        adaptedTileLayerProps = tileLayerPropsFromString;
+      }
     }
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
@@ -95,14 +105,13 @@ let TableMapWidget = React.createClass({
         zoom={zoom}
       >
         <FeatureGroupWidget>
-          <TileLayerWidget
-            attribution={tileLayerAttribution}
-            tileLayerMaxZoom
-            maxZoom={tileLayerMaxZoom}
-            minZoom={tileLayerMinZoom}
-            url={tileLayerURL}
-           />
-          <TableMarkersLayerWidget highlight={highlight} locationDataTable={locationDataTable} primKey={primKey} query={query} />
+          <TileLayerWidget {...adaptedTileLayerProps.toObject()} />
+          <TableMarkersLayerWidget
+            highlight={highlight}
+            locationDataTable={locationDataTable}
+            primKey={primKey}
+            query={query}
+          />
         </FeatureGroupWidget>
       </MapWidget>
     );

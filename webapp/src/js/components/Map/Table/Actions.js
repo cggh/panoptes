@@ -1,13 +1,15 @@
+import React from 'react';
+
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import React from 'react';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
-import _map from 'lodash/map';
 import _filter from 'lodash/filter';
+import _isFunction from 'lodash/isFunction';
+import _map from 'lodash/map';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -31,17 +33,13 @@ import TableMapWidget from 'Map/Table/Widget';
 
 import 'map.scss';
 
-//import 'Map/Table/actions-styles.css';
-
 import 'leaflet-providers/leaflet-providers.js';
 
-const DEFAULT_TILE_LAYER_OBJ = Immutable.Map(Immutable.fromJS({
-  tileLayerAttribution: undefined,
-  tileLayerMaxZoom: undefined,
-  tileLayerMinZoom: undefined,
-  tileLayerUniqueName: '— Default —',
-  tileLayerURL: undefined
-}));
+const DEFAULT_TILE_LAYER = '— Default —';
+
+// http://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+const COORDINATES_PRECISION_IN_TEMPLATE_CODE = 5;
+
 
 let TableMapActions = React.createClass({
   mixins: [
@@ -55,7 +53,8 @@ let TableMapActions = React.createClass({
     componentUpdate: React.PropTypes.func.isRequired,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
-    selectedTileLayerObj: ImmutablePropTypes.map,
+    tileLayer: React.PropTypes.string,
+    tileLayerProps: ImmutablePropTypes.map,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
@@ -64,18 +63,120 @@ let TableMapActions = React.createClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      selectedTileLayerObj: DEFAULT_TILE_LAYER_OBJ,
+      tileLayer: DEFAULT_TILE_LAYER,
       sidebar: true,
       table: '_NONE_'
     };
   },
 
-  icon() {
-    return 'globe';
-  },
+  componentDidMount() {
 
-  title() {
-    return this.props.title || 'Table Mapper';
+    // Process the Leaflet tile layer providers.
+
+    // https://github.com/leaflet-extras/leaflet-providers
+    // https://leaflet-extras.github.io/leaflet-providers/preview/
+    this.tileLayers = {};
+    this.tileLayersMenu = [];
+
+    // Add the default tileLayer options, so it can be re-selected.
+
+    this.tileLayers[DEFAULT_TILE_LAYER] = {};
+    this.tileLayersMenu.push(<MenuItem key="__DEFAULT__" primaryText={"— Default —"} value={"— Default —"} />);
+
+    if (window.L.TileLayer.Provider.providers !== undefined) {
+
+      let providerNames = Object.keys(window.L.TileLayer.Provider.providers);
+      providerNames.sort();
+
+      for (let i = 0, len = providerNames.length; i < len; i++) {
+
+        let providerName = providerNames[i];
+        let providerObj = window.L.TileLayer.Provider.providers[providerName];
+
+        // TODO: Support providers that require registration
+        if (providerName === 'HERE' || providerName === 'MapBox') {
+          continue;
+        }
+
+        // FIXME: Providers not supported here yet
+        // NASAGIBS requires {time}, {tilematrixset}
+        if (providerName === 'NASAGIBS') {
+          continue;
+        }
+
+        let providerTileLayerObj = {
+          attribution: providerObj.options !== undefined ? providerObj.options.attribution : undefined,
+          ext: providerObj.options !== undefined ? providerObj.options.ext : undefined,
+          format: providerObj.options !== undefined ? providerObj.options.format : undefined,
+          maxZoom: providerObj.options !== undefined ? providerObj.options.maxZoom : undefined,
+          minZoom: providerObj.options !== undefined ? providerObj.options.minZoom : undefined,
+          variant: providerObj.options !== undefined ? providerObj.options.variant : undefined,
+          url: providerObj.url
+        };
+
+        // Add the default variant of this provider's tile layer to the menu and our memory.
+        // Only if
+        // - there is a URL
+        // - AND there is either no {variant} placeholder in the URL, OR there is both a placeholder and a value for variant.
+        // FIXME: List of default tile layers that don't work, e.g. BasemapAT
+        if (
+          providerTileLayerObj.url !== undefined
+          && (!providerObj.url.includes('{variant}') || (providerObj.url.includes('{variant}') && providerTileLayerObj.variant !== undefined))
+          && !providerName.match('BasemapAT|FreeMapSK|NLS|OpenSeaMap')
+        ) {
+          let tileLayerId = providerName;
+          this.tileLayers[tileLayerId] = providerTileLayerObj;
+          this.tileLayersMenu.push(<MenuItem key={i} primaryText={tileLayerId} value={tileLayerId} />);
+        }
+
+        // If this provider has variants...
+        // FIXME: List of tile layer variants that don't work, e.g. BasemapAT
+        if (
+          providerObj.variants !== undefined
+          && typeof providerObj.variants === 'object'
+          && !providerName.match('BasemapAT')
+        ) {
+
+          let variantKeyNames = Object.keys(providerObj.variants);
+          variantKeyNames.sort();
+
+          for (let j = 0, len = variantKeyNames.length; j < len; j++) {
+
+            let variantKeyName = variantKeyNames[j];
+            let variantObj = providerObj.variants[variantKeyName];
+
+            let variant = (variantObj.options !== undefined && variantObj.options.variant !== undefined) ? variantObj.options.variant : providerTileLayerObj.variant;
+            if (typeof variantObj === 'string') {
+              variant = variantObj;
+            }
+
+            let variantTileLayerObj = {
+              attribution: variantObj.options !== undefined && variantObj.options.attribution !== undefined ? variantObj.options.attribution : providerTileLayerObj.attribution,
+              ext: variantObj.options !== undefined && variantObj.options.ext !== undefined ? variantObj.options.ext : providerTileLayerObj.ext,
+              format: variantObj.options !== undefined && variantObj.options.format !== undefined ? variantObj.options.format : providerTileLayerObj.format,
+              maxZoom: variantObj.options !== undefined && variantObj.options.maxZoom !== undefined ? variantObj.options.maxZoom : providerTileLayerObj.maxZoom,
+              minZoom: variantObj.options !== undefined && variantObj.options.minZoom !== undefined ? variantObj.options.minZoom : providerTileLayerObj.minZoom,
+              variant: variant,
+              url: (variantObj.options !== undefined && variantObj.options.url !== undefined) ? variantObj.options.url : providerTileLayerObj.url,
+            };
+
+            let tileLayerId = providerName + '.' + variantKeyName;
+
+            if (variantTileLayerObj.url === undefined) {
+              console.warn('URL could not be determined for map tile layer: ' + tileLayerId);
+              continue;
+            }
+
+            this.tileLayers[tileLayerId] = variantTileLayerObj;
+            this.tileLayersMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerId} value={tileLayerId} />);
+
+          }
+
+        }
+
+      }
+
+    }
 
   },
 
@@ -86,35 +187,38 @@ let TableMapActions = React.createClass({
   handleChangeTable(table) {
     this.props.componentUpdate({table});
   },
-  handleChangeTileLayer(event, selectedIndex, selectedValue) {
+  handleChangeTileLayer(event, selectedIndex, selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
-    let selectedTileLayerObj = _cloneDeep(this.tileLayerObjects[selectedValue]);
+    let selectedTileLayerProps = _cloneDeep(this.tileLayers[selectedTileLayer]);
 
+    // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
     let adaptedZoom = this.props.zoom;
-    if (
-      selectedTileLayerObj.get('tileLayerMaxZoom') !== undefined
-      && this.props.zoom > selectedTileLayerObj.get('tileLayerMaxZoom')
-    ) {
-      adaptedZoom = selectedTileLayerObj.get('tileLayerMaxZoom');
+    if (this.props.zoom > selectedTileLayerProps.maxZoom) {
+      adaptedZoom = selectedTileLayerProps.maxZoom;
+    }
+    if (this.props.zoom < selectedTileLayerProps.minZoom) {
+      adaptedZoom = selectedTileLayerProps.minZoom;
     }
 
-    if (
-      selectedTileLayerObj.get('tileLayerMinZoom') !== undefined
-      && this.props.zoom < selectedTileLayerObj.get('tileLayerMinZoom')
-    ) {
-      adaptedZoom = selectedTileLayerObj.get('tileLayerMinZoom');
-    }
-
-    this.props.componentUpdate({selectedTileLayerObj: selectedTileLayerObj, zoom: adaptedZoom});
+    // NB: tileLayerProps will get converted from a plain object to an Immutable map.
+    this.props.componentUpdate({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
   },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
     this.props.componentUpdate({center, zoom});
   },
 
+  icon() {
+    return 'globe';
+  },
+  title() {
+    return this.props.title || 'Table Mapper';
+
+  },
+
   render() {
-    let {center, componentUpdate, query, selectedTileLayerObj, sidebar, table, zoom} = this.props;
+    let {center, componentUpdate, query, tileLayer, tileLayerProps, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -130,249 +234,6 @@ let TableMapActions = React.createClass({
     tableOptions = [{value: '_NONE_', leftIcon: undefined, label: '— None —'}].concat(tableOptions);
 
 
-    // https://github.com/leaflet-extras/leaflet-providers
-    // https://leaflet-extras.github.io/leaflet-providers/preview/
-    this.tileLayerObjects = {};
-    let tileLayerMenu = [];
-
-    // Add the default tileLayer options, so it can be re-selected.
-
-    this.tileLayerObjects['— Default —'] = DEFAULT_TILE_LAYER_OBJ;
-    tileLayerMenu.push(<MenuItem key="__DEFAULT__" primaryText={"— Default —"} value={"— Default —"} />);
-
-    if (window.L.TileLayer.Provider.providers !== undefined) {
-
-      let mapProviderNames = Object.keys(window.L.TileLayer.Provider.providers);
-      mapProviderNames.sort();
-
-      for (let i = 0, len = mapProviderNames.length; i < len; i++) {
-
-        let mapProviderName = mapProviderNames[i];
-        let providerObj = window.L.TileLayer.Provider.providers[mapProviderName];
-
-        // TODO: Support providers requiring registration
-        // Skip providers requiring registration
-        if (mapProviderName === 'HERE' || mapProviderName === 'MapBox') {
-          continue;
-        }
-
-        // FIXME: Providers not working
-        // Skip providers not working
-        // BasemapAT requires {format} -- trying but failing
-        // NASAGIBS requires {time}, {tilematrixset}, {maxZoom}, {format}
-        if (mapProviderName === 'BasemapAT' || mapProviderName === 'NASAGIBS') {
-          continue;
-        }
-
-        if (
-          providerObj.variants !== undefined
-          && typeof providerObj.variants === 'object'
-          && Object.keys(providerObj.variants).length > 0
-        ) {
-
-          // If this provider has variants...
-
-          let variantTemplateUrl = undefined;
-          let defaultUrl = undefined;
-          let defaultFormat = providerObj.options.format;
-
-          if (
-            providerObj.options.variant !== undefined
-            && !providerObj.url.includes('{variant}')
-            && providerObj.url.includes(`/${providerObj.options.variant}/`)
-          ) {
-            // If this provider has a default variant, but its URL doesn't have the variant placeholder
-            // but the default variant does appear in the URL
-            // Then replace the first occurrence of the default variant with the variant placeholder
-            // to make the _variantTemplateUrl
-            // TODO: Use a more Leaflet-esque method, i.e. http://leafletjs.com/reference.html#url-template
-
-            variantTemplateUrl = providerObj.url.replace(`/${providerObj.options.variant}/`, '/{variant}/');
-            defaultUrl = providerObj.url;
-          } else if (
-            providerObj.options.variant !== undefined
-            && providerObj.url.includes('{variant}')
-          ) {
-            // If this provider has a default variant, and its URL has the variant placeholder
-            variantTemplateUrl = providerObj.url;
-            defaultUrl = providerObj.url.replace('/{variant}/', `/${providerObj.options.variant}/`);
-          } else if (
-            providerObj.options.variant === undefined
-            && providerObj.url.includes('{variant}')
-          ) {
-            // If this provider has no default variant, but its URL has the variant placeholder
-            variantTemplateUrl = providerObj.url;
-            defaultUrl = null;
-          } else if (
-            providerObj.options.variant === undefined
-            && providerObj.url !== undefined
-            && !providerObj.url.includes('{variant}')
-          ) {
-            // If this provider has no default variant and its URL does not have the variant placeholder
-            // but it does have a URL, and its variants *might* have a URL
-            variantTemplateUrl = null;
-            defaultUrl = providerObj.url;
-          } else {
-            console.warn('Unhandled map tile provider variants: %o', providerObj);
-            continue;
-          }
-
-          if (variantTemplateUrl !== undefined && variantTemplateUrl !== null) {
-            if (variantTemplateUrl.includes('{ext}')) {
-              variantTemplateUrl = variantTemplateUrl.replace('{ext}', 'png');
-            }
-          }
-
-          if (defaultUrl !== undefined && defaultUrl !== null) {
-
-            if (defaultUrl.includes('{format}') && defaultFormat !== undefined) {
-              defaultUrl = defaultUrl.replace('{format}', defaultFormat);
-            }
-
-            if (defaultUrl.includes('{ext}')) {
-              defaultUrl = defaultUrl.replace('{ext}', 'png');
-            }
-
-            // If there is no defaultUrl (perhaps only variant URLs)
-            // then don't create a default menu option for this tile provider.
-
-            // If this provider has a default variant, then show the variant name in the menu option.
-            // Otherwise, just show the provider name.
-
-            let defaultTileLayerObj = {
-              mapProviderName: mapProviderName,
-              tileLayerAttribution: providerObj.options.attribution,
-              tileLayerMaxZoom: providerObj.options.maxZoom,
-              tileLayerMinZoom: providerObj.options.minZoom,
-              tileLayerUniqueName: providerObj.options.variant !== undefined ? `${mapProviderName} (${providerObj.options.variant})` : mapProviderName,
-              tileLayerVariantName: mapProviderName,
-              tileLayerURL: defaultUrl
-            };
-
-            this.tileLayerObjects[defaultTileLayerObj.tileLayerUniqueName] = Immutable.fromJS(defaultTileLayerObj);
-            tileLayerMenu.push(<MenuItem key={i} primaryText={defaultTileLayerObj.tileLayerUniqueName} value={defaultTileLayerObj.tileLayerUniqueName} />);
-          }
-
-          //// Convert each variant into a tileLayerMenu with a tileLayerObj as a value.
-
-          let variantKeyNames = Object.keys(providerObj.variants);
-          variantKeyNames.sort();
-
-          for (let j = 0, len = variantKeyNames.length; j < len; j++) {
-
-            let variantKeyName = variantKeyNames[j];
-            let variantObj = providerObj.variants[variantKeyName];
-
-            let tileLayerObj = {
-              mapProviderName: mapProviderName,
-              tileLayerAttribution: providerObj.options.attribution,
-              tileLayerMaxZoom: providerObj.options.maxZoom,
-              tileLayerMinZoom: providerObj.options.minZoom,
-              tileLayerUniqueName: mapProviderName + '.' + variantKeyName,
-              tileLayerVariantName: variantKeyName
-            };
-
-            // NB: Variants either have their own URL specified in options,
-            // or their URL is composed using the variantTemplateUrl and the variant name.
-
-            // NB: The value of a variant is either a string, specifying the variant name
-            // or the value is an object with options.
-
-            if (variantObj === undefined) {
-              // Skip if the variant object is undefined (i.e. we only have the key name)
-              continue;
-            }
-
-            if (typeof variantObj === 'string' && variantObj !== '') {
-
-              if (variantTemplateUrl !== undefined && variantTemplateUrl !== null) {
-                tileLayerObj.tileLayerURL = variantTemplateUrl.replace('{variant}', variantObj);
-
-                if (tileLayerObj.tileLayerURL.includes('{format}')) {
-                  if (defaultFormat !== undefined && defaultFormat !== null) {
-                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', defaultFormat);
-                  }
-                }
-
-              } else {
-                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerUniqueName + ': ' + variantObj);
-              }
-
-            } else if (typeof variantObj === 'object') {
-
-
-              if (variantObj.options !== undefined && variantObj.options !== null) {
-
-                if (variantObj.options.maxZoom !== undefined && variantObj.options.maxZoom !== null) {
-                  tileLayerObj.tileLayerMaxZoom = variantObj.options.maxZoom;
-                }
-                if (variantObj.options.minZoom !== undefined && variantObj.options.minZoom !== null) {
-                  tileLayerObj.tileLayerMinZoom = variantObj.options.minZoom;
-                }
-              }
-
-
-              if (
-                variantTemplateUrl !== undefined
-                && variantTemplateUrl !== null
-                && variantObj.options !== undefined
-                && variantObj.options !== null
-                && variantObj.options.variant !== undefined
-                && variantObj.options.variant !== null
-              ) {
-
-                tileLayerObj.tileLayerURL = variantTemplateUrl.replace('{variant}', variantObj.options.variant);
-
-                if (tileLayerObj.tileLayerURL.includes('{format}')) {
-                  if (variantObj.options.format !== undefined && variantObj.options.format !== null) {
-                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', variantObj.options.format);
-                  } else if (defaultFormat !== undefined && defaultFormat !== null) {
-                    tileLayerObj.tileLayerURL = tileLayerObj.tileLayerURL.replace('{format}', defaultFormat);
-                  }
-                }
-
-              } else if (
-                variantObj.url !== undefined
-                && variantObj.url !== null
-              ) {
-                tileLayerObj.tileLayerURL = variantObj.url;
-              } else {
-                console.warn('Could not determine URL for map tile option ' + tileLayerObj.tileLayerUniqueName + ': %o', variantObj);
-              }
-
-            } else {
-              console.warn('Unhandled variant type for option ' + tileLayerObj.tileLayerUniqueName + ': %o', variantObj);
-            }
-
-            if (tileLayerObj.tileLayerURL !== undefined && tileLayerObj.tileLayerURL !== null) {
-              this.tileLayerObjects[tileLayerObj.tileLayerUniqueName] = Immutable.fromJS(tileLayerObj);
-              tileLayerMenu.push(<MenuItem key={i + '_' + j} primaryText={tileLayerObj.tileLayerUniqueName} value={tileLayerObj.tileLayerUniqueName} />);
-            } else {
-              // Already warned, "Could not determine URL for map tile option"
-              //console.warn('tileLayerURL was not defined for option ' + tileLayerObj.tileLayerUniqueName + ': %o', tileLayerObj);
-            }
-
-          }
-        } else {
-
-          let tileLayerObj = {
-            mapProviderName: mapProviderName,
-            tileLayerAttribution: providerObj.options.attribution,
-            tileLayerMaxZoom: providerObj.options.maxZoom,
-            tileLayerMinZoom: providerObj.options.minZoom,
-            tileLayerUniqueName: mapProviderName,
-            tileLayerVariantName: mapProviderName,
-            tileLayerURL: providerObj.url
-          };
-
-          this.tileLayerObjects[tileLayerObj.tileLayerUniqueName] = Immutable.fromJS(tileLayerObj);
-          tileLayerMenu.push(<MenuItem key={i} primaryText={tileLayerObj.tileLayerUniqueName} value={tileLayerObj.tileLayerUniqueName} />);
-        }
-
-
-      }
-
-    }
 
     // TODO: Persist current tile layer through marker onClick event?
 
@@ -383,36 +244,61 @@ let TableMapActions = React.createClass({
 
     // TODO: truncate center lat & lng decimals to fewer places.
 
-    let adaptedCenterForTemplate = center !== undefined ? ' center=\'' + JSON.stringify(center) + '\'' : '';
-    let adaptedZoomForTemplate = zoom !== undefined ? ' zoom="' + zoom.toString() + '"' : '';
+    let adaptedCenterForTemplate = undefined;
 
-    let templateWrap = '<div style="width:300px;height:300px">';
 
-    let templateCode = templateWrap + '<Map /></div>';
-    if (table !== undefined && table !== '_NONE_' && selectedTileLayerObj.size !== 0) {
+
+    if (center instanceof Array) {
+      // TODO: check the array looks like [0, 0]
+      adaptedCenterForTemplate = JSON.stringify(center);
+    } else if (center !== undefined && typeof center === 'object') {
+      // TODO: check the object looks like {lat: 50, lng: 30} or {lat: 50, lon: 30}
+      if (center.lat !== undefined) {
+        adaptedCenterForTemplate = JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
+      } else if (_isFunction(center.get)) {
+        // TODO: check the object is a Map
+        adaptedCenterForTemplate = JSON.stringify([center.get('lat').toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.get('lng').toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
+      } else {
+        console.error('center is an unhandled object: %o', center);
+      }
+    } else if (center !== undefined && typeof center === 'string') {
+      // TODO: check the string looks like OK before accepting.
+      adaptedCenterForTemplate = center;
+    }
+
+    let centerAttribute = adaptedCenterForTemplate !== undefined ? ' center=\'' + adaptedCenterForTemplate + '\'' : '';
+    let zoomAttribute = zoom !== undefined ? ' zoom=\'' + zoom + '\'' : '';
+
+    // Default to just a Map
+    let templateCode = '<Map />';
+
+    if (table !== undefined && table !== '_NONE_' && tileLayerProps !== undefined && tileLayerProps.size !== 0) {
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table, a query and a tileLayer have been specified.
-        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' query=\'' + query + '\' table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
       } else {
         // A table and a tileLayer have been specified.
-        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + '  table="' + table + '" tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
       }
 
     } else if (table !== undefined && table !== '_NONE_') {
 
       if (query !== undefined && table !== '_NONE_' && query !== SQL.nullQuery) {
         // A table and a query have been specified.
-        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' query=\'' + query + '\' table="' + table + '" /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" /></div>';
       } else {
         // Only a table has been specified.
-        templateCode = templateWrap + '<TableMap' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' table="' + table + '" /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' table="' + table + '" /></div>';
       }
 
-    } else if (selectedTileLayerObj.size !== 0) {
+    } else if (tileLayerProps !== undefined && tileLayerProps.size !== 0) {
       // Only a tileLayer has been specified.
-      templateCode = templateWrap + '<Map' + adaptedCenterForTemplate + adaptedZoomForTemplate + ' tileLayerAttribution="' + selectedTileLayerObj.get('tileLayerAttribution') + '" tileLayerURL="' + selectedTileLayerObj.get('tileLayerURL') + '" /></div>';
+      templateCode = '<Map' + centerAttribute + zoomAttribute + ' tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
     }
+
+    // Wrap the map template code in a container with dimensions.
+    templateCode = '<div style="width:300px;height:300px">' + templateCode + '</div>';
 
 
     let sidebarContent = (
@@ -436,9 +322,9 @@ let TableMapActions = React.createClass({
             autoWidth={true}
             floatingLabelText="Map tile layer:"
             onChange={(e, i, v) => this.handleChangeTileLayer(e, i, v)}
-            value={selectedTileLayerObj.get('tileLayerUniqueName')}
+            value={tileLayer}
           >
-            {tileLayerMenu}
+            {this.tileLayersMenu}
           </SelectField>
           <TextField
             floatingLabelText="Template code:"
@@ -451,10 +337,10 @@ let TableMapActions = React.createClass({
     );
 
     // This title appears above the map, in the blue bar.
-    // Could use tileLayerObj.get('mapProviderName') or tileLayerObj.get('tileLayerUniqueName') instead
+    // Could use tileLayerObj.get('providerName') or tileLayerObj.get('tileLayerUniqueName') instead
     let mapTitle = 'Map';
-    if (selectedTileLayerObj.get('tileLayerVariantName') !== undefined) {
-      mapTitle = selectedTileLayerObj.get('tileLayerVariantName') + ' map';
+    if (tileLayerProps !== undefined && tileLayerProps.get('variant') !== undefined) {
+      mapTitle = tileLayerProps.get('variant') + ' map';
     }
     if (table !== undefined && table !== '_NONE_') {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
@@ -466,10 +352,7 @@ let TableMapActions = React.createClass({
         center={center}
         componentUpdate={componentUpdate}
         onChange={this.handleChangeMap}
-        tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
-        tileLayerMaxZoom={selectedTileLayerObj.get('tileLayerMaxZoom')}
-        tileLayerMinZoom={selectedTileLayerObj.get('tileLayerMinZoom')}
-        tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
+        tileLayerProps={tileLayerProps}
         zoom={zoom}
       />
     );
@@ -482,10 +365,7 @@ let TableMapActions = React.createClass({
           locationDataTable={table}
           onChange={this.handleChangeMap}
           query={query}
-          tileLayerAttribution={selectedTileLayerObj.get('tileLayerAttribution')}
-          tileLayerMaxZoom={selectedTileLayerObj.get('tileLayerMaxZoom')}
-          tileLayerMinZoom={selectedTileLayerObj.get('tileLayerMinZoom')}
-          tileLayerURL={selectedTileLayerObj.get('tileLayerURL')}
+          tileLayerProps={tileLayerProps}
           zoom={zoom}
         />
       );
