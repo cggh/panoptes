@@ -75,6 +75,7 @@ let TableMapActions = React.createClass({
 
     // https://github.com/leaflet-extras/leaflet-providers
     // https://leaflet-extras.github.io/leaflet-providers/preview/
+    this.attributions = {};
     this.tileLayers = {};
     this.tileLayersMenu = [];
 
@@ -104,8 +105,11 @@ let TableMapActions = React.createClass({
           continue;
         }
 
+        let attribution = providerObj.options !== undefined ? providerObj.options.attribution : undefined;
+        this.attributions[providerName] = attribution;
+
         let providerTileLayerObj = {
-          attribution: providerObj.options !== undefined ? providerObj.options.attribution : undefined,
+          attribution: attribution,
           ext: providerObj.options !== undefined ? providerObj.options.ext : undefined,
           format: providerObj.options !== undefined ? providerObj.options.format : undefined,
           maxZoom: providerObj.options !== undefined ? providerObj.options.maxZoom : undefined,
@@ -201,6 +205,9 @@ let TableMapActions = React.createClass({
       adaptedZoom = selectedTileLayerProps.minZoom;
     }
 
+    // Evaluate any embedded attributions.
+    selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
+
     // NB: tileLayerProps will get converted from a plain object to an Immutable map.
     this.props.componentUpdate({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
   },
@@ -209,6 +216,7 @@ let TableMapActions = React.createClass({
     this.props.componentUpdate({center, zoom});
   },
 
+  // Other functions
   icon() {
     return 'globe';
   },
@@ -216,6 +224,20 @@ let TableMapActions = React.createClass({
     return this.props.title || 'Table Mapper';
 
   },
+  attributionReplacer(attr) {
+    /*
+      CREDIT:
+      https://github.com/leaflet-extras/leaflet-providers
+      https://github.com/leaflet-extras/leaflet-providers/blob/bda94330c710d88fd1cf0ed2ba37749299fff57a/leaflet-providers.js
+    */
+    if (attr.indexOf('{attribution.') === -1) {
+      return attr;
+    }
+    return attr.replace(/\{attribution.(\w*)\}/,
+      (match, providerName) => this.attributionReplacer(this.attributions[providerName])
+    );
+  },
+
 
   render() {
     let {center, componentUpdate, query, tileLayer, tileLayerProps, sidebar, table, zoom} = this.props;
