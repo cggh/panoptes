@@ -26,8 +26,10 @@ let TileLayerWidget = React.createClass({
     map: React.PropTypes.object,
     maxZoom: React.PropTypes.number,
     minZoom: React.PropTypes.number,
+    opacity: React.PropTypes.number,
     url: React.PropTypes.string.isRequired,
-    variant: React.PropTypes.string
+    variant: React.PropTypes.string,
+    zIndex: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -49,7 +51,7 @@ let TileLayerWidget = React.createClass({
   },
 
   render() {
-    let {attribution, ext, format, maxZoom, minZoom, url, variant} = this.props;
+    let {attribution, ext, format, maxZoom, minZoom, opacity, url, variant, zIndex} = this.props;
 
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
@@ -75,8 +77,10 @@ let TileLayerWidget = React.createClass({
         format={format}
         maxZoom={maxZoom}
         minZoom={minZoom}
+        opacity={opacity}
         url={url}
         variant={variant}
+        zIndex={zIndex}
       />
     );
 

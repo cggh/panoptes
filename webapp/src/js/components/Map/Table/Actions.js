@@ -194,22 +194,28 @@ let TableMapActions = React.createClass({
   handleChangeTileLayer(event, selectedIndex, selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
-    let selectedTileLayerProps = _cloneDeep(this.tileLayers[selectedTileLayer]);
+    if (selectedTileLayer === DEFAULT_TILE_LAYER) {
+      this.props.componentUpdate({tileLayer: undefined, tileLayerProps: undefined, zoom: undefined});
+    } else {
 
-    // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
-    let adaptedZoom = this.props.zoom;
-    if (this.props.zoom > selectedTileLayerProps.maxZoom) {
-      adaptedZoom = selectedTileLayerProps.maxZoom;
+      let selectedTileLayerProps = _cloneDeep(this.tileLayers[selectedTileLayer]);
+
+      // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
+      let adaptedZoom = this.props.zoom;
+      if (this.props.zoom > selectedTileLayerProps.maxZoom) {
+        adaptedZoom = selectedTileLayerProps.maxZoom;
+      }
+      if (this.props.zoom < selectedTileLayerProps.minZoom) {
+        adaptedZoom = selectedTileLayerProps.minZoom;
+      }
+
+      // Evaluate any embedded attributions.
+      selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
+
+      // NB: tileLayerProps will get converted from a plain object to an Immutable map.
+      this.props.componentUpdate({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
     }
-    if (this.props.zoom < selectedTileLayerProps.minZoom) {
-      adaptedZoom = selectedTileLayerProps.minZoom;
-    }
 
-    // Evaluate any embedded attributions.
-    selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
-
-    // NB: tileLayerProps will get converted from a plain object to an Immutable map.
-    this.props.componentUpdate({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
   },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
@@ -225,6 +231,11 @@ let TableMapActions = React.createClass({
 
   },
   attributionReplacer(attr) {
+
+    if (attr == undefined) {
+      return undefined;
+    }
+
     /*
       CREDIT:
       https://github.com/leaflet-extras/leaflet-providers
