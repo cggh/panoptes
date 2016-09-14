@@ -361,8 +361,8 @@ let TableMapActions = React.createClass({
     // This title appears above the map, in the blue bar.
     // Could use tileLayerObj.get('providerName') or tileLayerObj.get('tileLayerUniqueName') instead
     let mapTitle = 'Map';
-    if (tileLayerProps !== undefined && tileLayerProps.get('variant') !== undefined) {
-      mapTitle = tileLayerProps.get('variant') + ' map';
+    if (tileLayer !== undefined) {
+      mapTitle = tileLayer + ' map';
     }
     if (table !== undefined && table !== '_NONE_') {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
