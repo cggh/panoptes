@@ -1,6 +1,8 @@
 Installation and deployment guide
 =================================
 
+<!---
+
 Deployment on a new Ubuntu image
 --------------------------------
 
@@ -36,6 +38,8 @@ Short debain/ubuntu guide for the temporarly challenged
     ./scripts/build.sh
     ./scripts/run.sh
 
+--->
+
 Basic installation
 ------------------
 
@@ -47,7 +51,7 @@ Download the code from the GitHub repository::
     unzip master.zip
     cd panoptes-master
 
-Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from their repository. See instructions at https://www.monetdb.org/downloads For ubuntu this is:
+Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from their repository. See instructions at https://www.monetdb.org/downloads For ubuntu this is::
 
     sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
     wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
@@ -56,7 +60,7 @@ Panoptes uses MonetDB (https://www.monetdb.org) which is best installed from the
 
 You will need to install the following packages (or equivalent) before Panoptes can be installed. E.g. for debian-based Linuxes::
 
-	sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
+    sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
 
 Build
