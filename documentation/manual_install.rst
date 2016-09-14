@@ -1,45 +1,6 @@
 Installation and deployment guide
 =================================
 
-<!---
-
-Deployment on a new Ubuntu image
---------------------------------
-
-For testing purposes, a slightly easier way to obtain a running instance of Panoptes is to do a full deployment on a fresh a fresh Ubuntu 14.04.1 LTS image,
-e.g. on an EC2 virtual machine.
-A script is provided that performs a fully automatic installation, including
-
-- Installation of all dependencies
-- Deployment and configuration of Apache2
-
-.. caution::
-  This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
-
-The following steps will create a fully working Panoptes instance on an Ubuntu 14.04.1 LTS image::
-
-  cd /
-  sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
-  sudo chmod +x deployfull.sh
-  sudo ./deployfull.sh
-
-The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerAddress]/index.html`.
-
-Short debain/ubuntu guide for the temporarly challenged
--------------------------------------------------------
-::
-
-    sudo apt-get install mysql-server-5.6 mysql-client-5.6 git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
-    wget https://github.com/cggh/panoptes/archive/master.zip
-    unzip master.zip
-    cd panoptes-master
-    cp config.py.example config.py
-    nano config.py #EDIT DB CREDENTIALS AND FILE PATHS
-    ./scripts/build.sh
-    ./scripts/run.sh
-
---->
-
 Basic installation
 ------------------
 
@@ -106,6 +67,30 @@ To run on your external network interface use (with the port you desire)::
 	./scripts/run.sh 0.0.0.0:8000
 
 Note that you will need internet access even if you run Panoptes locally due to google-hosted mapping tools.
+
+
+Deployment on a new Ubuntu image
+--------------------------------
+
+For testing purposes, a slightly easier way to obtain a running instance of Panoptes is to do a full deployment on a fresh a fresh Ubuntu 14.04.1 LTS image,
+e.g. on an EC2 virtual machine.
+A script is provided that performs a fully automatic installation, including
+
+- Installation of all dependencies
+- Deployment and configuration of Apache2
+
+.. caution::
+  This deployment option will aggressively override packages and settings on the machine. It is only intended to be used on a fresh image.
+
+The following steps will create a fully working Panoptes instance on an Ubuntu 14.04.1 LTS image::
+
+  cd /
+  sudo wget https://raw.github.com/cggh/panoptes/master/scripts/deploy_default/deployfull.sh
+  sudo chmod +x deployfull.sh
+  sudo ./deployfull.sh
+
+The source data folder is set to `/panoptes/sourcedata`. The application is accessible from `[ServerAddress]/index.html`.
+
 
 Deployment on Apache2 (OPTIONAL)
 ................................
