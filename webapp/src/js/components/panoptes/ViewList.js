@@ -14,7 +14,6 @@ import DatasetManagerActions from 'Dataset/Manager/Actions';
 import PlotWithActions from 'Plot/Table/Actions';
 import TableMapActions from 'Map/Table/Actions';
 import TreeWithActions from 'containers/TreeWithActions';
-import TablePlotWidget from 'Plot/Table/Widget';
 
 let ViewList = React.createClass({
   mixins: [
@@ -58,7 +57,7 @@ let ViewList = React.createClass({
           <ListItem primaryText="Table Plotter"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
+                    onClick={(e) => this.handleOpen(e, <PlotWithActions wat={() => 1}/>)}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Table Mapper"

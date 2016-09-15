@@ -159,9 +159,9 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
     let appState = getAppState();
     appState.session.components = {
       error: {
-        component: 'containers/ErrorTab',
-        props: {
-          err: err
+        component: {
+          type: 'ErrorTab',
+          props: {err}
         }
       }
     };
