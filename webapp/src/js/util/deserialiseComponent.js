@@ -11,12 +11,12 @@ export default function deserialiseComponent(component) {
   component = component.toObject();
   let {type, props} = component;
   type = ComponentRegistry(type) || type;
-  let children = props.get('children');
+  let children = props ? props.get('children') : null;
   if (List.isList(children)) {
     children = children.map(deserialiseComponent).toArray();
   } else if (children) {
     children = deserialiseComponent(children);
   }
-  const otherProps = props.delete('children').toJS();
+  const otherProps = props ? props.delete('children').toJS() : {};
   return React.createElement(type, {children, ...otherProps});
 };

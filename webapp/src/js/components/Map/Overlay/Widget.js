@@ -6,6 +6,18 @@ const {Overlay} = LayersControl;
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'TableMarkersLayerWidget',
+  'MarkerWidget',
+  'CircleWidget',
+  'RectangleWidget',
+  'PopupWidget',
+  'FeatureGroupWidget',
+  'TileLayerWidget'
+];
+
 let OverlayWidget = React.createClass({
 
   mixins: [
@@ -27,6 +39,7 @@ let OverlayWidget = React.createClass({
 
   render() {
     let {addOverlay, checked, children, name} = this.props;
+    children = filterChildren(this, ALLOWED_CHILDREN, children);
 
     let checkedBoolean = (checked === 'true');
 

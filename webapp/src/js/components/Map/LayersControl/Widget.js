@@ -4,6 +4,13 @@ import {LayersControl} from 'react-leaflet';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'BaseLayerWidget',
+  'OverlayWidget'
+];
+
 let LayersControlWidget = React.createClass({
 
   mixins: [
@@ -38,6 +45,7 @@ let LayersControlWidget = React.createClass({
   render() {
 
     let {autoZIndex, children} = this.props;
+    children = filterChildren(this, ALLOWED_CHILDREN, children);
 
     return (
       <LayersControl

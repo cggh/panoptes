@@ -3,9 +3,14 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Map} from 'react-leaflet';
+import React from 'react';
+import displayName from 'react-display-name';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
+
+//Panoptes
+import filterChildren from 'util/filterChildren';
 
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
@@ -14,13 +19,24 @@ import TileLayerWidget from 'Map/TileLayer/Widget';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
+import _isArray from 'lodash/isArray';
 import _isEqual from 'lodash/isEqual';
 import _isFunction from 'lodash/isFunction';
+import _isObject from 'lodash/isObject';
+import _isString from 'lodash/isString';
 import _max from 'lodash/max';
 import _min from 'lodash/min';
 
 // CSS
 import 'leaflet/dist/leaflet.css';
+
+const ALLOWED_CHILDREN = [
+  'LayersControlWidget',
+  'TileLayerWidget',
+  'FeatureGroupWidget',
+  'MarkerWidget',
+  'OverlayWidget',
+];
 
 /* To use maps in templates
 
@@ -199,6 +215,7 @@ let MapWidget = React.createClass({
 
   render() {
     let {center, children, tileLayerProps, zoom} = this.props;
+    children = filterChildren(this, ALLOWED_CHILDREN, children);
     let {bounds, loadStatus} = this.state;
 
     if (bounds === undefined && center === undefined && zoom === undefined) {
@@ -291,7 +308,7 @@ let MapWidget = React.createClass({
     // TODO: Tidy up this logic. Maybe extract into functions?
     // Is similar logic needed elsewhere?
 
-    if (children !== undefined && children.length !== undefined && children.length > 0) {
+    if (children && children.length) {
 
       // If children is iterable and not empty (i.e. MapWidget has real children).
 
@@ -312,7 +329,9 @@ let MapWidget = React.createClass({
           nonMarkerChildrenCount++;
         }
         keyedChildren[i] = _cloneDeep(childrenToInspect[i]);
-        keyedChildren[i].key = i;
+        if (!_isString(keyedChildren[i])) {
+          keyedChildren[i].key = i;
+        }
       }
 
       if (nonMarkerChildrenCount === 0) {
@@ -349,23 +368,14 @@ let MapWidget = React.createClass({
       // Otherwise, children either does not have a length property or it has a zero length property.
 
       if (
-        children !== undefined
-        && children !== null
-        && children.length === undefined
-        && !(children instanceof Array)
-        && typeof children === 'object'
+        _isObject(children) && !_isArray(children)
       ) {
 
         // If there is a child that is an object (and not an array).
-
         if (
-          children.type !== undefined
-          && children.type.displayName === 'LayersControlWidget'
-          && children.props.children !== null
-          && !children.props.children.length
-          && typeof children.props.children === 'object'
-          && children.props.children.type !== undefined
-          && children.props.children.type.displayName === 'BaseLayerWidget'
+          children && displayName(children.type) === 'LayersControlWidget'
+          && _isObject(children.props.children) && !isArray(children.props.children)
+          && displayName(children.props.children.type) === 'BaseLayerWidget'
         ) {
 
           // If the child is a LayersControlWidget that only has a BaseLayerWidget child, then select that BaseLayer.

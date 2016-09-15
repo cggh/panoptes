@@ -6,6 +6,13 @@ const {BaseLayer} = LayersControl;
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'TileLayerWidget',
+  'FeatureGroupWidget',
+];
+
 let BaseLayerWidget = React.createClass({
 
   mixins: [
@@ -46,6 +53,7 @@ let BaseLayerWidget = React.createClass({
 
   render() {
     let {addBaseLayer, checked, children, name} = this.props;
+    children = filterChildren(this, ALLOWED_CHILDREN, children);
 
     let checkedBoolean = null;
     if (

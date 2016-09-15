@@ -22,19 +22,57 @@ description: '
   />
   <p>A tree of samples</p>
   <div style="position:relative;width:300px;height:300px">
-  <Tree table="samples" tree="tree2" />
+  <TreeContainer table="samples" tree="tree2" />
   </div>
   <p>A plot of variants:</p>
   <div style="position:relative;width:300px;height:300px">
-  <Plot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
+  <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
   </div>
   <p>A map of sampling sites:</p>
   <div style="position:relative;width:300px;height:300px">
-  <TableMap table="samplingsites" />
+  <TableMapWidget table="samplingsites" />
   </div>
   <p>A complex map:</p>
   <div style="width:300px;height:300px">
-  <Map center="[1, -1.1]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  <MapWidget center="[1, -1.1]" zoom="2">
+    <LayersControlWidget position="topright">
+      <BaseLayerWidget checked="true" name="OpenStreetMap.Mapnik">
+        <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
+      </BaseLayerWidget>
+      <BaseLayerWidget name="OpenStreetMap.BlackAndWhite">
+        <FeatureGroupWidget>
+          <TileLayerWidget attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
+          <FeatureGroupWidget>
+            <MarkerWidget position="[0, 0]">
+              <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
+            </MarkerWidget>
+            <MarkerWidget position="[50, 0]">
+              <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
+            </MarkerWidget>
+          </FeatureGroupWidget>
+        </FeatureGroupWidget>
+      </BaseLayerWidget>
+      <OverlayWidget name="Sampling Sites">
+        <TableMarkersLayerWidget table="samplingsites" />
+      </OverlayWidget>
+      <OverlayWidget checked="true" name="Layer group with circles">
+        <FeatureGroupWidget>
+          <CircleWidget center="[0, 0]" fillColor="blue" radius="200" />
+          <CircleWidget center="[0, 0]" fillColor="red" radius="100" stroke="false" />
+          <FeatureGroupWidget>
+            <CircleWidget center="[51.51, -0.08]" color="green" fillColor="green" radius="100" />
+          </FeatureGroupWidget>
+        </FeatureGroupWidget>
+      </OverlayWidget>
+      <OverlayWidget name="Feature group">
+        <FeatureGroupWidget color="purple">
+          <PopupWidget><span>Popup in FeatureGroup</span></PopupWidget>
+          <CircleWidget center="[51.51, -0.06]" radius="200" />
+          <RectangleWidget bounds="[[51.49, -0.08],[51.5, -0.06]]" />
+        </FeatureGroupWidget>
+      </OverlayWidget>
+    </LayersControlWidget>
+  </Map>
   </div>
   '
 

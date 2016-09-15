@@ -7,6 +7,12 @@ import FluxMixin from 'mixins/FluxMixin';
 // Lodash
 import _isFunction from 'lodash/isFunction';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'PopupWidget'
+];
+
 let MarkerWidget = React.createClass({
 
   mixins: [
@@ -46,6 +52,7 @@ let MarkerWidget = React.createClass({
   render() {
 
     let {alt, children, onClick, opacity, position, title, zIndexOffset} = this.props;
+    children = filterChildren(this, ALLOWED_CHILDREN, children);
 
 
     let adaptedMarkerProps = {};
