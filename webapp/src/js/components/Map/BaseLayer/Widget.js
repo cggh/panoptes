@@ -28,7 +28,7 @@ let BaseLayerWidget = React.createClass({
   },
   propTypes: {
     addBaseLayer: React.PropTypes.func,
-    checked: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.bool]),
+    checked: React.PropTypes.bool,
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,

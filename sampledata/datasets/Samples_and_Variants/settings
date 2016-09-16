@@ -36,7 +36,7 @@ description: '
   <div style="width:300px;height:300px">
   <MapWidget center="[1, -1.1]" zoom="2">
     <LayersControlWidget position="topright">
-      <BaseLayerWidget checked="true" name="OpenStreetMap.Mapnik">
+      <BaseLayerWidget checked name="OpenStreetMap.Mapnik">
         <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
       </BaseLayerWidget>
       <BaseLayerWidget name="OpenStreetMap.BlackAndWhite">
@@ -55,7 +55,7 @@ description: '
       <OverlayWidget name="Sampling Sites">
         <TableMarkersLayerWidget table="samplingsites" />
       </OverlayWidget>
-      <OverlayWidget checked="true" name="Layer group with circles">
+      <OverlayWidget checked name="Layer group with circles">
         <FeatureGroupWidget>
           <CircleWidget center="[0, 0]" fillColor="blue" radius="200" />
           <CircleWidget center="[0, 0]" fillColor="red" radius="100" stroke="false" />

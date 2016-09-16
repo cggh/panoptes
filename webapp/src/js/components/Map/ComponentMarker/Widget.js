@@ -18,7 +18,7 @@ let ComponentMarkerWidget = React.createClass({
   propTypes: {
     children: React.PropTypes.node,
     onClick: React.PropTypes.func,
-    position: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]).isRequired,
+    position: React.PropTypes.array.isRequired,
     title: React.PropTypes.string,
     alt: React.PropTypes.string
   },
@@ -36,23 +36,6 @@ let ComponentMarkerWidget = React.createClass({
     if (alt === undefined && title !== undefined) {
       // If not alt has been specified, then use the title.
       alt = title;
-    }
-
-    let adaptedPosition = undefined;
-
-    if (position instanceof Array) {
-      adaptedPosition = position;
-    }
-    if (typeof position === 'string') {
-      // TODO: check the string looks like "[0, 0]" before trying to parse.
-      let positionArrayFromString = JSON.parse(position);
-      if (positionArrayFromString instanceof Array) {
-        adaptedPosition = positionArrayFromString;
-      }
-    }
-
-    if (adaptedPosition === undefined || adaptedPosition === null) {
-      console.error('ComponentMarkerWidget failed to determine position');
     }
 
     if (children === undefined) {

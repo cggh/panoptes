@@ -49,7 +49,7 @@ let TableMapActions = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
+    center: React.PropTypes.array,
     componentUpdate: React.PropTypes.func.isRequired,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
@@ -57,7 +57,7 @@ let TableMapActions = React.createClass({
     tileLayerProps: ImmutablePropTypes.map,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+    zoom: React.PropTypes.number
   },
 
   getDefaultProps() {

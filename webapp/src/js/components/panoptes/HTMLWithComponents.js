@@ -52,11 +52,32 @@ let HTMLWithComponents = React.createClass({
                   elementProps.className = value;
                   break;
                 default:
+                  //Cast types for known props
+                  switch (type.propTypes[key]) {
+                    case React.PropTypes.bool:
+                    case React.PropTypes.bool.isRequired:
+                      value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
+                      break;
+                    case React.PropTypes.number:
+                    case React.PropTypes.number.isRequired:
+                      value = Number(value);
+                      break;
+                    case React.PropTypes.array:
+                    case React.PropTypes.array.isRequired:
+                    case React.PropTypes.object:
+                    case React.PropTypes.object.isRequired:
+                      try {
+                        value = JSON.parse(value);
+                      } catch (e) {
+                        throw Error(`Can't parse ${key} attribute for ${node.name}`);
+                      }
+                      break;
+                  }
                   elementProps[key] = value;
                   break;
               }
             });
-            return React.createElement(type, {children, ...node.attribs});
+            return React.createElement(type, {children, ...elementProps});
           } else {
             return defaultProcess(node, children, index);
           }

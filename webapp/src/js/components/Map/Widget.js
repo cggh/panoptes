@@ -87,13 +87,13 @@ let MapWidget = React.createClass({
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
+    center: React.PropTypes.array,
     children: React.PropTypes.node,
     componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
     tileLayerProps: React.PropTypes.oneOfType([React.PropTypes.string, ImmutablePropTypes.map]),
     title: React.PropTypes.string,
-    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+    zoom: React.PropTypes.number
   },
   childContextTypes: {
     crs: React.PropTypes.object,
@@ -228,67 +228,6 @@ let MapWidget = React.createClass({
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
 
-    let adaptedMapProps = {};
-    let adaptedTileLayerProps = Immutable.Map();
-
-    // Translate prop values from strings (used in templates)
-    // into the required primitive types.
-
-    // TODO: Could also support individual centerLat and centerLng props.
-
-    if (center instanceof Array) {
-      // TODO: check the array looks like [0, 0]
-      adaptedMapProps.center = center;
-    } else if (center !== undefined && typeof center === 'object') {
-      // TODO: check the object looks like {lat: 50, lng: 30} or {lat: 50, lon: 30}
-      if (center.lat !== undefined) {
-        adaptedMapProps.center = center;
-      } else if (_isFunction(center.get)) {
-        // TODO: check the object is a Map
-        adaptedMapProps.center = {lat: center.get('lat'), lng: center.get('lng')};
-      } else {
-        console.error('center is an unhandled object: %o', center);
-      }
-    } else if (center !== undefined && typeof center === 'string') {
-      // TODO: check the string looks like "[0, 0]" before trying to parse.
-      let centerArrayFromString = JSON.parse(center);
-      if (centerArrayFromString instanceof Array) {
-        adaptedMapProps.center = centerArrayFromString;
-      }
-    }
-
-    if (tileLayerProps !== undefined && typeof tileLayerProps === 'object') {
-      // TODO: check the object looks right before accepting it
-      adaptedTileLayerProps = tileLayerProps;
-    } else if (tileLayerProps !== undefined && typeof tileLayerProps === 'string') {
-      // TODO: check the string looks right before trying to parse
-      let tileLayerPropsFromString = Immutable.fromJS(JSON.parse(tileLayerProps));
-      if (typeof tileLayerPropsFromString === 'object') {
-        adaptedTileLayerProps = tileLayerPropsFromString;
-      }
-    }
-
-    if (typeof zoom === 'number') {
-      adaptedMapProps.zoom = zoom;
-    } else if (typeof zoom === 'string') {
-      // TODO: check the string looks like "0" before trying to parse.
-      let zoomNumberFromString = Number(zoom);
-      if (typeof zoomNumberFromString === 'number') {
-        adaptedMapProps.zoom = zoomNumberFromString;
-      }
-    }
-
-    if (bounds === undefined && (adaptedMapProps.center === undefined || adaptedMapProps.center === null)) {
-      console.error('MapWidget failed to determine center or bounds');
-    }
-
-    if (bounds === undefined && (adaptedMapProps.zoom === undefined || adaptedMapProps.zoom === null)) {
-      console.error('MapWidget failed to determine zoom or bounds');
-    }
-
-    // NB: JSX children will overwrite the passed prop, if any.
-    // https://github.com/facebook/flow/issues/1355
-
     // NB: The bounds prop on the react-leaflet Map component is equivalent to fitBounds
     // There is also a boundsOptions prop corresponding to http://leafletjs.com/reference.html#map-fitboundsoptions
     // TODO: boundsOptions: {padding: [1, 1]},
@@ -341,7 +280,8 @@ let MapWidget = React.createClass({
         mapComponent = (
           <Map
             {...commonMapProps}
-            {...adaptedMapProps}
+            center={center}
+            zoom={zoom}
           >
             <TileLayerWidget key="0" {...adaptedTileLayerProps.toObject()} />
             {keyedChildren}
@@ -357,7 +297,8 @@ let MapWidget = React.createClass({
           <Map
             children={children}
             {...commonMapProps}
-            {...adaptedMapProps}
+            center={center}
+            zoom={zoom}
           />
         );
 
@@ -386,7 +327,8 @@ let MapWidget = React.createClass({
             <Map
               children={augmentedChild}
               {...commonMapProps}
-              {...adaptedMapProps}
+              center={center}
+              zoom={zoom}
             />
           );
 
@@ -398,7 +340,8 @@ let MapWidget = React.createClass({
             <Map
               children={children}
               {...commonMapProps}
-              {...adaptedMapProps}
+              center={center}
+              zoom={zoom}
             />
           );
 
@@ -413,7 +356,8 @@ let MapWidget = React.createClass({
         mapComponent = (
           <Map
             {...commonMapProps}
-            {...adaptedMapProps}
+            center={center}
+            zoom={zoom}
           >
             <TileLayerWidget {...adaptedTileLayerProps.toObject()} />
           </Map>
