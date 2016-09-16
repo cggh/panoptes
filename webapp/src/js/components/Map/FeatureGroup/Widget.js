@@ -50,7 +50,7 @@ let FeatureGroupWidget = React.createClass({
 
   render() {
     let {children} = this.props;
-    children = filterChildren(this, ALLOWED_CHILDREN, children);
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
       <FeatureGroup

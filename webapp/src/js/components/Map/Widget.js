@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import {Map} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
@@ -21,7 +19,6 @@ import TileLayerWidget from 'Map/TileLayer/Widget';
 import _cloneDeep from 'lodash/cloneDeep';
 import _isArray from 'lodash/isArray';
 import _isEqual from 'lodash/isEqual';
-import _isFunction from 'lodash/isFunction';
 import _isObject from 'lodash/isObject';
 import _isString from 'lodash/isString';
 import _max from 'lodash/max';
@@ -91,7 +88,7 @@ let MapWidget = React.createClass({
     children: React.PropTypes.node,
     componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
-    tileLayerProps: React.PropTypes.oneOfType([React.PropTypes.string, ImmutablePropTypes.map]),
+    tileLayerProps: React.PropTypes.object,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number
   },
@@ -215,7 +212,7 @@ let MapWidget = React.createClass({
 
   render() {
     let {center, children, tileLayerProps, zoom} = this.props;
-    children = filterChildren(this, ALLOWED_CHILDREN, children);
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
     if (bounds === undefined && center === undefined && zoom === undefined) {
@@ -283,7 +280,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget key="0" {...adaptedTileLayerProps.toObject()} />
+            <TileLayerWidget key="0" {...tileLayerProps} />
             {keyedChildren}
           </Map>
         );
@@ -315,7 +312,7 @@ let MapWidget = React.createClass({
         // If there is a child that is an object (and not an array).
         if (
           children && displayName(children.type) === 'LayersControlWidget'
-          && _isObject(children.props.children) && !isArray(children.props.children)
+          && _isObject(children.props.children) && !_isArray(children.props.children)
           && displayName(children.props.children.type) === 'BaseLayerWidget'
         ) {
 
@@ -359,7 +356,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget {...adaptedTileLayerProps.toObject()} />
+            <TileLayerWidget {...tileLayerProps} />
           </Map>
         );
 

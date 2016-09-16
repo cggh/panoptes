@@ -3,15 +3,8 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
 import RaisedButton from 'material-ui/RaisedButton';
-
-// TODO: Deprecate ItemMap in favour of TableMap or Map
-
-const componentTranslation = {
-  ItemMap: 'Map/Table/Actions',
-  Map: 'Map/Table/Actions',
-  Tree: 'containers/TreeWithActions',
-  Plot: 'Plot/Table/Actions'
-};
+import filterChildren from 'util/filterChildren';
+import _isArray from 'lodash/isArray';
 
 let PopupButton = React.createClass({
   mixins: [
@@ -20,37 +13,33 @@ let PopupButton = React.createClass({
   ],
 
   propTypes: {
-    //Use either component or componentPath
-    component: React.PropTypes.string,
-    componentPath: React.PropTypes.string,
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
-    //Optional - if not specified will launch new popup instead of replacing
-    componentUpdate: React.PropTypes.func
-    //rest of proptypes depend on component
+  },
+
+  getDefaultProps() {
+    return {
+      label: 'Untitled',
+      icon: 'circle'
+    }
   },
 
   handleClick(e) {
-    const {component,  componentPath, componentUpdate, ...others} = this.props;
+    let {children} = this.props;
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    if (middleClick) {
-      let switchTo = false;
-      this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo);
-    } else if (!componentUpdate) {
-      e.stopPropagation();
-      let switchTo = true;
-      this.getFlux().actions.session.popupOpen(componentTranslation[component] || componentPath, others, switchTo);
-    } else {
-      this.props.componentUpdate(others, componentTranslation[component] || componentPath);
-    }
+    this.getFlux().actions.session.popupOpen(filterChildren(this, children), !middleClick);
   },
 
   render() {
-    const {label, icon, component, componentPath} = this.props;
-
-    if (!componentTranslation.hasOwnProperty(component) && !componentPath) {
-      console.error(`${component} is not a valid component name (from PopupButton)`);
+    let {children, label, icon} = this.props;
+    children = filterChildren(this, children);
+    if (_isArray(children)) {
+      throw Error('PopupButton can only have one child');
     }
+    if (!children) {
+      throw Error('PopupButton can only have one child not none');
+    }
+
     return <RaisedButton
       style={{margin: '7px', color: 'white'}}
       label={label}

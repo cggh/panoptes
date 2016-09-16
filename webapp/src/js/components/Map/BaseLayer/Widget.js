@@ -53,7 +53,7 @@ let BaseLayerWidget = React.createClass({
 
   render() {
     let {addBaseLayer, checked, children, name} = this.props;
-    children = filterChildren(this, ALLOWED_CHILDREN, children);
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     let checkedBoolean = null;
     if (

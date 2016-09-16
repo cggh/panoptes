@@ -37,7 +37,7 @@ let SessionActions = {
   },
   popupOpen(component, switchTo = true) {
     this.dispatch(SESSION.POPUP_OPEN, {
-      component,
+      component: serialiseComponent(component),
       switchTo
     });
   },

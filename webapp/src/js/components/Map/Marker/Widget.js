@@ -52,7 +52,7 @@ let MarkerWidget = React.createClass({
   render() {
 
     let {alt, children, onClick, opacity, position, title, zIndexOffset} = this.props;
-    children = filterChildren(this, ALLOWED_CHILDREN, children);
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
 
     if (children instanceof Array) {

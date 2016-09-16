@@ -45,7 +45,7 @@ let LayersControlWidget = React.createClass({
   render() {
 
     let {autoZIndex, children} = this.props;
-    children = filterChildren(this, ALLOWED_CHILDREN, children);
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
       <LayersControl

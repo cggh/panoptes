@@ -13,16 +13,22 @@ description: '
   target="_blank">external hyperlink</a> and a <a class="doclink" href="intro">link</a>
   to documentation part of this deployment.
   <p>Some buttons that open popups:</p>
-  <PopupButton label="Plot of Variants" icon="area-chart" component="Plot" plotType="scatter"
-  table="variants" horizontal="Value1" vertical="Value2" />
-  <PopupButton label="Map
-  of sites" icon="globe"  component="ItemMap" table="samplingsites" />
-  <PopupButton
-  label="Tree of samples" icon="tree" component="Tree" table="samples" tree="tree2"
-  />
+  <PopupButton label="Plot of Variants" icon="area-chart">
+    <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
+  </PopupButton>
+  <PopupButton label="Map of sites" icon="globe">
+    <MapWidget center="[1, -1.1]" zoom="2">
+      <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
+    </MapWidget>
+  </PopupButton>
+  <PopupButton label="Tree of samples" icon="tree">
+    <TreeContainer table="samples" tree="tree2" />
+  </PopupButton>
+  <PopupButton>
+    <div>Some <b>config specified</b> content</div>
+  </PopupButton>
   <p>A tree of samples</p>
   <div style="position:relative;width:300px;height:300px">
-  <TreeContainer table="samples" tree="tree2" />
   </div>
   <p>A plot of variants:</p>
   <div style="position:relative;width:300px;height:300px">
@@ -72,8 +78,9 @@ description: '
         </FeatureGroupWidget>
       </OverlayWidget>
     </LayersControlWidget>
-  </Map>
+  </MapWidget>
   </div>
+
   '
 
 # Optional: a list of all the data table identifiers in the dataset

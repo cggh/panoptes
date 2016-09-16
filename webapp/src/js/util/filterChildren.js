@@ -4,7 +4,7 @@ import _isString from 'lodash/isString';
 import _isArray from 'lodash/isArray';
 import _filter from 'lodash/filter';
 
-export default function filterChildren(parent, allowed, children) {
+export default function filterChildren(parent, children, allowed) {
   if (!children || children.length === 0)
     return null;
 
@@ -19,15 +19,21 @@ export default function filterChildren(parent, allowed, children) {
     if (name === 'Component') {
       throw Error(`Can't get name for child of ${displayName(parent.constructor)}`);
     }
-    if (_includes(allowed, name)) {
+    if (!allowed || _includes(allowed, name)) {
       return true;
     }
     throw Error(`${name} cannot be a child of ${displayName(parent.constructor)}`);
   }
 
   if (_isArray(children)) {
-    return _filter(children, childOK)
+    children  = _filter(children, childOK);
+    if (children.length === 0) {
+      return null;
+    } else if (children.length === 1){
+      return children[0];
+    }
+    return children;
   }
-
-  return childOK(children);
+  //We have a single child
+  return childOK(children) ? children : null;
 }
