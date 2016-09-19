@@ -18,6 +18,7 @@ let LayersControlWidget = React.createClass({
     map: React.PropTypes.object
   },
   propTypes: {
+    autoZIndex: React.PropTypes.bool,
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object
@@ -36,10 +37,11 @@ let LayersControlWidget = React.createClass({
 
   render() {
 
-    let {children} = this.props;
+    let {autoZIndex, children} = this.props;
 
     return (
       <LayersControl
+        autoZIndex={autoZIndex}
         children={children}
       />
     );

@@ -19,10 +19,12 @@ let ImageOverlayWidget = React.createClass({
     map: React.PropTypes.object
   },
   propTypes: {
+    attribution: React.PropTypes.string,
     imageBounds: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array]),
     imageUrl: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    map: React.PropTypes.object,
+    opacity: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -43,7 +45,7 @@ let ImageOverlayWidget = React.createClass({
   },
 
   render() {
-    let {imageBounds, imageUrl} = this.props;
+    let {attribution, imageBounds, imageUrl, opacity} = this.props;
 
     let adaptedProps = {};
 
@@ -61,8 +63,10 @@ let ImageOverlayWidget = React.createClass({
     return (
       <ImageOverlay
         {...adaptedProps}
-        children={undefined}
+        attribution={attribution}
         imageUrl={imageUrl}
+        children={undefined}
+        opacity={opacity}
       />
     );
 
