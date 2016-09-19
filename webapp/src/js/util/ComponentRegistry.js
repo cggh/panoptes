@@ -1,4 +1,3 @@
-import React from 'react';
 const dynreq = require.context('../components', true);
 import getDisplayName from 'react-display-name';
 

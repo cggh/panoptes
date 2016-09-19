@@ -42,38 +42,38 @@ let HTMLWithComponents = React.createClass({
           let elementProps = {
             key: index,
           };
-          _forEach(node.attribs, function (value, key) {
+          _forEach(node.attribs, (value, key) => {
             switch (key || '') {
-              case 'style':
-                elementProps.style = createStyleJsonFromString(node.attribs.style);
-                break;
-              case 'class':
-                elementProps.className = value;
-                break;
-              default:
+            case 'style':
+              elementProps.style = createStyleJsonFromString(node.attribs.style);
+              break;
+            case 'class':
+              elementProps.className = value;
+              break;
+            default:
                 //Cast types for known props
-                switch (type.propTypes[key]) {
-                  case React.PropTypes.bool:
-                  case React.PropTypes.bool.isRequired:
-                    value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
-                    break;
-                  case React.PropTypes.number:
-                  case React.PropTypes.number.isRequired:
-                    value = Number(value);
-                    break;
-                  case React.PropTypes.array:
-                  case React.PropTypes.array.isRequired:
-                  case React.PropTypes.object:
-                  case React.PropTypes.object.isRequired:
-                    try {
-                      value = JSON.parse(value);
-                    } catch (e) {
-                      throw Error(`Can't parse ${key} attribute for ${node.name}`);
-                    }
-                    break;
-                }
-                elementProps[key] = value;
+              switch (type.propTypes[key]) {
+              case React.PropTypes.bool:
+              case React.PropTypes.bool.isRequired:
+                value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
                 break;
+              case React.PropTypes.number:
+              case React.PropTypes.number.isRequired:
+                value = Number(value);
+                break;
+              case React.PropTypes.array:
+              case React.PropTypes.array.isRequired:
+              case React.PropTypes.object:
+              case React.PropTypes.object.isRequired:
+                try {
+                  value = JSON.parse(value);
+                } catch (e) {
+                  throw Error(`Can't parse ${key} attribute for ${node.name}:${value}`);
+                }
+                break;
+              }
+              elementProps[key] = value;
+              break;
             }
           });
           return React.createElement(type, {children, ...elementProps});

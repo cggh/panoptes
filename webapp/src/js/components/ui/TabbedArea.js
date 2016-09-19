@@ -17,7 +17,8 @@ let TabbedArea = React.createClass({
     onClose: React.PropTypes.func,
     onDragAway: React.PropTypes.func,
     onAddTab: React.PropTypes.func,
-    children: React.PropTypes.object
+    children: React.PropTypes.node
+
   },
 
   getInitialState() {
@@ -152,7 +153,6 @@ let TabbedArea = React.createClass({
     delete divProps.onClose;
     delete divProps.onAddTab;
     delete divProps.onDragAway;
-
     return (
       <div {...divProps} className="tabbed-area">
         <div className="tabs">

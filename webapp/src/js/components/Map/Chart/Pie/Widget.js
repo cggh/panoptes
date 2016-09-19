@@ -17,9 +17,9 @@ let PieChartMapWidget = React.createClass({
 
   propTypes: { // NB: componentColumns is not easy enough to supply via template
     chartDataTable: React.PropTypes.string,
-    center: React.PropTypes.array,
-    componentColumns: React.PropTypes.object,
-    componentUpdate: React.PropTypes.func.isRequired,
+    center: React.PropTypes.object,
+    componentColumns: React.PropTypes.array,
+    setProps: React.PropTypes.func,
     locationDataTable: React.PropTypes.string,
     locationNameProperty: React.PropTypes.string,
     locationSizeProperty: React.PropTypes.string,
@@ -39,7 +39,7 @@ let PieChartMapWidget = React.createClass({
       center,
       chartDataTable,
       componentColumns,
-      componentUpdate,
+      setProps,
       locationDataTable,
       locationNameProperty,
       locationSizeProperty,
@@ -63,7 +63,7 @@ let PieChartMapWidget = React.createClass({
     return (
       <MapWidget
         center={center}
-        componentUpdate={componentUpdate}
+        setProps={setProps}
         style={widgetStyle}
         zoom={zoom}
       >

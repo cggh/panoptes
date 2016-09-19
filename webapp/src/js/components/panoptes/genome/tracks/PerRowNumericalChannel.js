@@ -45,7 +45,7 @@ let PerRowScaledSVGChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
-        'componentUpdate',
+        'setProps',
         'onClose'
       ]
     }),
@@ -54,12 +54,12 @@ let PerRowScaledSVGChannel = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    setProps: React.PropTypes.func,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
@@ -106,7 +106,7 @@ let PerRowScaledSVGChannel = React.createClass({
         dataYMax={dataYMax}
         side={<span>{name}</span>}
         onClose={this.redirectedProps.onClose}
-        controls={<PerRowNumericalTrackControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        controls={<PerRowNumericalTrackControls {...this.props} setProps={this.redirectedProps.setProps} />}
         legend={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={legendValues}/> : null}
       >
         <PerRowNumericalTrack {...this.props} onYLimitChange={this.handleYLimitChange} onKnownLegendValuesChange={this.handleKnownLegendValuesChange}/>
@@ -125,14 +125,14 @@ let PerRowNumericalTrack = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string.isRequired,
+    chromosome: React.PropTypes.string,
     blockStart: React.PropTypes.number,
     blockEnd: React.PropTypes.number,
     blockPixelWidth: React.PropTypes.number,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     interpolation: React.PropTypes.string,
     autoYScale: React.PropTypes.bool,
     tension: React.PropTypes.number,
@@ -363,7 +363,7 @@ let PerRowNumericalTrackControls = React.createClass({
         'query',
         'colourProperty'
       ],
-      redirect: ['componentUpdate']
+      redirect: ['setProps']
     })
   ],
 
@@ -379,7 +379,7 @@ let PerRowNumericalTrackControls = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.redirectedProps.componentUpdate({query});
+    this.redirectedProps.setProps({query});
   },
 
   render() {
@@ -394,13 +394,13 @@ let PerRowNumericalTrackControls = React.createClass({
           <div className="label">Colour By:</div>
           <PropertySelector table={table}
                             value={colourProperty}
-                            onSelect={(colourProperty) => this.redirectedProps.componentUpdate({colourProperty})} />
+                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})} />
         </div>
         <div className="control">
           <div className="label">Interpolation:</div>
           <DropDownMenu className="dropdown"
                         value={interpolation}
-                        onChange={(e, i, v) => this.redirectedProps.componentUpdate({interpolation: v})}>
+                        onChange={(e, i, v) => this.redirectedProps.setProps({interpolation: v})}>
             {INTERPOLATIONS.map((interpolation) =>
               <MenuItem key={interpolation.payload} value={interpolation.payload} primaryText={interpolation.text}/>)}
           </DropDownMenu>
@@ -413,7 +413,7 @@ let PerRowNumericalTrackControls = React.createClass({
                     name="tension"
                     value={tension}
                     defaultValue={tension}
-                    onChange={(e, value) => this.redirectedProps.componentUpdate({tension: value})}/>
+                    onChange={(e, value) => this.redirectedProps.setProps({tension: value})}/>
           </div>
           : null
         }
@@ -424,7 +424,7 @@ let PerRowNumericalTrackControls = React.createClass({
             name="autoYScale"
             defaultChecked={autoYScale}
             style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.componentUpdate({autoYScale: checked})}/>
+            onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
         </div>
         {!autoYScale ? <div className="control">
           <div className="label">Y Min:</div>
@@ -435,7 +435,7 @@ let PerRowNumericalTrackControls = React.createClass({
                  onChange={() => {
                    let value = parseFloat(this.refs.yMin.value);
                    if (_isFinite(value))
-                     this.redirectedProps.componentUpdate({yMin: value});
+                     this.redirectedProps.setProps({yMin: value});
                  }
                                 }/>
         </div>
@@ -449,7 +449,7 @@ let PerRowNumericalTrackControls = React.createClass({
                  onChange={() => {
                    let value = parseFloat(this.refs.yMax.value);
                    if (_isFinite(value))
-                     this.redirectedProps.componentUpdate({yMax: value});
+                     this.redirectedProps.setProps({yMax: value});
                  }
                                 }/>
         </div>

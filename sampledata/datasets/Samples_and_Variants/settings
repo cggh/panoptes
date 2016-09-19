@@ -4,7 +4,7 @@ name: Samples & Variants               # The displayed name of this dataset
 nameBanner: Samples and Variants       # Name as it appears in the top banner of the app
 
 # A description of the dataset that will appear on the start page
-description: '
+description: |
   This is the description of this sample dataset.
   <div style="color:rgb(0,128,0)">
   A second line, html formatted
@@ -17,7 +17,7 @@ description: '
     <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
   </PopupButton>
   <PopupButton label="Map of sites" icon="globe">
-    <MapWidget center="[1, -1.1]" zoom="2">
+    <MapWidget center='{"lat":1, "lng":-1.1}' zoom="2">
       <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
     </MapWidget>
   </PopupButton>
@@ -29,6 +29,7 @@ description: '
   </PopupButton>
   <p>A tree of samples</p>
   <div style="position:relative;width:300px;height:300px">
+    <TreeContainer table="samples" tree="tree2" />
   </div>
   <p>A plot of variants:</p>
   <div style="position:relative;width:300px;height:300px">
@@ -40,7 +41,7 @@ description: '
   </div>
   <p>A complex map:</p>
   <div style="width:300px;height:300px">
-  <MapWidget center="[1, -1.1]" zoom="2">
+  <MapWidget center='{"lat": 1, "lng": -1.1}' zoom="2">
     <LayersControlWidget position="topright">
       <BaseLayerWidget checked name="OpenStreetMap.Mapnik">
         <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
@@ -49,10 +50,10 @@ description: '
         <FeatureGroupWidget>
           <TileLayerWidget attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
           <FeatureGroupWidget>
-            <MarkerWidget position="[0, 0]">
+            <MarkerWidget position='{"lat":0, "lng":0}'>
               <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
             </MarkerWidget>
-            <MarkerWidget position="[50, 0]">
+            <MarkerWidget position='{"lat":50, "lng":0}'>
               <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
             </MarkerWidget>
           </FeatureGroupWidget>
@@ -63,25 +64,23 @@ description: '
       </OverlayWidget>
       <OverlayWidget checked name="Layer group with circles">
         <FeatureGroupWidget>
-          <CircleWidget center="[0, 0]" fillColor="blue" radius="200" />
-          <CircleWidget center="[0, 0]" fillColor="red" radius="100" stroke="false" />
+          <CircleWidget center='{"lat":0, "lng":0}' fillColor="blue" radius="200" />
+          <CircleWidget center='{"lat":0, "lng":0}' fillColor="red" radius="100" stroke="false" />
           <FeatureGroupWidget>
-            <CircleWidget center="[51.51, -0.08]" color="green" fillColor="green" radius="100" />
+            <CircleWidget center='{"lat":51.51, "lng":-0.08}' color="green" fillColor="green" radius="100" />
           </FeatureGroupWidget>
         </FeatureGroupWidget>
       </OverlayWidget>
       <OverlayWidget name="Feature group">
         <FeatureGroupWidget color="purple">
           <PopupWidget><span>Popup in FeatureGroup</span></PopupWidget>
-          <CircleWidget center="[51.51, -0.06]" radius="200" />
-          <RectangleWidget bounds="[[51.49, -0.08],[51.5, -0.06]]" />
+          <CircleWidget center='{"lat":51.51, "lng":-0.06}' radius="200" />
+          <RectangleWidget bounds='[{"lat":51.49, "lng":-0.08},{"lat":51.5, "lng":-0.06}]' />
         </FeatureGroupWidget>
       </OverlayWidget>
     </LayersControlWidget>
   </MapWidget>
   </div>
-
-  '
 
 # Optional: a list of all the data table identifiers in the dataset
 # These names should correspond to the folder names in [datatables]

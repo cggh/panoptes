@@ -24,6 +24,8 @@ let Popup = React.createClass({
   ],
 
   propTypes: {
+    className: React.PropTypes.string,
+    style: React.PropTypes.object,
     initialPosition: ImmutablePropTypes.shape({
       x: React.PropTypes.number,
       y: React.PropTypes.number
@@ -173,7 +175,7 @@ let Popup = React.createClass({
   },
 
   render() {
-    let {children, ...other} = this.props;
+    let {children, className, style} = this.props;
     let {icon, title, position, size} = this.state;
 
     if (!children)
@@ -188,9 +190,9 @@ let Popup = React.createClass({
                    handleSize={[20, 20]}
                    onResize={this.handleResize}
                    onResizeStop={this.handleResizeStop}>
-          <div className="popup"
-               style={size.toObject()}
-               {...other}>
+          <div className={'popup ' + className}
+               style={{...style, ...size.toObject()}}
+          >
             <div className="popup-header">
               {icon ? <Icon name={icon}/> : null}
               <div className="title">{title}</div>

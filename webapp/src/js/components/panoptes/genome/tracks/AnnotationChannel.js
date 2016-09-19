@@ -19,7 +19,7 @@ let AnnotationChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
-        //'componentUpdate',
+        //'setProps',
         //'onClose'
       ],
       check: [
@@ -35,16 +35,14 @@ let AnnotationChannel = React.createClass({
   ],
 
   propTypes: {
-    //componentUpdate: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     name: React.PropTypes.string,
-    onChangeLoadStatus: React.PropTypes.func
-    //onClose: React.PropTypes.func,
-    //table: React.PropTypes.string.isRequired
+    onChangeLoadStatus: React.PropTypes.func,
+    onClose: React.PropTypes.func
   },
 
   getInitialState() {
@@ -237,7 +235,7 @@ let AnnotationChannel = React.createClass({
 //    PureRenderWithRedirectedProps({
 //      check: [
 //      ],
-//      redirect: ['componentUpdate']
+//      redirect: ['setProps']
 //    })
 //  ],
 //

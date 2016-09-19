@@ -15,7 +15,8 @@ const ALLOWED_CHILDREN = [
   'RectangleWidget',
   'PopupWidget',
   'FeatureGroupWidget',
-  'TileLayerWidget'
+  'TileLayerWidget',
+  'PieChartMarkersLayerWidget'
 ];
 
 let FeatureGroupWidget = React.createClass({

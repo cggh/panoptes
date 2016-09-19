@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Map} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
@@ -84,9 +82,9 @@ let MapWidget = React.createClass({
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
   propTypes: {
-    center: React.PropTypes.array,
+    center: React.PropTypes.object,
     children: React.PropTypes.node,
-    componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
+    setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
     tileLayerProps: React.PropTypes.object,
     title: React.PropTypes.string,
@@ -177,7 +175,7 @@ let MapWidget = React.createClass({
 
       let leafletCenter = this.map.leafletElement.getCenter();
       let maxZoom = this.map.leafletElement.getMaxZoom();
-      let newCenter = Immutable.Map({lat: leafletCenter.lat, lng: leafletCenter.lng});
+      let newCenter = {lat: leafletCenter.lat, lng: leafletCenter.lng};
       let newZoom = this.map.leafletElement.getZoom();
 
       if (newZoom > maxZoom) {
@@ -193,11 +191,11 @@ let MapWidget = React.createClass({
           });
         }
 
-        // this.props.componentUpdate is not available when the widget is mounted via a template (when it's not session-bound)
-        // FIXME: this.props.componentUpdate is not available when the widget is mounted through DataItem/Actions
+        // this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
+        // FIXME: this.props.setProps is not available when the widget is mounted through DataItem/Actions
 
-        if (this.props.componentUpdate !== undefined) {
-          this.props.componentUpdate({center: newCenter, zoom: newZoom});
+        if (this.props.setProps !== undefined) {
+          this.props.setProps({center: newCenter, zoom: newZoom});
         }
 
       }

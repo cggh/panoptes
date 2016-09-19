@@ -10,6 +10,9 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
 import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
+import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
+
 import DatasetManagerActions from 'Dataset/Manager/Actions';
 import PlotWithActions from 'Plot/Table/Actions';
 import TableMapActions from 'Map/Table/Actions';
@@ -51,13 +54,18 @@ let ViewList = React.createClass({
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, <GenomeBrowserWithActions />)}/>
+                    onClick={(e) => this.handleOpen(e,
+                      <GenomeBrowserWithActions>
+                        <ReferenceSequence fixed/>
+                        <AnnotationChannel fixed/>
+                      </GenomeBrowserWithActions>
+                        )}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Table Plotter"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={(e) => this.handleOpen(e, <PlotWithActions wat={() => 1}/>)}/>
+                    onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Table Mapper"

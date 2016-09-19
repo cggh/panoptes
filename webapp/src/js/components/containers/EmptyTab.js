@@ -13,7 +13,7 @@ let EmptyTab = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired
+    replaceSelf: React.PropTypes.func
   },
 
   icon() {
@@ -23,11 +23,11 @@ let EmptyTab = React.createClass({
     return 'New tab';
   },
 
-  handleClick({container, props, middleClick}) {
+  handleClick({component, middleClick}) {
     if (middleClick)
-      this.flux.actions.session.tabOpen(container, props, false);
+      this.flux.actions.session.tabOpen(component, false);
     else {
-      this.props.componentUpdate(props, container);
+      this.props.replaceSelf(component);
     }
   },
 

@@ -98,7 +98,10 @@ let Panoptes = React.createClass({
                       <TabPane
                         compId={compId}
                         key={compId}>
-                        {deserialiseComponent(tab)}
+                        {deserialiseComponent(tab, [compId], {
+                          setProps: actions.componentSetProps,
+                          replaceSelf: actions.componentReplace
+                        })}
                       </TabPane>
                     );
                   })}
@@ -128,7 +131,10 @@ let Panoptes = React.createClass({
                     onClose={actions.popupClose.bind(this, compId)}
                     onMaximise={actions.popupToTab.bind(this, compId)}
                     onClick={actions.popupFocus.bind(this, compId)}>
-                    {deserialiseComponent(popup)}
+                    {deserialiseComponent(popup, [compId], {
+                      setProps: actions.componentSetProps,
+                      replaceSelf: actions.componentReplace
+                    })}
                   </Popup>
                 );
               })}

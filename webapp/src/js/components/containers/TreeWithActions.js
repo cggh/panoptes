@@ -36,7 +36,7 @@ let TreeWithActions = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
@@ -46,7 +46,7 @@ let TreeWithActions = React.createClass({
 
   getDefaultProps() {
     return {
-      componentUpdate: null,
+      setProps: null,
       sidebar: true
     };
   },
@@ -70,19 +70,19 @@ let TreeWithActions = React.createClass({
   },
 
   handleChangeTable(table) {
-    this.props.componentUpdate({table});
+    this.props.setProps({table});
   },
 
   handleChangeTree(tree) {
-    this.props.componentUpdate({tree});
+    this.props.setProps({tree});
   },
 
   handleChangeTreeType(treeType) {
-    this.props.componentUpdate({treeType});
+    this.props.setProps({treeType});
   },
 
   render() {
-    const {sidebar, table, tree, treeType, componentUpdate} = this.props;
+    const {sidebar, table, tree, treeType, setProps} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.trees.length > 0),
       (table) => ({
@@ -159,7 +159,7 @@ let TreeWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">Tree {table ? `of ${this.config.tablesById[table].capNamePlural}` : ''} </span>
           </div>
           <div className="grow">

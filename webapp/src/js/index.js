@@ -24,6 +24,11 @@ import API from 'panoptes/API';
 import InitialConfig from 'panoptes/InitialConfig';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
+import Perf from 'react-addons-perf';
+
+if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
+  window.Perf = Perf;
+}
 
 import 'console-polyfill';
 import 'normalize.css';

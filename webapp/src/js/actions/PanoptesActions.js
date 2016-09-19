@@ -1,5 +1,8 @@
+import React from 'react';
 import Constants from '../constants/Constants';
 import DataItemViews from 'panoptes/DataItemViews';
+import DataItemWidget from 'components/DataItem/Widget';
+import serialiseComponent from 'util/serialiseComponent';
 const SESSION = Constants.SESSION;
 
 const PanoptesActions = (config) => ({
@@ -9,13 +12,13 @@ const PanoptesActions = (config) => ({
 
     // NB: If tableDataItemViews is undefined or null, then default views (Overview and maybe Map) will be returned by getViews().
     let views = DataItemViews.getViews(tableDataItemViews, config.tablesById[table].hasGeoCoord);
-
     this.dispatch(SESSION.POPUP_OPEN, {
-      component: {
-        component: 'DataItem/Widget',
-        props: {table, primKey, views}
-      },
-      switchTo: switchTo
+      component: serialiseComponent(
+        <DataItemWidget table={table} primKey={primKey}>
+          {views}
+        </DataItemWidget>
+      ),
+      switchTo
     });
   }
 });

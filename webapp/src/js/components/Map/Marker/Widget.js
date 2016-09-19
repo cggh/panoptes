@@ -4,9 +4,6 @@ import {Marker} from 'react-leaflet';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-// Lodash
-import _isFunction from 'lodash/isFunction';
-
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
@@ -34,7 +31,7 @@ let MarkerWidget = React.createClass({
     onClick: React.PropTypes.func,
     opacity: React.PropTypes.number,
     zIndexOffset: React.PropTypes.number,
-    position: React.PropTypes.array.isRequired,
+    position: React.PropTypes.object.isRequired,
     title: React.PropTypes.string
   },
   childContextTypes: {

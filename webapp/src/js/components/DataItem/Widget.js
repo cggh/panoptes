@@ -1,7 +1,6 @@
 import React from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import _isFunction from 'lodash/isFunction';
-
+import filterChildren from 'util/filterChildren';
+import ValidComponentChildren from 'util/ValidComponentChildren';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -13,9 +12,6 @@ import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import DataItemActions from 'DataItem/Actions';
 
-let dynreq = require.context('..', true);
-const dynamicRequire = (path) => dynreq('./' + path);
-
 let DataItemWidget = React.createClass({
 
   mixins: [
@@ -25,15 +21,11 @@ let DataItemWidget = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
     activeTab: React.PropTypes.string,
-    views: ImmutablePropTypes.listOf(
-      ImmutablePropTypes.contains({
-        component: React.PropTypes.string.isRequired,
-        props: ImmutablePropTypes.map
-      })).isRequired
+    children: React.PropTypes.node
   },
 
   getDefaultProps: function() {
@@ -51,36 +43,23 @@ let DataItemWidget = React.createClass({
   },
 
   render() {
-    let {table, primKey, componentUpdate, activeTab, views} = this.props;
-
+    let {table, primKey, setProps, activeTab, children} = this.props;
+    children = filterChildren(this, children); //Remove whitespace children from template padding
     return (
       <div className="vertical stack" style={{position: 'absolute'}}>
         <div className="grow">
           <TabbedArea
             activeTab={activeTab}
-            onSwitch={(id) => componentUpdate({activeTab: id})}
+            onSwitch={(id) => setProps({activeTab: id})}
            >
-            {views.map((view, i) => {
-              view = view.toObject();
+            {ValidComponentChildren.map(children, (child, i) => {
               let viewId = `view_${i}`;
-              let props = view.props ? view.props.toObject() : {};
               return (
                 <TabPane
                   compId={viewId}
                   key={viewId}
                 >
-                  {React.createElement(dynamicRequire(view.component),
-                    Object.assign(props,
-                      {table, primKey},
-                      {
-                        componentUpdate: (updater) => componentUpdate((props) => {
-                          if (_isFunction(updater))
-                            return props.updateIn(['views', i, 'props'], updater);
-                          else
-                            return props.mergeIn(['views', i, 'props'], updater);
-                        })
-                      })
-                  )}
+                  {React.cloneElement(child, {table, primKey})}
                 </TabPane>
               );
             })}

@@ -15,13 +15,14 @@ let PopupButton = React.createClass({
   propTypes: {
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
+    children: React.PropTypes.node
   },
 
   getDefaultProps() {
     return {
       label: 'Untitled',
       icon: 'circle'
-    }
+    };
   },
 
   handleClick(e) {

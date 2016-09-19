@@ -32,7 +32,7 @@ let PerRowIndicatorChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
-        'componentUpdate',
+        'setProps',
         'onClose'
       ],
       check: [
@@ -51,12 +51,12 @@ let PerRowIndicatorChannel = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    setProps: React.PropTypes.func,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
@@ -281,7 +281,7 @@ let PerRowIndicatorChannel = React.createClass({
       if (!_isEqual(this.state.knownValues, drawnColourVals)) {
         this.setState({knownValues: drawnColourVals});
       }
-    } else {
+    } else if (this.state.knownValues) {
       this.setState({knownValues: null});
     }
 
@@ -301,7 +301,7 @@ let PerRowIndicatorChannel = React.createClass({
             </div>
             }
         //Override component update to get latest in case of skipped render
-        configComponent={<PerRowIndicatorControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        configComponent={<PerRowIndicatorControls {...this.props} setProps={this.redirectedProps.setProps} />}
         legendComponent={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={knownValues} /> : null}
         onClose={this.redirectedProps.onClose}
       >
@@ -317,7 +317,7 @@ const PerRowIndicatorControls = React.createClass({
         'colourProperty',
         'query'
       ],
-      redirect: ['componentUpdate']
+      redirect: ['setProps']
     }),
     FluxMixin
   ],
@@ -329,7 +329,7 @@ const PerRowIndicatorControls = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.redirectedProps.componentUpdate({query});
+    this.redirectedProps.setProps({query});
   },
 
   render() {
@@ -344,7 +344,7 @@ const PerRowIndicatorControls = React.createClass({
           <div className="label">Colour By:</div>
           <PropertySelector table={table}
                             value={colourProperty}
-                            onSelect={(colourProperty) => this.redirectedProps.componentUpdate({colourProperty})} />
+                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})} />
         </div>
       </div>
     );

@@ -229,7 +229,7 @@ let TableMarkersLayerWidget = React.createClass({
         markerWidgets.push(
           <ComponentMarkerWidget
             key={i}
-            position={[marker.get('lat'), marker.get('lng')]}
+            position={{lat: marker.get('lat'), lng: marker.get('lng')}}
             title={marker.get('title')}
             onClick={(e) => this.handleClickMarker(e, marker)}
           >

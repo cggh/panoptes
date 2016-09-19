@@ -33,7 +33,7 @@ let NumericalSummaryTrack = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string.isRequired,
+    chromosome: React.PropTypes.string,
     start: React.PropTypes.number, //Provided by ScaledSVGChannel
     end: React.PropTypes.number, //Provided by ScaledSVGChannel
     height: React.PropTypes.number,
@@ -44,7 +44,7 @@ let NumericalSummaryTrack = React.createClass({
     onYLimitChange: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
     track: React.PropTypes.string.isRequired,
-    onChangeLoadStatus: React.PropTypes.func.isRequired,
+    onChangeLoadStatus: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -174,7 +174,6 @@ let NumericalSummaryTrack = React.createClass({
     ) {
       return;
     }
-
     const nullVal = API.nullValues[this.blocks[0].min.type];
     const windowSize = this.summaryWindow;
     const xScaleFactor = width / (end - start);

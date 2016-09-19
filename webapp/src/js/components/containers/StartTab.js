@@ -19,7 +19,7 @@ let StartTab = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired
+    setProps: React.PropTypes.func.isRequired
   },
 
   icon() {

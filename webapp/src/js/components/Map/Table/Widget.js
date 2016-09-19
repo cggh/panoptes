@@ -36,8 +36,8 @@ let TableMapWidget = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.array,
-    componentUpdate: React.PropTypes.func,
+    center: React.PropTypes.object,
+    setProps: React.PropTypes.func,
     highlight: React.PropTypes.string,
     locationDataTable: React.PropTypes.string,
     onChange: React.PropTypes.func,
@@ -57,7 +57,7 @@ let TableMapWidget = React.createClass({
 
     let {
       center,
-      componentUpdate,
+      setProps,
       highlight,
       locationDataTable,
       onChange,
@@ -83,7 +83,7 @@ let TableMapWidget = React.createClass({
     return (
       <MapWidget
         center={center}
-        componentUpdate={componentUpdate}
+        setProps={setProps}
         onChange={onChange}
         style={widgetStyle}
         zoom={zoom}

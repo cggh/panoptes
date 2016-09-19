@@ -1,12 +1,11 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import Sidebar from 'react-sidebar';
 import scrollbarSize from 'scrollbar-size';
 
 // Lodash
 import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
+import _map from 'lodash/map';
 import _forEach from 'lodash/forEach';
 
 // Mixins
@@ -30,6 +29,7 @@ import SQL from 'panoptes/SQL';
 import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
+import PivotTableWithActions from 'containers/PivotTableWithActions';
 
 // Constants
 const MAX_ROWS_COUNT = 100000;
@@ -38,14 +38,14 @@ let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
-    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
-    columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
+    columns: React.PropTypes.array,
+    columnWidths: React.PropTypes.object,
     initialStartRowIndex: React.PropTypes.number,
     sidebar: React.PropTypes.bool,
     initialSearchFocus: React.PropTypes.bool,
@@ -58,7 +58,7 @@ let DataTableWithActions = React.createClass({
       query: SQL.nullQuery,
       order: null,
       ascending: true,
-      columnWidths: Immutable.Map(),
+      columnWidths: {},
       initialStartRowIndex: 0,
       sidebar: true,
       initialSearchFocus: false,
@@ -104,20 +104,20 @@ let DataTableWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.props.componentUpdate({query: query});
+    this.props.setProps({query: query});
   },
 
   handleColumnChange(columns) {
     this.getFlux().actions.session.modalClose();
-    this.props.componentUpdate((props) => props.set('columns', columns));
+    this.props.setProps((props) => props.set('columns', columns));
   },
 
   handleColumnResize(column, size) {
-    this.props.componentUpdate({columnWidths: {[column]: size}});
+    this.props.setProps({columnWidths: {[column]: size}});
   },
 
   handleOrderChange(column, ascending) {
-    this.props.componentUpdate({order: column, ascending: ascending});
+    this.props.setProps({order: column, ascending: ascending});
   },
 
   handleFetchedRowsCountChange(fetchedRowsCount) {
@@ -178,7 +178,7 @@ let DataTableWithActions = React.createClass({
   },
 
   handleSearchChange(event) {
-    this.props.componentUpdate({searchText: event.target.value});
+    this.props.setProps({searchText: event.target.value});
   },
 
   handleSearchBlur(event) {
@@ -237,14 +237,14 @@ let DataTableWithActions = React.createClass({
 
   render() {
     let actions = this.getFlux().actions;
-    let {table, query, columns, columnWidths, order, ascending, sidebar, componentUpdate, searchText} = this.props;
+    let {table, query, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalTruncatedRowsCount} = this.state;
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
-    if (!columns)
-      columns = Immutable.List(this.tableConfig().properties)
-        .filter((prop) => prop.showByDefault && prop.showInTable)
-        .map((prop) => prop.id);
+    if (!columns) {
+      columns = _filter(this.tableConfig().properties, (prop) => prop.showByDefault && prop.showInTable);
+      columns = _map(columns, (prop) => prop.id);
+    }
     let {description} = this.tableConfig();
     let quickFindFieldsList = '';
     for (let i = 0, len = this.tableConfig().quickFindFields.length; i < len; i++) {
@@ -310,7 +310,7 @@ let DataTableWithActions = React.createClass({
         {searchGUI}
         <FlatButton label="Pivot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen('containers/PivotTableWithActions', {table}, true)}
+                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table}/>, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
       </div>
@@ -418,7 +418,7 @@ let DataTableWithActions = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>

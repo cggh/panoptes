@@ -79,6 +79,7 @@
     "rc-tooltip": "^3.4.2",
     "react": "^15.3.0",
     "react-addons-create-fragment": "^15.3.0",
+    "react-addons-perf": "^15.3.2",
     "react-addons-transition-group": "^15.3.0",
     "react-addons-update": "^15.3.0",
     "react-display-name": "^0.2.0",

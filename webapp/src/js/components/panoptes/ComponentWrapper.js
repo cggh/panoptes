@@ -2,7 +2,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import _isFunction from 'lodash/isFunction';
 
-// This component wraps a component that has a "componentUpdate" method,
+// This component wraps a component that has a "setProps" method,
 // such that it's props will be changed by the call to update eg:
 // <ComponentWrapper>
 //   <GenomeBrowser table="variants"/>
@@ -29,7 +29,7 @@ let ComponentWrapper = React.createClass({
     return React.cloneElement(child,
       {
         ...childProps.toObject(),
-        componentUpdate: (updater) => {
+        setProps: (updater) => {
           if (_isFunction(updater))
             this.setState({childProps: childProps.update(updater)});
           else

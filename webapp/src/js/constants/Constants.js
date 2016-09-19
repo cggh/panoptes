@@ -8,7 +8,8 @@ function nameSpace(namespace, obj) {
 }
 
 let session = keyMirror({
-  COMPONENT_UPDATE: null,
+  COMPONENT_SET_PROPS: null,
+  COMPONENT_REPLACE: null,
   MODAL_CLOSE: null,
   MODAL_OPEN: null,
   NOTIFY: null,

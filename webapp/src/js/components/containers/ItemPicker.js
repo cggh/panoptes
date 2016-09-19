@@ -31,7 +31,7 @@ let ItemPicker = React.createClass({
       ImmutablePropTypes.contains({
         name: React.PropTypes.string.isRequired,
         icon: React.PropTypes.string,
-        items: ImmutablePropTypes.mapOf(
+        items: ImmutablePropTypes.listOf(
           ImmutablePropTypes.contains({
             name: React.PropTypes.string.isRequired,
             icon: React.PropTypes.string,
@@ -91,7 +91,7 @@ let ItemPicker = React.createClass({
     this.setState({picked: Immutable.List()});
   },
   handlePick() {
-    this.props.onPick(this.state.picked);
+    this.props.onPick(this.state.picked.map((item) => item.get('payload')));
   },
   handleSearchChange(event) {
     this.setState({'search': event.target.value});

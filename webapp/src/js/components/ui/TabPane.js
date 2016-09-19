@@ -13,14 +13,24 @@ let TabPane = React.createClass({
   },
 
   icon() {
-    return (this.child.icon ? this.child.icon() : null) ||
-           (this.props.children.props ? this.props.children.props.icon : null) ||
-            "circle";
+    if (this.child.icon) {
+      return this.child.icon();
+    }
+    const child = React.Children.only(this.props.children);
+    if (child.props.icon) {
+      return child.props.icon;
+    }
+    return null;
   },
   title() {
-    return (this.child.title ? this.child.title() : null) ||
-      (this.props.children.props ? this.props.children.props.title : null) ||
-      "Untitled";
+    if (this.child.title) {
+      return this.child.title();
+    }
+    const child = React.Children.only(this.props.children);
+    if (child.props.title) {
+      return child.props.title;
+    }
+    return 'Untitled';
   },
 
   render() {

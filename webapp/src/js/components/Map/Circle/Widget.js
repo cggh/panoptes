@@ -11,7 +11,7 @@ let CircleWidget = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.array,
+    center: React.PropTypes.object,
     radius: React.PropTypes.number,
   },
 
