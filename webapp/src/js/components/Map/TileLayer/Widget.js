@@ -46,6 +46,8 @@ let TileLayerWidget = React.createClass({
     return {
       attribution: '&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       ext: 'png',
+      maxZoom: 17,
+      minZoom: 0,
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
     };
   },
