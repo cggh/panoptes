@@ -1,6 +1,8 @@
-import Immutable from 'immutable';
-import {Map} from 'react-leaflet';
 import React from 'react';
+
+import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import {Map} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -73,10 +75,7 @@ let MapWidget = React.createClass({
     children: React.PropTypes.node,
     componentUpdate: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
     onChange: React.PropTypes.func,
-    tileLayerAttribution: React.PropTypes.string,
-    tileLayerMaxZoom: React.PropTypes.number,
-    tileLayerMinZoom: React.PropTypes.number,
-    tileLayerURL: React.PropTypes.string,
+    tileLayerProps: React.PropTypes.oneOfType([React.PropTypes.string, ImmutablePropTypes.map]),
     title: React.PropTypes.string,
     zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
   },
@@ -96,9 +95,7 @@ let MapWidget = React.createClass({
     // because render() relies on undefined to indicate that they have not already been set in the session (then decide a default).
     return {
       center: undefined,
-      zoom: undefined,
-      tileLayerAttribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      tileLayerURL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      zoom: undefined
     };
   },
   getInitialState() {
@@ -201,7 +198,7 @@ let MapWidget = React.createClass({
   },
 
   render() {
-    let {center, children, tileLayerAttribution, tileLayerMaxZoom, tileLayerMinZoom, tileLayerURL, zoom} = this.props;
+    let {center, children, tileLayerProps, zoom} = this.props;
     let {bounds, loadStatus} = this.state;
 
     if (bounds === undefined && center === undefined && zoom === undefined) {
@@ -215,6 +212,7 @@ let MapWidget = React.createClass({
     let widgetStyle = {height: '100%'};
 
     let adaptedMapProps = {};
+    let adaptedTileLayerProps = Immutable.Map();
 
     // Translate prop values from strings (used in templates)
     // into the required primitive types.
@@ -239,6 +237,17 @@ let MapWidget = React.createClass({
       let centerArrayFromString = JSON.parse(center);
       if (centerArrayFromString instanceof Array) {
         adaptedMapProps.center = centerArrayFromString;
+      }
+    }
+
+    if (tileLayerProps !== undefined && typeof tileLayerProps === 'object') {
+      // TODO: check the object looks right before accepting it
+      adaptedTileLayerProps = tileLayerProps;
+    } else if (tileLayerProps !== undefined && typeof tileLayerProps === 'string') {
+      // TODO: check the string looks right before trying to parse
+      let tileLayerPropsFromString = Immutable.fromJS(JSON.parse(tileLayerProps));
+      if (typeof tileLayerPropsFromString === 'object') {
+        adaptedTileLayerProps = tileLayerPropsFromString;
       }
     }
 
@@ -273,24 +282,11 @@ let MapWidget = React.createClass({
       center: center,
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
-      tileLayerAttribution: tileLayerAttribution,
-      tileLayerURL: tileLayerURL,
       ref: (ref) => this.map = ref,
       zoom: zoom
     };
 
     let mapComponent = null;
-
-    // Provide a default tile layer.
-    // Is there a situation where the user wants no tile layer?
-    let defaultTileLayer = (
-      <TileLayerWidget
-        attribution={tileLayerAttribution}
-        maxZoom={tileLayerMaxZoom}
-        minZoom={tileLayerMinZoom}
-        url={tileLayerURL}
-      />
-    );
 
     // TODO: Tidy up this logic. Maybe extract into functions?
     // Is similar logic needed elsewhere?
@@ -323,15 +319,12 @@ let MapWidget = React.createClass({
 
         // If there are only Markers as children.
 
-        let keyedDefaultTileLayer = _cloneDeep(defaultTileLayer);
-        keyedDefaultTileLayer.key = 0;
-
         mapComponent = (
           <Map
             {...commonMapProps}
             {...adaptedMapProps}
           >
-            {keyedDefaultTileLayer}
+            <TileLayerWidget key="0" {...adaptedTileLayerProps.toObject()} />
             {keyedChildren}
           </Map>
         );
@@ -412,7 +405,7 @@ let MapWidget = React.createClass({
             {...commonMapProps}
             {...adaptedMapProps}
           >
-            {defaultTileLayer}
+            <TileLayerWidget {...adaptedTileLayerProps.toObject()} />
           </Map>
         );
 

@@ -26,8 +26,10 @@ let MarkerWidget = React.createClass({
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     onClick: React.PropTypes.func,
+    opacity: React.PropTypes.number,
     position: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]).isRequired,
-    title: React.PropTypes.string
+    title: React.PropTypes.string,
+    zIndexOffset: React.PropTypes.number
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -43,7 +45,7 @@ let MarkerWidget = React.createClass({
 
   render() {
 
-    let {alt, children, onClick, position, title} = this.props;
+    let {alt, children, onClick, opacity, position, title, zIndexOffset} = this.props;
 
 
     let adaptedMarkerProps = {};
@@ -105,7 +107,9 @@ let MarkerWidget = React.createClass({
     return (
       <Marker
         {...adaptedMarkerProps}
+        opacity={opacity}
         title={title}
+        zIndexOffset={zIndexOffset}
       />
     );
 
