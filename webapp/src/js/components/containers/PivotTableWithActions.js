@@ -63,41 +63,42 @@ let PivotTableWithActions = React.createClass({
       <div className="sidebar pivot-sidebar">
         <SidebarHeader icon={this.icon()} description={`Summary and aggregates of the ${this.tableConfig().namePlural} table`}/>
         <div className="pivot-controls vertical stack">
-		{(typeof instantFilter == 'undefined' || instantFilter == null ) ? 
-          <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
-		:
-          <PropertyValueSelector table={table}
-                            key="instantFilter"
-                            propid={instantFilter}
-                            value={typeof instantFilterValue != 'undefined' ? instantFilterValue : null}
-                            label={instantFilter}
-                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => {
-                            	let v2 = {"whcClass":"comparefixed","isCompound":false,"ColName":instantFilter,"CompValue":v,"isRoot":true,"Tpe":"="} ;
-                            	let query = JSON.stringify(v2) ;
-                            	this.props.setProps({query})
-                            	}
-                            }/>
-		}
+          {(typeof instantFilter == 'undefined' || instantFilter == null ) ?
+                <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
+          :
+                <PropertyValueSelector table={table}
+                                  key="instantFilter"
+                                  propid={instantFilter}
+                                  value={typeof instantFilterValue != 'undefined' ? instantFilterValue : null}
+                                  label={instantFilter}
+                                  filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+                                  onSelect={(v) => {
+                                    let v2 = {"whcClass":"comparefixed","isCompound":false,"ColName":instantFilter,"CompValue":v,"isRoot":true,"Tpe":"="} ;
+                                    let query = JSON.stringify(v2) ;
+                                    this.props.setProps({query})
+                                    }
+                                  }/>
+          }
 
-        {(columnLabel=='hide')?'':
-          <PropertySelector table={table}
-                            key="columnProperty"
-                            value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
-                            allowNull={true}
-                            label={(typeof columnLabel=='undefined')?"Column":columnLabel}
-                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({columnProperty: v})}/>
-        }
-                            
-        {(rowLabel=='hide')?'':
-          <PropertySelector table={table}
-                            key="rowProperty"
-                            value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
-                            allowNull={true}
-                            label={(typeof rowLabel=='undefined')?"Row":rowLabel}
-                            filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => setProps({rowProperty: v})}/>
+          {(columnLabel=='hide')?'':
+            <PropertySelector table={table}
+                              key="columnProperty"
+                              value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
+                              allowNull={true}
+                              label={(typeof columnLabel=='undefined')?"Column":columnLabel}
+                              filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+                              onSelect={(v) => setProps({columnProperty: v})}/>
+          }
+
+          {(rowLabel == 'hide') ? '' :
+            <PropertySelector table={table}
+                              key="rowProperty"
+                              value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
+                              allowNull={true}
+                              label={(typeof rowLabel == 'undefined') ? "Row" : rowLabel}
+                              filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
+                              onSelect={(v) => setProps({rowProperty: v})}/>
+          }
         </div>
       </div>
     );
