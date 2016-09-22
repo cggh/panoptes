@@ -6,7 +6,7 @@ let Popups = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
-    children: React.PropTypes.object
+    children: React.PropTypes.node
   },
 
   renderPopup(popup) {

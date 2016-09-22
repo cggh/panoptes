@@ -36,7 +36,7 @@ let PopupWidget = React.createClass({
   },
 
   render() {
-    let children = filterChildren(this, children);
+    let children = filterChildren(this, this.props.children);
     return (
       <Popup
         children={React.Children.only(children)}

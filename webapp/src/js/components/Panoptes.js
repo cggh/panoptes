@@ -104,7 +104,7 @@ let Panoptes = React.createClass({
                         })}
                       </TabPane>
                     );
-                  })}
+                  }).toArray()}
                 </TabbedArea>
               </div>
             </div>
@@ -137,7 +137,7 @@ let Panoptes = React.createClass({
                     })}
                   </Popup>
                 );
-              })}
+              }).toArray()}
             </Popups>
             <Modal visible={modal.component ? true : false}
                    onClose={actions.modalClose}>
