@@ -27,7 +27,7 @@ let PivotTableWithActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
@@ -119,8 +119,8 @@ let PivotTableWithActions = React.createClass({
             <PivotTableView {...this.props}/>
           </div>
           <div>
-          	<div dangerouslySetInnerHTML={{__html:(columnLabel=='hide')?'':this.config.tablesById[table].propertiesById[columnProperty].description}} />
-          	<div dangerouslySetInnerHTML={{__html:(rowLabel=='hide')?'':this.config.tablesById[table].propertiesById[rowProperty].description}} />
+            {columnProperty ? <div dangerouslySetInnerHTML={{__html:(columnLabel=='hide')?'':this.config.tablesById[table].propertiesById[columnProperty].description}} /> : null}
+            {rowProperty ? <div dangerouslySetInnerHTML={{__html:(rowLabel=='hide')?'':this.config.tablesById[table].propertiesById[rowProperty].description}} /> : null}
           </div>
         </div>
       </Sidebar>

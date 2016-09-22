@@ -166,7 +166,7 @@ let PivotTableView = React.createClass({
       return null;
 
 	let distinctValuesCol = {} ;
-	if ( typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
+	if ( columnProperty && typeof tableConfig.propertiesById[columnProperty].distinctValues != 'undefined' ) {
 		distinctValuesCol = JSON.parse ( tableConfig.propertiesById[columnProperty].distinctValues ) ;
 	}
 
