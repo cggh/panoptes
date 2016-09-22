@@ -69,20 +69,11 @@ let BaseLayerWidget = React.createClass({
       console.error('BaseLayerWidget could not determine checked status');
     }
 
-    if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('BaseLayerWidget received more than one child. Using first child.');
-        // NB: <BaseLayer><Marker /><Marker /></BaseLayer> would error,
-        // whereas <BaseLayer><FeatureGroup><Marker /><Marker /></FeatureGroup></BaseLayer> is valid.
-      }
-      children = children[0];
-    }
-
     return (
       <BaseLayer
         checked={checkedBoolean}
         name={name}
-        children={children}
+        children={React.Children.only(children)}
         addBaseLayer={addBaseLayer}
       />
     );

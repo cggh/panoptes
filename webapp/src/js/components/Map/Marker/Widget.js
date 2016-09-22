@@ -51,25 +51,13 @@ let MarkerWidget = React.createClass({
     let {alt, children, onClick, opacity, position, title, zIndexOffset} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
-
-    if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('MarkerWidget received more than one child. Using first child.');
-        // NB: <Marker><foo /><bar /></ Marker> would error,
-        // whereas <Marker><baz><foo /><bar /></baz></ Marker> is valid.
-      }
-      // NB: The single child object is often passed to Map components as the first element of an array.
-      // However, an array would cause an error if it was passed forward as this component's children.
-      children = children[0];
-    }
-
     return (
       <Marker
         position={position}
         onClick={onClick || (() => null)}
         alt={alt}
         title={title || alt}
-        children={children}
+        children={React.Children.only(children)}
         opacity={opacity}
         zIndexOffset={zIndexOffset}
       />

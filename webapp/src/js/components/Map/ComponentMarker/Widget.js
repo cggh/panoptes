@@ -50,17 +50,12 @@ let ComponentMarkerWidget = React.createClass({
             title={title}
           />
       );
-    } else if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('ComponentMarkerWidget received more than one child. Using first child.');
-      }
-      children = children[0];
     }
 
     return (
       <DivIcon
         alt={alt}
-        children={children}
+        children={React.Children.only(children)}
         className="panoptes-map-componentmarker"
         onClick={(e) => onClick(e, this)}
         position={position}

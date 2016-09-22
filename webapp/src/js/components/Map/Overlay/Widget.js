@@ -47,19 +47,12 @@ let OverlayWidget = React.createClass({
       checkedBoolean = null;
     }
 
-    if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('OverlayWidget received more than one child. Using first child.');
-      }
-      children = children[0];
-    }
-
     return (
       <Overlay
         addOverlay={addOverlay}
         checked={checkedBoolean}
         name={name}
-        children={children}
+        children={React.Children.only(children)}
       />
 
     );
