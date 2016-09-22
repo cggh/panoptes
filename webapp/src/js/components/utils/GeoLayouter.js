@@ -10,10 +10,6 @@ import _zip from 'lodash/zip';
 // Panoptes
 import {latlngToMercatorXY, mercatorXYtolatlng} from 'util/WebMercator';
 
-// Mixins
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-
 // External functions
 function collide(node) {
   let r = node.collisionRadius + 16,
@@ -95,17 +91,15 @@ function updateXYUsingLngLat(node) {
 
 let GeoLayouter = React.createClass({
 
-  // NB: GeoLayouter is given nodes an Immutable List, but d3's force requires a simple array.
-  // .toArray() is shallow, .toJS() is deep.
   // GeoLayouter returns its children ("renderNodes") as a simple array.
   propTypes: {
-    nodes: ImmutablePropTypes.list.isRequired,
+    nodes: React.PropTypes.array.isRequired,
     children: React.PropTypes.func.isRequired
   },
 
   getDefaultProps() {
     return {
-      nodes: Immutable.List()
+      nodes: []
     };
   },
 
@@ -159,7 +153,7 @@ let GeoLayouter = React.createClass({
 
     // Convert the prop nodes from an Immutable List to a simple array.
     // .toArray() is shallow, .toJS() is deep.
-    let propNodesAsArray = this.props.nodes.toJS();
+    let propNodesAsArray = this.props.nodes;
 
     // Derive the fixedNodes and nextRenderNodes from the propNodes and previous renderNodes.
     let {fixedNodes, nextRenderNodes} = createFixedAndNextRenderNodes({propNodes: propNodesAsArray, prevRenderNodes: this.renderNodes});

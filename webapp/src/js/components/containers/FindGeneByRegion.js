@@ -26,7 +26,7 @@ let FindGeneByRegion = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func.isRequired,
     activeTab: React.PropTypes.string,
     search: React.PropTypes.string,
     chromosome: React.PropTypes.string,
@@ -56,11 +56,11 @@ let FindGeneByRegion = React.createClass({
   },
 
   componentWillMount() {
-    this.props.componentUpdate({'endPosition': parseInt(this.config.chromosomes[this.props.chromosome].len)});
+    this.props.setProps({'endPosition': parseInt(this.config.chromosomes[this.props.chromosome].len)});
   },
 
   handleChromChange(event) {
-    this.props.componentUpdate({
+    this.props.setProps({
       'chromosome': event.target.value,
       'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len),
       'startPosition': 0,
@@ -70,13 +70,13 @@ let FindGeneByRegion = React.createClass({
 
   handleStartPosChange(event) {
     if (event.target) {
-      this.props.componentUpdate({'startPosition': event.target.value});
+      this.props.setProps({'startPosition': event.target.value});
     }
   },
 
   handleEndPosChange(event) {
     if (event.target) {
-      this.props.componentUpdate({'endPosition': event.target.value});
+      this.props.setProps({'endPosition': event.target.value});
     }
   },
 
@@ -103,7 +103,7 @@ let FindGeneByRegion = React.createClass({
     if (middleClick) {
       this.getFlux().actions.session.popupOpen(container, props, false);
     } else {
-      this.props.componentUpdate(props, container);
+      this.props.setProps(props, container);
     }
 
   },

@@ -1,73 +1,25 @@
 import React from 'react';
 import HtmlToReact from 'html-to-react';
+import ComponentRegistry from 'util/ComponentRegistry';
+import _forEach from 'lodash/forEach';
+import _camelCase from 'lodash/camelCase';
 
-// Panoptes
-import BaseLayerWidget from 'Map/BaseLayer/Widget';
-import CircleWidget from 'Map/Circle/Widget';
-import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
-import ImageOverlayWidget from 'Map/ImageOverlay/Widget';
-import ItemLink from 'panoptes/ItemLink';
-import LayersControlWidget from 'Map/LayersControl/Widget';
-import MapWidget from 'Map/Widget';
-import MarkerWidget from 'Map/Marker/Widget';
-import OverlayWidget from 'Map/Overlay/Widget';
-import PieChartMapWidget from 'Map/Chart/Pie/Widget';
-import PopupButton from 'panoptes/PopupButton';
-import PopupWidget from 'Map/Popup/Widget';
-import RectangleWidget from 'Map/Rectangle/Widget';
-import TableMapWidget from 'Map/Table/Widget';
-import TablePlotWidget from 'Plot/Table/Widget';
-import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
-import TileLayerWidget from 'Map/TileLayer/Widget';
-import TreeContainer from 'containers/TreeContainer';
-import WMSTileLayerWidget from 'Map/TileLayer/WMS/Widget';
-
-
-
-// TODO: Deprecate ItemMap template component in favour of TableMap
-
-/*eslint-disable react/display-name */
-const components = {
-  BaseLayer: (node, children) =>
-    <BaseLayerWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  Circle: (node, children) =>
-    <CircleWidget key={node.attribs.key} {...node.attribs} />,
-  FeatureGroup: (node, children) =>
-    <FeatureGroupWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  ImageOverlay: (node, children) =>
-    <ImageOverlayWidget key={node.attribs.key} {...node.attribs} />,
-  ItemLink: (node, children) =>
-    <ItemLink key={node.attribs.key} {...node.attribs} />,
-  LayersControl: (node, children) =>
-    <LayersControlWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  Marker: (node, children) =>
-    <MarkerWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  Map: (node, children) =>
-    <MapWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  Overlay: (node, children) =>
-    <OverlayWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  PieChartMap: (node, children) =>
-    <PieChartMapWidget key={node.attribs.key} {...node.attribs} />,
-  Plot: (node, children) =>
-    <TablePlotWidget key={node.attribs.key} {...node.attribs} />,
-  Popup: (node, children) =>
-    <PopupWidget key={node.attribs.key} {...node.attribs} children={children} />,
-  PopupButton: (node, children) =>
-    <PopupButton key={node.attribs.key} {...node.attribs} />,
-  Rectangle: (node, children) =>
-    <RectangleWidget key={node.attribs.key} {...node.attribs} />,
-  TableMap: (node, children) =>
-    <TableMapWidget key={node.attribs.key} {...node.attribs} />,
-  TableMarkersLayer: (node, children) =>
-    <TableMarkersLayerWidget key={node.attribs.key} {...node.attribs} />,
-  TileLayer: (node, children) =>
-    <TileLayerWidget key={node.attribs.key} {...node.attribs} />,
-  Tree: (node, children) =>
-    <TreeContainer key={node.attribs.key} {...node.attribs} />,
-  WMSTileLayer: (node, children) =>
-    <WMSTileLayerWidget key={node.attribs.key} {...node.attribs} />
-};
-/*eslint-enable react/display-name */
+function createStyleJsonFromString(styleString) {
+  if (!styleString) {
+    return {};
+  }
+  let styles = styleString.split(';');
+  let singleStyle, key, value, jsonStyles = {};
+  for (let i = 0; i < styles.length; i++) {
+    singleStyle = styles[i].split(':');
+    key = _camelCase(singleStyle[0]);
+    value = singleStyle[1];
+    if (key.length > 0 && value.length > 0) {
+      jsonStyles[key] = value;
+    }
+  }
+  return jsonStyles;
+}
 
 let HTMLWithComponents = React.createClass({
 
@@ -82,11 +34,54 @@ let HTMLWithComponents = React.createClass({
       lowerCaseTags: false,
       recognizeSelfClosing: true
     });
-    let defaultProcess = new HtmlToReact.ProcessNodeDefinitions(React).processDefaultNode;
     let processingInstructions = [
       {
+        shouldProcessNode: (node) => !!ComponentRegistry(node.name),
+        processNode: (node, children, index) => {
+          const type = ComponentRegistry(node.name);
+          let elementProps = {
+            key: index,
+          };
+          _forEach(node.attribs, (value, key) => {
+            switch (key || '') {
+            case 'style':
+              elementProps.style = createStyleJsonFromString(node.attribs.style);
+              break;
+            case 'class':
+              elementProps.className = value;
+              break;
+            default:
+                //Cast types for known props
+              switch (type.propTypes[key]) {
+              case React.PropTypes.bool:
+              case React.PropTypes.bool.isRequired:
+                value = true;      //We use the usual HTML sense for boolean props - if it is defined it is true - e.g. input/checked
+                break;
+              case React.PropTypes.number:
+              case React.PropTypes.number.isRequired:
+                value = Number(value);
+                break;
+              case React.PropTypes.array:
+              case React.PropTypes.array.isRequired:
+              case React.PropTypes.object:
+              case React.PropTypes.object.isRequired:
+                try {
+                  value = JSON.parse(value);
+                } catch (e) {
+                  throw Error(`Can't parse ${key} attribute for ${node.name}:${value}`);
+                }
+                break;
+              }
+              elementProps[key] = value;
+              break;
+            }
+          });
+          return React.createElement(type, {children, ...elementProps});
+        }
+      },
+      {
         shouldProcessNode: (node) => true,
-        processNode: (node, children) => (components[node.name] || defaultProcess)(node, children)
+        processNode: new HtmlToReact.ProcessNodeDefinitions(React).processDefaultNode
       }
     ];
     let isValidNode = () => true;

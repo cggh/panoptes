@@ -9,6 +9,14 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
+import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
+import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
+import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
+
+import DatasetManagerActions from 'Dataset/Manager/Actions';
+import PlotWithActions from 'Plot/Table/Actions';
+import TableMapActions from 'Map/Table/Actions';
+import TreeWithActions from 'containers/TreeWithActions';
 
 let ViewList = React.createClass({
   mixins: [
@@ -23,9 +31,9 @@ let ViewList = React.createClass({
   },
 
 
-  handleOpen(e, container, props) {
+  handleOpen(e, component) {
     const middleClick = e.button == 1 || e.metaKey || e.ctrlKey;
-    this.props.onClick({container, props, middleClick});
+    this.props.onClick({component, middleClick});
   },
 
 
@@ -40,19 +48,24 @@ let ViewList = React.createClass({
           <ListItem primaryText="Dataset Manager"
                     secondaryText="Import and configure datasets"
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'Dataset/Manager/Actions', {})}/>
+                    onClick={(e) => this.handleOpen(e, <DatasetManagerActions />)}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Genome Browser"
                     secondaryText="View table data and sequence data on the genome"
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/GenomeBrowserWithActions', {})}/>
+                    onClick={(e) => this.handleOpen(e,
+                      <GenomeBrowserWithActions>
+                        <ReferenceSequence fixed/>
+                        <AnnotationChannel fixed/>
+                      </GenomeBrowserWithActions>
+                        )}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Table Plotter"
                     secondaryText="View table data graphically"
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'Plot/Table/Actions', {})}/>
+                    onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Table Mapper"
@@ -60,13 +73,13 @@ let ViewList = React.createClass({
                     style={{opacity: hasGeo ? '1' : '0.5'}}
                     secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={hasGeo ? (e) => this.handleOpen(e, 'Map/Table/Actions', {}) : null }/>
+                    onClick={hasGeo ? (e) => this.handleOpen(e, <TableMapActions />) : null }/>
           : null}
         {hasShowableTables ?
           <ListItem primaryText="Tree"
                     secondaryText="View a tree"
                     leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
-                    onClick={(e) => this.handleOpen(e, 'containers/TreeWithActions', {})}/>
+                    onClick={(e) => this.handleOpen(e, <TreeWithActions />)}/>
           : null}
       </List>
     );

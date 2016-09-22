@@ -20,12 +20,12 @@ let CanvasGroupChannel = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
     height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number,
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
@@ -33,7 +33,7 @@ let CanvasGroupChannel = React.createClass({
     controls: React.PropTypes.element,
     legend: React.PropTypes.element,
     onClose: React.PropTypes.func,
-    children: React.PropTypes.object
+    children: React.PropTypes.node
   },
 
   getDefaultProps() {

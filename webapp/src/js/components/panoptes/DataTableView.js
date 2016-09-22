@@ -1,6 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Color from 'color';
 
@@ -50,8 +48,8 @@ let DataTableView = React.createClass({
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
     startRowIndex: React.PropTypes.number,
-    columns: ImmutablePropTypes.listOf(React.PropTypes.string),
-    columnWidths: ImmutablePropTypes.mapOf(React.PropTypes.number),
+    columns: React.PropTypes.array,
+    columnWidths: React.PropTypes.object,
     maxRowsCount: React.PropTypes.number,
     onColumnResize: React.PropTypes.func,
     onOrderChange: React.PropTypes.func,
@@ -69,8 +67,8 @@ let DataTableView = React.createClass({
       order: null,
       ascending: true,
       startRowIndex: 0,
-      columns: Immutable.List(),
-      columnWidths: Immutable.Map(),
+      columns: [],
+      columnWidths: {},
     };
   },
 
@@ -96,8 +94,8 @@ let DataTableView = React.createClass({
     let {showableRowsCount} = this.state;
     let tableConfig = this.config.tablesById[table];
     let columnspec = {};
-    columns.map((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
-    if (props.columns.size > 0 && showableRowsCount > 0) {
+    columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
+    if (columns.length > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
 
@@ -215,7 +213,7 @@ let DataTableView = React.createClass({
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
-    if (columns.size > 0)
+    if (columns.length > 0)
       return (
         <DetectResize onResize={this.handleResize}>
           <div className={classNames('datatable', className)}>
@@ -239,7 +237,7 @@ let DataTableView = React.createClass({
                 let {id, isPrimKey, description, name} = columnData;
                 let asc = order == column && ascending;
                 let desc = order == column && !ascending;
-                let width = columnWidths.get(column, this.defaultWidth(columnData));
+                let width = columnWidths[column] || this.defaultWidth(columnData);
                 return <Column
                   //TODO Better default column widths
                   width={width}

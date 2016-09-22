@@ -3,7 +3,7 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-let EmptyTab = React.createClass({
+let ErrorTab = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin
@@ -29,4 +29,4 @@ let EmptyTab = React.createClass({
   }
 });
 
-module.exports = EmptyTab;
+module.exports = ErrorTab;

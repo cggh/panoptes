@@ -1,16 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import offset from 'bloody-offset';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import ConfigMixin from 'mixins/ConfigMixin';
 import _has from 'lodash/has';
 import _head from 'lodash/head';
 import _keys from 'lodash/keys';
-import _isFunction from 'lodash/isFunction';
 import d3 from 'd3';
 import scrollbarSize from 'scrollbar-size';
+import ValidComponentChildren from 'util/ValidComponentChildren';
 
 import Hammer from 'react-hammerjs';
 import {Motion, spring} from 'react-motion';
@@ -18,16 +16,11 @@ import {Motion, spring} from 'react-motion';
 import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
 import LoadingIndicator from 'panoptes/genome/LoadingIndicator';
 import Controls from 'panoptes/genome/Controls';
-import ReferenceSequence from 'panoptes/genome/tracks/ReferenceSequence';
-import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 import Background from 'panoptes/genome/Background';
 import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
 import FluxMixin from 'mixins/FluxMixin';
-
-const dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./tracks/' + path);
-
+import filterChildren from 'util/filterChildren';
 
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
@@ -38,34 +31,28 @@ const CONTROLS_HEIGHT = 33;
 
 let GenomeBrowser = React.createClass({
   mixins: [
-    PureRenderWithRedirectedProps({redirect: ['componentUpdate']}),
+    PureRenderWithRedirectedProps({redirect: ['setProps']}),
     FluxMixin,
     ConfigMixin
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
     sideWidth: React.PropTypes.number.isRequired,
-    chromPositions: ImmutablePropTypes.map,  //Stores the position on each chrom so you can flick back without losing place
-    channels: ImmutablePropTypes.mapOf(
-      ImmutablePropTypes.contains({
-        channel: React.PropTypes.string.isRequired,
-        props: ImmutablePropTypes.map
-      }))
+    chromPositions: React.PropTypes.object,  //Stores the position on each chrom so you can flick back without losing place
+    children: React.PropTypes.node
   },
 
   getDefaultProps() {
     return {
-      channels: Immutable.Map(),
       chromosome: '',
       start: 0,
       end: 10000,
       sideWidth: 150,
       width: 500,
-      components: Immutable.OrderedMap()
     };
   },
 
@@ -166,7 +153,7 @@ let GenomeBrowser = React.createClass({
     start = pos - (newWidth * fracX);
     end = pos + (newWidth * (1 - fracX));
     [start, end] = this.scaleClamp(start, end, fracX);
-    this.props.componentUpdate({start: start, end: end});
+    this.props.setProps({start: start, end: end});
   },
 
   handleMouseWheel(e) {
@@ -216,7 +203,7 @@ let GenomeBrowser = React.createClass({
       this.nextSpringConfig = NO_SPRING;
 
     }
-    this.props.componentUpdate({start: start, end: end});
+    this.props.setProps({start: start, end: end});
   },
 
   handleChangeLoadStatus(status) {
@@ -228,8 +215,9 @@ let GenomeBrowser = React.createClass({
   },
 
   render() {
-    let settings = this.config.genome;
-    let {start, end, sideWidth, chromosome, channels} = this.props;
+    let {start, end, sideWidth, chromosome, children} = this.props;
+    children = filterChildren(this, children); //Remove whitespace children from template padding
+
     chromosome = chromosome || this.defaultChrom;
     let {loading} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
@@ -290,31 +278,20 @@ let GenomeBrowser = React.createClass({
                       <div className="fixed">
                         <GenomeScale start={start} end={end}
                                      width={width} sideWidth={sideWidth}/>
-                        <ReferenceSequence {...trackProps}/>
-                        { settings.annotation ?
-                          <AnnotationChannel {...trackProps} /> :
-                          null }
-
+                        {ValidComponentChildren.map(children,
+                          (child, i) => child.props.fixed ?
+                            React.cloneElement(child, {
+                              onClose: () => this.redirectedProps.setProps((props) => props.deleteIn(['children', i])),
+                              ...trackProps
+                            }) : null)}
                       </div>
                       <div className="scrolling grow scroll-within">
-                        {channels.map((channel, channelId) => {
-                          let props = channel.get('props');
-                          return React.createElement(dynamicRequire(channel.get('channel')),
-                               Object.assign({
-                                 key: channelId,
-                                 onClose: () =>
-                                   this.redirectedProps.componentUpdate((props) =>
-                                     props.deleteIn(['channels', channelId])),
-                                 componentUpdate: (updater) => this.redirectedProps.componentUpdate((props) => {
-                                   if (_isFunction(updater))
-                                     return props.updateIn(['channels', channelId, 'props'], updater);
-                                   else
-                                    return props.mergeIn(['channels', channelId, 'props'], updater);
-                                 })
-                               }, props.toObject(), trackProps));
-                        }
-                        ).toList()
-                        }
+                        {ValidComponentChildren.map(children,
+                          (child, i) => !child.props.fixed ?
+                            React.cloneElement(child, {
+                              onClose: () => this.redirectedProps.setProps((props) => props.deleteIn(['children', i])),
+                              ...trackProps
+                            }) : null)}
                       </div>
                     </div>
                   );

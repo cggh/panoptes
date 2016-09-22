@@ -10,7 +10,7 @@ import YScale from 'panoptes/genome/tracks/YScale';
 
 import {Motion, spring} from 'react-motion';
 
-import findBlocks from 'panoptes/genome/FindBlocks';
+import findBlocks from 'panoptes/FindBlocks';
 
 let ScaledSVGChannel = React.createClass({
   mixins: [
@@ -22,12 +22,12 @@ let ScaledSVGChannel = React.createClass({
   ],
 
   propTypes: {
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
     height: React.PropTypes.number,
-    sideWidth: React.PropTypes.number.isRequired,
+    sideWidth: React.PropTypes.number,
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,

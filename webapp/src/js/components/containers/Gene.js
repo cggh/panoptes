@@ -17,8 +17,11 @@
   import GenomeScale from 'panoptes/genome/tracks/GenomeScale';
   import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
   import DetectResize from 'utils/DetectResize';
+  import ListWithActions from 'containers/ListWithActions';
+  import DataTableWithActions from 'containers/DataTableWithActions';
 
-// UI
+
+  // UI
   import Loading from 'ui/Loading';
 
   import _forEach from 'lodash/forEach';
@@ -35,7 +38,7 @@
 
     propTypes: {
       icon: React.PropTypes.string,
-      componentUpdate: React.PropTypes.func, //Optional for buttons to replace this component.
+      setProps: React.PropTypes.func, //Optional for buttons to replace this component.
       geneId: React.PropTypes.string.isRequired
     },
 
@@ -100,7 +103,7 @@
     },
 
     render() {
-      const {componentUpdate} = this.props;
+      const {setProps} = this.props;
       const {geneData, loadStatus} = this.state;
       const {annotation} = this.config.genome;
       if (!geneData) return null;
@@ -122,15 +125,15 @@
               SQL.WhereClause.CompareFixed(table.regionStop, '>=', parseInt(geneData['fstart']))
             ]));
           }
+          const component = table.listView ? ListWithActions : DataTableWithActions;
           let genomePositionTableButton = (
-          <PopupButton key={table.id}
+            <PopupButton key={table.id}
                        label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
-                       icon={table.icon}
-                       componentPath={table.listView ? 'containers/ListWithActions' : 'containers/DataTableWithActions'}
-                       componentUpdate={componentUpdate}
+                       icon={table.icon} >
+            <component setProps={setProps}
                        table={table.id}
-                       query={genomePositionTableQuery}
-          />
+                       query={genomePositionTableQuery} />
+            </PopupButton>
         );
           genomePositionTableButtons.push(genomePositionTableButton);
         }
@@ -179,7 +182,7 @@
               <PopupButton  label="Show in Genome Browser"
                             icon="bitmap:genomebrowser.png"
                             componentPath="containers/GenomeBrowserWithActions"
-                            componentUpdate={componentUpdate}
+                            setProps={setProps}
                             chromosome={geneData['chromid']}
                             start={parseInt(geneData['fstart'])}
                             end={parseInt(geneData['fstop'])}

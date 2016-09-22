@@ -1,4 +1,3 @@
-import Immutable from 'immutable';
 import React from 'react';
 
 // Mixins
@@ -8,7 +7,7 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import API from 'panoptes/API';
-import CalcMapBounds from 'utils/CalcMapBounds';
+import CalcMapBounds from 'util/CalcMapBounds';
 import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
 import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
@@ -20,6 +19,9 @@ import PieChartWidget from 'Chart/Pie/Widget';
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
 import _sumBy from 'lodash/sumBy';
+import _filter from 'lodash/filter';
+import _map from 'lodash/map';
+import _sum from 'lodash/sum';
 
 let PieChartMarkersLayerWidget = React.createClass({
 
@@ -39,7 +41,7 @@ let PieChartMarkersLayerWidget = React.createClass({
     defaultResidualFractionName: React.PropTypes.string,
     defaultResidualSectorColor: React.PropTypes.string,
     chartDataTable: React.PropTypes.string.isRequired,
-    componentColumns: React.PropTypes.object.isRequired,
+    componentColumns: React.PropTypes.array.isRequired,
     primKey: React.PropTypes.string.isRequired,
     locationDataTable: React.PropTypes.string.isRequired,
     locationNameProperty: React.PropTypes.string,
@@ -64,7 +66,7 @@ let PieChartMarkersLayerWidget = React.createClass({
   },
   getInitialState() {
     return {
-      markers: Immutable.List()
+      markers: []
     };
   },
 
@@ -83,7 +85,7 @@ let PieChartMarkersLayerWidget = React.createClass({
 
     let adaptedMarkers = _cloneDeep(markers);
 
-    if (bounds && adaptedMarkers.size > 0) {
+    if (bounds && adaptedMarkers.length > 0) {
 
       ////Now we have bounds we can set some sensible radii
 
@@ -98,14 +100,14 @@ let PieChartMarkersLayerWidget = React.createClass({
 
       // NB: the markers' positions match the bounds exactly here,
       // since the bounds have been determined automatically using the marker positions.
-      let pieAreaSum = adaptedMarkers.filter(
-        (marker) => marker.get('lat') >= se.lat &&
-          marker.get('lat') <= nw.lat &&
-          marker.get('lng') >= nw.lng &&
-          marker.get('lng') <= se.lng
-      )
-      .map((marker) => marker.get('radius') * marker.get('radius') * 2 * Math.PI)
-      .reduce((sum, val) => sum + val, 0);
+      let pieAreaSum = _sum(_map(
+        _filter(adaptedMarkers,
+          (marker) => marker.lat >= se.lat &&
+            marker.lat <= nw.lat &&
+            marker.lng >= nw.lng &&
+            marker.lng <= se.lng
+          ),
+        (marker) => marker.radius * marker.radius * 2 * Math.PI));
 
       let fudge = 0.01; // FIXME: was 75
 
@@ -118,13 +120,13 @@ let PieChartMarkersLayerWidget = React.createClass({
       }
 
       if (this.lastFactor) {
-        adaptedMarkers = adaptedMarkers.map((marker) => marker.set('radius', marker.get('radius') * this.lastFactor));
+        adaptedMarkers.forEach((marker) => marker.radius = marker.radius * this.lastFactor);
       } else {
-        adaptedMarkers = Immutable.List();
+        adaptedMarkers = [];
       }
 
     } else {
-      adaptedMarkers = Immutable.List();
+      adaptedMarkers = [];
     }
 
     return adaptedMarkers;
@@ -219,7 +221,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       )
       .then(([locationData, chartData]) => {
 
-        let markers = Immutable.List();
+        let markers = [];
 
         // Translate the fetched locationData and chartData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
@@ -229,15 +231,12 @@ let PieChartMarkersLayerWidget = React.createClass({
           let markerChartData = [];
           let locationDataPrimKey = locationData[i][locationPrimKeyProperty];
 
-          // FIXME: ???
-          let componentColumnsArray = componentColumns.toArray();
-
-          for (let j = 0; j < componentColumnsArray.length; j++) {
-            let chartDataColumnIndex = componentColumnsArray[j].get('pattern').replace('{locid}', locationDataPrimKey);
+          for (let j = 0; j < componentColumns.length; j++) {
+            let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
             markerChartData.push({
-              name: componentColumnsArray[j].get('name'),
+              name: componentColumns[j].name,
               value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
-              color: componentColumnsArray[j].get('color')
+              color: componentColumns[j].color
             });
           }
 
@@ -250,7 +249,7 @@ let PieChartMarkersLayerWidget = React.createClass({
               color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
             });
 
-          markers = markers.push(Immutable.fromJS({
+          markers.push({
             chartDataTable: chartDataTable,
             key: i,
             lat: locationData[i][locationTableConfig.latitude],
@@ -261,7 +260,7 @@ let PieChartMarkersLayerWidget = React.createClass({
             locationTable: locationDataTable,
             locationPrimKey: locationDataPrimKey,
             primKey: primKey
-          }));
+          });
 
         }
 
@@ -280,6 +279,7 @@ let PieChartMarkersLayerWidget = React.createClass({
       .catch((error) => {
         ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         changeLayerStatus({loadStatus: 'error'});
+        throw error;
       });
   },
 
@@ -288,7 +288,7 @@ let PieChartMarkersLayerWidget = React.createClass({
     let {crs, layerContainer, map} = this.context;
     let {markers} = this.state;
 
-    if (!markers.size) {
+    if (!markers.length) {
       return null;
     }
 
@@ -305,7 +305,7 @@ let PieChartMarkersLayerWidget = React.createClass({
                 (marker, i) =>
                 <ComponentMarkerWidget
                   key={i}
-                  position={[marker.lat, marker.lng]}
+                  position={{lat: marker.lat, lng: marker.lng}}
                   onClick={(e) => this.handleClickMarker(e, marker)}
                 >
                   <PieChartWidget

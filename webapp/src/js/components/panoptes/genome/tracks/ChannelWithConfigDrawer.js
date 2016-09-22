@@ -12,9 +12,9 @@ let ChannelWithConfigDrawer = React.createClass({
   ],
 
   propTypes: {
-    height: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     sideComponent: React.PropTypes.element,
     configComponent: React.PropTypes.element,
     legendComponent: React.PropTypes.element,

@@ -6,6 +6,13 @@ const {BaseLayer} = LayersControl;
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'TileLayerWidget',
+  'FeatureGroupWidget',
+];
+
 let BaseLayerWidget = React.createClass({
 
   mixins: [
@@ -21,7 +28,7 @@ let BaseLayerWidget = React.createClass({
   },
   propTypes: {
     addBaseLayer: React.PropTypes.func,
-    checked: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.bool]),
+    checked: React.PropTypes.bool,
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
@@ -46,6 +53,7 @@ let BaseLayerWidget = React.createClass({
 
   render() {
     let {addBaseLayer, checked, children, name} = this.props;
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     let checkedBoolean = null;
     if (
@@ -61,20 +69,11 @@ let BaseLayerWidget = React.createClass({
       console.error('BaseLayerWidget could not determine checked status');
     }
 
-    if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('BaseLayerWidget received more than one child. Using first child.');
-        // NB: <BaseLayer><Marker /><Marker /></BaseLayer> would error,
-        // whereas <BaseLayer><FeatureGroup><Marker /><Marker /></FeatureGroup></BaseLayer> is valid.
-      }
-      children = children[0];
-    }
-
     return (
       <BaseLayer
         checked={checkedBoolean}
         name={name}
-        children={children}
+        children={React.Children.only(children)}
         addBaseLayer={addBaseLayer}
       />
     );

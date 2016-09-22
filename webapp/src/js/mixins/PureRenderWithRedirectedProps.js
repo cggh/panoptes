@@ -7,7 +7,7 @@ let PureRenderWithRedirectedProps = function({check, redirect}) {
     componentWillMount() {
       //We need to redirect these so we always use the latest as
       //render might not have been called to update them
-      //as componentUpdate does not check them
+      //as setProps does not check them
       if (redirect) {
         this.redirectedProps = {};
         redirect.forEach((prop) => this.redirectedProps[prop] =

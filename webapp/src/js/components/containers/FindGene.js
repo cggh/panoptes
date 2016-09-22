@@ -22,7 +22,7 @@ let FindGene = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     activeTab: React.PropTypes.string,
     search: React.PropTypes.string,
     chromosome: React.PropTypes.string,
@@ -47,7 +47,7 @@ let FindGene = React.createClass({
   },
 
   render() {
-    let {componentUpdate, activeTab, search, chromosome, startPosition, endPosition, chromosomeLength} = this.props;
+    let {setProps, activeTab, search, chromosome, startPosition, endPosition, chromosomeLength} = this.props;
 
     // Avoid trying to mutate props.
     let setChromosome = chromosome;
@@ -74,11 +74,11 @@ let FindGene = React.createClass({
 
     return (
       <TabbedArea activeTab={activeTab}
-                  onSwitch={(id) => componentUpdate({activeTab: id})}>
+                  onSwitch={(id) => setProps({activeTab: id})}>
             <TabPane
               compId={'tab_0'}
               key={'tab_0'}>
-                <FindGeneByNameDesc componentUpdate={componentUpdate}
+                <FindGeneByNameDesc setProps={setProps}
                                     title="Find gene by name / description"
                                     search={search}
                 />
@@ -86,7 +86,7 @@ let FindGene = React.createClass({
             <TabPane
               compId={'tab_1'}
               key={'tab_1'}>
-                <FindGeneByRegion componentUpdate={componentUpdate}
+                <FindGeneByRegion setProps={setProps}
                                   title="Find gene by region"
                                   chromosome={setChromosome}
                                   startPosition={startPosition}
@@ -97,7 +97,7 @@ let FindGene = React.createClass({
             <TabPane
               compId={'tab_2'}
               key={'tab_2'}>
-                <RecentlyFoundGenes componentUpdate={componentUpdate}
+                <RecentlyFoundGenes setProps={setProps}
                                   title="Recently found genes"
                 />
             </TabPane>

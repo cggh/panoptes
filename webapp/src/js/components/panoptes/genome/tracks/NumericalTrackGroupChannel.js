@@ -1,6 +1,5 @@
 import React from 'react';
 import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import _isFinite from 'lodash/isFinite';
 import _forEach from 'lodash/forEach';
@@ -12,28 +11,30 @@ import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps'
 import CanvasGroupChannel from 'panoptes/genome/tracks/CanvasGroupChannel';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
+import serialiseComponent from 'util/serialiseComponent';
+import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
+import filterChildren from 'util/filterChildren';
+import ValidComponentChildren from 'util/ValidComponentChildren';
 
-let dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./' + path);
+const ALLOWED_CHILDREN = [
+  'NumericalSummaryTrack'
+];
+
 
 let NumericalTrackGroupChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
-        'componentUpdate',
+        'setProps',
         'onClose'
       ]
     })
   ],
 
   propTypes: {
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
-    tracks: ImmutablePropTypes.listOf(
-      ImmutablePropTypes.contains({
-        track: React.PropTypes.string.isRequired,
-        props: ImmutablePropTypes.map
-      }))
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
+    children: React.PropTypes.node
   },
 
   getInitialState() {
@@ -47,28 +48,20 @@ let NumericalTrackGroupChannel = React.createClass({
   },
 
   render() {
-    let {tracks, width, sideWidth} = this.props;
-
+    let {width, sideWidth, children} = this.props;
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
       <CanvasGroupChannel {...this.props}
         side={
           <span>
-            {tracks.map((track) => track.get('name')).join(', ')}
+            {ValidComponentChildren.map(children, (track) => track.props.name).join(', ')}
           </span>
         }
         onClose={this.redirectedProps.onClose}
-        controls={<NumericalTrackGroupControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate} />}
+        controls={<NumericalTrackGroupControls {...this.props} setProps={this.redirectedProps.setProps} />}
         >
-        {tracks.map((track, index) => React.createElement(dynamicRequire(track.get('track')), Object.assign(
-            {},
-            this.props,
-            {width: width - sideWidth},
-            track.get('props').toObject(),
-          {
-            key: index
-          }
-          ))
-        )}
+        {React.Children.map(children,
+          (child) => React.cloneElement(child, {...this.props, width: width - sideWidth}))}
       </CanvasGroupChannel>
     );
   }
@@ -86,9 +79,8 @@ let NumericalTrackGroupControls = React.createClass({
         'autoYScale',
         'yMin',
         'yMax',
-        'tracks'
       ],
-      redirect: ['componentUpdate']
+      redirect: ['setProps']
     })
   ],
 
@@ -98,20 +90,10 @@ let NumericalTrackGroupControls = React.createClass({
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
-    tracks: ImmutablePropTypes.listOf(
-      ImmutablePropTypes.contains({
-        track: React.PropTypes.string.isRequired,
-        props: ImmutablePropTypes.map
-      }))
   },
 
   trackGroups() {
     let groups = {
-      __reference__: {
-        name: 'Reference',
-        icon: 'bitmap:genomebrowser.png',
-        items: {}
-      }
     };
 
     _forEach(this.config.tables, (table) => {
@@ -119,23 +101,18 @@ let NumericalTrackGroupControls = React.createClass({
         groups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon,
-          items: {}
+          items: []
         };
         _forEach(table.properties, (prop) => {
           if (prop.showInBrowser && prop.isNumerical && prop.summaryValues) {
-            groups[table.id].items[prop.id] = {
+            groups[table.id].items.push({
               name: prop.name,
               description: prop.description,
               icon: 'line-chart',
-              payload: {
-                track: 'NumericalSummaryTrack',
-                name: prop.name,
-                props: {
-                  table: table.id,
-                  track: prop.id
-                }
-              }
-            };
+              payload: serialiseComponent(
+                <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id} />
+              )
+            });
           }
         });
       }
@@ -146,19 +123,14 @@ let NumericalTrackGroupControls = React.createClass({
 
   handleTrackChange(tracks) {
     this.getFlux().actions.session.modalClose();
-    tracks = tracks.map((track) => track.get('payload'));
-    this.redirectedProps.componentUpdate({tracks});
+    this.redirectedProps.setProps((props) => props.set('children', tracks));
   },
 
   render() {
-    let {autoYScale, yMin, yMax, tracks} = this.props;
+    let {autoYScale, yMin, yMax} = this.props;
+
     let actions = this.getFlux().actions;
-    tracks = tracks.map((track) => Immutable.Map({
-      groupId: track.getIn(['props', 'table']),
-      itemId: track.getIn(['props', 'track']),
-      payload: track
-    })
-    );
+
     return (
       <div className="channel-controls">
         <div className="control">
@@ -170,7 +142,7 @@ let NumericalTrackGroupControls = React.createClass({
                           itemName: 'Numerical track',
                           itemVerb: 'display',
                           groups: this.trackGroups(),
-                          initialSelection: tracks,
+                          initialSelection: [],
                           onPick: this.handleTrackChange
                         })}/>
         </div>
@@ -182,7 +154,7 @@ let NumericalTrackGroupControls = React.createClass({
             value="toggleValue1"
             defaultChecked={autoYScale}
             style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.componentUpdate({autoYScale: checked})}/>
+            onCheck={(e, checked) => this.redirectedProps.setProps({autoYScale: checked})}/>
         </div>
         {!autoYScale ? <div className="control">
           <div className="label">Y Min:</div>
@@ -193,7 +165,7 @@ let NumericalTrackGroupControls = React.createClass({
                  onChange={() => {
                    let value = parseFloat(this.refs.yMin.value);
                    if (_isFinite(value))
-                     this.redirectedProps.componentUpdate({yMin: value});
+                     this.redirectedProps.setProps({yMin: value});
                  }
                                 }/>
         </div>
@@ -207,7 +179,7 @@ let NumericalTrackGroupControls = React.createClass({
                  onChange={() => {
                    let value = parseFloat(this.refs.yMax.value);
                    if (_isFinite(value))
-                     this.redirectedProps.componentUpdate({yMax: value});
+                     this.redirectedProps.setProps({yMax: value});
                  }
                                 }/>
         </div>

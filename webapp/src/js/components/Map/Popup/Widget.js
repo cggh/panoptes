@@ -1,5 +1,6 @@
 import React from 'react';
 import {Popup} from 'react-leaflet';
+import filterChildren from 'util/filterChildren';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -35,21 +36,10 @@ let PopupWidget = React.createClass({
   },
 
   render() {
-
-    let {children} = this.props;
-
-    if (children instanceof Array) {
-      if (children.length > 1) {
-        console.warn('PopupWidget received more than one child. Using first child.');
-        // NB: <Popup><p>foo</p><p>bar</p></Popup> would error,
-        // whereas <Popup><div><p>foo</p><p>bar</p></div></Popup> is valid.
-      }
-      children = children[0];
-    }
-
+    let children = filterChildren(this, children);
     return (
       <Popup
-        children={children}
+        children={React.Children.only(children)}
       />
     );
 

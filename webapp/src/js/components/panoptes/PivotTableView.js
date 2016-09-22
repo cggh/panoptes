@@ -30,7 +30,7 @@ const HEADER_HEIGHT = 50;
 // const SCROLLBAR_HEIGHT = 15;
 const COLUMN_WIDTH = 100;
 
-let DataTableView = React.createClass({
+let PivotTableView = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
@@ -229,4 +229,4 @@ let DataTableView = React.createClass({
 
 });
 
-module.exports = DataTableView;
+module.exports = PivotTableView;

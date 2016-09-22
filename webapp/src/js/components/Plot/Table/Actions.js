@@ -42,7 +42,7 @@ let TablePlotActions = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     plotType: React.PropTypes.string,
@@ -54,7 +54,7 @@ let TablePlotActions = React.createClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      componentUpdate: null,
+      setProps: null,
       sidebar: true
     };
   },
@@ -71,15 +71,15 @@ let TablePlotActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.props.componentUpdate({query: query});
+    this.props.setProps({query: query});
   },
 
   handleChangeTable(table) {
-    this.props.componentUpdate({table});
+    this.props.setProps({table});
   },
 
   render() {
-    let {sidebar, table, query, plotType, componentUpdate} = this.props;
+    let {sidebar, table, query, plotType, setProps} = this.props;
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
@@ -105,7 +105,7 @@ let TablePlotActions = React.createClass({
           <SelectField value={plotType}
                        autoWidth={true}
                        floatingLabelText="Plot Type:"
-                       onChange={(e, i, v) => componentUpdate({plotType: v})}>
+                       onChange={(e, i, v) => setProps({plotType: v})}>
             {_map(plotTypes, (plot, key) =>
               <MenuItem value={key} key={key} primaryText={plot.displayName}/>)}
           </SelectField>
@@ -115,7 +115,7 @@ let TablePlotActions = React.createClass({
                                 key={dimension}
                                 value={this.config.tablesById[table].propertiesById[this.props[dimension]] ? this.props[dimension] : null}
                                 label={titleCase(dimension)}
-                                onSelect={(v) => componentUpdate({[dimension]: v})}/>
+                                onSelect={(v) => setProps({[dimension]: v})}/>
             )
             : null }
         </div>
@@ -131,7 +131,7 @@ let TablePlotActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {plotType && table ?
               <span className="block text">

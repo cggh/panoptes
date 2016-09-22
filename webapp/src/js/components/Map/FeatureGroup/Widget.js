@@ -5,6 +5,20 @@ import {FeatureGroup} from 'react-leaflet';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
+import filterChildren from 'util/filterChildren';
+
+const ALLOWED_CHILDREN = [
+  'ComponentMarkerWidget',
+  'TableMarkersLayerWidget',
+  'MarkerWidget',
+  'CircleWidget',
+  'RectangleWidget',
+  'PopupWidget',
+  'FeatureGroupWidget',
+  'TileLayerWidget',
+  'PieChartMarkersLayerWidget'
+];
+
 let FeatureGroupWidget = React.createClass({
 
   mixins: [
@@ -37,6 +51,7 @@ let FeatureGroupWidget = React.createClass({
 
   render() {
     let {children} = this.props;
+    children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
       <FeatureGroup

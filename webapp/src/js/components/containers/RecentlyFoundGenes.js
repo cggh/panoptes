@@ -20,7 +20,7 @@ let RecentlyFoundGenes = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func
+    setProps: React.PropTypes.func
   },
 
 
@@ -34,7 +34,7 @@ let RecentlyFoundGenes = React.createClass({
     if (middleClick) {
       this.getFlux().actions.session.popupOpen(container, props, false);
     } else {
-      this.props.componentUpdate(props, container);
+      this.props.setProps(props, container);
     }
 
   },

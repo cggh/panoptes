@@ -19,7 +19,7 @@ let StartTab = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired
+    setProps: React.PropTypes.func.isRequired
   },
 
   icon() {
@@ -29,11 +29,11 @@ let StartTab = React.createClass({
     return 'Start';
   },
 
-  handleClick({container, props, middleClick}) {
+  handleClick({component, middleClick}) {
     if (middleClick)
-      this.flux.actions.session.tabOpen(container, props, false);
+      this.flux.actions.session.tabOpen(component, false);
     else {
-      this.flux.actions.session.tabOpen(container, props, true);
+      this.flux.actions.session.tabOpen(component, true);
     }
   },
 

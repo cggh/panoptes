@@ -17,7 +17,7 @@ let FindGeneByNameDesc = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
     search: React.PropTypes.string
   },
@@ -33,7 +33,7 @@ let FindGeneByNameDesc = React.createClass({
   },
 
   handleSearchChange(event) {
-    this.props.componentUpdate({search: event.target.value});
+    this.props.setProps({search: event.target.value});
   },
 
   handleSelectGene(e, geneId) {
@@ -49,7 +49,7 @@ let FindGeneByNameDesc = React.createClass({
     if (middleClick) {
       this.getFlux().actions.session.popupOpen(container, props, false);
     } else {
-      this.props.componentUpdate(props, container);
+      this.props.setProps(props, container);
     }
 
   },

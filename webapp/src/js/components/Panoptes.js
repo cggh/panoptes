@@ -29,6 +29,7 @@ import DetectResize from 'utils/DetectResize';
 import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
+import deserialiseComponent from 'util/deserialiseComponent';
 
 let dynreq = require.context('.', true);
 const dynamicRequire = (path) => dynreq('./' + path);
@@ -92,14 +93,15 @@ let Panoptes = React.createClass({
                             onDragAway={actions.tabPopOut}
                 >
                   {tabs.get('components').map((compId) => {
-                    let tab = components.get(compId).toObject();
-                    let props = tab.props ? tab.props.toObject() : {};
-                    props.componentUpdate = actions.componentUpdateFor(compId);
+                    let tab = components.get(compId);
                     return (
                       <TabPane
                         compId={compId}
                         key={compId}>
-                        {React.createElement(dynamicRequire(tab.component), props)}
+                        {deserialiseComponent(tab, [compId], {
+                          setProps: actions.componentSetProps,
+                          replaceSelf: actions.componentReplace
+                        })}
                       </TabPane>
                     );
                   })}
@@ -108,9 +110,7 @@ let Panoptes = React.createClass({
             </div>
             <Popups>
               {popups.get('components').map((compId) => {
-                let popup = components.get(compId).toObject();
-                let props = popup.props ? popup.props.toObject() : {};
-                props.componentUpdate = actions.componentUpdateFor(compId);
+                let popup = components.get(compId);
                 let state = popups.getIn(['state', compId]);
 
                 let initialPosition = undefined;
@@ -131,7 +131,10 @@ let Panoptes = React.createClass({
                     onClose={actions.popupClose.bind(this, compId)}
                     onMaximise={actions.popupToTab.bind(this, compId)}
                     onClick={actions.popupFocus.bind(this, compId)}>
-                    {React.createElement(dynamicRequire(popup.component), props)}
+                    {deserialiseComponent(popup, [compId], {
+                      setProps: actions.componentSetProps,
+                      replaceSelf: actions.componentReplace
+                    })}
                   </Popup>
                 );
               })}

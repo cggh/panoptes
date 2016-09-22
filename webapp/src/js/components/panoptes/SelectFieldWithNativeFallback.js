@@ -12,7 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 // TODO: move to app config?
 const MAX_SELECTFIELD_OPTIONS = 100;
 
-let ItemLink = React.createClass({
+let SelectFieldWithNativeFallback = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -220,4 +220,4 @@ let ItemLink = React.createClass({
 
 });
 
-module.exports = ItemLink;
+module.exports = SelectFieldWithNativeFallback;

@@ -39,7 +39,7 @@ let GenotypesChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
       redirect: [
-        'componentUpdate',
+        'setProps',
         'onClose'
       ],
       check: [
@@ -84,12 +84,12 @@ let GenotypesChannel = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
-    chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
-    width: React.PropTypes.number.isRequired,
-    sideWidth: React.PropTypes.number.isRequired,
+    setProps: React.PropTypes.func,
+    chromosome: React.PropTypes.string,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
+    width: React.PropTypes.number,
+    sideWidth: React.PropTypes.number,
     name: React.PropTypes.string,
     onClose: React.PropTypes.func,
     table: React.PropTypes.string.isRequired,
@@ -104,7 +104,7 @@ let GenotypesChannel = React.createClass({
     pageSize: React.PropTypes.number,
     page: React.PropTypes.number,
     layoutGaps: React.PropTypes.bool,
-    onChangeLoadStatus: React.PropTypes.func.isRequired
+    onChangeLoadStatus: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -413,7 +413,7 @@ let GenotypesChannel = React.createClass({
           rowLabel={rowLabel || rowConfig.primKey}
         />}
         //Override component update to get latest in case of skipped render
-        configComponent={<GenotypesControls {...this.props} componentUpdate={this.redirectedProps.componentUpdate}/>}
+        configComponent={<GenotypesControls {...this.props} setProps={this.redirectedProps.setProps}/>}
         legendComponent={<GenotypesLegend />}
         onClose={this.redirectedProps.onClose}
       >
@@ -461,7 +461,7 @@ const GenotypesControls = React.createClass({
         'pageSize',
         'page'
       ],
-      redirect: ['componentUpdate']
+      redirect: ['setProps']
     }),
     FluxMixin,
     ConfigMixin
@@ -491,41 +491,41 @@ const GenotypesControls = React.createClass({
         <div className="control">
           <FilterButton table={config.columnDataTable} query={columnQuery}
                         name={this.config.tablesById[config.columnDataTable].capNamePlural}
-                        onPick={(columnQuery) => this.redirectedProps.componentUpdate({columnQuery})}/>
+                        onPick={(columnQuery) => this.redirectedProps.setProps({columnQuery})}/>
         </div>
         <div className="control">
           <FilterButton table={config.rowDataTable} query={rowQuery}
                         name={this.config.tablesById[config.rowDataTable].capNamePlural}
-                        onPick={(rowQuery) => this.redirectedProps.componentUpdate({rowQuery})}/>
+                        onPick={(rowQuery) => this.redirectedProps.setProps({rowQuery})}/>
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
                             value={rowLabel || this.config.tablesById[config.rowDataTable].primKey}
                             label="Row Label"
-                            onSelect={(rowLabel) => this.redirectedProps.componentUpdate({rowLabel})}/>
+                            onSelect={(rowLabel) => this.redirectedProps.setProps({rowLabel})}/>
         </div>
         <div className="control">
           <PropertySelector table={config.rowDataTable}
                             value={rowSort}
                             label="Row Sort"
                             allowNull={true}
-                            onSelect={(rowSort) => this.redirectedProps.componentUpdate({rowSort})}/>
+                            onSelect={(rowSort) => this.redirectedProps.setProps({rowSort})}/>
         </div>
         <div className="control">
-          <NumericInput value={rowHeight} onChange={(rowHeight) => this.redirectedProps.componentUpdate({rowHeight})}/>
+          <NumericInput value={rowHeight} onChange={(rowHeight) => this.redirectedProps.setProps({rowHeight})}/>
         </div>
         <div className="control">
-          <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.componentUpdate({pageSize})}/>
+          <NumericInput value={pageSize} onChange={(pageSize) => this.redirectedProps.setProps({pageSize})}/>
         </div>
         <div className="control">
-          <NumericInput value={page} onChange={(page) => this.redirectedProps.componentUpdate({page})}/>
+          <NumericInput value={page} onChange={(page) => this.redirectedProps.setProps({page})}/>
         </div>
         <div className="control">
           <SelectField style={{width: '140px'}}
                        value={cellColour}
                        autoWidth={true}
                        floatingLabelText="Cell Colour"
-                       onChange={(e, i, cellColour) => this.redirectedProps.componentUpdate({cellColour})}>
+                       onChange={(e, i, cellColour) => this.redirectedProps.setProps({cellColour})}>
             <MenuItem value="call" primaryText="Call"/>
             <MenuItem value="fraction" primaryText="Ref fraction"/>
           </SelectField>
@@ -535,7 +535,7 @@ const GenotypesControls = React.createClass({
                        value={cellAlpha}
                        autoWidth={true}
                        floatingLabelText="Cell Opacity"
-                       onChange={(e, i, cellAlpha) => this.redirectedProps.componentUpdate({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
+                       onChange={(e, i, cellAlpha) => this.redirectedProps.setProps({cellAlpha: cellAlpha === 'none' ? undefined : cellAlpha})}>
             <MenuItem value="none" primaryText="None"/>
             {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
@@ -545,7 +545,7 @@ const GenotypesControls = React.createClass({
                        value={cellHeight}
                        autoWidth={true}
                        floatingLabelText="Cell Height"
-                       onChange={(e, i, cellHeight) => this.redirectedProps.componentUpdate({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
+                       onChange={(e, i, cellHeight) => this.redirectedProps.setProps({cellHeight: cellHeight === 'none' ? undefined : cellHeight})}>
             <MenuItem value="none" primaryText="None"/>
             {config.showInGenomeBrowser.extraProperties.map((prop) => <MenuItem value={prop} key={prop} primaryText={config.propertiesById[prop].name}/>)}
           </SelectField>
@@ -556,7 +556,7 @@ const GenotypesControls = React.createClass({
             name="layoutGaps"
             defaultChecked={layoutGaps}
             style={{width: 'inherit'}}
-            onCheck={(e, checked) => this.redirectedProps.componentUpdate({layoutGaps: checked})}/>
+            onCheck={(e, checked) => this.redirectedProps.setProps({layoutGaps: checked})}/>
         </div>
 
       </div>

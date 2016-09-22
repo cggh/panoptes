@@ -1,27 +1,24 @@
+import React from  'react';
 import Constants from '../constants/Constants';
 const SESSION = Constants.SESSION;
-import memoize from 'utils/Memoize';
+
+import serialiseComponent from 'util/serialiseComponent';
+import EmptyTab from 'containers/EmptyTab';
 
 
 let SessionActions = {
-  componentUpdate(compId, updater, newComponent = null) {
-    this.dispatch(SESSION.COMPONENT_UPDATE, {
-      compId,
+  componentSetProps(componentPath, updater) {
+    this.dispatch(SESSION.COMPONENT_SET_PROPS, {
+      componentPath,
       updater,
-      newComponent
     });
   },
-  //We cache these, other wise the prop looks different causing a re-render
-  //TODO Strictly speaking this is memory leak, albeit a small one
-  componentUpdateFor: memoize((compId) =>
-    function(updater, newComponent = null) {
-      this.dispatch(SESSION.COMPONENT_UPDATE, {
-        compId,
-        updater,
-        newComponent
-      });
-    }
-  ),
+  componentReplace(componentPath, newComponent) {
+    this.dispatch(SESSION.COMPONENT_REPLACE, {
+      componentPath,
+      newComponent: serialiseComponent(newComponent)
+    });
+  },
   modalClose() {
     this.dispatch(SESSION.MODAL_CLOSE);
   },
@@ -34,9 +31,9 @@ let SessionActions = {
   popupClose(compId) {
     this.dispatch(SESSION.POPUP_CLOSE, {compId});
   },
-  popupOpen(component = null, props = {}, switchTo = true) {
+  popupOpen(component, switchTo = true) {
     this.dispatch(SESSION.POPUP_OPEN, {
-      component: {component, props},
+      component: serialiseComponent(component),
       switchTo
     });
   },
@@ -55,9 +52,12 @@ let SessionActions = {
   tabClose(compId) {
     this.dispatch(SESSION.TAB_CLOSE, {compId});
   },
-  tabOpen(component = null, props = {}, switchTo = true) {
+  tabOpen(component, switchTo = true) {
+    if (!component) {
+      component = <EmptyTab />;
+    }
     this.dispatch(SESSION.TAB_OPEN, {
-      component: {component, props},
+      component: serialiseComponent(component),
       switchTo
     });
   },

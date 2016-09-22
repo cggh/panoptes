@@ -5,6 +5,7 @@ const history = createHistory();
 //Needed for JSX
 import React from 'react'; //eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
+
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 import Panoptes from 'components/Panoptes.js';
@@ -23,6 +24,11 @@ import API from 'panoptes/API';
 import InitialConfig from 'panoptes/InitialConfig';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
+import Perf from 'react-addons-perf';
+
+if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
+  window.Perf = Perf;
+}
 
 import 'console-polyfill';
 import 'normalize.css';
@@ -44,7 +50,7 @@ function getAppState(location) {
     session: {
       components: {
         FirstTab: {
-          component: 'containers/StartTab',
+          type: 'StartTab',
           props: {}
         }
       },
@@ -151,56 +157,5 @@ Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]
         <Panoptes flux={flux} />
       </div>
       , document.getElementById('main'));
-  })
-  .catch((err) => {
-    console.error(err);
-    err = err.message || err.responseText || 'Could not connect to server';
-    let appState = getAppState();
-    appState.session.components = {
-      error: {
-        component: 'containers/ErrorTab',
-        props: {
-          err: err
-        }
-      }
-    };
-    appState.session.tabs = {
-      components: ['error'],
-      selectedTab: 'error'
-    };
-
-    let config = {
-      ...initialConfig,   //eslint-disable-line no-undef
-      user: {isManager: false},
-      settings: {
-        name: initialConfig.dataset //eslint-disable-line no-undef
-      }
-    };
-    let stores = {
-      PanoptesStore: new PanoptesStore({}),
-      SessionStore: new SessionStore(appState.session),
-      ConfigStore: new ConfigStore(config)
-    };
-    let actions = {
-      session: SessionActions,
-      panoptes: PanoptesActions(config),
-      api: APIActions
-    };
-
-    let flux = new Fluxxor.Flux(stores, actions);
-
-    flux.setDispatchInterceptor((action, dispatch) =>
-      ReactDOM.unstable_batchedUpdates(() =>
-        dispatch(action)
-      )
-    );
-
-    ReactDOM.render(
-      <div>
-        <Loading status="done"/>
-        <Panoptes flux={flux} />
-      </div>
-      , document.getElementById('main'));
-
   })
   .done();

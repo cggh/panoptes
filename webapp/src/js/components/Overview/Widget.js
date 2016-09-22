@@ -29,8 +29,8 @@ let OverviewWidget = React.createClass({
 
   propTypes: {
     title: React.PropTypes.string,
-    table: React.PropTypes.string.isRequired,
-    primKey: React.PropTypes.string.isRequired,
+    table: React.PropTypes.string,
+    primKey: React.PropTypes.string,
     className: React.PropTypes.string
   },
 

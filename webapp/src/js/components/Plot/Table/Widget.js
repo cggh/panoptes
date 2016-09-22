@@ -32,7 +32,7 @@ let TablePlotWidget = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func,
+    setProps: React.PropTypes.func,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})

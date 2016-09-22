@@ -1,8 +1,5 @@
 import React from 'react';
 
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
@@ -39,17 +36,17 @@ let TableMapWidget = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
-    componentUpdate: React.PropTypes.func,
+    center: React.PropTypes.object,
+    setProps: React.PropTypes.func,
     highlight: React.PropTypes.string,
     locationDataTable: React.PropTypes.string,
     onChange: React.PropTypes.func,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
     table: React.PropTypes.string,
-    tileLayerProps: React.PropTypes.oneOfType([React.PropTypes.string, ImmutablePropTypes.map]),
+    tileLayerProps: React.PropTypes.object,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number]),
+    zoom: React.PropTypes.number,
   },
 
   title() {
@@ -60,7 +57,7 @@ let TableMapWidget = React.createClass({
 
     let {
       center,
-      componentUpdate,
+      setProps,
       highlight,
       locationDataTable,
       onChange,
@@ -79,19 +76,6 @@ let TableMapWidget = React.createClass({
       locationDataTable = table;
     }
 
-    let adaptedTileLayerProps = Immutable.Map();
-
-    if (tileLayerProps !== undefined && typeof tileLayerProps === 'object') {
-      // TODO: check the object looks OK before accepting it
-      adaptedTileLayerProps = tileLayerProps;
-    } else if (tileLayerProps !== undefined && typeof tileLayerProps === 'string') {
-      // TODO: check the string looks OK before trying to parse
-      let tileLayerPropsFromString = Immutable.fromJS(JSON.parse(tileLayerProps));
-      if (typeof tileLayerPropsFromString === 'object') {
-        adaptedTileLayerProps = tileLayerPropsFromString;
-      }
-    }
-
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
@@ -99,13 +83,13 @@ let TableMapWidget = React.createClass({
     return (
       <MapWidget
         center={center}
-        componentUpdate={componentUpdate}
+        setProps={setProps}
         onChange={onChange}
         style={widgetStyle}
         zoom={zoom}
       >
         <FeatureGroupWidget>
-          <TileLayerWidget {...adaptedTileLayerProps.toObject()} />
+          <TileLayerWidget {...tileLayerProps} />
           <TableMarkersLayerWidget
             highlight={highlight}
             locationDataTable={locationDataTable}

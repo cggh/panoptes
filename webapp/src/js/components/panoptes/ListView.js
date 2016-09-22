@@ -119,6 +119,7 @@ let ListView = React.createClass({
     .catch((xhr) => {
       ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
       this.setState({loadStatus: 'error'});
+      throw xhr;
     });
   },
 

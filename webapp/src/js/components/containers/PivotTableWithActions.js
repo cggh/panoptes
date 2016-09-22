@@ -27,7 +27,7 @@ let PivotTableWithActions = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func.isRequired,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
@@ -39,7 +39,7 @@ let PivotTableWithActions = React.createClass({
   getDefaultProps() {
     return {
       query: SQL.nullQuery,
-      componentUpdate: null,
+      setProps: null,
       sidebar: true
     };
   },
@@ -53,27 +53,27 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, query, columnProperty, rowProperty, componentUpdate} = this.props;
+    const {sidebar, table, query, columnProperty, rowProperty, setProps} = this.props;
 
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
         <SidebarHeader icon={this.icon()} description={`Summary and aggregates of the ${this.tableConfig().namePlural} table`}/>
         <div className="pivot-controls vertical stack">
-          <FilterButton table={table} query={query} onPick={(query) => this.props.componentUpdate({query})}/>
+          <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
           <PropertySelector table={table}
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
                             label="Column"
                             allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => componentUpdate({columnProperty: v})}/>
+                            onSelect={(v) => setProps({columnProperty: v})}/>
           <PropertySelector table={table}
                             key="rowProperty"
                             value={this.config.tablesById[table].propertiesById[rowProperty] ? rowProperty : null}
                             label="Row"
                             allowNull={true}
                             filter={(prop) => prop.isCategorical || prop.isBoolean || prop.isText}
-                            onSelect={(v) => componentUpdate({rowProperty: v})}/>
+                            onSelect={(v) => setProps({rowProperty: v})}/>
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ let PivotTableWithActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text"><QueryString prepend="Filter:" table={table} query={query}/></span>
           </div>
           <div className="grow">

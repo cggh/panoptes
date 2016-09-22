@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
@@ -49,15 +47,15 @@ let TableMapActions = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
-    componentUpdate: React.PropTypes.func.isRequired,
+    center: React.PropTypes.object,
+    setProps: React.PropTypes.func,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     tileLayer: React.PropTypes.string,
-    tileLayerProps: ImmutablePropTypes.map,
+    tileLayerProps: React.PropTypes.object,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+    zoom: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -186,16 +184,16 @@ let TableMapActions = React.createClass({
 
   // Event handlers
   handleQueryPick(query) {
-    this.props.componentUpdate({query});
+    this.props.setProps({query});
   },
   handleChangeTable(table) {
-    this.props.componentUpdate({table});
+    this.props.setProps({table});
   },
   handleChangeTileLayer(event, selectedIndex, selectedTileLayer) {
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
     if (selectedTileLayer === DEFAULT_TILE_LAYER) {
-      this.props.componentUpdate({tileLayer: undefined, tileLayerProps: undefined, zoom: undefined});
+      this.props.setProps({tileLayer: undefined, tileLayerProps: undefined, zoom: undefined});
     } else {
 
       let selectedTileLayerProps = _cloneDeep(this.tileLayers[selectedTileLayer]);
@@ -213,13 +211,13 @@ let TableMapActions = React.createClass({
       selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
 
       // NB: tileLayerProps will get converted from a plain object to an Immutable map.
-      this.props.componentUpdate({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
+      this.props.setProps({tileLayer: selectedTileLayer, tileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
     }
 
   },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
-    this.props.componentUpdate({center, zoom});
+    this.props.setProps({center, zoom});
   },
 
   // Other functions
@@ -251,7 +249,7 @@ let TableMapActions = React.createClass({
 
 
   render() {
-    let {center, componentUpdate, query, tileLayer, tileLayerProps, sidebar, table, zoom} = this.props;
+    let {center, setProps, query, tileLayer, tileLayerProps, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -383,7 +381,7 @@ let TableMapActions = React.createClass({
     let mapWidget = (
       <MapWidget
         center={center}
-        componentUpdate={componentUpdate}
+        setProps={setProps}
         onChange={this.handleChangeMap}
         tileLayerProps={tileLayerProps}
         zoom={zoom}
@@ -394,7 +392,7 @@ let TableMapActions = React.createClass({
       mapWidget = (
         <TableMapWidget
           center={center}
-          componentUpdate={componentUpdate}
+          setProps={setProps}
           locationDataTable={table}
           onChange={this.handleChangeMap}
           query={query}
@@ -414,7 +412,7 @@ let TableMapActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">

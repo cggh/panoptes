@@ -13,6 +13,10 @@ import Icon from 'ui/Icon';
 // lodash
 import _forEach from 'lodash/forEach';
 
+import DataTableWithActions from 'containers/DataTableWithActions';
+import ListWithActions from 'containers/ListWithActions';
+import FindGene from 'containers/FindGene';
+
 let Finder = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -53,16 +57,16 @@ let Finder = React.createClass({
       this.getFlux().actions.session.modalClose();
     }
 
-    let container = 'containers/DataTableWithActions';
+    let container = DataTableWithActions;
     if (this.config.tablesById[table.id].listView) {
-      container = 'containers/ListWithActions';
+      container = ListWithActions;
     }
 
     let switchTo = !middleClick;
-    this.getFlux().actions.session.tabOpen(container, {table: table.id, initialSearchFocus: true}, switchTo);
+    this.getFlux().actions.session.tabOpen(<container table={table.id} initialSearchFocus={true} />, switchTo);
   },
 
-  handleOpenPopup(e, container, props) {
+  handleOpenPopup(e, component) {
 
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
 
@@ -71,7 +75,7 @@ let Finder = React.createClass({
     }
 
     let switchTo = !middleClick;
-    this.getFlux().actions.session.popupOpen(container, props, switchTo);
+    this.getFlux().actions.session.popupOpen(component, switchTo);
   },
 
   render() {
@@ -90,7 +94,7 @@ let Finder = React.createClass({
                   primaryText="Gene"
                   secondaryText={secondaryText}
                   leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                  onClick={(e) => this.handleOpenPopup(e, 'containers/FindGene', {})}
+                  onClick={(e) => this.handleOpenPopup(e, <FindGene />)}
         />
       );
 

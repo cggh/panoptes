@@ -8,6 +8,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 // Panoptes components
 import API from 'panoptes/API';
 import ErrorReport from 'panoptes/ErrorReporter';
+import DatasetImportStatusItemView from 'Dataset/ImportStatus/ItemView';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -76,7 +77,7 @@ let DatasetImportStatusListView = React.createClass({
 
   handleClickImportStatus(logId, title, icon) {
     let switchTo = true;
-    this.getFlux().actions.session.popupOpen('Dataset/ImportStatus/ItemView', {logId, title, icon}, switchTo);
+    this.getFlux().actions.session.popupOpen(<DatasetImportStatusItemView {...{logId, title, icon}} />, switchTo);
   },
 
   render() {

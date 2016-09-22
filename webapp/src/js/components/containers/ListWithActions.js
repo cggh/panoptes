@@ -19,9 +19,9 @@ import Icon from 'ui/Icon';
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
 import DataItemWidget from 'DataItem/Widget';
-import DataDownloader from 'utils/DataDownloader';
+import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
-import DataItemViews from 'utils/DataItemViews';
+import DataItemViews from 'panoptes/DataItemViews';
 
 // Constants
 const MAX_ROWS_COUNT = 10000;
@@ -35,7 +35,7 @@ let ListWithActions = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     selectedPrimKey: React.PropTypes.string,
@@ -72,7 +72,7 @@ let ListWithActions = React.createClass({
   },
 
   handleSelect(selectedPrimKey) {
-    this.props.componentUpdate({selectedPrimKey});
+    this.props.setProps({selectedPrimKey});
   },
 
   handleSearchChange(event) {
@@ -102,7 +102,7 @@ let ListWithActions = React.createClass({
   },
 
   render() {
-    let {table, sidebar, componentUpdate, selectedPrimKey} = this.props;
+    let {table, sidebar, setProps, selectedPrimKey} = this.props;
     let {description} = this.tableConfig();
     let {search} = this.state;
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
@@ -154,7 +154,7 @@ let ListWithActions = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             {selectedPrimKey ?

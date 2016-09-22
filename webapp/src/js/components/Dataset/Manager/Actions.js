@@ -27,7 +27,7 @@ let DatasetManagerActions = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool
   },
@@ -55,7 +55,7 @@ let DatasetManagerActions = React.createClass({
   },
 
   render() {
-    let {sidebar, componentUpdate} = this.props;
+    let {sidebar, setProps} = this.props;
 
     if (!this.config.user.isManager) {
       return <Loading status="custom">Sorry you do not have management permissions for this dataset</Loading>;
@@ -88,7 +88,7 @@ let DatasetManagerActions = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}
+                  onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             <span className="block text">Status logs</span>

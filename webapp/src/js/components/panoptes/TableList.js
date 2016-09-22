@@ -9,6 +9,8 @@ import Subheader from 'material-ui/Subheader';
 import Icon from 'ui/Icon';
 import striptags from 'striptags';
 import FluxMixin from 'mixins/FluxMixin';
+import ListWithActions from 'containers/ListWithActions';
+import DataTableWithActions from 'containers/DataTableWithActions';
 
 let TableList = React.createClass({
   mixins: [
@@ -23,16 +25,16 @@ let TableList = React.createClass({
   },
 
 
-  handleOpen(e, container, props) {
+  handleOpen(e, component) {
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-    this.props.onClick({container, props, middleClick});
+    this.props.onClick({component, middleClick});
   },
 
   handleTableClick(e, table) {
     if (this.config.tablesById[table.id].listView) {
-      this.handleOpen(e, 'containers/ListWithActions', {table: table.id});
+      this.handleOpen(e, <ListWithActions table={table.id} />);
     } else {
-      this.handleOpen(e, 'containers/DataTableWithActions', {table: table.id});
+      this.handleOpen(e, <DataTableWithActions table={table.id} />);
     }
   },
 

@@ -17,7 +17,7 @@ let Controls = React.createClass({
   ],
 
   propTypes: {
-    componentUpdate: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
     start: React.PropTypes.number.isRequired,
     end: React.PropTypes.number.isRequired,
@@ -43,7 +43,7 @@ let Controls = React.createClass({
   },
 
   handleChromChange() {
-    this.props.componentUpdate({
+    this.props.setProps({
       chromosome: this.refs.chromosome.value
     });
   },
@@ -62,7 +62,7 @@ let Controls = React.createClass({
       mid <= (this.config.chromosomes[this.props.chromosome].len || FALLBACK_MAXIMUM) &&
       width > this.props.minWidth
     ) {
-      this.props.componentUpdate({
+      this.props.setProps({
         start: mid - (width / 2),
         end: mid + (width / 2)
       });
@@ -80,7 +80,7 @@ let Controls = React.createClass({
       chromosome = chromosome || this.props.chromosome;
       if (_has(this.config.chromosomes, chromosome)  && start < end) {
         this.setState({regionValid: true});
-        this.props.componentUpdate({chromosome, start, end});
+        this.props.setProps({chromosome, start, end});
         return;
       }
     }

@@ -162,9 +162,7 @@ dataItemViews:
   locationDataTable: populations                       # Datatable containing the locations (should have a Longitude & Latitude property)
   locationSizeProperty: SampleCount                    # Property of the locations datatable containing the size of the pie chart
   locationNameProperty: Name                           # Property of the locations datatable containing the name of the pie chart
-  componentColumns:
-  
-                                                       # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
+  componentColumns:                                    # Enumerates all the components of the pie charts, and binds them to columns (one for each component x location)
   - pattern: NRAF_{locid}                              # Column name providing the data ({locid} will be replaced by the location primary key values)
     name: Non-reference allele frequency               # Name of the pie
     color: rgb(128,28,0)                               # Color of the pie

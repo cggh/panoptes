@@ -19,7 +19,9 @@ let SessionStore = Fluxxor.createStore({
     this.state = Immutable.fromJS(state);
 
     this.bindActions(
-      SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.componentUpdate),
+//      SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.setProps),
+      SESSION.COMPONENT_SET_PROPS, this.emitIfNeeded(this.componentSetProps),
+      SESSION.COMPONENT_REPLACE, this.emitIfNeeded(this.componentReplace),
       SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
       SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
       SESSION.NOTIFY, this.emitIfNeeded(this.notify, 'notify'),
@@ -48,27 +50,20 @@ let SessionStore = Fluxxor.createStore({
     };
   },
 
-  componentUpdate(payload) {
-    let {compId, updater, newComponent} = payload;
-    if (newComponent) {
-      if (_isFunction(updater)) {
-        this.state = this.state.setIn(['components', compId], Immutable.fromJS({component: newComponent, props: {}}));
-        this.state = this.state.updateIn(['components', compId, 'props'], updater);
-      } else {
-        let component = Immutable.fromJS({
-          component: newComponent,
-          props: updater
-        });
-        this.state = this.state.setIn(['components', compId], component);
-      }
+  componentSetProps({componentPath, updater}) {
+    if (_isFunction(updater)) {
+      this.state = this.state.updateIn(['components', ...componentPath, 'props'], updater);
     } else {
-      if (_isFunction(updater)) {
-        this.state = this.state.updateIn(['components', compId, 'props'], updater);
-      } else {
-        this.state = this.state.mergeDeepIn(['components', compId, 'props'], updater);
-      }
+      this.state = this.state.mergeDeepIn(['components', ...componentPath, 'props'], updater);
     }
   },
+
+  componentReplace({componentPath, newComponent}) {
+    newComponent = Immutable.fromJS(newComponent);
+    this.state = this.state.setIn(['components', ...componentPath], newComponent);
+  },
+
+
   modalClose() {
     this.state = this.state.set('modal', Immutable.Map());
   },
@@ -81,32 +76,25 @@ let SessionStore = Fluxxor.createStore({
     this.lastNotification = payload;
   },
 
-  popupClose(payload) {
-    let {compId} = payload;
+  popupClose({compId}) {
     let list = this.state.getIn(['popups', 'components']).filter((popupId) => popupId !== compId);
     this.state = this.state.setIn(['popups', 'components'], list);
   },
 
-  popupFocus(payload) {
-    let {compId} = payload;
+  popupFocus({compId}) {
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
   },
 
-  popupMove(payload) {
-    let {compId, pos} = payload;
+  popupMove({compId, pos}) {
     this.state = this.state.mergeIn(['popups', 'state', compId, 'position'], pos);
   },
 
-  popupOpen(payload) {
-    let {component, compId, switchTo} = payload;
-
+  popupOpen({component, compId, switchTo}) {
     if (compId) {
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
     } else {
-      if (!component.component)
-        component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
       let id = uid(10);
       this.state = this.state.setIn(['components', id], component);
@@ -119,8 +107,7 @@ let SessionStore = Fluxxor.createStore({
 
   },
 
-  popupResize(payload) {
-    let {compId, size} = payload;
+  popupResize({compId, size}) {
     this.state = this.state.mergeIn(['popups', 'state', compId, 'size'], size);
   },
 
@@ -129,8 +116,7 @@ let SessionStore = Fluxxor.createStore({
     this.popupClose(payload);
   },
 
-  tabClose(payload, force) {
-    let {compId} = payload;
+  tabClose({compId}, force) {
     //Closing the start tab is a no-op
     if (!force && this.state.getIn(['components', compId, 'component']) === START_TAB)
       return;
@@ -153,14 +139,11 @@ let SessionStore = Fluxxor.createStore({
     }
   },
 
-  tabOpen(payload) {
-    let {component, switchTo, compId} = payload;
+  tabOpen({component, switchTo, compId}) {
     if (compId)
       this.state = this.state.updateIn(['tabs', 'components'],
         (list) => list.filter((tabId) => tabId !== compId).push(compId));
     else {
-      if (!component.component)
-        component.component = EMPTY_TAB;
       component = Immutable.fromJS(component);
       compId = uid(10);
       this.state = this.state.setIn(['components', compId], component);
@@ -170,16 +153,15 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
     }
   },
-  tabPopOut(payload) {
-    let {compId, pos} = payload;
+  tabPopOut({compId, pos}) {
     this.state = this.state.updateIn(['popups', 'components'],
       (list) => list.filter((popupId) => popupId !== compId).push(compId));
     if (pos)
       this.state = this.state.mergeIn(['popups', 'state', compId, 'position'], pos);
-    this.tabClose(payload, true);
+    this.tabClose({compId, pos}, true);
   },
-  tabSwitch(payload) {
-    this.state = this.state.setIn(['tabs', 'selectedTab'], payload.compId);
+  tabSwitch({compId}) {
+    this.state = this.state.setIn(['tabs', 'selectedTab'], compId);
   },
 
   getState() {
@@ -190,14 +172,11 @@ let SessionStore = Fluxxor.createStore({
     return this.lastNotification;
   },
 
-  geneFound(payload) {
-    let {geneId} = payload;
+  geneFound({geneId}) {
     this.state = this.state.updateIn(['foundGenes'], (list) => list.filter((foundGeneId) => foundGeneId !== geneId).push(geneId));
   },
 
-  tableQueryUsed(payload) {
-    let {table, query} = payload;
-
+  tableQueryUsed({table, query}) {
     // Remove the query from the list, if it already exists.
     // Put the query at the top of the list.
     this.state = this.state.updateIn(['usedTableQueries'], (list) => list.filter((usedTableQuery) => (!(usedTableQuery.get('table') === table && usedTableQuery.get('query') === query))).unshift(Immutable.fromJS({table: table, query: query})));
