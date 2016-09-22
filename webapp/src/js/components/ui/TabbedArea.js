@@ -6,6 +6,7 @@ import _forEach from 'lodash/forEach';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import Icon from 'ui/Icon';
 import Draggable from 'react-draggable';
+import filterChildren from 'util/filterChildren';
 
 let TabbedArea = React.createClass({
   mixins: [PureRenderMixin],
@@ -153,14 +154,16 @@ let TabbedArea = React.createClass({
     delete divProps.onClose;
     delete divProps.onAddTab;
     delete divProps.onDragAway;
+    const children = filterChildren(this, this.props.children);
+
     return (
       <div {...divProps} className="tabbed-area">
         <div className="tabs">
-          {ValidComponentChildren.map(this.props.children, this.renderTab, this)}
+          {ValidComponentChildren.map(children, this.renderTab, this)}
           {this.props.onAddTab ? <Icon name="plus-circle" onClick={this.handleAddTab}/> : null}
         </div>
         <div className="tab-content">
-          {ValidComponentChildren.map(this.props.children, this.renderPane, this)}
+          {ValidComponentChildren.map(children, this.renderPane, this)}
         </div>
       </div>
     );

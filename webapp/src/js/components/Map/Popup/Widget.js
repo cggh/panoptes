@@ -1,5 +1,6 @@
 import React from 'react';
 import {Popup} from 'react-leaflet';
+import filterChildren from 'util/filterChildren';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -35,9 +36,10 @@ let PopupWidget = React.createClass({
   },
 
   render() {
+    let children = filterChildren(this, children);
     return (
       <Popup
-        children={React.Children.only(this.props.children)}
+        children={React.Children.only(children)}
       />
     );
 
