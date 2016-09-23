@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
@@ -52,19 +50,19 @@ let MapActions = React.createClass({
   ],
 
   propTypes: {
-    center: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.array, React.PropTypes.object]),
-    componentUpdate: React.PropTypes.func.isRequired,
+    center: React.PropTypes.object,
+    setProps: React.PropTypes.func,
     query: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     baseTileLayer: React.PropTypes.string,
-    baseTileLayerProps: ImmutablePropTypes.map,
+    baseTileLayerProps: React.PropTypes.object,
     imageOverlayLayer: React.PropTypes.string,
-    imageOverlayLayerProps: ImmutablePropTypes.map,
+    imageOverlayLayerProps: React.PropTypes.object,
     overlayTileLayer: React.PropTypes.string,
-    overlayTileLayerProps: ImmutablePropTypes.map,
+    overlayTileLayerProps: React.PropTypes.object,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
-    zoom: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+    zoom: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -103,28 +101,48 @@ let MapActions = React.createClass({
     this.overlayTileLayers[DEFAULT_OVERLAY_TILE_LAYER] = {};
     this.overlayTileLayersMenu.push(<MenuItem key={DEFAULT_OVERLAY_TILE_LAYER} primaryText={DEFAULT_OVERLAY_TILE_LAYER} value={DEFAULT_OVERLAY_TILE_LAYER} />);
 
+/*
+Origin = (-18.000064799999990,37.541627650000002)
+Pixel Size = (0.041666650000000,-0.041666650000000)
+Metadata:
+  AREA_OR_POINT=Area
+Image Structure Metadata:
+  COMPRESSION=LZW
+  INTERLEAVE=BAND
+Corner Coordinates:
+Upper Left  ( -18.0000648,  37.5416277) ( 18d 0' 0.23"W, 37d32'29.86"N)
+Lower Left  ( -18.0000648, -35.0000100) ( 18d 0' 0.23"W, 35d 0' 0.04"S)
+Upper Right (  52.0415739,  37.5416277) ( 52d 2'29.67"E, 37d32'29.86"N)
+Lower Right (  52.0415739, -35.0000100) ( 52d 2'29.67"E, 35d 0' 0.04"S)
+Center      (  17.0207545,   1.2708088) ( 17d 1'14.72"E,  1d16'14.91"N)
 
+
+bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
+
+*/
 
     // FIXME: Hard-coded MAP maps
 
-    this.imageOverlayLayers['MAP_Prevalence_2000'] = {
+    this.imageOverlayLayers['MAP_Prevalence_2000_IO'] = {
       attribution: '<a href="http://www.map.ox.ac.uk/">MAP</a> | <a href="http://www.nature.com/doifinder/10.1038/nature15535">MAP credits and acknowledgements</a>',
-      bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
-      name: 'MAP_Prevalence_2000',
+      bounds: [[-35.0000100, 52.0415739], [37.541627650000002, -18.000064799999990]],
+      name: 'MAP_Prevalence_2000_IO',
       opacity: 0.7,
       url: '/dist/geo/MAP/Prevalence/2000/MODEL43.2000.PR.rmean.stable.COLOUR.png'
     };
-    this.imageOverlayLayersMenu.push(<MenuItem key="MAP_Prevalence_2000" primaryText="MAP_Prevalence_2000" value="MAP_Prevalence_2000" />);
+    this.imageOverlayLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_IO" primaryText="MAP_Prevalence_2000_IO" value="MAP_Prevalence_2000_IO" />);
 
-    this.overlayTileLayers['MAP_Prevalence_2000'] = {
+    this.overlayTileLayers['MAP_Prevalence_2000_TL'] = {
       attribution: '<a href="http://www.map.ox.ac.uk/">MAP</a> | <a href="http://www.nature.com/doifinder/10.1038/nature15535">MAP credits and acknowledgements</a>',
+      bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
+      checked: true,
       maxNativeZoom: 8,
-      name: 'MAP_Prevalence_2000',
+      name: 'MAP_Prevalence_2000_TL',
       tms: true,
       opacity: 0.7,
       url: '/dist/geo/MAP/Prevalence/2000/{z}/{x}/{y}.png'
     };
-    this.overlayTileLayersMenu.push(<MenuItem key="MAP_Prevalence_2000" primaryText="MAP_Prevalence_2000" value="MAP_Prevalence_2000" />);
+    this.overlayTileLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_TL" primaryText="MAP_Prevalence_2000_TL" value="MAP_Prevalence_2000_TL" />);
 
     if (window.L.TileLayer.Provider.providers !== undefined) {
 
@@ -230,14 +248,14 @@ let MapActions = React.createClass({
 
   // Event handlers
   handleQueryPick(query) {
-    this.props.componentUpdate({query});
+    this.props.setProps({query});
   },
   handleChangeTable(table) {
 
     if (table === DEFAULT_MARKER_LAYER) {
-      this.props.componentUpdate({table: undefined});
+      this.props.setProps({table: undefined});
     } else {
-      this.props.componentUpdate({table});
+      this.props.setProps({table});
     }
 
   },
@@ -245,7 +263,7 @@ let MapActions = React.createClass({
     // NB: Ideally wanted to use objects as the SelectField values, but that didn't seem to work.
 
     if (selectedTileLayer === DEFAULT_BASE_TILE_LAYER) {
-      this.props.componentUpdate({baseTileLayer: undefined, baseTileLayerProps: undefined, zoom: undefined});
+      this.props.setProps({baseTileLayer: undefined, baseTileLayerProps: undefined, zoom: undefined});
     } else {
 
       let selectedTileLayerProps = _cloneDeep(this.baseTileLayers[selectedTileLayer]);
@@ -262,8 +280,7 @@ let MapActions = React.createClass({
       // Evaluate any embedded attributions.
       selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
 
-      // NB: baseTileLayerProps will get converted from a plain object to an Immutable map.
-      this.props.componentUpdate({baseTileLayer: selectedTileLayer, baseTileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
+      this.props.setProps({baseTileLayer: selectedTileLayer, baseTileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
     }
 
   },
@@ -271,7 +288,7 @@ let MapActions = React.createClass({
   handleChangeImageOverlayLayer(event, selectedIndex, selectedLayer) {
 
     if (selectedLayer === DEFAULT_IMAGE_OVERLAY_LAYER) {
-      this.props.componentUpdate({imageOverlayLayer: undefined, imageOverlayLayerProps: undefined, zoom: undefined});
+      this.props.setProps({imageOverlayLayer: undefined, imageOverlayLayerProps: undefined, zoom: undefined});
     } else {
 
       let selectedLayerProps = _cloneDeep(this.imageOverlayLayers[selectedLayer]);
@@ -288,20 +305,19 @@ let MapActions = React.createClass({
       // Evaluate any embedded attributions.
       selectedLayerProps.attribution = this.attributionReplacer(selectedLayerProps.attribution);
 
-      // NB: imageOverlayLayerProps will get converted from a plain object to an Immutable map.
-      this.props.componentUpdate({imageOverlayLayer: selectedLayer, imageOverlayLayerProps: selectedLayerProps, zoom: adaptedZoom});
+      this.props.setProps({imageOverlayLayer: selectedLayer, imageOverlayLayerProps: selectedLayerProps, zoom: adaptedZoom});
     }
 
   },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
-    this.props.componentUpdate({center, zoom});
+    this.props.setProps({center, zoom});
   },
   // TODO: Refactor. This is identical to handleChangeBaseTileLayer()
   handleChangeOverlayTileLayer(event, selectedIndex, selectedTileLayer) {
 
     if (selectedTileLayer === DEFAULT_OVERLAY_TILE_LAYER) {
-      this.props.componentUpdate({overlayTileLayer: undefined, overlayTileLayerProps: undefined, zoom: undefined});
+      this.props.setProps({overlayTileLayer: undefined, overlayTileLayerProps: undefined, zoom: undefined});
     } else {
 
       let selectedTileLayerProps = _cloneDeep(this.overlayTileLayers[selectedTileLayer]);
@@ -318,8 +334,7 @@ let MapActions = React.createClass({
       // Evaluate any embedded attributions.
       selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
 
-      // NB: overlayTileLayerProps will get converted from a plain object to an Immutable map.
-      this.props.componentUpdate({overlayTileLayer: selectedTileLayer, overlayTileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
+      this.props.setProps({overlayTileLayer: selectedTileLayer, overlayTileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
     }
 
   },
@@ -353,7 +368,7 @@ let MapActions = React.createClass({
 
 
   render() {
-    let {center, componentUpdate, query, baseTileLayer, baseTileLayerProps, imageOverlayLayer, imageOverlayLayerProps, overlayTileLayer, overlayTileLayerProps, sidebar, table, zoom} = this.props;
+    let {center, setProps, query, baseTileLayer, baseTileLayerProps, imageOverlayLayer, imageOverlayLayerProps, overlayTileLayer, overlayTileLayerProps, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -399,10 +414,10 @@ let MapActions = React.createClass({
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table, a query and a baseTileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps.toObject()) + '\' /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
       } else {
         // A table and a baseTileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps.toObject()) + '\' /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
       }
 
     } else if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
@@ -417,7 +432,7 @@ let MapActions = React.createClass({
 
     } else if (baseTileLayerProps !== undefined && baseTileLayerProps.size !== 0) {
       // Only a baseTileLayer has been specified.
-      templateCode = '<Map' + centerAttribute + zoomAttribute + ' baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps.toObject()) + '\' /></div>';
+      templateCode = '<Map' + centerAttribute + zoomAttribute + ' baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
     }
 
     // Wrap the map template code in a container with dimensions.
@@ -462,7 +477,7 @@ let MapActions = React.createClass({
             onChange={(e, i, v) => this.handleChangeImageOverlayLayer(e, i, v)}
             value={imageOverlayLayer}
           >
-            {this.overlayTileLayersMenu}
+            {this.imageOverlayLayersMenu}
           </SelectField>
           <TextField
             floatingLabelText="Template code:"
@@ -488,7 +503,7 @@ let MapActions = React.createClass({
       <MapWidget
         baseLayer={baseTileLayerProps}
         center={center}
-        componentUpdate={componentUpdate}
+        setProps={setProps}
         imageOverlay={imageOverlayLayerProps}
         onChange={this.handleChangeMap}
         overlay={overlayTileLayerProps}
@@ -501,7 +516,7 @@ let MapActions = React.createClass({
         <TableMapWidget
           baseLayer={baseTileLayerProps}
           center={center}
-          componentUpdate={componentUpdate}
+          setProps={setProps}
           imageOverlay={imageOverlayLayerProps}
           locationDataTable={table}
           onChange={this.handleChangeMap}
@@ -522,7 +537,7 @@ let MapActions = React.createClass({
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
-                  onClick={() => componentUpdate({sidebar: !sidebar})}/>
+                  onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">

@@ -15,7 +15,7 @@ import AnnotationChannel from 'panoptes/genome/tracks/AnnotationChannel';
 
 import DatasetManagerActions from 'Dataset/Manager/Actions';
 import PlotWithActions from 'Plot/Table/Actions';
-import TableMapActions from 'Map/Table/Actions';
+import MapActions from 'Map/Actions';
 import TreeWithActions from 'containers/TreeWithActions';
 
 let ViewList = React.createClass({
@@ -71,7 +71,7 @@ let ViewList = React.createClass({
                     style={{opacity: 1}}
                     secondaryText={'View data geographically'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={(e) => this.handleOpen(e, <TableMapActions />)}/>
+                    onClick={(e) => this.handleOpen(e, <MapActions />)}/>
         {hasShowableTables ?
           <ListItem primaryText="Tree"
                     secondaryText="View a tree"

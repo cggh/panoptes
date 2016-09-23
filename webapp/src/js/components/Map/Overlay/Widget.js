@@ -38,7 +38,9 @@ let OverlayWidget = React.createClass({
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    name: React.PropTypes.string
+    name: React.PropTypes.string,
+    removeLayer: React.PropTypes.func,
+    removeLayerControl: React.PropTypes.func
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -53,7 +55,7 @@ let OverlayWidget = React.createClass({
 
   render() {
 
-    let {addOverlay, checked, children, name} = this.props;
+    let {addOverlay, checked, children, name, removeLayer, removeLayerControl} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
@@ -62,6 +64,8 @@ let OverlayWidget = React.createClass({
         checked={checked}
         children={React.Children.only(children)}
         name={name}
+        removeLayer={removeLayer}
+        removeLayerControl={removeLayerControl}
       />
 
     );

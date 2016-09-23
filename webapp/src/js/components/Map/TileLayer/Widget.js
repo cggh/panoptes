@@ -20,6 +20,7 @@ let TileLayerWidget = React.createClass({
   },
   propTypes: {
     attribution: React.PropTypes.string,
+    bounds: React.PropTypes.array,
     ext: React.PropTypes.string,
     format: React.PropTypes.string,
     layerContainer: React.PropTypes.object,

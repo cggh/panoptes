@@ -104,11 +104,11 @@ let TableMapWidget = React.createClass({
       >
         <LayersControlWidget>
           <BaseLayerWidget checked={true} name={baseLayer ? baseLayer.name : undefined}>
-            <TileLayerWidget {...baseLayer} />
+            <TileLayerWidget zIndex={1} {...baseLayer} />
           </BaseLayerWidget>
           {overlay ?
           <OverlayWidget checked={true} name={overlay.name}>
-            <TileLayerWidget {...overlay} />
+            <TileLayerWidget zIndex={2} {...overlay} />
           </OverlayWidget>
           : null}
           {imageOverlay ?

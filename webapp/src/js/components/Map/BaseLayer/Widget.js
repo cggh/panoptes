@@ -33,7 +33,8 @@ let BaseLayerWidget = React.createClass({
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     name: React.PropTypes.string,
-    removeLayer: React.PropTypes.func // Required when the BaseLayer is changed
+    removeLayer: React.PropTypes.func, // Required when the BaseLayer is changed
+    removeLayerControl: React.PropTypes.func
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -54,7 +55,7 @@ let BaseLayerWidget = React.createClass({
 
   render() {
 
-    let {addBaseLayer, checked, children, name, removeLayer} = this.props;
+    let {addBaseLayer, checked, children, name, removeLayer, removeLayerControl} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
@@ -64,6 +65,7 @@ let BaseLayerWidget = React.createClass({
         children={React.Children.only(children)}
         name={name}
         removeLayer={removeLayer}
+        removeLayerControl={removeLayerControl}
       />
     );
 
