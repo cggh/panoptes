@@ -6,6 +6,8 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import filterChildren from 'util/filterChildren';
 
+import _cloneDeep from 'lodash/cloneDeep';
+
 const ALLOWED_CHILDREN = [
   'BaseLayerWidget',
   'OverlayWidget'
@@ -43,7 +45,8 @@ let LayersControlWidget = React.createClass({
   },
 
   render() {
-
+// console.log('LayersControl props: %o', _cloneDeep(this.props));
+// console.log('LayersControl context: %o', _cloneDeep(this.context));
     let {autoZIndex, children} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 

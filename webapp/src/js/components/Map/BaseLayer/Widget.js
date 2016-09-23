@@ -32,7 +32,8 @@ let BaseLayerWidget = React.createClass({
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    name: React.PropTypes.string.isRequired
+    name: React.PropTypes.string,
+    removeLayer: React.PropTypes.func // Required when the BaseLayer is changed
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -47,34 +48,22 @@ let BaseLayerWidget = React.createClass({
   },
   getDefaultProps() {
     return {
-      name: 'Base Layer'
+      name: 'Base layer'
     };
   },
 
   render() {
-    let {addBaseLayer, checked, children, name} = this.props;
+
+    let {addBaseLayer, checked, children, name, removeLayer} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
-
-    let checkedBoolean = null;
-    if (
-      (typeof checked === 'string' && checked.toLowerCase() === 'true')
-      || (typeof checked === 'boolean' && checked === true)
-    ) {
-      checkedBoolean = true;
-    } else {
-      checkedBoolean = false;
-    }
-
-    if (checkedBoolean === null) {
-      console.error('BaseLayerWidget could not determine checked status');
-    }
 
     return (
       <BaseLayer
-        checked={checkedBoolean}
-        name={name}
-        children={React.Children.only(children)}
         addBaseLayer={addBaseLayer}
+        checked={checked}
+        children={React.Children.only(children)}
+        name={name}
+        removeLayer={removeLayer}
       />
     );
 

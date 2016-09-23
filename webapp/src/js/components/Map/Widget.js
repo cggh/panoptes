@@ -30,34 +30,34 @@ const ALLOWED_CHILDREN = [
   'TileLayerWidget',
   'FeatureGroupWidget',
   'MarkerWidget',
-  'OverlayWidget',
+  'OverlayWidget'
 ];
 
 /* To use maps in templates
 
   <p>A simple map:</p>
   <div style="width:300px;height:300px">
-  <Map center="[1, -1.1]" zoom="2" />
+  <MapWidget />
   </div>
 
   <p>A map with a tilelayer and markers:</p>
   <div style="width:300px;height:300px">
-  <Map center="[0, 0]" zoom="4"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></Map>
+  <Map center='{"lat":0,"lng":0}' zoom="4"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></Map>
   </div>
 
   <p>A map with two different base layers:</p>
   <div style="width:300px;height:300px">
-  <Map center="[1, -1.1]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /></BaseLayer></LayersControl></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /></BaseLayer></LayersControl></Map>
   </div>
 
   <p>A map with two different base layers and two markers on one base layer:</p>
   <div style="width:300px;height:300px">
-  <Map center="[0, 0]" zoom="4"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></FeatureGroup></BaseLayer></LayersControl></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="4"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><Marker position="[2, -2.1]" /><Marker position="[0, 0]" /></FeatureGroup></BaseLayer></LayersControl></Map>
   </div>
 
   <p>A map with markers and popups:</p>
   <div style="width:300px;height:300px">
-  <Map center="[0, 0]" zoom="4"><Marker position="[2, -2.1]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="4"><Marker position="[2, -2.1]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></Map>
   </div>
 
   <p>A map with markers from a table:</p>
@@ -67,7 +67,7 @@ const ALLOWED_CHILDREN = [
 
   <p>A complex map:</p>
   <div style="width:300px;height:300px">
-  <Map center="[1, -1.1]" zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
   </div>
 
 */
@@ -82,11 +82,13 @@ let MapWidget = React.createClass({
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
   propTypes: {
+    baseLayer: React.PropTypes.object,
     center: React.PropTypes.object,
     children: React.PropTypes.node,
     setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
+    imageOverlay: React.PropTypes.object,
     onChange: React.PropTypes.func,
-    tileLayerProps: React.PropTypes.object,
+    overlay:React.PropTypes.object,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number
   },
@@ -209,19 +211,24 @@ let MapWidget = React.createClass({
   },
 
   render() {
-    let {center, children, tileLayerProps, zoom} = this.props;
+    let {baseLayer, center, children, imageOverlay, overlay, zoom} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
-    if (bounds === undefined && center === undefined && zoom === undefined) {
-      // NB: The center/zoom props may have been set by the session or determined by bounds.
-      center = [0, 0];
+    // NB: The center/zoom props may have been set by the session or determined by bounds.
+    if (bounds === undefined && center === undefined) {
+      center = {lat: 0, lng: 0};
+    }
+    if (bounds === undefined && zoom === undefined) {
       zoom = 0;
     }
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
+
+    // NB: JSX children will overwrite the passed prop, if any.
+    // https://github.com/facebook/flow/issues/1355
 
     // NB: The bounds prop on the react-leaflet Map component is equivalent to fitBounds
     // There is also a boundsOptions prop corresponding to http://leafletjs.com/reference.html#map-fitboundsoptions
@@ -278,7 +285,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget key="0" {...tileLayerProps} />
+            <TileLayerWidget key="0" {...baseLayer} />
             {keyedChildren}
           </Map>
         );
@@ -354,7 +361,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget {...tileLayerProps} />
+            <TileLayerWidget {...baseLayer} />
           </Map>
         );
 

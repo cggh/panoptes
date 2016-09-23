@@ -24,12 +24,14 @@ let TileLayerWidget = React.createClass({
     format: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
-    maxZoom: React.PropTypes.number,
-    minZoom: React.PropTypes.number,
-    opacity: React.PropTypes.number,
+    maxNativeZoom: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+    maxZoom: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+    minZoom: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+    opacity: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+    tms: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.string]),
     url: React.PropTypes.string.isRequired,
     variant: React.PropTypes.string,
-    zIndex: React.PropTypes.number
+    zIndex: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -53,7 +55,7 @@ let TileLayerWidget = React.createClass({
   },
 
   render() {
-    let {attribution, ext, format, maxZoom, minZoom, opacity, url, variant, zIndex} = this.props;
+    let {attribution, bounds, ext, format, maxNativeZoom, maxZoom, minZoom, opacity, tms, url, variant, zIndex} = this.props;
 
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
@@ -70,16 +72,31 @@ let TileLayerWidget = React.createClass({
     // We workaround this, to make sure that those props (e.g. attribution) are updated accordingly
     // by changing the key whenever those props change, thereby causing React to remount the component.
 
+    // If maxNativeZoom is supplied to TileLayer undefined, then it causes /NaN/0/0.png 404 errors [22 Sep 2016]
+    let adaptedProps = {};
+    if (maxNativeZoom !== undefined) {
+      adaptedProps.maxNativeZoom = maxNativeZoom;
+    }
+
+    // NB: Setting an errorTileUrl for missing tiles does not prevent 404 errors, and causes visible swap.
+    // Perhaps use bounds instead, if possible, which will prevent 404 errors.
+    // errorTileUrl="/dist/mapTiles/invisible.png"
+
     return (
       <TileLayer
-        key={JSON.stringify({attribution, maxZoom, minZoom, variant})}
+        {...adaptedProps}
         attribution={attribution}
+        bounds={bounds}
         children={undefined}
+        detectRetinea="true"
         ext={ext}
         format={format}
+        key={JSON.stringify({attribution, maxNativeZoom, maxZoom, minZoom, variant})}
         maxZoom={maxZoom}
         minZoom={minZoom}
         opacity={opacity}
+        reuseTiles="true"
+        tms={tms}
         url={url}
         variant={variant}
         zIndex={zIndex}

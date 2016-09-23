@@ -9,12 +9,13 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
-  'TableMarkersLayerWidget',
-  'MarkerWidget',
   'CircleWidget',
-  'RectangleWidget',
-  'PopupWidget',
   'FeatureGroupWidget',
+  'ImageOverlayWidget',
+  'MarkerWidget',
+  'PopupWidget',
+  'RectangleWidget',
+  'TableMarkersLayerWidget',
   'TileLayerWidget'
 ];
 
@@ -24,11 +25,24 @@ let OverlayWidget = React.createClass({
     FluxMixin
   ],
 
+  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
+  // in which case, we copy those props into context. Props override context.
+
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
   propTypes: {
     addOverlay: React.PropTypes.func,
-    checked: React.PropTypes.string,
+    checked: React.PropTypes.bool,
     children: React.PropTypes.node,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
     name: React.PropTypes.string
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
   },
 
   getDefaultProps() {
@@ -38,21 +52,16 @@ let OverlayWidget = React.createClass({
   },
 
   render() {
+
     let {addOverlay, checked, children, name} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
-
-    let checkedBoolean = (checked === 'true');
-
-    if (!checkedBoolean instanceof Boolean) {
-      checkedBoolean = null;
-    }
 
     return (
       <Overlay
         addOverlay={addOverlay}
-        checked={checkedBoolean}
-        name={name}
+        checked={checked}
         children={React.Children.only(children)}
+        name={name}
       />
 
     );

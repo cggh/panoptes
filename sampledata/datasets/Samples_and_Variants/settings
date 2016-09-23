@@ -17,9 +17,7 @@ description: |
     <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
   </PopupButton>
   <PopupButton label="Map of sites" icon="globe">
-    <MapWidget center='{"lat":1, "lng":-1.1}' zoom="2">
-      <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
-    </MapWidget>
+    <TableMapWidget table="samplingsites" />
   </PopupButton>
   <PopupButton label="Tree of samples" icon="tree">
     <TreeContainer table="samples" tree="tree2" />
@@ -34,10 +32,6 @@ description: |
   <p>A plot of variants:</p>
   <div style="position:relative;width:300px;height:300px">
   <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
-  </div>
-  <p>A map of sampling sites:</p>
-  <div style="position:relative;width:300px;height:300px">
-  <TableMapWidget table="samplingsites" />
   </div>
   <p>A complex map:</p>
   <div style="width:300px;height:300px">

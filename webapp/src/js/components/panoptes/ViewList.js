@@ -67,14 +67,11 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
                     onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
           : null}
-        {hasShowableTables ?
-          <ListItem primaryText="Table Mapper"
-                    disabled={!hasGeo}
-                    style={{opacity: hasGeo ? '1' : '0.5'}}
-                    secondaryText={hasGeo ? 'View table data geographically' : 'None of your tables have geographic data'}
+          <ListItem primaryText="Map Composer"
+                    style={{opacity: 1}}
+                    secondaryText={'View data geographically'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
-                    onClick={hasGeo ? (e) => this.handleOpen(e, <TableMapActions />) : null }/>
-          : null}
+                    onClick={(e) => this.handleOpen(e, <TableMapActions />)}/>
         {hasShowableTables ?
           <ListItem primaryText="Tree"
                     secondaryText="View a tree"

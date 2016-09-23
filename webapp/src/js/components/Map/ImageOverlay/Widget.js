@@ -20,8 +20,8 @@ let ImageOverlayWidget = React.createClass({
   },
   propTypes: {
     attribution: React.PropTypes.string,
-    imageBounds: React.PropTypes.array,
-    imageUrl: React.PropTypes.string,
+    bounds: React.PropTypes.array,
+    url: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
     map: React.PropTypes.object,
     opacity: React.PropTypes.number
@@ -39,19 +39,19 @@ let ImageOverlayWidget = React.createClass({
   },
   getDefaultProps() {
     return {
-      imageBounds: [[40.712216, -74.22655], [40.773941, -74.12544]],
-      imageUrl: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg'
+      bounds: [[40.712216, -74.22655], [40.773941, -74.12544]],
+      url: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg'
     };
   },
 
   render() {
-    let {attribution, imageBounds, imageUrl, opacity} = this.props;
+    let {attribution, bounds, url, opacity} = this.props;
 
     return (
       <ImageOverlay
-        imageBounds={imageBounds}
+        bounds={bounds}
         attribution={attribution}
-        imageUrl={imageUrl}
+        url={url}
         opacity={opacity}
       />
     );
