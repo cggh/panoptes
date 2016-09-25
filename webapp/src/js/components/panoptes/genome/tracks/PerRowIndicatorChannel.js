@@ -23,7 +23,6 @@ import {hatchRect} from 'util/CanvasDrawing';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import FilterButton from 'panoptes/FilterButton';
 
-import 'hidpi-canvas';
 import {propertyColour} from 'util/Colours';
 
 const HEIGHT = 50;

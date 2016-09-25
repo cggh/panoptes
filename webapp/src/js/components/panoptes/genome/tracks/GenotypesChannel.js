@@ -31,8 +31,6 @@ import GenotypesRowHeader from 'panoptes/genome/tracks/GenotypesRowHeader';
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 import NumericInput from 'ui/NumericInput';
 
-import 'hidpi-canvas';
-
 const FAN_HEIGHT = 60;
 
 let GenotypesChannel = React.createClass({

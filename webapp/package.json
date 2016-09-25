@@ -60,7 +60,6 @@
     "fluxxor": "^1.7.3",
     "google-map-react": "^0.19.0",
     "handlebars": "^4.0.5",
-    "hidpi-canvas": "git+https://github.com/benjeffery/hidpi-canvas-polyfill.git",
     "history": "^4.0.0-1",
     "html-to-react": "git+https://github.com/benjeffery/html-to-react.git",
     "immutable": "^3.8.1",

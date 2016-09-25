@@ -13,8 +13,6 @@ import findBlocks from 'panoptes/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
 
-import 'hidpi-canvas';
-
 let AnnotationChannel = React.createClass({
   mixins: [
     PureRenderWithRedirectedProps({
