@@ -53,7 +53,7 @@ let GenomeScale = React.createClass({
     end = Math.max(start, end);
     let format = scale.tickFormat((end - start) / (smallTickWidth * 5), end - start > 5000 ? 's' : null);
 
-    const ctx = canvas.getContext('2d', {alpha: false});
+    const ctx = canvas.getContext('2d');
     ctx.lineWidth = 0.25;
     ctx.strokeStyle = 'darkgrey';
     ctx.textAlign = 'center';
