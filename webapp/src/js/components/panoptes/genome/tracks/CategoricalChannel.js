@@ -362,7 +362,6 @@ let CategoricalTrackControls = React.createClass({
   },
 
   render() {
-    console.log('r');
     let {fractional, autoYScale, yMin, yMax} = this.props;
     return (
       <div className="channel-controls">

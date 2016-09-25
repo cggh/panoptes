@@ -51,7 +51,7 @@ let AnnotationChannel = React.createClass({
 
 
   componentWillMount() {
-    this.data = {};
+    this.data = null;
   },
 
   componentDidUpdate() {
@@ -62,7 +62,7 @@ let AnnotationChannel = React.createClass({
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, onChangeLoadStatus} = props;
     if (this.props.chromosome !== chromosome) {
-      this.applyData(props, {});
+      this.applyData(props, null);
     }
     if (width - sideWidth < 1) {
       return;
@@ -101,7 +101,7 @@ let AnnotationChannel = React.createClass({
         .catch(API.filterAborted)
         .catch(LRUCache.filterCancelled)
         .catch((error) => {
-          this.applyData(this.props, {});
+          this.applyData(this.props, null);
           ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
         });
     }
@@ -110,7 +110,7 @@ let AnnotationChannel = React.createClass({
 
   applyData(props, data) {
     if (!data) {
-      this.data = {};
+      this.data = null;
       return;
     }
     const {ids, parents, sizes, starts, types} = data;

@@ -186,7 +186,7 @@ let GenotypesChannel = React.createClass({
     // console.log(config);
     const dataInvlidatingProps = ['chromosome', 'cellColour', 'cellAlpha', 'cellHeight',  'rowQuery', 'columnQuery', 'rowLabel', 'rowSort', 'layoutGaps', 'page', 'pageSize'];
     if (dataInvlidatingProps.some((name) => this.props[name] !== props[name])) {
-      this.applyData(props, {});
+      this.applyData(props, null);
     }
     if (width - sideWidth < 1) {
       return;
