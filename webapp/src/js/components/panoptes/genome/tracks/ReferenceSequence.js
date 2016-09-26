@@ -192,7 +192,8 @@ let ReferenceSequence = React.createClass({
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext('2d', {alpha: false});
     //Squares
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (!this.summaryWindow || !this.blocks || this.blocks.length < 1) {
       return;
     }

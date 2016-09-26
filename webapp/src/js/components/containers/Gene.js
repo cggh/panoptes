@@ -184,7 +184,13 @@
                 <GenomeBrowserWithActions
                   chromosome={geneData['chromid']}
                   start={parseInt(geneData['fstart'])}
-                  end={parseInt(geneData['fstop'])} />
+                  end={parseInt(geneData['fstop'])} >
+                    <ReferenceSequence />
+                    { annotation ?
+                      <AnnotationChannel /> : null
+                    }
+
+                </GenomeBrowserWithActions>
               </PopupButton>
               {genomePositionTableButtons}
               {externalGeneLinkButtons}
