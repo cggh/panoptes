@@ -1,7 +1,6 @@
 import React from 'react';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
 import GeneSearchResultsList from 'panoptes/GeneSearchResultsList';
@@ -13,13 +12,13 @@ import TextField from 'material-ui/TextField';
 let FindGeneByNameDesc = React.createClass({
   mixins: [
     PureRenderMixin,
-    FluxMixin
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
-    search: React.PropTypes.string
+    search: React.PropTypes.string,
+    onSelect: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -36,27 +35,9 @@ let FindGeneByNameDesc = React.createClass({
     this.props.setProps({search: event.target.value});
   },
 
-  handleSelectGene(e, geneId) {
-
-    // Add selected geneId to list of recently found genes.
-    this.getFlux().actions.session.geneFound(geneId);
-
-    let container = 'containers/Gene';
-    let props = {geneId: geneId};
-
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-
-    if (middleClick) {
-      this.getFlux().actions.session.popupOpen(container, props, false);
-    } else {
-      this.props.setProps(props, container);
-    }
-
-  },
-
   render() {
 
-    let {search} = this.props;
+    let {search, onSelect} = this.props;
 
     let geneList = null;
 
@@ -71,7 +52,7 @@ let FindGeneByNameDesc = React.createClass({
       geneList = (
         <GeneSearchResultsList
            search={search}
-           onSelectGene={this.handleSelectGene}
+           onSelectGene={onSelect}
            icon="bitmap:genomebrowser.png"
           />
       );

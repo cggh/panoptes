@@ -10,6 +10,7 @@ import _map from 'lodash/map';
 
 // Panoptes
 import RegionGenesList from 'panoptes/RegionGenesList';
+import Gene from 'containers/Gene';
 
 // Panoptes UI
 import Icon from 'ui/Icon';
@@ -26,13 +27,14 @@ let FindGeneByRegion = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     activeTab: React.PropTypes.string,
     search: React.PropTypes.string,
     chromosome: React.PropTypes.string,
     startPosition: React.PropTypes.number,
     endPosition: React.PropTypes.number,
     chromosomeLength: React.PropTypes.number,
+    onSelect: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -90,27 +92,9 @@ let FindGeneByRegion = React.createClass({
     );
   },
 
-  handleSelectGene(e, geneId) {
-
-    // Add selected geneId to list of recently found genes.
-    this.getFlux().actions.session.geneFound(geneId);
-
-    let container = 'containers/Gene';
-    let props = {geneId: geneId};
-
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-
-    if (middleClick) {
-      this.getFlux().actions.session.popupOpen(container, props, false);
-    } else {
-      this.props.setProps(props, container);
-    }
-
-  },
-
   render() {
 
-    let {chromosome, chromosomeLength, startPosition, endPosition} = this.props;
+    let {chromosome, chromosomeLength, startPosition, endPosition, onSelect} = this.props;
     let {findChromosome, findStartPosition, findEndPosition} = this.state;
 
     let geneList = null;
@@ -130,7 +114,7 @@ let FindGeneByRegion = React.createClass({
           chromosome={findChromosome}
           startPosition={parseInt(findStartPosition)}
           endPosition={parseInt(findEndPosition)}
-          onSelectGene={this.handleSelectGene}
+          onSelectGene={onSelect}
           icon="bitmap:genomebrowser.png"
         />
       );

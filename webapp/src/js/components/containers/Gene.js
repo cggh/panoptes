@@ -19,7 +19,7 @@
   import DetectResize from 'utils/DetectResize';
   import ListWithActions from 'containers/ListWithActions';
   import DataTableWithActions from 'containers/DataTableWithActions';
-
+  import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 
   // UI
   import Loading from 'ui/Loading';
@@ -163,7 +163,7 @@
         <div>
           <div className="vertical stack">
             <GenomeScale {...trackProps}/>
-            <ReferenceSequence {...trackProps}/> :
+            <ReferenceSequence {...trackProps}/>
             { annotation ?
               <AnnotationChannel name="Structure" {...trackProps} /> : null
             }
@@ -180,13 +180,12 @@
             </div>
             <div className="horizontal stack wrap">
               <PopupButton  label="Show in Genome Browser"
-                            icon="bitmap:genomebrowser.png"
-                            componentPath="containers/GenomeBrowserWithActions"
-                            setProps={setProps}
-                            chromosome={geneData['chromid']}
-                            start={parseInt(geneData['fstart'])}
-                            end={parseInt(geneData['fstop'])}
-              />
+                            icon="bitmap:genomebrowser.png">
+                <GenomeBrowserWithActions
+                  chromosome={geneData['chromid']}
+                  start={parseInt(geneData['fstart'])}
+                  end={parseInt(geneData['fstop'])} />
+              </PopupButton>
               {genomePositionTableButtons}
               {externalGeneLinkButtons}
             </div>

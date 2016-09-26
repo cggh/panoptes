@@ -20,24 +20,9 @@ let RecentlyFoundGenes = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func
+    onSelect: React.PropTypes.func
   },
 
-
-  handleSelectGene(e, geneId) {
-
-    let container = 'containers/Gene';
-    let props = {geneId: geneId};
-
-    const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
-
-    if (middleClick) {
-      this.getFlux().actions.session.popupOpen(container, props, false);
-    } else {
-      this.props.setProps(props, container);
-    }
-
-  },
 
   getStateFromFlux() {
     return {
@@ -50,7 +35,7 @@ let RecentlyFoundGenes = React.createClass({
   },
 
   render() {
-    let {foundGenes} = this.state;
+    let {foundGenes, onSelect} = this.state;
 
     let foundGenesList = null;
 
@@ -64,7 +49,7 @@ let RecentlyFoundGenes = React.createClass({
           <ListItem key={foundGene}
                     primaryText={foundGene}
                     leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png" /></div>}
-                    onClick={(e) => this.handleSelectGene(e, foundGene)}
+                    onClick={(e) => onSelect(e, foundGene)}
           />
         );
 
