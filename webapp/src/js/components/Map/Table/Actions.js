@@ -307,10 +307,10 @@ let TableMapActions = React.createClass({
 
       if (query !== undefined && query !== SQL.nullQuery) {
         // A table, a query and a tileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps) + '\' /></div>';
       } else {
         // A table and a tileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
+        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" tileLayerProps=\'' + JSON.stringify(tileLayerProps) + '\' /></div>';
       }
 
     } else if (table !== undefined && table !== '_NONE_') {
@@ -325,7 +325,7 @@ let TableMapActions = React.createClass({
 
     } else if (tileLayerProps !== undefined && tileLayerProps.size !== 0) {
       // Only a tileLayer has been specified.
-      templateCode = '<Map' + centerAttribute + zoomAttribute + ' tileLayerProps=\'' + JSON.stringify(tileLayerProps.toObject()) + '\' /></div>';
+      templateCode = '<Map' + centerAttribute + zoomAttribute + ' tileLayerProps=\'' + JSON.stringify(tileLayerProps) + '\' /></div>';
     }
 
     // Wrap the map template code in a container with dimensions.
