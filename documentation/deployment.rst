@@ -10,7 +10,7 @@ Automated installation :doc:`automated_install`
 Server data file structure
 ..........................
 Panoptes uses two file directories, and the location of both has to be specified in config.py
-(example: `config.py.sample <https://github.com/cggh/DQXServer/blob/master/config.py.sample#L38>`_).
+(example: `config.py.sample <https://github.com/cggh/panoptes/blob/master/config.py.sample#L11>`_).
 
 BASEDIR:
 This is the root directory for storing file-based server data. It should contain subdirectories "SummaryTracks", "Uploads" and "temp".

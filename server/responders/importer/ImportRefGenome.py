@@ -117,7 +117,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
 
 if __name__ == "__main__":
     import sys
-    import customresponders.panoptesserver.asyncresponder as asyncresponder
+    import responders.asyncresponder as asyncresponder
 
     datasetId = sys.argv[1]
     importSettings = {

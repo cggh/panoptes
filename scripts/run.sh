@@ -15,9 +15,8 @@ PROJECT_ROOT=`pwd`;
 BASEDIR=`python -c "import config;print config.BASEDIR"`
 monetdbd start $BASEDIR/monetdb || true  #Fails if already started
 
-source build/panoptes_virtualenv/bin/activate
-cd build/DQXServer
-rm -rf cache
+source panoptes_virtualenv/bin/activate
+cd server
 if [ -z "$1" ]; then
     echo "No address specified - using localhost:8000"
     BIND="localhost:8000"
@@ -25,4 +24,4 @@ else
 	BIND=${1}
 fi  
 echo -e "${green}Serving PANOPTES on http://${BIND}/index.html${NC}"
-../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application
+PYTHONPATH=`pwd`:`pwd`/.. ../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application

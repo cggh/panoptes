@@ -5,9 +5,7 @@ let fetchInitialConfig = function(dataset) {
   let isManager = false;
   return API.requestJSON({
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'datasetinfo',
+      datatype: 'datasetinfo',
       database: dataset
     }
   })
@@ -20,9 +18,7 @@ let fetchInitialConfig = function(dataset) {
     })
     .then(() => API.requestJSON({
       params: {
-        datatype: 'custom',
-        respmodule: 'panoptesserver',
-        respid: 'getconfig',
+        datatype: 'getconfig',
         dataset
       }
     }))

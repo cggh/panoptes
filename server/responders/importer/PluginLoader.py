@@ -17,7 +17,7 @@ class PluginLoader(BaseImport):
             
 
         for path in sys.path:
-            testDir = os.path.join(path,'customresponders','panoptesserver','importer','plugins')
+            testDir = os.path.join(path,'responders','importer','plugins')
             if os.path.isdir(testDir):
                 plugin_folders.append(testDir)
         

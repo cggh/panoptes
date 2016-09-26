@@ -244,9 +244,7 @@ function treeData(options) {
   return requestJSON({
     ...args,
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'getgraph',
+      datatype: 'getgraph',
       database: database,
       tableid: table,
       graphid: tree
@@ -394,9 +392,7 @@ function fetchImportStatusLog(options) {
   return requestJSON({
     ...args,
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'getcalculationlog',
+      datatype: 'getcalculationlog',
       id: logId
     }
   })
@@ -407,9 +403,7 @@ function importDataset(dataset) {
   return requestJSON({
 
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'fileload_dataset',
+      datatype: 'fileload_dataset',
       ScopeStr: 'all',
       SkipTableTracks: 'false',
       datasetid: dataset
@@ -423,9 +417,7 @@ function importDatasetConfig(dataset) {
   return requestJSON({
 
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'fileload_dataset',
+      datatype: 'fileload_dataset',
       ScopeStr: 'none',
       SkipTableTracks: 'false',
       datasetid: dataset
@@ -471,9 +463,7 @@ function modifyConfig(options) {
       dataset,
       path,
       action,
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'modifyconfig'
+      datatype: 'modifyconfig'
     }
   }).then((response) => response.config);
 }
@@ -508,9 +498,7 @@ function twoDPageQuery(options) {
   return requestArrayBuffer({
     ...args,
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: '2d_query',
+      datatype: '2d_query',
       dataset,
       table,
       colQry: encodeQuery(colQry),
@@ -548,9 +536,7 @@ function query(options) {
   return requestArrayBuffer({
     ...args,
     params: {
-      datatype: 'custom',
-      respmodule: 'panoptesserver',
-      respid: 'query',
+      datatype: 'query'
     }
   }, 'POST',
   JSON.stringify({

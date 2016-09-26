@@ -29,8 +29,9 @@ gulp.task("webpack-dev-server", function(callback) {
     stats: {
       colors: true,
       chunkModules: false, //Reduce logging a bit!
-      assets: false
-    }
+      assets: false,
+    },
+    contentBase: path.resolve('dist')
   }).listen(config.server.settings.port, config.server.settings.host, function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
       gutil.log("[webpack-dev-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");
@@ -64,8 +65,9 @@ gulp.task("webpack-devhot-server", function(callback) {
     stats: {
       colors: true,
       chunkModules: false, //Reduce logging a bit!
-      assets: false
-    }
+      assets: false,
+    },
+    contentBase: path.resolve('dist')
   }).listen(config.server.settings.port, config.server.settings.host, function(err) {
     if(err) throw new gutil.PluginError("webpack-dev-server", err);
     gutil.log("[webpack-devhot-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");
@@ -81,7 +83,8 @@ gulp.task("webpack-prodtest-server", function(callback) {
     historyApiFallback: true,
     stats: {
       colors: true
-    }
+    },
+    contentBase: path.resolve('dist')
   }).listen(config.server.settings.port, config.server.settings.host, function(err) {
       if(err) throw new gutil.PluginError("webpack-dev-server", err);
       gutil.log("[webpack-dev-server]", "http://"+config.server.settings.host+":"+config.server.settings.port+"/webpack-dev-server/index.html");

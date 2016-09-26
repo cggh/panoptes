@@ -11,9 +11,7 @@ let APIActions = {
     this.dispatch(APICONST.FETCH_USER);
     API.requestJSON({
       params: {
-        datatype: 'custom',
-        respmodule: 'panoptesserver',
-        respid: 'serverstatus'
+        datatype: 'serverstatus'
       }
     })
       .then((status) => {
@@ -23,9 +21,7 @@ let APIActions = {
       })
       .then(API.requestJSON({
         params: {
-          datatype: 'custom',
-          respmodule: 'panoptesserver',
-          respid: 'datasetinfo',
+          datatype: 'datasetinfo',
           database: dataset
         }
       })

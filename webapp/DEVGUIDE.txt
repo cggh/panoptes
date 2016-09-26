@@ -12,8 +12,8 @@ cd panoptes
 cp config.py.example config.py
 nano config.py #Edit config for DB, paths
 
-#Install all the things (dev mode largely irrelevant for react dev so far, but we'll use that anyway)
-./scripts/build.sh DEV
+#Install all the things:
+./scripts/build.sh
 
 #Then you can run panoptes:
 ./scripts/run.sh

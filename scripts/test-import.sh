@@ -13,10 +13,10 @@ PROJECT_ROOT=`pwd`;
 if [ 1 = 1 ]
 then
 source build/panoptes_virtualenv/bin/activate
-PYTHONPATH=${PROJECT_ROOT}/build/DQXServer
+PYTHONPATH=${PROJECT_ROOT}/server
 export PYTHONPATH
 
-cd build/DQXServer/customresponders/panoptesserver/importer
+cd server/responders/importer
 
 python ImportFiles.py dataset all Samples_and_Variants
 
