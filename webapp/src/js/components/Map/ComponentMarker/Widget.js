@@ -18,7 +18,7 @@ let ComponentMarkerWidget = React.createClass({
   propTypes: {
     children: React.PropTypes.node,
     onClick: React.PropTypes.func,
-    position: React.PropTypes.object.isRequired,
+    position: React.PropTypes.object,
     title: React.PropTypes.string,
     alt: React.PropTypes.string
   },

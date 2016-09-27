@@ -31,7 +31,7 @@ let MarkerWidget = React.createClass({
     onClick: React.PropTypes.func,
     opacity: React.PropTypes.number,
     zIndexOffset: React.PropTypes.number,
-    position: React.PropTypes.object.isRequired,
+    position: React.PropTypes.object,
     title: React.PropTypes.string
   },
   childContextTypes: {

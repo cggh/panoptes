@@ -125,7 +125,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
 
     this.imageOverlayLayers['MAP_Prevalence_2000_IO'] = {
       attribution: '<a href="http://www.map.ox.ac.uk/">MAP</a> | <a href="http://www.nature.com/doifinder/10.1038/nature15535">MAP credits and acknowledgements</a>',
-      bounds: [[-35.0000100, 52.0415739], [37.541627650000002, -18.000064799999990]],
+      bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
       name: 'MAP_Prevalence_2000_IO',
       opacity: 0.7,
       url: '/dist/Maps/Samples_and_Variants/MAP/Prevalence/2000/MODEL43.2000.PR.rmean.stable.COLOUR.png'
@@ -384,25 +384,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     tableOptions = [{value: DEFAULT_MARKER_LAYER, leftIcon: undefined, label: DEFAULT_MARKER_LAYER}].concat(tableOptions);
 
 
-    let adaptedCenterForTemplate = undefined;
-
-    if (center instanceof Array) {
-      // TODO: check the array looks like [0, 0]
-      adaptedCenterForTemplate = JSON.stringify(center);
-    } else if (center !== undefined && typeof center === 'object') {
-      // TODO: check the object looks like {lat: 50, lng: 30} or {lat: 50, lon: 30}
-      if (center.lat !== undefined) {
-        adaptedCenterForTemplate = JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
-      } else if (_isFunction(center.get)) {
-        // TODO: check the object is a Map
-        adaptedCenterForTemplate = JSON.stringify([center.get('lat').toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.get('lng').toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
-      } else {
-        console.error('center is an unhandled object: %o', center);
-      }
-    } else if (center !== undefined && typeof center === 'string') {
-      // TODO: check the string looks like OK before accepting.
-      adaptedCenterForTemplate = center;
-    }
+    let adaptedCenterForTemplate = JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
 
     let centerAttribute = adaptedCenterForTemplate !== undefined ? ' center=\'' + adaptedCenterForTemplate + '\'' : '';
     let zoomAttribute = zoom !== undefined ? ' zoom=\'' + zoom + '\'' : '';
