@@ -31,6 +31,20 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         shutil.copytree(sourceDocFolder, destDocFolder)
 
 
+#TODO: Identical to ImportDocs
+def ImportMaps(calculationObject, datasetFolder, datasetId):
+    config = PanoptesConfig(calculationObject)
+    sourceFolder = os.path.join(datasetFolder, 'maps')
+    if not(os.path.exists(sourceFolder)):
+        return
+    with calculationObject.LogHeader('Creating maps'):
+        destFolder = os.path.join(config.getBaseDir(), 'Maps', datasetId)
+        try:
+            shutil.rmtree(destFolder)
+        except OSError:
+            #Don't fail if exists
+            pass
+        shutil.copytree(sourceFolder, destFolder)
 
 
 
@@ -53,7 +67,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             scriptPath = os.path.dirname(os.path.realpath(__file__))
             calculationObject.SetInfo('Creating database')
             dao.loadFile(scriptPath + "/createdataset.sql")
-            
+
             dao.setDatabaseVersion(schemaversion.major, schemaversion.minor)
         else:
             #Raises an exception if not present
@@ -62,14 +76,14 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
             currentVersion = dao.getCurrentSchemaVersion()
             if currentVersion[0] < schemaversion.major:
                 raise Exception("The database schema of this dataset is outdated. Actualise it by running a full data import or or top N preview import.")
- 
+
 
         dao.clearDatasetCatalogs()
 
 
         modules = PluginLoader(calculationObject, datasetId, importSettings)
         modules.importAll('pre')
-        
+
         importer = ImportDataTable(calculationObject, datasetId, importSettings, baseFolder = baseFolder)
         importer.importAllDataTables()
 
@@ -77,16 +91,17 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         import2D.importAll2DTables()
 
         globalSettings = importer._globalSettings
-        
+
         if ImportRefGenome.ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             globalSettings['hasGenomeBrowser'] = True
-        
+
         ImportDocs(calculationObject, datasetFolder, datasetId)
+        ImportMaps(calculationObject, datasetFolder, datasetId)
 
         # Finalise: register dataset
         with calculationObject.LogHeader('Registering dataset'):
             dao.registerDataset(globalSettings['name'], importSettings['ConfigOnly'])
-            
+
         modules.importAll('post')
 
 
@@ -139,4 +154,3 @@ if __name__ == "__main__":
  #           }
  #       )
         sys.exit()
-

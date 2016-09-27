@@ -85,6 +85,7 @@ mkdir -p $BASEDIR/temp
 mkdir -p $BASEDIR/SummaryTracks
 mkdir -p $BASEDIR/Uploads
 mkdir -p $BASEDIR/Docs
+mkdir -p $BASEDIR/Maps
 mkdir -p $BASEDIR/Graphs
 mkdir -p $BASEDIR/2D_data
 if ! [ -w $BASEDIR ]; then
@@ -101,6 +102,9 @@ if ! [ -w $BASEDIR/Uploads ]; then
 fi
 if ! [ -w $BASEDIR/Docs ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Docs is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/Maps ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/Maps is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
 if ! [ -w $BASEDIR/Graphs ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Graphs is not writable by this user - it needs to be for the user that panoptes is run under"
@@ -140,6 +144,11 @@ echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Docs
 ln -s $BASEDIR/Docs Docs
+
+echo -e "${green}  Linking BASEDIR/Maps to webapp/Maps${NC}"
+cd $PROJECT_ROOT/build/DQXServer/static
+rm -rf Maps
+ln -s $BASEDIR/Maps Maps
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
