@@ -6,6 +6,8 @@
 .DS_Store
 webapp/bower_components/
 webapp/node_modules/
+webapp/Docs/
+webapp/Maps/
 
 servermodule/panoptesserver/VTTable.py
 servermodule/panoptesserver/import/VTTable.py
