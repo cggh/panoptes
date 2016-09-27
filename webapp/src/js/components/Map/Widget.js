@@ -23,7 +23,8 @@ import _max from 'lodash/max';
 import _min from 'lodash/min';
 
 // CSS
-import 'leaflet/dist/leaflet.css';
+// FIXME: leaflet/dist/leaflet.css
+import 'leaflet.css';
 
 const ALLOWED_CHILDREN = [
   'LayersControlWidget',
