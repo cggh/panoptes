@@ -69,7 +69,7 @@ touch build/DQXServer/customresponders/__init__.py
 cd build/DQXServer/customresponders
 ln -s $PROJECT_ROOT/servermodule/* .
 
-echo -e "${green}  Linking static content into DQXServer${NC}"
+echo -e "${green}  Linking static content in PROJECT_ROOT/webapp/dist to PROJECT_ROOT/build/DQXServer/static${NC}"
 cd $PROJECT_ROOT/build/DQXServer
 ln -s $PROJECT_ROOT/webapp/dist static
 
@@ -140,15 +140,15 @@ else
     echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
-echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
+echo -e "${green}  Linking BASEDIR/Docs to PROJECT_ROOT/build/DQXServer/static/Docs (=> PROJECT_ROOT/webapp/dist/Docs) ${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Docs
-ln -s $BASEDIR/Docs $PROJECT_ROOT/webapp/Docs
+ln -sf $BASEDIR/Docs Docs
 
-echo -e "${green}  Linking BASEDIR/Maps to webapp/Maps${NC}"
+echo -e "${green}  Linking BASEDIR/Maps to PROJECT_ROOT/build/DQXServer/static/Maps (=> PROJECT_ROOT/webapp/dist/Maps) ${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Maps
-ln -s $BASEDIR/Maps $PROJECT_ROOT/webapp/Maps
+ln -sf $BASEDIR/Maps Maps
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
