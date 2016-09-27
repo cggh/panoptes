@@ -384,7 +384,10 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     tableOptions = [{value: DEFAULT_MARKER_LAYER, leftIcon: undefined, label: DEFAULT_MARKER_LAYER}].concat(tableOptions);
 
 
-    let adaptedCenterForTemplate = JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
+    let adaptedCenterForTemplate = undefined;
+    if (center !== undefined) {
+      JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
+    }
 
     let centerAttribute = adaptedCenterForTemplate !== undefined ? ' center=\'' + adaptedCenterForTemplate + '\'' : '';
     let zoomAttribute = zoom !== undefined ? ' zoom=\'' + zoom + '\'' : '';

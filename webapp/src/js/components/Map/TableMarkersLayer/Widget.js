@@ -202,13 +202,13 @@ let TableMarkersLayerWidget = React.createClass({
     let {layerContainer, map} = this.context;
     let {markers} = this.state;
 
-    if (!markers.size) {
+    if (!markers.length) {
       return null;
     }
 
     let markerWidgets = [];
 
-    for (let i = 0, len = markers.size; i < len; i++) {
+    for (let i = 0, len = markers.length; i < len; i++) {
 
       let marker = markers[i];
 
