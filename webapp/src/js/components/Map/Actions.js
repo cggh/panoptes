@@ -128,7 +128,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
       bounds: [[-35.0000100, 52.0415739], [37.541627650000002, -18.000064799999990]],
       name: 'MAP_Prevalence_2000_IO',
       opacity: 0.7,
-      url: '/dist/geo/MAP/Prevalence/2000/MODEL43.2000.PR.rmean.stable.COLOUR.png'
+      url: '/dist/Maps/Samples_and_Variants/MAP/Prevalence/2000/MODEL43.2000.PR.rmean.stable.COLOUR.png'
     };
     this.imageOverlayLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_IO" primaryText="MAP_Prevalence_2000_IO" value="MAP_Prevalence_2000_IO" />);
 
@@ -140,7 +140,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
       name: 'MAP_Prevalence_2000_TL',
       tms: true,
       opacity: 0.7,
-      url: '/dist/geo/MAP/Prevalence/2000/{z}/{x}/{y}.png'
+      url: '/dist/Maps/Samples_and_Variants/MAP/Prevalence/2000/{z}/{x}/{y}.png'
     };
     this.overlayTileLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_TL" primaryText="MAP_Prevalence_2000_TL" value="MAP_Prevalence_2000_TL" />);
 
