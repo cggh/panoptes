@@ -1,5 +1,6 @@
 import React from 'react';
 
+import jsxToString from 'jsx-to-string';
 import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
@@ -20,14 +21,20 @@ import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
 
 // Panoptes
+import BaseLayerWidget from 'Map/BaseLayer/Widget';
 import FilterButton from 'panoptes/FilterButton';
 import Icon from 'ui/Icon';
+import ImageOverlayWidget from 'Map/ImageOverlay/Widget';
+import LayersControlWidget from 'Map/LayersControl/Widget';
 import MapWidget from 'Map/Widget';
+import OverlayWidget from 'Map/Overlay/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import SidebarHeader from 'ui/SidebarHeader';
 import SQL from 'panoptes/SQL';
 import TableMapWidget from 'Map/Table/Widget';
+import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+import TileLayerWidget from 'Map/TileLayer/Widget';
 
 import 'map.scss';
 
@@ -37,10 +44,6 @@ const DEFAULT_BASE_TILE_LAYER = '— Default —';
 const DEFAULT_MARKER_LAYER = '— None —';
 const DEFAULT_OVERLAY_TILE_LAYER = '— None —';
 const DEFAULT_IMAGE_OVERLAY_LAYER = '— None —';
-
-// http://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
-const COORDINATES_PRECISION_IN_TEMPLATE_CODE = 5;
-
 
 let MapActions = React.createClass({
   mixins: [
@@ -384,44 +387,99 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     tableOptions = [{value: DEFAULT_MARKER_LAYER, leftIcon: undefined, label: DEFAULT_MARKER_LAYER}].concat(tableOptions);
 
 
-    let adaptedCenterForTemplate = undefined;
-    if (center !== undefined) {
-      JSON.stringify([center.lat.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE), center.lng.toFixed(COORDINATES_PRECISION_IN_TEMPLATE_CODE)]);
+    // If no table has been selected, just show a map with the other selected layers (if any).
+
+    let markersLayerComponent = null;
+    let baseLayerComponent = null;
+    let overlayTileLayerComponent = null;
+    let imageOverlayLayerComponent = null;
+
+    if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+      // NB: This might not be used, if/when only a table has been selected.
+      markersLayerComponent = (
+        <OverlayWidget
+          checked={true}
+          name={this.config.tablesById[table].capNamePlural}
+        >
+          <TableMarkersLayerWidget locationDataTable={table} />
+        </OverlayWidget>
+      );
     }
 
-    let centerAttribute = adaptedCenterForTemplate !== undefined ? ' center=\'' + adaptedCenterForTemplate + '\'' : '';
-    let zoomAttribute = zoom !== undefined ? ' zoom=\'' + zoom + '\'' : '';
+    if (baseTileLayer !== undefined && baseTileLayer !== DEFAULT_BASE_TILE_LAYER) {
+      baseLayerComponent = (
+        <BaseLayerWidget
+          checked={true}
+          name={baseTileLayerProps.name}
+        >
+          <TileLayerWidget {...baseTileLayerProps} />
+        </BaseLayerWidget>
+      );
+    }
 
-    // Default to just a Map
-    let templateCode = '<Map />';
+    if (overlayTileLayer !== undefined && overlayTileLayer !== DEFAULT_OVERLAY_TILE_LAYER) {
+      overlayTileLayerComponent = (
+        <OverlayWidget
+          checked={true}
+          name={overlayTileLayerProps.name}
+        >
+          <TileLayerWidget {...overlayTileLayerProps} />
+        </OverlayWidget>
+      );
+    }
 
-    if (table !== undefined && table !== DEFAULT_MARKER_LAYER && baseTileLayerProps !== undefined && baseTileLayerProps.size !== 0) {
+    if (imageOverlayLayer !== undefined && imageOverlayLayer !== DEFAULT_IMAGE_OVERLAY_LAYER) {
+      imageOverlayLayerComponent = (
+        <OverlayWidget
+          checked={true}
+          name={imageOverlayLayerProps.name}
+        >
+          <ImageOverlayWidget {...imageOverlayLayerProps} />
+        </OverlayWidget>
+      );
+    }
 
-      if (query !== undefined && query !== SQL.nullQuery) {
-        // A table, a query and a baseTileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
-      } else {
-        // A table and a baseTileLayer have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + '  table="' + table + '" baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
-      }
+    let mapWidget = (
+      <MapWidget
+        center={center}
+        setProps={setProps}
+        onChange={this.handleChangeMap}
+        zoom={zoom}
+      />
+    );
 
-    } else if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+    if (markersLayerComponent) {
+      mapWidget = (
+        <TableMapWidget
+          center={center}
+          setProps={setProps}
+          table={table}
+          onChange={this.handleChangeMap}
+          zoom={zoom}
+        />
+      );
+    }
 
-      if (query !== undefined && table !== DEFAULT_MARKER_LAYER && query !== SQL.nullQuery) {
-        // A table and a query have been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' query=\'' + query + '\' table="' + table + '" /></div>';
-      } else {
-        // Only a table has been specified.
-        templateCode = '<TableMap' + centerAttribute + zoomAttribute + ' table="' + table + '" /></div>';
-      }
-
-    } else if (baseTileLayerProps !== undefined && baseTileLayerProps.size !== 0) {
-      // Only a baseTileLayer has been specified.
-      templateCode = '<Map' + centerAttribute + zoomAttribute + ' baseTileLayerProps=\'' + JSON.stringify(baseTileLayerProps) + '\' /></div>';
+    if (baseLayerComponent || overlayTileLayerComponent || imageOverlayLayerComponent) {
+      mapWidget = (
+        <MapWidget
+          center={center}
+          setProps={setProps}
+          onChange={this.handleChangeMap}
+          zoom={zoom}
+        >
+          <LayersControlWidget>
+            {baseLayerComponent}
+            {markersLayerComponent}
+            {overlayTileLayerComponent}
+            {imageOverlayLayerComponent}
+          </LayersControlWidget>
+        </MapWidget>
+      );
     }
 
     // Wrap the map template code in a container with dimensions.
-    templateCode = '<div style="width:300px;height:300px">' + templateCode + '</div>';
+    let templateCode = '<div style="width:300px;height:300px">' + jsxToString(mapWidget, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
 
     let sidebarContent = (
@@ -481,35 +539,6 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     }
     if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
       mapTitle =  mapTitle + ' of ' + this.config.tablesById[table].namePlural;
-    }
-
-    // If no table has been selected, just show a map with the other selected layers (if any).
-    let mapWidget = (
-      <MapWidget
-        baseLayer={baseTileLayerProps}
-        center={center}
-        setProps={setProps}
-        imageOverlay={imageOverlayLayerProps}
-        onChange={this.handleChangeMap}
-        overlay={overlayTileLayerProps}
-        zoom={zoom}
-      />
-    );
-
-    if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
-      mapWidget = (
-        <TableMapWidget
-          baseLayer={baseTileLayerProps}
-          center={center}
-          setProps={setProps}
-          imageOverlay={imageOverlayLayerProps}
-          locationDataTable={table}
-          onChange={this.handleChangeMap}
-          overlay={overlayTileLayerProps}
-          query={query}
-          zoom={zoom}
-        />
-      );
     }
 
     return (

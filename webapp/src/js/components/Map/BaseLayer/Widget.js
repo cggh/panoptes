@@ -58,11 +58,15 @@ let BaseLayerWidget = React.createClass({
     let {addBaseLayer, checked, children, name, removeLayer, removeLayerControl} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
+    if (children) {
+      children = React.Children.only(children);
+    }
+
     return (
       <BaseLayer
         addBaseLayer={addBaseLayer}
         checked={checked}
-        children={React.Children.only(children)}
+        children={children}
         name={name}
         removeLayer={removeLayer}
         removeLayerControl={removeLayerControl}

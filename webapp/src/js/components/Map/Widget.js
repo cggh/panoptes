@@ -88,13 +88,10 @@ let MapWidget = React.createClass({
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
   propTypes: {
-    baseLayer: React.PropTypes.object,
     center: React.PropTypes.object,
     children: React.PropTypes.node,
     setProps: React.PropTypes.func, // NB: session will not record {center, zoom} when widget is in templates
-    imageOverlay: React.PropTypes.object,
     onChange: React.PropTypes.func,
-    overlay:React.PropTypes.object,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number
   },
@@ -217,7 +214,7 @@ let MapWidget = React.createClass({
   },
 
   render() {
-    let {baseLayer, center, children, imageOverlay, overlay, zoom} = this.props;
+    let {center, children, zoom} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     let {bounds, loadStatus} = this.state;
 
@@ -291,7 +288,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget key="0" {...baseLayer} />
+            <TileLayerWidget key="0" />
             {keyedChildren}
           </Map>
         );
@@ -367,7 +364,7 @@ let MapWidget = React.createClass({
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget {...baseLayer} />
+            <TileLayerWidget />
           </Map>
         );
 
