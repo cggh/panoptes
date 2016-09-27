@@ -143,12 +143,12 @@ fi
 echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Docs
-ln -s $BASEDIR/Docs Docs
+ln -s $BASEDIR/Docs $PROJECT_ROOT/webapp/Docs
 
 echo -e "${green}  Linking BASEDIR/Maps to webapp/Maps${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Maps
-ln -s $BASEDIR/Maps Maps
+ln -s $BASEDIR/Maps $PROJECT_ROOT/webapp/Maps
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`
