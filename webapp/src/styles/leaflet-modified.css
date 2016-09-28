@@ -331,12 +331,12 @@
 	border-radius: 5px;
 	}
 .leaflet-control-layers-toggle {
-	background-image: url(http://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images//layers.png);
+	background-image: url(http://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/layers.png);
 	width: 36px;
 	height: 36px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
-	background-image: url(http://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images//layers-2x.png);
+	background-image: url(http://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.3/images/layers-2x.png);
 	background-size: 26px 26px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
