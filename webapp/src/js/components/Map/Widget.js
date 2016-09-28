@@ -33,6 +33,7 @@ import 'leaflet-modified.css';
 
 const ALLOWED_CHILDREN = [
   'LayersControlWidget',
+  'TableMarkersLayerWidget',
   'TileLayerWidget',
   'FeatureGroupWidget',
   'MarkerWidget',

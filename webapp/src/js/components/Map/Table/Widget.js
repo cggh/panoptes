@@ -5,11 +5,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import BaseLayerWidget from 'Map/BaseLayer/Widget';
-import ImageOverlayWidget from 'Map/ImageOverlay/Widget';
-import LayersControlWidget from 'Map/LayersControl/Widget';
 import MapWidget from 'Map/Widget';
-import OverlayWidget from 'Map/Overlay/Widget';
 import TileLayerWidget from 'Map/TileLayer/Widget';
 import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
 
@@ -43,18 +39,14 @@ let TableMapWidget = React.createClass({
   ],
 
   propTypes: {
-    baseLayer: React.PropTypes.object,
     center: React.PropTypes.object,
     highlight: React.PropTypes.string,
-    imageOverlay: React.PropTypes.object,
     locationDataTable: React.PropTypes.string, // Either locationDataTable or table are required
     onChange: React.PropTypes.func,
-    overlay: React.PropTypes.object,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
     setProps: React.PropTypes.func,
     table: React.PropTypes.string, // Either locationDataTable or table are required
-    tileLayerProps: React.PropTypes.object,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
   },
@@ -66,13 +58,10 @@ let TableMapWidget = React.createClass({
   render() {
 
     let {
-      baseLayer,
       center,
       highlight,
-      imageOverlay,
       locationDataTable,
       onChange,
-      overlay,
       primKey,
       query,
       setProps,
@@ -88,8 +77,6 @@ let TableMapWidget = React.createClass({
       locationDataTable = table;
     }
 
-    // NB: If baseLayer is not defined, then a BaseLayerWidget with a default TileLayerWidget will be used.
-
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
@@ -102,29 +89,13 @@ let TableMapWidget = React.createClass({
         style={widgetStyle}
         zoom={zoom}
       >
-        <LayersControlWidget>
-          <BaseLayerWidget checked={true} name={baseLayer ? baseLayer.name : undefined}>
-            <TileLayerWidget zIndex={1} {...baseLayer} />
-          </BaseLayerWidget>
-          {overlay ?
-          <OverlayWidget checked={true} name={overlay.name}>
-            <TileLayerWidget zIndex={2} {...overlay} />
-          </OverlayWidget>
-          : null}
-          {imageOverlay ?
-          <OverlayWidget checked={true} name={imageOverlay.name}>
-            <ImageOverlayWidget {...imageOverlay} />
-          </OverlayWidget>
-          : null}
-          <OverlayWidget checked={true} name={this.config.tablesById[locationDataTable].capNamePlural}>
-            <TableMarkersLayerWidget
-              highlight={highlight}
-              locationDataTable={locationDataTable}
-              primKey={primKey}
-              query={query}
-            />
-          </OverlayWidget>
-        </LayersControlWidget>
+        <TileLayerWidget />
+        <TableMarkersLayerWidget
+          highlight={highlight}
+          locationDataTable={locationDataTable}
+          primKey={primKey}
+          query={query}
+        />
       </MapWidget>
     );
 

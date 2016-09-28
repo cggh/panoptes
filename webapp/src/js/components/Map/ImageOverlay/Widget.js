@@ -37,22 +37,30 @@ let ImageOverlayWidget = React.createClass({
       map: this.props.map !== undefined ? this.props.map : this.context.map
     };
   },
-  getDefaultProps() {
-    return {
-      bounds: [[40.712216, -74.22655], [40.773941, -74.12544]],
-      url: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg'
-    };
-  },
 
   render() {
     let {attribution, bounds, url, opacity} = this.props;
 
+    // NB: Only the props url and opacity are dynamic.
+    // The props attribution and bounds will not update automatically.
+    /* https://github.com/PaulLeCam/react-leaflet/blob/master/docs/Components.md
+
+      The properties documented as dynamic properties are updated using the relevant Leaflet setter, other properties will not update the component when they are changed after the component is mounted.
+      All other properties are passed as the options argument to their corresponding Leaflet element and should work fine for static maps, it is however unlikely that they would updated if you change them afterwards.
+
+    */
+    // https://github.com/PaulLeCam/react-leaflet/blob/master/docs/Components.md#imageoverlay
+
+    // We workaround this, to make sure that those props (e.g. attribution) are updated accordingly
+    // by changing the key whenever those props change, thereby causing React to remount the component.
+
     return (
       <ImageOverlay
-        bounds={bounds}
         attribution={attribution}
-        url={url}
+        bounds={bounds}
+        key={JSON.stringify({attribution, bounds})}
         opacity={opacity}
+        url={url}
       />
     );
 

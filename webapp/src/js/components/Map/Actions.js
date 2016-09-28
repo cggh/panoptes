@@ -42,8 +42,7 @@ import 'leaflet-providers/leaflet-providers.js';
 
 const DEFAULT_BASE_TILE_LAYER = '— Default —';
 const DEFAULT_MARKER_LAYER = '— None —';
-const DEFAULT_OVERLAY_TILE_LAYER = '— None —';
-const DEFAULT_IMAGE_OVERLAY_LAYER = '— None —';
+const DEFAULT_OVERLAY_LAYER = '— None —';
 
 let MapActions = React.createClass({
   mixins: [
@@ -59,10 +58,7 @@ let MapActions = React.createClass({
     sidebar: React.PropTypes.bool,
     baseTileLayer: React.PropTypes.string,
     baseTileLayerProps: React.PropTypes.object,
-    imageOverlayLayer: React.PropTypes.string,
-    imageOverlayLayerProps: React.PropTypes.object,
-    overlayTileLayer: React.PropTypes.string,
-    overlayTileLayerProps: React.PropTypes.object,
+    overlayLayer: React.PropTypes.string,
     table: React.PropTypes.string,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number
@@ -72,8 +68,7 @@ let MapActions = React.createClass({
     return {
       query: SQL.nullQuery,
       baseTileLayer: DEFAULT_BASE_TILE_LAYER,
-      overlayTileLayer: DEFAULT_OVERLAY_TILE_LAYER,
-      imageOverlayLayer: DEFAULT_IMAGE_OVERLAY_LAYER,
+      overlayLayer: DEFAULT_OVERLAY_LAYER,
       sidebar: true,
       table: DEFAULT_MARKER_LAYER
     };
@@ -88,64 +83,19 @@ let MapActions = React.createClass({
     this.attributions = {};
     this.baseTileLayers = {};
     this.baseTileLayersMenu = [];
-    this.imageOverlayLayers = {};
-    this.imageOverlayLayersMenu = [];
-    this.overlayTileLayers = {};
-    this.overlayTileLayersMenu = [];
+    this.overlayLayers = {};
+    this.overlayLayersMenu = [];
 
     // Add the default baseTileLayer option, so it can be re-selected.
     this.baseTileLayers[DEFAULT_BASE_TILE_LAYER] = {};
     this.baseTileLayersMenu.push(<MenuItem key={DEFAULT_BASE_TILE_LAYER} primaryText={DEFAULT_BASE_TILE_LAYER} value={DEFAULT_BASE_TILE_LAYER} />);
 
-    this.imageOverlayLayers[DEFAULT_IMAGE_OVERLAY_LAYER] = {};
-    this.imageOverlayLayersMenu.push(<MenuItem key={DEFAULT_IMAGE_OVERLAY_LAYER} primaryText={DEFAULT_IMAGE_OVERLAY_LAYER} value={DEFAULT_IMAGE_OVERLAY_LAYER} />);
+    this.overlayLayers[DEFAULT_OVERLAY_LAYER] = {};
+    this.overlayLayersMenu.push(<MenuItem key={DEFAULT_OVERLAY_LAYER} primaryText={DEFAULT_OVERLAY_LAYER} value={DEFAULT_OVERLAY_LAYER} />);
 
-
-    this.overlayTileLayers[DEFAULT_OVERLAY_TILE_LAYER] = {};
-    this.overlayTileLayersMenu.push(<MenuItem key={DEFAULT_OVERLAY_TILE_LAYER} primaryText={DEFAULT_OVERLAY_TILE_LAYER} value={DEFAULT_OVERLAY_TILE_LAYER} />);
-
-/*
-Origin = (-18.000064799999990,37.541627650000002)
-Pixel Size = (0.041666650000000,-0.041666650000000)
-Metadata:
-  AREA_OR_POINT=Area
-Image Structure Metadata:
-  COMPRESSION=LZW
-  INTERLEAVE=BAND
-Corner Coordinates:
-Upper Left  ( -18.0000648,  37.5416277) ( 18d 0' 0.23"W, 37d32'29.86"N)
-Lower Left  ( -18.0000648, -35.0000100) ( 18d 0' 0.23"W, 35d 0' 0.04"S)
-Upper Right (  52.0415739,  37.5416277) ( 52d 2'29.67"E, 37d32'29.86"N)
-Lower Right (  52.0415739, -35.0000100) ( 52d 2'29.67"E, 35d 0' 0.04"S)
-Center      (  17.0207545,   1.2708088) ( 17d 1'14.72"E,  1d16'14.91"N)
-
-
-bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
-
-*/
-
-    // FIXME: Hard-coded MAP maps
-
-    this.imageOverlayLayers['MAP_Prevalence_2000_IO'] = {
-      attribution: '<a href="http://www.map.ox.ac.uk/">MAP</a> | <a href="http://www.nature.com/doifinder/10.1038/nature15535">MAP credits and acknowledgements</a>',
-      bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
-      name: 'MAP_Prevalence_2000_IO',
-      opacity: 0.7,
-      url: '/dist/Maps/Samples_and_Variants/MAP/Prevalence/2000/MODEL43.2000.PR.rmean.stable.COLOUR.png'
-    };
-    this.imageOverlayLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_IO" primaryText="MAP_Prevalence_2000_IO" value="MAP_Prevalence_2000_IO" />);
-
-    this.overlayTileLayers['MAP_Prevalence_2000_TL'] = {
-      attribution: '<a href="http://www.map.ox.ac.uk/">MAP</a> | <a href="http://www.nature.com/doifinder/10.1038/nature15535">MAP credits and acknowledgements</a>',
-      bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
-      checked: true,
-      maxNativeZoom: 8,
-      name: 'MAP_Prevalence_2000_TL',
-      tms: true,
-      opacity: 0.7,
-      url: '/dist/Maps/Samples_and_Variants/MAP/Prevalence/2000/{z}/{x}/{y}.png'
-    };
-    this.overlayTileLayersMenu.push(<MenuItem key="MAP_Prevalence_2000_TL" primaryText="MAP_Prevalence_2000_TL" value="MAP_Prevalence_2000_TL" />);
+    for (let mapLayerKey in this.config.mapLayers) {
+      this.overlayLayersMenu.push(<MenuItem key={mapLayerKey} primaryText={this.config.mapLayers[mapLayerKey].name} value={mapLayerKey} />);
+    }
 
     if (window.L.TileLayer.Provider.providers !== undefined) {
 
@@ -287,57 +237,16 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     }
 
   },
-  // TODO: Refactor. This is identical to handleChangeBaseTileLayer()
-  handleChangeImageOverlayLayer(event, selectedIndex, selectedLayer) {
-
-    if (selectedLayer === DEFAULT_IMAGE_OVERLAY_LAYER) {
-      this.props.setProps({imageOverlayLayer: undefined, imageOverlayLayerProps: undefined, zoom: undefined});
-    } else {
-
-      let selectedLayerProps = _cloneDeep(this.imageOverlayLayers[selectedLayer]);
-
-      // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
-      let adaptedZoom = this.props.zoom;
-      if (this.props.zoom > selectedLayerProps.maxZoom) {
-        adaptedZoom = selectedLayerProps.maxZoom;
-      }
-      if (this.props.zoom < selectedLayerProps.minZoom) {
-        adaptedZoom = selectedLayerProps.minZoom;
-      }
-
-      // Evaluate any embedded attributions.
-      selectedLayerProps.attribution = this.attributionReplacer(selectedLayerProps.attribution);
-
-      this.props.setProps({imageOverlayLayer: selectedLayer, imageOverlayLayerProps: selectedLayerProps, zoom: adaptedZoom});
-    }
-
-  },
   handleChangeMap(payload) {
     let {center, zoom} = payload;
     this.props.setProps({center, zoom});
   },
-  // TODO: Refactor. This is identical to handleChangeBaseTileLayer()
-  handleChangeOverlayTileLayer(event, selectedIndex, selectedTileLayer) {
+  handleChangeOverlayLayer(event, selectedIndex, selectedTileLayer) {
 
-    if (selectedTileLayer === DEFAULT_OVERLAY_TILE_LAYER) {
-      this.props.setProps({overlayTileLayer: undefined, overlayTileLayerProps: undefined, zoom: undefined});
+    if (selectedTileLayer === DEFAULT_OVERLAY_LAYER) {
+      this.props.setProps({overlayLayer: undefined});
     } else {
-
-      let selectedTileLayerProps = _cloneDeep(this.overlayTileLayers[selectedTileLayer]);
-
-      // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
-      let adaptedZoom = this.props.zoom;
-      if (this.props.zoom > selectedTileLayerProps.maxZoom) {
-        adaptedZoom = selectedTileLayerProps.maxZoom;
-      }
-      if (this.props.zoom < selectedTileLayerProps.minZoom) {
-        adaptedZoom = selectedTileLayerProps.minZoom;
-      }
-
-      // Evaluate any embedded attributions.
-      selectedTileLayerProps.attribution = this.attributionReplacer(selectedTileLayerProps.attribution);
-
-      this.props.setProps({overlayTileLayer: selectedTileLayer, overlayTileLayerProps: selectedTileLayerProps, zoom: adaptedZoom});
+      this.props.setProps({overlayLayer: selectedTileLayer});
     }
 
   },
@@ -371,7 +280,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
 
 
   render() {
-    let {center, setProps, query, baseTileLayer, baseTileLayerProps, imageOverlayLayer, imageOverlayLayerProps, overlayTileLayer, overlayTileLayerProps, sidebar, table, zoom} = this.props;
+    let {center, setProps, query, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -391,8 +300,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
 
     let markersLayerComponent = null;
     let baseLayerComponent = null;
-    let overlayTileLayerComponent = null;
-    let imageOverlayLayerComponent = null;
+    let overlayLayerComponent = null;
 
     if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
       // NB: This might not be used, if/when only a table has been selected.
@@ -407,6 +315,10 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     }
 
     if (baseTileLayer !== undefined && baseTileLayer !== DEFAULT_BASE_TILE_LAYER) {
+
+      // Place the base tile layer below the overlay layer tile layer.
+      baseTileLayerProps.zIndex = baseTileLayerProps.zIndex !== undefined ? baseTileLayerProps.zIndex : 1;
+
       baseLayerComponent = (
         <BaseLayerWidget
           checked={true}
@@ -417,26 +329,56 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
       );
     }
 
-    if (overlayTileLayer !== undefined && overlayTileLayer !== DEFAULT_OVERLAY_TILE_LAYER) {
-      overlayTileLayerComponent = (
-        <OverlayWidget
-          checked={true}
-          name={overlayTileLayerProps.name}
-        >
-          <TileLayerWidget {...overlayTileLayerProps} />
-        </OverlayWidget>
-      );
-    }
+    if (overlayLayer !== undefined && overlayLayer !== DEFAULT_OVERLAY_LAYER) {
 
-    if (imageOverlayLayer !== undefined && imageOverlayLayer !== DEFAULT_IMAGE_OVERLAY_LAYER) {
-      imageOverlayLayerComponent = (
-        <OverlayWidget
-          checked={true}
-          name={imageOverlayLayerProps.name}
-        >
-          <ImageOverlayWidget {...imageOverlayLayerProps} />
-        </OverlayWidget>
-      );
+      let overlayLayerConfig = this.config.mapLayers[overlayLayer];
+
+      // NB: Leaflet uses [[south, west], [north, east]] bounds.
+      let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng],[overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
+      let mapLayerServerPath = '/dist/Maps/' + this.config.dataset + '/' + overlayLayer + '/';
+      let absoluteURLPattern = /^https?:\/\/|^\/\//i;
+
+      let overlayLayerProps = {
+        attribution: overlayLayerConfig.attribution,
+        bounds: bounds,
+        maxNativeZoom: overlayLayerConfig.maxNativeZoom,
+        opacity: overlayLayerConfig.opacity
+      };
+
+      // TODO: Convert to component with the mapLayers key as its prop.
+      if (this.config.mapLayers[overlayLayer].format === "tile") {
+
+        overlayLayerProps.maxNativeZoom = overlayLayerConfig.maxNativeZoom;
+        overlayLayerProps.tms = overlayLayerConfig.tms;
+        overlayLayerProps.url = absoluteURLPattern.test(overlayLayerConfig.filePattern) ? overlayLayerConfig.filePattern :'/dist/Maps/' + this.config.dataset + '/' + overlayLayer + '/' + overlayLayerConfig.filePattern;
+
+        // Place the overlay tile layer above the base layer tile layer.
+        overlayLayerProps.zIndex = overlayLayerProps.zIndex !== undefined ? overlayLayerProps.zIndex : 2;
+
+        overlayLayerComponent = (
+          <OverlayWidget
+            checked={true}
+            name={this.config.mapLayers[overlayLayer].name}
+          >
+            <TileLayerWidget {...overlayLayerProps} />
+          </OverlayWidget>
+        );
+
+      } else if (this.config.mapLayers[overlayLayer].format === "image") {
+
+        overlayLayerProps.url = '/dist/Maps/' + this.config.dataset + '/' + overlayLayer + '/data.png';
+
+        overlayLayerComponent = (
+          <OverlayWidget
+            checked={true}
+            name={this.config.mapLayers[overlayLayer].name}
+          >
+            <ImageOverlayWidget {...overlayLayerProps} />
+          </OverlayWidget>
+        );
+
+      }
+
     }
 
     let mapWidget = (
@@ -449,6 +391,7 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
     );
 
     if (markersLayerComponent) {
+
       mapWidget = (
         <TableMapWidget
           center={center}
@@ -458,9 +401,22 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
           zoom={zoom}
         />
       );
+
     }
 
-    if (baseLayerComponent || overlayTileLayerComponent || imageOverlayLayerComponent) {
+    if (baseLayerComponent || overlayLayerComponent) {
+
+      // Use a default baseLayer
+      if (!baseLayerComponent) {
+        baseLayerComponent = (
+          <BaseLayerWidget
+            checked={true}
+          >
+            <TileLayerWidget zIndex="1" />
+          </BaseLayerWidget>
+        );
+      }
+
       mapWidget = (
         <MapWidget
           center={center}
@@ -470,12 +426,12 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
         >
           <LayersControlWidget>
             {baseLayerComponent}
+            {overlayLayerComponent}
             {markersLayerComponent}
-            {overlayTileLayerComponent}
-            {imageOverlayLayerComponent}
           </LayersControlWidget>
         </MapWidget>
       );
+
     }
 
 
@@ -512,26 +468,22 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
           </SelectField>
           <SelectField
             autoWidth={true}
-            floatingLabelText="Tile overlay:"
-            onChange={(e, i, v) => this.handleChangeOverlayTileLayer(e, i, v)}
-            value={overlayTileLayer}
+            floatingLabelText="Overlay:"
+            onChange={(e, i, v) => this.handleChangeOverlayLayer(e, i, v)}
+            value={overlayLayer}
           >
-            {this.overlayTileLayersMenu}
+            {this.overlayLayersMenu}
           </SelectField>
-          <SelectField
-            autoWidth={true}
-            floatingLabelText="Image overlay:"
-            onChange={(e, i, v) => this.handleChangeImageOverlayLayer(e, i, v)}
-            value={imageOverlayLayer}
-          >
-            {this.imageOverlayLayersMenu}
-          </SelectField>
-          <TextField
-            floatingLabelText="Template code:"
-            multiLine={true}
-            textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt', lineHeight: '8pt'}}
-            value={templateCode}
-          />
+          {
+            this.config.user.isManager ?
+              <TextField
+                floatingLabelText="Template code:"
+                multiLine={true}
+                textareaStyle={{fontFamily: "'Courier New', Courier, monospace", fontSize: '8pt', lineHeight: '8pt'}}
+                value={templateCode}
+              />
+            : null
+          }
         </div>
       </div>
     );
