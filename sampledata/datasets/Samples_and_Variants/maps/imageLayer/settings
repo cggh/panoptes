@@ -1,0 +1,6 @@
+name: Homer Simpson
+description: Homer's picture
+format: image
+bounds:
+ topLeft: [0,0]
+ bottomRight: [10,10]

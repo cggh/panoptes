@@ -7,6 +7,7 @@ from SettingsDataset import SettingsDataset
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
+from SettingsMapLayer import SettingsMapLayer
 
 config = PanoptesConfig(None)
 baseFolder = join(config.getSourceDataDir(), 'datasets')
@@ -28,12 +29,14 @@ def readJSONConfig(datasetId):
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
+    mapLayers = readSetOfSettings(join(datasetFolder, 'maps'), SettingsMapLayer)
     return {
         'settings': settings,
         'chromosomes': chromosomes,
         'tablesById': tables,
         'twoDTablesById': twoDTables,
-        'genome': genome
+        'genome': genome,
+        'mapLayers': mapLayers
     }
 
 class ReadOnlyErrorWriter:
@@ -47,9 +50,10 @@ def writeJSONConfig(datasetId, action, path, newConfig):
     settingsFile = join(datasetFolder, 'settings')
     #We have a path in the combined JSON object - we now follow the path until we hit a subset confined to one YAML handler
     writers = {
-        'settings': lambda path: (path, SettingsGlobal(settingsFile, validate=True)),
+        'settings': lambda path: (path, SettingsDataset(settingsFile, validate=True)),
         'chromosomes': lambda path: (path, ReadOnlyErrorWriter('chromosomes')),
         'genome': lambda path: (path, ReadOnlyErrorWriter('genome')), #For now as this will likely get a refactor
+        'mapLayers': lambda path: (path, ReadOnlyErrorWriter('mapLayers')),  # For now as this will likely get a refactor
         'tablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, 'datatables', path[0], 'settings'), validate=True)),
         'twoDTablesById': lambda path: (path[1:], SettingsDataTable(join(datasetFolder, '2D_datatables', path[0], 'settings'), validate=True)),
     }

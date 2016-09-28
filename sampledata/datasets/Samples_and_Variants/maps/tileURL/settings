@@ -1,0 +1,6 @@
+name: An example tileURL layer
+description: A remote OSM layer
+format: tileURL
+filePattern: http://a.tile.openstreetmap.org/{zoom}/{x}/{y}.png
+maxNativeZoom: 19
+

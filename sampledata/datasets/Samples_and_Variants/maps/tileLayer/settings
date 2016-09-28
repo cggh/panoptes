@@ -1,0 +1,6 @@
+name: An example tile layer
+description: A random OSM tile
+format: tile
+filePattern: tiles/{zoom}/{x}/{y}.png
+maxNativeZoom: 0
+
