@@ -69,7 +69,7 @@ touch build/DQXServer/customresponders/__init__.py
 cd build/DQXServer/customresponders
 ln -s $PROJECT_ROOT/servermodule/* .
 
-echo -e "${green}  Linking static content into DQXServer${NC}"
+echo -e "${green}  Linking static content in PROJECT_ROOT/webapp/dist to PROJECT_ROOT/build/DQXServer/static${NC}"
 cd $PROJECT_ROOT/build/DQXServer
 ln -s $PROJECT_ROOT/webapp/dist static
 
@@ -85,6 +85,7 @@ mkdir -p $BASEDIR/temp
 mkdir -p $BASEDIR/SummaryTracks
 mkdir -p $BASEDIR/Uploads
 mkdir -p $BASEDIR/Docs
+mkdir -p $BASEDIR/Maps
 mkdir -p $BASEDIR/Graphs
 mkdir -p $BASEDIR/2D_data
 if ! [ -w $BASEDIR ]; then
@@ -101,6 +102,9 @@ if ! [ -w $BASEDIR/Uploads ]; then
 fi
 if ! [ -w $BASEDIR/Docs ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Docs is not writable by this user - it needs to be for the user that panoptes is run under"
+fi
+if ! [ -w $BASEDIR/Maps ]; then
+    echo -e "${red}  WARNING ${BASEDIR}/Maps is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
 if ! [ -w $BASEDIR/Graphs ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Graphs is not writable by this user - it needs to be for the user that panoptes is run under"
@@ -136,10 +140,15 @@ else
     echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
-echo -e "${green}  Linking BASEDIR/Docs to webapp/Docs${NC}"
+echo -e "${green}  Linking BASEDIR/Docs to PROJECT_ROOT/build/DQXServer/static/Docs (=> PROJECT_ROOT/webapp/dist/Docs) ${NC}"
 cd $PROJECT_ROOT/build/DQXServer/static
 rm -rf Docs
-ln -s $BASEDIR/Docs Docs
+ln -sf $BASEDIR/Docs Docs
+
+echo -e "${green}  Linking BASEDIR/Maps to PROJECT_ROOT/build/DQXServer/static/Maps (=> PROJECT_ROOT/webapp/dist/Maps) ${NC}"
+cd $PROJECT_ROOT/build/DQXServer/static
+rm -rf Maps
+ln -sf $BASEDIR/Maps Maps
 
 cd $PROJECT_ROOT
 SOURCEDATADIR=`python -c "import config;print config.SOURCEDATADIR"`

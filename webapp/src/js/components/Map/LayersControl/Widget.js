@@ -6,6 +6,8 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import filterChildren from 'util/filterChildren';
 
+import _cloneDeep from 'lodash/cloneDeep';
+
 const ALLOWED_CHILDREN = [
   'BaseLayerWidget',
   'OverlayWidget'
@@ -28,7 +30,9 @@ let LayersControlWidget = React.createClass({
     autoZIndex: React.PropTypes.bool,
     children: React.PropTypes.node,
     layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    map: React.PropTypes.object,
+    removeLayer: React.PropTypes.func,
+    removeLayerControl: React.PropTypes.func
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -44,13 +48,15 @@ let LayersControlWidget = React.createClass({
 
   render() {
 
-    let {autoZIndex, children} = this.props;
+    let {autoZIndex, children, removeLayer, removeLayerControl} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
       <LayersControl
         autoZIndex={autoZIndex}
         children={children}
+        removeLayer={removeLayer}
+        removeLayerControl={removeLayerControl}
       />
     );
 

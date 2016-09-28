@@ -1,5 +1,4 @@
 import React from 'react';
-import Immutable from 'immutable';
 
 // Mixins
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -57,7 +56,7 @@ let TableMarkersLayerWidget = React.createClass({
 
   getInitialState() {
     return {
-      markers: Immutable.List()
+      markers: []
     };
   },
 
@@ -67,7 +66,7 @@ let TableMarkersLayerWidget = React.createClass({
     if (!middleClick) {
       e.originalEvent.stopPropagation();
     }
-    this.getFlux().actions.panoptes.dataItemPopup({table: marker.get('table'), primKey: marker.get('primKey'), switchTo: !middleClick});
+    this.getFlux().actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey, switchTo: !middleClick});
   },
 
   fetchData(props, requestContext) {
@@ -154,7 +153,7 @@ let TableMarkersLayerWidget = React.createClass({
       })
       .then((data) => {
 
-        let markers = Immutable.List();
+        let markers = [];
 
         // Translate the fetched locationData into markers.
         let locationTableConfig = this.config.tablesById[locationDataTable];
@@ -176,14 +175,14 @@ let TableMarkersLayerWidget = React.createClass({
             isHighlighted = (data[i][highlightField] === highlightValue ? true : false);
           }
 
-          markers = markers.push(Immutable.fromJS({
+          markers.push({
             isHighlighted: isHighlighted,
             table: locationDataTable,
             lat: parseFloat(data[i][locationTableConfig.latitude]),
             lng: parseFloat(data[i][locationTableConfig.longitude]),
             primKey: locationDataPrimKey,
             title: locationDataPrimKey,
-          }));
+          });
 
         }
 
@@ -203,23 +202,23 @@ let TableMarkersLayerWidget = React.createClass({
     let {layerContainer, map} = this.context;
     let {markers} = this.state;
 
-    if (!markers.size) {
+    if (!markers.length) {
       return null;
     }
 
     let markerWidgets = [];
 
-    for (let i = 0, len = markers.size; i < len; i++) {
+    for (let i = 0, len = markers.length; i < len; i++) {
 
-      let marker = markers.get(i);
+      let marker = markers[i];
 
-      if (marker.get('isHighlighted') || len === 1) {
+      if (marker.isHighlighted || len === 1) {
 
         markerWidgets.push(
           <ComponentMarkerWidget
             key={i}
-            position={[marker.get('lat'), marker.get('lng')]}
-            title={marker.get('title')}
+            position={{lat: marker.lat, lng: marker.lng}}
+            title={marker.title}
             onClick={(e) => this.handleClickMarker(e, marker)}
           />
         );
@@ -229,8 +228,8 @@ let TableMarkersLayerWidget = React.createClass({
         markerWidgets.push(
           <ComponentMarkerWidget
             key={i}
-            position={{lat: marker.get('lat'), lng: marker.get('lng')}}
-            title={marker.get('title')}
+            position={{lat: marker.lat, lng: marker.lng}}
+            title={marker.title}
             onClick={(e) => this.handleClickMarker(e, marker)}
           >
             <svg height="12" width="12">

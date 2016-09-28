@@ -9,13 +9,18 @@ export default function filterChildren(parent, children, allowed) {
     return null;
 
   function childOK(child) {
+
+    if (!child) return false;
+
     if (_isString(child)) {
       if (child.trim() !== '') { //Only error on non-whitespace strings, removing them from the return so we can have nice formatting in th e HTML
         throw Error(`Text is not a valid child of ${displayName(parent.constructor)}`);
       }
       return false;
     }
+
     const name = displayName(child.type);
+
     if (name === 'Component') {
       throw Error(`Can't get name for child of ${displayName(parent.constructor)}`);
     }

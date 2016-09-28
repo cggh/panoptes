@@ -1,6 +1,8 @@
 name: An example tile layer
 description: A random OSM tile
 format: tile
-filePattern: tiles/{zoom}/{x}/{y}.png
+filePattern: tiles/{z}/{x}/{y}.png
 maxNativeZoom: 0
+attribution: © <a href="/copyright">OpenStreetMap contributors</a> ♥ <a class="donate-attr" href="http://donate.openstreetmap.org">Make a Donation</a>
+opacity: 0.7
 

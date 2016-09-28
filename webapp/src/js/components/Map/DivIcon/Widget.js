@@ -6,9 +6,6 @@ import {render, unmountComponentAtNode} from 'react-dom';
 import {DivIcon, marker} from 'leaflet';
 import {MapLayer} from 'react-leaflet';
 
-// CSS
-import 'Map/DivIcon/widget-styles.css';
-
 export default class Divicon extends MapLayer {
   static propTypes = {
     opacity: PropTypes.number,
@@ -46,6 +43,7 @@ export default class Divicon extends MapLayer {
 
   renderContent() {
     const container = this.leafletElement._icon;
+
     if (container) {
       render(
         Children.only(this.props.children),

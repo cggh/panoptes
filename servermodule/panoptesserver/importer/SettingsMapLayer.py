@@ -26,9 +26,6 @@ class SettingsMapLayer(ImportSettings):
                     ('tile', {
                         'description': 'tile layer served by panoptes'
                     }),
-                    ('tileURL', {
-                        'description': 'Remotely served tiles'
-                    }),
                     ('image', {
                         'description': 'Single image overlay'
                     }),
@@ -41,30 +38,55 @@ class SettingsMapLayer(ImportSettings):
                 'settingRequired': {'name': 'format', 'value': 'image'},
                 'description': 'The geographical bounds for the image',
                 'children': OrderedDict((
-                    ('topLeft', {
-                        'type': 'List',
+                    ('northLat', {
+                        'type': 'Value',
                         'required': True,
-                        'description': 'Lat lng for top-left (NW) point of image'
+                        'description': 'Latitude for the top (north) of the image'
                     }),
-                    ('bottomRight', {
-                        'type': 'List',
+                    ('southLat', {
+                        'type': 'Value',
                         'required': True,
-                        'description': 'Lat lng for bottom-right (SE) point of image'
+                        'description': 'Latitude for the bottom (south) of the image'
+                    }),
+                    ('westLng', {
+                        'type': 'Value',
+                        'required': True,
+                        'description': 'Longitude for the left (west) of the image'
+                    }),
+                    ('eastLng', {
+                        'type': 'Value',
+                        'required': True,
+                        'description': 'Longitude for the right (east) of the image'
                     })
                 ))
             }),
             ('filePattern', {
                 'type': 'Text',
                 'required': False,
-                'settingRequired': [{'name': 'format', 'value': 'tile'}, {'name': 'format', 'value': 'tileURL'}],
-                'description': 'String to describe the location of tiles relative to the settings file ("tile") or a URL ("tileURL") e.g. "tiles/{zoom}/{x}/{y}/image.png". Interpolates the values zoom, x, and y.'
+                'settingRequired': {'name': 'format', 'value': 'tile'},
+                'description': 'String to describe the location of the tiles, either relative to the settings file or a URL, e.g. "tiles/{z}/{x}/{y}/image.png" or "http://tiles.org/{z}/{x}/{y}.png". Interpolates the values z (for zoom), x, and y.'
             }),
             ('maxNativeZoom', {
                 'type': 'Value',
                 'required': False,
-                'settingRequired': [{'name': 'format', 'value': 'tile'}, {'name': 'format', 'value': 'tileURL'}],
+                'settingRequired': {'name': 'format', 'value': 'tile'},
                 'description': 'Max zoom level at which to request tiles for this layer'
             }),
+            ('attribution', {
+                'type': 'Text',
+                'required': False,
+                'description': 'The attribution for this layer'
+            }),
+            ('opacity', {
+                'type': 'Value',
+                'required': False,
+                'description': 'The opacity for this layer'
+            }),
+            ('tms', {
+                'type': 'Boolean',
+                'required': False,
+                'description': 'If true, applies settings for tiles that meet the Tile Map Service (TMS) specification, such as inversing the Y axis numbering.'
+            })
         ))
 
         return mapLayerSettings
