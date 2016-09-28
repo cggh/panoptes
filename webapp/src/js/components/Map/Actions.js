@@ -478,6 +478,10 @@ bounds: [[-34.9904035897, 52.0257997896], [37.54162765, -18.0000648]],
       );
     }
 
+
+    // FIXME: jsxToString produces markup like: center={{"lat": -0.7031073524364783, "lng": 1.40625}}
+    // Whereas we need markup like: center='{"lat": -0.7031073524364783, "lng": 1.40625}'
+
     // Wrap the map template code in a container with dimensions.
     let templateCode = '<div style="width:300px;height:300px">' + jsxToString(mapWidget, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
