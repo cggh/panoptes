@@ -5,6 +5,7 @@ import SQL from 'panoptes/SQL';
 
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
+// TODO: migrate to API.js ???
 function downloadTableData(payload) {
 
   let defaults = {
@@ -44,7 +45,7 @@ function downloadTableData(payload) {
   let downloadURL = API.serverURL;
   downloadURL += '?datatype' + '=' + 'downloadtable';
   downloadURL += '&database' + '=' + dataset;
-  downloadURL += '&qry' + '=' + query;
+  downloadURL += '&qry' + '=' + API.encodeQuery(query);
   downloadURL += '&tbname' + '=' + table;
   downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
   if (tableConfig.position) {

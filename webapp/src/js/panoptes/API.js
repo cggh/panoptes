@@ -587,6 +587,7 @@ const nullValues = {
 
 module.exports = {
   annotationData,
+  encodeQuery,
   errorMessage,
   fetchData,
   fetchGene,
