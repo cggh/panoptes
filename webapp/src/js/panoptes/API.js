@@ -8,7 +8,7 @@ import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
 
-const serverURL = process.env.NODE_ENV === 'production' ? '/api' : '//' + window.location.hostname + ':8000/api';
+const serverURL = '/panoptes/api';
 
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {

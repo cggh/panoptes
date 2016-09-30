@@ -29,7 +29,7 @@ general_with_static = SharedDataMiddleware(wsgi_general.application, {
     '/': os.path.join(os.path.dirname(config.__file__), 'webapp/dist')
 })
 application = DispatcherMiddleware(general_with_static, {
-    '/api':        wsgi_api.application,
+    '/panoptes/api':        wsgi_api.application,
 })
 
 #Wrap in cas service if configured

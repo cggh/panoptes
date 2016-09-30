@@ -24,6 +24,7 @@ let Loading = React.createClass({
       return (
         <div className="loading-container show hide-content">
           <div className="spinner" />
+          
         </div>
       );
 
