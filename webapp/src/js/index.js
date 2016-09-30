@@ -42,8 +42,6 @@ injectTapEventPlugin();
 //Throw up a loader till we are ready
 ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
-initialConfig.serverURL = process.env.NODE_ENV === 'production' ? '/api' : '//' + window.location.hostname + ':8000/api'; //eslint-disable-line no-undef
-
 function getAppState(location) {
   let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
   let defaultState = {

@@ -8,6 +8,8 @@ import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
 import Base64 from 'panoptes/Base64';
 
+const serverURL = process.env.NODE_ENV === 'production' ? '/api' : '//' + window.location.hostname + ':8000/api';
+
 //TODO: Refactor server errors to closer to HTTP standard
 function _filterError(json) {
   if (typeof (json) !== 'object') {
@@ -51,7 +53,7 @@ function encodeQuery(query) {
 
 function request(options, method = 'GET', data = null) {
   let defaults = {
-    url: initialConfig.serverURL, //eslint-disable-line no-undef
+    url: serverURL,
     method: method,
     params: {},
     timeout: 60000,
@@ -583,29 +585,29 @@ const nullValues = {
   i4: -2147483648,
 };
 
-// TODO: Maintain an order to this list?
 module.exports = {
-  serverURL: initialConfig.serverURL, //eslint-disable-line no-undef
-  filterAborted,
-  errorMessage,
-  requestJSON,
-  pageQuery,
-  storeData,
-  fetchData,
-  summaryData,
   annotationData,
-  fetchSingleRecord,
-  treeData,
-  findGene,
-  findGenesInRegion,
+  encodeQuery,
+  errorMessage,
+  fetchData,
   fetchGene,
   fetchImportStatusData,
   fetchImportStatusLog,
+  fetchSingleRecord,
+  filterAborted,
+  findGene,
+  findGenesInRegion,
   importDataset,
   importDatasetConfig,
-  truncatedRowsCount,
   modifyConfig,
-  twoDPageQuery,
+  nullValues,
+  pageQuery,
   query,
-  nullValues
+  requestJSON,
+  serverURL,
+  summaryData,
+  storeData,
+  treeData,
+  truncatedRowsCount,
+  twoDPageQuery
 };
