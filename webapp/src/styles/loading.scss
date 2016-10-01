@@ -5,6 +5,7 @@
   left: 0;
   z-index: 2;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
@@ -13,7 +14,7 @@
   visibility: hidden;
   opacity: 0;
   transition: visibility 0s linear 0.5s, opacity 0.5s linear;
-  div {
+  .load-icon {
     opacity: 0.5;
     height: 50%;
     width: 50%;
@@ -23,16 +24,19 @@
   }
   .spinner {
     background-image: url(../images/spinner.svg);
-    animation: fa-spin 2s infinite linear;
+    animation: spin 2s infinite linear;
   }
   .error {
     background-image: url(../images/error.svg);
+  }
+  .error-text {
+    font-style: italic;
+    padding-top: 15px;
   }
   .custom {
     text-align: center;
     font-style: italic;
   }
-
 }
 
 .loading-container.show {

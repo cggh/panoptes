@@ -25,6 +25,7 @@ import InitialConfig from 'panoptes/InitialConfig';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import Perf from 'react-addons-perf';
+import _filter from 'lodash/filter';
 
 if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
   window.Perf = Perf;
@@ -42,9 +43,10 @@ injectTapEventPlugin();
 //Throw up a loader till we are ready
 ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
+const HASH_REGEX = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
+
 function getAppState(location) {
-  let match = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.exec(location);
-  let defaultState = {
+  const defaultState = {
     session: {
       components: {
         FirstTab: {
@@ -67,14 +69,27 @@ function getAppState(location) {
     }
   };
 
-  if (match)
-    return API.fetchData(match[0]).then((appState) => appState || defaultState
-    );
-  else
-    return defaultState;
+  location = location.pathname.split('/');
+  location = _filter(location);
+  const start = Math.max(0, location.length - 2);
+  const end = Math.min(start + 2, location.length);
+  location = location.slice(start, end);
+  if (location[0] === 'panoptes') {  //Remove panoptes part of path if needed.
+    location.shift()
+  }
+  if (location.length === 0)
+    return {};
+  if (location.length === 1)
+    return {dataset: location[0], state: defaultState};
+  let match = HASH_REGEX.exec(location[1]);
+  if (match) {
+    return {dataset: location[0], state: API.fetchData(match[0]).then((appState) => appState || defaultState)};
+  } else {
+    return {dataset: location[1], state: defaultState};
+  }
 }
 
-Promise.prototype.done = function(onFulfilled, onRejected) {
+Promise.prototype.done = function (onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch((e) => {
       setTimeout(() => {
@@ -84,76 +99,98 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
     })
   ;
 };
+const {dataset, state} = getAppState(window.location);
+if (dataset) {  //dataset being "panoptes" means that root URL is being hit
+  Promise.all([InitialConfig(dataset), state]) //eslint-disable-line no-undef
+    .then(([config, appState]) => {
+      let stores = {
+        PanoptesStore: new PanoptesStore({
+          storedSubsets: {}
+        }),
+        SessionStore: new SessionStore(appState.session),
+        ConfigStore: new ConfigStore(config)
+      };
 
-Promise.all([InitialConfig(initialConfig.dataset), getAppState(window.location)]) //eslint-disable-line no-undef
-  .then((values) => {
-    let [config, appState] = values;
-    let stores = {
-      PanoptesStore: new PanoptesStore({
-        storedSubsets: {}
-      }),
-      SessionStore: new SessionStore(appState.session),
-      ConfigStore: new ConfigStore(config)
-    };
-
-    //Listen to the stores and update the URL after storing the state, when it changes.
-    let getState = () => {
-      let state = Immutable.Map();
-      //Clear the modal as we don't want that to be stored
-      state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
-      return state;
-    };
-    let lastState = getState();
-    //Store if state change was due to backbutton - if it was then don't store it again.
-    let backbutton = null;
-    let storeState = () => {
-      if (backbutton) {
-        backbutton = false;
-        return;
-      }
-      backbutton = false;
-      let newState = getState();
-      if (!lastState.equals(newState)) {
-        lastState = newState;
-        API.storeData(newState.toJS()).then((resp) => {
-          history.push(`/${resp}`, newState.toJS());
-        });
-      }
-
-    };
-    storeState = _debounce(storeState, 250);
-    stores.SessionStore.on('change', storeState);
-
-    history.listen((location, action) => {
-      if (action === 'POP') {
-        let newState = Immutable.fromJS((location.state ? location.state.session : null) || getAppState(location.pathname).session);
-        if (!newState.equals(stores.SessionStore.state)) {
-          stores.SessionStore.state = newState;
-          backbutton = true;
-          stores.SessionStore.emit('change');
+      //Listen to the stores and update the URL after storing the state, when it changes.
+      let getState = () => {
+        let state = Immutable.Map();
+        //Clear the modal as we don't want that to be stored
+        state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
+        return state;
+      };
+      let lastState = getState();
+      //Store if state change was due to backbutton - if it was then don't store it again.
+      let backbutton = null;
+      let storeState = () => {
+        if (backbutton) {
+          backbutton = false;
+          return;
         }
-      }
-    });
+        backbutton = false;
+        let newState = getState();
+        if (!lastState.equals(newState)) {
+          lastState = newState;
+          API.storeData(newState.toJS()).then((hash) => {
+            const newLocation = (HASH_REGEX.exec(window.location.pathname) ||
+            window.location.pathname[window.location.pathname.length-1] === '/') ?
+              hash : `${dataset}/${hash}`;
+            history.push(newLocation, newState.toJS());
+          });
+        }
 
-    let actions = {
-      session: SessionActions,
-      panoptes: PanoptesActions(config),
-      api: APIActions
-    };
+      };
+      storeState = _debounce(storeState, 250);
+      stores.SessionStore.on('change', storeState);
 
-    let flux = new Fluxxor.Flux(stores, actions);
+      history.listen((location, action) => {
+        if (action === 'POP') {
+          let newState = Immutable.fromJS((location.state ? location.state.session : null) || getAppState(location.pathname).session);
+          if (!newState.equals(stores.SessionStore.state)) {
+            stores.SessionStore.state = newState;
+            backbutton = true;
+            stores.SessionStore.emit('change');
+          }
+        }
+      });
 
-    flux.setDispatchInterceptor((action, dispatch) =>
-      ReactDOM.unstable_batchedUpdates(() =>
-        dispatch(action)
-      )
-    );
+      let actions = {
+        session: SessionActions,
+        panoptes: PanoptesActions(config),
+        api: APIActions
+      };
 
-    ReactDOM.render(
-      <div>
-        <Loading status="done"/>
-        <Panoptes flux={flux} />
-      </div>
-      , document.getElementById('main'));
-  })
-  .done();
+      let flux = new Fluxxor.Flux(stores, actions);
+
+      flux.setDispatchInterceptor((action, dispatch) =>
+        ReactDOM.unstable_batchedUpdates(() =>
+          dispatch(action)
+        )
+      );
+
+      ReactDOM.render(
+        <div>
+          <Loading status="done"/>
+          <Panoptes flux={flux}/>
+        </div>
+        , document.getElementById('main'));
+    })
+    .catch((err) => {
+      ReactDOM.render(
+        <div>
+          <Loading status="error">
+            {err.responseText || err.message || "Error"}
+          </Loading>
+        </div>
+        , document.getElementById('main'));
+      throw err;
+    })
+    .done();
+} else {
+  ReactDOM.render(
+    <div>
+      <Loading status="error">
+        No dataset selected, append an ID of one to your URL
+      </Loading>
+    </div>
+    , document.getElementById('main'));
+}

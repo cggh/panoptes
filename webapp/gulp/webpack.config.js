@@ -10,13 +10,10 @@ module.exports = {
     panoptes: [path.resolve(__dirname, "../src/js/index.js")]
   },
   output: {
-    path: path.resolve(__dirname, "../dist"),
+    path: path.resolve(__dirname, "../dist/panoptes"),
     filename: "[name].js",
-    chunkFilename: "[chunkhash].js"
-  },
-  devServer: {
-    contentBase: path.resolve(__dirname, "../dist"),
-    headers: { "Access-Control-Allow-Origin": "*" }
+    chunkFilename: "[chunkhash].js",
+    publicPath: "/panoptes/"
   },
   module: {
     noParse: [

@@ -36,8 +36,6 @@ Edit the file and specify the following components:
 
 .. note::
 The login credentials used need to have sufficient privileges to perform alterations such as database creation.
-.. note::
-  Changes in 'config.py' are fixed on build, so you will need to rebuild if they change.
 
 
 To build run::
@@ -52,7 +50,7 @@ To build for development::
 to create a panoptes installation in 'build'. Note that this deletes any existing build.
 This build copies the different components of the application, and merges them into a single file structure.
 Note that, during this process, a copy of `config.py` is put in the build folder. This copy is used by the actual server process.
-This will attempt to install the needed python packages and link Panoptes into the DQXServer framework which serves the app.
+This will attempt to install the needed python packages.
 
 
 Simple Server
@@ -101,9 +99,9 @@ Deployment on Apache2 (OPTIONAL)
   
 Install the Apache2 wsgi dependency `libapache2-mod-wsgi`.
 
-Create a symbolic link in `/var/www/` to `[PanoptesInstallationPath]/build/DQXServer/wsgi_server.py`::
+Create a symbolic link in `/var/www/` to `[PanoptesInstallationPath]/server/wsgi_server.py`::
 
-    ln -s [PanoptesInstallationPath]/build/DQXServer/wsgi_server.py /var/www/.
+    ln -s [PanoptesInstallationPath]/server/wsgi_server.py /var/www/.
 
 The build script uses a virtualenv for the installation of Python dependencies,
 and the Apache2 WSGI configuration has to be instructed to use that virtualenv.
@@ -115,7 +113,7 @@ An example VirtualHost config would be (note that the tokens need to be replaced
             Options FollowSymLinks
             AllowOverride None
         </Directory>
-        WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/build/panoptes_virtualenv/lib/python2.7/site-packages:[PanoptesInstallationPath]/build/DQXServer
+        WSGIDaemonProcess Panoptes processes=2 threads=25 python-path=[PanoptesInstallationPath]/panoptes_virtualenv/lib/python2.7/site-packages:[PanoptesInstallationPath]:[PanoptesInstallationPath]/server
         WSGIProcessGroup Panoptes
         WSGIScriptAlias / /var/www/wsgi_server.py
     </VirtualHost>

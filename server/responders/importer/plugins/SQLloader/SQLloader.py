@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import sqlparse
 import os
-from customresponders.panoptesserver.importer.BasePlugin import BasePlugin
+from responders.importer.BasePlugin import BasePlugin
     
 class SQLloader(BasePlugin):
     

@@ -7,7 +7,7 @@ import sys
 import shutil
 from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
-import customresponders.panoptesserver.schemaversion as schemaversion
+import responders.schemaversion as schemaversion
 
 from ImportDataTable import ImportDataTable
 from Import2DDataTable import Import2DDataTable
@@ -106,7 +106,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
 
 
 if __name__ == "__main__":
-    import customresponders.panoptesserver.asyncresponder as asyncresponder
+    import responders.asyncresponder as asyncresponder
     calc = asyncresponder.CalculationThread('', None, {'isRunningLocal': 'True'}, '')
 
     scopeOptions = ["all", "none", "1k", "10k", "100k"]

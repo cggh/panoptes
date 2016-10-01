@@ -1,3 +1,8 @@
+https://github.com/cggh/DQXTableUtils/raw/master/dist/DQXTableUtils-0.1.1.tar.gz
+Werkzeug==0.9.4
+argparse==1.2.1
+simplejson==3.4.0
+requests==2.2.1
 python-monetdb==11.19.3.2
 Cython==0.23.4
 xlrd==0.9.2

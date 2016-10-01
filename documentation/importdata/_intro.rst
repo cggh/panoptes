@@ -22,7 +22,7 @@ Editing the source directory structure
 The source data directory structure on the server can be directly manipulated:
 adding new directories, copying data files and setting files, etc...
 These source data files are located in the directory ``[SOURCEDATADIR]/datasets``
-(``[SOURCEDATADIR]`` as specified in ``config.py``, see `config.py.sample <https://github.com/cggh/DQXServer/blob/master/config.py.sample#L38>`_).
+(``[SOURCEDATADIR]`` as specified in ``config.py``, see `config.py.sample <https://github.com/cggh/panoptes/blob/master/config.py.sample#L15>`_).
 
 .. Note::
   This is a more low-level approach, which works best for large data sets and experienced data administrators.

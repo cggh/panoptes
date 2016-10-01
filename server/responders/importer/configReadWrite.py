@@ -19,9 +19,10 @@ def readSetOfSettings(dirPath, loader, wanted_names=None):
                  for name in listdir(dirPath)
                   if path.isdir(join(dirPath, name)) and (not wanted_names or name in wanted_names)}
 
-
 def readJSONConfig(datasetId):
     datasetFolder = join(baseFolder, datasetId)
+    if not path.isdir(datasetFolder):
+        raise Exception('Error: ' + datasetId + ' is not a known dataset in the source directory')
     settingsFile = join(datasetFolder, 'settings')
     settings = loads(SettingsDataset(settingsFile, validate=True).serialize())
     with open(join(datasetFolder, 'refgenome', 'refsequence.fa')) as fastaFile:

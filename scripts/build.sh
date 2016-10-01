@@ -19,70 +19,28 @@ then
   exit 1
 fi
 
-echo -e "${red}THIS BRANCH IS UNDERGOING LARGE REWRITES YOU SHOULD USE 1.6.2${NC}"
-echo -e "${green}Building PANOPTES....${NC}"
 cd $PROJECT_ROOT
-#mkdir -p webapp/scripts/Local
-#cp -rf webapp/scripts/Local.example/* webapp/scripts/Local/.
-mkdir -p webapp/scripts
-mkdir -p build
-rm -rf build/DQX
-rm -rf build/DQXServer
-cd build
-
 echo -e "${green}  Fetching dependancies${NC}"
-cd $PROJECT_ROOT/build
-
-echo -e "${green}    DQXServer${NC}"
-if [ -z "$GITSSH" ]; then
-    git clone https://github.com/cggh/DQXServer.git
-else
-    git clone git@github.com:cggh/DQXServer.git
-fi
-cd DQXServer
-git checkout `cat $PROJECT_ROOT/dependencies/DQXServer_Version`
-
 echo -e "${green}    Python dependancies${NC}"
-cd ..
 if [ ! -d panoptes_virtualenv ]
 then
   virtualenv panoptes_virtualenv
 fi
+
 source panoptes_virtualenv/bin/activate
-cd DQXServer
-echo -e "${green}      DQXServer requirements...${NC}"
-pip install -q -r REQUIREMENTS
-#Extra ones for custom responder
 #Have to do numpy first as h5py does not stipulate it as an install requirement....
 echo -e "${green}      NumPy...${NC}"
-pip install -q numpy
+pip install  numpy
 echo -e "${green}      Panoptes requirements...${NC}"
-pip install -q -r $PROJECT_ROOT/servermodule/REQUIREMENTS
+pip install  -r $PROJECT_ROOT/server/REQUIREMENTS
 echo -e "${green}      gunicorn...${NC}"
-pip install -q gunicorn==19.1.0 #For testing and instant run, not a strict requirement of DQXServer
+pip install  gunicorn==19.1.0 #For testing and instant run, not a strict requirement
 
-
-echo -e "${green}  Linking custom responders into DQXServer${NC}"
-cd $PROJECT_ROOT
-mkdir -p build/DQXServer/customresponders
-touch build/DQXServer/customresponders/__init__.py
-cd build/DQXServer/customresponders
-ln -s $PROJECT_ROOT/servermodule/* .
-
-echo -e "${green}  Linking static content in PROJECT_ROOT/webapp/dist to PROJECT_ROOT/build/DQXServer/static${NC}"
-cd $PROJECT_ROOT/build/DQXServer
-ln -s $PROJECT_ROOT/webapp/dist static
-
-echo -e "${green}  Copying config.py${NC}"
-cp $PROJECT_ROOT/config.py config.py
 echo pythoncommand = \'`which python`\' >> config.py
-echo mysqlcommand = \'`which mysql`\' >> config.py
-
 BASEDIR=`python -c "import config;print config.BASEDIR"`
 echo -e "${green}  Basedir is ${BASEDIR} - making if it doesn't exist"
 mkdir -p $BASEDIR
 mkdir -p $BASEDIR/temp
-mkdir -p $BASEDIR/SummaryTracks
 mkdir -p $BASEDIR/Uploads
 mkdir -p $BASEDIR/Docs
 mkdir -p $BASEDIR/Maps
@@ -132,21 +90,21 @@ EOF
     fi
     monetdbd set control=True $BASEDIR/monetdb
     monetdbd set passphrase=monetdb $BASEDIR/monetdb
-    if monetdb create $DB ; then
-        monetdb release $DB
-        DOTMONETDBFILE=$PROJECT_ROOT/.monetdb mclient -d ${DB} < ${PROJECT_ROOT}/scripts/datasetindex.sql
+    if monetdb create datasets ; then
+        monetdb release datasets
+        DOTMONETDBFILE=$PROJECT_ROOT/.monetdb mclient -d datasets < ${PROJECT_ROOT}/scripts/datasetindex.sql
     fi
 else
     echo -e "${red}  SKIPPING Creating skeleton DB as SKIP_SQL set${NC}"
 fi
 
-echo -e "${green}  Linking BASEDIR/Docs to PROJECT_ROOT/build/DQXServer/static/Docs (=> PROJECT_ROOT/webapp/dist/Docs) ${NC}"
-cd $PROJECT_ROOT/build/DQXServer/static
+echo -e "${green}  Linking BASEDIR/Docs to served directory ${NC}"
+mkdir -p $PROJECT_ROOT/webapp/dist/panoptes
+cd $PROJECT_ROOT/webapp/dist/panoptes
 rm -rf Docs
 ln -sf $BASEDIR/Docs Docs
 
-echo -e "${green}  Linking BASEDIR/Maps to PROJECT_ROOT/build/DQXServer/static/Maps (=> PROJECT_ROOT/webapp/dist/Maps) ${NC}"
-cd $PROJECT_ROOT/build/DQXServer/static
+echo -e "${green}  Linking BASEDIR/Maps to served directory ${NC}"
 rm -rf Maps
 ln -sf $BASEDIR/Maps Maps
 
@@ -160,30 +118,6 @@ if find $SOURCEDATADIR/datasets -maxdepth 0 -empty | read v; then
     cp -r $PROJECT_ROOT/sampledata/* $SOURCEDATADIR
 fi
 
-#Don't need to do this in react world
-#cd $PROJECT_ROOT
-#if [ "$1" = "DEV" ]; then
-#    echo -e "${green}  Creating DEVELOPMENT html${NC}"
-#    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py DEBUG DEV
-#else
-#    echo -e "${green}  Creating PRODUCTION html${NC}"
-#    VERSION=`uuidgen`
-#    cp webapp/scripts/main-built.js webapp/scripts/main-built-$VERSION.js
-#    PYTHONPATH=$PROJECT_ROOT python scripts/_render_templates.py PRODUCTION $VERSION
-#fi
 echo -e "${green}Done!${NC}"
-
-#if [ -z "$WSGI_FOLDER" ]; then
-#	echo "WSGI_FOLDER not set, you need to manually serve dependencies/DQXServer/app.wsgi"
-#else
-#	echo "Symlinking DQX server at $WSGI_FOLDER/panoptes/$CONFIG"
-#	mkdir -p $WSGI_FOLDER/panoptes/$CONFIG
-#	rm -rf $WSGI_FOLDER/panoptes/$CONFIG/*
-#	ln -s $PROJECT_ROOT/dependencies/DQXServer/* $WSGI_FOLDER/panoptes/$CONFIG/.
-#fi
-#wget https://github.com/n1k0/casperjs/zipball/1.1-beta3
-#unzip 1.1-beta3
-#wget https://phantomjs.googlecode.com/files/phantomjs-1.9.2-linux-x86_64.tar.bz2
-#tar xjvf phantomjs-1.9.2-linux-x86_64.tar.bz2
 
 popd  > /dev/null
