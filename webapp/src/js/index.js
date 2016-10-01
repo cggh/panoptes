@@ -25,6 +25,7 @@ import InitialConfig from 'panoptes/InitialConfig';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import Perf from 'react-addons-perf';
+import _filter from 'lodash/filter';
 
 if (process.env.NODE_ENV !== 'production') { //eslint-disable-line no-undef
   window.Perf = Perf;
@@ -69,7 +70,8 @@ function getAppState(location) {
   };
 
   location = location.pathname.split('/');
-  const start = Math.max(1,location.length-2);
+  location = _filter(location);
+  const start = Math.max(0, location.length - 2);
   const end = Math.min(start + 2, location.length);
   location = location.slice(start, end);
   if (location[0] === 'panoptes') {  //Remove panoptes part of path if needed.
@@ -87,7 +89,7 @@ function getAppState(location) {
   }
 }
 
-Promise.prototype.done = function(onFulfilled, onRejected) {
+Promise.prototype.done = function (onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch((e) => {
       setTimeout(() => {
@@ -129,7 +131,9 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
         if (!lastState.equals(newState)) {
           lastState = newState;
           API.storeData(newState.toJS()).then((hash) => {
-            const newLocation = HASH_REGEX.exec(window.location.pathname) ? hash : `${dataset}/${hash}`;
+            const newLocation = (HASH_REGEX.exec(window.location.pathname) ||
+            window.location.pathname[window.location.pathname.length-1] === '/') ?
+              hash : `${dataset}/${hash}`;
             history.push(newLocation, newState.toJS());
           });
         }
@@ -170,11 +174,23 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
         </div>
         , document.getElementById('main'));
     })
+    .catch((err) => {
+      ReactDOM.render(
+        <div>
+          <Loading status="error">
+            {err.responseText || err.message || "Error"}
+          </Loading>
+        </div>
+        , document.getElementById('main'));
+      throw err;
+    })
     .done();
 } else {
   ReactDOM.render(
-        <div>
-          No dataset selected, append an id of one to your URL
-        </div>
-        , document.getElementById('main'));
+    <div>
+      <Loading status="error">
+        No dataset selected, append an ID of one to your URL
+      </Loading>
+    </div>
+    , document.getElementById('main'));
 }

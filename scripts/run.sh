@@ -24,4 +24,4 @@ else
 	BIND=${1}
 fi  
 echo -e "${green}Serving PANOPTES on http://${BIND}/index.html${NC}"
-PYTHONPATH=`pwd`:`pwd`/.. ../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w 20 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application
+PYTHONPATH=`pwd`:`pwd`/.. ../panoptes_virtualenv/bin/gunicorn -b ${BIND} -p ${PROJECT_ROOT}/scripts/gunicorn.pid --timeout 120 -w 10 --access-logfile /dev/null --error-logfile - --log-level warning wsgi_server:application

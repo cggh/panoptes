@@ -17,7 +17,7 @@ def response(returndata):
 
         therow = cur.fetchone()
         if therow is None:
-            returndata['Error'] = 'Storage record not found'
+            returndata['Error'] = 'Link ID not found'
         else:
             returndata['content'] = therow[0]
 

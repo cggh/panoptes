@@ -335,7 +335,7 @@ let MapActions = React.createClass({
 
       // NB: Leaflet uses [[south, west], [north, east]] bounds.
       let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng],[overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
-      let mapLayerServerPath = 'Maps/' + this.config.dataset + '/' + overlayLayer + '/';
+      let mapLayerServerPath = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/';
       let absoluteURLPattern = /^https?:\/\/|^\/\//i;
 
       let overlayLayerProps = {
@@ -366,7 +366,7 @@ let MapActions = React.createClass({
 
       } else if (this.config.mapLayers[overlayLayer].format === "image") {
 
-        overlayLayerProps.url = 'Maps/' + this.config.dataset + '/' + overlayLayer + '/data.png';
+        overlayLayerProps.url = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/data.png';
 
         overlayLayerComponent = (
           <OverlayWidget

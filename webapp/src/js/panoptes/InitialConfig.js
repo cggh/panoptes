@@ -1,6 +1,5 @@
 import API from 'panoptes/API';
 
-//TODO CONFIG SHOULD BE COMPILED SERVER SIDE AND SENT DOWN IN INDEX.HTML, NOT AJAXED IN
 let fetchInitialConfig = function(dataset) {
   let isManager = false;
   return API.requestJSON({

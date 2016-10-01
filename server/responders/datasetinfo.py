@@ -8,6 +8,8 @@ import uuid
 import DQXDbTools
 import authorization
 import schemaversion
+from monetdb.exceptions import DatabaseError
+
 
 def response(returndata):
 
@@ -19,19 +21,22 @@ def response(returndata):
 
     needfullreload = False
     needconfigreload = False
-    with DQXDbTools.DBCursor(returndata, databaseName) as cur:
-        cur.execute('SELECT "content" FROM "settings" WHERE "id"=%s', ("DBSchemaVersion",))
-        rs = cur.fetchone()
-        if rs is None:
-            needfullreload = True
-        else:
-            majorversion = int(rs[0].split('.')[0])
-            minorversion = int(rs[0].split('.')[1])
-            if majorversion < schemaversion.major:
+    try:
+        with DQXDbTools.DBCursor(returndata, databaseName) as cur:
+            cur.execute('SELECT "content" FROM "settings" WHERE "id"=%s', ("DBSchemaVersion",))
+            rs = cur.fetchone()
+            if rs is None:
                 needfullreload = True
             else:
-                if (majorversion == schemaversion.major) and (minorversion < schemaversion.minor):
-                    needconfigreload = True
+                majorversion = int(rs[0].split('.')[0])
+                minorversion = int(rs[0].split('.')[1])
+                if majorversion < schemaversion.major:
+                    needfullreload = True
+                else:
+                    if (majorversion == schemaversion.major) and (minorversion < schemaversion.minor):
+                        needconfigreload = True
+    except DatabaseError:
+        needfullreload = True
 
     returndata['needfullreload'] = needfullreload
     returndata['needconfigreload'] = needconfigreload

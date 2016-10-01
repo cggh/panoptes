@@ -99,12 +99,12 @@ else
 fi
 
 echo -e "${green}  Linking BASEDIR/Docs to served directory ${NC}"
-cd $PROJECT_ROOT/webapp/dist
+mkdir -p $PROJECT_ROOT/webapp/dist/panoptes
+cd $PROJECT_ROOT/webapp/dist/panoptes
 rm -rf Docs
 ln -sf $BASEDIR/Docs Docs
 
 echo -e "${green}  Linking BASEDIR/Maps to served directory ${NC}"
-cd $PROJECT_ROOT/webapp/dist
 rm -rf Maps
 ln -sf $BASEDIR/Maps Maps
 
