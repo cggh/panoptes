@@ -23,13 +23,7 @@ import _max from 'lodash/max';
 import _min from 'lodash/min';
 
 // CSS
-// FIXME: leaflet/dist/leaflet.css
-/*
-ERROR in ./~/css-loader!./~/postcss-loader!./~/leaflet/dist/leaflet.css
-Module not found: Error: Cannot resolve directory './images' in /[...]/panoptes/webapp/node_modules/leaflet/dist
- @ ./~/css-loader!./~/postcss-loader!./~/leaflet/dist/leaflet.css 6:8942-8962
-*/
-import 'leaflet-modified.css';
+import 'leaflet/dist/leaflet.css';
 
 const ALLOWED_CHILDREN = [
   'LayersControlWidget',
