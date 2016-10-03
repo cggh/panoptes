@@ -10,10 +10,10 @@ cd `dirname ${SCRIPT_PATH}`
 cd ..
 PROJECT_ROOT=`pwd`;
 
-source build/panoptes_virtualenv/bin/activate
-PYTHONPATH=${PROJECT_ROOT}/build/DQXServer:${PROJECT_ROOT}/servermodule/panoptesserver/importer
+source panoptes_virtualenv/bin/activate
+PYTHONPATH=${PROJECT_ROOT}/server:${PROJECT_ROOT}/server/responders/importer
 export PYTHONPATH
 
 #pip install nose
 #nosetests
-python ${PROJECT_ROOT}/servermodule/panoptesserver/importer/ImportSettings.py
+python ${PROJECT_ROOT}/server/responders/importer/ImportSettings.py

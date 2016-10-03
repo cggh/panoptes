@@ -7,6 +7,7 @@ from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
 from SettingsGraph import SettingsGraph
 from SettingsDataset import SettingsDataset
+from SettingsMapLayer import SettingsMapLayer
 from __builtin__ import file
 
 ''' Not doing it anymore....
@@ -275,37 +276,31 @@ class ImportSettingsTest(unittest.TestCase):
 	def validateSettings(self, settingsType, file):
 		
 		validateTestLoad = None
-		try:
-			if settingsType == "2D_datatables":
-				validateTestLoad = Settings2Dtable()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == 'datasets':
-				validateTestLoad = SettingsDataset()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == 'datatables':
-				validateTestLoad = SettingsDataTable()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == "refgenome":
-				validateTestLoad = SettingsRefGenome()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == "graphs":
-				validateTestLoad = SettingsGraph()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == 'summaryvalues':
-				parent = os.path.dirname(file)
-				validateTestLoad = SettingsDataTable()
-				validateTestLoad.loadFile(file, True)
-			elif settingsType == 'pre' or settingsType == 'post':
-				validateTestLoad = {}
-#			else:
-#				print "Settings not found:" + settingsType
-				
-		except ValueError as ve:
-			self.fail(settingsType + ':' + file + ':' + str(ve))
-		except KeyError as ve:
-			self.fail(settingsType + ':' + file + ':' + str(ve))
-		
-#		print "returning:" + str(validateTestLoad)	
+		# try:
+		if settingsType == "2D_datatables":
+			validateTestLoad = Settings2Dtable()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == 'datasets':
+			validateTestLoad = SettingsDataset()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == 'datatables':
+			validateTestLoad = SettingsDataTable()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == "refgenome":
+			validateTestLoad = SettingsRefGenome()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == "graphs":
+			validateTestLoad = SettingsGraph()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == "maps":
+			validateTestLoad = SettingsMapLayer()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == 'summaryvalues':
+			parent = os.path.dirname(file)
+			validateTestLoad = SettingsDataTable()
+			validateTestLoad.loadFile(file, True)
+		elif settingsType == 'pre' or settingsType == 'post':
+			validateTestLoad = {}
 		return validateTestLoad
 	
 	def testSampleData(self):
