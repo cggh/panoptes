@@ -515,7 +515,7 @@ let MapActions = React.createClass({
               </span>
               : null}
           </div>
-          <div className="grow">
+          <div className="grow map-content">
             {mapWidget}
           </div>
         </div>
