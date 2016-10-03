@@ -36,11 +36,10 @@ class PluginLoader(BaseImport):
     def loadPlugin(self, plugin, dirPath, settings):
         # Fast path: see if the module has already been imported.
         try:
-            return sys.modules[plugin["name"]]
+            m = sys.modules[plugin["name"]]
         except KeyError:
-            pass
-        try:
             m = imp.load_module(plugin["name"], *plugin["info"])
+        try:
             return getattr(m, plugin["name"])(self._calculationObject, self._datasetId, settings, dirPath)
         finally:
             fp = plugin["info"][0]
@@ -76,7 +75,7 @@ class PluginLoader(BaseImport):
                 
             plugin_settings = PluginSettings(fileName = settings, validate = False)
             
-            self._log("Loading plugin:" + plugin_settings["plugin"]);
+            self._log("Loading plugin:" + plugin_settings["plugin"])
             for i in self.getPlugins():
                 if i["name"] == plugin_settings["plugin"]:
                     plugin = self.loadPlugin(i, dirPath, settings)
