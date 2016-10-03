@@ -17,6 +17,10 @@
   }
 }
 
+.map-content {
+  height: calc(100% - $topbar-height)
+}
+
 //Inside the popover menu we are not inside plot-controls
 .dropdown-option {
   .icon {
