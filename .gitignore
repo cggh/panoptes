@@ -6,13 +6,9 @@
 .DS_Store
 webapp/bower_components/
 webapp/node_modules/
-webapp/dist/panoptes
+webapp/dist/panoptes/Maps
+webapp/dist/panoptes/Docs
 
-servermodule/panoptesserver/VTTable.py
-servermodule/panoptesserver/import/VTTable.py
-importscripts/TableUtils
-
-servermodule/panoptesserver/PanoptesAuthDb
 settings.gen
 chef-install
 panoptes-boxes-master
