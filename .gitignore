@@ -6,8 +6,7 @@
 .DS_Store
 webapp/bower_components/
 webapp/node_modules/
-webapp/dist/Docs
-webapp/dist/Maps
+webapp/dist/panoptes
 
 servermodule/panoptesserver/VTTable.py
 servermodule/panoptesserver/import/VTTable.py
@@ -25,7 +24,7 @@ panoptes-boxes-master
 # Packages
 *.egg
 *.egg-info
-build
+panoptes_virtualenv
 eggs
 parts
 bin
