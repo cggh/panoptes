@@ -18,7 +18,7 @@
 }
 
 .map-content {
-  height: calc(100% - $topbar-height)
+  height: calc(100% - #{$topbar-height});
 }
 
 //Inside the popover menu we are not inside plot-controls
