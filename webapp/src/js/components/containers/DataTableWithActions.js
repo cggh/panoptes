@@ -31,9 +31,6 @@ import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import FilterButton from 'panoptes/FilterButton';
 import PivotTableWithActions from 'containers/PivotTableWithActions';
 
-// Constants
-const MAX_ROWS_COUNT = 100000;
-
 let DataTableWithActions = React.createClass({
   mixins: [PureRenderMixin, FluxMixin, ConfigMixin],
 
@@ -72,7 +69,7 @@ let DataTableWithActions = React.createClass({
       startRowIndex: this.props.initialStartRowIndex,
       showableRowsCount: 0,
       searchOpen: this.props.initialSearchFocus || this.props.searchText !== '',
-      totalTruncatedRowsCount: 0
+      totalRowsCount: 0
     };
   },
 
@@ -128,8 +125,8 @@ let DataTableWithActions = React.createClass({
     this.setState({showableRowsCount});
   },
 
-  handleTotalTruncatedRowsCountChange(totalTruncatedRowsCount) {
-    this.setState({totalTruncatedRowsCount});
+  handleTotalRowsCountChange(totalRowsCount) {
+    this.setState({totalRowsCount});
   },
 
   handleNextPage() {
@@ -149,7 +146,7 @@ let DataTableWithActions = React.createClass({
   },
 
   handleLastPage() {
-    this.setState({startRowIndex: this.state.totalTruncatedRowsCount - this.state.showableRowsCount});
+    this.setState({startRowIndex: this.state.totalRowsCount - this.state.showableRowsCount});
   },
 
   handleDownload() {
@@ -158,7 +155,7 @@ let DataTableWithActions = React.createClass({
         dataset: this.config.dataset,
         table: this.props.table,
         tableConfig: this.tableConfig(),
-        truncatedRowsCount: this.state.totalTruncatedRowsCount,
+        rowsCount: this.state.totalRowsCount,
         onLimitBreach: this.handleDownloadLimitBreach,
         query: this.props.query,
         columns: this.props.columns,
@@ -236,9 +233,10 @@ let DataTableWithActions = React.createClass({
   },
 
   render() {
+
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
-    let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalTruncatedRowsCount} = this.state;
+    let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns) {
@@ -361,21 +359,13 @@ let DataTableWithActions = React.createClass({
       shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {startRowIndex + fetchedRowsCount}</span>;
     } else if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount) {
       // If we're showing something and it's all we can show, then there could be more or we might be showing the last lot.
-      if (totalTruncatedRowsCount >= MAX_ROWS_COUNT) {
-        if (totalTruncatedRowsCount > MAX_ROWS_COUNT) {
-          // Somehow the total number of rows exceeds the maximum number of rows allowed before truncation was expected to occur.
-          console.error('totalTruncatedRowsCount > MAX_ROWS_COUNT, i.e. ' + totalTruncatedRowsCount + ' > ' + MAX_ROWS_COUNT);
-        }
-        // What we're showing is at least what we could possibly show, so there could be more, i.e. the rows could be truncated.
-        shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of at least {totalTruncatedRowsCount}</span>;
-      } else {
-        // What we're showing is less than we could possibly show, so it's safe to assume that we're showing the last lot.
-        shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {totalTruncatedRowsCount}</span>;
-      }
+
+      // What we're showing is less than we could possibly show, so it's safe to assume that we're showing the last lot.
+      shownRowsMessage = <span className="text">Showing rows {startRowIndex + 1}–{startRowIndex + fetchedRowsCount} of {totalRowsCount}</span>;
     }
 
     let pageForwardNav = null;
-    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount && (startRowIndex + showableRowsCount < totalTruncatedRowsCount)) {
+    if (fetchedRowsCount != 0 && fetchedRowsCount == showableRowsCount && (startRowIndex + showableRowsCount < totalRowsCount)) {
       // If we are showing something and it's as many as possible, then provide nav to further rows.
       pageForwardNav = (
         <span>
@@ -424,7 +414,7 @@ let DataTableWithActions = React.createClass({
             <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {order ? this.tableConfig().propertiesById[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
-            <span className="block text">{columns.size} of {this.tableConfig().properties.length} columns shown</span>
+            <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>
           <div className="grow">
@@ -439,8 +429,7 @@ let DataTableWithActions = React.createClass({
                            startRowIndex={startRowIndex}
                            onShowableRowsCountChange={this.handleShowableRowsCountChange}
                            onFetchedRowsCountChange={this.handleFetchedRowsCountChange}
-                           onTotalTruncatedRowsCountChange={this.handleTotalTruncatedRowsCountChange}
-                           maxRowsCount={MAX_ROWS_COUNT}
+                           onTotalRowsCountChange={this.handleTotalRowsCountChange}
               />
             </div>
         </div>
