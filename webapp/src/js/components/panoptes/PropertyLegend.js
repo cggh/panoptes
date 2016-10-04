@@ -36,7 +36,7 @@ let PropertyLegend = React.createClass({
         <LegendElement key="false" name="False" colour={colourFunc(false)} />
       ];
     } else if (propConfig.isCategorical || propConfig.isText) {
-      elements = _map(propConfig.propCategories || knownValues || [], (value) => (
+      elements = _map(propConfig.distinctValues || knownValues || [], (value) => (
         <LegendElement key={value} name={value} colour={colourFunc(value)} />));
     } else {
       const colour = scaleColour([0, 1]);

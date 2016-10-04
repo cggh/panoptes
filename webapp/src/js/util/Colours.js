@@ -59,8 +59,8 @@ export function propertyColour(propConfig, min = null, max = null) {
   if (propConfig.isCategorical) {
     const colourFunc = categoryColours(`${propConfig.tableId}_${propConfig.id}`);
     //Run thorugh the possibilites so they are enumerated in sort order, not appearance order.
-    if (propConfig.propCategories) {
-      propConfig.propCategories.forEach(colourFunc);
+    if (propConfig.distinctValues) {
+      propConfig.distinctValues.forEach(colourFunc);
     }
     return colourFunc;
   }

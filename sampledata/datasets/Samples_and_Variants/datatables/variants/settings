@@ -71,8 +71,6 @@ properties:
   groupId: Info
   index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
   showInBrowser: true           # If true, this property will be displayed in the genome browser
-  minVal: 0                     # Optional: For Value types, specifies the minimum value that can be reached.
-  maxVal: 1                     # Optional: For Value types, specifies the maximum value that can be reached.
   decimDigits: 2                # Optional: For Value types, specifies the number of decmimal digits that should be used to display the value
 
 - id: Value1
@@ -80,7 +78,9 @@ properties:
   dataType: Float
   description: The first numerical value
   showBar: true                   # Draws a bar in the background of the table, indicating the value. This requires MinVal & MaxVal to be defined
-  channelColor: rgb(0,80,200)    # Colour used to display this property
+  minVal: 0                       # Optional: For Value types, specifies the minimum value that can be reached.
+  maxVal: 1                       # Optional: For Value types, specifies the maximum value that can be reached.
+  channelColor: rgb(0,80,200)     # Colour used to display this property
   browserDefaultVisible: true
 
 - id: Value2
@@ -101,7 +101,6 @@ properties:
   description: An example categorical property
   dataType: Text
   showInBrowser: true
-  isCategorical: true               # This directive instructs Panoptes to treat the property as a categorical variable. For example, a combo box with the possible states is automatically shown in queries for this property
   categoryColors:                   # Specifies display colours for the categorical states of this property
     A: rgb(255,128,60)
     B: rgb(0,180,0)
@@ -116,6 +115,7 @@ properties:
 
 - id: NRAF_WAF
   description: Non-reference allele frequency in West Africa
+  isCategorical: false
 
 - id: NRAF_EAF
   description: Non-reference allele frequency in East Africa
