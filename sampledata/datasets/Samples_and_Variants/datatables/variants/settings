@@ -101,10 +101,15 @@ properties:
   description: An example categorical property
   dataType: Text
   showInBrowser: true
-  valueColours:                   # Specifies display colours for the categorical states of this property
+  valueColours:                   # Specifies display colours for the values of this property
     A: rgb(255,128,60)
     B: rgb(0,180,0)
     _other_: rgb(128, 128, 128)     # Garbage state, collection all states that are not explicitly specified
+  valueDescriptions:                # Specifies descriptions for this property
+    A: <b>OMG</b> This value is <i>A</i>. It is the first letter of the alphabet
+    B: B is boring and has only a line<br/>break
+  valueDisplays:                # Specifies descriptions for this property, not applied if externalURL is specified for this property.
+    B: :)<em>B</em>:P
   browserDefaultVisible: true
 
 - id: NRAF_WAF, NRAF_EAF, NRAF_SAF

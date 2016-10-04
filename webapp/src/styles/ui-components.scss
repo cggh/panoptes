@@ -545,6 +545,17 @@ input.invalid {
   overflow: hidden;
   white-space: nowrap;
   padding: 8px;
+  .icon {
+    min-width: 20px;
+    color: darkgrey;
+    font-size: 14px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+  .icon:hover {
+    color: #4e4e4e;
+  }
+
 }
 
 .table-col {
