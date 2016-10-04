@@ -74,7 +74,7 @@ let FindGene = React.createClass({
 
     if ((setChromosome === null || setChromosome === undefined)  && defaultChromosome !== null) {
 
-      let defaultChromosomeLength = parseInt(this.config.chromosomes[defaultChromosome].len);
+      let defaultChromosomeLength = parseInt(this.config.chromosomes[defaultChromosome]);
 
       setChromosomeLength = defaultChromosomeLength;
       setChromosome = defaultChromosome;

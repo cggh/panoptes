@@ -4,6 +4,9 @@
 
 import os
 import uuid
+from os.path import join
+
+import errno
 
 import ImpUtils
 import shutil
@@ -11,6 +14,8 @@ from PanoptesConfig import PanoptesConfig
 from SettingsDAO import SettingsDAO
 from SettingsRefGenome import SettingsRefGenome
 import json
+from readChromLengths import readChromLengths
+import simplejson
 from Bio import SeqIO
 
 def flattenarglist(arg):
@@ -19,10 +24,12 @@ def flattenarglist(arg):
     else:
         return arg
 
-def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
-    
-    datasetFolder = os.path.join(baseFolder, datasetId)
-    folder = os.path.join(datasetFolder, 'refgenome')
+def ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings):
+    config = PanoptesConfig(calculationObject)
+    baseFolder = join(config.getBaseDir(), 'config', datasetId)
+    datasetFolder = join(sourceFolder, datasetId)
+    folder = join(datasetFolder, 'refgenome')
+
     if not os.path.exists(folder):
         return False
 
@@ -30,7 +37,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             
     with calculationObject.LogHeader('Importing reference genome data'):
 
-        settings = SettingsRefGenome(os.path.join(folder, 'settings'), validate=True)
+        settings = SettingsRefGenome(join(folder, 'settings'), validate=True)
         print('Settings: '+str(settings))
 
         for token in settings.getLoadedSettings().keys():
@@ -38,8 +45,18 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
             if (type(val) is list) or (type(val) is dict):
                 val = json.dumps(val)
             dao.saveSettings(token, val)
-
         conf = PanoptesConfig(calculationObject)
+
+        # Store chrom lengths from FASTA
+        chromosomes = readChromLengths(join(folder, 'refsequence.fa'))
+        try:
+            os.makedirs(baseFolder)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
+        with open(join(baseFolder, 'chromosomes.json'), 'w') as f:
+            simplejson.dump(chromosomes, f)
+
         # Import reference genome
         if not(importSettings['ConfigOnly']):
             maxBaseCount = slice(0,None)
@@ -47,10 +64,10 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                 maxBaseCount = slice(0,10000)
             if importSettings['ScopeStr'] == '100k':
                 maxBaseCount = slice(0,1000000)
-            refsequencefile = os.path.join(folder, 'refsequence.fa')
+            refsequencefile = join(folder, 'refsequence.fa')
             if os.path.exists(refsequencefile):
                 with calculationObject.LogHeader('Converting reference genome'):
-                    tempFile = os.path.join(conf.getBaseDir(), str(uuid.uuid4()))
+                    tempFile = join(conf.getBaseDir(), str(uuid.uuid4()))
                     with open(refsequencefile, "rU") as f, open(tempFile, 'w') as o:
                         for record in SeqIO.parse(f, "fasta"):
                             chrom = record.id
@@ -95,7 +112,7 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
 
                 tempgfffile = ImpUtils.GetTempFileName()
                 temppath = os.path.dirname(tempgfffile)
-                shutil.copyfile(os.path.join(folder, 'annotation.gff'), tempgfffile)
+                shutil.copyfile(join(folder, 'annotation.gff'), tempgfffile)
                 ImpUtils.RunConvertor(calculationObject, 'ParseAnnotation', temppath, [
                     str_maxrowcount,
                     formatid,
@@ -107,11 +124,11 @@ def ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings):
                     os.path.basename(tempgfffile)
                 ])
                 print('Importing annotation')
-                dao.loadFile(os.path.join(temppath, 'annotation_dump.sql'))
+                dao.loadFile(join(temppath, 'annotation_dump.sql'))
                 os.remove(tempgfffile)
-                os.remove(os.path.join(temppath, 'annotation.txt'))
-                os.remove(os.path.join(temppath, 'annotation_dump.sql'))
-                os.remove(os.path.join(temppath, 'annotation_create.sql'))
+                os.remove(join(temppath, 'annotation.txt'))
+                os.remove(join(temppath, 'annotation_dump.sql'))
+                os.remove(join(temppath, 'annotation_create.sql'))
 
     return True
 
@@ -128,5 +145,5 @@ if __name__ == "__main__":
     calculationObject = asyncresponder.CalculationThread('', None, {'isRunningLocal': True}, '')
     DQXDbTools.DbCredentialVerifier = None
     conf = PanoptesConfig(calculationObject)
-    baseFolder = os.path.join(conf.getSourceDataDir(), 'datasets')
-    ImportRefGenome(calculationObject, datasetId, baseFolder, importSettings)
+    sourceFolder = join(conf.getSourceDataDir(), 'datasets')
+    ImportRefGenome(calculationObject, datasetId, sourceFolder, importSettings)

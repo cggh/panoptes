@@ -7,7 +7,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
-const FALLBACK_MAXIMUM = 1000000000;
+const FALLBACK_MAXIMUM = 214700000;
 
 let Controls = React.createClass({
   mixins: [
@@ -59,7 +59,7 @@ let Controls = React.createClass({
       _isFinite(mid) &&
       _isFinite(width) &&
       mid >= 0 &&
-      mid <= (this.config.chromosomes[this.props.chromosome].len || FALLBACK_MAXIMUM) &&
+      mid <= (this.config.chromosomes[this.props.chromosome] || FALLBACK_MAXIMUM) &&
       width > this.props.minWidth
     ) {
       this.props.setProps({
@@ -90,7 +90,7 @@ let Controls = React.createClass({
   render() {
     let {chromosome, minWidth} = this.props;
     let {midpoint, width, regionText, regionValid} = this.state;
-    let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
+    let max = this.config.chromosomes[chromosome] || FALLBACK_MAXIMUM;
     return (
       <span className="controls">
         <span> Chromosome: </span>

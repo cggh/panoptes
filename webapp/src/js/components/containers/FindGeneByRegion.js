@@ -58,15 +58,15 @@ let FindGeneByRegion = React.createClass({
   },
 
   componentWillMount() {
-    this.props.setProps({'endPosition': parseInt(this.config.chromosomes[this.props.chromosome].len)});
+    this.props.setProps({'endPosition': parseInt(this.config.chromosomes[this.props.chromosome])});
   },
 
   handleChromChange(event) {
     this.props.setProps({
       'chromosome': event.target.value,
-      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value].len),
+      'chromosomeLength': parseInt(this.config.chromosomes[event.target.value]),
       'startPosition': 0,
-      'endPosition': parseInt(this.config.chromosomes[event.target.value].len)
+      'endPosition': parseInt(this.config.chromosomes[event.target.value])
     });
   },
 

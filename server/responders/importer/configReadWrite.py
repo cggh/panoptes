@@ -1,16 +1,17 @@
 from os import path, listdir
 from os.path import join
-from simplejson import loads, dumps
-from Bio import SeqIO
+from simplejson import load, loads, dumps
 from PanoptesConfig import PanoptesConfig
 from SettingsDataset import SettingsDataset
 from SettingsDataTable import SettingsDataTable
 from Settings2Dtable import Settings2Dtable
 from SettingsRefGenome import SettingsRefGenome
 from SettingsMapLayer import SettingsMapLayer
+from readChromLengths import readChromLengths
 
 config = PanoptesConfig(None)
-baseFolder = join(config.getSourceDataDir(), 'datasets')
+sourceDir = join(config.getSourceDataDir(), 'datasets')
+baseDir = config.getBaseDir()
 
 def readSetOfSettings(dirPath, loader, wanted_names=None):
     if not path.isdir(dirPath):
@@ -20,13 +21,19 @@ def readSetOfSettings(dirPath, loader, wanted_names=None):
                   if path.isdir(join(dirPath, name)) and (not wanted_names or name in wanted_names)}
 
 def readJSONConfig(datasetId):
-    datasetFolder = join(baseFolder, datasetId)
+    datasetFolder = join(sourceDir, datasetId)
+    baseFolder = join(baseDir, 'config', datasetId)
     if not path.isdir(datasetFolder):
         raise Exception('Error: ' + datasetId + ' is not a known dataset in the source directory')
     settingsFile = join(datasetFolder, 'settings')
     settings = loads(SettingsDataset(settingsFile, validate=True).serialize())
-    with open(join(datasetFolder, 'refgenome', 'refsequence.fa')) as fastaFile:
-        chromosomes = {fasta.id: len(fasta.seq) for fasta in SeqIO.parse(fastaFile, 'fasta')}
+    try:
+        with open(join(baseFolder, 'chromosomes.json'), 'r') as f:
+            chromosomes = load(f)
+    except IOError:
+        print('Cached chrom config not found - scanning')
+        chromosomes = readChromLengths(join(datasetFolder, 'refgenome', 'refsequence.fa'))
+
     tables = readSetOfSettings(join(datasetFolder, 'datatables'), SettingsDataTable, settings.get('DataTables'))
     twoDTables = readSetOfSettings(join(datasetFolder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(datasetFolder, 'refgenome', 'settings'), validate=True).serialize())
@@ -47,7 +54,7 @@ class ReadOnlyErrorWriter:
         raise Exception("The config at:"+'.'.join([self.name]+updatePath)+" is read-only")
 
 def writeJSONConfig(datasetId, action, path, newConfig):
-    datasetFolder = join(baseFolder, datasetId)
+    datasetFolder = join(sourceDir, datasetId)
     settingsFile = join(datasetFolder, 'settings')
     #We have a path in the combined JSON object - we now follow the path until we hit a subset confined to one YAML handler
     writers = {
