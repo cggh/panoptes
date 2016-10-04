@@ -235,8 +235,8 @@ let Criterion = React.createClass({
 
     // TODO: This logic is essentially replicated from render(). Possible to abstract?
     if (currentOperator.fieldType === 'value') {
-      if (property.propCategories) {
-        component.CompValue = property.propCategories[0];
+      if (property.distinctValues) {
+        component.CompValue = property.distinctValues[0];
       } else if (property.isBoolean) {
         component.CompValue = true;
       }
@@ -381,13 +381,13 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
-      if (property.propCategories) {
+      if (property.distinctValues) {
         fields = (
           <div className="fields">
             <select className="field" ref="value"
                     value={component.CompValue}
                     onChange={this.handleValueChange}>
-              {property.propCategories.map((cat) =>
+              {property.distinctValues.map((cat) =>
                 <option key={cat}
                         value={cat}>
                   {cat}

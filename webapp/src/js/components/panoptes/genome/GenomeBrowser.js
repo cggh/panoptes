@@ -90,7 +90,7 @@ let GenomeBrowser = React.createClass({
     let {chromosome} = this.props;
     chromosome = chromosome || this.defaultChrom;
     let min = 0;
-    let max = this.config.chromosomes[chromosome].len || FALLBACK_MAXIMUM;
+    let max = this.config.chromosomes[chromosome] || FALLBACK_MAXIMUM;
     let width = end - start;
     if (start <= min && end >= max) {
       start = min;

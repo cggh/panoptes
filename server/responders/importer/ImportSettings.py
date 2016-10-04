@@ -12,11 +12,12 @@ from abc import ABCMeta
 import ruamel.yaml
 import portalocker
 
+valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32']
+
 class ImportSettings:
 
     __metaclass__ = ABCMeta
 
-    _valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32']
     _propertiesDefault = OrderedDict((
                             ('id', {
                                    'type': 'Text',
@@ -84,7 +85,7 @@ class ImportSettings:
                             ('isCategorical', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n  Categorical properties are automatically indexed'
+                                   'description': 'Set automatically for columns with <50 distinct entries, unless set. Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n'
                                    }),
                             ('categoryColors', {
                                    'type': 'Block',
@@ -95,31 +96,31 @@ class ImportSettings:
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'Sets the deafult column width in pixels.',
-                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('showBar', {
                                    'type': 'Boolean',
                                    'required': False,
                                    'description': 'Draws a bar in the background of the table, indicating the value.\n  Requires *minVal* & *maxVal* to be defined.',
-                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('minVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'For *Value* types, upper extent of scale',
-                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
+                                   'description': 'Set automatically from data unless overridden. For *Value* types, upper extent of scale',
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('maxVal', {
                                    'type': 'Value',
                                    'required': False,
-                                   'description': 'For *Value* types, lower extent of scale',
-                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
+                                   'description': 'Set automatically from data unless overridden. For *Value* types, lower extent of scale',
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('decimDigits', {
                                    'type': 'Value',
                                    'required': False,
                                    'description': 'For *Value* types, specifies the number of decimal digits used to display the value',
-                                   'siblingOptional': { 'name': 'dataType', 'value': _valueTypes}
+                                   'siblingOptional': { 'name': 'dataType', 'value': valueTypes}
                                    }),
                             ('index', {
                                    'type': 'Boolean',
