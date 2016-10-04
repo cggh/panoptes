@@ -87,7 +87,7 @@ class ImportSettings:
                                    'required': False,
                                    'description': 'Set automatically for columns with <50 distinct entries, unless set. Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n'
                                    }),
-                            ('categoryColors', {
+                            ('valueColours', {
                                    'type': 'Block',
                                    'required': False,
                                    'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
@@ -213,6 +213,7 @@ class ImportSettings:
                                                 'default': True,
                                                 'description': ''
                                                 }),
+
                           ))
 
 
@@ -507,7 +508,7 @@ class ImportSettings:
     def _postProcess(self):
 
         for propid in self.getPropertyNames():
-            cc = self.getPropertyValue(propid, 'categoryColors')
+            cc = self.getPropertyValue(propid, 'valueColours')
             if cc:
                 categories = [x for x in cc]
                 self._propidMap[propid]['categories'] = categories

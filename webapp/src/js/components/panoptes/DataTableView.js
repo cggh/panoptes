@@ -264,7 +264,7 @@ let DataTableView = React.createClass({
                   cell={({rowIndex}) => {
 
                     let background = 'inherit';
-                    let {maxVal, minVal, categoryColors, showBar, alignment} = columnData;
+                    let {maxVal, minVal, valueColours, showBar, alignment} = columnData;
                     let cellData = rows[rowIndex][id];
                     if (showBar && cellData !== null && maxVal !== undefined && minVal !== undefined) {
                       cellData = parseFloat(cellData);
@@ -274,8 +274,8 @@ let DataTableView = React.createClass({
                       let clippedCellData = Math.min(Math.max(parseFloat(cellData), minVal), maxVal);
                       background = _cloneDeep(MAX_COLOR).lighten(0.58 * (1 - (clippedCellData - minVal) / (maxVal - minVal))).rgbString();
                     }
-                    if (categoryColors) {
-                      let col = categoryColors[cellData] || categoryColors['_other_'];
+                    if (valueColours) {
+                      let col = valueColours[cellData] || valueColours['_other_'];
                       if (col) {
                         col = Color(col).lighten(0.3);
                         if (rowIndex % 2)
