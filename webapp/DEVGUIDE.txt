@@ -33,7 +33,6 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 #Update npm
 sudo npm install -g npm
 #Update node
-#You might see /usr/bin/env: 'node': No such file or directory
 sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
