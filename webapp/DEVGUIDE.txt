@@ -18,9 +18,9 @@ nano config.py #Edit config for DB, paths
 #Then you can run panoptes:
 ./scripts/run.sh
 
-#Navigate to http://localhost:8000 and you should see a big error message because we haven't imported any datasets.
-#Here is how to import one of the sample datasets:
-#Navigate to http://localhost:8000/Samples_and_Variants and you might see other error messages because we haven't imported the dataset yet.
+#Datasets are hosted at http://localhost:8000/{DATASET_ID}
+#If you're using the sampledata (by default you are) then several are available for example
+#Navigate to http://localhost:8000/Samples_and_Variants - error messages will appear as the dataset hasn't been loaded
 #Click on the Dataset Manager button to open that view.
 #Click on the Reimport Everything button to import the Samples_and_Variants dataset.
 #Wait for the import to finish and then close the Dataset Manager tab and refresh the page.
