@@ -23,9 +23,6 @@ import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import DataItemViews from 'panoptes/DataItemViews';
 
-// Constants
-const MAX_ROWS_COUNT = 10000;
-
 let ListWithActions = React.createClass({
 
   mixins: [
@@ -79,8 +76,8 @@ let ListWithActions = React.createClass({
     this.setState({'search': event.target.value});
   },
 
-  handleTruncatedRowsCountChange(truncatedRowsCount) {
-    this.setState({truncatedRowsCount});
+  handleRowsCountChange(rowsCount) {
+    this.setState({rowsCount});
   },
 
   handleDownload() {
@@ -89,7 +86,7 @@ let ListWithActions = React.createClass({
         dataset: this.config.dataset,
         table: this.props.table,
         tableConfig: this.tableConfig(),
-        truncatedRowsCount: this.state.truncatedRowsCount,
+        rowsCount: this.state.rowsCount,
         onLimitBreach: this.handleDownloadLimitBreach
       }
     );
@@ -131,8 +128,7 @@ let ListWithActions = React.createClass({
              onSelect={this.handleSelect}
              icon={this.icon()}
              autoSelectIfNoneSelected
-             onTruncatedRowsCountChange={this.handleTruncatedRowsCountChange}
-             maxRowsCount={MAX_ROWS_COUNT}
+             onRowsCountChange={this.handleRowsCountChange}
             />
         </div>
       </div>

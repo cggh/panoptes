@@ -50,12 +50,11 @@ let DataTableView = React.createClass({
     startRowIndex: React.PropTypes.number,
     columns: React.PropTypes.array,
     columnWidths: React.PropTypes.object,
-    maxRowsCount: React.PropTypes.number,
     onColumnResize: React.PropTypes.func,
     onOrderChange: React.PropTypes.func,
     onShowableRowsCountChange: React.PropTypes.func,
     onFetchedRowsCountChange: React.PropTypes.func,
-    onTotalTruncatedRowsCountChange: React.PropTypes.func,
+    onTotalRowsCountChange: React.PropTypes.func,
     className: React.PropTypes.string
   },
 
@@ -79,7 +78,7 @@ let DataTableView = React.createClass({
       width: 0,
       height: 0,
       showableRowsCount: 0,
-      totalTruncatedRowsCount: 0
+      totalRowsCount: 0
     };
   },
 
@@ -90,7 +89,7 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, startRowIndex, maxRowsCount} = props;
+    let {table, query, columns, order, ascending, startRowIndex} = props;
     let {showableRowsCount} = this.state;
     let tableConfig = this.config.tablesById[table];
     let columnspec = {};
@@ -110,11 +109,10 @@ let DataTableView = React.createClass({
         stop: stopRowIndex
       };
 
-      let truncatedRowsCountAPIargs = {
+      let rowsCountAPIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
-        query,
-        maxRowsCount
+        query
       };
 
       requestContext.request((componentCancellation) =>
@@ -126,18 +124,18 @@ let DataTableView = React.createClass({
             componentCancellation
           ),
           LRUCache.get(
-            'truncatedRowsCount' + JSON.stringify(truncatedRowsCountAPIargs),
+            'rowsCount' + JSON.stringify(rowsCountAPIargs),
             (cacheCancellation) =>
-              API.truncatedRowsCount({cancellation: cacheCancellation, ...truncatedRowsCountAPIargs}),
+              API.rowsCount({cancellation: cacheCancellation, ...rowsCountAPIargs}),
             componentCancellation
           )
         ])
       )
-      .then(([rows, truncatedRowsCount]) => {
+      .then(([rows, rowsCount]) => {
         this.setState({
           loadStatus: 'loaded',
           rows: rows,
-          totalTruncatedRowsCount: truncatedRowsCount
+          totalRowsCount: rowsCount
         });
       })
       .catch(API.filterAborted)
@@ -191,7 +189,6 @@ let DataTableView = React.createClass({
     this.setState({showableRowsCount: size.height ? Math.floor((size.height - HEADER_HEIGHT - SCROLLBAR_HEIGHT) / ROW_HEIGHT) : 0});
   },
 
-
   componentDidUpdate: function(prevProps, prevState) {
     if (this.props.onShowableRowsCountChange && prevState.showableRowsCount !== this.state.showableRowsCount) {
       this.forceFetch();
@@ -200,8 +197,8 @@ let DataTableView = React.createClass({
     if (this.props.onFetchedRowsCountChange && prevState.rows.length !== this.state.rows.length) {
       this.props.onFetchedRowsCountChange(this.state.rows.length);
     }
-    if (this.props.onTotalTruncatedRowsCountChange && prevState.totalTruncatedRowsCount !== this.state.totalTruncatedRowsCount) {
-      this.props.onTotalTruncatedRowsCountChange(this.state.totalTruncatedRowsCount);
+    if (this.props.onTotalRowsCountChange && prevState.totalRowsCount !== this.state.totalRowsCount) {
+      this.props.onTotalRowsCountChange(this.state.totalRowsCount);
     }
   },
 
@@ -261,7 +258,7 @@ let DataTableView = React.createClass({
                         null}
                       name={name}
                       description={description}
-                      tooltipPlacement={"bottom"}
+                      tooltipPlacement={'bottom'}
                       tooltipTrigger={['click']}/>
                   }
                   cell={({rowIndex}) => {
