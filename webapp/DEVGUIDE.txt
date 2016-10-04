@@ -1,6 +1,6 @@
 #Getting started - a little rough at the mo until we come to fix up the build and deploy system
 
-sudo apt-get install git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
+sudo apt-get install -y git gcc gfortran python-dev python-virtualenv libblas-dev liblapack-dev cython libhdf5-serial-dev
 
 sudo apt-add-repository "http://dev.monetdb.org/downloads/deb/ xenial monetdb"
 wget --output-document=- https://www.monetdb.org/downloads/MonetDB-GPG-KEY | sudo apt-key add -
@@ -18,17 +18,22 @@ nano config.py #Edit config for DB, paths
 #Then you can run panoptes:
 ./scripts/run.sh
 
-#Navigate to http://localhost:8000/index.html and you should see an ugly error as we have no datasets and the mechanism for dealing with this is not complete in 2.0
-#So we manually import one of the sample datasets - not that the dataset is chosen manually in webapp/src/index.html for now
-curl 'http://localhost:8000/api?datatype=custom&respmodule=panoptesserver&respid=fileload_dataset&ScopeStr=all&SkipTableTracks=false&datasetid=Samples_and_Variants'
+#Navigate to http://localhost:8000 and you should see a big error message because we haven't imported any datasets.
+#Here is how to import one of the sample datasets:
+#Navigate to http://localhost:8000/Samples_and_Variants and you might see other error messages because we haven't imported the dataset yet.
+#Click on the Dataset Manager button to open that view.
+#Click on the Reimport Everything button to import the Samples_and_Variants dataset.
+#Wait for the import to finish and then close the Dataset Manager tab and refresh the page.
+#http://localhost:8000/Samples_and_Variants should now show the dataset!
 
-#Wait for a few mins and then http://localhost:8000/index.html should show the dataset!
-
-#Now if you want to edit the JS we need to setup the JS build env
-sudo apt-get install nodejs npm
+#Now if you want to edit the JS, we need to setup the JS build env.
+#In another terminal window:
+sudo apt-get install -y nodejs npm
+sudo ln -s /usr/bin/nodejs /usr/bin/node
 #Update npm
 sudo npm install -g npm
 #Update node
+#You might see /usr/bin/env: 'node': No such file or directory
 sudo npm cache clean -f
 sudo npm install -g n
 sudo n stable
@@ -40,9 +45,5 @@ npm install
 #Now run the dev html/js server
 npm run dev          #(options are dev, build, serveprod)
 
-#Navigate to (NOTE DIFFERENT PORT) http://localhost:8080/webpack-dev-server/index.html
+#Navigate to (NOTE DIFFERENT PORT) http://localhost:8080/Samples_and_Variants
 #Any changes you save to files will now be detected and applied on refresh, experimental hot loading is via "npm run devhot"
-
-
-
-
