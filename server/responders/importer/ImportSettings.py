@@ -85,13 +85,23 @@ class ImportSettings:
                             ('isCategorical', {
                                    'type': 'Boolean',
                                    'required': False,
-                                   'description': 'Set automatically for columns with <50 distinct entries, unless set. Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n'
+                                   'description': 'Set automatically for columns with <50 distinct entries, unless set here. Instructs Panoptes to treat the property as a categorical variable.\n  For example, a combo box with the possible states is automatically shown in queries for this property.\n'
                                    }),
-                            ('categoryColors', {
+                            ('valueColours', {
                                    'type': 'Block',
                                    'required': False,
-                                   'description': 'Specifies display colours for the categorical states of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
+                                   'description': 'Specifies display colours for specific values of this property.\n  Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).\n  The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly'
                                    }),
+                            ('valueDescriptions', {
+                                    'type': 'Block',
+                                    'required': False,
+                                    'description': 'Specifies descriptions for specific values of this property which will displayed next to it under an info icon.'
+                            }),
+                            ('valueDisplays', {
+                                    'type': 'Block',
+                                    'required': False,
+                                    'description': 'Specifies display html for specific values of this property. The html will replace this value when it is displayed'
+                            }),
                             ('defaultWidth', {
                                    'type': 'Value',
                                    'required': False,
@@ -213,6 +223,7 @@ class ImportSettings:
                                                 'default': True,
                                                 'description': ''
                                                 }),
+
                           ))
 
 
@@ -505,14 +516,7 @@ class ImportSettings:
 
     #Set any implied values here
     def _postProcess(self):
-
-        for propid in self.getPropertyNames():
-            cc = self.getPropertyValue(propid, 'categoryColors')
-            if cc:
-                categories = [x for x in cc]
-                self._propidMap[propid]['categories'] = categories
-                print ("Set Categories for {}".format(propid))
-
+        pass
 
     @abc.abstractmethod
     def getSettings(self):

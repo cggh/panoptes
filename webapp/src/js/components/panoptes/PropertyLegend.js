@@ -27,8 +27,8 @@ let PropertyLegend = React.createClass({
     const propConfig = this.config.tablesById[table].propertiesById[property];
     const colourFunc = propertyColour(propConfig);
     let elements = null;
-    if (propConfig.categoryColors) {
-      elements = _map(propConfig.categoryColors, (colour, key) => (
+    if (propConfig.valueColours) {
+      elements = _map(propConfig.valueColours, (colour, key) => (
         <LegendElement key={key} name={key === '_other_' ? 'Other' : key} colour={colour} />));
     } else if (propConfig.isBoolean) {
       elements = [
