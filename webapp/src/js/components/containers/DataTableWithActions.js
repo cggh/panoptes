@@ -104,7 +104,7 @@ let DataTableWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.props.setProps({query: query});
+    this.props.setProps({query});
   },
 
   handleColumnChange(columns) {
@@ -313,12 +313,12 @@ let DataTableWithActions = React.createClass({
                     onClick={() => this.handleDownload()}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
-        {searchGUI}
         <FlatButton label="Pivot Table"
                     primary={true}
                     onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
+        {searchGUI}
       </div>
     );
 
