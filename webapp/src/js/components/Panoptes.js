@@ -1,6 +1,6 @@
 import React from  'react';
 import NotificationSystem from 'react-notification-system';
-import deserialiseComponent from 'util/deserialiseComponent';
+import deserialiseComponent from 'util/deserialiseComponent'; // NB: deserialiseComponent is actually used.
 import {Map} from 'immutable';
 import _assign from 'lodash/assign';
 
@@ -84,7 +84,7 @@ let Panoptes = React.createClass({
     let {tabs, popups, modal} = this.state;
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.config;
-    // NB: initialConfig is defined in index.html
+    // NB: initialConfig is actually defined (in index.html)
     return (
       <DetectResize onResize={this.handleResize}>
         <MuiThemeProvider muiTheme={muiTheme}>
