@@ -1,5 +1,5 @@
 import React from 'react';
-import {LayersControl} from 'react-leaflet';
+import {LayersControl as LeafletLayersControl} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -9,11 +9,11 @@ import filterChildren from 'util/filterChildren';
 import _cloneDeep from 'lodash/cloneDeep';
 
 const ALLOWED_CHILDREN = [
-  'BaseLayerWidget',
-  'OverlayWidget'
+  'BaseLayer',
+  'Overlay'
 ];
 
-let LayersControlWidget = React.createClass({
+let LayersControl = React.createClass({
 
   mixins: [
     FluxMixin
@@ -52,7 +52,7 @@ let LayersControlWidget = React.createClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
-      <LayersControl
+      <LeafletLayersControl
         autoZIndex={autoZIndex}
         children={children}
         removeLayer={removeLayer}
@@ -64,4 +64,4 @@ let LayersControlWidget = React.createClass({
 
 });
 
-module.exports = LayersControlWidget;
+module.exports = LayersControl;

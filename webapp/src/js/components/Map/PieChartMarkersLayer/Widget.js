@@ -8,13 +8,13 @@ import FluxMixin from 'mixins/FluxMixin';
 // Panoptes
 import API from 'panoptes/API';
 import CalcMapBounds from 'util/CalcMapBounds';
-import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
+import ComponentMarker from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
-import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import FeatureGroup from 'Map/FeatureGroup/Widget';
 import GeoLayouter from 'utils/GeoLayouter';
 import {latlngToMercatorXY} from 'util/WebMercator'; // TODO: Is there a Leaflet equivalent?
 import LRUCache from 'util/LRUCache';
-import PieChartWidget from 'Chart/Pie/Widget';
+import PieChart from 'Chart/Pie/Widget';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -23,7 +23,7 @@ import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _sum from 'lodash/sum';
 
-let PieChartMarkersLayerWidget = React.createClass({
+let PieChartMarkersLayer = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -296,19 +296,19 @@ let PieChartMarkersLayerWidget = React.createClass({
       <GeoLayouter nodes={markers}>
         {
           (renderNodes) =>
-          <FeatureGroupWidget
+          <FeatureGroup
             layerContainer={layerContainer}
             map={map}
           >
             {
               renderNodes.map(
                 (marker, i) =>
-                <ComponentMarkerWidget
+                <ComponentMarker
                   key={i}
                   position={{lat: marker.lat, lng: marker.lng}}
                   onClick={(e) => this.handleClickMarker(e, marker)}
                 >
-                  <PieChartWidget
+                  <PieChart
                     chartData={marker.chartData}
                     crs={crs}
                     key={i}
@@ -319,10 +319,10 @@ let PieChartMarkersLayerWidget = React.createClass({
                     originalLng={marker.lng}
                     radius={marker.radius}
                   />
-                </ComponentMarkerWidget>
+                </ComponentMarker>
               )
             }
-          </FeatureGroupWidget>
+          </FeatureGroup>
         }
       </GeoLayouter>
     );
@@ -331,4 +331,4 @@ let PieChartMarkersLayerWidget = React.createClass({
 
 });
 
-module.exports = PieChartMarkersLayerWidget;
+module.exports = PieChartMarkersLayer;

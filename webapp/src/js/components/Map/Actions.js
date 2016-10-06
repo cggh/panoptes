@@ -21,20 +21,20 @@ import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
 
 // Panoptes
-import BaseLayerWidget from 'Map/BaseLayer/Widget';
+import BaseLayer from 'Map/BaseLayer/Widget';
 import FilterButton from 'panoptes/FilterButton';
 import Icon from 'ui/Icon';
-import ImageOverlayWidget from 'Map/ImageOverlay/Widget';
-import LayersControlWidget from 'Map/LayersControl/Widget';
-import MapWidget from 'Map/Widget';
-import OverlayWidget from 'Map/Overlay/Widget';
+import ImageOverlay from 'Map/ImageOverlay/Widget';
+import LayersControl from 'Map/LayersControl/Widget';
+import Map from 'Map/Widget';
+import Overlay from 'Map/Overlay/Widget';
 import QueryString from 'panoptes/QueryString';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
 import SidebarHeader from 'ui/SidebarHeader';
 import SQL from 'panoptes/SQL';
-import TableMapWidget from 'Map/Table/Widget';
-import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
-import TileLayerWidget from 'Map/TileLayer/Widget';
+import TableMap from 'Map/Table/Widget';
+import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
+import TileLayer from 'Map/TileLayer/Widget';
 
 import 'map.scss';
 
@@ -305,12 +305,12 @@ let MapActions = React.createClass({
     if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (
-        <OverlayWidget
+        <Overlay
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayerWidget locationDataTable={table} />
-        </OverlayWidget>
+          <TableMarkersLayer locationDataTable={table} />
+        </Overlay>
       );
     }
 
@@ -320,12 +320,12 @@ let MapActions = React.createClass({
       baseTileLayerProps.zIndex = baseTileLayerProps.zIndex !== undefined ? baseTileLayerProps.zIndex : 1;
 
       baseLayerComponent = (
-        <BaseLayerWidget
+        <BaseLayer
           checked={true}
           name={baseTileLayerProps.name}
         >
-          <TileLayerWidget {...baseTileLayerProps} />
-        </BaseLayerWidget>
+          <TileLayer {...baseTileLayerProps} />
+        </BaseLayer>
       );
     }
 
@@ -356,12 +356,12 @@ let MapActions = React.createClass({
         overlayLayerProps.zIndex = overlayLayerProps.zIndex !== undefined ? overlayLayerProps.zIndex : 2;
 
         overlayLayerComponent = (
-          <OverlayWidget
+          <Overlay
             checked={true}
             name={this.config.mapLayers[overlayLayer].name}
           >
-            <TileLayerWidget {...overlayLayerProps} />
-          </OverlayWidget>
+            <TileLayer {...overlayLayerProps} />
+          </Overlay>
         );
 
       } else if (this.config.mapLayers[overlayLayer].format === "image") {
@@ -369,20 +369,20 @@ let MapActions = React.createClass({
         overlayLayerProps.url = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/data.png';
 
         overlayLayerComponent = (
-          <OverlayWidget
+          <Overlay
             checked={true}
             name={this.config.mapLayers[overlayLayer].name}
           >
-            <ImageOverlayWidget {...overlayLayerProps} />
-          </OverlayWidget>
+            <ImageOverlay {...overlayLayerProps} />
+          </Overlay>
         );
 
       }
 
     }
 
-    let mapWidget = (
-      <MapWidget
+    let map = (
+      <Map
         center={center}
         setProps={setProps}
         onChange={this.handleChangeMap}
@@ -392,8 +392,8 @@ let MapActions = React.createClass({
 
     if (markersLayerComponent) {
 
-      mapWidget = (
-        <TableMapWidget
+      map = (
+        <TableMap
           center={center}
           setProps={setProps}
           table={table}
@@ -409,27 +409,27 @@ let MapActions = React.createClass({
       // Use a default baseLayer
       if (!baseLayerComponent) {
         baseLayerComponent = (
-          <BaseLayerWidget
+          <BaseLayer
             checked={true}
           >
-            <TileLayerWidget zIndex="1" />
-          </BaseLayerWidget>
+            <TileLayer zIndex="1" />
+          </BaseLayer>
         );
       }
 
-      mapWidget = (
-        <MapWidget
+      map = (
+        <Map
           center={center}
           setProps={setProps}
           onChange={this.handleChangeMap}
           zoom={zoom}
         >
-          <LayersControlWidget>
+          <LayersControl>
             {baseLayerComponent}
             {overlayLayerComponent}
             {markersLayerComponent}
-          </LayersControlWidget>
-        </MapWidget>
+          </LayersControl>
+        </Map>
       );
 
     }
@@ -439,7 +439,7 @@ let MapActions = React.createClass({
     // Whereas we need markup like: center='{"lat": -0.7031073524364783, "lng": 1.40625}'
 
     // Wrap the map template code in a container with dimensions.
-    let templateCode = '<div style="width:300px;height:300px">' + jsxToString(mapWidget, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
+    let templateCode = '<div style="width:300px;height:300px">' + jsxToString(map, {ignoreProps: ['setProps', 'onChange']}) + '</div>';
 
 
     let sidebarContent = (
@@ -516,7 +516,7 @@ let MapActions = React.createClass({
               : null}
           </div>
           <div className="grow map-content">
-            {mapWidget}
+            {map}
           </div>
         </div>
       </Sidebar>

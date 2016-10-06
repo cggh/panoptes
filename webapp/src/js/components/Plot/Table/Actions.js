@@ -23,7 +23,7 @@ import PropertySelector from 'panoptes/PropertySelector';
 
 // Panoptes
 import SQL from 'panoptes/SQL';
-import TablePlotWidget from 'Plot/Table/Widget';
+import TablePlot from 'Plot/Table/Widget';
 import QueryString from 'panoptes/QueryString';
 import {plotTypes, allDimensions} from 'panoptes/plotTypes';
 import SelectFieldWithNativeFallback from 'panoptes/SelectFieldWithNativeFallback';
@@ -140,7 +140,7 @@ let TablePlotActions = React.createClass({
             : null}
           </div>
           <div className="grow">
-            {table ? <TablePlotWidget {...this.props} /> : null}
+            {table ? <TablePlot {...this.props} /> : null}
           </div>
         </div>
       </Sidebar>

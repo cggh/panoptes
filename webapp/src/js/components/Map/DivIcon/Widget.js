@@ -3,10 +3,10 @@ https://github.com/jgimbel/react-leaflet-div-icon/blob/master/div-icon.js
 */
 import {PropTypes, Children} from 'react';
 import {render, unmountComponentAtNode} from 'react-dom';
-import {DivIcon, marker} from 'leaflet';
+import {DivIcon as LeafletDivIcon, marker} from 'leaflet';
 import {MapLayer} from 'react-leaflet';
 
-export default class Divicon extends MapLayer {
+export default class DivIcon extends MapLayer {
   static propTypes = {
     opacity: PropTypes.number,
     zIndexOffset: PropTypes.number,
@@ -15,7 +15,7 @@ export default class Divicon extends MapLayer {
   componentWillMount() {
     super.componentWillMount();
     const {position, ...props} = this.props;
-    this.icon = new DivIcon(props);
+    this.icon = new LeafletDivIcon(props);
     this.leafletElement = marker(position, {icon: this.icon,  ...props});
     this.leafletElement.on('add', this.renderContent.bind(this));
     this.leafletElement.on('remove', this.removeContent.bind(this));

@@ -14,10 +14,10 @@ description: |
   to documentation part of this deployment.
   <p>Some buttons that open popups:</p>
   <PopupButton label="Plot of Variants" icon="area-chart">
-    <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
+    <TablePlot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
   </PopupButton>
   <PopupButton label="Map of sites" icon="globe">
-    <TableMapWidget table="samplingsites" />
+    <TableMap table="samplingsites" />
   </PopupButton>
   <PopupButton label="Tree of samples" icon="tree">
     <TreeContainer table="samples" tree="tree2" />
@@ -35,49 +35,49 @@ description: |
   </div>
   <p>A plot of variants:</p>
   <div style="position:relative;width:300px;height:300px">
-  <TablePlotWidget plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
+  <TablePlot plotType="scatter" table="variants" horizontal="Value1" vertical="Value2" />
   </div>
   <p>A complex map:</p>
   <div style="width:300px;height:300px">
-  <MapWidget center='{"lat": 1, "lng": -1.1}' zoom="2">
-    <LayersControlWidget position="topright">
-      <BaseLayerWidget checked name="OpenStreetMap.Mapnik">
-        <TileLayerWidget attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
-      </BaseLayerWidget>
-      <BaseLayerWidget name="OpenStreetMap.BlackAndWhite">
-        <FeatureGroupWidget>
-          <TileLayerWidget attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
-          <FeatureGroupWidget>
-            <MarkerWidget position='{"lat":0, "lng":0}'>
-              <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
-            </MarkerWidget>
-            <MarkerWidget position='{"lat":50, "lng":0}'>
-              <PopupWidget><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></PopupWidget>
-            </MarkerWidget>
-          </FeatureGroupWidget>
-        </FeatureGroupWidget>
-      </BaseLayerWidget>
-      <OverlayWidget name="Sampling Sites">
-        <TableMarkersLayerWidget table="samplingsites" />
-      </OverlayWidget>
-      <OverlayWidget checked name="Layer group with circles">
-        <FeatureGroupWidget>
-          <CircleWidget center='{"lat":0, "lng":0}' fillColor="blue" radius="200" />
-          <CircleWidget center='{"lat":0, "lng":0}' fillColor="red" radius="100" stroke="false" />
-          <FeatureGroupWidget>
-            <CircleWidget center='{"lat":51.51, "lng":-0.08}' color="green" fillColor="green" radius="100" />
-          </FeatureGroupWidget>
-        </FeatureGroupWidget>
-      </OverlayWidget>
-      <OverlayWidget name="Feature group">
-        <FeatureGroupWidget color="purple">
-          <PopupWidget><span>Popup in FeatureGroup</span></PopupWidget>
-          <CircleWidget center='{"lat":51.51, "lng":-0.06}' radius="200" />
-          <RectangleWidget bounds='[{"lat":51.49, "lng":-0.08},{"lat":51.5, "lng":-0.06}]' />
-        </FeatureGroupWidget>
-      </OverlayWidget>
-    </LayersControlWidget>
-  </MapWidget>
+  <Map center='{"lat": 1, "lng": -1.1}' zoom="2">
+    <LayersControl position="topright">
+      <BaseLayer checked name="OpenStreetMap.Mapnik">
+        <TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" />
+      </BaseLayer>
+      <BaseLayer name="OpenStreetMap.BlackAndWhite">
+        <FeatureGroup>
+          <TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
+          <FeatureGroup>
+            <Marker position='{"lat":0, "lng":0}'>
+              <MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup>
+            </Marker>
+            <Marker position='{"lat":50, "lng":0}'>
+              <MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup>
+            </Marker>
+          </FeatureGroup>
+        </FeatureGroup>
+      </BaseLayer>
+      <Overlay name="Sampling Sites">
+        <TableMarkersLayer table="samplingsites" />
+      </Overlay>
+      <Overlay checked name="Layer group with circles">
+        <FeatureGroup>
+          <Circle center='{"lat":0, "lng":0}' fillColor="blue" radius="200" />
+          <Circle center='{"lat":0, "lng":0}' fillColor="red" radius="100" stroke="false" />
+          <FeatureGroup>
+            <Circle center='{"lat":51.51, "lng":-0.08}' color="green" fillColor="green" radius="100" />
+          </FeatureGroup>
+        </FeatureGroup>
+      </Overlay>
+      <Overlay name="Feature group">
+        <FeatureGroup color="purple">
+          <MapPopup><span>MapPopup in FeatureGroup</span></MapPopup>
+          <Circle center='{"lat":51.51, "lng":-0.06}' radius="200" />
+          <Rectangle bounds='[{"lat":51.49, "lng":-0.08},{"lat":51.5, "lng":-0.06}]' />
+        </FeatureGroup>
+      </Overlay>
+    </LayersControl>
+  </Map>
   </div>
 
 # Optional: a list of all the data table identifiers in the dataset

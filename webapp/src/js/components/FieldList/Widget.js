@@ -18,7 +18,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 // UI components
 import Loading from 'ui/Loading';
 
-let FieldListWidget = React.createClass({
+let FieldList = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -117,4 +117,4 @@ let FieldListWidget = React.createClass({
 
 });
 
-module.exports = FieldListWidget;
+module.exports = FieldList;

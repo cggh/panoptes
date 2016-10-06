@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {TileLayer} from 'react-leaflet';
+import {TileLayer as LeafletTileLayer} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let TileLayerWidget = React.createClass({
+let TileLayer = React.createClass({
 
   mixins: [
     FluxMixin
@@ -84,7 +84,7 @@ let TileLayerWidget = React.createClass({
     // errorTileUrl="/dist/mapTiles/invisible.png"
 
     return (
-      <TileLayer
+      <LeafletTileLayer
         {...adaptedProps}
         attribution={attribution}
         bounds={bounds}
@@ -108,4 +108,4 @@ let TileLayerWidget = React.createClass({
 
 });
 
-module.exports = TileLayerWidget;
+module.exports = TileLayer;

@@ -1,16 +1,16 @@
 import React from 'react';
-import OverviewWidget from 'Overview/Widget';
-import TableMapWidget from 'Map/Table/Widget';
-import PieChartMapWidget from 'Map/Chart/Pie/Widget';
-import FieldListWidget from 'FieldList/Widget';
-import PropertyGroupWidget from 'PropertyGroup/Widget';
-import TemplateWidget from 'Template/Widget';
+import Overview from 'Overview/Widget';
+import TableMap from 'Map/Table/Widget';
+import PieChartMap from 'Map/Chart/Pie/Widget';
+import FieldList from 'FieldList/Widget';
+import PropertyGroup from 'PropertyGroup/Widget';
+import Template from 'Template/Widget';
 
 function getViews(dataItemViews, hasGeoCoord) {
   /*eslint-disable react/display-name */
   const viewTypes = {
-    Overview: (dataItemView, key) => (<OverviewWidget title="Overview" key={key}/>),
-    PieChartMap: (dataItemView, key) => (<PieChartMapWidget
+    Overview: (dataItemView, key) => (<Overview title="Overview" key={key}/>),
+    PieChartMap: (dataItemView, key) => (<PieChartMap
       initCenter={[dataItemView.mapCenter.latitude, dataItemView.mapCenter.longitude]}
       componentColumns={dataItemView.componentColumns}
       locationDataTable={dataItemView.locationDataTable}
@@ -19,14 +19,14 @@ function getViews(dataItemViews, hasGeoCoord) {
       title={dataItemView.name}
       residualFractionName={dataItemView.residualFractionName}
       key={key} />),
-    ItemMap: (dataItemView, key) => (<TableMapWidget title={dataItemView.name} key={key} />),
-    TableMap: (dataItemView, key) => (<TableMapWidget title={dataItemView.name} key={key} />),
-    FieldList: (dataItemView, key) => (<FieldListWidget title={dataItemView.name} fields={dataItemView.fields} key={key} />),
-    PropertyGroup: (dataItemView, key) => (<PropertyGroupWidget
+    ItemMap: (dataItemView, key) => (<TableMap title={dataItemView.name} key={key} />),
+    TableMap: (dataItemView, key) => (<TableMap title={dataItemView.name} key={key} />),
+    FieldList: (dataItemView, key) => (<FieldList title={dataItemView.name} fields={dataItemView.fields} key={key} />),
+    PropertyGroup: (dataItemView, key) => (<PropertyGroup
       title={dataItemView.name || dataItemView.groupId} //TODO This should be name from group config
       propertyGroupId={dataItemView.groupId}
       key={key} />),
-    Template: (dataItemView, key) => (<TemplateWidget
+    Template: (dataItemView, key) => (<Template
       title={dataItemView.name}
       content={dataItemView.content}
       key={key} />)
@@ -36,10 +36,10 @@ function getViews(dataItemViews, hasGeoCoord) {
   const views = [];
   if (dataItemViews === undefined || dataItemViews === null) {
     // If there are no dataItemViews specified, then default to showing an Overview.
-    views.push(<OverviewWidget title="Overview" />);
+    views.push(<Overview title="Overview" />);
     if (hasGeoCoord) {
       // If there are no dataItemViews specified and this table hasGeoCoord, then default to showing a Map
-      views.push(<TableMapWidget title="Location" />);
+      views.push(<TableMap title="Location" />);
     }
   } else {
     dataItemViews.forEach((dataItemView, i) => {

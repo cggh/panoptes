@@ -17,7 +17,7 @@ import LRUCache from 'util/LRUCache';
 // UI components
 import Loading from 'ui/Loading';
 
-let PropertyGroupWidget = React.createClass({
+let PropertyGroup = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -111,4 +111,4 @@ let PropertyGroupWidget = React.createClass({
 
 });
 
-module.exports = PropertyGroupWidget;
+module.exports = PropertyGroup;

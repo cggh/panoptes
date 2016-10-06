@@ -18,7 +18,7 @@ import Icon from 'ui/Icon';
 // Panoptes
 import ListView from 'panoptes/ListView';
 import ItemTemplate from 'panoptes/ItemTemplate';
-import DataItemWidget from 'DataItem/Widget';
+import DataItem from 'DataItem/Widget';
 import DataDownloader from 'util/DataDownloader';
 import HTMLWithComponents from 'panoptes/HTMLWithComponents';
 import DataItemViews from 'panoptes/DataItemViews';
@@ -138,7 +138,7 @@ let ListWithActions = React.createClass({
 
     let dataItem = '';
     if (selectedPrimKey) {
-      dataItem = <DataItemWidget views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
+      dataItem = <DataItem views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
     }
 
     return (

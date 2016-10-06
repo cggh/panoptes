@@ -5,9 +5,9 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import MapWidget from 'Map/Widget';
-import TileLayerWidget from 'Map/TileLayer/Widget';
-import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
+import Map from 'Map/Widget';
+import TileLayer from 'Map/TileLayer/Widget';
+import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
 
 // NB: This is a void component; no children allowed.
 // Although, the components returned by this component may have children.
@@ -16,22 +16,22 @@ import TableMarkersLayerWidget from 'Map/TableMarkersLayer/Widget';
 
 <p>A map of sampling sites:</p>
 <div style="position:relative;width:300px;height:300px">
-<TableMapWidget table="samplingsites" />
+<TableMap table="samplingsites" />
 </div>
 
 <p>A map highlighting a sampling site:</p>
 <div style="position:relative;width:300px;height:300px">
-<TableMapWidget table="samplingsites" primKey="St04" />
+<TableMap table="samplingsites" primKey="St04" />
 </div>
 
 <p>A map highlighting UK sampling sites:</p>
 <div style="position:relative;width:300px;height:300px">
-<TableMapWidget table="samplingsites" highlight="Country:UK" />
+<TableMap table="samplingsites" highlight="Country:UK" />
 </div>
 
 */
 
-let TableMapWidget = React.createClass({
+let TableMap = React.createClass({
 
   mixins: [
     ConfigMixin,
@@ -82,25 +82,25 @@ let TableMapWidget = React.createClass({
     let widgetStyle = {height: '100%'};
 
     return (
-      <MapWidget
+      <Map
         center={center}
         setProps={setProps}
         onChange={onChange}
         style={widgetStyle}
         zoom={zoom}
       >
-        <TileLayerWidget />
-        <TableMarkersLayerWidget
+        <TileLayer />
+        <TableMarkersLayer
           highlight={highlight}
           locationDataTable={locationDataTable}
           primKey={primKey}
           query={query}
         />
-      </MapWidget>
+      </Map>
     );
 
   }
 
 });
 
-module.exports = TableMapWidget;
+module.exports = TableMap;

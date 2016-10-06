@@ -1,7 +1,6 @@
 import React from 'react';
 
-import {LayersControl} from 'react-leaflet';
-const {BaseLayer} = LayersControl;
+import {LayersControl as LeafletLayersControl} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -9,11 +8,11 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
-  'TileLayerWidget',
-  'FeatureGroupWidget',
+  'TileLayer',
+  'FeatureGroup',
 ];
 
-let BaseLayerWidget = React.createClass({
+let BaseLayer = React.createClass({
 
   mixins: [
     FluxMixin
@@ -63,7 +62,7 @@ let BaseLayerWidget = React.createClass({
     }
 
     return (
-      <BaseLayer
+      <LeafletLayersControl.BaseLayer
         addBaseLayer={addBaseLayer}
         checked={checked}
         children={children}
@@ -77,4 +76,4 @@ let BaseLayerWidget = React.createClass({
 
 });
 
-module.exports = BaseLayerWidget;
+module.exports = BaseLayer;

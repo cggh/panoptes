@@ -1,10 +1,10 @@
 import React from 'react';
-import {Circle} from 'react-leaflet';
+import {Circle as LeafletCircle} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let CircleWidget = React.createClass({
+let Circle = React.createClass({
 
   mixins: [
     FluxMixin
@@ -18,7 +18,7 @@ let CircleWidget = React.createClass({
   render() {
     let {center, radius} = this.props;
     return (
-      <Circle
+      <LeafletCircle
         children={null}
         center={center}
         radius={radius}
@@ -27,4 +27,4 @@ let CircleWidget = React.createClass({
   }
 });
 
-module.exports = CircleWidget;
+module.exports = Circle;

@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {ImageOverlay} from 'react-leaflet';
+import {ImageOverlay as LeafletImageOverlay} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let ImageOverlayWidget = React.createClass({
+let ImageOverlay = React.createClass({
 
   mixins: [
     FluxMixin
@@ -55,7 +55,7 @@ let ImageOverlayWidget = React.createClass({
     // by changing the key whenever those props change, thereby causing React to remount the component.
 
     return (
-      <ImageOverlay
+      <LeafletImageOverlay
         attribution={attribution}
         bounds={bounds}
         key={JSON.stringify({attribution, bounds})}
@@ -68,4 +68,4 @@ let ImageOverlayWidget = React.createClass({
 
 });
 
-module.exports = ImageOverlayWidget;
+module.exports = ImageOverlay;

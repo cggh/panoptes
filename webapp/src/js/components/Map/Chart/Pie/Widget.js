@@ -4,12 +4,12 @@ import React from 'react';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
-import MapWidget from 'Map/Widget';
-import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
-import TileLayerWidget from 'Map/TileLayer/Widget';
-import PieChartMarkersLayerWidget from 'Map/PieChartMarkersLayer/Widget';
+import Map from 'Map/Widget';
+import FeatureGroup from 'Map/FeatureGroup/Widget';
+import TileLayer from 'Map/TileLayer/Widget';
+import PieChartMarkersLayer from 'Map/PieChartMarkersLayer/Widget';
 
-let PieChartMapWidget = React.createClass({
+let PieChartMap = React.createClass({
 
   mixins: [
     FluxMixin
@@ -61,15 +61,15 @@ let PieChartMapWidget = React.createClass({
     let widgetStyle = {height: '100%'};
 
     return (
-      <MapWidget
+      <Map
         center={center}
         setProps={setProps}
         style={widgetStyle}
         zoom={zoom}
       >
-        <FeatureGroupWidget>
-          <TileLayerWidget />
-          <PieChartMarkersLayerWidget
+        <FeatureGroup>
+          <TileLayer />
+          <PieChartMarkersLayer
             locationDataTable={locationDataTable}
             chartDataTable={chartDataTable}
             componentColumns={componentColumns}
@@ -77,12 +77,12 @@ let PieChartMapWidget = React.createClass({
             locationSizeProperty={locationSizeProperty}
             primKey={primKey}
           />
-        </FeatureGroupWidget>
-      </MapWidget>
+        </FeatureGroup>
+      </Map>
     );
 
   }
 
 });
 
-module.exports = PieChartMapWidget;
+module.exports = PieChartMap;
