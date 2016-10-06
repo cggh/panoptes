@@ -51,9 +51,12 @@ let TablePlotActions = React.createClass({
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery,
+      query: undefined,
       setProps: null,
       sidebar: true
     };
@@ -87,7 +90,14 @@ let TablePlotActions = React.createClass({
       label: table.capNamePlural
     }));
 
-
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      if (table !== undefined) {
+        this.definedQuery = this.config.tablesById[table].defaultQuery !== undefined ? this.config.tablesById[table].defaultQuery : SQL.nullQuery;
+      } else {
+        this.definedQuery = SQL.nullQuery;
+      }
+    }
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -100,7 +110,7 @@ let TablePlotActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+          {table ? <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
             : null}
           <SelectField value={plotType}
                        autoWidth={true}
@@ -135,12 +145,12 @@ let TablePlotActions = React.createClass({
             <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {plotType && table ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={query}/>
+                <QueryString prepend="Filter:" table={table} query={this.definedQuery} />
               </span>
             : null}
           </div>
           <div className="grow">
-            {table ? <TablePlot {...this.props} /> : null}
+            {table ? <TablePlot {...this.props} query={this.definedQuery} /> : null}
           </div>
         </div>
       </Sidebar>

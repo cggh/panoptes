@@ -39,9 +39,12 @@ let TablePlot = React.createClass({
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery
+      query: undefined
     };
   },
 
@@ -56,13 +59,19 @@ let TablePlot = React.createClass({
     const tableConfig = this.config.tablesById[table];
     const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
+
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = tableConfig.defaultQuery !== undefined ? tableConfig.defaultQuery : SQL.nullQuery;
+    }
+
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columns,
-        query: query,
+        query: this.definedQuery,
         transpose: false,
         randomSample: 20000
       };
