@@ -27,7 +27,7 @@ let PivotTableWithActions = React.createClass({
   ],
 
   propTypes: {
-    setProps: React.PropTypes.func.isRequired,
+    setProps: React.PropTypes.func,
     title: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,

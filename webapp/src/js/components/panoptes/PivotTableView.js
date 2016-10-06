@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-// import Color from 'color';
+import Color from 'color';
 import _uniq from 'lodash/uniq';
 
 // Mixins
@@ -95,49 +95,49 @@ let PivotTableView = React.createClass({
     };
 
     requestContext.request((componentCancellation) =>
-        LRUCache.get(
-          'query' + JSON.stringify(queryAPIargs),
-          (cacheCancellation) =>
-            API.query({cancellation: cacheCancellation, ...queryAPIargs}),
-          componentCancellation
-        )
+      LRUCache.get(
+        'query' + JSON.stringify(queryAPIargs),
+        (cacheCancellation) =>
+          API.query({cancellation: cacheCancellation, ...queryAPIargs}),
+        componentCancellation
+      )
     )
-    .then((data) => {
-      let columnData = data[columnProperty];
-      let rowData = data[rowProperty];
-      let countData = data['count'];
-      let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData.array) : []);
-      let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData.array) : []);
-      let dataByColumnRow = {};
-      uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
-      dataByColumnRow['_all_'] = {};
-      uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
-      for (let i = 0; i < countData.shape[0]; ++i) {
-        dataByColumnRow['_all_']['_all_'] += countData.array[i];
-        if (columnProperty) {
-          dataByColumnRow[columnData.array[i]]['_all_'] += countData.array[i];
+      .then((data) => {
+        let columnData = data[columnProperty];
+        let rowData = data[rowProperty];
+        let countData = data['count'];
+        let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData.array) : []);
+        let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData.array) : []);
+        let dataByColumnRow = {};
+        uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
+        dataByColumnRow['_all_'] = {};
+        uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
+        for (let i = 0; i < countData.shape[0]; ++i) {
+          dataByColumnRow['_all_']['_all_'] += countData.array[i];
+          if (columnProperty) {
+            dataByColumnRow[columnData.array[i]]['_all_'] += countData.array[i];
+          }
+          if (rowProperty) {
+            dataByColumnRow['_all_'][rowData.array[i]] += countData.array[i];
+          }
+          if (columnProperty && rowProperty) {
+            dataByColumnRow[columnData.array[i]][rowData.array[i]] = countData.array[i];
+          }
         }
-        if (rowProperty) {
-          dataByColumnRow['_all_'][rowData.array[i]] += countData.array[i];
-        }
-        if (columnProperty && rowProperty) {
-          dataByColumnRow[columnData.array[i]][rowData.array[i]] = countData.array[i];
-        }
-      }
-      this.setState({
-        loadStatus: 'loaded',
-        uniqueRows,
-        uniqueColumns,
-        dataByColumnRow
-      });
-    })
-    .catch(API.filterAborted)
-    .catch(LRUCache.filterCancelled)
-    .catch((xhr) => {
-      ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
-      this.setState({loadStatus: 'error'});
-    })
-    .done();
+        this.setState({
+          loadStatus: 'loaded',
+          uniqueRows,
+          uniqueColumns,
+          dataByColumnRow
+        });
+      })
+      .catch(API.filterAborted)
+      .catch(LRUCache.filterCancelled)
+      .catch((xhr) => {
+        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        this.setState({loadStatus: 'error'});
+      })
+      .done();
   },
 
   handleResize(size) {
@@ -173,22 +173,42 @@ let PivotTableView = React.createClass({
               isResizable={false}
               minWidth={50}
               header=""
-              cell={({rowIndex}) =>
-                  <div className="table-row-cell"
-                       style={{
-                         textAlign: uniqueRows[rowIndex] == '_all_' ? 'center' : tableConfig.propertiesById[rowProperty].alignment,
-                         width: COLUMN_WIDTH,
-                         height: ROW_HEIGHT + 'px',
-                         //background: background
-                       }}>
-                    {
-                      uniqueRows[rowIndex] == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[rowProperty]} value={uniqueRows[rowIndex]}/>
+              cell={({rowIndex}) => {
+                const value = uniqueRows[rowIndex];
+                const rowPropConfig = tableConfig.propertiesById[rowProperty] || {};
+                const valueColours = rowPropConfig.valueColours;
+                let background = 'inherit';
+                if (valueColours && value !== '_all_') {
+                  let col = valueColours[value] || valueColours['_other_'];
+                  if (col) {
+                    background = Color(col).lighten(0.3).rgbString();
                     }
-                  </div>
                 }
+                return <div className="table-row-cell"
+                     style={{
+                       textAlign: value == '_all_' ? 'center' : rowPropConfig.alignment,
+                       width: COLUMN_WIDTH,
+                       height: ROW_HEIGHT + 'px',
+                       background: background
+                     }}>
+                  {
+                    uniqueRows[rowIndex] == '_all_' ? 'All' :
+                      <PropertyCell prop={rowPropConfig} value={value}/>
+                  }
+                </div>
+              }}
             />
-            {uniqueColumns.map((columnValue) => <Column
+            {uniqueColumns.map((columnValue) => {
+                const colPropConfig = tableConfig.propertiesById[columnProperty] || {};
+                const valueColours = colPropConfig.valueColours;
+                let background = 'inherit';
+                if (valueColours && columnValue !== '_all_') {
+                  let col = valueColours[columnValue] || valueColours['_other_'];
+                  if (col) {
+                    background = Color(col).lighten(0.3).rgbString();
+                    }
+                }
+                return <Column
                 //TODO Better default column widths
                 width={COLUMN_WIDTH}
                 key={columnValue}
@@ -196,35 +216,35 @@ let PivotTableView = React.createClass({
                 isResizable={false}
                 minWidth={50}
                 header={
-                    <div className="table-row-cell"
-                         style={{
-                           textAlign: columnValue == '_all_' ? 'center' : tableConfig.propertiesById[columnProperty].alignment,
-                           width: COLUMN_WIDTH,
-                           height: HEADER_HEIGHT + 'px',
-                           //background: background
-                         }}>
-                      { columnValue == '_all_' ? 'All' :
-                        <PropertyCell prop={tableConfig.propertiesById[columnProperty]} value={columnValue}/> }
-                    </div>
-                }
-                cell={({rowIndex}) =>
-                    <div className="table-row-cell"
-                         style={{
-                           textAlign: 'right',
-                           width: COLUMN_WIDTH,
-                           height: ROW_HEIGHT + 'px',
-                           //background: background
-                         }}>
-                      {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
-                    </div>
+                      <div className="table-row-cell"
+                           style={{
+                             textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
+                             width: COLUMN_WIDTH,
+                             height: HEADER_HEIGHT + 'px',
+                             background: background
+                           }}>
+                        { columnValue == '_all_' ? 'All' :
+                          <PropertyCell prop={colPropConfig} value={columnValue}/> }
+                      </div>
                   }
-              />)
-            }
+                cell={({rowIndex}) =>
+                      <div className="table-row-cell"
+                           style={{
+                             textAlign: 'right',
+                             width: COLUMN_WIDTH,
+                             height: ROW_HEIGHT + 'px',
+                             //background: background
+                           }}>
+                        {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
+                      </div>
+                    }
+              />;
+            })}
           </Table>
           <Loading status={loadStatus}/>
         </div>
       </DetectResize>
-      );
+    );
   }
 
 });
