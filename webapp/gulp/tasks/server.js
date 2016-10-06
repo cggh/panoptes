@@ -20,6 +20,10 @@ var devConfig = {
       '/panoptes/api': {
         target: 'http://localhost:8000/',
         secure: false
+      },
+      '/panoptes/Docs': {
+        target: 'http://localhost:8000/',
+        secure: false
       }
     }
   };

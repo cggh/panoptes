@@ -9,7 +9,8 @@ let TabPane = React.createClass({
     title: React.PropTypes.string,
     active: React.PropTypes.bool, //Usually set by TabbedArea
     children: React.PropTypes.element,
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    updateTitleIcon: React.PropTypes.func
   },
 
   icon() {
@@ -45,7 +46,10 @@ let TabPane = React.createClass({
 
     return (
       <div {...divProps} className={classNames(this.props.className, classes)}>
-        {React.cloneElement(this.props.children, {ref: (node) => this.child = node})}
+        {React.cloneElement(this.props.children, {
+          updateTitleIcon: this.props.updateTitleIcon,
+          ref: (node) => this.child = node
+        })}
       </div>
     );
   }

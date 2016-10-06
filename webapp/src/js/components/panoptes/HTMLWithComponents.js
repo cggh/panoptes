@@ -3,6 +3,7 @@ import HtmlToReact from 'html-to-react';
 import ComponentRegistry from 'util/ComponentRegistry';
 import _forEach from 'lodash/forEach';
 import _camelCase from 'lodash/camelCase';
+import DocLink from 'panoptes/DocLink';
 
 function createStyleJsonFromString(styleString) {
   if (!styleString) {
@@ -25,7 +26,8 @@ let HTMLWithComponents = React.createClass({
 
   propTypes: {
     className: React.PropTypes.string,
-    children: React.PropTypes.string
+    children: React.PropTypes.string,
+    replaceSelf: React.PropTypes.func
   },
 
   componentWillMount() {
@@ -45,7 +47,7 @@ let HTMLWithComponents = React.createClass({
           _forEach(node.attribs, (value, key) => {
             switch (key || '') {
             case 'style':
-              elementProps.style = createStyleJsonFromString(node.attribs.style);
+              elementProps.style = createStyleJsonFromString(value);
               break;
             case 'class':
               elementProps.className = value;
@@ -76,6 +78,9 @@ let HTMLWithComponents = React.createClass({
               break;
             }
           });
+          if (type === DocLink) {
+            elementProps.replaceParent = this.props.replaceSelf;
+          }
           return React.createElement(type, {children, ...elementProps});
         }
       },
@@ -94,8 +99,8 @@ let HTMLWithComponents = React.createClass({
   },
 
   render() {
-    return this.htmlToReact(`<div class="${this.props.className}">${this.props.children}</div>`);
+    return this.htmlToReact(`<div class="${this.props.className ? this.props.className : ''}">${this.props.children}</div>`);
   }
 });
 
-module.exports = HTMLWithComponents;
+export default HTMLWithComponents;

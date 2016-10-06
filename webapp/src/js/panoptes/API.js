@@ -562,6 +562,11 @@ function query(options) {
     // });
 }
 
+function staticContent(options) {
+  assertRequired(options, ['url']);
+  return request(options).then((resp) => resp.responseText);
+}
+
 const nullValues = {
   i1: -128,
   i2: -32768,
@@ -592,5 +597,6 @@ module.exports = {
   summaryData,
   storeData,
   treeData,
-  twoDPageQuery
+  twoDPageQuery,
+  staticContent,
 };

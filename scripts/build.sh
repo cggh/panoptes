@@ -52,9 +52,6 @@ fi
 if ! [ -w $BASEDIR/temp ]; then
     echo -e "${red}  WARNING ${BASEDIR}/temp is not writable by this user - it needs to be for the user that panoptes is run under"
 fi
-if ! [ -w $BASEDIR/SummaryTracks ]; then
-    echo -e "${red}  WARNING ${BASEDIR}/SummaryTracks is not writable by this user - it needs to be for the user that panoptes is run under"
-fi
 if ! [ -w $BASEDIR/Uploads ]; then
     echo -e "${red}  WARNING ${BASEDIR}/Uploads is not writable by this user - it needs to be for the user that panoptes is run under"
 fi

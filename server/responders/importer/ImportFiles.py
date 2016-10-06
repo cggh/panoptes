@@ -26,9 +26,17 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
         try:
             shutil.rmtree(destDocFolder)
         except OSError:
+            try:
+                #Symbolic links error for rmtree
+                os.remove(destDocFolder)
+            except:
+                pass
             #Don't fail if exists
             pass
-        shutil.copytree(sourceDocFolder, destDocFolder)
+        try:
+            os.symlink(sourceDocFolder, destDocFolder)
+        except:
+            shutil.copytree(sourceDocFolder, destDocFolder)
 
 
 #TODO: Identical to ImportDocs

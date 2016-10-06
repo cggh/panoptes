@@ -142,7 +142,8 @@ let TabbedArea = React.createClass({
       {
         active: (tab.props.compId === this.props.activeTab),
         key: tab.props.compId,
-        ref: tab.props.compId
+        ref: tab.props.compId,
+        updateTitleIcon: () => this.forceUpdate()
       });
   },
 

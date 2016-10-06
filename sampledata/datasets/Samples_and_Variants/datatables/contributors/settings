@@ -67,7 +67,7 @@ dataItemViews:
       <ItemMap table='samplingsites' highlight='Contributor_ID:{{ID}}' />
     </div>
     <h4>
-      More information on the nature of contribution <a class="doclink" href="samples">here</a>
+      More information on the nature of contribution <DocLink href="samples.html">here</DocLink>
     </h4>
 
 

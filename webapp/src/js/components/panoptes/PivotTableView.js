@@ -154,7 +154,7 @@ let PivotTableView = React.createClass({
     }
     return (
       <DetectResize onResize={this.handleResize}>
-        <div className={classNames('datatable', className)}>
+        <div className={classNames('load-container', className)}>
           <Table
             rowHeight={ROW_HEIGHT}
             rowsCount={uniqueRows.length}

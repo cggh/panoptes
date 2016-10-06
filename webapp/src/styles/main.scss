@@ -28,6 +28,11 @@ body {
   font-size: 14px;
 }
 
+a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .main {
   .page {
     height: 100vh;
