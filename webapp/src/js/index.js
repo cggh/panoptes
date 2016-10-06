@@ -40,8 +40,6 @@ import 'normalize.css';
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
 
-//Throw up a loader till we are ready
-ReactDOM.render(<div><Loading status="loading-hide"/></div>, document.getElementById('main'));
 
 const HASH_REGEX = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
 
@@ -101,6 +99,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
 };
 const {dataset, state} = getAppState(window.location);
 if (dataset) {  //dataset being "panoptes" means that root URL is being hit
+  ReactDOM.render(<div><Loading status="loading-hide">Loading {dataset}...</Loading></div>, document.getElementById('main'));
   Promise.all([InitialConfig(dataset), state]) //eslint-disable-line no-undef
     .then(([config, appState]) => {
       let stores = {

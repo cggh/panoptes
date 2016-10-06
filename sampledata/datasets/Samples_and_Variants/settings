@@ -10,7 +10,7 @@ description: |
   A second line, html formatted
   </div>
   An <a href="http://panoptes.readthedocs.org/en/latest//"
-  target="_blank">external hyperlink</a> and a <a class="doclink" href="intro">link</a>
+  target="_blank">external hyperlink</a> and a <DocLink href="intro.html">link</DocLink>
   to documentation part of this deployment.
   <p>Some buttons that open popups:</p>
   <PopupButton label="Plot of Variants" icon="area-chart">
@@ -25,6 +25,10 @@ description: |
   <PopupButton>
     <div>Some <b>config specified</b> content</div>
   </PopupButton>
+  <p>A table, with styled headers</p>
+  <div style="position:relative;height:150px">
+      <PivotTableView table="variants" columnProperty="Extra_1" rowProperty="HighQuality" />
+  </div>
   <p>A tree of samples</p>
   <div style="position:relative;width:300px;height:300px">
     <TreeContainer table="samples" tree="tree2" />

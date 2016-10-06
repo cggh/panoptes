@@ -17,6 +17,7 @@ let Loading = React.createClass({
       return (
         <div className="loading-container show">
           <div className="spinner load-icon" />
+          {this.props.children}
         </div>
       );
 
@@ -24,14 +25,15 @@ let Loading = React.createClass({
       return (
         <div className="loading-container show hide-content">
           <div className="spinner load-icon" />
-
+          <div className="error-text">{this.props.children}</div>
         </div>
       );
 
     if (status == 'error')
       return (
         <div className="loading-container show">
-          <div className="error load-icon"/><div className="error-text">{this.props.children}</div>
+          <div className="error load-icon"/>
+          <div className="error-text">{this.props.children}</div>
         </div>
       );
 

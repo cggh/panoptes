@@ -213,7 +213,7 @@ let DataTableView = React.createClass({
     if (columns.length > 0)
       return (
         <DetectResize onResize={this.handleResize}>
-          <div className={classNames('datatable', className)}>
+          <div className={classNames('load-container', className)}>
             <Table
               rowHeight={ROW_HEIGHT}
               //rowGetter={(index) => rows[index]}
@@ -307,7 +307,7 @@ let DataTableView = React.createClass({
       );
     else
       return (
-        <div className={classNames('datatable', className)}>
+        <div className={classNames('load-container', className)}>
           <Loading status="custom">No columns selected</Loading>
         </div>
       );
