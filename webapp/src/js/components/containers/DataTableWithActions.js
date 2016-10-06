@@ -49,10 +49,13 @@ let DataTableWithActions = React.createClass({
     searchText: React.PropTypes.string
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.nullQuery,
+      query: undefined,
       order: null,
       ascending: true,
       columnWidths: {},
@@ -157,7 +160,7 @@ let DataTableWithActions = React.createClass({
         tableConfig: this.tableConfig(),
         rowsCount: this.state.totalRowsCount,
         onLimitBreach: this.handleDownloadLimitBreach,
-        query: this.props.query,
+        query: this.definedQuery,
         columns: this.props.columns,
         ascending: this.props.ascending
       }
@@ -187,10 +190,10 @@ let DataTableWithActions = React.createClass({
 
   createDataTableQuery() {
 
-    let {query, searchText} = this.props;
+    let {searchText} = this.props;
 
     // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
-    let dataTableQuery = query;
+    let dataTableQuery = this.definedQuery;
     if (searchText !== '') {
 
       let searchQueryUnencoded = null;
@@ -216,7 +219,7 @@ let DataTableWithActions = React.createClass({
       }
 
       // Add the searchQuery to the base query, if the base query is not trivial.
-      let baseQueryDecoded = SQL.WhereClause.decode(query);
+      let baseQueryDecoded = SQL.WhereClause.decode(this.definedQuery);
       if (baseQueryDecoded.isTrivial) {
         dataTableQuery = SQL.WhereClause.encode(searchQueryUnencoded);
       } else {
@@ -237,6 +240,11 @@ let DataTableWithActions = React.createClass({
     let actions = this.getFlux().actions;
     let {table, query, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
+
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns) {
@@ -287,7 +295,7 @@ let DataTableWithActions = React.createClass({
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-        <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+        <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
         <FlatButton label="Add/Remove Columns"
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
@@ -411,7 +419,7 @@ let DataTableWithActions = React.createClass({
                   onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
+            <span className="block text"><QueryString prepend="Filter:" table={table} query={this.definedQuery}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {order ? this.tableConfig().propertiesById[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
