@@ -292,11 +292,19 @@ let DataTableWithActions = React.createClass({
 
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
+    // TODO: Or simply label "Pick Columns" ?
+    let columnPickerLabel = 'Add/Remove Columns';
+    if (columns.length === this.tableConfig().properties.length) {
+      columnPickerLabel = 'Remove Columns';
+    } else if (columns.length === 0) {
+      columnPickerLabel = 'Add Columns';
+    }
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
         <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
-        <FlatButton label="Add/Remove Columns"
+        <FlatButton label={columnPickerLabel}
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
                       {
