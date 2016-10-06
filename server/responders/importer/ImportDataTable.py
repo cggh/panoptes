@@ -19,7 +19,7 @@ from SettingsGraph import SettingsGraph
 from PanoptesConfig import PanoptesConfig
 from ImportSettings import valueTypes
 
-pool = multiprocessing.dummy.Pool(multiprocessing.cpu_count())
+pool = multiprocessing.dummy.Pool(multiprocessing.cpu_count()/2)
 
 class ImportDataTable(BaseImport):
 
