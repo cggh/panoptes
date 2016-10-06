@@ -72,7 +72,9 @@ let TableMarkersLayer = React.createClass({
 
     let {highlight, locationDataTable, primKey, query, table} = props;
 
-    let adaptedQuery = query !== undefined ? query : SQL.nullQuery;
+    let {changeLayerStatus} = this.context;
+
+    changeLayerStatus({loadStatus: 'loading'});
 
     // NB: The locationDataTable prop is named to distinguish it from the chartDataTable.
     // Either "table" or "locationDataTable" can be used in templates,
@@ -80,8 +82,6 @@ let TableMarkersLayer = React.createClass({
     if (locationDataTable === undefined && table !== undefined) {
       locationDataTable = table;
     }
-
-    let {changeLayerStatus} = this.context;
 
     let locationTableConfig = this.config.tablesById[locationDataTable];
     if (locationTableConfig === undefined) {
@@ -94,7 +94,10 @@ let TableMarkersLayer = React.createClass({
       return null;
     }
 
-    changeLayerStatus({loadStatus: 'loading'});
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = locationTableConfig.defaultQuery !== undefined ? locationTableConfig.defaultQuery : SQL.nullQuery;
+    }
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
 
@@ -136,7 +139,7 @@ let TableMarkersLayer = React.createClass({
         let locationAPIargs = {
           columns: locationColumnsColumnSpec,
           database: this.config.dataset,
-          query: adaptedQuery,
+          query: this.definedQuery,
           table: locationTableConfig.fetchTableName
         };
 

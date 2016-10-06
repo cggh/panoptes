@@ -7,7 +7,6 @@ import Sidebar from 'react-sidebar';
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
 import _filter from 'lodash/filter';
-import _isFunction from 'lodash/isFunction';
 import _map from 'lodash/map';
 
 // Mixins
@@ -64,9 +63,12 @@ let MapActions = React.createClass({
     zoom: React.PropTypes.number
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery,
+      query: undefined,
       baseTileLayer: DEFAULT_BASE_TILE_LAYER,
       overlayLayer: DEFAULT_OVERLAY_LAYER,
       sidebar: true,
@@ -136,7 +138,6 @@ let MapActions = React.createClass({
         // Only if
         // - there is a URL
         // - AND there is either no {variant} placeholder in the URL, OR there is both a placeholder and a value for variant.
-        // FIXME: List of default tile layers that don't work, e.g. BasemapAT
         if (
           providerTileLayerObj.url !== undefined
           && (!providerObj.url.includes('{variant}') || (providerObj.url.includes('{variant}') && providerTileLayerObj.variant !== undefined))
@@ -282,6 +283,15 @@ let MapActions = React.createClass({
   render() {
     let {center, setProps, query, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
 
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+        this.definedQuery = this.config.tablesById[table].defaultQuery !== undefined ? this.config.tablesById[table].defaultQuery : SQL.nullQuery;
+      } else {
+        this.definedQuery = SQL.nullQuery;
+      }
+    }
+
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
         value: table.id,
@@ -302,14 +312,22 @@ let MapActions = React.createClass({
     let baseLayerComponent = null;
     let overlayLayerComponent = null;
 
+
+    let adaptedMarkersLayerProps = {};
+
     if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
+
+      if (this.definedQuery !== SQL.nullQuery && this.definedQuery !== this.config.tablesById[table].defaultQuery) {
+        adaptedMarkersLayerProps.query = this.definedQuery;
+      }
+
       // NB: This might not be used, if/when only a table has been selected.
       markersLayerComponent = (
         <Overlay
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayer locationDataTable={table} />
+          <TableMarkersLayerWidget locationDataTable={table} {...adaptedMarkersLayerProps} />
         </Overlay>
       );
     }
@@ -334,7 +352,7 @@ let MapActions = React.createClass({
       let overlayLayerConfig = this.config.mapLayers[overlayLayer];
 
       // NB: Leaflet uses [[south, west], [north, east]] bounds.
-      let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng],[overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
+      let bounds = overlayLayerConfig.bounds !== undefined ? [[overlayLayerConfig.bounds.southLat, overlayLayerConfig.bounds.westLng], [overlayLayerConfig.bounds.northLat, overlayLayerConfig.bounds.eastLng]] : undefined;
       let mapLayerServerPath = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/';
       let absoluteURLPattern = /^https?:\/\/|^\/\//i;
 
@@ -346,11 +364,11 @@ let MapActions = React.createClass({
       };
 
       // TODO: Convert to component with the mapLayers key as its prop.
-      if (this.config.mapLayers[overlayLayer].format === "tile") {
+      if (this.config.mapLayers[overlayLayer].format === 'tile') {
 
         overlayLayerProps.maxNativeZoom = overlayLayerConfig.maxNativeZoom;
         overlayLayerProps.tms = overlayLayerConfig.tms;
-        overlayLayerProps.url = absoluteURLPattern.test(overlayLayerConfig.filePattern) ? overlayLayerConfig.filePattern :'/dist/Maps/' + this.config.dataset + '/' + overlayLayer + '/' + overlayLayerConfig.filePattern;
+        overlayLayerProps.url = absoluteURLPattern.test(overlayLayerConfig.filePattern) ? overlayLayerConfig.filePattern : mapLayerServerPath + overlayLayerConfig.filePattern;
 
         // Place the overlay tile layer above the base layer tile layer.
         overlayLayerProps.zIndex = overlayLayerProps.zIndex !== undefined ? overlayLayerProps.zIndex : 2;
@@ -364,9 +382,9 @@ let MapActions = React.createClass({
           </Overlay>
         );
 
-      } else if (this.config.mapLayers[overlayLayer].format === "image") {
+      } else if (this.config.mapLayers[overlayLayer].format === 'image') {
 
-        overlayLayerProps.url = '/panoptes/Maps/' + this.config.dataset + '/' + overlayLayer + '/data.png';
+        overlayLayerProps.url = mapLayerServerPath + 'data.png';
 
         overlayLayerComponent = (
           <Overlay
@@ -394,6 +412,7 @@ let MapActions = React.createClass({
 
       map = (
         <TableMap
+          {...adaptedMarkersLayerProps}
           center={center}
           setProps={setProps}
           table={table}
@@ -455,7 +474,7 @@ let MapActions = React.createClass({
           />
           {
             table ?
-              <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+              <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
             : null
           }
           <SelectField
@@ -511,7 +530,7 @@ let MapActions = React.createClass({
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={query}/>
+                <QueryString prepend="Filter:" table={table} query={this.definedQuery}/>
               </span>
               : null}
           </div>
