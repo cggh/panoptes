@@ -171,6 +171,18 @@ let QueryPicker = React.createClass({
           <div className="centering-container">
             <QueryString className="text" prepend="" table={table} query={query}/>
           </div>
+          {
+            this.config.user.isManager && query ?
+            <div className="centering-container">
+              <RaisedButton
+                label="Get JSON"
+                primary={false}
+                onClick={() => prompt('Query as JSON:', query)}
+                icon={<Icon fixedWidth={true} name={'paste'} inverse={false} />}
+              />
+            </div>
+            : null
+          }
           <div className="centering-container">
             {
               this.config.user.isManager && storedFilterNameOpen ?

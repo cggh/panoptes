@@ -46,10 +46,12 @@ let PivotTableView = React.createClass({
     className: React.PropTypes.string
   },
 
-
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery,
+      query: undefined,
     };
   },
 
@@ -65,8 +67,13 @@ let PivotTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columnProperty, rowProperty} = props;
-    let tableConfig = this.config.tablesById[table];
+    let {query, columnProperty, rowProperty} = props;
+
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+
     let columns = [
       {expr: ['count', ['*']], as: 'count'}
     ];
@@ -85,9 +92,9 @@ let PivotTableView = React.createClass({
 
     let queryAPIargs = {
       database: this.config.dataset,
-      table: tableConfig.fetchTableName,
+      table: this.tableConfig().fetchTableName,
       columns: columns,
-      query: query,
+      query: this.definedQuery,
       groupBy,
       start: 0,
       stop: 1000,
@@ -147,8 +154,7 @@ let PivotTableView = React.createClass({
   render() {
     let {className, columnProperty, rowProperty} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
-    let tableConfig = this.tableConfig();
-    if (!tableConfig) {
+    if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
@@ -175,14 +181,14 @@ let PivotTableView = React.createClass({
               header=""
               cell={({rowIndex}) => {
                 const value = uniqueRows[rowIndex];
-                const rowPropConfig = tableConfig.propertiesById[rowProperty] || {};
+                const rowPropConfig = this.tableConfig().propertiesById[rowProperty] || {};
                 const valueColours = rowPropConfig.valueColours;
                 let background = 'inherit';
                 if (valueColours && value !== '_all_') {
                   let col = valueColours[value] || valueColours['_other_'];
                   if (col) {
                     background = Color(col).lighten(0.3).rgbString();
-                    }
+                  }
                 }
                 return <div className="table-row-cell"
                      style={{
@@ -195,49 +201,49 @@ let PivotTableView = React.createClass({
                     uniqueRows[rowIndex] == '_all_' ? 'All' :
                       <PropertyCell prop={rowPropConfig} value={value}/>
                   }
-                </div>
+                </div>;
               }}
             />
             {uniqueColumns.map((columnValue) => {
-                const colPropConfig = tableConfig.propertiesById[columnProperty] || {};
-                const valueColours = colPropConfig.valueColours;
-                let background = 'inherit';
-                if (valueColours && columnValue !== '_all_') {
-                  let col = valueColours[columnValue] || valueColours['_other_'];
-                  if (col) {
-                    background = Color(col).lighten(0.3).rgbString();
-                    }
+              const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
+              const valueColours = colPropConfig.valueColours;
+              let background = 'inherit';
+              if (valueColours && columnValue !== '_all_') {
+                let col = valueColours[columnValue] || valueColours['_other_'];
+                if (col) {
+                  background = Color(col).lighten(0.3).rgbString();
                 }
-                return <Column
-                //TODO Better default column widths
-                width={COLUMN_WIDTH}
-                key={columnValue}
-                allowCellsRecycling={true}
-                isResizable={false}
-                minWidth={50}
-                header={
-                      <div className="table-row-cell"
-                           style={{
-                             textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
-                             width: COLUMN_WIDTH,
-                             height: HEADER_HEIGHT + 'px',
-                             background: background
-                           }}>
-                        { columnValue == '_all_' ? 'All' :
-                          <PropertyCell prop={colPropConfig} value={columnValue}/> }
-                      </div>
+              }
+              return <Column
+              //TODO Better default column widths
+              width={COLUMN_WIDTH}
+              key={columnValue}
+              allowCellsRecycling={true}
+              isResizable={false}
+              minWidth={50}
+              header={
+                    <div className="table-row-cell"
+                         style={{
+                           textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
+                           width: COLUMN_WIDTH,
+                           height: HEADER_HEIGHT + 'px',
+                           background: background
+                         }}>
+                      { columnValue == '_all_' ? 'All' :
+                        <PropertyCell prop={colPropConfig} value={columnValue}/> }
+                    </div>
+                }
+              cell={({rowIndex}) =>
+                    <div className="table-row-cell"
+                         style={{
+                           textAlign: 'right',
+                           width: COLUMN_WIDTH,
+                           height: ROW_HEIGHT + 'px',
+                           //background: background
+                         }}>
+                      {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
+                    </div>
                   }
-                cell={({rowIndex}) =>
-                      <div className="table-row-cell"
-                           style={{
-                             textAlign: 'right',
-                             width: COLUMN_WIDTH,
-                             height: ROW_HEIGHT + 'px',
-                             //background: background
-                           }}>
-                        {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
-                      </div>
-                    }
               />;
             })}
           </Table>
