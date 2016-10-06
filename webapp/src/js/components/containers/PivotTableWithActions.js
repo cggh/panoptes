@@ -36,9 +36,12 @@ let PivotTableWithActions = React.createClass({
     rowProperty: React.PropTypes.string,
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery,
+      query: undefined,
       setProps: null,
       sidebar: true
     };
@@ -55,11 +58,16 @@ let PivotTableWithActions = React.createClass({
   render() {
     const {sidebar, table, query, columnProperty, rowProperty, setProps} = this.props;
 
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
         <SidebarHeader icon={this.icon()} description={`Summary and aggregates of the ${this.tableConfig().namePlural} table`}/>
         <div className="pivot-controls vertical stack">
-          <FilterButton table={table} query={query} onPick={(query) => this.props.setProps({query})}/>
+          <FilterButton table={table} query={this.definedQuery} onPick={(query) => this.props.setProps({query})}/>
           <PropertySelector table={table}
                             key="columnProperty"
                             value={this.config.tablesById[table].propertiesById[columnProperty] ? columnProperty : null}
@@ -88,10 +96,10 @@ let PivotTableWithActions = React.createClass({
                   name={sidebar ? 'arrows-h' : 'bars'}
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
-            <span className="text"><QueryString prepend="Filter:" table={table} query={query}/></span>
+            <span className="text"><QueryString prepend="Filter:" table={table} query={this.definedQuery}/></span>
           </div>
           <div className="grow">
-            <PivotTableView {...this.props}/>
+            <PivotTableView {...this.props} query={this.definedQuery}/>
           </div>
         </div>
       </Sidebar>

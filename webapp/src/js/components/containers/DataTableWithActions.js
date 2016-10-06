@@ -316,7 +316,7 @@ let DataTableWithActions = React.createClass({
         {searchGUI}
         <FlatButton label="Pivot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table}/>, true)}
+                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
       </div>
