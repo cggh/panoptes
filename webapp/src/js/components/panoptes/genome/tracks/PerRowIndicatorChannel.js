@@ -64,9 +64,12 @@ let PerRowIndicatorChannel = React.createClass({
     onChangeLoadStatus: React.PropTypes.func
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery
+      query: undefined
     };
   },
 
@@ -92,7 +95,12 @@ let PerRowIndicatorChannel = React.createClass({
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-    const tableConfig = this.config.tablesById[table];
+
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+
     if (this.props.chromosome !== chromosome ||
       this.props.table !== table) {
       this.applyData(props, []);
@@ -100,7 +108,7 @@ let PerRowIndicatorChannel = React.createClass({
     if (width - sideWidth < 1) {
       return;
     }
-    if (colourProperty && !tableConfig.propertiesById[colourProperty]) {
+    if (colourProperty && !this.tableConfig().propertiesById[colourProperty]) {
       ErrorReport(this.getFlux(), `Per ${table} channel: ${colourProperty} is not a valid property of ${table}`);
       return;
     }
@@ -118,22 +126,21 @@ let PerRowIndicatorChannel = React.createClass({
       this.blockIndex = blockIndex;
       this.needNext = needNext;
       this.props.onChangeLoadStatus('LOADING');
-      let columns = [tableConfig.primKey, tableConfig.position];
+      let columns = [this.tableConfig().primKey, this.tableConfig().position];
       if (colourProperty)
         columns.push(colourProperty);
-      query = SQL.WhereClause.decode(query);
-      query = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(tableConfig.chromosome, '=', chromosome),
-        query]);
+      let decodedQuery = SQL.WhereClause.decode(this.definedQuery);
+      decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
         table,
         columns: columns,
-        query: SQL.WhereClause.encode(query),
+        query: SQL.WhereClause.encode(decodedQuery),
         transpose: false,
       };
       let cacheArgs = {
         method: 'query',
-        regionField: tableConfig.position,
+        regionField: this.tableConfig().position,
         queryField: 'query',
         limitField: 'stop',
         start,
@@ -164,8 +171,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   applyData(props, blocks) {
     let {table, colourProperty} = props;
-    let tableConfig = this.config.tablesById[table];
-    this.positions = combineBlocks(blocks, tableConfig.position);
+    this.positions = combineBlocks(blocks, this.tableConfig().position);
     if (colourProperty) {
       this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
@@ -318,7 +324,8 @@ const PerRowIndicatorControls = React.createClass({
       ],
       redirect: ['setProps']
     }),
-    FluxMixin
+    FluxMixin,
+    ConfigMixin
   ],
 
   propTypes: {
@@ -334,10 +341,15 @@ const PerRowIndicatorControls = React.createClass({
   render() {
     let {table, query, colourProperty} = this.props;
 
+    this.definedQuery = query;
+    if (this.definedQuery === undefined) {
+      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+
     return (
       <div className="channel-controls">
         <div className="control">
-          <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
+          <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
         </div>
         <div className="control">
           <div className="label">Colour By:</div>
