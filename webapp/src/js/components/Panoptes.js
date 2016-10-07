@@ -83,7 +83,7 @@ let Panoptes = React.createClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header name={config.settings.name} userID={userID} logo={config.logo}/>
+              <Header name={config.settings.name} userID={userID} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
                             unclosableTab={tabs.get('unclosableTab')}
