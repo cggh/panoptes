@@ -9,6 +9,9 @@ from os.path import join
 
 import errno
 import simplejson
+import multiprocessing
+import multiprocessing.dummy
+
 
 from ProcessDatabase import ProcessDatabase
 from BaseImport import BaseImport
@@ -16,6 +19,7 @@ from SettingsGraph import SettingsGraph
 from PanoptesConfig import PanoptesConfig
 from ImportSettings import valueTypes
 
+pool = multiprocessing.dummy.Pool(multiprocessing.cpu_count()/2)
 
 class ImportDataTable(BaseImport):
 
@@ -40,30 +44,39 @@ class ImportDataTable(BaseImport):
             self.importGraphs(tableid)
             self.storeDataDerivedConfig(tableid)
 
-    def storeDataDerivedConfig(self, tableId):
+    def storeDataDerivedConfig(self, table_id):
         with self._logHeader('Storing data derived config'):
             config = PanoptesConfig(self._calculationObject)
-            baseFolder = join(config.getBaseDir(), 'config', self._datasetId, tableId)
-            config = {}
-            for propId in self._settingsLoader.getPropertyNames():
-                config[propId] = {}
-                prop = self._settingsLoader.getProperty(propId)
-                if 'isCategorical' not in prop and self._dao._execSqlQuery('select count(distinct "{0}") from "{1}"'.format(propId, tableId))[0][0] < 50:
-                    config[propId]['isCategorical'] = True
-                if (config[propId].get('isCategorical', False) or prop.get('isCategorical', False)) \
-                        and prop['dataType'] != 'Date':  #TODO Dates don't serialise nicely
-                    config[propId]['distinctValues'] = map(lambda a: a[0], self._dao._execSqlQuery('select distinct "{0}" from "{1}" order by "{0}"'.format(propId, tableId)))
+            base_folder = join(config.getBaseDir(), 'config', self._datasetId, table_id)
+            def getDataDerivedConfigForProp(prop_id):
+                result = {}
+                prop = self._settingsLoader.getProperty(prop_id)
+                if 'isCategorical' not in prop and self._dao._execSqlQuery(
+                        'select count(distinct "{0}") from "{1}"'.format(prop_id, table_id))[0][0] < 50:
+                    result['isCategorical'] = True
+                if (result.get('isCategorical', False) or prop.get('isCategorical', False)) \
+                        and prop['dataType'] != 'Date':  # TODO Dates don't serialise nicely
+                    result['distinctValues'] = map(lambda a: a[0], self._dao._execSqlQuery(
+                        'select distinct "{0}" from "{1}" order by "{0}"'.format(prop_id, table_id)))
                 if 'maxVal' not in prop and prop['dataType'] in valueTypes:
-                    config[propId]['maxVal'] = self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(propId, tableId))[0][0]
+                    result['maxVal'] = \
+                    self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(prop_id, table_id))[0][0]
                 if 'minVal' not in prop and prop['dataType'] in valueTypes:
-                    config[propId]['minVal'] = self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(propId, tableId))[0][0]
+                    result['minVal'] = \
+                    self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(prop_id, table_id))[0][0]
+                return result
+            prop_ids = self._settingsLoader.getPropertyNames()
+            results = pool.map(getDataDerivedConfigForProp, prop_ids)
+            data_derived_config = {}
+            for prop_id, result in zip(prop_ids, results):
+                data_derived_config[prop_id] = result
             try:
-                os.makedirs(baseFolder)
+                os.makedirs(base_folder)
             except OSError as exception:
                 if exception.errno != errno.EEXIST:
                     raise
-            with open(join(baseFolder, 'dataConfig.json'), 'w') as f:
-                simplejson.dump(config, f)
+            with open(join(base_folder, 'dataConfig.json'), 'w') as f:
+                simplejson.dump(data_derived_config, f)
 
     def importGraphs(self, tableid):
         folder = self._datatablesFolder
