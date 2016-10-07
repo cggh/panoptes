@@ -39,8 +39,7 @@ let DataItemActions = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      table: table,
-      primKeyField: this.config.tablesById[table].primKey,
+      tableConfig: this.tableConfig(),
       primKeyValue: primKey
     };
 
@@ -67,7 +66,7 @@ let DataItemActions = React.createClass({
   render() {
     const {table, primKey} = this.props;
     const {data} = this.state;
-    const tableConfig = this.config.tablesById[table];
+    const tableConfig = this.tableConfig();
     if (!data)
       return null;
 

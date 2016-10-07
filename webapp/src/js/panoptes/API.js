@@ -3,6 +3,7 @@ import arrayBufferDecode from 'panoptes/arrayBufferDecode';
 import _keys from 'lodash/keys';
 import LZString from 'lz-string';
 import _forEach from 'lodash/forEach';
+import _map from 'lodash/map';
 import {assertRequired} from 'util/Assert';
 import SQL from 'panoptes/SQL';
 import DataDecoders from 'panoptes/DataDecoders';
@@ -112,63 +113,6 @@ function _decodeSummaryList(columns) {
   };
 }
 
-function pageQuery(options) {
-  assertRequired(options, ['database', 'table', 'columns']);
-  let defaults = {
-    query: SQL.nullQuery,
-    order: null,
-    groupby: null,
-    ascending: true,
-    count: false,
-    start: 0,
-    stop: 1000000,
-    distinct: false,
-    transpose: true
-  };
-  let {database, table, columns, query, order, groupby,
-    ascending, count, start, stop, distinct, transpose} = {...defaults, ...options};
-
-  let collist = '';
-  _forEach(columns, (encoding, id) => {
-    if (collist.length > 0) collist += '~';
-    collist += encoding + id;
-  });
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  let params = {};
-  params = order ? {order, ...params} : params;
-  params = groupby ? {groupby: groupby.join('~'), ...params} : params;
-  return requestJSON({
-    ...args,
-    params: {
-      ...params,
-      datatype: 'pageqry',
-      database,
-      tbname: table,
-      qry: encodeQuery(query),
-      collist: LZString.compressToEncodedURIComponent(collist),
-      sortreverse: ascending ? '0' : '1',
-      needtotalcount: count ? '1' : '0',
-      limit: `${start}~${stop}`,
-      distinct: distinct ? '1' : '0'
-    }
-  })
-    .then(_decodeValList(columns))
-    //Transpose into rows if needed
-    .then((columns) => {
-      if (transpose) {
-        let rows = [];
-        for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
-          let row = {};
-          _forEach(columns, (array, id) => row[id] = array[i]);
-          rows.push(row);
-        }
-        return rows;
-      } else {
-        return columns;
-      }
-    });
-}
-
 function annotationData(options) {
   //TODO Extra field when needed by region channel?
   assertRequired(options, [
@@ -269,19 +213,22 @@ function fetchData(id) {
 }
 
 function fetchSingleRecord(options) {
-  assertRequired(options, ['database', 'table', 'primKeyField', 'primKeyValue']);
-  let {database, table, primKeyField, primKeyValue} = options;
-  let args = options.cancellation ? {cancellation: options.cancellation} : {};
-  let query = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKeyField, '=', primKeyValue));
-  return requestJSON({
-    ...args,
-    params: {
-      datatype: 'recordinfo',
-      database: database,
-      tbname: table,
-      qry: encodeQuery(query)
+  assertRequired(options, ['database', 'tableConfig', 'primKeyValue']);
+  let {database, tableConfig, primKeyValue,cancellation} = options;
+  let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(tableConfig.primKey, '=', primKeyValue));
+  return query({
+    cancellation,
+    database: database,
+    table: tableConfig.id,
+    columns: _map(tableConfig.properties, 'id'),
+    query: recordQuery,
+    transpose: true //We want rows, not columns
+  }).then((data) => {
+    if (data.length === 0) {
+      throw Error(`Tried to get non-existent record ${primKeyValue}`);
     }
-  }).then((response) => response.Data);
+    return data[0];
+  })
 }
 
 function findGene(options) {
@@ -322,7 +269,7 @@ function findGenesInRegion(options) {
   assertRequired(options, ['database', 'chromosome', 'startPosition', 'endPosition']);
   let {database, chromosome, startPosition, endPosition} = options;
 
-  let columns = {'fid': 'ST', 'fname': 'ST', 'descr': 'ST', 'fstart': 'IN', 'fstop': 'IN'};
+  let columns = ['fid', 'fname', 'descr', 'fstart', 'fstop'];
 
   // Construct query for chromosome, start and end positions.
   let query = SQL.WhereClause.encode(SQL.WhereClause.AND([
@@ -332,12 +279,13 @@ function findGenesInRegion(options) {
     SQL.WhereClause.CompareFixed('ftype', '=', 'gene')
   ]));
 
-  return pageQuery(
+  return query(
     {
       database: database,
       table: 'annotation',
       columns: columns,
-      query: query
+      query: query,
+      transpose: true
     }
   );
 }
@@ -345,41 +293,45 @@ function findGenesInRegion(options) {
 function fetchGene(options) {
   assertRequired(options, ['database', 'geneId']);
   let {database, geneId} = options;
-  return fetchSingleRecord(
-    {
-      database: database,
-      table: 'annotation',
-      primKeyField: 'fid',
-      primKeyValue: geneId
+  let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed('fid', '=', geneId));
+  return query({
+    database: database,
+    table: 'annotation',
+    columns: ['fid', 'fname', 'descr', 'fstart', 'fstop'],
+    query: recordQuery,
+    transpose: true //We want rows, not columns
+  }).then((data) => {
+    if (data.length === 0) {
+      throw Error(`Tried to get non-existent record ${primKeyValue}`);
     }
-  );
+    return data[0];
+  })
 }
 
 function fetchImportStatusData(options) {
   assertRequired(options, ['dataset']);
   // let {dataset} = options;
-  let columns = {'id': 'GN',
-                 'user': 'GN',
-                 'timestamp': 'GN',
-                 'name': 'GN',
-                 'status': 'GN',
-                 'progress': 'IN',
-                 'completed': 'IN',
-                 'failed': 'IN',
-                 'scope': 'GN'
-  };
+  let columns = ['id',
+                 'user',
+                 'timestamp',
+                 'name',
+                 'status',
+                 'progress',
+                 'completed',
+                 'failed',
+                 'scope'
+  ];
   // TODO: only get logs for this dataset
   //SQL.WhereClause.encode(SQL.WhereClause.CompareFixed("dataset", '=', dataset))
-
-  let query = SQL.nullQuery;
-  return pageQuery(
+  let recordQuery = SQL.nullQuery;
+  return query(
     {
-      database: '', // Falls back to default DB in DQXServer config
+      database: 'datasets',
       table: 'calculations',
       columns: columns,
-      query: query,
-      order: 'timestamp',
-      ascending: false
+      query: recordQuery,
+      order: ['asc', 'timestamp'],
+      transpose: true
     }
   );
 }
@@ -415,7 +367,6 @@ function importDataset(dataset) {
 
 function importDatasetConfig(dataset) {
   return requestJSON({
-
     params: {
       datatype: 'fileload_dataset',
       ScopeStr: 'none',
@@ -525,11 +476,12 @@ function query(options) {
     start: undefined,
     stop: undefined,
     distinct: false,
-    transpose: true,
+    transpose: false,
+    typedArrays: false,
     randomSample: undefined
   };
   let {database, table, columns, query, orderBy, groupBy,
-    start, stop, distinct, randomSample} = {...defaults, ...options};
+    start, stop, distinct, transpose, randomSample, typedArrays} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -547,21 +499,41 @@ function query(options) {
     orderBy: JSON.stringify(orderBy),
     groupBy: groupBy.join('~'),
     randomSample: randomSample
-  }));
-    //Transpose into rows if needed
-    // .then((columns) => {
-    //   if (transpose) {
-    //     let rows = [];
-    //     for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
-    //       let row = {};
-    //       _forEach(columns, (array, id) => row[id] = array[i]);
-    //       rows.push(row);
-    //     }
-    //     return rows;
-    //   } else {
-    //     return columns;
-    //   }
-    // });
+  }))
+  .then((columns) => {
+    if (!typedArrays) {
+      //Convert to regular arrays and convert nulls
+      let plainArrays = {};
+      _forEach(columns, (array, name) => plainArrays[name] = Array.prototype.slice.call(array.array));
+      _forEach(plainArrays, (array, name) => {
+        let nullValue = nullValues[columns[name].type];
+        if (nullValue !== undefined) {
+          for (let i = 0, len = array.length; i < len; ++i) {
+            if (array[i] === nullValue) {
+              array[i] =  null;
+            }
+          }
+        }
+      });
+      return plainArrays;
+    } else {
+      return columns;
+    }
+  })
+  .then((columns) => {
+    // Transpose into rows if needed
+    if (transpose) {
+      let rows = [];
+      for (let i = 0; i < columns[_keys(columns)[0]].length; i++) {
+        let row = {};
+        _forEach(columns, (array, id) => row[id] = array[i]);
+        rows.push(row);
+      }
+      return rows;
+    } else {
+      return columns;
+    }
+  });
 }
 
 function staticContent(options) {
@@ -569,10 +541,16 @@ function staticContent(options) {
   return request(options).then((resp) => resp.responseText);
 }
 
+
+//Null values from monet - https://www.monetdb.org/Documentation/Manuals/SQLreference/BuiltinTypes
+//Monet will not let these values be imported so it is safe to do.
 const nullValues = {
   i1: -128,
   i2: -32768,
   i4: -2147483648,
+  Int8: -128,
+  Int16: -32768,
+  Int32: -2147483648,
 };
 
 module.exports = {
@@ -591,7 +569,6 @@ module.exports = {
   importDatasetConfig,
   modifyConfig,
   nullValues,
-  pageQuery,
   query,
   requestJSON,
   rowsCount,

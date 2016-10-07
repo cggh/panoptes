@@ -39,7 +39,7 @@ let DataTableWithActions = React.createClass({
     title: React.PropTypes.string,
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
-    order: React.PropTypes.string,
+    order: React.PropTypes.array,
     ascending: React.PropTypes.bool,
     columns: React.PropTypes.array,
     columnWidths: React.PropTypes.object,
@@ -56,7 +56,7 @@ let DataTableWithActions = React.createClass({
     return {
       table: null,
       query: undefined,
-      order: null,
+      order: [],
       ascending: true,
       columnWidths: {},
       initialStartRowIndex: 0,
@@ -116,8 +116,9 @@ let DataTableWithActions = React.createClass({
     this.props.setProps({columnWidths: {[column]: size}});
   },
 
-  handleOrderChange(column, ascending) {
-    this.props.setProps({order: column, ascending: ascending});
+  handleOrderChange(order) {
+    //Dont use merge syntax!
+    this.props.setProps((props) => props.set('order', order));
   },
 
   handleFetchedRowsCountChange(fetchedRowsCount) {
@@ -243,12 +244,20 @@ let DataTableWithActions = React.createClass({
     return dataTableQuery;
   },
 
+  orderDescriptionString(order) {
+    if (order.length === 0) {
+      return "None";
+    }
+    return _map(order, ([dir, column]) =>
+      `${this.tableConfig().propertiesById[column].name} ${dir === 'asc' ? 'asc' : 'desc'}`)
+      .join(', ');
+  },
+
   render() {
 
     let actions = this.getFlux().actions;
     let {table, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
-
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns) {
@@ -433,7 +442,7 @@ let DataTableWithActions = React.createClass({
             />
             <span className="block text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
-            <span className="block text">Sort: {order ? this.tableConfig().propertiesById[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
+            <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
             <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
             <span className="block text">{pageBackwardNav}{shownRowsMessage}{pageForwardNav}</span>
           </div>

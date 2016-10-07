@@ -331,7 +331,9 @@ class WhereClause:
             self.querystring += st
             self.querystring_params += st
 
-        if statm['Tpe'] == 'ISABSENT':
+        if statm['Tpe'] == 'ISABSENT' or \
+                (statm['Tpe'] == '=' and statm['CompValue'] is None) or \
+                (statm['Tpe'] == '=' and statm['CompValue'] == ''):
             processed = True
             st = '{0} IS NULL'.format(DBCOLESC(statm['ColName']))
             self.querystring += st

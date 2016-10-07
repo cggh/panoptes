@@ -1,10 +1,17 @@
+
 let JD2DateTime = function(JD) {
   return new Date((JD - 2440587.5) * 24 * 60 * 60 * 1000);
 };
 
-
-
 module.exports = function(property, value) {
+  if (property.isText) {
+    return value === null ? '' : value;
+  }
+
+  if (value === null || isNaN(value)) {
+    return 'NULL';
+  }
+
   if (property.isBoolean) {
     return value ? 'True' : 'False';
   }
@@ -24,15 +31,7 @@ module.exports = function(property, value) {
   }
 
   if (property.isFloat) {
-    if ((value == null) || (value == 'None'))
-      return '';
-    else {
-      value = parseFloat(value);
-      if (isNaN(value))
-        return '';
-      else
-        return value.toFixed(property.decimDigits).toString();
-    }
+    return value.toFixed(property.decimDigits).toLocaleString();
   }
-  return (value === undefined || value === null) ? '' : value.toString();
+  return value.toLocaleString();
 };

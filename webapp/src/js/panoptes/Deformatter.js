@@ -21,23 +21,23 @@ module.exports = function(property, string) {
   }
 
   if (property.isFloat) {
-    if ((string == ''))
-      return '';
+    if ((string == 'NULL'))
+      return null;
     else {
       let value = parseFloat(string);
       if (isNaN(value))
-        return '';
+        return null;
       else
-        return value.toFixed(property.decimDigits);
+        return value;
     }
   }
   if (property.isInt) {
-    if ((string == ''))
-      return '';
+    if ((string == 'NULL'))
+      return null;
     else {
       let value = parseInt(string);
       if (isNaN(value))
-        return '';
+        return null;
       else
         return value;
     }

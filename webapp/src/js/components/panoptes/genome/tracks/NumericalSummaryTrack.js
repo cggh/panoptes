@@ -115,6 +115,7 @@ let NumericalSummaryTrack = React.createClass({
         groupBy: ['window'],
         orderBy: [['asc', 'window']],
         transpose: false,
+        typedArrays: true
       };
       let cacheArgs = {
         method: 'query',

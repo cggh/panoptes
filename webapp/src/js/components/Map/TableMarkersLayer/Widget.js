@@ -132,23 +132,21 @@ let TableMarkersLayer = React.createClass({
       }
     }
 
-    let locationColumnsColumnSpec = {};
-    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
-
     requestContext.request(
       (componentCancellation) => {
 
         // Get all markers using the specified table.
         let locationAPIargs = {
-          columns: locationColumnsColumnSpec,
+          columns: locationColumns,
           database: this.config.dataset,
           query: this.getDefinedQuery(),
-          table: locationTableConfig.fetchTableName
+          table: locationTableConfig.id,
+          transpose: true
         };
 
         return LRUCache.get(
-          'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
-            API.pageQuery({
+          'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+            API.query({
               cancellation: cacheCancellation,
               ...locationAPIargs
             }),

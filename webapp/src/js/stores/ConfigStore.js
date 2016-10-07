@@ -100,32 +100,17 @@ const ConfigStore = Fluxxor.createStore({
         table.icon = table.icon.substring(3);
       else
         table.icon = 'table';
-      table.fetchTableName = table.id;  //eslint-disable-line no-undef
-      table.fetchSubsamplingTableName = table.id; //eslint-disable-line no-undef
       table.propertyGroupsById = {};
       table.propertyGroups.forEach((group) => {
         table.propertyGroupsById[group.id] = group;
         group.properties = []; //Added later in addPropertyConfig
-      });
-      table.tableBasedSummaryValuesById = {};
-      table.tableBasedSummaryValues.forEach((summary, i) => {
-        table.tableBasedSummaryValuesById[summary.id] = summary;
-        summary.index = i;
       });
       if (table.defaultQuery === '')
         table.defaultQuery = SQL.nullQuery;
       table.trees = table.trees || [];
       this.addPropertyConfig(table);
     };
-
     config.tables.forEach(processTable);
-    if (config.genome && config.genome.summaryValues) {
-      _forEach(config.genome.summaryValues, (table, id) => {
-        table.id = id;
-        processTable(table);
-        config.tablesById[`__reference__${id}`] = table;
-      });
-    }
     return config;
   },
 
@@ -289,6 +274,18 @@ const ConfigStore = Fluxxor.createStore({
       prop.id == table.chromosome ||
       prop.id == table.position ||
       false;
+      prop.defaultValue = (prop.distinctValues || {})[0] || {
+          'Text': '',
+          'Float': 0,
+          'Double': 0,
+          'Int8': 0,
+          'Int16': 0,
+          'Int32': 0,
+          'Boolean': true,
+          'GeoLatitude': 0,
+          'GeoLongitude': 0,
+          'Date': 0
+        }[prop.dataType];
     });
     table.hasGeoCoord = !!(table.longitude && table.latitude);
   }

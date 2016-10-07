@@ -47,8 +47,7 @@ let PropertyGroup = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      table: table,
-      primKeyField: this.config.tablesById[table].primKey,
+      tableConfig: this.tableConfig(),
       primKeyValue: primKey
     };
 
