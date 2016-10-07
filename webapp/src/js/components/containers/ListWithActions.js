@@ -138,7 +138,7 @@ let ListWithActions = React.createClass({
 
     let dataItem = '';
     if (selectedPrimKey) {
-      dataItem = <DataItem views={views} primKey={selectedPrimKey} {...this.props}/>; //We pass along all props as currently selected tab etc are stored here
+      dataItem = <DataItem primKey={selectedPrimKey} {...this.props}>{views}</DataItem>; //We pass along all props as currently selected tab etc are stored here
     }
 
     return (

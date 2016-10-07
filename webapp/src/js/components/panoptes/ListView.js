@@ -190,7 +190,7 @@ let ListView = React.createClass({
 
     } else {
       return (
-        <div>
+        <div style={{position:'relative', height:'30px'}}>
           <Loading status="custom">No rows</Loading>
         </div>
       );
