@@ -57,13 +57,12 @@ let ItemTemplate = React.createClass({
     let possibleChildTables = [];
     let childField = {};
     relations.forEach((rel) => {
-      possibleChildTables.push(rel.childtableid);
-      childField[rel.childtableid] = rel.childid;
+      possibleChildTables.push(rel.childTable.id);
+      childField[rel.childTable.id] = rel.childPropId;
     });
 
     // Determine which childTables are actually used in the raw template.
     let usedChildTables = templateFieldsUsed(children, possibleChildTables);
-
     // Compose all the column specs for each table using the config data.
     let columnSpecsByTable = {};
     for (let i = 0, len = usedChildTables.length; i < len; i++) {

@@ -38,16 +38,21 @@ let TabPane = React.createClass({
     const divProps = Object.assign({}, this.props);
     delete divProps.active;
     delete divProps.compId;
+    delete divProps.updateTitleIcon;
 
     let classes = {
       'tab-pane': true,
       'active': this.props.active
     };
 
+    let child = React.Children.only(this.props.children);
+    let extraProps = (child && child.propTypes && child.propTypes.updateTitleIcon) ?
+    {updateTitleIcon: this.props.updateTitleIcon} : {};
+
     return (
       <div {...divProps} className={classNames(this.props.className, classes)}>
-        {React.cloneElement(this.props.children, {
-          updateTitleIcon: this.props.updateTitleIcon,
+        {React.cloneElement(child, {
+          ...extraProps,
           ref: (node) => this.child = node
         })}
       </div>
