@@ -522,13 +522,14 @@ function query(options) {
     query: SQL.nullQuery,
     orderBy: [],
     groupBy: [],
-    start: 0,
-    stop: 1000000,
+    start: undefined,
+    stop: undefined,
     distinct: false,
-    transpose: true
+    transpose: true,
+    randomSample: undefined
   };
   let {database, table, columns, query, orderBy, groupBy,
-    start, stop, distinct} = {...defaults, ...options};
+    start, stop, distinct, randomSample} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -541,10 +542,11 @@ function query(options) {
     table,
     query: query,
     columns: JSON.stringify(columns),
-    limit: `${start}~${stop}`,
+    limit: (start && stop) ? `${start}~${stop}` : undefined,
     distinct: distinct ? 'true' : 'false',
     orderBy: JSON.stringify(orderBy),
-    groupBy: groupBy.join('~')
+    groupBy: groupBy.join('~'),
+    randomSample: randomSample
   }));
     //Transpose into rows if needed
     // .then((columns) => {

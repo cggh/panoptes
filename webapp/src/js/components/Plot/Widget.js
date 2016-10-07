@@ -1,5 +1,5 @@
 import React from 'react';
-import  Plotly from 'react-plotlyjs';
+import Plotly from 'react-plotlyjs';
 import _reduce from 'lodash/reduce';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';

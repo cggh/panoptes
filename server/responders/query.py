@@ -36,6 +36,7 @@ def handler(start_response, requestData):
     columns = map(decode, json.loads(content['columns']))
     groupBy = content.get('groupBy', None)
     database = content['database']
+    startRow, endRow = None, None
     if content.get('limit', False):
         startRow, endRow = content['limit'].split('~')
         startRow = int(startRow)
@@ -44,8 +45,9 @@ def handler(start_response, requestData):
             startRow = 0
         if endRow <= startRow:
             endRow = startRow + 1
-    else:
-        startRow, endRow = None, None
+    randomSample = None
+    if content.get('randomSample', False):
+        randomSample = int(content['randomSample'])
 
     with DQXDbTools.DBCursor(requestData, database, read_timeout=config.TIMEOUT) as cur:
         whereClause = DQXDbTools.WhereClause()
@@ -65,6 +67,8 @@ def handler(start_response, requestData):
             sqlQuery += " ORDER BY {0}".format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
         if startRow is not None and endRow is not None:
             sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
+        if randomSample is not None:
+            sqlQuery += " UNIFORM SAMPLE {0}".format(randomSample)
 
         if DQXDbTools.LogRequests:
             DQXUtils.LogServer('###QRY:'+sqlQuery)
