@@ -12,7 +12,7 @@ import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import DataItemActions from 'DataItem/Actions';
 
-let DataItemWidget = React.createClass({
+let DataItem = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -75,4 +75,4 @@ let DataItemWidget = React.createClass({
 
 });
 
-module.exports = DataItemWidget;
+module.exports = DataItem;

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import {LayersControl} from 'react-leaflet';
-const {Overlay} = LayersControl;
+import {LayersControl as LeafletLayersControl} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -9,17 +8,17 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
-  'CircleWidget',
-  'FeatureGroupWidget',
-  'ImageOverlayWidget',
-  'MarkerWidget',
-  'PopupWidget',
-  'RectangleWidget',
-  'TableMarkersLayerWidget',
-  'TileLayerWidget'
+  'Circle',
+  'FeatureGroup',
+  'ImageOverlay',
+  'Marker',
+  'MapPopup',
+  'Rectangle',
+  'TableMarkersLayer',
+  'TileLayer'
 ];
 
-let OverlayWidget = React.createClass({
+let Overlay = React.createClass({
 
   mixins: [
     FluxMixin
@@ -59,7 +58,7 @@ let OverlayWidget = React.createClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
-      <Overlay
+      <LeafletLayersControl.Overlay
         addOverlay={addOverlay}
         checked={checked}
         children={React.Children.only(children)}
@@ -74,4 +73,4 @@ let OverlayWidget = React.createClass({
 
 });
 
-module.exports = OverlayWidget;
+module.exports = Overlay;

@@ -9,7 +9,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import 'template.scss';
 
 
-let TemplateWidget = React.createClass({
+let Template = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -39,4 +39,4 @@ let TemplateWidget = React.createClass({
   }
 });
 
-module.exports = TemplateWidget;
+module.exports = Template;

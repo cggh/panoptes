@@ -1,4 +1,4 @@
-import {Map} from 'react-leaflet';
+import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
 
@@ -11,7 +11,7 @@ import filterChildren from 'util/filterChildren';
 // Panoptes components
 import DetectResize from 'utils/DetectResize';
 import Loading from 'ui/Loading';
-import TileLayerWidget from 'Map/TileLayer/Widget';
+import TileLayer from 'Map/TileLayer/Widget';
 
 // Lodash
 import _cloneDeep from 'lodash/cloneDeep';
@@ -26,19 +26,19 @@ import _min from 'lodash/min';
 import 'leaflet/dist/leaflet.css';
 
 const ALLOWED_CHILDREN = [
-  'LayersControlWidget',
-  'TableMarkersLayerWidget',
-  'TileLayerWidget',
-  'FeatureGroupWidget',
-  'MarkerWidget',
-  'OverlayWidget'
+  'LayersControl',
+  'TableMarkersLayer',
+  'TileLayer',
+  'FeatureGroup',
+  'Marker',
+  'Overlay'
 ];
 
 /* To use maps in templates
 
   <p>A simple map:</p>
   <div style="width:300px;height:300px">
-  <MapWidget />
+  <Map />
   </div>
 
   <p>A map with a tilelayer and markers:</p>
@@ -58,7 +58,7 @@ const ALLOWED_CHILDREN = [
 
   <p>A map with markers and popups:</p>
   <div style="width:300px;height:300px">
-  <Map center='{"lat":1,"lng":-1.1}' zoom="4"><Marker position="[2, -2.1]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="4"><Marker position="[2, -2.1]"><MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup></Marker><Marker position="[0, 0]"><MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup></Marker></Map>
   </div>
 
   <p>A map with markers from a table:</p>
@@ -68,13 +68,13 @@ const ALLOWED_CHILDREN = [
 
   <p>A complex map:</p>
   <div style="width:300px;height:300px">
-  <Map center='{"lat":1,"lng":-1.1}' zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker><Marker position="[50, 0]"><Popup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></Popup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><Popup><span>Popup in FeatureGroup</span></Popup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
+  <Map center='{"lat":1,"lng":-1.1}' zoom="2"><LayersControl position="topright"><BaseLayer checked="true" name="OpenStreetMap.Mapnik"><TileLayer attribution="FIXME" url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" /></BaseLayer><BaseLayer name="OpenStreetMap.BlackAndWhite"><FeatureGroup><TileLayer attribution="FIXME" url="http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /><FeatureGroup><Marker position="[0, 0]"><MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup></Marker><Marker position="[50, 0]"><MapPopup><div><span>A pretty CSS3 popup. <br /> Easily customizable.</span></div></MapPopup></Marker></FeatureGroup></FeatureGroup></BaseLayer><Overlay name="Sampling Sites"><TableMarkersLayer table="samplingsites" /></Overlay><Overlay checked="true" name="Layer group with circles"><FeatureGroup><Circle center="[0, 0]" fillColor="blue" radius="200" /><Circle center="[0, 0]" fillColor="red" radius="100" stroke="false" /><FeatureGroup><Circle center="[51.51, -0.08]" color="green" fillColor="green" radius="100" /></FeatureGroup></FeatureGroup></Overlay><Overlay name="Feature group"><FeatureGroup color="purple"><MapPopup><span>Popup in FeatureGroup</span></MapPopup><Circle center="[51.51, -0.06]" radius="200" /><Rectangle bounds="[[51.49, -0.08],[51.5, -0.06]]" /></FeatureGroup></Overlay></LayersControl></Map>
   </div>
 
 */
 
 
-let MapWidget = React.createClass({
+let Map = React.createClass({
 
   mixins: [
     FluxMixin
@@ -249,22 +249,22 @@ let MapWidget = React.createClass({
 
     if (children && children.length) {
 
-      // If children is iterable and not empty (i.e. MapWidget has real children).
+      // If children is iterable and not empty (i.e. Map has real children).
 
-      // If the children are all MarkerWidgets, or only a FeatureGroup containing only MarkerWidgets, then insert the default TileLayer.
+      // If the children are all Markers, or only a FeatureGroup containing only Markers, then insert the default TileLayer.
 
       let nonMarkerChildrenCount = 0;
 
       let childrenToInspect = children;
 
-      if (children.length === 1 && children[0].type !== undefined && children[0].type.displayName === 'FeatureGroupWidget') {
+      if (children.length === 1 && children[0].type !== undefined && children[0].type.displayName === 'FeatureGroup') {
         childrenToInspect = children[0].props.children;
       }
 
       let keyedChildren = [];
 
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
-        if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'MarkerWidget') {
+        if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'Marker') {
           nonMarkerChildrenCount++;
         }
         keyedChildren[i] = _cloneDeep(childrenToInspect[i]);
@@ -278,14 +278,14 @@ let MapWidget = React.createClass({
         // If there are only Markers as children.
 
         mapComponent = (
-          <Map
+          <LeafletMap
             {...commonMapProps}
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget key="0" />
+            <TileLayer key="0" />
             {keyedChildren}
-          </Map>
+          </LeafletMap>
         );
 
       } else {
@@ -294,7 +294,7 @@ let MapWidget = React.createClass({
         // pass everything to the Map component.
 
         mapComponent = (
-          <Map
+          <LeafletMap
             children={children}
             {...commonMapProps}
             center={center}
@@ -314,17 +314,17 @@ let MapWidget = React.createClass({
 
         // If there is a child that is an object (and not an array).
         if (
-          children && displayName(children.type) === 'LayersControlWidget'
+          children && displayName(children.type) === 'LayersControl'
           && _isObject(children.props.children) && !_isArray(children.props.children)
-          && displayName(children.props.children.type) === 'BaseLayerWidget'
+          && displayName(children.props.children.type) === 'BaseLayer'
         ) {
 
-          // If the child is a LayersControlWidget that only has a BaseLayerWidget child, then select that BaseLayer.
+          // If the child is a LayersControl that only has a BaseLayer child, then select that BaseLayer.
 
           let augmentedChild = _cloneDeep(children);
           augmentedChild.props.children.props.checked = true;
           mapComponent = (
-            <Map
+            <LeafletMap
               children={augmentedChild}
               {...commonMapProps}
               center={center}
@@ -337,7 +337,7 @@ let MapWidget = React.createClass({
           // Otherwise, pass everything to the Map component.
 
           mapComponent = (
-            <Map
+            <LeafletMap
               children={children}
               {...commonMapProps}
               center={center}
@@ -350,17 +350,17 @@ let MapWidget = React.createClass({
 
       } else {
 
-        // MapWidget has no real children.
+        // Map has no real children.
         // Just show the default map with the default TileLayer
 
         mapComponent = (
-          <Map
+          <LeafletMap
             {...commonMapProps}
             center={center}
             zoom={zoom}
           >
-            <TileLayerWidget />
-          </Map>
+            <TileLayer />
+          </LeafletMap>
         );
 
       }
@@ -382,4 +382,4 @@ let MapWidget = React.createClass({
 
 });
 
-module.exports = MapWidget;
+module.exports = Map;

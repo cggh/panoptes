@@ -1,10 +1,10 @@
 import React from 'react';
-import {Rectangle} from 'react-leaflet';
+import {Rectangle as LeafletRectangle} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let RectangleWidget = React.createClass({
+let Rectangle = React.createClass({
 
   mixins: [
     FluxMixin
@@ -16,11 +16,11 @@ let RectangleWidget = React.createClass({
 
   render() {
     return (
-      <Rectangle
+      <LeafletRectangle
         bounds={this.props.bounds}
       />
     );
   }
 });
 
-module.exports = RectangleWidget;
+module.exports = Rectangle;

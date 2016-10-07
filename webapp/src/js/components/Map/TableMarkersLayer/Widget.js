@@ -6,16 +6,15 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes
-// Panoptes
 import API from 'panoptes/API';
 import CalcMapBounds from 'util/CalcMapBounds';
-import ComponentMarkerWidget from 'Map/ComponentMarker/Widget';
+import ComponentMarker from 'Map/ComponentMarker/Widget';
 import ErrorReport from 'panoptes/ErrorReporter';
-import FeatureGroupWidget from 'Map/FeatureGroup/Widget';
+import FeatureGroup from 'Map/FeatureGroup/Widget';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 
-let TableMarkersLayerWidget = React.createClass({
+let TableMarkersLayer = React.createClass({
 
   mixins: [
     FluxMixin,
@@ -215,7 +214,7 @@ let TableMarkersLayerWidget = React.createClass({
       if (marker.isHighlighted || len === 1) {
 
         markerWidgets.push(
-          <ComponentMarkerWidget
+          <ComponentMarker
             key={i}
             position={{lat: marker.lat, lng: marker.lng}}
             title={marker.title}
@@ -226,7 +225,7 @@ let TableMarkersLayerWidget = React.createClass({
       } else {
 
         markerWidgets.push(
-          <ComponentMarkerWidget
+          <ComponentMarker
             key={i}
             position={{lat: marker.lat, lng: marker.lng}}
             title={marker.title}
@@ -235,7 +234,7 @@ let TableMarkersLayerWidget = React.createClass({
             <svg height="12" width="12">
               <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />
             </svg>
-          </ComponentMarkerWidget>
+          </ComponentMarker>
         );
 
       }
@@ -243,7 +242,7 @@ let TableMarkersLayerWidget = React.createClass({
     }
 
     return (
-      <FeatureGroupWidget
+      <FeatureGroup
         children={markerWidgets}
         layerContainer={layerContainer}
         map={map}
@@ -254,4 +253,4 @@ let TableMarkersLayerWidget = React.createClass({
 
 });
 
-module.exports = TableMarkersLayerWidget;
+module.exports = TableMarkersLayer;

@@ -1,7 +1,7 @@
 import React from 'react';
 import Constants from '../constants/Constants';
 import DataItemViews from 'panoptes/DataItemViews';
-import DataItemWidget from 'components/DataItem/Widget';
+import DataItem from 'components/DataItem/Widget';
 import serialiseComponent from 'util/serialiseComponent';
 const SESSION = Constants.SESSION;
 
@@ -14,9 +14,9 @@ const PanoptesActions = (config) => ({
     let views = DataItemViews.getViews(tableDataItemViews, config.tablesById[table].hasGeoCoord);
     this.dispatch(SESSION.POPUP_OPEN, {
       component: serialiseComponent(
-        <DataItemWidget table={table} primKey={primKey}>
+        <DataItem table={table} primKey={primKey}>
           {views}
-        </DataItemWidget>
+        </DataItem>
       ),
       switchTo
     });

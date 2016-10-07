@@ -1,11 +1,11 @@
 import React from 'react';
-import {Popup} from 'react-leaflet';
+import {Popup as LeafletPopup} from 'react-leaflet';
 import filterChildren from 'util/filterChildren';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let PopupWidget = React.createClass({
+let MapPopup = React.createClass({
 
   mixins: [
     FluxMixin
@@ -38,7 +38,7 @@ let PopupWidget = React.createClass({
   render() {
     let children = filterChildren(this, this.props.children);
     return (
-      <Popup
+      <LeafletPopup
         children={React.Children.only(children)}
       />
     );
@@ -47,4 +47,4 @@ let PopupWidget = React.createClass({
 
 });
 
-module.exports = PopupWidget;
+module.exports = MapPopup;

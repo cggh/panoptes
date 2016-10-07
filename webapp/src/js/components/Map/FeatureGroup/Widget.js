@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {FeatureGroup} from 'react-leaflet';
+import {FeatureGroup as LeafletFeatureGroup} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -8,18 +8,18 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
-  'ComponentMarkerWidget',
-  'TableMarkersLayerWidget',
-  'MarkerWidget',
-  'CircleWidget',
-  'RectangleWidget',
-  'PopupWidget',
-  'FeatureGroupWidget',
-  'TileLayerWidget',
-  'PieChartMarkersLayerWidget'
+  'ComponentMarker',
+  'TableMarkersLayer',
+  'Marker',
+  'Circle',
+  'Rectangle',
+  'MapPopup',
+  'FeatureGroup',
+  'TileLayer',
+  'PieChartMarkersLayer'
 ];
 
-let FeatureGroupWidget = React.createClass({
+let FeatureGroup = React.createClass({
 
   mixins: [
     FluxMixin
@@ -54,7 +54,7 @@ let FeatureGroupWidget = React.createClass({
     children = filterChildren(this, children, ALLOWED_CHILDREN);
 
     return (
-      <FeatureGroup
+      <LeafletFeatureGroup
         children={children}
       />
     );
@@ -62,4 +62,4 @@ let FeatureGroupWidget = React.createClass({
 
 });
 
-module.exports = FeatureGroupWidget;
+module.exports = FeatureGroup;

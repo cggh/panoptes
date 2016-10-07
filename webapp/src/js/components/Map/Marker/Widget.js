@@ -1,5 +1,5 @@
 import React from 'react';
-import {Marker} from 'react-leaflet';
+import {Marker as LeafletMarker} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -7,10 +7,10 @@ import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
 
 const ALLOWED_CHILDREN = [
-  'PopupWidget'
+  'MapPopup'
 ];
 
-let MarkerWidget = React.createClass({
+let Marker = React.createClass({
 
   mixins: [
     FluxMixin
@@ -57,7 +57,7 @@ let MarkerWidget = React.createClass({
     }
 
     return (
-      <Marker
+      <LeafletMarker
         position={position}
         onClick={onClick || (() => null)}
         alt={alt}
@@ -72,4 +72,4 @@ let MarkerWidget = React.createClass({
 
 });
 
-module.exports = MarkerWidget;
+module.exports = Marker;

@@ -4,7 +4,7 @@ import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
 
-import PlotWidget from 'Plot/Widget';
+import Plot from 'Plot/Widget';
 
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -22,7 +22,7 @@ import 'plot.scss';
 // CSS
 //TODO: import 'Plot/Table/widget-styles.scss';
 
-let TablePlotWidget = React.createClass({
+let TablePlot = React.createClass({
 
   mixins: [
     PureRenderMixin,
@@ -104,7 +104,7 @@ let TablePlotWidget = React.createClass({
     return (
       <div className="plot-container">
         { plotType ?
-          <PlotWidget className="plot"
+          <Plot className="plot"
                 plotType={plotType}
                 {...this.state}
           />
@@ -114,4 +114,4 @@ let TablePlotWidget = React.createClass({
   }
 });
 
-module.exports = TablePlotWidget;
+module.exports = TablePlot;

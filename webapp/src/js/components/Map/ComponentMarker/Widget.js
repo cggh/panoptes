@@ -1,11 +1,11 @@
 import React from 'react';
 import DivIcon from 'Map/DivIcon/Widget';
-import MarkerWidget from 'Map/Marker/Widget';
+import Marker from 'Map/Marker/Widget';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 
-let ComponentMarkerWidget = React.createClass({
+let ComponentMarker = React.createClass({
 
   mixins: [
     FluxMixin
@@ -40,7 +40,7 @@ let ComponentMarkerWidget = React.createClass({
 
     if (children === undefined) {
       children = (
-          <MarkerWidget
+          <Marker
             alt={alt}
             children={children}
             layerContainer={layerContainer}
@@ -67,4 +67,4 @@ let ComponentMarkerWidget = React.createClass({
 
 });
 
-module.exports = ComponentMarkerWidget;
+module.exports = ComponentMarker;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {WMSTileLayer} from 'react-leaflet';
+import {WMSTileLayer as LeafletWMSTileLayer} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -14,9 +14,9 @@ import FluxMixin from 'mixins/FluxMixin';
 
 */
 
-// TODO: Is crs passed on to WMSTileLayer automatically (from MapWidget) via context?
+// TODO: Is crs passed on to WMSTileLayer automatically (from Map) via context?
 
-let WMSTileLayerWidget = React.createClass({
+let WMSTileLayer = React.createClass({
 
   mixins: [
     FluxMixin
@@ -66,7 +66,7 @@ let WMSTileLayerWidget = React.createClass({
     // FIXME: How to handle double quotes inside double quotes inside single quotes (!) in descriptions in templates.
 
     return (
-      <WMSTileLayer
+      <LeafletWMSTileLayer
         attribution={attribution}
         children={undefined}
         format={format}
@@ -80,4 +80,4 @@ let WMSTileLayerWidget = React.createClass({
 
 });
 
-module.exports = WMSTileLayerWidget;
+module.exports = WMSTileLayer;
