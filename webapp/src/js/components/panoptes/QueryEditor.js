@@ -301,7 +301,7 @@ let Criterion = React.createClass({
         </div>
       );
 
-    let groups = _clone(this.tableConfig().propertyGroups);
+    let groups = _clone(this.tableConfig().propertyGroupsById);
     groups.other = {
       id: 'other',
       name: 'Other',
