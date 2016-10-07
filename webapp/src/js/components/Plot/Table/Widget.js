@@ -3,6 +3,7 @@ import React from 'react';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
+import _forEach from 'lodash/forEach';
 
 import Plot from 'Plot/Widget';
 
@@ -55,27 +56,28 @@ let TablePlot = React.createClass({
     const tableConfig = this.config.tablesById[table];
     const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
-    let columnspec = {};
-    _map(columns, (column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
-        columns: columnspec,
+        columns: columns,
         query: query,
-        transpose: false
+        transpose: false,
+        randomSample: 20000
       };
 
       requestContext.request((componentCancellation) =>
           LRUCache.get(
-            'pageQuery' + JSON.stringify(APIargs),
+            'query' + JSON.stringify(APIargs),
             (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+              API.query({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation
           )
         )
         .then((data) => {
+          //Sadly we have to convert to normal arrays :(
+          _forEach(data, (array, name) => data[name] = Array.prototype.slice.call(array.array));
           this.setState(
             _reduce(allDimensions,
               (state, dim) => { state[dim] = data[props[dim]] || null; return state; },
