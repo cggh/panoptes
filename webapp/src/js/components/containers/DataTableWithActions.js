@@ -75,7 +75,7 @@ let DataTableWithActions = React.createClass({
 
   componentWillMount() {
     this.propertyGroups = {};
-    _forEach(this.tableConfig().propertyGroups, (val, key) => {
+    _forEach(this.tableConfig().propertyGroupsById, (val, key) => {
       let filteredProps = _filter(val.properties, {showInTable: true});
       if (filteredProps.length > 0) {
         this.propertyGroups[key] = _clone(val);
