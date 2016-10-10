@@ -279,18 +279,24 @@ let MapActions = React.createClass({
     );
   },
 
+  // NB: the behaviour depends on whether this.props.table is defined.
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+
+      if (this.props.table !== undefined && this.props.table !== DEFAULT_MARKER_LAYER) {
+        definedQuery = this.config.tablesById[this.props.table].defaultQuery !== undefined ? this.config.tablesById[this.props.table].defaultQuery : SQL.nullQuery;
+      } else {
+        definedQuery = SQL.nullQuery;
+      }
+
+    }
+    return definedQuery;
+  },
 
   render() {
-    let {center, setProps, query, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
-        this.definedQuery = this.config.tablesById[table].defaultQuery !== undefined ? this.config.tablesById[table].defaultQuery : SQL.nullQuery;
-      } else {
-        this.definedQuery = SQL.nullQuery;
-      }
-    }
+    let {center, setProps, baseTileLayer, baseTileLayerProps, overlayLayer, sidebar, table, zoom} = this.props;
 
     let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.hasGeoCoord),
       (table) => ({
@@ -317,8 +323,8 @@ let MapActions = React.createClass({
 
     if (table !== undefined && table !== DEFAULT_MARKER_LAYER) {
 
-      if (this.definedQuery !== SQL.nullQuery && this.definedQuery !== this.config.tablesById[table].defaultQuery) {
-        adaptedMarkersLayerProps.query = this.definedQuery;
+      if (this.getDefinedQuery() !== SQL.nullQuery && this.getDefinedQuery() !== this.config.tablesById[table].defaultQuery) {
+        adaptedMarkersLayerProps.query = this.getDefinedQuery();
       }
 
       // NB: This might not be used, if/when only a table has been selected.
@@ -327,7 +333,7 @@ let MapActions = React.createClass({
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayerWidget locationDataTable={table} {...adaptedMarkersLayerProps} />
+          <TableMarkersLayer locationDataTable={table} {...adaptedMarkersLayerProps} />
         </Overlay>
       );
     }
@@ -474,7 +480,7 @@ let MapActions = React.createClass({
           />
           {
             table ?
-              <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
+              <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null
           }
           <SelectField
@@ -530,7 +536,7 @@ let MapActions = React.createClass({
             <span className="text">{mapTitle}</span>
             {table ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={this.definedQuery}/>
+                <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/>
               </span>
               : null}
           </div>
