@@ -96,76 +96,81 @@ let GroupedItemPicker = React.createClass({
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
-          <div className="grow scroll-within">
-            <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
-            <div className="search">
-              <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
+          <div className="grow stack vertical scroll-within">
+            <div>
+              <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
+              <div className="search">
+                <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
-            <List>
-              {
-                _map(groups.toJS(), (group) => {
-                  let {id, name, properties} = group;
-                  let subItems = properties.map((prop) => {
-                    let {name, description, id,  icon} = prop;
-                    return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                          <ListItem className={classNames({picked: !picked.includes(id)})}
-                                    key={id}
-                                    primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-                                    secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                                    leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
-                                    onClick={() => this.handleAdd(id)}
-                            />) : null;
-                  }
-                    );
-                  return subItems.filter((i) => i).length > 0 ? (
-                    <ListItem primaryText={name}
-                              key={id}
-                              initiallyOpen={true}
-                              //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
-                              onClick={() => this.handleAddAll(id)}
-                              nestedItems={subItems}
-                      />
+            </div>
+            <div style={{overflow: 'auto'}}>
+              <List>
+                {
+                  _map(groups.toJS(), (group) => {
+                    let {id, name, properties} = group;
+                    let subItems = properties.map((prop) => {
+                      let {name, description, id,  icon} = prop;
+                      return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                            <ListItem className={classNames({picked: !picked.includes(id)})}
+                                      key={id}
+                                      primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
+                                      secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
+                                      leftIcon={<div><Icon fixedWidth={true} name={icon} /></div>}
+                                      onClick={() => this.handleAdd(id)}
+                              />) : null;
+                    }
+                      );
+                    return subItems.filter((i) => i).length > 0 ? (
+                      <ListItem primaryText={name}
+                                key={id}
+                                initiallyOpen={true}
+                                //leftIcon={<div><Icon fixedWidth={true} name="plus"/></div>}
+                                onClick={() => this.handleAddAll(id)}
+                                nestedItems={subItems}
+                        />
 
-                  ) : null;
-                })
-              }
-            </List>
+                    ) : null;
+                  })
+                }
+              </List>
+            </div>
           </div>
           <div className="grow stack vertical">
-            <div className="grow scroll-within">
+            <div>
               <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
-                <List>
-                  {
-                    _map(groups.toJS(), (group) => {
-                      let {id, name, properties} = group;
-                      return ( picked.intersect(properties.map((prop) => prop.id)).size > 0 ?
-                          <ListItem primaryText={name}
-                                    key={id}
-                                    initiallyOpen={true}
-                                    onClick={() => this.handleRemoveAll(id)}
-                                    nestedItems={
-                        properties.map((prop) => {
-                          let {name, description, id, icon} = prop;
-                          return picked.includes(id) ? (
-                              <ListItem key={id}
-                                        secondaryText={description}
-                                        primaryText={name}
-                                        leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                        onClick={() => this.handleRemove(id)}/>
-                            ) : null;
-                        }
-                        )
+            </div>
+            <div className="scroll-within">
+              <List>
+                {
+                  _map(groups.toJS(), (group) => {
+                    let {id, name, properties} = group;
+                    return ( picked.intersect(properties.map((prop) => prop.id)).size > 0 ?
+                        <ListItem primaryText={name}
+                                  key={id}
+                                  initiallyOpen={true}
+                                  onClick={() => this.handleRemoveAll(id)}
+                                  nestedItems={
+                      properties.map((prop) => {
+                        let {name, description, id, icon} = prop;
+                        return picked.includes(id) ? (
+                            <ListItem key={id}
+                                      secondaryText={description}
+                                      primaryText={name}
+                                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+                                      onClick={() => this.handleRemove(id)}/>
+                          ) : null;
                       }
-                            /> : null
-                      );
-                    })
-                  }
+                      )
+                    }
+                          /> : null
+                    );
+                  })
+                }
 
-                </List>
+              </List>
             </div>
             <div className="centering-container">
               <RaisedButton label="Use" primary={true} onClick={this.handlePick}/>
-
             </div>
           </div>
         </div>

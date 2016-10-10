@@ -105,44 +105,50 @@ let ItemPicker = React.createClass({
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
-          <div className="grow scroll-within">
-            <div className="header">{count} <Pluralise text={itemName} ord={count}/> available</div>
-            <div className="search">
-              <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
+          <div className="grow stack vertical scroll-within">
+            <div>
+              <div className="header">{count} <Pluralise text={itemName} ord={count}/> available</div>
+              <div className="search">
+                <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
+              </div>
             </div>
-            <List>
-              {
-                groups.map((group, groupId) => {
-                  let {name, icon, items} = group.toObject();
-                  let subItems = items.map((item, itemId) => {
-                    let {name, description, icon, payload} = item.toObject();
-                    return (name + '#' + (description || '')).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                      <ListItem key={itemId}
-                                primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
-                                secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
-                                leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
-                                onClick={() => this.handleAdd({groupId, itemId, payload})}
-                      />) : null;
-                  });
-                  let numberSubItems = subItems.filter((i) => i).size;
-                  return numberSubItems > 0 ? (
-                    <ListItem
-                      primaryText={<div> {name} ({numberSubItems} <Pluralise text={itemName} ord={numberSubItems}/>)</div>}
-                      key={groupId + !!search}
-                      initiallyOpen={!!search}
-                      leftIcon={<Icon fixedWidth={true} name={icon}/>}
-                      primaryTogglesNestedList={true}
-                      nestedItems={subItems.toArray()}
-                    />
+            <div style={{overflow: 'auto'}}>
+              <List>
+                {
+                  groups.map((group, groupId) => {
+                    let {name, icon, items} = group.toObject();
+                    let subItems = items.map((item, itemId) => {
+                      let {name, description, icon, payload} = item.toObject();
+                      return (name + '#' + (description || '')).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
+                        <ListItem key={itemId}
+                                  primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
+                                  secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
+                                  leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+                                  onClick={() => this.handleAdd({groupId, itemId, payload})}
+                        />) : null;
+                    });
+                    let numberSubItems = subItems.filter((i) => i).size;
+                    return numberSubItems > 0 ? (
+                      <ListItem
+                        primaryText={<div> {name} ({numberSubItems} <Pluralise text={itemName} ord={numberSubItems}/>)</div>}
+                        key={groupId + !!search}
+                        initiallyOpen={!!search}
+                        leftIcon={<Icon fixedWidth={true} name={icon}/>}
+                        primaryTogglesNestedList={true}
+                        nestedItems={subItems.toArray()}
+                      />
 
-                  ) : null;
-                }).toArray()
-              }
-            </List>
+                    ) : null;
+                  }).toArray()
+                }
+              </List>
+            </div>
           </div>
           <div className="grow stack vertical">
-            <div className="grow scroll-within">
+            <div>
               <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text={itemName} ord={picked.size}/> to {itemVerb}</div>
+            </div>
+            <div className="scroll-within">
               <List>
                 {
                   picked.map((item, index) => {
