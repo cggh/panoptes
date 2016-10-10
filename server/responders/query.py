@@ -68,7 +68,7 @@ def handler(start_response, requestData):
         if startRow is not None and endRow is not None:
             sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
         if randomSample is not None:
-            sqlQuery += " UNIFORM SAMPLE {0}".format(randomSample)
+            sqlQuery += " SAMPLE {0}".format(randomSample)
 
         if DQXDbTools.LogRequests:
             DQXUtils.LogServer('###QRY:'+sqlQuery)
