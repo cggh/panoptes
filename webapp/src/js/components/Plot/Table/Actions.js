@@ -81,23 +81,31 @@ let TablePlotActions = React.createClass({
     this.props.setProps({table});
   },
 
+  // NB: the behaviour depends on whether this.props.table is defined.
+  getDefinedQuery() {
+
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+
+      if (this.props.table !== undefined) {
+        definedQuery = this.config.tablesById[this.props.table].defaultQuery !== undefined ? this.config.tablesById[this.props.table].defaultQuery : SQL.nullQuery;
+      } else {
+        definedQuery = SQL.nullQuery;
+      }
+
+    }
+    return definedQuery;
+  },
+
   render() {
-    let {sidebar, table, query, plotType, setProps} = this.props;
+    let {sidebar, table, plotType, setProps} = this.props;
 
     let tableOptions = _map(this.config.visibleTables, (table) => ({
       value: table.id,
       leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
       label: table.capNamePlural
     }));
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      if (table !== undefined) {
-        this.definedQuery = this.config.tablesById[table].defaultQuery !== undefined ? this.config.tablesById[table].defaultQuery : SQL.nullQuery;
-      } else {
-        this.definedQuery = SQL.nullQuery;
-      }
-    }
 
     let sidebarContent = (
       <div className="sidebar plot-sidebar">
@@ -110,7 +118,7 @@ let TablePlotActions = React.createClass({
             onChange={this.handleChangeTable}
             options={tableOptions}
           />
-          {table ? <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
+          {table ? <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
             : null}
           <SelectField value={plotType}
                        autoWidth={true}
@@ -145,12 +153,12 @@ let TablePlotActions = React.createClass({
             <span className="text">{plotType && table ? `${plotTypes[plotType].displayName} plot of ${this.config.tablesById[table].namePlural}` : 'Plot'}</span>
             {plotType && table ?
               <span className="block text">
-                <QueryString prepend="Filter:" table={table} query={this.definedQuery} />
+                <QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()} />
               </span>
             : null}
           </div>
           <div className="grow">
-            {table ? <TablePlot {...this.props} query={this.definedQuery} /> : null}
+            {table ? <TablePlot {...this.props} query={this.getDefinedQuery()} /> : null}
           </div>
         </div>
       </Sidebar>
