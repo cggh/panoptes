@@ -6,6 +6,7 @@ import FluxMixin from 'mixins/FluxMixin';
 
 // Panoptes components
 import Map from 'Map/Widget';
+import SQL from 'panoptes/SQL';
 import TileLayer from 'Map/TileLayer/Widget';
 import TableMarkersLayer from 'Map/TableMarkersLayer/Widget';
 
@@ -55,6 +56,14 @@ let TableMap = React.createClass({
     return this.props.title || 'Table Map';
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   render() {
 
     let {
@@ -63,7 +72,6 @@ let TableMap = React.createClass({
       locationDataTable,
       onChange,
       primKey,
-      query,
       setProps,
       table,
       zoom
@@ -75,6 +83,12 @@ let TableMap = React.createClass({
     // with locationDataTable taking preference when both are specfied.
     if (locationDataTable === undefined && table !== undefined) {
       locationDataTable = table;
+    }
+
+    let locationTableConfig = this.config.tablesById[locationDataTable];
+    if (locationTableConfig === undefined) {
+      console.error('locationTableConfig === undefined');
+      return null;
     }
 
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
@@ -94,7 +108,7 @@ let TableMap = React.createClass({
           highlight={highlight}
           locationDataTable={locationDataTable}
           primKey={primKey}
-          query={query}
+          query={this.getDefinedQuery()}
         />
       </Map>
     );

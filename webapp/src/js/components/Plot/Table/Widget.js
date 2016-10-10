@@ -20,9 +20,6 @@ import {allDimensions} from 'panoptes/plotTypes';
 
 import 'plot.scss';
 
-// CSS
-//TODO: import 'Plot/Table/widget-styles.scss';
-
 let TablePlot = React.createClass({
 
   mixins: [
@@ -39,9 +36,12 @@ let TablePlot = React.createClass({
     ..._reduce(allDimensions, (props, dim) => { props[dim] = React.PropTypes.string; return props; }, {})
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
-      query: SQL.nullQuery
+      query: undefined
     };
   },
 
@@ -51,18 +51,27 @@ let TablePlot = React.createClass({
     };
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   fetchData(props, requestContext) {
-    const {table, query} = props;
+    const {table} = props;
     const tableConfig = this.config.tablesById[table];
     const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
+
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columns,
-        query: query,
+        query: this.getDefinedQuery(),
         transpose: false,
         randomSample: 20000
       };

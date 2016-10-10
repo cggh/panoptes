@@ -44,7 +44,7 @@ let DataTableView = React.createClass({
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
-    query: React.PropTypes.string.isRequired,
+    query: React.PropTypes.string,
     order: React.PropTypes.string,
     ascending: React.PropTypes.bool,
     startRowIndex: React.PropTypes.number,
@@ -58,11 +58,13 @@ let DataTableView = React.createClass({
     className: React.PropTypes.string
   },
 
-
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.nullQuery,
+      query: undefined,
       order: null,
       ascending: true,
       startRowIndex: 0,
@@ -86,33 +88,40 @@ let DataTableView = React.createClass({
     this.setShowableRows = _throttle(this.setShowableRows, 500);
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, query, columns, order, ascending, startRowIndex} = props;
+    let {columns, order, ascending, startRowIndex} = props;
     let {showableRowsCount} = this.state;
-    let tableConfig = this.config.tablesById[table];
+
     let columnspec = {};
-    columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
+    columns.forEach((column) => columnspec[column] = this.tableConfig().propertiesById[column].defaultDisplayEncoding);
     if (columns.length > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
 
       let pageQueryAPIargs = {
         database: this.config.dataset,
-        table: tableConfig.fetchTableName,
+        table: this.tableConfig().fetchTableName,
         columns: columnspec,
         order,
         ascending: ascending,
-        query,
+        query: this.getDefinedQuery(),
         start: startRowIndex,
         stop: stopRowIndex
       };
 
       let rowsCountAPIargs = {
         database: this.config.dataset,
-        table: tableConfig.fetchTableName,
-        query
+        table: this.tableConfig().fetchTableName,
+        query: this.getDefinedQuery()
       };
 
       requestContext.request((componentCancellation) =>
@@ -205,8 +214,7 @@ let DataTableView = React.createClass({
   render() {
     let {className, columns, columnWidths, order, ascending} = this.props;
     let {loadStatus, rows, width, height} = this.state;
-    let tableConfig = this.config.tablesById[this.props.table];
-    if (!tableConfig) {
+    if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
       return null;
     }
@@ -226,11 +234,11 @@ let DataTableView = React.createClass({
               isColumnResizing={false}
             >
               {columns.map((column) => {
-                if (!tableConfig.propertiesById[column]) {
+                if (!this.tableConfig().propertiesById[column]) {
                   console.error(`Column ${column} doesn't exist on ${this.props.table}.`);
                   return;
                 }
-                let columnData = tableConfig.propertiesById[column];
+                let columnData = this.tableConfig().propertiesById[column];
                 let {id, isPrimKey, description, name} = columnData;
                 let asc = order == column && ascending;
                 let desc = order == column && !ascending;

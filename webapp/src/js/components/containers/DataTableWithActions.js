@@ -49,10 +49,13 @@ let DataTableWithActions = React.createClass({
     searchText: React.PropTypes.string
   },
 
+  // NB: We want to default to the tableConfig().defaultQuery, if there is one
+  // Otherwise, default to SQL.nullQuery
+  // But this.tableConfig() is not available to getDefaultProps()
   getDefaultProps() {
     return {
       table: null,
-      query: SQL.nullQuery,
+      query: undefined,
       order: null,
       ascending: true,
       columnWidths: {},
@@ -101,7 +104,7 @@ let DataTableWithActions = React.createClass({
   },
 
   handleQueryPick(query) {
-    this.props.setProps({query: query});
+    this.props.setProps({query});
   },
 
   handleColumnChange(columns) {
@@ -157,7 +160,7 @@ let DataTableWithActions = React.createClass({
         tableConfig: this.tableConfig(),
         rowsCount: this.state.totalRowsCount,
         onLimitBreach: this.handleDownloadLimitBreach,
-        query: this.props.query,
+        query: this.getDefinedQuery(),
         columns: this.props.columns,
         ascending: this.props.ascending
       }
@@ -185,12 +188,20 @@ let DataTableWithActions = React.createClass({
     }
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   createDataTableQuery() {
 
-    let {query, searchText} = this.props;
+    let {searchText} = this.props;
 
     // If there is searchText, then add the searchQuery to the base query, to form the dataTableQuery.
-    let dataTableQuery = query;
+    let dataTableQuery = this.getDefinedQuery();
     if (searchText !== '') {
 
       let searchQueryUnencoded = null;
@@ -216,7 +227,7 @@ let DataTableWithActions = React.createClass({
       }
 
       // Add the searchQuery to the base query, if the base query is not trivial.
-      let baseQueryDecoded = SQL.WhereClause.decode(query);
+      let baseQueryDecoded = SQL.WhereClause.decode(this.getDefinedQuery());
       if (baseQueryDecoded.isTrivial) {
         dataTableQuery = SQL.WhereClause.encode(searchQueryUnencoded);
       } else {
@@ -235,8 +246,9 @@ let DataTableWithActions = React.createClass({
   render() {
 
     let actions = this.getFlux().actions;
-    let {table, query, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
+    let {table, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
+
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
     if (!columns) {
@@ -284,11 +296,19 @@ let DataTableWithActions = React.createClass({
 
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
+    // TODO: Or simply label "Pick Columns" ?
+    let columnPickerLabel = 'Add/Remove Columns';
+    if (columns.length === this.tableConfig().properties.length) {
+      columnPickerLabel = 'Remove Columns';
+    } else if (columns.length === 0) {
+      columnPickerLabel = 'Add Columns';
+    }
+
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>
-        <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
-        <FlatButton label="Add/Remove Columns"
+        <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+        <FlatButton label={columnPickerLabel}
                     primary={true}
                     onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
                       {
@@ -305,12 +325,12 @@ let DataTableWithActions = React.createClass({
                     onClick={() => this.handleDownload()}
                     icon={<Icon fixedWidth={true} name="download" />}
         />
-        {searchGUI}
         <FlatButton label="Pivot Table"
                     primary={true}
-                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table}/>, true)}
+                    onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
+        {searchGUI}
       </div>
     );
 
@@ -411,7 +431,7 @@ let DataTableWithActions = React.createClass({
                   onClick={() => setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
-            <span className="block text"><QueryString prepend="Filter:" table={table} query={query}/></span>
+            <span className="block text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
             <span className="block text">Search: {searchText !== '' ? searchText : 'None'}</span>
             <span className="block text">Sort: {order ? this.tableConfig().propertiesById[order].name : 'None'} {order ? (ascending ? 'ascending' : 'descending') : null}</span>
             <span className="block text">{columns.length} of {this.tableConfig().properties.length} columns shown</span>
