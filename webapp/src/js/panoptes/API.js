@@ -330,7 +330,7 @@ function fetchImportStatusData(options) {
       table: 'calculations',
       columns: columns,
       query: recordQuery,
-      order: ['asc', 'timestamp'],
+      orderBy: [['asc', 'timestamp']],
       transpose: true
     }
   );

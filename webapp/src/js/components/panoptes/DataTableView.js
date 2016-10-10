@@ -110,7 +110,7 @@ let DataTableView = React.createClass({
         database: this.config.dataset,
         table: this.tableConfig().id,
         columns: columns,
-        order,
+        orderBy: order,
         query: this.getDefinedQuery(),
         start: startRowIndex,
         stop: stopRowIndex,
