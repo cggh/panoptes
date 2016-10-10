@@ -283,7 +283,8 @@ let MapActions = React.createClass({
   getDefinedQuery() {
     let definedQuery = this.props.query;
     if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+      definedQuery = (this.tableConfig() && this.tableConfig().defaultQuery !== undefined) ?
+        this.tableConfig().defaultQuery : SQL.nullQuery;
 
       if (this.props.table !== undefined && this.props.table !== DEFAULT_MARKER_LAYER) {
         definedQuery = this.config.tablesById[this.props.table].defaultQuery !== undefined ? this.config.tablesById[this.props.table].defaultQuery : SQL.nullQuery;

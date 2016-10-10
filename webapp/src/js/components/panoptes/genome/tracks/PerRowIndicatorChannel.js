@@ -342,6 +342,14 @@ const PerRowIndicatorControls = React.createClass({
     this.redirectedProps.setProps({query});
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   render() {
     let {table, colourProperty} = this.props;
 
