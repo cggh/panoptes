@@ -140,6 +140,7 @@ let PerRowIndicatorChannel = React.createClass({
         columns: columns,
         query: SQL.WhereClause.encode(decodedQuery),
         transpose: false,
+        typedArrays: true
       };
       let cacheArgs = {
         method: 'query',

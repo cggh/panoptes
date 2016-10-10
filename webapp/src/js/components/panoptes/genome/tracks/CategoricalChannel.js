@@ -179,6 +179,7 @@ let CategoricalTrack = React.createClass({
         groupBy: ['window', track],
         orderBy: [['asc', 'window'], ['asc', track]],
         transpose: false,
+        typedArrays: true
       };
       let cacheArgs = {
         method: 'query',

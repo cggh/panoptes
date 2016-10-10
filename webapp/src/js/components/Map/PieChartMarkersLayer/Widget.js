@@ -182,19 +182,17 @@ let PieChartMarkersLayer = React.createClass({
       locationColumns.push(locationSizeProperty);
     } // Otherwise, the pie charts will have a fixed size (prop default)
 
-    let locationColumnsColumnSpec = {};
-    locationColumns.map((column) => locationColumnsColumnSpec[column] = locationTableConfig.propertiesById[column].defaultDisplayEncoding);
 
     let locationAPIargs = {
       database: this.config.dataset,
-      table: locationTableConfig.fetchTableName,
-      columns: locationColumnsColumnSpec
+      table: locationTableConfig.id,
+      columns: locationColumns,
+      transpose: true
     };
 
     let chartAPIargs = {
       database: this.config.dataset,
-      table: chartDataTable,
-      primKeyField: this.config.tablesById[chartDataTable].primKey,
+      tableConfig: this.config.tablesById[chartDataTable],
       primKeyValue: primKey
     };
 
@@ -202,8 +200,8 @@ let PieChartMarkersLayer = React.createClass({
       (componentCancellation) =>
         Promise.all([
           LRUCache.get(
-            'pageQuery' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
-              API.pageQuery({
+            'query' + JSON.stringify(locationAPIargs), (cacheCancellation) =>
+              API.query({
                 cancellation: cacheCancellation,
                 ...locationAPIargs
               }),

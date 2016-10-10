@@ -72,28 +72,27 @@ let ListView = React.createClass({
     columns.push(this.config.tablesById[table].primKey);
     columns = _uniq(columns);
 
-    let columnspec = {};
-    columns.map((column) => columnspec[column] = tableConfig.propertiesById[column].defaultDisplayEncoding);
     this.setState({loadStatus: 'loading'});
 
-    let pageQueryAPIargs = {
+    let queryAPIargs = {
       database: this.config.dataset,
-      table: tableConfig.fetchTableName,
-      columns: columnspec,
-      start: 0
+      table: tableConfig.id,
+      columns: columns,
+      start: 0,
+      transpose: true
     };
 
     let rowsCountAPIargs = {
       database: this.config.dataset,
-      table: tableConfig.fetchTableName
+      table: tableConfig.id
     };
 
     requestContext.request((componentCancellation) =>
       Promise.all([
         LRUCache.get(
-          'pageQuery' + JSON.stringify(pageQueryAPIargs),
+          'query' + JSON.stringify(queryAPIargs),
           (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
+            API.query({cancellation: cacheCancellation, ...queryAPIargs}),
           componentCancellation
         ),
         LRUCache.get(

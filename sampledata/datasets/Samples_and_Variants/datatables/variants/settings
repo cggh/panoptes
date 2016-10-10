@@ -128,7 +128,17 @@ properties:
 - id: NRAF_SAF
   description: Non-reference allele frequency in South Africa
 
+- id: int8
+  dataType: Int8
 
+- id: int16
+  dataType: Int16
+
+- id: int32
+  dataType: Int32
+
+- id: boolean
+  dataType: Boolean
 
 
 

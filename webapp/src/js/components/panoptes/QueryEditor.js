@@ -132,7 +132,8 @@ let Criterion = React.createClass({
   },
 
   newComponent() {
-    return SQL.WhereClause.CompareFixed(this.tableConfig().primKey, '=', '');
+    let config = this.tableConfig();
+    return SQL.WhereClause.CompareFixed(config.primKey, '=', config.propertiesById[config.primKey].defaultValue);
   },
 
   handleAddOr() {
@@ -302,15 +303,16 @@ let Criterion = React.createClass({
       );
 
     let groups = _clone(this.tableConfig().propertyGroupsById);
-    groups.other = {
-      id: 'other',
-      name: 'Other',
-      properties: [{
-        id: '_subset_',
-        name: 'In subset',
-        disabled: (this.state.subsets.size === 0)
-      }]
-    };
+    //Disabled until full subset implementation
+    // groups.other = {
+    //   id: 'other',
+    //   name: 'Other',
+    //   properties: [{
+    //     id: '_subset_',
+    //     name: 'In subset',
+    //     disabled: (this.state.subsets.size === 0)
+    //   }]
+    // };
     let propertySelect = (
       <select ref="property" value={component.ColName} onChange={this.handlePropertyChange}>
         {_map(groups, (group) =>
@@ -381,16 +383,16 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
-      if (property.distinctValues) {
+      if (property.distinctValues && !property.isBoolean) {
         fields = (
           <div className="fields">
             <select className="field" ref="value"
-                    value={component.CompValue}
+                    value={component.CompValue === null ? 'NULL': component.CompValue}
                     onChange={this.handleValueChange}>
               {property.distinctValues.map((cat) =>
-                <option key={cat}
-                        value={cat}>
-                  {cat}
+                <option key={cat === null ? 'NULL': cat}
+                        value={Formatter(property, cat)}>
+                  {Formatter(property, cat)}
                 </option>)
               }
             </select>

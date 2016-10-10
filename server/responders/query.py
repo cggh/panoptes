@@ -16,6 +16,13 @@ from DQXDbTools import desciptionToDType
 import arraybuffer
 from gzipstream import gzip
 
+NULL_VALUES = {
+    'i1': -128,
+    'i2': -32768,
+    'i4': -2147483648,
+    'S': ''
+}
+
 def response(requestData):
     return requestData
 
@@ -79,7 +86,11 @@ def handler(start_response, requestData):
         result = {}
         for i, desc in enumerate(cur.description):
             dtype = desciptionToDType(desc)
-            result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
+            if dtype in ['i1', 'i2', 'i4', 'S']:
+                null_value = NULL_VALUES[dtype]
+                result[desc[0]] = np.array([row[i] if row[i] is not None else null_value for row in rows], dtype=dtype)
+            else:
+                result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
         data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
         status = '200 OK'
         response_headers = [('Content-type', 'text/plain'),

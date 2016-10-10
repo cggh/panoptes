@@ -69,7 +69,7 @@ let TablePlot = React.createClass({
       this.setState({loadStatus: 'loading'});
       let APIargs = {
         database: this.config.dataset,
-        table: tableConfig.fetchTableName,
+        table: tableConfig.id,
         columns: columns,
         query: this.getDefinedQuery(),
         transpose: false,
@@ -85,8 +85,6 @@ let TablePlot = React.createClass({
           )
         )
         .then((data) => {
-          //Sadly we have to convert to normal arrays :(
-          _forEach(data, (array, name) => data[name] = Array.prototype.slice.call(array.array));
           this.setState(
             _reduce(allDimensions,
               (state, dim) => { state[dim] = data[props[dim]] || null; return state; },

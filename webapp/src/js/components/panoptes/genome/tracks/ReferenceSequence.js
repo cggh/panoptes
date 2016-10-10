@@ -82,6 +82,7 @@ let ReferenceSequence = React.createClass({
         groupBy: ['base', 'window'],
         orderBy: [['asc', 'window'], ['desc', 'count']],
         transpose: false,
+        typedArrays: true
       };
       let cacheArgs = {
         method: 'query',

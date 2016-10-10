@@ -5,6 +5,9 @@ import Color from 'color';
 // Lodash
 import _throttle from 'lodash/throttle';
 import _cloneDeep from 'lodash/cloneDeep';
+import _some from 'lodash/some';
+import _forEach from 'lodash/forEach';
+import _filter from 'lodash/filter';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -45,7 +48,7 @@ let DataTableView = React.createClass({
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
-    order: React.PropTypes.string,
+    order: React.PropTypes.array,
     ascending: React.PropTypes.bool,
     startRowIndex: React.PropTypes.number,
     columns: React.PropTypes.array,
@@ -65,7 +68,7 @@ let DataTableView = React.createClass({
     return {
       table: null,
       query: undefined,
-      order: null,
+      order: [],
       ascending: true,
       startRowIndex: 0,
       columns: [],
@@ -100,36 +103,32 @@ let DataTableView = React.createClass({
   fetchData(props, requestContext) {
     let {columns, order, ascending, startRowIndex} = props;
     let {showableRowsCount} = this.state;
-
-    let columnspec = {};
-    columns.forEach((column) => columnspec[column] = this.tableConfig().propertiesById[column].defaultDisplayEncoding);
     if (columns.length > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
       let stopRowIndex = startRowIndex + showableRowsCount - 1;
-
-      let pageQueryAPIargs = {
+      let queryAPIargs = {
         database: this.config.dataset,
-        table: this.tableConfig().fetchTableName,
-        columns: columnspec,
+        table: this.tableConfig().id,
+        columns: columns,
         order,
-        ascending: ascending,
         query: this.getDefinedQuery(),
         start: startRowIndex,
-        stop: stopRowIndex
+        stop: stopRowIndex,
+        transpose: true //We want rows, not columns
       };
 
       let rowsCountAPIargs = {
         database: this.config.dataset,
-        table: this.tableConfig().fetchTableName,
+        table: this.tableConfig().id,
         query: this.getDefinedQuery()
       };
 
       requestContext.request((componentCancellation) =>
         Promise.all([
           LRUCache.get(
-            'pageQuery' + JSON.stringify(pageQueryAPIargs),
+            'query' + JSON.stringify(queryAPIargs),
             (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...pageQueryAPIargs}),
+              API.query({cancellation: cacheCancellation, ...queryAPIargs}),
             componentCancellation
           ),
           LRUCache.get(
@@ -166,14 +165,22 @@ let DataTableView = React.createClass({
   },
 
   handleOrderChange(column) {
-    let ascending = true;
-    if (this.props.order == column)
-      if (this.props.ascending)
-        ascending = false;
-      else
-        column = null;
+    let currentOrder = this.props.order;
+    //Choose direction based on if this column already in order
+    let newDir = 'asc';
+    _forEach(currentOrder, ([dir, orderCol]) => {
+      if (orderCol === column) {
+        newDir = {asc:'desc', desc:null}[dir];
+      }
+    });
+    //Remove this column from the sort order
+    currentOrder = _filter(currentOrder, ([dir, orderCol]) => orderCol !== column);
+    //Then add it to the end (if needed)
+    if (newDir) {
+      currentOrder.push([newDir, column]);
+    }
     if (this.props.onOrderChange) {
-      this.props.onOrderChange(column, ascending);
+      this.props.onOrderChange(currentOrder);
     }
   },
 
@@ -230,7 +237,7 @@ let DataTableView = React.createClass({
               height={height}
               headerHeight={HEADER_HEIGHT}
               //headerDataGetter={this.headerData}
-              onColumnResizeEndCallback={this.handleColumnResize}
+              onColumnResizeEndCallback={this.handleCUQolumnResize}
               isColumnResizing={false}
             >
               {columns.map((column) => {
@@ -240,8 +247,8 @@ let DataTableView = React.createClass({
                 }
                 let columnData = this.tableConfig().propertiesById[column];
                 let {id, isPrimKey, description, name} = columnData;
-                let asc = order == column && ascending;
-                let desc = order == column && !ascending;
+                let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol===column);
+                let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol===column);
                 let width = columnWidths[column] || this.defaultWidth(columnData);
                 return <Column
                   //TODO Better default column widths

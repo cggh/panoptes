@@ -208,20 +208,18 @@ let PerRowNumericalTrack = React.createClass({
     let columns = [tableConfig.primKey];
     if (colourProperty)
       columns.push(colourProperty);
-    let columnspec = {};
-    columns.forEach((column) => columnspec[column] = tableConfig.propertiesById[column].defaultFetchEncoding);
     let APIargs = {
       database: this.config.dataset,
       table: table,
-      columns: columnspec,
+      columns: columns,
       query: query,
       transpose: false
     };
     requestContext.request((componentCancellation) =>
         LRUCache.get(
-          'pageQuery' + JSON.stringify(APIargs),
+          'query' + JSON.stringify(APIargs),
           (cacheCancellation) =>
-            API.pageQuery({cancellation: cacheCancellation, ...APIargs}),
+            API.query({cancellation: cacheCancellation, ...APIargs}),
           componentCancellation
         ).then((tableData) => {
           let primKeys = tableData[tableConfig.primKey].slice(0, 50);

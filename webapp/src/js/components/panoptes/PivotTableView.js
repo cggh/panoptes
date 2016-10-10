@@ -95,7 +95,7 @@ let PivotTableView = React.createClass({
 
     let queryAPIargs = {
       database: this.config.dataset,
-      table: this.tableConfig().fetchTableName,
+      table: this.tableConfig().id,
       columns: columns,
       query: this.getDefinedQuery(),
       groupBy,
@@ -116,22 +116,22 @@ let PivotTableView = React.createClass({
         let columnData = data[columnProperty];
         let rowData = data[rowProperty];
         let countData = data['count'];
-        let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData.array) : []);
-        let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData.array) : []);
+        let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData) : []);
+        let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData) : []);
         let dataByColumnRow = {};
         uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
         dataByColumnRow['_all_'] = {};
         uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
-        for (let i = 0; i < countData.shape[0]; ++i) {
-          dataByColumnRow['_all_']['_all_'] += countData.array[i];
+        for (let i = 0; i < countData.length; ++i) {
+          dataByColumnRow['_all_']['_all_'] += countData[i];
           if (columnProperty) {
-            dataByColumnRow[columnData.array[i]]['_all_'] += countData.array[i];
+            dataByColumnRow[columnData[i]]['_all_'] += countData[i];
           }
           if (rowProperty) {
-            dataByColumnRow['_all_'][rowData.array[i]] += countData.array[i];
+            dataByColumnRow['_all_'][rowData[i]] += countData[i];
           }
           if (columnProperty && rowProperty) {
-            dataByColumnRow[columnData.array[i]][rowData.array[i]] = countData.array[i];
+            dataByColumnRow[columnData[i]][rowData[i]] = countData[i];
           }
         }
         this.setState({

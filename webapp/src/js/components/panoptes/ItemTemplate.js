@@ -71,7 +71,7 @@ let ItemTemplate = React.createClass({
       for (let property in this.config.tablesById[usedChildTable].propertiesById) {
         // Don't include the StoredSelection property; otherwise the API call breaks. (TODO: why?)
         if (property === 'StoredSelection') continue;
-        columnSpecsByTable[usedChildTable][property] = this.config.tablesById[usedChildTable].propertiesById[property].defaultDisplayEncoding;
+        columnSpecsByTable[usedChildTable].push(property);
       }
     }
 
@@ -86,20 +86,20 @@ let ItemTemplate = React.createClass({
             query: SQL.WhereClause.encode(
               SQL.WhereClause.CompareFixed(childField[usedChildTableName], '=', primKey)
             ),
-            columns: columnSpecsByTable[usedChildTableName]
+            columns: columnSpecsByTable[usedChildTableName],
+            transpose: true
           };
           return LRUCache.get(
-            'pageQuery' + JSON.stringify(usedChildTableAPIargs), (cacheCancellation) =>
-              API.pageQuery({cancellation: cacheCancellation, ...usedChildTableAPIargs}),
+            'query' + JSON.stringify(usedChildTableAPIargs), (cacheCancellation) =>
+              API.query({cancellation: cacheCancellation, ...usedChildTableAPIargs}),
             componentCancellation
           );
         });
 
         // Push the API call for the data item record onto the array of promises.
-        let mainTableAPIargs = {
+        let APIargs = {
           database: this.config.dataset,
-          table: table,
-          primKeyField: this.config.tablesById[table].primKey,
+          tableConfig: this.tableConfig(),
           primKeyValue: primKey
         };
         promises.push(
