@@ -68,9 +68,17 @@ let TableMarkersLayer = React.createClass({
     this.getFlux().actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey, switchTo: !middleClick});
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   fetchData(props, requestContext) {
 
-    let {highlight, locationDataTable, primKey, query, table} = props;
+    let {highlight, locationDataTable, primKey, table} = props;
 
     let {changeLayerStatus} = this.context;
 
@@ -92,11 +100,6 @@ let TableMarkersLayer = React.createClass({
     if (locationTableConfig.hasGeoCoord === false) {
       console.error('locationTableConfig.hasGeoCoord === false');
       return null;
-    }
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      this.definedQuery = locationTableConfig.defaultQuery !== undefined ? locationTableConfig.defaultQuery : SQL.nullQuery;
     }
 
     let locationPrimKeyProperty = locationTableConfig.primKey;
@@ -139,7 +142,7 @@ let TableMarkersLayer = React.createClass({
         let locationAPIargs = {
           columns: locationColumnsColumnSpec,
           database: this.config.dataset,
-          query: this.definedQuery,
+          query: this.getDefinedQuery(),
           table: locationTableConfig.fetchTableName
         };
 

@@ -92,14 +92,17 @@ let PerRowIndicatorChannel = React.createClass({
     this.draw(this.props);
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   //Called by DataFetcherMixin on componentWillReceiveProps
   fetchData(props, requestContext) {
     let {chromosome, start, end, width, sideWidth, table, query, colourProperty} = props;
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
 
     if (this.props.chromosome !== chromosome ||
       this.props.table !== table) {
@@ -129,7 +132,7 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [this.tableConfig().primKey, this.tableConfig().position];
       if (colourProperty)
         columns.push(colourProperty);
-      let decodedQuery = SQL.WhereClause.decode(this.definedQuery);
+      let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery());
       decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
@@ -339,17 +342,12 @@ const PerRowIndicatorControls = React.createClass({
   },
 
   render() {
-    let {table, query, colourProperty} = this.props;
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      this.definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
+    let {table, colourProperty} = this.props;
 
     return (
       <div className="channel-controls">
         <div className="control">
-          <FilterButton table={table} query={this.definedQuery} onPick={this.handleQueryPick}/>
+          <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
         </div>
         <div className="control">
           <div className="label">Colour By:</div>

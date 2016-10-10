@@ -56,6 +56,14 @@ let TableMap = React.createClass({
     return this.props.title || 'Table Map';
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   render() {
 
     let {
@@ -64,7 +72,6 @@ let TableMap = React.createClass({
       locationDataTable,
       onChange,
       primKey,
-      query,
       setProps,
       table,
       zoom
@@ -84,11 +91,6 @@ let TableMap = React.createClass({
       return null;
     }
 
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      this.definedQuery = locationTableConfig.defaultQuery !== undefined ? locationTableConfig.defaultQuery : SQL.nullQuery;
-    }
-
     // NB: Widgets and their children should always fill their container's height, i.e.  style={{height: '100%'}}. Width will fill automatically.
     // TODO: Turn this into a class for all widgets.
     let widgetStyle = {height: '100%'};
@@ -106,7 +108,7 @@ let TableMap = React.createClass({
           highlight={highlight}
           locationDataTable={locationDataTable}
           primKey={primKey}
-          query={query}
+          query={this.getDefinedQuery()}
         />
       </Map>
     );

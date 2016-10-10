@@ -20,9 +20,6 @@ import {allDimensions} from 'panoptes/plotTypes';
 
 import 'plot.scss';
 
-// CSS
-//TODO: import 'Plot/Table/widget-styles.scss';
-
 let TablePlot = React.createClass({
 
   mixins: [
@@ -54,16 +51,19 @@ let TablePlot = React.createClass({
     };
   },
 
+  getDefinedQuery() {
+    let definedQuery = this.props.query;
+    if (definedQuery === undefined) {
+      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+    }
+    return definedQuery;
+  },
+
   fetchData(props, requestContext) {
-    const {table, query} = props;
+    const {table} = props;
     const tableConfig = this.config.tablesById[table];
     const dimensions = _filter(allDimensions, (dim) => props[dim] && tableConfig.propertiesById[props[dim]]);
     const columns = _map(dimensions, (dim) => props[dim]);
-
-    this.definedQuery = query;
-    if (this.definedQuery === undefined) {
-      this.definedQuery = tableConfig.defaultQuery !== undefined ? tableConfig.defaultQuery : SQL.nullQuery;
-    }
 
     if (columns.length > 0) {
       this.setState({loadStatus: 'loading'});
@@ -71,7 +71,7 @@ let TablePlot = React.createClass({
         database: this.config.dataset,
         table: tableConfig.fetchTableName,
         columns: columns,
-        query: this.definedQuery,
+        query: this.getDefinedQuery(),
         transpose: false,
         randomSample: 20000
       };
