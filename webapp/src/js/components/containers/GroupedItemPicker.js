@@ -96,14 +96,14 @@ let GroupedItemPicker = React.createClass({
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
-          <div className="vertical stack">
-            <div className="shrink">
+          <div className="grow stack vertical scroll-within">
+            <div>
               <div className="header">{count} Column{count != 1 ? 's' : null} Available</div>
               <div className="search">
                 <TextField floatingLabelText="Search" value={search} onChange={this.handleSearchChange}/>
               </div>
             </div>
-            <div className="shrink scroll-within">
+            <div style={{overflow: 'auto'}}>
               <List>
                 {
                   _map(groups.toJS(), (group) => {
@@ -135,11 +135,11 @@ let GroupedItemPicker = React.createClass({
               </List>
             </div>
           </div>
-          <div className="grow vertical stack">
+          <div className="grow stack vertical">
             <div>
               <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
             </div>
-            <div className="grow scroll-within">
+            <div className="scroll-within">
               <List>
                 {
                   _map(groups.toJS(), (group) => {
