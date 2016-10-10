@@ -67,7 +67,7 @@ let PieChart = React.createClass({
     let location = crs.project({lat, lng});
 
     let line = null;
-    if (originalLat && originalLng) {
+    if (pieData.length && originalLat && originalLng) {
       let originalLocation = crs.project({lat: originalLat, lng: originalLng});
       line = (
         <line

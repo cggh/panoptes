@@ -73,7 +73,7 @@ function getAppState(location) {
   const end = Math.min(start + 2, location.length);
   location = location.slice(start, end);
   if (location[0] === 'panoptes') {  //Remove panoptes part of path if needed.
-    location.shift()
+    location.shift();
   }
   if (location.length === 0)
     return {};
@@ -87,7 +87,7 @@ function getAppState(location) {
   }
 }
 
-Promise.prototype.done = function (onFulfilled, onRejected) {
+Promise.prototype.done = function(onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch((e) => {
       setTimeout(() => {
@@ -131,7 +131,7 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
           lastState = newState;
           API.storeData(newState.toJS()).then((hash) => {
             const newLocation = (HASH_REGEX.exec(window.location.pathname) ||
-            window.location.pathname[window.location.pathname.length-1] === '/') ?
+            window.location.pathname[window.location.pathname.length - 1] === '/') ?
               hash : `${dataset}/${hash}`;
             history.push(newLocation, newState.toJS());
           });
@@ -177,7 +177,7 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
       ReactDOM.render(
         <div>
           <Loading status="error">
-            {err.responseText || err.message || "Error"}
+            {err.responseText || err.message || 'Error'}
           </Loading>
         </div>
         , document.getElementById('main'));

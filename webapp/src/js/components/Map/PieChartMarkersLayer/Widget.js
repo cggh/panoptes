@@ -235,19 +235,19 @@ let PieChartMarkersLayer = React.createClass({
             let chartDataColumnIndex = componentColumns[j].pattern.replace('{locid}', locationDataPrimKey);
             markerChartData.push({
               name: componentColumns[j].name,
-              value: chartData[chartDataColumnIndex] !== null ? chartData[chartDataColumnIndex] : 0,
+              value: (chartData[chartDataColumnIndex] !== undefined && chartData[chartDataColumnIndex] !== null) ? chartData[chartDataColumnIndex] : 0,
               color: componentColumns[j].color
             });
           }
 
-          // NB: undefined == null, undefined !== null
           let sum = _sumBy(markerChartData, 'value');
-          if (sum < 1)
+          if (sum < 1) {
             markerChartData.push({
-              name: residualFractionName != null ? residualFractionName : defaultResidualFractionName,
+              name: (residualFractionName !== undefined && residualFractionName !== null) ? residualFractionName : defaultResidualFractionName,
               value: (1 - sum).toFixed(2),
-              color: residualSectorColor != null ? residualSectorColor : defaultResidualSectorColor
+              color: (residualSectorColor !== undefined && residualSectorColor !== null) ? residualSectorColor : defaultResidualSectorColor
             });
+          }
 
           markers.push({
             chartDataTable: chartDataTable,
