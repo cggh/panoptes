@@ -219,7 +219,7 @@ let DataTableView = React.createClass({
   },
 
   render() {
-    let {className, columns, columnWidths, order, ascending} = this.props;
+    let {className, columns, columnWidths, order} = this.props;
     let {loadStatus, rows, width, height} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -237,7 +237,7 @@ let DataTableView = React.createClass({
               height={height}
               headerHeight={HEADER_HEIGHT}
               //headerDataGetter={this.headerData}
-              onColumnResizeEndCallback={this.handleCUQolumnResize}
+              onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={false}
             >
               {columns.map((column) => {
@@ -254,6 +254,7 @@ let DataTableView = React.createClass({
                   //TODO Better default column widths
                   width={width}
                   key={id}
+                  columnKey={id}
                   fixed={isPrimKey}
                   allowCellsRecycling={true}
                   isResizable={true}
