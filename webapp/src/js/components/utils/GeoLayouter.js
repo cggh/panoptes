@@ -12,6 +12,9 @@ import {latlngToMercatorXY, mercatorXYtolatlng} from 'util/WebMercator';
 
 // External functions
 function collide(node) {
+
+console.log('collide');
+
   let r = node.collisionRadius + 16,
     nx1 = node.x - r,
     nx2 = node.x + r,
@@ -138,26 +141,30 @@ let GeoLayouter = React.createClass({
 
   // Event handlers
   handleTick() {
+console.log('handleTick');
     this.detectCollisions();
     this.forceUpdate();
   },
 
   // Internal functions
   detectCollisions() {
+console.log('detectCollisions');
     let q = d3.geom.quadtree(this.renderNodes);
     _each(this.renderNodes, (node) =>
       q.visit(collide(node))
     );
   },
   initForceUsingProps() {
-
+console.log('initForceUsingProps');
     // Convert the prop nodes from an Immutable List to a simple array.
     // .toArray() is shallow, .toJS() is deep.
     let propNodesAsArray = this.props.nodes;
-
+console.log('initForceUsingProps propNodesAsArray: %o', propNodesAsArray);
     // Derive the fixedNodes and nextRenderNodes from the propNodes and previous renderNodes.
     let {fixedNodes, nextRenderNodes} = createFixedAndNextRenderNodes({propNodes: propNodesAsArray, prevRenderNodes: this.renderNodes});
-
+console.log('initForceUsingProps nextRenderNodes 0: ' + nextRenderNodes[0].lat + ', '  + nextRenderNodes[0].lng);
+console.log('initForceUsingProps nextRenderNodes 1: ' + nextRenderNodes[1].lat + ', '  + nextRenderNodes[1].lng);
+console.log('initForceUsingProps nextRenderNodes 2: ' + nextRenderNodes[2].lat + ', '  + nextRenderNodes[2].lng);
     // Provide the force engine with all the nodes.
     this.force.nodes(fixedNodes.concat(nextRenderNodes));
 

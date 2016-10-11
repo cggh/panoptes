@@ -164,7 +164,7 @@ let Map = React.createClass({
     }
   },
   handleMapMoveEnd(e) { // e is not being used
-
+console.log('Map handleMapMoveEnd');
     // NB: this event fires whenever the map's bounds, center or zoom change.
 
     // this.map is not available on the first render; it's a callback ref attached to the Map component; no DOM yet.
@@ -191,11 +191,12 @@ let Map = React.createClass({
           });
         }
 
-        // this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
-        // FIXME: this.props.setProps is not available when the widget is mounted through DataItem/Actions
+        // NB: this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
+        // Also, this.props.setProps is not available when the widget is mounted through DataItem/Actions
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
+console.log('handleMapMoveEnd setProps center and zoom');
         }
 
       }

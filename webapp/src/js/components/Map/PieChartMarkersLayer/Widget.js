@@ -302,24 +302,29 @@ let PieChartMarkersLayer = React.createClass({
           >
             {
               renderNodes.map(
-                (marker, i) =>
-                <ComponentMarker
-                  key={i}
-                  position={{lat: marker.lat, lng: marker.lng}}
-                  onClick={(e) => this.handleClickMarker(e, marker)}
-                >
-                  <PieChart
-                    chartData={marker.chartData}
-                    crs={crs}
-                    key={i}
-                    lat={marker.lat}
-                    lng={marker.lng}
-                    name={marker.name}
-                    originalLat={marker.lat}
-                    originalLng={marker.lng}
-                    radius={marker.radius}
-                  />
-                </ComponentMarker>
+                (marker, i) => {
+console.log('marker ' + i + ': ' + marker.lat + ', '  + marker.lng);
+
+                  return (
+                    <ComponentMarker
+                      key={i}
+                      position={{lat: marker.lat, lng: marker.lng}}
+                      onClick={(e) => this.handleClickMarker(e, marker)}
+                    >
+                      <PieChart
+                        chartData={marker.chartData}
+                        crs={crs}
+                        key={i}
+                        lat={marker.lat}
+                        lng={marker.lng}
+                        name={marker.name}
+                        originalLat={marker.lat}
+                        originalLng={marker.lng}
+                        radius={marker.radius}
+                      />
+                    </ComponentMarker>
+                  );
+                }
               )
             }
           </FeatureGroup>
