@@ -83,9 +83,11 @@ let PieChartMarkersLayer = React.createClass({
   // Functions
   adaptMarkerRadii(markers, bounds) {
 
-    let adaptedMarkers = _cloneDeep(markers);
+    let adaptedMarkers = [];
 
-    if (bounds && adaptedMarkers.length > 0) {
+    if (bounds && markers.length > 0) {
+
+      adaptedMarkers = _cloneDeep(markers);
 
       ////Now we have bounds we can set some sensible radii
 
@@ -125,8 +127,6 @@ let PieChartMarkersLayer = React.createClass({
         adaptedMarkers = [];
       }
 
-    } else {
-      adaptedMarkers = [];
     }
 
     return adaptedMarkers;
