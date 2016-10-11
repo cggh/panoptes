@@ -82,7 +82,8 @@ let DataTableWithActions = React.createClass({
       let filteredProps = _filter(val.properties, {showInTable: true});
       if (filteredProps.length > 0) {
         this.propertyGroups[key] = _clone(val);
-        this.propertyGroups[key].properties = filteredProps;
+        this.propertyGroups[key].properties = _map(filteredProps,
+          ({id, name, description, icon}) => ({id, name, description, icon}));
       }
     });
   },
@@ -312,7 +313,6 @@ let DataTableWithActions = React.createClass({
     } else if (columns.length === 0) {
       columnPickerLabel = 'Add Columns';
     }
-
     let sidebarContent = (
       <div className="sidebar">
         <SidebarHeader icon={this.icon()} description={descriptionWithHTML}/>

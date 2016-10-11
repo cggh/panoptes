@@ -387,11 +387,11 @@ let Criterion = React.createClass({
         fields = (
           <div className="fields">
             <select className="field" ref="value"
-                    value={component.CompValue === null ? 'NULL': component.CompValue}
+                    value={Formatter(property,component.CompValue)}
                     onChange={this.handleValueChange}>
               {property.distinctValues.map((cat) =>
                 <option key={cat === null ? 'NULL': cat}
-                        value={Formatter(property, cat)}>
+                        value={Formatter(property,cat)}>
                   {Formatter(property, cat)}
                 </option>)
               }

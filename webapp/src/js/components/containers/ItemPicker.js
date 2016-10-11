@@ -148,7 +148,7 @@ let ItemPicker = React.createClass({
             <div>
               <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text={itemName} ord={picked.size}/> to {itemVerb}</div>
             </div>
-            <div className="scroll-within">
+            <div className="grow scroll-within">
               <List>
                 {
                   picked.map((item, index) => {

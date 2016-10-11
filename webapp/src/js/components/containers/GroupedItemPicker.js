@@ -139,7 +139,7 @@ let GroupedItemPicker = React.createClass({
             <div>
               <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
             </div>
-            <div className="scroll-within">
+            <div className="grow scroll-within">
               <List>
                 {
                   _map(groups.toJS(), (group) => {
