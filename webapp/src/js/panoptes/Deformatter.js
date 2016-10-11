@@ -14,6 +14,9 @@ module.exports = function(property, string) {
     let year = parseInt(string.substring(0, 4));
     let month = parseInt(string.substring(5, 7));
     let day = parseInt(string.substring(8, 10));
+    if (isNaN(year) && isNaN(month) && isNaN(day)) {
+      return null;
+    }
     if (isNaN(year)) year = 2000;
     if (isNaN(month)) month = 1;
     if (isNaN(day)) day = 1;

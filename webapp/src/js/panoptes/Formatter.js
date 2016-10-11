@@ -17,8 +17,6 @@ module.exports = function(property, value) {
   }
 
   if (property.isDate) {
-    if ((value == null) || (value == 'None'))
-      return '';
     let dt = JD2DateTime(parseFloat(value));
     if (isNaN(dt.getTime()))
       return '2000-01-01';

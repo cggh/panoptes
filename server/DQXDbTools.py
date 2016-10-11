@@ -483,8 +483,7 @@ def CreateOrderByStatement(orderstr,reverse=False):
 #    return ', '.join( [ "IF(ISNULL({0}),1,0),{0}{1}".format(DBCOLESC(field),dirstr) for field in orderstr.split('~') ] )
     return ', '.join( [ "{0}{1}".format(DBCOLESC(field), dirstr) for field in orderstr.split('~') ] )
 
-def desciptionToDType(desc):
-    col_type = desc[1]
+def desciptionToDType(col_type):
     dtype = {
         'boolean': 'i1',
         'char': 'u1',
@@ -495,6 +494,7 @@ def desciptionToDType(desc):
         'float': 'f8',
         'real': 'f4',
         'wrd': 'i4', #Monet returns this type for count(*) - it is 64bit but that is not supported by JS
-        'clob': 'S'
+        'clob': 'S',
+        'timestamp': 'f8' #We convert to this in query.py
     }
     return dtype[col_type]

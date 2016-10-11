@@ -12,7 +12,7 @@ from abc import ABCMeta
 import ruamel.yaml
 import portalocker
 
-valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32']
+valueTypes = ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']
 
 class ImportSettings:
 

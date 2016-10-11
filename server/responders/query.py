@@ -3,24 +3,25 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 import json
 
-import B64
 import DQXDbTools
 import DQXUtils
+import arraybuffer
 import numpy as np
 from DQXDbTools import DBCOLESC
 from DQXDbTools import DBTBESC
-import config
-import DQXbase64
-from columnDecode import decode
 from DQXDbTools import desciptionToDType
-import arraybuffer
+
+import config
+from columnDecode import decode
 from gzipstream import gzip
+from dates import datetimeToJulianDay
 
 NULL_VALUES = {
     'i1': -128,
     'i2': -32768,
     'i4': -2147483648,
-    'S': ''
+    'S': '',
+    'timestamp': None
 }
 
 def response(requestData):
@@ -85,10 +86,12 @@ def handler(start_response, requestData):
         rows = cur.fetchall()
         result = {}
         for i, desc in enumerate(cur.description):
-            dtype = desciptionToDType(desc)
+            dtype = desciptionToDType(desc[1])
             if dtype in ['i1', 'i2', 'i4', 'S']:
                 null_value = NULL_VALUES[dtype]
                 result[desc[0]] = np.array([row[i] if row[i] is not None else null_value for row in rows], dtype=dtype)
+            elif desc[1] == 'timestamp':
+                result[desc[0]] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
             else:
                 result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
         data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))

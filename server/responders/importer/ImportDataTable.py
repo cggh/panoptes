@@ -18,6 +18,7 @@ from BaseImport import BaseImport
 from SettingsGraph import SettingsGraph
 from PanoptesConfig import PanoptesConfig
 from ImportSettings import valueTypes
+from dates import datetimeToJulianDay
 
 pool = multiprocessing.dummy.Pool(multiprocessing.cpu_count()/2)
 
@@ -51,22 +52,22 @@ class ImportDataTable(BaseImport):
             def getDataDerivedConfigForProp(prop_id):
                 result = {}
                 prop = self._settingsLoader.getProperty(prop_id)
+                encode = datetimeToJulianDay if prop['dataType'] == 'Date' else lambda a: a
                 if 'isCategorical' not in prop and self._dao._execSqlQuery(
                         'select count(distinct "{0}") from "{1}"'.format(prop_id, table_id))[0][0] < 50:
                     result['isCategorical'] = True
-                if (result.get('isCategorical', False) or prop.get('isCategorical', False)) \
-                        and prop['dataType'] != 'Date':  # TODO Dates don't serialise nicely
-                    result['distinctValues'] = map(lambda a: a[0], self._dao._execSqlQuery(
+                if (result.get('isCategorical', False) or prop.get('isCategorical', False)):
+                    result['distinctValues'] = map(lambda a: encode(a[0]), self._dao._execSqlQuery(
                         'select distinct "{0}" from "{1}" order by "{0}"'.format(prop_id, table_id)))
                 if 'maxVal' not in prop and prop['dataType'] in valueTypes:
                     result['maxVal'] = \
-                    self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(prop_id, table_id))[0][0]
+                    encode(self._dao._execSqlQuery('select max("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
                 if 'minVal' not in prop and prop['dataType'] in valueTypes:
                     result['minVal'] = \
-                    self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(prop_id, table_id))[0][0]
+                    encode(self._dao._execSqlQuery('select min("{0}") from "{1}"'.format(prop_id, table_id))[0][0])
                 return result
             prop_ids = self._settingsLoader.getPropertyNames()
-            results = pool.map(getDataDerivedConfigForProp, prop_ids)
+            results = map(getDataDerivedConfigForProp, prop_ids)
             data_derived_config = {}
             for prop_id, result in zip(prop_ids, results):
                 data_derived_config[prop_id] = result
