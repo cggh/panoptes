@@ -92,8 +92,8 @@ let PerRowIndicatorChannel = React.createClass({
     this.draw(this.props);
   },
 
-  getDefinedQuery() {
-    let definedQuery = this.props.query;
+  getDefinedQuery(query) {
+    let definedQuery = query;
     if (definedQuery === undefined) {
       definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
     }
@@ -119,7 +119,7 @@ let PerRowIndicatorChannel = React.createClass({
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
         this.props.table !== table ||
-        this.props.query !== query ||
+        this.getDefinedQuery(this.props.query) !== this.getDefinedQuery(query) ||
         this.props.colourProperty !== colourProperty ||
         !(this.blockLevel === blockLevel
           && this.blockIndex === blockIndex
@@ -132,7 +132,7 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [this.tableConfig().primKey, this.tableConfig().position];
       if (colourProperty)
         columns.push(colourProperty);
-      let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery());
+      let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery(query));
       decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
