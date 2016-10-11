@@ -2,9 +2,6 @@ import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
 
-// Mixins
-import FluxMixin from 'mixins/FluxMixin';
-
 //Panoptes
 import filterChildren from 'util/filterChildren';
 
@@ -75,10 +72,6 @@ const ALLOWED_CHILDREN = [
 
 
 let Map = React.createClass({
-
-  mixins: [
-    FluxMixin
-  ],
 
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
@@ -262,12 +255,10 @@ console.log('handleMapMoveEnd setProps center and zoom');
         childrenToInspect = children[0].props.children;
       }
 
-      //let keyedChildren = [];
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
         if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'Marker') {
           nonMarkerChildrenCount++;
         }
-        //keyedChildren[i] = React.cloneElement(childrenToInspect[i], {key: ( _isString(keyedChildren[i]) ? childrenToInspect[i].key : i)});
       }
 
       if (nonMarkerChildrenCount === 0) {
