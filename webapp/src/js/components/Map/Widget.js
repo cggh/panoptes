@@ -261,16 +261,12 @@ let Map = React.createClass({
         childrenToInspect = children[0].props.children;
       }
 
-      let keyedChildren = [];
-
+      //let keyedChildren = [];
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
         if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'Marker') {
           nonMarkerChildrenCount++;
         }
-        keyedChildren[i] = _cloneDeep(childrenToInspect[i]);
-        if (!_isString(keyedChildren[i])) {
-          keyedChildren[i].key = i;
-        }
+        //keyedChildren[i] = React.cloneElement(childrenToInspect[i], {key: ( _isString(keyedChildren[i]) ? childrenToInspect[i].key : i)});
       }
 
       if (nonMarkerChildrenCount === 0) {
@@ -284,7 +280,7 @@ let Map = React.createClass({
             zoom={zoom}
           >
             <TileLayer key="0" />
-            {keyedChildren}
+            {children}
           </LeafletMap>
         );
 
