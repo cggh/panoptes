@@ -228,7 +228,7 @@ function fetchSingleRecord(options) {
       throw Error(`Tried to get non-existent record ${primKeyValue}`);
     }
     return data[0];
-  })
+  });
 }
 
 function findGene(options) {
