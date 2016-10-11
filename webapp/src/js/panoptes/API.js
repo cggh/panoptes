@@ -3,6 +3,7 @@ import arrayBufferDecode from 'panoptes/arrayBufferDecode';
 import _keys from 'lodash/keys';
 import LZString from 'lz-string';
 import _forEach from 'lodash/forEach';
+import _isNumber from 'lodash/isNumber';
 import _map from 'lodash/map';
 import {assertRequired} from 'util/Assert';
 import SQL from 'panoptes/SQL';
@@ -494,7 +495,7 @@ function query(options) {
     table,
     query: query,
     columns: JSON.stringify(columns),
-    limit: (start && stop) ? `${start}~${stop}` : undefined,
+    limit: (_isNumber(start) && _isNumber(stop)) ? `${start}~${stop}` : undefined,
     distinct: distinct ? 'true' : 'false',
     orderBy: JSON.stringify(orderBy),
     groupBy: groupBy.join('~'),
