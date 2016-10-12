@@ -91,8 +91,7 @@ let DataTableView = React.createClass({
     this.setShowableRows = _throttle(this.setShowableRows, 500);
   },
 
-  getDefinedQuery() {
-    let definedQuery = this.props.query;
+  getDefinedQuery(definedQuery) {
     if (definedQuery === undefined) {
       definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
     }
@@ -101,7 +100,7 @@ let DataTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {columns, order, ascending, startRowIndex} = props;
+    let {columns, order, startRowIndex, query} = props;
     let {showableRowsCount} = this.state;
     if (columns.length > 0 && showableRowsCount > 0) {
       this.setState({loadStatus: 'loading'});
@@ -111,7 +110,7 @@ let DataTableView = React.createClass({
         table: this.tableConfig().id,
         columns: columns,
         orderBy: order,
-        query: this.getDefinedQuery(),
+        query: this.getDefinedQuery(query),
         start: startRowIndex,
         stop: stopRowIndex,
         transpose: true //We want rows, not columns
@@ -120,7 +119,7 @@ let DataTableView = React.createClass({
       let rowsCountAPIargs = {
         database: this.config.dataset,
         table: this.tableConfig().id,
-        query: this.getDefinedQuery()
+        query: this.getDefinedQuery(query)
       };
 
       requestContext.request((componentCancellation) =>
