@@ -134,7 +134,7 @@ def summarise_call(calls):
         call = c
     return str(call) + ''.join(map(lambda a: str(a).zfill(2), calls))
 
-def handler(start_response, request_data):
+def handler(start_response, request_data, cache):
     datatable = request_data['table']
     dataset = request_data['dataset']
     two_d_properties = request_data['2DProperties'].split('~')

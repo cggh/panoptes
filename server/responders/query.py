@@ -27,7 +27,8 @@ NULL_VALUES = {
 def response(requestData):
     return requestData
 
-def handler(start_response, requestData):
+
+def handler(start_response, requestData, cache):
     try:
         length = int(requestData['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:
@@ -36,7 +37,7 @@ def handler(start_response, requestData):
     content = json.loads(content) if len(content) > 0 else None
     if not content:
         raise SyntaxError('No query parameters supplied')
-    
+
     tableId = content['table']
     query = content['query']
     orderBy = json.loads(content.get('orderBy', '[]'))
@@ -57,49 +58,59 @@ def handler(start_response, requestData):
     if content.get('randomSample', False):
         randomSample = int(content['randomSample'])
 
-    with DQXDbTools.DBCursor(requestData, database, read_timeout=config.TIMEOUT) as cur:
-        whereClause = DQXDbTools.WhereClause()
-        whereClause.ParameterPlaceHolder = '%s'
-        whereClause.Decode(query, True)
-        whereClause.CreateSelectStatement()
+    cacheKey = json.dumps([tableId, query, orderBy, distinct, columns, groupBy, database, startRow, endRow])
+    data = None
+    if randomSample is None: #Don't serve cache on random sample!!
+        try:
+            data = cache[cacheKey]
+        except KeyError:
+            pass
 
-        sqlQuery = "SELECT "
-        if distinct:
-            sqlQuery += " DISTINCT "
-        sqlQuery += "{0} FROM {1}".format(','.join(columns), DBTBESC(tableId))
-        if len(whereClause.querystring_params) > 0:
-            sqlQuery += " WHERE {0}".format(whereClause.querystring_params)
-        if groupBy and len(groupBy) > 0:
-            sqlQuery += " GROUP BY " + ','.join(map(DBCOLESC, groupBy.split('~')))
-        if len(orderBy) > 0:
-            sqlQuery += " ORDER BY {0}".format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
-        if startRow is not None and endRow is not None:
-            sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
-        if randomSample is not None:
-            sqlQuery += " SAMPLE {0}".format(randomSample)
+    if data is None:
+        with DQXDbTools.DBCursor(requestData, database, read_timeout=config.TIMEOUT) as cur:
+            whereClause = DQXDbTools.WhereClause()
+            whereClause.ParameterPlaceHolder = '%s'
+            whereClause.Decode(query, True)
+            whereClause.CreateSelectStatement()
 
-        if DQXDbTools.LogRequests:
-            DQXUtils.LogServer('###QRY:'+sqlQuery)
-            DQXUtils.LogServer('###PARAMS:'+str(whereClause.queryparams))
+            sqlQuery = "SELECT "
+            if distinct:
+                sqlQuery += " DISTINCT "
+            sqlQuery += "{0} FROM {1}".format(','.join(columns), DBTBESC(tableId))
+            if len(whereClause.querystring_params) > 0:
+                sqlQuery += " WHERE {0}".format(whereClause.querystring_params)
+            if groupBy and len(groupBy) > 0:
+                sqlQuery += " GROUP BY " + ','.join(map(DBCOLESC, groupBy.split('~')))
+            if len(orderBy) > 0:
+                sqlQuery += " ORDER BY {0}".format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
+            if startRow is not None and endRow is not None:
+                sqlQuery += " LIMIT {0} OFFSET {1}".format(endRow-startRow+1, startRow)
+            if randomSample is not None:
+                sqlQuery += " SAMPLE {0}".format(randomSample)
 
-        cur.execute(sqlQuery, whereClause.queryparams)
-        rows = cur.fetchall()
-        result = {}
-        for i, desc in enumerate(cur.description):
-            dtype = desciptionToDType(desc[1])
-            if dtype in ['i1', 'i2', 'i4', 'S']:
-                null_value = NULL_VALUES[dtype]
-                result[desc[0]] = np.array([row[i] if row[i] is not None else null_value for row in rows], dtype=dtype)
-            elif desc[1] == 'timestamp':
-                result[desc[0]] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
-            else:
-                result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
-        data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
-        status = '200 OK'
-        response_headers = [('Content-type', 'text/plain'),
-                            ('Content-Length', str(len(data))),
-                            ('Content-Encoding', 'gzip'),
-                            ('Access-Control-Allow-Origin', '*')
-                            ]
-        start_response(status, response_headers)
-        yield data
+            if DQXDbTools.LogRequests:
+                DQXUtils.LogServer('###QRY:'+sqlQuery)
+                DQXUtils.LogServer('###PARAMS:'+str(whereClause.queryparams))
+
+            cur.execute(sqlQuery, whereClause.queryparams)
+            rows = cur.fetchall()
+            result = {}
+            for i, desc in enumerate(cur.description):
+                dtype = desciptionToDType(desc[1])
+                if dtype in ['i1', 'i2', 'i4', 'S']:
+                    null_value = NULL_VALUES[dtype]
+                    result[desc[0]] = np.array([row[i] if row[i] is not None else null_value for row in rows], dtype=dtype)
+                elif desc[1] == 'timestamp':
+                    result[desc[0]] = np.array([datetimeToJulianDay(row[i]) if row[i] is not None else None for row in rows], dtype=dtype)
+                else:
+                    result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
+            data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
+            cache[cacheKey] = data
+    status = '200 OK'
+    response_headers = [('Content-type', 'text/plain'),
+                        ('Content-Length', str(len(data))),
+                        ('Content-Encoding', 'gzip'),
+                        ('Access-Control-Allow-Origin', '*')
+                        ]
+    start_response(status, response_headers)
+    yield data

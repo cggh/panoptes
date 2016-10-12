@@ -42,7 +42,6 @@ def readJSONConfig(datasetId):
     try:
         for tableId, table_config in tables.items():
             config_file = join(base_folder, tableId, 'dataConfig.json')
-            print(config_file)
             if exists(config_file):
                 with open(config_file, 'r') as f:
                     data_config = load(f)
