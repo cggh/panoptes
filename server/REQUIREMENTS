@@ -17,3 +17,4 @@ sqlparse==0.1.15
 biopython==1.67
 ruamel.yaml==0.11.14
 portalocker==0.5.7
+diskcache==2.0.2

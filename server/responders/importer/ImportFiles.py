@@ -1,7 +1,9 @@
 # This file is part of Panoptes - (C) Copyright 2014, CGGH <info@cggh.org>
 # This program is free software licensed under the GNU Affero General Public License.
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
-
+from cache import getCache
+from os.path import join
+import config
 import os
 import sys
 import shutil
@@ -15,14 +17,13 @@ import ImportRefGenome
 from PluginLoader import PluginLoader
 
 
-
 def ImportDocs(calculationObject, datasetFolder, datasetId):
     config = PanoptesConfig(calculationObject)
-    sourceDocFolder = os.path.join(datasetFolder, 'doc')
+    sourceDocFolder = join(datasetFolder, 'doc')
     if not(os.path.exists(sourceDocFolder)):
         return
     with calculationObject.LogHeader('Creating documentation'):
-        destDocFolder = os.path.join(config.getBaseDir(), 'Docs', datasetId)
+        destDocFolder = join(config.getBaseDir(), 'Docs', datasetId)
         try:
             shutil.rmtree(destDocFolder)
         except OSError:
@@ -42,11 +43,11 @@ def ImportDocs(calculationObject, datasetFolder, datasetId):
 #TODO: Identical to ImportDocs
 def ImportMaps(calculationObject, datasetFolder, datasetId):
     config = PanoptesConfig(calculationObject)
-    sourceFolder = os.path.join(datasetFolder, 'maps')
+    sourceFolder = join(datasetFolder, 'maps')
     if not(os.path.exists(sourceFolder)):
         return
     with calculationObject.LogHeader('Creating maps'):
-        destFolder = os.path.join(config.getBaseDir(), 'Maps', datasetId)
+        destFolder = join(config.getBaseDir(), 'Maps', datasetId)
         try:
             shutil.rmtree(destFolder)
         except OSError:
@@ -60,7 +61,7 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
     with calculationObject.LogHeader('Importing dataset {0}'.format(datasetId)):
         calculationObject.Log('Import settings: '+str(importSettings))
 
-        datasetFolder = os.path.join(baseFolder, datasetId)
+        datasetFolder = join(baseFolder, datasetId)
 
         dao = SettingsDAO(calculationObject, datasetId)
         dao.removeDatasetMasterRef()
@@ -110,6 +111,9 @@ def ImportDataSet(calculationObject, baseFolder, datasetId, importSettings):
         with calculationObject.LogHeader('Registering dataset'):
             dao.registerDataset(globalSettings['name'], importSettings['ConfigOnly'])
 
+        with calculationObject.LogHeader('Clear cache'):
+            getCache().clear()
+
         modules.importAll('post')
 
 
@@ -155,7 +159,7 @@ if __name__ == "__main__":
             sys.exit()
         datatableid = sys.argv[4]
         print('Start importing datatable "{0}.{1}"...'.format(datasetid, datatableid))
-        datatableFolder = os.path.join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatableid)
+        datatableFolder = join(config.SOURCEDATADIR, 'datasets', datasetid, 'datatables', datatableid)
  #       ImportDataTable.ImportDataTable(calc, datasetid, datatableid, datatableFolder,
  #           {
  #               'ConfigOnly': configOnly

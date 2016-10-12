@@ -3,6 +3,10 @@
 # You can find a copy of this license in LICENSE in the top directory of the source code or at <http://opensource.org/licenses/AGPL-3.0>
 
 from urlparse import parse_qs
+
+import config
+from os.path import join
+
 import simplejson
 import traceback
 
@@ -10,6 +14,7 @@ import DQXUtils
 import DQXDbTools
 import responders
 import wrappedResponders
+from cache import getCache
 
 def application(environ, start_response):
     request_data = dict((k,v[0]) for k,v in parse_qs(environ['QUERY_STRING']).items())
@@ -65,4 +70,4 @@ def application(environ, start_response):
         yield str(e)
 
 
-    DQXUtils.LogServer('Responded to {0} in wall={1}s cpu={2}s'.format(request_type, tm.Elapsed(),tm.ElapsedCPU()))
+    DQXUtils.LogServer('{0}: in wall={1}s cpu={2}s'.format(request_type, round(tm.Elapsed(),2),round(tm.ElapsedCPU(),2)))

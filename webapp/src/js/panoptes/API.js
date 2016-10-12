@@ -332,7 +332,8 @@ function fetchImportStatusData(options) {
       columns: columns,
       query: recordQuery,
       orderBy: [['desc', 'timestamp']],
-      transpose: true
+      transpose: true,
+      cache: false
     }
   );
 }
@@ -479,10 +480,11 @@ function query(options) {
     distinct: false,
     transpose: false,
     typedArrays: false,
-    randomSample: undefined
+    randomSample: undefined,
+    cache: true
   };
   let {database, table, columns, query, orderBy, groupBy,
-    start, stop, distinct, transpose, randomSample, typedArrays} = {...defaults, ...options};
+    start, stop, distinct, transpose, randomSample, cache, typedArrays} = {...defaults, ...options};
   let args = options.cancellation ? {cancellation: options.cancellation} : {};
   return requestArrayBuffer({
     ...args,
@@ -499,7 +501,8 @@ function query(options) {
     distinct: distinct ? 'true' : 'false',
     orderBy: JSON.stringify(orderBy),
     groupBy: groupBy.join('~'),
-    randomSample: randomSample
+    randomSample,
+    cache
   }))
   .then((columns) => {
     if (!typedArrays) {
