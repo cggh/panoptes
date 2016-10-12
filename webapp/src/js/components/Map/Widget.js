@@ -173,6 +173,9 @@ let Map = React.createClass({
 
     if (this.map !== null) {
 
+      //tmp
+      //this.map.leafletElement.eachLayer((layer) => this.map.leafletElement.removeLayer(layer));
+
       let leafletCenter = this.map.leafletElement.getCenter();
       let maxZoom = this.map.leafletElement.getMaxZoom();
       let newCenter = {lat: leafletCenter.lat, lng: leafletCenter.lng};
