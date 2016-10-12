@@ -19,7 +19,7 @@ let TableMarkersLayer = React.createClass({
   mixins: [
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('highlight', 'locationDataTable', 'primKey', 'query', 'table')
+    DataFetcherMixin('highlight', 'primKey', 'query', 'table')
   ],
 
   //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
@@ -33,11 +33,10 @@ let TableMarkersLayer = React.createClass({
   propTypes: {
     highlight: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
-    locationDataTable: React.PropTypes.string,
     map: React.PropTypes.object,
-    primKey: React.PropTypes.string, // if not specified then all locationDataTable records are used
+    primKey: React.PropTypes.string, // if not specified then all table records are used
     query: React.PropTypes.string,
-    table: React.PropTypes.string // An alias for locationDataTable
+    table: React.PropTypes.string
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -70,38 +69,32 @@ let TableMarkersLayer = React.createClass({
 
   getDefinedQuery(definedQuery) {
     if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
+      let tableConfig = this.config.tablesById[this.props.table];
+      definedQuery = tableConfig.defaultQuery !== undefined ? tableConfig.defaultQuery : SQL.nullQuery;
     }
     return definedQuery;
   },
 
   fetchData(props, requestContext) {
 
-    let {highlight, locationDataTable, primKey, table, query} = props;
+    let {highlight, primKey, table, query} = props;
 
     let {changeLayerStatus} = this.context;
 
     changeLayerStatus({loadStatus: 'loading'});
 
-    // NB: The locationDataTable prop is named to distinguish it from the chartDataTable.
-    // Either "table" or "locationDataTable" can be used in templates,
-    // with locationDataTable taking preference when both are specfied.
-    if (locationDataTable === undefined && table !== undefined) {
-      locationDataTable = table;
-    }
-
-    let locationTableConfig = this.config.tablesById[locationDataTable];
-    if (locationTableConfig === undefined) {
-      console.error('locationTableConfig === undefined');
+    let tableConfig = this.config.tablesById[table];
+    if (tableConfig === undefined) {
+      console.error('tableConfig === undefined');
       return null;
     }
     // Check that the table specified for locations has geographic coordinates.
-    if (locationTableConfig.hasGeoCoord === false) {
-      console.error('locationTableConfig.hasGeoCoord === false');
+    if (tableConfig.hasGeoCoord === false) {
+      console.error('tableConfig.hasGeoCoord === false');
       return null;
     }
 
-    let locationPrimKeyProperty = locationTableConfig.primKey;
+    let locationPrimKeyProperty = tableConfig.primKey;
 
     // TODO: support lngProperty and latProperty props, to specify different geo columns.
     // If specified, use the lat lng properties from the props.
@@ -109,8 +102,8 @@ let TableMarkersLayer = React.createClass({
     // let locationLongitudeProperty = lngProperty ? lngProperty : locationTableConfig.longitude;
     // let locationLatitudeProperty = latProperty ? latProperty : locationTableConfig.latitude;
 
-    let locationLongitudeProperty = locationTableConfig.longitude;
-    let locationLatitudeProperty = locationTableConfig.latitude;
+    let locationLongitudeProperty = tableConfig.longitude;
+    let locationLatitudeProperty = tableConfig.latitude;
 
     let locationColumns = [locationPrimKeyProperty, locationLongitudeProperty, locationLatitudeProperty];
 
@@ -123,8 +116,8 @@ let TableMarkersLayer = React.createClass({
     if (highlight !== undefined && typeof highlight === 'string' && highlight !== '') {
       let [highlightField] = highlight.split(':');
       if (highlightField !== undefined) {
-        if (locationTableConfig.propertiesById[highlightField] === undefined) {
-          console.error('The specified highlight field ' + highlightField + ' was not found in the table ' + locationDataTable);
+        if (tableConfig.propertiesById[highlightField] === undefined) {
+          console.error('The specified highlight field ' + highlightField + ' was not found in the table ' + table);
         } else {
           locationColumns.push(highlightField);
         }
@@ -139,7 +132,7 @@ let TableMarkersLayer = React.createClass({
           columns: locationColumns,
           database: this.config.dataset,
           query: this.getDefinedQuery(query),
-          table: locationTableConfig.id,
+          table: tableConfig.id,
           transpose: true
         };
 
@@ -158,7 +151,7 @@ let TableMarkersLayer = React.createClass({
         let markers = [];
 
         // Translate the fetched locationData into markers.
-        let locationTableConfig = this.config.tablesById[locationDataTable];
+        let locationTableConfig = this.config.tablesById[table];
         let locationPrimKeyProperty = locationTableConfig.primKey;
 
         let highlightField, highlightValue = null;
@@ -179,7 +172,7 @@ let TableMarkersLayer = React.createClass({
 
           markers.push({
             isHighlighted: isHighlighted,
-            table: locationDataTable,
+            table,
             lat: parseFloat(data[i][locationTableConfig.latitude]),
             lng: parseFloat(data[i][locationTableConfig.longitude]),
             primKey: locationDataPrimKey,

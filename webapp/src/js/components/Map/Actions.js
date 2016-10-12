@@ -334,7 +334,7 @@ let MapActions = React.createClass({
           checked={true}
           name={this.config.tablesById[table].capNamePlural}
         >
-          <TableMarkersLayer locationDataTable={table} {...adaptedMarkersLayerProps} />
+          <TableMarkersLayer table={table} {...adaptedMarkersLayerProps} />
         </Overlay>
       );
     }
