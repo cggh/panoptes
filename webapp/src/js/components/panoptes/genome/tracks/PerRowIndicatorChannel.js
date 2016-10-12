@@ -298,7 +298,7 @@ let PerRowIndicatorChannel = React.createClass({
   },
 
   render() {
-    let {width, sideWidth, table, colourProperty} = this.props;
+    let {width, sideWidth, table, colourProperty, query} = this.props;
     const {knownValues} = this.state;
     return (
       <ChannelWithConfigDrawer
@@ -311,7 +311,7 @@ let PerRowIndicatorChannel = React.createClass({
             </div>
             }
         //Override component update to get latest in case of skipped render
-        configComponent={<PerRowIndicatorControls {...this.props} setProps={this.redirectedProps.setProps} />}
+        configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery(query)} setProps={this.redirectedProps.setProps} />}
         legendComponent={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={knownValues} /> : null}
         onClose={this.redirectedProps.onClose}
       >
@@ -343,21 +343,13 @@ const PerRowIndicatorControls = React.createClass({
     this.redirectedProps.setProps({query});
   },
 
-  getDefinedQuery() {
-    let definedQuery = this.props.query;
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
-  },
-
   render() {
     let {table, colourProperty} = this.props;
 
     return (
       <div className="channel-controls">
         <div className="control">
-          <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
+          <FilterButton table={table} query={query} onPick={this.handleQueryPick}/>
         </div>
         <div className="control">
           <div className="label">Colour By:</div>
