@@ -24,6 +24,10 @@ var devConfig = {
       '/panoptes/Docs': {
         target: 'http://localhost:8000/',
         secure: false
+      },
+      '/panoptes/Maps': {
+        target: 'http://localhost:8000/',
+        secure: false
       }
     }
   };
