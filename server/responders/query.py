@@ -12,6 +12,7 @@ from DQXDbTools import DBTBESC
 from DQXDbTools import desciptionToDType
 
 import config
+from cache import getCache
 from columnDecode import decode
 from gzipstream import gzip
 from dates import datetimeToJulianDay
@@ -28,7 +29,7 @@ def response(requestData):
     return requestData
 
 
-def handler(start_response, requestData, cache):
+def handler(start_response, requestData):
     try:
         length = int(requestData['environ'].get('CONTENT_LENGTH', '0'))
     except ValueError:
@@ -57,10 +58,12 @@ def handler(start_response, requestData, cache):
     randomSample = None
     if content.get('randomSample', False):
         randomSample = int(content['randomSample'])
+    cacheData = content.get('cache', True)
 
+    cache = getCache()
     cacheKey = json.dumps([tableId, query, orderBy, distinct, columns, groupBy, database, startRow, endRow])
     data = None
-    if randomSample is None: #Don't serve cache on random sample!!
+    if cacheData and randomSample is None: #Don't serve cache on random sample!!
         try:
             data = cache[cacheKey]
         except KeyError:
@@ -105,7 +108,8 @@ def handler(start_response, requestData, cache):
                 else:
                     result[desc[0]] = np.array([row[i] for row in rows], dtype=dtype)
             data = gzip(data=''.join(arraybuffer.encode_array_set(result.items())))
-            cache[cacheKey] = data
+            if cacheData:
+                cache[cacheKey] = data
     status = '200 OK'
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(data))),

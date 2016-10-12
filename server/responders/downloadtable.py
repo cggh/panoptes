@@ -39,7 +39,7 @@ def response(returndata):
             line='\t'.join([str(x) for x in row])+'\n'
             yield line
 
-def handler(start_response, response, cache):
+def handler(start_response, response):
         status = '200 OK'
         response_headers = [('Content-type', 'text/plain'),('Content-Disposition','attachment; filename=download.txt')]
         start_response(status, response_headers)
