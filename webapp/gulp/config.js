@@ -39,7 +39,7 @@ module.exports = {
     dest: dest+'/fonts'
   },
   images: {
-    src: 'src/images/**/*.{png,jpg,svg}',
+    src: 'src/images/**/*.{png,jpg,svg,ico,xml,json}',
     dest: dest+'/images'
   },
   watch: {
@@ -47,5 +47,3 @@ module.exports = {
     tasks: ['build']
   }
 };
-
-
