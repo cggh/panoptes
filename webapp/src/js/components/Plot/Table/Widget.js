@@ -3,7 +3,6 @@ import React from 'react';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _reduce from 'lodash/reduce';
-import _forEach from 'lodash/forEach';
 
 import Plot from 'Plot/Widget';
 
@@ -17,6 +16,8 @@ import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
 import ErrorReport from 'panoptes/ErrorReporter';
 import {allDimensions} from 'panoptes/plotTypes';
+import {propertyColour} from 'util/Colours';
+
 
 import 'plot.scss';
 
@@ -86,7 +87,14 @@ let TablePlot = React.createClass({
         .then((data) => {
           this.setState(
             _reduce(allDimensions,
-              (state, dim) => { state[dim] = data[props[dim]] || null; return state; },
+              (state, dim) => {
+                state[dim] = data[props[dim]] || null;
+                let prop = tableConfig.propertiesById[props[dim]];
+                if (dim == 'colour' && state[dim] && !prop.isNumerical && prop.isCategorical) {
+                  state[dim] = _map(state[dim], propertyColour(prop));
+                }
+                return state;
+              },
               {loadStatus: 'loaded'})
           );
         })
