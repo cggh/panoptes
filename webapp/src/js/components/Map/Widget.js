@@ -15,7 +15,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _isArray from 'lodash/isArray';
 import _isEqual from 'lodash/isEqual';
 import _isObject from 'lodash/isObject';
-import _isString from 'lodash/isString';
 import _max from 'lodash/max';
 import _min from 'lodash/min';
 
