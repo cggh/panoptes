@@ -49,9 +49,6 @@ let LayersControl = React.createClass({
     let {autoZIndex, children, removeLayer, removeLayerControl} = this.props;
     let filteredChildren = filterChildren(this, children, ALLOWED_CHILDREN);
 
-    //tmp
-    //this.context.map.eachLayer((layer) => this.layersControl.removeLayer(layer));
-
     // NB: Only the position prop is dynamic.
     // https://github.com/PaulLeCam/react-leaflet/blob/master/docs/Components.md#layerscontrol
 
