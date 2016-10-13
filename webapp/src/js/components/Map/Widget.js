@@ -156,7 +156,6 @@ let Map = React.createClass({
     }
   },
   handleMapMoveEnd(e) { // e is not being used
-console.log('Map handleMapMoveEnd');
     // NB: this event fires whenever the map's bounds, center or zoom change.
 
     // this.map is not available on the first render; it's a callback ref attached to the Map component; no DOM yet.
@@ -188,7 +187,6 @@ console.log('Map handleMapMoveEnd');
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
-console.log('handleMapMoveEnd setProps center and zoom');
         }
 
       }
@@ -232,7 +230,8 @@ console.log('handleMapMoveEnd setProps center and zoom');
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
       ref: (ref) => this.map = ref,
-      zoom: zoom
+      zoom: zoom,
+      zoomAnimation: false
     };
 
     let mapComponent = null;

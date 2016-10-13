@@ -16,7 +16,8 @@ const ALLOWED_CHILDREN = [
   'MapPopup',
   'FeatureGroup',
   'TileLayer',
-  'PieChartMarkersLayer'
+  'PieChartMarkersLayer',
+  'Polyline'
 ];
 
 let FeatureGroup = React.createClass({

@@ -29,7 +29,6 @@ let ComponentMarker = React.createClass({
   },
 
   render() {
-
     let {layerContainer, map} = this.context;
     let {alt, children, onClick, position, title} = this.props;
 
@@ -55,12 +54,13 @@ let ComponentMarker = React.createClass({
     return (
       <DivIcon
         alt={alt}
-        children={React.Children.only(children)}
         className="panoptes-map-componentmarker"
         onClick={(e) => onClick(e, this)}
         position={position}
         title={title}
-      />
+      >
+        {React.Children.only(children)}
+      </DivIcon>
     );
 
   }

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Marker as LeafletMarker} from 'react-leaflet';
+import {DivIcon, Point} from 'leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -16,13 +17,6 @@ let Marker = React.createClass({
     FluxMixin
   ],
 
-  //NB: layerContainer and map might be provided as props rather than context (e.g. <Map><GetsProps><GetsContext /></GetsProps></Map>
-  // in which case, we copy those props into context. Props override context.
-
-  contextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
-  },
   propTypes: {
     alt: React.PropTypes.string,
     children: React.PropTypes.node,
@@ -33,17 +27,6 @@ let Marker = React.createClass({
     zIndexOffset: React.PropTypes.number,
     position: React.PropTypes.object,
     title: React.PropTypes.string
-  },
-  childContextTypes: {
-    layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
-  },
-
-  getChildContext() {
-    return {
-      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
-      map: this.props.map !== undefined ? this.props.map : this.context.map
-    };
   },
 
   render() {

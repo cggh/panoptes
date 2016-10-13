@@ -17,7 +17,7 @@ let PieChart = React.createClass({
 
   propTypes: {
     chartData: React.PropTypes.array,
-    crs: React.PropTypes.object,
+    map: React.PropTypes.object,
     lat: React.PropTypes.number,
     lng: React.PropTypes.number,
     name: React.PropTypes.string,
@@ -35,7 +35,7 @@ let PieChart = React.createClass({
   },
 
   render() {
-    let {chartData, crs, lat, lng, name, originalLat, originalLng, radius} = this.props;
+    let {chartData, lat, lng, name, originalLat, originalLng, radius} = this.props;
 
     let sectorsData = [];
     let pieData = [];
@@ -51,40 +51,39 @@ let PieChart = React.createClass({
 
     let pie = d3.layout.pie().sort(null);
     let arcDescriptors = pie(pieData);
-    let outerRadius = crs.project({lat: 0, lng: radius}).x - crs.project({lat: 0, lng: 0}).x;
 
     let sectors = sectorsData.map((sectorData, i) =>
         <PieChartSector
           key={i}
           arcDescriptor={arcDescriptors[i]}
-          outerRadius={outerRadius}
+          outerRadius={radius}
           fillColor={sectorData.color}
           title={sectorData.title}
           className="panoptes-chart-pie-sector"
         />
     );
 
-    let location = crs.project({lat, lng});
-
-    let line = null;
-    if (pieData.length && originalLat && originalLng) {
-      let originalLocation = crs.project({lat: originalLat, lng: originalLng});
-      line = (
-        <line
-          className="pie-chart-line"
-          style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
-          x1="0" y1="0"
-          x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
-        />
-      );
-    }
+    // let location = crs.project({lat, lng});
+    //
+    // let line = null;
+    // if (pieData.length && originalLat && originalLng) {
+    //   let originalLocation = crs.project({lat: originalLat, lng: originalLng});
+    //   line = (
+    //     <line
+    //       className="pie-chart-line"
+    //       style={{strokeWidth: '2', stroke: 'black', strokeDasharray: '3,3'}}
+    //       x1="0" y1="0"
+    //       x2={originalLocation.x - location.x} y2={originalLocation.y - location.y}
+    //     />
+    //   );
+    // }
 
     return (
-      <svg style={{overflow: 'visible'}} width="50" height="50">
-        <g transform={'translate(0, 0)'}>
+      <svg style={{overflow: 'visible'}} width="1" height="1">
+        <g transform={'translate(5, 5)'}>
           {sectors}
         </g>
-        {line}
+/        {false ? line: null}
       </svg>
     );
 
