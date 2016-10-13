@@ -245,8 +245,8 @@ let DataTableView = React.createClass({
                 }
                 let columnData = this.tableConfig().propertiesById[column];
                 let {id, isPrimKey, description, name} = columnData;
-                let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol===column);
-                let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol===column);
+                let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
+                let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 let width = columnWidths[column] || this.defaultWidth(columnData);
                 return <Column
                   //TODO Better default column widths

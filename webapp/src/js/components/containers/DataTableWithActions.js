@@ -247,7 +247,7 @@ let DataTableWithActions = React.createClass({
 
   orderDescriptionString(order) {
     if (order.length === 0) {
-      return "None";
+      return 'None';
     }
     return _map(order, ([dir, column]) =>
       `${this.tableConfig().propertiesById[column].name} ${dir === 'asc' ? 'asc' : 'desc'}`)
