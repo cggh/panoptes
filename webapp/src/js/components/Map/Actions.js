@@ -5,7 +5,7 @@ import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
 // Lodash
-import _cloneDeep from 'lodash/cloneDeep';
+import _clone from 'lodash/clone';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 
@@ -220,7 +220,7 @@ let MapActions = React.createClass({
       this.props.setProps({baseTileLayer: undefined, baseTileLayerProps: undefined, zoom: undefined});
     } else {
 
-      let selectedTileLayerProps = _cloneDeep(this.baseTileLayers[selectedTileLayer]);
+      let selectedTileLayerProps = _clone(this.baseTileLayers[selectedTileLayer]);
 
       // Alter the existing zoom level so that it fits within the new layer's min/maxZoom values.
       let adaptedZoom = this.props.zoom;
@@ -347,6 +347,7 @@ let MapActions = React.createClass({
       baseLayerComponent = (
         <BaseLayer
           checked={true}
+          key={baseTileLayer}
           name={baseTileLayerProps.name}
         >
           <TileLayer {...baseTileLayerProps} />
@@ -383,6 +384,7 @@ let MapActions = React.createClass({
         overlayLayerComponent = (
           <Overlay
             checked={true}
+            key={overlayLayer}
             name={this.config.mapLayers[overlayLayer].name}
           >
             <TileLayer {...overlayLayerProps} />
