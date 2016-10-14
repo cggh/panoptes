@@ -1,7 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
 import Color from 'color';
+
+// Lodash
 import _uniq from 'lodash/uniq';
+import _some from 'lodash/some';
+import _forEach from 'lodash/forEach';
+import _filter from 'lodash/filter';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -22,25 +27,28 @@ import PropertyCell from 'panoptes/PropertyCell';
 // UI components
 import Loading from 'ui/Loading';
 import DetectResize from 'utils/DetectResize';
+import Icon from 'ui/Icon';
 
 // Constants in this component
 // const MAX_COLOR = Color('#44aafb');
 const ROW_HEIGHT = 30;
 const HEADER_HEIGHT = 50;
 // const SCROLLBAR_HEIGHT = 15;
-const COLUMN_WIDTH = 100;
+const COLUMN_WIDTH = 120;
 
 let PivotTableView = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columnProperty', 'rowProperty')
+    DataFetcherMixin('table', 'query', 'columnProperty', 'rowProperty', 'order')
   ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
+    order: React.PropTypes.array,
+    onOrderChange: React.PropTypes.func,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
     className: React.PropTypes.string
@@ -52,6 +60,7 @@ let PivotTableView = React.createClass({
   getDefaultProps() {
     return {
       query: undefined,
+      order: []
     };
   },
 
@@ -73,7 +82,7 @@ let PivotTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columnProperty, rowProperty, query} = props;
+    let {table, columnProperty, rowProperty, query, order} = props;
 
     let columns = [
       {expr: ['count', ['*']], as: 'count'}
@@ -101,7 +110,6 @@ let PivotTableView = React.createClass({
       stop: 1000,
       transpose: false
     };
-
     requestContext.request((componentCancellation) =>
       LRUCache.get(
         'query' + JSON.stringify(queryAPIargs),
@@ -152,8 +160,28 @@ let PivotTableView = React.createClass({
     this.setState(size);
   },
 
+  handleOrderChange(column) {
+    let currentOrder = this.props.order;
+    // Choose the sort direction based on whether this column is already in the order array.
+    let newDirection = 'asc';
+    _forEach(currentOrder, ([direction, orderCol]) => {
+      if (orderCol === column) {
+        newDirection = {asc: 'desc', desc: null}[direction];
+      }
+    });
+    //Remove this column from the sort order
+    currentOrder = _filter(currentOrder, ([direction, orderCol]) => orderCol !== column);
+    //Then add it to the end (if needed)
+    if (newDirection) {
+      currentOrder.push([newDirection, column]);
+    }
+    if (this.props.onOrderChange) {
+      this.props.onOrderChange(currentOrder);
+    }
+  },
+
   render() {
-    let {className, columnProperty, rowProperty} = this.props;
+    let {className, columnProperty, rowProperty, order} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -215,6 +243,11 @@ let PivotTableView = React.createClass({
                   background = Color(col).lighten(0.3).rgbString();
                 }
               }
+
+              let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === columnValue);
+              let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === columnValue);
+              let icon = (asc || desc) ? <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+
               return <Column
               //TODO Better default column widths
               width={COLUMN_WIDTH}
@@ -223,16 +256,25 @@ let PivotTableView = React.createClass({
               isResizable={false}
               minWidth={50}
               header={
-                    <div className="table-row-cell"
-                         style={{
-                           textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
-                           width: COLUMN_WIDTH,
-                           height: HEADER_HEIGHT + 'px',
-                           background: background
-                         }}>
-                      { columnValue == '_all_' ? 'All' :
-                        <PropertyCell prop={colPropConfig} value={columnValue}/> }
-                    </div>
+                <div
+                  className={classNames({
+                    'table-row-cell': true,
+                    'pointer': true,
+                    'table-row-header': true,
+                    'sort-column-ascending': asc,
+                    'sort-column-descending': desc
+                  })}
+                onClick={() => this.handleOrderChange(columnValue)}
+                style={{
+                  textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
+                  width: COLUMN_WIDTH,
+                  height: HEADER_HEIGHT + 'px',
+                  background: background
+                }}
+                >
+                  {icon}
+                  { columnValue == '_all_' ? 'All' : <PropertyCell prop={colPropConfig} value={columnValue}/> }
+                </div>
                 }
               cell={({rowIndex}) =>
                     <div className="table-row-cell"

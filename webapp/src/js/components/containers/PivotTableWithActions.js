@@ -7,6 +7,9 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import FluxMixin from 'mixins/FluxMixin';
 
+// Lodash
+import _map from 'lodash/map';
+
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
@@ -32,6 +35,7 @@ let PivotTableWithActions = React.createClass({
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
+    order: React.PropTypes.array,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
   },
@@ -42,6 +46,7 @@ let PivotTableWithActions = React.createClass({
   getDefaultProps() {
     return {
       query: undefined,
+      order: [],
       setProps: null,
       sidebar: true
     };
@@ -61,8 +66,22 @@ let PivotTableWithActions = React.createClass({
     return this.props.title || `Pivot ${this.tableConfig().namePlural}`;
   },
 
+  handleOrderChange(order) {
+    //Dont use merge syntax!
+    this.props.setProps((props) => props.set('order', order));
+  },
+
+  orderDescriptionString(order) {
+    if (order.length === 0) {
+      return 'None';
+    }
+    return _map(order, ([direction, value]) =>
+      `${value} ${direction === 'asc' ? 'asc' : 'desc'}`)
+      .join(', ');
+  },
+
   render() {
-    const {sidebar, table, columnProperty, rowProperty, setProps} = this.props;
+    const {sidebar, table, columnProperty, rowProperty, setProps, order} = this.props;
 
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
@@ -98,9 +117,10 @@ let PivotTableWithActions = React.createClass({
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
+            <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
           </div>
           <div className="grow">
-            <PivotTableView {...this.props} query={this.getDefinedQuery()}/>
+            <PivotTableView {...this.props} order={order} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
           </div>
         </div>
       </Sidebar>
