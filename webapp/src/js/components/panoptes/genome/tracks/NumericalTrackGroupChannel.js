@@ -15,6 +15,7 @@ import serialiseComponent from 'util/serialiseComponent';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
+import ItemPicker from 'containers/ItemPicker';
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -34,7 +35,8 @@ let NumericalTrackGroupChannel = React.createClass({
   propTypes: {
     width: React.PropTypes.number,
     sideWidth: React.PropTypes.number,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
+    setProps: React.PropTypes.func.isRequired
   },
 
   getInitialState() {
@@ -90,6 +92,7 @@ let NumericalTrackGroupControls = React.createClass({
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
+    setProps: React.PropTypes.func
   },
 
   trackGroups() {
@@ -104,7 +107,7 @@ let NumericalTrackGroupControls = React.createClass({
           items: []
         };
         _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.isNumerical && prop.summaryValues) {
+          if (prop.showInBrowser && prop.isNumerical) {
             groups[table.id].items.push({
               name: prop.name,
               description: prop.description,
@@ -136,15 +139,15 @@ let NumericalTrackGroupControls = React.createClass({
         <div className="control">
           <FlatButton label="Add/Remove Tracks"
                       primary={true}
-                      onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
-                        {
-                          title: 'Pick tracks to be displayed',
-                          itemName: 'Numerical track',
-                          itemVerb: 'display',
-                          groups: this.trackGroups(),
-                          initialSelection: [],
-                          onPick: this.handleTrackChange
-                        })}/>
+                      onClick={() => actions.session.modalOpen(<ItemPicker
+                        title="Pick tracks to be displayed"
+                        itemName="Numerical track"
+                        itemVerb="display"
+                        groups={this.trackGroups()}
+                        initialSelection={[]}
+                        onPick={this.handleTrackChange}
+                      />)}
+          />
         </div>
 
         <div className="control">

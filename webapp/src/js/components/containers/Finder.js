@@ -43,12 +43,7 @@ let Finder = React.createClass({
   title() {
     return this.props.title;
   },
-
-  handleSwitchModal(container, props) {
-    this.getFlux().actions.session.modalClose();
-    this.getFlux().actions.session.modalOpen(container, props);
-  },
-
+  
   handleOpenTableTab(e, table) {
 
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;

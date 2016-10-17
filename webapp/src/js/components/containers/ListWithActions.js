@@ -14,6 +14,7 @@ import FlatButton from 'material-ui/FlatButton';
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
+import Alert from 'ui/Alert';
 
 // Panoptes
 import ListView from 'panoptes/ListView';
@@ -95,7 +96,7 @@ let ListWithActions = React.createClass({
   handleDownloadLimitBreach(payload) {
     let {totalDataPoints, maxDataPoints} = payload;
     let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
-    this.getFlux().actions.session.modalOpen('ui/Alert', {title: 'Warning', message: message});
+    this.getFlux().actions.session.modalOpen(<Alert title="Warning" message={message} />);
   },
 
   render() {

@@ -12,6 +12,7 @@ let session = keyMirror({
   COMPONENT_REPLACE: null,
   MODAL_CLOSE: null,
   MODAL_OPEN: null,
+  MODAL_SET_PROPS: null,
   NOTIFY: null,
   POPUP_CLOSE: null,
   POPUP_MOVE: null,

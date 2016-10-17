@@ -1,3 +1,4 @@
+import React from 'react';
 import Fluxxor from 'fluxxor';
 import Immutable from 'immutable';
 import uid from 'uid';
@@ -17,13 +18,14 @@ let SessionStore = Fluxxor.createStore({
 
   initialize(state) {
     this.state = Immutable.fromJS(state);
+    this.modal = null;
 
     this.bindActions(
-//      SESSION.COMPONENT_UPDATE, this.emitIfNeeded(this.setProps),
       SESSION.COMPONENT_SET_PROPS, this.emitIfNeeded(this.componentSetProps),
       SESSION.COMPONENT_REPLACE, this.emitIfNeeded(this.componentReplace),
-      SESSION.MODAL_CLOSE, this.emitIfNeeded(this.modalClose),
-      SESSION.MODAL_OPEN, this.emitIfNeeded(this.modalOpen),
+      SESSION.MODAL_CLOSE, this.modalClose,
+      SESSION.MODAL_OPEN, this.modalOpen,
+      SESSION.MODAL_SET_PROPS, this.emitIfNeeded(this.modalSetProps),
       SESSION.NOTIFY, this.emitIfNeeded(this.notify, 'notify'),
       SESSION.POPUP_CLOSE, this.emitIfNeeded(this.popupClose),
       SESSION.POPUP_FOCUS, this.emitIfNeeded(this.popupFocus),
@@ -59,17 +61,27 @@ let SessionStore = Fluxxor.createStore({
   },
 
   componentReplace({componentPath, newComponent}) {
-    newComponent = Immutable.fromJS(newComponent);
     this.state = this.state.setIn(['components', ...componentPath], newComponent);
   },
 
 
   modalClose() {
-    this.state = this.state.set('modal', Immutable.Map());
+    this.modal = null;
+    this.emit('change');
   },
 
   modalOpen(payload) {
-    this.state = this.state.set('modal', Immutable.fromJS(payload));
+    this.modal = payload;
+    this.emit('change');
+  },
+
+  modalSetProps({updater}) {
+    if (_isFunction(updater)) {
+      this.modal = React.cloneElement(this.modal, updater(this.modal.props));
+    } else {
+      this.modal = React.cloneElement(this.modal, updater);
+    }
+    this.emit('change');
   },
 
   notify(payload) {
@@ -95,7 +107,6 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
     } else {
-      component = Immutable.fromJS(component);
       let id = uid(10);
       this.state = this.state.setIn(['components', id], component);
       this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(id));
@@ -144,7 +155,6 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.updateIn(['tabs', 'components'],
         (list) => list.filter((tabId) => tabId !== compId).push(compId));
     else {
-      component = Immutable.fromJS(component);
       compId = uid(10);
       this.state = this.state.setIn(['components', compId], component);
       this.state = this.state.updateIn(['tabs', 'components'], (list) => list.push(compId));
@@ -166,6 +176,10 @@ let SessionStore = Fluxxor.createStore({
 
   getState() {
     return this.state;
+  },
+
+  getModal() {
+    return this.modal;
   },
 
   getLastNotification() {

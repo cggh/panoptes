@@ -1,4 +1,5 @@
 import React from 'react';
+import Immutable from 'immutable';
 import getDisplayName from 'react-display-name';
 import _map from 'lodash/map';
 import _isString from 'lodash/isString';
@@ -26,8 +27,8 @@ export default function serialiseComponent(component) {
     }
   });
   children = React.Children.map(children, serialiseComponent);
-  return {
+  return Immutable.fromJS({
     type: displayName,
     props: {children, ...otherFiltered}
-  };
+  });
 }

@@ -1,5 +1,6 @@
 import React from  'react';
 import NotificationSystem from 'react-notification-system';
+import deserialiseComponent from 'util/deserialiseComponent';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -13,6 +14,7 @@ import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
+import Finder from 'containers/Finder';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -29,10 +31,6 @@ import DetectResize from 'utils/DetectResize';
 import 'font-awesome.css';
 import 'ui-components.scss';
 import 'main.scss';
-import deserialiseComponent from 'util/deserialiseComponent';
-
-let dynreq = require.context('.', true);
-const dynamicRequire = (path) => dynreq('./' + path);
 
 const muiTheme = getMuiTheme({
   palette: {
@@ -61,6 +59,7 @@ let Panoptes = React.createClass({
   getStateFromFlux() {
     return {
       session: this.getFlux().store('SessionStore').getState(),
+      modal: this.getFlux().store('SessionStore').getModal(),
       panoptes: this.getFlux().store('PanoptesStore').getState()
     };
   },
@@ -71,8 +70,8 @@ let Panoptes = React.createClass({
 
   render() {
     let actions = this.getFlux().actions.session;
-    let {tabs, popups, modal, components} = this.state.session.toObject();
-    modal = modal.toObject();
+    let {tabs, popups, components} = this.state.session.toObject();
+    let modal = this.state.modal;
     let userID = this.state.panoptes.getIn(['user', 'id']);
     let config = this.config;
     return (
@@ -139,9 +138,11 @@ let Panoptes = React.createClass({
                 );
               }).toArray()}
             </Popups>
-            <Modal visible={modal.component ? true : false}
+            <Modal visible={modal ? true : false}
                    onClose={actions.modalClose}>
-              {modal.component ? React.createElement(dynamicRequire(modal.component), modal.props.toObject()) : null}
+                    {modal ?
+                      React.cloneElement(modal, {setProps: actions.modalSetProps})
+                      : null}
             </Modal>
             <NotificationSystem ref="notificationSystem"/>
           </div>
@@ -174,7 +175,7 @@ let Header = React.createClass({
         <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
-                    onClick={() => actions.session.modalOpen('containers/Finder', {})}
+                    onClick={() => actions.session.modalOpen(<Finder />, {})}
         />
         <IconButton tooltip="Link" iconClassName="fa fa-link"/>
       </div>

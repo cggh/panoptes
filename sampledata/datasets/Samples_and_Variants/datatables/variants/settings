@@ -68,6 +68,7 @@ properties:
   browserShowOnTop: Yes         # Indicates that the channel will be shown in the top (non-scrolling) area of the genome browser. In this case, it will always be visible
 
 - id: Value1, Value2, Value_three  # Common settings for groups of properties can be defined simultaneously
+  isCategorical: false
   groupId: Info
   index: true                   # Instructs Panoptes to create a database index for this property. For large datasets, this massively speeds up queries based on this field
   showInBrowser: true           # If true, this property will be displayed in the genome browser
@@ -113,6 +114,7 @@ properties:
   browserDefaultVisible: true
 
 - id: NRAF_WAF, NRAF_EAF, NRAF_SAF
+  isCategorical: false
   dataType: Float
   groupId: AlleleFreq
   minVal: 0
@@ -120,7 +122,6 @@ properties:
 
 - id: NRAF_WAF
   description: Non-reference allele frequency in West Africa
-  isCategorical: false
 
 - id: NRAF_EAF
   description: Non-reference allele frequency in East Africa
