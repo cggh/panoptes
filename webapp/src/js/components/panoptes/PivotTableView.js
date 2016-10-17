@@ -36,6 +36,11 @@ const HEADER_HEIGHT = 50;
 // const SCROLLBAR_HEIGHT = 15;
 const COLUMN_WIDTH = 120;
 
+// TODO: global agreement on null (Formatter.js ?)
+function isNull(value) {
+  return value === undefined || value === null || value === 'NULL' || value === '' ? true : false;
+}
+
 let PivotTableView = React.createClass({
   mixins: [
     PureRenderMixin,
@@ -181,9 +186,9 @@ let PivotTableView = React.createClass({
           let [dir, heading] = columnSortOrder[0];
 
           if (dir === 'asc') {
-            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || dataByColumnRow[heading][a] === undefined ? -1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || dataByColumnRow[heading][b] === undefined ? 1 : 0);
+            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][a]) ? -1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][b]) ? 1 : 0);
           } else if (dir === 'desc') {
-            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || dataByColumnRow[heading][a] === undefined ? 1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || dataByColumnRow[heading][b] === undefined ? -1 : 0);
+            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][a]) ? 1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][b]) ? -1 : 0);
           }
 
         }
@@ -192,9 +197,9 @@ let PivotTableView = React.createClass({
           let [dir, heading] = rowSortOrder[0];
 
           if (dir === 'asc') {
-            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || dataByColumnRow[a][heading] === undefined ? -1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || dataByColumnRow[b][heading] === undefined ? 1 : 0);
+            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || isNull(dataByColumnRow[a][heading]) ? -1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || isNull(dataByColumnRow[b][heading]) ? 1 : 0);
           } else if (dir === 'desc') {
-            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || dataByColumnRow[a][heading] === undefined ? 1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || dataByColumnRow[b][heading] === undefined ? -1 : 0);
+            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || isNull(dataByColumnRow[a][heading]) ? 1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || isNull(dataByColumnRow[b][heading]) ? -1 : 0);
           }
 
         }
