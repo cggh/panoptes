@@ -114,7 +114,7 @@ let GenomeBrowserWithActions = React.createClass({
         };
       }
     });
-    return Immutable.fromJS(groups);
+    return groups;
   },
 
 
@@ -144,9 +144,9 @@ let GenomeBrowserWithActions = React.createClass({
                        description="A browser for exploring the reference genome and per-sample data including coverage and mapping qualities."/>
         <FlatButton label="Add Channels"
                     primary={true}
-                    onClick={() => actions.session.modalOpen(<ItemPicker 
+                    onClick={() => actions.session.modalOpen(<ItemPicker
                       title="Pick channels to be added"
-                      itemName={channel}
+                      itemName="channel"
                       itemVerb="add"
                       groups={this.channelGroups()}
                       onPick={this.handleChannelAdd}

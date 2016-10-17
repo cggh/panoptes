@@ -36,7 +36,7 @@ let NumericalTrackGroupChannel = React.createClass({
     width: React.PropTypes.number,
     sideWidth: React.PropTypes.number,
     children: React.PropTypes.node,
-    setProps: React.PropTypes.func.isRequired
+    setProps: React.PropTypes.func
   },
 
   getInitialState() {
@@ -81,6 +81,7 @@ let NumericalTrackGroupControls = React.createClass({
         'autoYScale',
         'yMin',
         'yMax',
+        'children'
       ],
       redirect: ['setProps']
     })
@@ -104,33 +105,33 @@ let NumericalTrackGroupControls = React.createClass({
         groups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon,
-          items: []
+          items: {}
         };
         _forEach(table.properties, (prop) => {
           if (prop.showInBrowser && prop.isNumerical) {
-            groups[table.id].items.push({
+            groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
               icon: 'line-chart',
               payload: serialiseComponent(
                 <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id} />
               )
-            });
+            };
           }
         });
       }
     });
-    return Immutable.fromJS(groups);
+    return groups;
   },
 
 
   handleTrackChange(tracks) {
     this.getFlux().actions.session.modalClose();
-    this.redirectedProps.setProps((props) => props.set('children', tracks));
+    this.redirectedProps.setProps((props) => props.set('children', Immutable.List(tracks)));
   },
 
   render() {
-    let {autoYScale, yMin, yMax} = this.props;
+    let {autoYScale, yMin, yMax, children} = this.props;
 
     let actions = this.getFlux().actions;
 
@@ -144,7 +145,10 @@ let NumericalTrackGroupControls = React.createClass({
                         itemName="Numerical track"
                         itemVerb="display"
                         groups={this.trackGroups()}
-                        initialSelection={[]}
+                        initialSelection={React.Children.map(children, (child) => ({
+                          groupId: child.props.table,
+                          itemId: child.props.track,
+                        }))}
                         onPick={this.handleTrackChange}
                       />)}
           />
