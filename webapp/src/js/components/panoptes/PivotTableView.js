@@ -41,13 +41,21 @@ let PivotTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columnProperty', 'rowProperty', 'order')
+    DataFetcherMixin(
+      'table',
+      'query',
+      'columnProperty',
+      'rowProperty',
+      'columnSortOrder',
+      'rowSortOrder'
+    )
   ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
-    order: React.PropTypes.array,
+    columnSortOrder: React.PropTypes.array,
+    rowSortOrder: React.PropTypes.array,
     onOrderChange: React.PropTypes.func,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
@@ -60,7 +68,8 @@ let PivotTableView = React.createClass({
   getDefaultProps() {
     return {
       query: undefined,
-      order: []
+      columnSortOrder: [],
+      rowSortOrder: []
     };
   },
 
@@ -82,7 +91,14 @@ let PivotTableView = React.createClass({
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {table, columnProperty, rowProperty, query, order} = props;
+    let {
+      table,
+      columnProperty,
+      rowProperty,
+      query,
+      columnSortOrder,
+      rowSortOrder
+    } = props;
 
     let columns = [
       {expr: ['count', ['*']], as: 'count'}
@@ -98,7 +114,14 @@ let PivotTableView = React.createClass({
     }
     columns = _uniq(columns);
     groupBy = _uniq(groupBy);
-    this.setState({loadStatus: 'loading', dataByColumnRow: null, uniqueColumns: [], uniqueRows: []});
+    this.setState(
+      {
+        loadStatus: 'loading',
+        dataByColumnRow: null,
+        uniqueColumns: [],
+        uniqueRows: []
+      }
+    );
 
     let queryAPIargs = {
       database: this.config.dataset,
@@ -110,6 +133,7 @@ let PivotTableView = React.createClass({
       stop: 1000,
       transpose: false
     };
+
     requestContext.request((componentCancellation) =>
       LRUCache.get(
         'query' + JSON.stringify(queryAPIargs),
@@ -119,15 +143,27 @@ let PivotTableView = React.createClass({
       )
     )
       .then((data) => {
+
         let columnData = data[columnProperty];
         let rowData = data[rowProperty];
         let countData = data['count'];
-        let uniqueColumns = ['_all_'].concat(columnData ? _uniq(columnData) : []);
-        let uniqueRows = ['_all_'].concat(rowData ? _uniq(rowData) : []);
+
+        let uniqueColumns = columnData ? _uniq(columnData) : [];
+        let uniqueRows = rowData ? _uniq(rowData) : [];
+
+        uniqueColumns.unshift('_all_');
+        uniqueRows.unshift('_all_');
+
         let dataByColumnRow = {};
-        uniqueColumns.forEach((columnValue) => dataByColumnRow[columnValue] = {'_all_': 0});
+
+        uniqueColumns.forEach(
+          (columnValue) => dataByColumnRow[columnValue] = {'_all_': 0}
+        );
         dataByColumnRow['_all_'] = {};
-        uniqueRows.forEach((rowValue) => dataByColumnRow['_all_'][rowValue] = 0);
+        uniqueRows.forEach(
+          (rowValue) => dataByColumnRow['_all_'][rowValue] = 0
+        );
+
         for (let i = 0; i < countData.length; ++i) {
           dataByColumnRow['_all_']['_all_'] += countData[i];
           if (columnProperty) {
@@ -140,6 +176,30 @@ let PivotTableView = React.createClass({
             dataByColumnRow[columnData[i]][rowData[i]] = countData[i];
           }
         }
+
+        if (columnSortOrder && columnSortOrder.length) {
+          let [dir, heading] = columnSortOrder[0];
+
+          if (dir === 'asc') {
+            uniqueRows.sort((a, b) => dataByColumnRow[heading][a] > dataByColumnRow[heading][b] ? 1 : -1);
+          } else if (dir === 'desc') {
+            uniqueRows.sort((a, b) => dataByColumnRow[heading][a] < dataByColumnRow[heading][b] ? 1 : -1);
+          }
+
+        }
+
+        if (rowSortOrder && rowSortOrder.length) {
+          let [dir, heading] = rowSortOrder[0];
+
+          if (dir === 'asc') {
+            uniqueColumns.sort((a, b) => dataByColumnRow[a][heading] > dataByColumnRow[b][heading] ? 1 : -1);
+          } else if (dir === 'desc') {
+            uniqueColumns.sort((a, b) => dataByColumnRow[a][heading] < dataByColumnRow[b][heading] ? 1 : -1);
+          }
+
+        }
+
+
         this.setState({
           loadStatus: 'loaded',
           uniqueRows,
@@ -150,7 +210,9 @@ let PivotTableView = React.createClass({
       .catch(API.filterAborted)
       .catch(LRUCache.filterCancelled)
       .catch((xhr) => {
-        ErrorReport(this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props));
+        ErrorReport(
+          this.getFlux(), API.errorMessage(xhr), () => this.fetchData(this.props)
+        );
         this.setState({loadStatus: 'error'});
       })
       .done();
@@ -160,28 +222,45 @@ let PivotTableView = React.createClass({
     this.setState(size);
   },
 
-  handleOrderChange(column) {
-    let currentOrder = this.props.order;
-    // Choose the sort direction based on whether this column is already in the order array.
+  handleOrderChange(axis, heading) {
+
+    let currentOrder = undefined;
+
+    if (axis === 'column') {
+      currentOrder = this.props.columnSortOrder;
+    } else if (axis === 'row') {
+      currentOrder = this.props.rowSortOrder;
+    } else {
+      console.error('Unhandled order axis: ' + axis);
+      return;
+    }
+
+    // Choose the sort direction
+    // based on whether this value is already in the array.
     let newDirection = 'asc';
-    _forEach(currentOrder, ([direction, orderCol]) => {
-      if (orderCol === column) {
-        newDirection = {asc: 'desc', desc: null}[direction];
+    _forEach(currentOrder, ([dir, val]) => {
+      if (val === heading) {
+        newDirection = {asc: 'desc', desc: null}[dir];
       }
     });
-    //Remove this column from the sort order
-    currentOrder = _filter(currentOrder, ([direction, orderCol]) => orderCol !== column);
+    //Remove this value from the array
+    currentOrder = _filter(currentOrder, ([dir, val]) => val !== heading);
     //Then add it to the end (if needed)
     if (newDirection) {
-      currentOrder.push([newDirection, column]);
+      // FIXME: disabled multi-heading sort
+      //currentOrder.push([newDirection, heading]);
+      currentOrder = [[newDirection, heading]];
     }
+
     if (this.props.onOrderChange) {
-      this.props.onOrderChange(currentOrder);
+      this.props.onOrderChange(axis, currentOrder);
     }
+
   },
 
+
   render() {
-    let {className, columnProperty, rowProperty, order} = this.props;
+    let {className, columnProperty, rowProperty, columnSortOrder, rowSortOrder} = this.props;
     let {loadStatus, uniqueRows, uniqueColumns, dataByColumnRow, width, height} = this.state;
     if (!this.tableConfig()) {
       console.error(`Table ${this.props.table} doesn't exist'`);
@@ -209,49 +288,59 @@ let PivotTableView = React.createClass({
               minWidth={50}
               header=""
               cell={({rowIndex}) => {
-                const value = uniqueRows[rowIndex];
+                const rowHeading = uniqueRows[rowIndex];
                 const rowPropConfig = this.tableConfig().propertiesById[rowProperty] || {};
                 const valueColours = rowPropConfig.valueColours;
                 let background = 'inherit';
-                if (valueColours && value !== '_all_') {
-                  let col = valueColours[value] || valueColours['_other_'];
+                if (valueColours && rowHeading !== '_all_') {
+                  let col = valueColours[rowHeading] || valueColours['_other_'];
                   if (col) {
                     background = Color(col).lighten(0.3).rgbString();
                   }
                 }
+
+                let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
+                let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
+                let icon = (asc || desc) ? <Icon className="fa-rotate-270 sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+
                 return <div className="table-row-cell"
                      style={{
-                       textAlign: value == '_all_' ? 'center' : rowPropConfig.alignment,
+                       textAlign: rowHeading == '_all_' ? 'center' : rowPropConfig.alignment,
                        width: COLUMN_WIDTH,
                        height: ROW_HEIGHT + 'px',
-                       background: background
-                     }}>
+                       background: background,
+                       fontWeight: 'bold',
+                       cursor: 'pointer'
+                     }}
+                     onClick={() => this.handleOrderChange('row', rowHeading)}
+                     >
+                  {icon}
                   {
                     uniqueRows[rowIndex] == '_all_' ? 'All' :
-                      <PropertyCell prop={rowPropConfig} value={value}/>
+                      <PropertyCell prop={rowPropConfig} value={rowHeading}/>
                   }
                 </div>;
               }}
             />
-            {uniqueColumns.map((columnValue) => {
+            {uniqueColumns.map((columnHeading) => {
               const colPropConfig = this.tableConfig().propertiesById[columnProperty] || {};
               const valueColours = colPropConfig.valueColours;
               let background = 'inherit';
-              if (valueColours && columnValue !== '_all_') {
-                let col = valueColours[columnValue] || valueColours['_other_'];
+              if (valueColours && columnHeading !== '_all_') {
+                let col = valueColours[columnHeading] || valueColours['_other_'];
                 if (col) {
                   background = Color(col).lighten(0.3).rgbString();
                 }
               }
 
-              let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === columnValue);
-              let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === columnValue);
+              let asc = _some(columnSortOrder, ([dir, val]) => dir === 'asc' && val === columnHeading);
+              let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
               let icon = (asc || desc) ? <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
 
               return <Column
               //TODO Better default column widths
               width={COLUMN_WIDTH}
-              key={columnValue}
+              key={columnHeading}
               allowCellsRecycling={true}
               isResizable={false}
               minWidth={50}
@@ -264,16 +353,16 @@ let PivotTableView = React.createClass({
                     'sort-column-ascending': asc,
                     'sort-column-descending': desc
                   })}
-                onClick={() => this.handleOrderChange(columnValue)}
+                onClick={() => this.handleOrderChange('column', columnHeading)}
                 style={{
-                  textAlign: columnValue == '_all_' ? 'center' : colPropConfig.alignment,
+                  textAlign: columnHeading == '_all_' ? 'center' : colPropConfig.alignment,
                   width: COLUMN_WIDTH,
                   height: HEADER_HEIGHT + 'px',
                   background: background
                 }}
                 >
                   {icon}
-                  { columnValue == '_all_' ? 'All' : <PropertyCell prop={colPropConfig} value={columnValue}/> }
+                  { columnHeading == '_all_' ? 'All' : <PropertyCell prop={colPropConfig} value={columnHeading}/> }
                 </div>
                 }
               cell={({rowIndex}) =>
@@ -284,7 +373,7 @@ let PivotTableView = React.createClass({
                            height: ROW_HEIGHT + 'px',
                            //background: background
                          }}>
-                      {(dataByColumnRow[columnValue][uniqueRows[rowIndex]] || '').toLocaleString()}
+                      {(dataByColumnRow[columnHeading][uniqueRows[rowIndex]] || '').toLocaleString()}
                     </div>
                   }
               />;

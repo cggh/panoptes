@@ -35,7 +35,8 @@ let PivotTableWithActions = React.createClass({
     sidebar: React.PropTypes.bool,
     table: React.PropTypes.string,
     query: React.PropTypes.string,
-    order: React.PropTypes.array,
+    columnSortOrder: React.PropTypes.array,
+    rowSortOrder: React.PropTypes.array,
     columnProperty: React.PropTypes.string,
     rowProperty: React.PropTypes.string,
   },
@@ -46,7 +47,8 @@ let PivotTableWithActions = React.createClass({
   getDefaultProps() {
     return {
       query: undefined,
-      order: [],
+      columnSortOrder: [],
+      rowSortOrder: [],
       setProps: null,
       sidebar: true
     };
@@ -66,10 +68,15 @@ let PivotTableWithActions = React.createClass({
     return this.props.title || `Pivot ${this.tableConfig().namePlural}`;
   },
 
-  handleOrderChange(order) {
+  handleOrderChange(axis, order) {
     //Dont use merge syntax!
-    this.props.setProps((props) => props.set('order', order));
+    if (axis === 'column') {
+      this.props.setProps((props) => props.set('columnSortOrder', order));
+    } else if (axis === 'row') {
+      this.props.setProps((props) => props.set('rowSortOrder', order));
+    }
   },
+
 
   orderDescriptionString(order) {
     if (order.length === 0) {
@@ -81,7 +88,7 @@ let PivotTableWithActions = React.createClass({
   },
 
   render() {
-    const {sidebar, table, columnProperty, rowProperty, setProps, order} = this.props;
+    const {sidebar, table, columnProperty, rowProperty, setProps, columnSortOrder, rowSortOrder} = this.props;
 
     let sidebarContent = (
       <div className="sidebar pivot-sidebar">
@@ -117,10 +124,11 @@ let PivotTableWithActions = React.createClass({
                   title={sidebar ? 'Expand' : 'Sidebar'}
                   onClick={() => setProps({sidebar: !sidebar})}/>
             <span className="text"><QueryString prepend="Filter:" table={table} query={this.getDefinedQuery()}/></span>
-            <span className="block text">Sort: {this.orderDescriptionString(order)}</span>
+            <span className="block text">Column sort: {this.orderDescriptionString(columnSortOrder)}</span>
+            <span className="block text">Row sort: {this.orderDescriptionString(rowSortOrder)}</span>
           </div>
           <div className="grow">
-            <PivotTableView {...this.props} order={order} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
+            <PivotTableView {...this.props} columnSortOrder={columnSortOrder} rowSortOrder={rowSortOrder} onOrderChange={this.handleOrderChange} query={this.getDefinedQuery()}/>
           </div>
         </div>
       </Sidebar>
