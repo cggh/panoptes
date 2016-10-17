@@ -1,7 +1,6 @@
 import qajax from 'qajax';
 import arrayBufferDecode from 'panoptes/arrayBufferDecode';
 import _keys from 'lodash/keys';
-import LZString from 'lz-string';
 import _forEach from 'lodash/forEach';
 import _isNumber from 'lodash/isNumber';
 import _map from 'lodash/map';
@@ -303,10 +302,10 @@ function fetchGene(options) {
     transpose: true //We want rows, not columns
   }).then((data) => {
     if (data.length === 0) {
-      throw Error(`Tried to get non-existent record ${primKeyValue}`);
+      throw Error(`Tried to get non-existent record ${geneId}`);
     }
     return data[0];
-  })
+  });
 }
 
 function fetchImportStatusData(options) {
