@@ -52,11 +52,10 @@ let TablePlot = React.createClass({
     };
   },
 
-  getDefinedQuery(definedQuery) {
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   fetchData(props, requestContext) {
@@ -71,7 +70,7 @@ let TablePlot = React.createClass({
         database: this.config.dataset,
         table: tableConfig.id,
         columns: columns,
-        query: this.getDefinedQuery(query),
+        query: this.getDefinedQuery(query, table),
         transpose: false,
         randomSample: 20000
       };

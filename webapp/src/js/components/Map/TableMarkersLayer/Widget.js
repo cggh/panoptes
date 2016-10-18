@@ -67,12 +67,10 @@ let TableMarkersLayer = React.createClass({
     this.getFlux().actions.panoptes.dataItemPopup({table: marker.table, primKey: marker.primKey, switchTo: !middleClick});
   },
 
-  getDefinedQuery(definedQuery) {
-    if (definedQuery === undefined) {
-      let tableConfig = this.config.tablesById[this.props.table];
-      definedQuery = tableConfig.defaultQuery !== undefined ? tableConfig.defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   fetchData(props, requestContext) {
@@ -131,7 +129,7 @@ let TableMarkersLayer = React.createClass({
         let locationAPIargs = {
           columns: locationColumns,
           database: this.config.dataset,
-          query: this.getDefinedQuery(query),
+          query: this.getDefinedQuery(query, table),
           table: tableConfig.id,
           transpose: true
         };

@@ -65,16 +65,15 @@ let PivotTableView = React.createClass({
     };
   },
 
-  getDefinedQuery(definedQuery) {
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   //Called by DataFetcherMixin
   fetchData(props, requestContext) {
-    let {columnProperty, rowProperty, query} = props;
+    let {table, columnProperty, rowProperty, query} = props;
 
     let columns = [
       {expr: ['count', ['*']], as: 'count'}
@@ -94,9 +93,9 @@ let PivotTableView = React.createClass({
 
     let queryAPIargs = {
       database: this.config.dataset,
-      table: this.tableConfig().id,
+      table: this.config.tablesById[table].id,
       columns: columns,
-      query: this.getDefinedQuery(query),
+      query: this.getDefinedQuery(query, table),
       groupBy,
       start: 0,
       stop: 1000,

@@ -55,12 +55,10 @@ let TableMap = React.createClass({
     return this.props.title || 'Table Map';
   },
 
-  getDefinedQuery() {
-    let definedQuery = this.props.query;
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   render() {
