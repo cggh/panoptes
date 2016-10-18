@@ -39,30 +39,36 @@ externalUrl
   For example: ``http://www.ebi.ac.uk/ena/data/view/{value}``.
 
 isCategorical
-  *Boolean.* Instructs Panoptes to treat the property as a categorical variable.
+  *Boolean.* Set automatically for columns with <50 distinct entries, unless set here. Instructs Panoptes to treat the property as a categorical variable.
   For example, a combo box with the possible states is automatically shown in queries for this property.
-  Categorical properties are automatically indexed.
+.
 
-categoryColors
-  *Block.* Specifies display colours for the categorical states of this property.
+valueColours
+  *Block.* Specifies display colours for specific values of this property.
   Each key in the block links a possible value of the property to a color (example: ``Accepted: rgb(0,192,0)``).
   The special value ``_other_`` can be used to specify a color for all other property values that are not listed explicitly.
 
+valueDescriptions
+  *Block.* Specifies descriptions for specific values of this property which will displayed next to it under an info icon..
+
+valueDisplays
+  *Block.* Specifies display html for specific values of this property. The html will replace this value when it is displayed.
+
 defaultWidth
-  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
+  *Value.* Sets the deafult column width in pixels.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
 
 showBar
   *Boolean.* Draws a bar in the background of the table, indicating the value.
-  Requires *minVal* & *maxVal* to be defined.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
+  Requires *minVal* & *maxVal* to be defined.(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
 
 minVal
-  *Value.* For *Value* types, upper extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
+  *Value.* Set automatically from data unless overridden. For *Value* types, upper extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
 
 maxVal
-  *Value.* For *Value* types, lower extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
+  *Value.* Set automatically from data unless overridden. For *Value* types, lower extent of scale(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
 
 decimDigits
-  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32']).
+  *Value.* For *Value* types, specifies the number of decimal digits used to display the value(only applies if *dataType* is ['Float', 'Double', 'Int8', 'Int16', 'Int32', 'Date']).
 
 index
   *Boolean.*  Default:False.  If set, instructs Panoptes to create an index for this property in the relational database.

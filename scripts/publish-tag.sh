@@ -23,11 +23,11 @@ bash scripts/generateDocs.sh
 git rm -fr webapp/dist || true
 cd webapp
 npm run build
-cd ..
-git add -u
-git add webapp/dist/* || true
-echo $1
-git commit -m "Pre-release tasks" || true #Might fail due to no changes
-git push origin master
-echo git tag -a $1 -m "$1"
-git push --tags
+#cd ..
+#git add -u
+#git add webapp/dist/* || true
+#echo $1
+#git commit -m "Pre-release tasks" || true #Might fail due to no changes
+#git push origin master
+#echo git tag -a $1 -m "$1"
+#git push --tags

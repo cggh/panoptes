@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Panoptes</title>
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,700italic' rel='stylesheet' type='text/css'>
   <style>
     body {
       margin: 0;
@@ -71,11 +70,14 @@
       -webkit-box-align: center;
           -ms-flex-align: center;
               align-items: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      flex-direction: column;
       height: 100%;
       width: 100%;
       background-color: rgb(255, 255, 255);
     }
-    .non-js-spinner div {
+    .non-js-spinner .logo {
       height: 50%;
       width: 50%;
       opacity: 0.5;
@@ -86,6 +88,15 @@
       background-position: center;
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTA2MCAxMTEwIj4KPGNpcmNsZSBjeD0iNTMwIiBjeT0iNTU1IiByPSIzODUiIGZpbGw9IiM3ODc4NzgiLz4KPGNpcmNsZSBjeD0iNTMwIiBjeT0iNTU1IiByPSIzMjUiIGZpbGw9IndoaXRlIi8+CjxjaXJjbGUgY3g9Ijc0MCIgY3k9IjgyNSIgcj0iMTE1IiBmaWxsPSIjNzg3ODc4Ii8+CjxjaXJjbGUgY3g9IjY3NSIgY3k9IjE5MSIgcj0iMTkwIiBmaWxsPSIjNzg3ODc4Ii8+CjxjaXJjbGUgY3g9IjY3NSIgY3k9IjE5MSIgcj0iMTUwIiBmaWxsPSJsaWdodGdyZXkiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iNTU1IiByPSIxNzIiIGZpbGw9IiM3ODc4NzgiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iNTU1IiByPSIxNDUiIGZpbGw9IiNGRkZGRkYiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iNTU1IiByPSIxMTUiIGZpbGw9ImxpZ2h0Z3JleSIvPgo8Y2lyY2xlIGN4PSI3NDAiIGN5PSI4MjUiIHI9IjkwIiBmaWxsPSJsaWdodGdyZXkiLz4KPGNpcmNsZSBjeD0iNTMwIiBjeT0iNTU1IiByPSIyOTAiIGZpbGw9IiM3ODc4NzgiLz4KPGNpcmNsZSBjeD0iNTMwIiBjeT0iNTU1IiByPSI4MCIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iNTU1IiByPSI2MCIgZmlsbD0iIzc4Nzg3OCIvPgo8Y2lyY2xlIGN4PSI2NzUiIGN5PSIxOTEiIHI9Ijc3IiBmaWxsPSIjNzg3ODc4Ii8+CjxjaXJjbGUgY3g9Ijc0MCIgY3k9IjgyNSIgcj0iNDUiIGZpbGw9IiM3ODc4NzgiLz4KPC9zdmc+Cg==");
     }
+    .error-text {
+      font-style: italic;
+      padding-top: 15px;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: rgb(36, 36, 36);
+      font-size: 14px;
+    }
   </style>
 </head>
 <body id="body">
@@ -95,10 +106,11 @@
   document.getElementById('body').removeChild(document.getElementById('JSwarning'))
 </script>
 <div id="main" class="main">
-  <div
-    class="non-js-spinner">
-    <div />
+  <div class="non-js-spinner">
+    <div class="logo"></div>
+    <div class="error-text">Loading panoptes...</div>
   </div>
 </div>
-<script type="text/javascript" src="/panoptes/panoptes.js?c54134b86a209a06aaaf"></script><script type="text/javascript" src="/panoptes/babel.js?c54134b86a209a06aaaf"></script></body>
+<script type="text/javascript" src="/panoptes/panoptes.js?bb01d248c062758e8a59"></script><script type="text/javascript" src="/panoptes/babel.js?bb01d248c062758e8a59"></script></body>
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,700,700italic' rel='stylesheet' type='text/css'>
 </html>
