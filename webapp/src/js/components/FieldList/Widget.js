@@ -6,6 +6,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
+import _map from 'lodash/map';
 
 // Utils
 import LRUCache from 'util/LRUCache';
@@ -48,7 +49,9 @@ let FieldList = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      tableConfig: this.tableConfig(),
+      table,
+      columns: _map(this.config.tablesById[table].properties, 'id'),
+      primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 

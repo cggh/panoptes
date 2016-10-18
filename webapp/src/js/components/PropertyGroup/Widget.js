@@ -13,6 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 
 // Utils
 import LRUCache from 'util/LRUCache';
+import _map from 'lodash/map';
 
 // UI components
 import Loading from 'ui/Loading';
@@ -47,7 +48,9 @@ let PropertyGroup = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      tableConfig: this.tableConfig(),
+      table,
+      columns: _map(this.config.tablesById[table].properties, 'id'),
+      primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 

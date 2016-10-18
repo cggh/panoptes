@@ -214,14 +214,14 @@ function fetchData(id) {
 }
 
 function fetchSingleRecord(options) {
-  assertRequired(options, ['database', 'tableConfig', 'primKeyValue']);
-  let {database, tableConfig, primKeyValue,cancellation} = options;
-  let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(tableConfig.primKey, '=', primKeyValue));
+  assertRequired(options, ['database', 'table', 'columns', 'primKey', 'primKeyValue']);
+  let {database, table, columns, primKey, primKeyValue, cancellation} = options;
+  let recordQuery = SQL.WhereClause.encode(SQL.WhereClause.CompareFixed(primKey, '=', primKeyValue));
   return query({
     cancellation,
     database: database,
-    table: tableConfig.id,
-    columns: _map(tableConfig.properties, 'id'),
+    table,
+    columns,
     query: recordQuery,
     transpose: true //We want rows, not columns
   }).then((data) => {

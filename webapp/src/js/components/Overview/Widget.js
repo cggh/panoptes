@@ -1,5 +1,6 @@
 import React from 'react';
 import _cloneDeep from 'lodash/cloneDeep';
+import _map from 'lodash/map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -47,7 +48,9 @@ let Overview = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      tableConfig: this.tableConfig(),
+      table,
+      columns: _map(this.config.tablesById[table].properties, 'id'),
+      primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 

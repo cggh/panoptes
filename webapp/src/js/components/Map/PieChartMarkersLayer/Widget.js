@@ -192,7 +192,9 @@ let PieChartMarkersLayer = React.createClass({
 
     let chartAPIargs = {
       database: this.config.dataset,
-      tableConfig: this.config.tablesById[chartDataTable],
+      table: chartDataTable,
+      columns: _map(this.config.tablesById[chartDataTable].properties, 'id'),
+      primKey: this.config.tablesById[chartDataTable].primKey,
       primKeyValue: primKey
     };
 

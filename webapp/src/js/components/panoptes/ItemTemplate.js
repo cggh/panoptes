@@ -11,6 +11,7 @@ import DataFetcherMixin from 'mixins/DataFetcherMixin';
 import LRUCache from 'util/LRUCache';
 import SQL from 'panoptes/SQL';
 import templateFieldsUsed from 'util/templateFieldsUsed';
+import _map from 'lodash/map';
 
 // Panoptes components
 import API from 'panoptes/API';
@@ -67,17 +68,15 @@ let ItemTemplate = React.createClass({
     let columnSpecsByTable = {};
     for (let i = 0, len = usedChildTables.length; i < len; i++) {
       let usedChildTable = usedChildTables[i];
-      columnSpecsByTable[usedChildTable] = {};
+      columnSpecsByTable[usedChildTable] = [];
       for (let property in this.config.tablesById[usedChildTable].propertiesById) {
         // Don't include the StoredSelection property; otherwise the API call breaks. (TODO: why?)
         if (property === 'StoredSelection') continue;
         columnSpecsByTable[usedChildTable].push(property);
       }
     }
-
     requestContext.request(
       (componentCancellation) => {
-
         // Add API calls for the used child tables onto an array of promises.
         let promises = usedChildTables.map((usedChildTableName) => {
           let usedChildTableAPIargs = {
@@ -99,14 +98,16 @@ let ItemTemplate = React.createClass({
         // Push the API call for the data item record onto the array of promises.
         let APIargs = {
           database: this.config.dataset,
-          tableConfig: this.tableConfig(),
+          table,
+          columns: _map(this.config.tablesById[table].properties, 'id'),
+          primKey: this.config.tablesById[table].primKey,
           primKeyValue: primKey
         };
         promises.push(
           LRUCache.get(
-            'fetchSingleRecord' + JSON.stringify(mainTableAPIargs),
+            'fetchSingleRecord' + JSON.stringify(APIargs),
             (cacheCancellation) =>
-              API.fetchSingleRecord({cancellation: cacheCancellation, ...mainTableAPIargs}),
+              API.fetchSingleRecord({cancellation: cacheCancellation, ...APIargs}),
             componentCancellation
           )
         );

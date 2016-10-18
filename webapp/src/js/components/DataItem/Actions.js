@@ -13,6 +13,7 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import GenomeBrowserWithActions from 'containers/GenomeBrowserWithActions';
 import TreeWithActions from 'containers/TreeWithActions';
 import PerRowIndicatorChannel from 'panoptes/genome/tracks/PerRowIndicatorChannel';
+import _map from 'lodash/map';
 
 let DataItemActions = React.createClass({
   mixins: [
@@ -39,7 +40,9 @@ let DataItemActions = React.createClass({
 
     let APIargs = {
       database: this.config.dataset,
-      tableConfig: this.tableConfig(),
+      table,
+      columns: _map(this.config.tablesById[table].properties, 'id'),
+      primKey: this.config.tablesById[table].primKey,
       primKeyValue: primKey
     };
 
