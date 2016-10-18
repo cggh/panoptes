@@ -45,12 +45,12 @@ function downloadTableData(payload) {
   let downloadURL = API.serverURL;
   downloadURL += '?datatype=downloadtable';
   downloadURL += '&database=' + dataset;
-  downloadURL += '&qry=' + API.encodeQuery(query);
-  downloadURL += '&tbname=' + table;
-  downloadURL += '&collist=' + LZString.compressToEncodedURIComponent(columnList);
+  downloadURL += '&query=' + API.encodeQuery(query);
+  downloadURL += '&table=' + table;
+  downloadURL += '&columns=' + LZString.compressToEncodedURIComponent(columnList);
 
   if (order instanceof Array && order.length > 0) {
-    downloadURL += '&order=' + Base64.encode(JSON.stringify(order));
+    downloadURL += '&orderBy=' + JSON.stringify(order);
   }
 
   window.location.href = downloadURL;
