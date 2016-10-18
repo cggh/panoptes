@@ -168,8 +168,8 @@ let PivotTableView = React.createClass({
         let uniqueRows = rowData ? _uniq(rowData) : [];
 
         // Make null headings consistently 'NULL'
-        uniqueColumns = _map(uniqueColumns, (heading) => isNull(heading) ? 'NULL' : heading);
-        uniqueRows = _map(uniqueRows, (heading) => isNull(heading) ? 'NULL' : heading);
+        uniqueColumns = _map(uniqueColumns, (heading) => isNull(heading) ? '__NULL__' : heading);
+        uniqueRows = _map(uniqueRows, (heading) => isNull(heading) ? '__NULL__' : heading);
 
         // Add the '_all_' headings
         uniqueColumns.unshift('_all_');
@@ -192,11 +192,11 @@ let PivotTableView = React.createClass({
           let nulledRowDatum = undefined;
 
           if (columnProperty) {
-            nulledColumnDatum = isNull(columnData[i]) ? 'NULL' : columnData[i];
+            nulledColumnDatum = isNull(columnData[i]) ? '__NULL__' : columnData[i];
             dataByColumnRow[nulledColumnDatum]['_all_'] += countData[i];
           }
           if (rowProperty) {
-            nulledRowDatum = isNull(rowData[i]) ? 'NULL' : rowData[i];
+            nulledRowDatum = isNull(rowData[i]) ? '__NULL__' : rowData[i];
             dataByColumnRow['_all_'][nulledRowDatum] += countData[i];
           }
           if (columnProperty && rowProperty) {
@@ -377,7 +377,9 @@ let PivotTableView = React.createClass({
                 }}
                 >
                   {icon}
-                  { columnHeading == '_all_' ? 'All' : <PropertyCell prop={colPropConfig} value={columnHeading}/> }
+                  { columnHeading == '_all_' ?
+                    'All' :
+                    <PropertyCell prop={colPropConfig} value={columnHeading === '__NULL__' ? null : columnHeading}/> }
                 </div>
                 }
               cell={({rowIndex}) =>
