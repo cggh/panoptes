@@ -7,6 +7,7 @@ import _uniq from 'lodash/uniq';
 import _some from 'lodash/some';
 import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
+import _map from 'lodash/map';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -38,7 +39,8 @@ const COLUMN_WIDTH = 120;
 
 // TODO: global agreement on null (Formatter.js ?)
 function isNull(value) {
-  return value === undefined || value === null || value === 'NULL' || value === '' ? true : false;
+  // NB: Number.isNaN() is different to isNaN()
+  return value === undefined || value === null || value === 'NULL' || value === '' || Number.isNaN(value) ? true : false;
 }
 
 let PivotTableView = React.createClass({
@@ -156,11 +158,15 @@ let PivotTableView = React.createClass({
         let uniqueColumns = columnData ? _uniq(columnData) : [];
         let uniqueRows = rowData ? _uniq(rowData) : [];
 
+        // Make null headings consistently 'NULL'
+        uniqueColumns = _map(uniqueColumns, (heading) => isNull(heading) ? 'NULL' : heading);
+        uniqueRows = _map(uniqueRows, (heading) => isNull(heading) ? 'NULL' : heading);
+
+        // Add the '_all_' headings
         uniqueColumns.unshift('_all_');
         uniqueRows.unshift('_all_');
 
         let dataByColumnRow = {};
-
         uniqueColumns.forEach(
           (columnValue) => dataByColumnRow[columnValue] = {'_all_': 0}
         );
@@ -171,20 +177,26 @@ let PivotTableView = React.createClass({
 
         for (let i = 0; i < countData.length; ++i) {
           dataByColumnRow['_all_']['_all_'] += countData[i];
+
+          // Make null data consistently 'NULL'
+          let nulledColumnDatum = undefined;
+          let nulledRowDatum = undefined;
+
           if (columnProperty) {
-            dataByColumnRow[columnData[i]]['_all_'] += countData[i];
+            nulledColumnDatum = isNull(columnData[i]) ? 'NULL' : columnData[i];
+            dataByColumnRow[nulledColumnDatum]['_all_'] += countData[i];
           }
           if (rowProperty) {
-            dataByColumnRow['_all_'][rowData[i]] += countData[i];
+            nulledRowDatum = isNull(rowData[i]) ? 'NULL' : rowData[i];
+            dataByColumnRow['_all_'][nulledRowDatum] += countData[i];
           }
           if (columnProperty && rowProperty) {
-            dataByColumnRow[columnData[i]][rowData[i]] = countData[i];
+            dataByColumnRow[nulledColumnDatum][nulledRowDatum] = countData[i];
           }
         }
 
         if (columnSortOrder && columnSortOrder.length) {
           let [dir, heading] = columnSortOrder[0];
-
           if (dir === 'asc') {
             uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][a]) ? -1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][b]) ? 1 : 0);
           } else if (dir === 'desc') {
@@ -195,7 +207,6 @@ let PivotTableView = React.createClass({
 
         if (rowSortOrder && rowSortOrder.length) {
           let [dir, heading] = rowSortOrder[0];
-
           if (dir === 'asc') {
             uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || isNull(dataByColumnRow[a][heading]) ? -1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || isNull(dataByColumnRow[b][heading]) ? 1 : 0);
           } else if (dir === 'desc') {
@@ -306,7 +317,7 @@ let PivotTableView = React.createClass({
 
                 let asc = _some(rowSortOrder, ([dir, val]) => dir === 'asc' && val === rowHeading);
                 let desc = _some(rowSortOrder, ([dir, val]) => dir === 'desc' && val === rowHeading);
-                let icon = (asc || desc) ? <Icon className="fa-rotate-270 sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+                let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '2px'}} className="fa-rotate-270 sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
 
                 return <div className="table-row-cell"
                      style={{
@@ -340,7 +351,7 @@ let PivotTableView = React.createClass({
 
               let asc = _some(columnSortOrder, ([dir, val]) => dir === 'asc' && val === columnHeading);
               let desc = _some(columnSortOrder, ([dir, val]) => dir === 'desc' && val === columnHeading);
-              let icon = (asc || desc) ? <Icon className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
+              let icon = (asc || desc) ? <Icon style={{fontSize: '1em', marginRight: '3px'}} className="sort" name={asc ? 'sort-amount-asc' : 'sort-amount-desc'}/> : null;
 
               return <Column
               //TODO Better default column widths
