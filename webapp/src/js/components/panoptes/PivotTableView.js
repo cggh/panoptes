@@ -130,11 +130,19 @@ let PivotTableView = React.createClass({
       }
     );
 
+    let order = [];
+    if (columnProperty) {
+      order.push(['asc', columnProperty]);
+    }
+    if (rowProperty) {
+      order.push(['asc', rowProperty]);
+    }
     let queryAPIargs = {
       database: this.config.dataset,
       table: this.config.tablesById[table].id,
       columns: columns,
       query: this.getDefinedQuery(query, table),
+      orderBy: order,
       groupBy,
       start: 0,
       stop: 1000,
