@@ -1,8 +1,7 @@
 name: An example tileURL layer
 description: A remote OSM layer
 format: tile
-filePattern: http://a.tile.openstreetmap.org/{z}/{x}/{y}.png
+filePattern: http://a.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png
 maxNativeZoom: 19
 attribution: © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> ♥ <a href="http://donate.openstreetmap.org">Make a Donation</a>
 opacity: 0.7
-

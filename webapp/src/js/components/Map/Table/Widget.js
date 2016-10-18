@@ -42,12 +42,11 @@ let TableMap = React.createClass({
   propTypes: {
     center: React.PropTypes.object,
     highlight: React.PropTypes.string,
-    locationDataTable: React.PropTypes.string, // Either locationDataTable or table are required
     onChange: React.PropTypes.func,
     primKey: React.PropTypes.string,
     query: React.PropTypes.string,
     setProps: React.PropTypes.func,
-    table: React.PropTypes.string, // Either locationDataTable or table are required
+    table: React.PropTypes.string,
     title: React.PropTypes.string,
     zoom: React.PropTypes.number,
   },
@@ -56,12 +55,10 @@ let TableMap = React.createClass({
     return this.props.title || 'Table Map';
   },
 
-  getDefinedQuery() {
-    let definedQuery = this.props.query;
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   render() {
@@ -69,7 +66,6 @@ let TableMap = React.createClass({
     let {
       center,
       highlight,
-      locationDataTable,
       onChange,
       primKey,
       setProps,
@@ -77,16 +73,8 @@ let TableMap = React.createClass({
       zoom
     } = this.props;
 
-    // NB: The table prop is passed by Panoptes, e.g. DataItem/Widget
-    // The locationDataTable prop is named to distinguish it from the chartDataTable.
-    // Either "table" or "locationDataTable" can be used in templates,
-    // with locationDataTable taking preference when both are specfied.
-    if (locationDataTable === undefined && table !== undefined) {
-      locationDataTable = table;
-    }
-
-    let locationTableConfig = this.config.tablesById[locationDataTable];
-    if (locationTableConfig === undefined) {
+    let tableConfig = this.config.tablesById[table];
+    if (tableConfig === undefined) {
       console.error('locationTableConfig === undefined');
       return null;
     }
@@ -106,7 +94,7 @@ let TableMap = React.createClass({
         <TileLayer />
         <TableMarkersLayer
           highlight={highlight}
-          locationDataTable={locationDataTable}
+          table={table}
           primKey={primKey}
           query={this.getDefinedQuery()}
         />

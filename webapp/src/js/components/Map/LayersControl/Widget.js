@@ -6,8 +6,6 @@ import FluxMixin from 'mixins/FluxMixin';
 
 import filterChildren from 'util/filterChildren';
 
-import _cloneDeep from 'lodash/cloneDeep';
-
 const ALLOWED_CHILDREN = [
   'BaseLayer',
   'Overlay'
@@ -49,12 +47,16 @@ let LayersControl = React.createClass({
   render() {
 
     let {autoZIndex, children, removeLayer, removeLayerControl} = this.props;
-    children = filterChildren(this, children, ALLOWED_CHILDREN);
+    let filteredChildren = filterChildren(this, children, ALLOWED_CHILDREN);
+
+    // NB: Only the position prop is dynamic.
+    // https://github.com/PaulLeCam/react-leaflet/blob/master/docs/Components.md#layerscontrol
 
     return (
       <LeafletLayersControl
         autoZIndex={autoZIndex}
-        children={children}
+        children={filteredChildren}
+        ref={(ref) => this.layersControl = ref}
         removeLayer={removeLayer}
         removeLayerControl={removeLayerControl}
       />

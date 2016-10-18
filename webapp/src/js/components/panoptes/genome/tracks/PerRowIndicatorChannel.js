@@ -92,12 +92,10 @@ let PerRowIndicatorChannel = React.createClass({
     this.draw(this.props);
   },
 
-  getDefinedQuery(query) {
-    let definedQuery = query;
-    if (definedQuery === undefined) {
-      definedQuery = this.tableConfig().defaultQuery !== undefined ? this.tableConfig().defaultQuery : SQL.nullQuery;
-    }
-    return definedQuery;
+  getDefinedQuery(query, table) {
+    return (query || this.props.query) ||
+      ((table || this.props.table) ? this.config.tablesById[table || this.props.table].defaultQuery : null) ||
+      SQL.nullQuery;
   },
 
   //Called by DataFetcherMixin on componentWillReceiveProps
@@ -119,7 +117,7 @@ let PerRowIndicatorChannel = React.createClass({
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
         this.props.table !== table ||
-        this.getDefinedQuery(this.props.query) !== this.getDefinedQuery(query) ||
+        this.getDefinedQuery(this.props.query, this.props.table) !== this.getDefinedQuery(query, table) ||
         this.props.colourProperty !== colourProperty ||
         !(this.blockLevel === blockLevel
           && this.blockIndex === blockIndex
@@ -132,7 +130,7 @@ let PerRowIndicatorChannel = React.createClass({
       let columns = [this.tableConfig().primKey, this.tableConfig().position];
       if (colourProperty)
         columns.push(colourProperty);
-      let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery(query));
+      let decodedQuery = SQL.WhereClause.decode(this.getDefinedQuery(query, table));
       decodedQuery = SQL.WhereClause.AND([SQL.WhereClause.CompareFixed(this.tableConfig().chromosome, '=', chromosome), decodedQuery]);
       let APIargs = {
         database: this.config.dataset,
@@ -311,7 +309,7 @@ let PerRowIndicatorChannel = React.createClass({
             </div>
             }
         //Override component update to get latest in case of skipped render
-        configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery(query)} setProps={this.redirectedProps.setProps} />}
+        configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery()} setProps={this.redirectedProps.setProps} />}
         legendComponent={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={knownValues} /> : null}
         onClose={this.redirectedProps.onClose}
       >
