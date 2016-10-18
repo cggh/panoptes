@@ -8,6 +8,7 @@ import _some from 'lodash/some';
 import _forEach from 'lodash/forEach';
 import _filter from 'lodash/filter';
 import _map from 'lodash/map';
+import _orderBy from 'lodash/orderBy';
 
 // Mixins
 import PureRenderMixin from 'mixins/PureRenderMixin';
@@ -204,23 +205,15 @@ let PivotTableView = React.createClass({
         }
 
         if (columnSortOrder && columnSortOrder.length) {
-          let [dir, heading] = columnSortOrder[0];
-          if (dir === 'asc') {
-            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][a]) ? -1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][b]) ? 1 : 0);
-          } else if (dir === 'desc') {
-            uniqueRows.sort((a, b) => (dataByColumnRow[heading][a] < dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][a]) ? 1 : (dataByColumnRow[heading][a] > dataByColumnRow[heading][b]) || isNull(dataByColumnRow[heading][b]) ? -1 : 0);
-          }
-
+          uniqueRows = _orderBy(uniqueRows,
+            _map(columnSortOrder, ([dir, heading]) => (row) => dataByColumnRow[heading][row]),
+            _map(columnSortOrder, ([dir, heading]) => dir));
         }
 
         if (rowSortOrder && rowSortOrder.length) {
-          let [dir, heading] = rowSortOrder[0];
-          if (dir === 'asc') {
-            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || isNull(dataByColumnRow[a][heading]) ? -1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || isNull(dataByColumnRow[b][heading]) ? 1 : 0);
-          } else if (dir === 'desc') {
-            uniqueColumns.sort((a, b) => (dataByColumnRow[a][heading] < dataByColumnRow[b][heading]) || isNull(dataByColumnRow[a][heading]) ? 1 : (dataByColumnRow[a][heading] > dataByColumnRow[b][heading]) || isNull(dataByColumnRow[b][heading]) ? -1 : 0);
-          }
-
+          uniqueColumns = _orderBy(uniqueColumns,
+            _map(rowSortOrder, ([dir, heading]) => (col) => dataByColumnRow[col][heading]),
+            _map(rowSortOrder, ([dir, heading]) => dir));
         }
 
 
@@ -271,9 +264,7 @@ let PivotTableView = React.createClass({
     currentOrder = _filter(currentOrder, ([dir, val]) => val !== heading);
     //Then add it to the end (if needed)
     if (newDirection) {
-      // FIXME: disabled multi-heading sort
-      //currentOrder.push([newDirection, heading]);
-      currentOrder = [[newDirection, heading]];
+      currentOrder.push([newDirection, heading]);
     }
 
     if (this.props.onOrderChange) {
