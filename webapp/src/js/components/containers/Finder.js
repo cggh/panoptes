@@ -43,7 +43,7 @@ let Finder = React.createClass({
   title() {
     return this.props.title;
   },
-  
+
   handleOpenTableTab(e, table) {
 
     const middleClick =  e.button == 1 || e.metaKey || e.ctrlKey;
@@ -52,13 +52,13 @@ let Finder = React.createClass({
       this.getFlux().actions.session.modalClose();
     }
 
-    let container = DataTableWithActions;
-    if (this.config.tablesById[table.id].listView) {
-      container = ListWithActions;
-    }
-
     let switchTo = !middleClick;
-    this.getFlux().actions.session.tabOpen(<container table={table.id} initialSearchFocus={true} />, switchTo);
+
+    if (this.config.tablesById[table].listView) {
+      this.getFlux().actions.session.tabOpen(<ListWithActions table={table} initialSearchFocus={true} />, switchTo);
+    } else {
+      this.getFlux().actions.session.tabOpen(<DataTableWithActions table={table} initialSearchFocus={true} />, switchTo);
+    }
   },
 
   handleOpenPopup(e, component) {
