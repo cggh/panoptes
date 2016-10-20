@@ -83,7 +83,7 @@ let PivotTableWithActions = React.createClass({
       return 'None';
     }
     return _map(order, ([direction, value]) =>
-      `${value === '__NULL__' ? 'NULL' : value} ${direction === 'asc' ? 'asc' : 'desc'}`)
+      `${value === '__NULL__' ? 'NULL' : value === '_all_' ? 'All' : value} ${direction === 'asc' ? 'asc' : 'desc'}`)
       .join(', ');
   },
 
