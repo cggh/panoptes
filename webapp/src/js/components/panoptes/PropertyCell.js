@@ -32,7 +32,7 @@ let PropertyCell = React.createClass({
     let externalLinkIcon = <i className="fa fa-external-link external-link-icon"></i>;
     let descriptionIcon = prop.valueDescriptions && prop.valueDescriptions[value] ?
       <Tooltip placement="bottom"
-                 trigger={["click"]}
+                 trigger={['click']}
                  overlay={htmlToReactParser.parse('<span>' + prop.valueDescriptions[value] + '</span>')}>
           <Icon className="info" name="info-circle"/>
         </Tooltip> :
@@ -40,7 +40,7 @@ let PropertyCell = React.createClass({
 
     if (prop.externalUrl) {
       if (prop.valueDisplays) {
-        console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`)
+        console.error(`Properties cannot have externalUrl and valueDisplays: ${prop.id}`);
       }
       let refs = value.split(';');
       return (<span className="prop">
