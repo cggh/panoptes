@@ -8,7 +8,6 @@ from DQXDbTools import DBTBESC
 import config
 import lzstring
 import json
-from columnDecode import decode
 
 def response(returndata):
 
@@ -22,7 +21,7 @@ def response(returndata):
         database = returndata['database']
 
     if 'orderBy' in returndata:
-        orderBy = map(decode, (returndata['orderBy']))
+        orderBy = json.loads(returndata['orderBy'])
 
     with DQXDbTools.DBCursor(returndata, database, read_timeout = config.TIMEOUT) as cur:
         whc = DQXDbTools.WhereClause()
@@ -32,9 +31,8 @@ def response(returndata):
         sqlquery = "SELECT {0} FROM {1}" . format(','.join([DBCOLESC(x['Name']) for x in columns]), DBTBESC(tableId))
         if len(whc.querystring_params) > 0:
             sqlquery += " WHERE {0}" . format(whc.querystring_params)
-        # sqlquery+=" ORDER BY {0}".format(DQXDbTools.CreateOrderByStatement(myorderfield, sortreverse))
-        # if orderBy is not None:
-        #     sqlQuery += " ORDER BY {0}" . format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
+        if orderBy is not None:
+            sqlquery += " ORDER BY {0}" . format(','.join([DBCOLESC(col) + ' ' + direction for direction, col in orderBy]))
         cur.execute(sqlquery, whc.queryparams)
         yield '\t'.join(str(col[0]) for col in cur.description) + '\n'
         for row in cur.fetchall() :
