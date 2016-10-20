@@ -15,6 +15,7 @@ import serialiseComponent from 'util/serialiseComponent';
 import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack';
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
+import ItemPicker from 'containers/ItemPicker';
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -34,7 +35,8 @@ let NumericalTrackGroupChannel = React.createClass({
   propTypes: {
     width: React.PropTypes.number,
     sideWidth: React.PropTypes.number,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
+    setProps: React.PropTypes.func
   },
 
   getInitialState() {
@@ -79,6 +81,7 @@ let NumericalTrackGroupControls = React.createClass({
         'autoYScale',
         'yMin',
         'yMax',
+        'children'
       ],
       redirect: ['setProps']
     })
@@ -90,6 +93,7 @@ let NumericalTrackGroupControls = React.createClass({
     autoYScale: React.PropTypes.bool,
     yMin: React.PropTypes.number,
     yMax: React.PropTypes.number,
+    setProps: React.PropTypes.func
   },
 
   trackGroups() {
@@ -101,33 +105,33 @@ let NumericalTrackGroupControls = React.createClass({
         groups[table.id] = {
           name: table.capNamePlural,
           icon: table.icon,
-          items: []
+          items: {}
         };
         _forEach(table.properties, (prop) => {
-          if (prop.showInBrowser && prop.isNumerical && prop.summaryValues) {
-            groups[table.id].items.push({
+          if (prop.showInBrowser && prop.isNumerical) {
+            groups[table.id].items[prop.id] = {
               name: prop.name,
               description: prop.description,
               icon: 'line-chart',
               payload: serialiseComponent(
                 <NumericalSummaryTrack name={prop.name} table={table.id} track={prop.id} />
               )
-            });
+            };
           }
         });
       }
     });
-    return Immutable.fromJS(groups);
+    return groups;
   },
 
 
   handleTrackChange(tracks) {
     this.getFlux().actions.session.modalClose();
-    this.redirectedProps.setProps((props) => props.set('children', tracks));
+    this.redirectedProps.setProps((props) => props.set('children', Immutable.List(tracks)));
   },
 
   render() {
-    let {autoYScale, yMin, yMax} = this.props;
+    let {autoYScale, yMin, yMax, children} = this.props;
 
     let actions = this.getFlux().actions;
 
@@ -136,15 +140,18 @@ let NumericalTrackGroupControls = React.createClass({
         <div className="control">
           <FlatButton label="Add/Remove Tracks"
                       primary={true}
-                      onClick={() => actions.session.modalOpen('containers/ItemPicker.js',
-                        {
-                          title: 'Pick tracks to be displayed',
-                          itemName: 'Numerical track',
-                          itemVerb: 'display',
-                          groups: this.trackGroups(),
-                          initialSelection: [],
-                          onPick: this.handleTrackChange
-                        })}/>
+                      onClick={() => actions.session.modalOpen(<ItemPicker
+                        title="Pick tracks to be displayed"
+                        itemName="Numerical track"
+                        itemVerb="display"
+                        groups={this.trackGroups()}
+                        initialSelection={React.Children.map(children, (child) => ({
+                          groupId: child.props.table,
+                          itemId: child.props.track,
+                        }))}
+                        onPick={this.handleTrackChange}
+                      />)}
+          />
         </div>
 
         <div className="control">

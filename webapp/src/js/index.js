@@ -61,7 +61,6 @@ function getAppState(location) {
         components: [],
         state: {}
       },
-      modal: {},
       foundGenes: [],
       usedTableQueries: []
     }
@@ -113,8 +112,7 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
       //Listen to the stores and update the URL after storing the state, when it changes.
       let getState = () => {
         let state = Immutable.Map();
-        //Clear the modal as we don't want that to be stored
-        state = state.set('session', stores.SessionStore.getState().set('modal', Immutable.Map()));
+        state = state.set('session', stores.SessionStore.getState());
         return state;
       };
       let lastState = getState();

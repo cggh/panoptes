@@ -21,6 +21,8 @@ import TextField from 'material-ui/TextField';
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
 import Icon from 'ui/Icon';
+import GroupedItemPicker from 'containers/GroupedItemPicker';
+import Alert from 'ui/Alert';
 
 // Panoptes
 import DataTableView from 'panoptes/DataTableView';
@@ -172,7 +174,7 @@ let DataTableWithActions = React.createClass({
   handleDownloadLimitBreach(payload) {
     let {totalDataPoints, maxDataPoints} = payload;
     let message = `You have asked to download ${totalDataPoints} data points, which is more than our current limit of ${maxDataPoints}. Please use a stricter filter or fewer columns, or contact us directly.`;
-    this.getFlux().actions.session.modalOpen('ui/Alert', {title: 'Warning', message: message});
+    this.getFlux().actions.session.modalOpen(<Alert title="Warning" message={message}/>);
   },
 
   handleSearchOpen() {
@@ -317,14 +319,13 @@ let DataTableWithActions = React.createClass({
         <FilterButton table={table} query={this.getDefinedQuery()} onPick={this.handleQueryPick}/>
         <FlatButton label={columnPickerLabel}
                     primary={true}
-                    onClick={() => actions.session.modalOpen('containers/GroupedItemPicker',
-                      {
-                        groups: this.propertyGroups,
-                        initialPick: columns,
-                        title: `Pick columns for ${this.tableConfig().capNamePlural} table`,
-                        onPick: this.handleColumnChange
-                      })}
-                      icon={<Icon fixedWidth={true} name="columns" />}
+                    onClick={() => actions.session.modalOpen(<GroupedItemPicker
+                      groups={this.propertyGroups}
+                      initialPick={columns}
+                      title={`Pick columns for ${this.tableConfig().capNamePlural} table`}
+                      onPick={this.handleColumnChange}
+                    />)}
+                    icon={<Icon fixedWidth={true} name="columns" />}
         />
         <FlatButton label="Download data"
                     disabled={columns.size === 0}

@@ -1,10 +1,12 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import Immutable from 'immutable';
 import Highlight from 'react-highlighter';
 import Pluralise from 'ui/Pluralise';
 
+import _map from 'lodash/map';
+import _filter from 'lodash/filter';
+import _sum from 'lodash/sum';
+import _values from 'lodash/values';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -21,18 +23,18 @@ let ItemPicker = React.createClass({
   propTypes: {
     itemName: React.PropTypes.string,
     itemVerb: React.PropTypes.string,
-    initialSelection: ImmutablePropTypes.listOf(
-      ImmutablePropTypes.contains({
+    initialSelection: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
         groupId: React.PropTypes.string.isRequired,
         itemId: React.PropTypes.string.isRequired,
         payload: React.PropTypes.any
       })),
-    groups: ImmutablePropTypes.mapOf(
-      ImmutablePropTypes.contains({
+    groups: React.PropTypes.objectOf(
+      React.PropTypes.shape({
         name: React.PropTypes.string.isRequired,
         icon: React.PropTypes.string,
-        items: ImmutablePropTypes.listOf(
-          ImmutablePropTypes.contains({
+        items: React.PropTypes.objectOf(
+          React.PropTypes.shape({
             name: React.PropTypes.string.isRequired,
             icon: React.PropTypes.string,
             description: React.PropTypes.string,
@@ -51,7 +53,7 @@ let ItemPicker = React.createClass({
       icon: 'check-square-o',
       itemName: 'Item',
       itemVerb: 'Select',
-      initialSelection: Immutable.List()
+      initialSelection: []
     };
   },
 
@@ -77,21 +79,24 @@ let ItemPicker = React.createClass({
   },
 
   handleAdd({groupId, itemId, payload}) {
-    this.setState({picked: this.state.picked.push(Immutable.Map({groupId, itemId, payload}))});
+    this.setState({picked: this.state.picked.concat([{groupId, itemId, payload}])});
   },
   handleAddAll(groupId) {
-    let toAdd = this.props.groups.getIn([groupId, 'items']).map((item, itemId) =>
-      Immutable.Map({groupId, itemId, payload: item.get('payload')})).toList();
+    let toAdd = _map(this.props.groups[groupId].items, (item, itemId) =>
+      ({groupId, itemId, payload: item.payload}));
     this.setState({picked: this.state.picked.concat(toAdd)});
   },
   handleRemove(index) {
-    this.setState({picked: this.state.picked.delete(index)});
+    let picked = this.state.picked;
+    picked.splice(index,1);
+    this.setState({picked: [].concat(picked)});
   },
-  handleRemoveAll(index) {
-    this.setState({picked: Immutable.List()});
+  handleRemoveAll() {
+    this.setState({picked: []});
   },
   handlePick() {
-    this.props.onPick(this.state.picked.map((item) => item.get('payload')));
+    const {groups} = this.props;
+    this.props.onPick(_map(this.state.picked, (item) => item.payload || groups[item.groupId].items[item.itemId].payload));
   },
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
@@ -101,7 +106,7 @@ let ItemPicker = React.createClass({
   render() {
     let {picked, search} = this.state;
     let {itemName, itemVerb, groups} = this.props;
-    let count = groups.map((group) => group.get('items').size).reduce((sum, v) => sum + v, 0);
+    let count = _sum(_map(groups, (group) => _values(group.items).length));
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
@@ -115,10 +120,10 @@ let ItemPicker = React.createClass({
             <div style={{overflow: 'auto'}}>
               <List>
                 {
-                  groups.map((group, groupId) => {
-                    let {name, icon, items} = group.toObject();
-                    let subItems = items.map((item, itemId) => {
-                      let {name, description, icon, payload} = item.toObject();
+                  _map(groups, (group, groupId) => {
+                    let {name, icon, items} = group;
+                    let subItems = _map(items, (item, itemId) => {
+                      let {name, description, icon, payload} = item;
                       return (name + '#' + (description || '')).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
                         <ListItem key={itemId}
                                   primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
@@ -127,7 +132,7 @@ let ItemPicker = React.createClass({
                                   onClick={() => this.handleAdd({groupId, itemId, payload})}
                         />) : null;
                     });
-                    let numberSubItems = subItems.filter((i) => i).size;
+                    let numberSubItems = _filter(subItems, (i) => i).length;
                     return numberSubItems > 0 ? (
                       <ListItem
                         primaryText={<div> {name} ({numberSubItems} <Pluralise text={itemName} ord={numberSubItems}/>)</div>}
@@ -135,40 +140,40 @@ let ItemPicker = React.createClass({
                         initiallyOpen={!!search}
                         leftIcon={<Icon fixedWidth={true} name={icon}/>}
                         primaryTogglesNestedList={true}
-                        nestedItems={subItems.toArray()}
+                        nestedItems={subItems}
                       />
 
                     ) : null;
-                  }).toArray()
+                  })
                 }
               </List>
             </div>
           </div>
           <div className="grow stack vertical">
             <div>
-              <div className="header">{picked.size ? picked.size : 'No'} <Pluralise text={itemName} ord={picked.size}/> to {itemVerb}</div>
+              <div className="header">{picked.length ? picked.length : 'No'} <Pluralise text={itemName} ord={picked.length}/> to {itemVerb}</div>
             </div>
             <div className="grow scroll-within">
               <List>
                 {
-                  picked.map((item, index) => {
-                    let {groupId, itemId} = item.toObject();
-                    let groupName = groups.getIn([groupId, 'name']);
-                    let {description, name, icon} = groups.getIn([groupId, 'items', itemId]).toObject();
+                  _map(picked, (item, index) => {
+                    let {groupId, itemId} = item;
+                    let groupName = groups[groupId].name;
+                    let {description, name, icon} = groups[groupId].items[itemId];
                     return <ListItem key={index}
                                      secondaryText={description}
                                      primaryText={`${groupName} - ${name}`}
                                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
                                      onClick={() => this.handleRemove(index)}/>;
 
-                  }).toArray()
+                  })
                 }
 
               </List>
             </div>
             <div className="centering-container">
               <div style={{paddingRight: '10px'}}><FlatButton label="Clear" onClick={this.handleRemoveAll}/></div>
-              <RaisedButton label={<span>{`${itemVerb} ${picked.size}`} <Pluralise text={itemName} ord={picked.size}/></span>}
+              <RaisedButton label={<span>{`${itemVerb} ${picked.length}`} <Pluralise text={itemName} ord={picked.length}/></span>}
                             primary={true}
                             onClick={this.handlePick}/>
             </div>

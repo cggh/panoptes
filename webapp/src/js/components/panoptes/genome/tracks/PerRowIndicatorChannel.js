@@ -297,6 +297,7 @@ let PerRowIndicatorChannel = React.createClass({
 
   render() {
     let {width, sideWidth, table, colourProperty, query} = this.props;
+    query = this.getDefinedQuery(query);
     const {knownValues} = this.state;
     return (
       <ChannelWithConfigDrawer
@@ -342,8 +343,7 @@ const PerRowIndicatorControls = React.createClass({
   },
 
   render() {
-    let {table, colourProperty} = this.props;
-
+    let {table, colourProperty, query} = this.props;
     return (
       <div className="channel-controls">
         <div className="control">

@@ -22,8 +22,13 @@ let SessionActions = {
   modalClose() {
     this.dispatch(SESSION.MODAL_CLOSE);
   },
-  modalOpen(component, props) {
-    this.dispatch(SESSION.MODAL_OPEN, {component, props});
+  modalOpen(newComponent) {
+    this.dispatch(SESSION.MODAL_OPEN, newComponent);
+  },
+  modalSetProps(ignored, updater) {
+    this.dispatch(SESSION.MODAL_SET_PROPS, {
+      updater
+    });
   },
   notify(notification) {
     this.dispatch(SESSION.NOTIFY, notification);

@@ -4,6 +4,7 @@ import {FlatButton} from 'material-ui';
 import SQL from 'panoptes/SQL';
 import FluxMixin from 'mixins/FluxMixin';
 import Icon from 'ui/Icon';
+import QueryPicker from 'containers/QueryPicker';
 
 let FilterButton = React.createClass({
   mixins: [
@@ -36,12 +37,11 @@ let FilterButton = React.createClass({
     return <div>
       <FlatButton label={decodedQuery.isTrivial ? `Add ${name || ''} Filter` : `Change ${name || ''} Filter`}
                   primary={true}
-                  onClick={() => this.getFlux().actions.session.modalOpen('containers/QueryPicker',
-                    {
-                      table,
-                      initialQuery: query,
-                      onPick: this.handlePick
-                    })}
+                  onClick={() => this.getFlux().actions.session.modalOpen(<QueryPicker
+                    table={table}
+                    initialQuery={query}
+                    onPick={this.handlePick}
+                  />)}
                   icon={<Icon fixedWidth={true} name="filter" />}
       />
       {decodedQuery.isTrivial ? null :

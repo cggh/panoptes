@@ -1,7 +1,5 @@
 import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
-import Immutable from 'immutable';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 import Highlight from 'react-highlighter';
 
@@ -9,7 +7,14 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {List, ListItem} from 'material-ui/List';
 import _map from 'lodash/map';
-
+import _includes from 'lodash/includes';
+import _intersection from 'lodash/intersection';
+import _union from 'lodash/union';
+import _without from 'lodash/without';
+import _forEach from 'lodash/forEach';
+import _sumBy from 'lodash/sumBy';
+import _filter from 'lodash/filter';
+import _difference from 'lodash/difference'
 import Icon from 'ui/Icon';
 
 
@@ -19,23 +24,23 @@ let GroupedItemPicker = React.createClass({
   ],
 
   propTypes: {
-    groups: ImmutablePropTypes.mapOf(ImmutablePropTypes.map),
-    initialPick: ImmutablePropTypes.listOf(React.PropTypes.string),
+    groups: React.PropTypes.objectOf(React.PropTypes.object),
+    initialPick: React.PropTypes.arrayOf(React.PropTypes.string),
     onPick: React.PropTypes.func,
     title: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
-      groups: Immutable.Map(),
-      initialPick: Immutable.List(),
+      groups: {},
+      initialPick: [],
       title: 'Pick items'
     };
   },
 
   getInitialState() {
     return {
-      picked: this.props.initialPick.toSet(),
+      picked: this.props.initialPick,
       search: ''
     };
   },
@@ -55,32 +60,34 @@ let GroupedItemPicker = React.createClass({
   },
 
   handleAdd(propId) {
-    if (this.state.picked.has(propId))
-      this.setState({picked: this.state.picked.delete(propId)});
-    else
-      this.setState({picked: this.state.picked.add(propId)});
+    if (_includes(this.state.picked, propId)) {
+      this.setState({picked: _without(this.state.picked, propId)});
+    }
+    else {
+      this.setState({picked: this.state.picked.concat([propId])});
+    }
   },
   handleAddAll(groupId) {
-    let toAdd = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('id'));
-    this.setState({picked: this.state.picked.union(toAdd)});
+    let toAdd = _map(this.props.groups[groupId].properties, 'id');
+    this.setState({picked: _union(this.state.picked, toAdd)});
   },
   handleRemove(propId) {
-    this.setState({picked: this.state.picked.delete(propId)});
+    this.setState({picked: _without(this.state.picked, propId)});
   },
   handleRemoveAll(groupId) {
-    let toRemove = this.props.groups.getIn([groupId, 'properties']).map((prop) => prop.get('id'));
-    this.setState({picked: this.state.picked.subtract(toRemove)});
+    let toRemove = _map(this.props.groups[groupId].properties, 'id');
+    this.setState({picked: _difference(this.state.picked, toRemove)});
   },
   handleSearchChange(event) {
     this.setState({'search': event.target.value});
   },
 
   handlePick() {
-    let result = Immutable.List();
-    this.props.groups.forEach((group) => {
-      group.get('properties').forEach((prop) => {
-        if (this.state.picked.has(prop.get('id'))) {
-          result = result.push(prop.get('id'));
+    let result = [];
+    _forEach(this.props.groups, (group) => {
+      _forEach(group.properties, (prop) => {
+        if (_includes(this.state.picked, prop.id)) {
+          result.push(prop.id);
         }
       });
     }
@@ -91,8 +98,7 @@ let GroupedItemPicker = React.createClass({
   render() {
     let {picked, search} = this.state;
     let {groups} = this.props;
-    let count = groups.map((group) => group.get('properties').size).reduce((sum, v) => sum + v, 0);
-    //"toJS" needed due to https://github.com/facebook/immutable-js/issues/554
+    let count = _sumBy(groups, (group) => group.properties.length);
     return (
       <div className="large-modal item-picker">
         <div className="horizontal stack">
@@ -106,12 +112,12 @@ let GroupedItemPicker = React.createClass({
             <div style={{overflow: 'auto'}}>
               <List>
                 {
-                  _map(groups.toJS(), (group) => {
+                  _map(groups, (group) => {
                     let {id, name, properties} = group;
-                    let subItems = properties.map((prop) => {
+                    let subItems = _map(properties, (prop) => {
                       let {name, description, id,  icon} = prop;
                       return (`${name}#${(description || '')}`).toLowerCase().indexOf(search.toLowerCase()) > -1 ? (
-                            <ListItem className={classNames({picked: !picked.includes(id)})}
+                            <ListItem className={classNames({picked: !_includes(picked, id)})}
                                       key={id}
                                       primaryText={<div><Highlight search={search}>{name}</Highlight></div>}
                                       secondaryText={<div><Highlight search={search}>{description}</Highlight></div>}
@@ -120,7 +126,7 @@ let GroupedItemPicker = React.createClass({
                               />) : null;
                     }
                       );
-                    return subItems.filter((i) => i).length > 0 ? (
+                    return _filter(subItems, (i) => i).length > 0 ? (
                       <ListItem primaryText={name}
                                 key={id}
                                 initiallyOpen={true}
@@ -137,22 +143,22 @@ let GroupedItemPicker = React.createClass({
           </div>
           <div className="grow stack vertical">
             <div>
-              <div className="header">{picked.size ? picked.size : 'No'} Column{picked.size != 1 ? 's' : null} Selected</div>
+              <div className="header">{picked.length ? picked.length : 'No'} Column{picked.length != 1 ? 's' : null} Selected</div>
             </div>
             <div className="grow scroll-within">
               <List>
                 {
-                  _map(groups.toJS(), (group) => {
+                  _map(groups, (group) => {
                     let {id, name, properties} = group;
-                    return ( picked.intersect(properties.map((prop) => prop.id)).size > 0 ?
+                    return ( _intersection(picked, _map(properties, 'id')).length > 0 ?
                         <ListItem primaryText={name}
                                   key={id}
                                   initiallyOpen={true}
                                   onClick={() => this.handleRemoveAll(id)}
                                   nestedItems={
-                      properties.map((prop) => {
+                      _map(properties, (prop) => {
                         let {name, description, id, icon} = prop;
-                        return picked.includes(id) ? (
+                        return _includes(picked, id) ? (
                             <ListItem key={id}
                                       secondaryText={description}
                                       primaryText={name}
