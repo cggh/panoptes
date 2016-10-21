@@ -32,7 +32,7 @@ function _filterError(json) {
 }
 
 function filterAborted(xhr) {
-  if (xhr.status === 0 && xhr.readyState == 0)  //This seems to be the only way to detect the cancel
+  if (xhr == '__CANCELLED__' || (xhr.status === 0 && xhr.readyState == 0))  //This seems to be the only way to detect the cancel
     return ('__SUPERSEEDED__');
   else
     throw xhr;
@@ -65,6 +65,10 @@ function request(options, method = 'GET', data = null) {
     if (options.params[key] === null) {
       delete options.params[key];
     }
+  }
+  //Annoyingly qajax doesn't check for cancellation before it fires off the request
+  if (options.cancellation && options.cancellation.isFulfilled()) {
+    return Promise.reject('__CANCELLED__');
   }
   //We could use the shiny new Fetch API here - but as there is no "abort" for that currently we stick with qajax.
   return qajax(Object.assign(defaults, options))
