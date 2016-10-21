@@ -21,7 +21,7 @@ export default class DivIcon extends MapLayer {
     this.leafletElement.on('remove', this.removeContent.bind(this));
   }
 
-  componentDidUpdate(prevProps: Object) {
+  componentDidUpdate(prevProps) {
     if (this.props.position !== prevProps.position) {
       this.leafletElement.setLatLng(this.props.position);
     }

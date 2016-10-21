@@ -42,7 +42,7 @@ let Overview = React.createClass({
   },
 
   fetchData(props, requestContext) {
-    let {table, primKey} = props;
+    let {primKey, table} = props;
 
     this.setState({loadStatus: 'loading'});
 

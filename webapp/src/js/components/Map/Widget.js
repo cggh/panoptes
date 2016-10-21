@@ -2,9 +2,6 @@ import {Map as LeafletMap} from 'react-leaflet';
 import React from 'react';
 import displayName from 'react-display-name';
 
-// Mixins
-import FluxMixin from 'mixins/FluxMixin';
-
 //Panoptes
 import filterChildren from 'util/filterChildren';
 
@@ -18,7 +15,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _isArray from 'lodash/isArray';
 import _isEqual from 'lodash/isEqual';
 import _isObject from 'lodash/isObject';
-import _isString from 'lodash/isString';
 import _max from 'lodash/max';
 import _min from 'lodash/min';
 
@@ -75,10 +71,6 @@ const ALLOWED_CHILDREN = [
 
 
 let Map = React.createClass({
-
-  mixins: [
-    FluxMixin
-  ],
 
   // TODO: honour maxZoom and minZoom, e.g. Esri.DeLorme tile provider options.maxZoom
 
@@ -164,7 +156,6 @@ let Map = React.createClass({
     }
   },
   handleMapMoveEnd(e) { // e is not being used
-
     // NB: this event fires whenever the map's bounds, center or zoom change.
 
     // this.map is not available on the first render; it's a callback ref attached to the Map component; no DOM yet.
@@ -191,8 +182,8 @@ let Map = React.createClass({
           });
         }
 
-        // this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
-        // FIXME: this.props.setProps is not available when the widget is mounted through DataItem/Actions
+        // NB: this.props.setProps is not available when the widget is mounted via a template (when it's not session-bound)
+        // Also, this.props.setProps is not available when the widget is mounted through DataItem/Actions
 
         if (this.props.setProps !== undefined) {
           this.props.setProps({center: newCenter, zoom: newZoom});
@@ -239,7 +230,8 @@ let Map = React.createClass({
       onMoveEnd: (e) => this.handleMapMoveEnd(e),
       style: widgetStyle,
       ref: (ref) => this.map = ref,
-      zoom: zoom
+      zoom: zoom,
+      zoomAnimation: false
     };
 
     let mapComponent = null;
@@ -261,12 +253,10 @@ let Map = React.createClass({
         childrenToInspect = children[0].props.children;
       }
 
-      //let keyedChildren = [];
       for (let i = 0, len = childrenToInspect.length; i < len; i++) {
         if (childrenToInspect[0].type !== undefined && childrenToInspect[i].type.displayName !== 'Marker') {
           nonMarkerChildrenCount++;
         }
-        //keyedChildren[i] = React.cloneElement(childrenToInspect[i], {key: ( _isString(keyedChildren[i]) ? childrenToInspect[i].key : i)});
       }
 
       if (nonMarkerChildrenCount === 0) {

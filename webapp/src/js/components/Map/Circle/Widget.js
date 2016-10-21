@@ -1,5 +1,5 @@
 import React from 'react';
-import {Circle as LeafletCircle} from 'react-leaflet';
+import {CircleMarker as LeafletCircle} from 'react-leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
