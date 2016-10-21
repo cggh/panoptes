@@ -22,7 +22,8 @@ let ComponentMarker = React.createClass({
     title: React.PropTypes.string,
     alt: React.PropTypes.string,
     layerContainer: React.PropTypes.object,
-    map: React.PropTypes.object
+    map: React.PropTypes.object,
+    zIndexOffset: React.PropTypes.number,
   },
   childContextTypes: {
     layerContainer: React.PropTypes.object,
@@ -43,7 +44,7 @@ let ComponentMarker = React.createClass({
 
   render() {
     let {layerContainer, map} = this.context;
-    let {alt, children, onClick, position, title} = this.props;
+    let {alt, children, onClick, position, title, zIndexOffset} = this.props;
 
     if (alt === undefined && title !== undefined) {
       // If not alt has been specified, then use the title.
@@ -60,6 +61,7 @@ let ComponentMarker = React.createClass({
             onClick={(e) => onClick(e, this)}
             position={position}
             title={title}
+            zIndexOffset={zIndexOffset}
           />
       );
     }
@@ -71,6 +73,7 @@ let ComponentMarker = React.createClass({
         onClick={(e) => onClick(e, this)}
         position={position}
         title={title}
+        zIndexOffset={zIndexOffset}
       >
         {React.Children.only(children)}
       </DivIcon>

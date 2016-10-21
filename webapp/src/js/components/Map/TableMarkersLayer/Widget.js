@@ -213,6 +213,7 @@ let TableMarkersLayer = React.createClass({
             position={{lat: marker.lat, lng: marker.lng}}
             title={marker.title}
             onClick={(e) => this.handleClickMarker(e, marker)}
+            zIndexOffset={len}
           />
         );
 
