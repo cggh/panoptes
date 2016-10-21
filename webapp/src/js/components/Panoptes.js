@@ -82,7 +82,7 @@ let Panoptes = React.createClass({
               <div className="spinner" />
             </div>
             <div className="page">
-              <Header name={config.settings.name} userID={userID} logo={initialConfig.logo}/>
+              <Header dataset={config.dataset} name={config.settings.name} userID={userID} logo={initialConfig.logo}/>
               <div className="body">
                 <TabbedArea activeTab={tabs.get('selectedTab')}
                             unclosableTab={tabs.get('unclosableTab')}
@@ -159,17 +159,18 @@ let Header = React.createClass({
   ],
 
   propTypes: {
+    dataset: React.PropTypes.string,
     name: React.PropTypes.string,
     userID: React.PropTypes.string,
     logo: React.PropTypes.string
   },
 
   render() {
-    let {name, userID, logo} = this.props;
+    let {dataset, name, userID, logo} = this.props;
     let actions = this.getFlux().actions;
     return (
       <div className="header">
-        <div className="title">{name}</div>
+        <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
         <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>

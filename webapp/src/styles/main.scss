@@ -49,6 +49,11 @@ a {
       height: 50px;
       background: white;
 
+      a {
+        color: inherit;
+        text-decoration: inherit;
+      }
+
       .title {
         flex: 1;
         margin: 25px;
