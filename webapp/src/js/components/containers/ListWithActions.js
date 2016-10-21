@@ -38,26 +38,22 @@ let ListWithActions = React.createClass({
     table: React.PropTypes.string.isRequired,
     selectedPrimKey: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
-    initialSearchFocus: React.PropTypes.bool
+    initialSearchFocus: React.PropTypes.bool,
+    search: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
       table: null,
       sidebar: true,
-      initialSearchFocus: false
-    };
-  },
-
-  getInitialState() {
-    return {
+      initialSearchFocus: false,
       search: ''
     };
   },
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.initialSearchFocus) {
-      this.refs.search.focus();
+      this.search.focus();
     }
   },
 
@@ -74,7 +70,7 @@ let ListWithActions = React.createClass({
   },
 
   handleSearchChange(event) {
-    this.setState({'search': event.target.value});
+    this.props.setProps({search: event.target.value});
   },
 
   handleRowsCountChange(rowsCount) {
@@ -100,9 +96,8 @@ let ListWithActions = React.createClass({
   },
 
   render() {
-    let {table, sidebar, setProps, selectedPrimKey} = this.props;
+    let {table, sidebar, setProps, selectedPrimKey, search} = this.props;
     let {description} = this.tableConfig();
-    let {search} = this.state;
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
@@ -115,7 +110,7 @@ let ListWithActions = React.createClass({
                       icon={<Icon fixedWidth={true} name="download" />}
           />
           <div className="search">
-            <TextField ref="search"
+            <TextField ref={(ref) => this.search = ref}
                        fullWidth={true}
                        floatingLabelText="Search"
                        value={search}
