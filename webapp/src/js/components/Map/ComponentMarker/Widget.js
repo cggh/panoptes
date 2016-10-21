@@ -66,10 +66,12 @@ let ComponentMarker = React.createClass({
       );
     }
 
+    // NB: any className to override the default white squares set by Leaflet CSS.
+
     return (
       <DivIcon
         alt={alt}
-        className="panoptes-map-componentmarker"
+        className={null}
         onClick={(e) => onClick(e, this)}
         position={position}
         title={title}
