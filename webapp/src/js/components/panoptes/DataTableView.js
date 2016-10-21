@@ -42,14 +42,13 @@ let DataTableView = React.createClass({
     PureRenderMixin,
     FluxMixin,
     ConfigMixin,
-    DataFetcherMixin('table', 'query', 'columns', 'order', 'ascending', 'startRowIndex')
+    DataFetcherMixin('table', 'query', 'columns', 'order', 'startRowIndex')
   ],
 
   propTypes: {
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     order: React.PropTypes.array,
-    ascending: React.PropTypes.bool,
     startRowIndex: React.PropTypes.number,
     columns: React.PropTypes.array,
     columnWidths: React.PropTypes.object,
@@ -69,7 +68,6 @@ let DataTableView = React.createClass({
       table: null,
       query: undefined,
       order: [],
-      ascending: true,
       startRowIndex: 0,
       columns: [],
       columnWidths: {},
@@ -168,7 +166,7 @@ let DataTableView = React.createClass({
     let newDir = 'asc';
     _forEach(currentOrder, ([dir, orderCol]) => {
       if (orderCol === column) {
-        newDir = {asc:'desc', desc:null}[dir];
+        newDir = {asc: 'desc', desc: null}[dir];
       }
     });
     //Remove this column from the sort order
@@ -245,8 +243,8 @@ let DataTableView = React.createClass({
                 }
                 let columnData = this.tableConfig().propertiesById[column];
                 let {id, isPrimKey, description, name} = columnData;
-                let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol===column);
-                let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol===column);
+                let asc = _some(order, ([dir, orderCol]) => dir === 'asc' && orderCol === column);
+                let desc = _some(order, ([dir, orderCol]) => dir === 'desc' && orderCol === column);
                 let width = columnWidths[column] || this.defaultWidth(columnData);
                 return <Column
                   //TODO Better default column widths

@@ -42,7 +42,6 @@ let DataTableWithActions = React.createClass({
     table: React.PropTypes.string.isRequired,
     query: React.PropTypes.string,
     order: React.PropTypes.array,
-    ascending: React.PropTypes.bool,
     columns: React.PropTypes.array,
     columnWidths: React.PropTypes.object,
     initialStartRowIndex: React.PropTypes.number,
@@ -59,7 +58,6 @@ let DataTableWithActions = React.createClass({
       table: null,
       query: undefined,
       order: [],
-      ascending: true,
       columnWidths: {},
       initialStartRowIndex: 0,
       sidebar: true,
@@ -166,7 +164,7 @@ let DataTableWithActions = React.createClass({
         onLimitBreach: this.handleDownloadLimitBreach,
         query: this.getDefinedQuery(),
         columns: this.props.columns,
-        ascending: this.props.ascending
+        order: this.props.order
       }
     );
   },
@@ -247,7 +245,7 @@ let DataTableWithActions = React.createClass({
 
   orderDescriptionString(order) {
     if (order.length === 0) {
-      return "None";
+      return 'None';
     }
     return _map(order, ([dir, column]) =>
       `${this.tableConfig().propertiesById[column].name} ${dir === 'asc' ? 'asc' : 'desc'}`)
@@ -257,7 +255,7 @@ let DataTableWithActions = React.createClass({
   render() {
 
     let actions = this.getFlux().actions;
-    let {table, columns, columnWidths, order, ascending, sidebar, setProps, searchText} = this.props;
+    let {table, columns, columnWidths, order, sidebar, setProps, searchText} = this.props;
     let {fetchedRowsCount, startRowIndex, showableRowsCount, searchOpen, totalRowsCount} = this.state;
 
     //Set default columns here as we can't do it in getDefaultProps as we don't have the config there.
@@ -449,7 +447,6 @@ let DataTableWithActions = React.createClass({
             <DataTableView table={table}
                            query={dataTableQuery}
                            order={order}
-                           ascending={ascending}
                            columns={columns}
                            columnWidths={columnWidths}
                            onColumnResize={this.handleColumnResize}

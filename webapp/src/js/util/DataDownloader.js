@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 import LZString from 'lz-string';
 import API from 'panoptes/API';
 import SQL from 'panoptes/SQL';
+import Base64 from 'panoptes/Base64';
 
 const MAX_DOWNLOAD_DATA_POINTS = 100000;
 
@@ -9,11 +10,10 @@ const MAX_DOWNLOAD_DATA_POINTS = 100000;
 function downloadTableData(payload) {
 
   let defaults = {
-    query: SQL.nullQuery,
-    ascending: true
+    query: SQL.nullQuery
   };
 
-  let {dataset, table, query, columns, tableConfig, ascending, rowsCount, onLimitBreach} = {...defaults, ...payload};
+  let {dataset, table, query, columns, tableConfig, rowsCount, onLimitBreach, order} = {...defaults, ...payload};
 
   // If no columns have been specified, get all of the showable columns.
   if (!columns)
@@ -43,18 +43,15 @@ function downloadTableData(payload) {
   }
 
   let downloadURL = API.serverURL;
-  downloadURL += '?datatype' + '=' + 'downloadtable';
-  downloadURL += '&database' + '=' + dataset;
-  downloadURL += '&qry' + '=' + API.encodeQuery(query);
-  downloadURL += '&tbname' + '=' + table;
-  downloadURL += '&collist' + '=' + LZString.compressToEncodedURIComponent(columnList);
-  if (tableConfig.position) {
-    downloadURL += '&posfield' + '=' + tableConfig.position;
-    downloadURL += '&order' + '=' + tableConfig.position;
-  } else {
-    downloadURL += '&order' + '=' + tableConfig.primKey;
+  downloadURL += '?datatype=downloadtable';
+  downloadURL += '&database=' + dataset;
+  downloadURL += '&query=' + API.encodeQuery(query);
+  downloadURL += '&table=' + table;
+  downloadURL += '&columns=' + LZString.compressToEncodedURIComponent(columnList);
+
+  if (order instanceof Array && order.length > 0) {
+    downloadURL += '&orderBy=' + JSON.stringify(order);
   }
-  downloadURL += '&sortreverse' + '=' + (ascending ? '0' : '1');
 
   window.location.href = downloadURL;
 }
