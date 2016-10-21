@@ -1,45 +1,45 @@
 CREATE TABLE "annotation" (
-  "chromid" varchar(30),
+  "chromid" text,
   "fstart" int,
   "fstop" int,
-  "fid" varchar(40),
-  "fparentid" varchar(40),
-  "ftype" varchar(20),
-  "fname" varchar(60),
-  "fnames" varchar(300),
-  "descr" varchar(200)
+  "fid" text,
+  "fparentid" text,
+  "ftype" text,
+  "fname" text,
+  "fnames" text,
+  "descr" text
 );
 
 CREATE TABLE "settings" (
-  "id" varchar(255),
+  "id" text,
   "content" text
 );
 
 CREATE TABLE "storedsubsets" (
   "subsetid" int NOT NULL AUTO_INCREMENT,
-  "name" varchar(255),
-  "tableid" varchar(255),
+  "name" text,
+  "tableid" text,
   "membercount" int,
   PRIMARY KEY ("subsetid")
 );
 
  CREATE TABLE "graphs" (
-  "graphid" varchar(255),
-  "tableid" varchar(255),
-  "tpe" varchar(255),
-  "dispname" varchar(255),
+  "graphid" text,
+  "tableid" text,
+  "tpe" text,
+  "dispname" text,
   "settings" text,
-  "crosslnk" varchar(255),
+  "crosslnk" text,
   "ordr"  int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY ("ordr")
 );
 
 CREATE TABLE "notes" (
-  "id" varchar(255),
-  "tableid" varchar(255),
-  "itemid" varchar(255),
-  "timestamp" varchar(255),
-  "userid" varchar(255),
+  "id" text,
+  "tableid" text,
+  "itemid" text,
+  "timestamp" text,
+  "userid" text,
   "content" text,
   PRIMARY KEY ("id")
 );
