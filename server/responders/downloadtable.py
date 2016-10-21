@@ -8,6 +8,7 @@ from DQXDbTools import DBTBESC
 import config
 import lzstring
 import json
+import DQXUtils
 
 def response(returndata):
 
@@ -39,7 +40,7 @@ def response(returndata):
             line = '\t'.join([str(x) for x in row]) + '\n'
             yield line
         if DQXDbTools.LogRequests:
-            DQXUtils.LogServer('###QRY:' + sqlQuery)
+            DQXUtils.LogServer('###QRY:' + sqlquery)
             DQXUtils.LogServer('###PARAMS:' + str(whc.queryparams))
 
 
