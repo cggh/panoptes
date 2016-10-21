@@ -21,6 +21,7 @@ import DetectResize from 'utils/DetectResize';
 import 'genomebrowser.scss';
 import FluxMixin from 'mixins/FluxMixin';
 import filterChildren from 'util/filterChildren';
+import _isNumber from 'lodash/isNumber';
 
 const DEFAULT_SPRING = [160, 30];
 const FLING_SPRING = [60, 15];
@@ -49,8 +50,8 @@ let GenomeBrowser = React.createClass({
   getDefaultProps() {
     return {
       chromosome: '',
-      start: 0,
-      end: 10000,
+      start: undefined, //Defaults for start and end are set at render time as they are config dependant
+      end: undefined,
       sideWidth: 150,
       width: 500,
     };
@@ -222,6 +223,11 @@ let GenomeBrowser = React.createClass({
     let {loading} = this.state;
     if (!_has(this.config.chromosomes, chromosome))
       console.log('Unrecognised chromosome in genome browser', chromosome);
+
+    //Set default bounds
+    start = _isNumber(start) ? start : 0;
+    end = (_isNumber(end) ? end : this.config.chromosomes[chromosome]) || 10000;
+
     let {width, height, springConfig} = this.state;
     width = Math.max(0, width - scrollbarSize());
     this.scale = d3.scale.linear().domain([start, end]).range([sideWidth, width]);
@@ -240,7 +246,7 @@ let GenomeBrowser = React.createClass({
         <div className="genome-browser">
           <div className="control-bar">
             <LoadingIndicator width={sideWidth - 20} animate={loading > 0}/>
-            <Controls {...this.props} chromosome={chromosome} minWidth={MIN_WIDTH}/>
+            <Controls {...this.props}  start={start} end={end} chromosome={chromosome} minWidth={MIN_WIDTH}/>
           </div>
           <Hammer
             ref={(c) => this.rootHammer = c}
