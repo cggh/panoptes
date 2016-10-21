@@ -301,7 +301,7 @@ function fetchGene(options) {
   return query({
     database: database,
     table: 'annotation',
-    columns: ['fid', 'fname', 'descr', 'fstart', 'fstop'],
+    columns: ['fid', 'chromid', 'fname', 'fnames', 'descr', 'fstart', 'fstop', 'fparentid', 'ftype'],
     query: recordQuery,
     transpose: true //We want rows, not columns
   }).then((data) => {
