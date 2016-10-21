@@ -3,7 +3,7 @@ import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
 // Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
@@ -27,7 +27,9 @@ import DataItemViews from 'panoptes/DataItemViews';
 let ListWithActions = React.createClass({
 
   mixins: [
-    PureRenderMixin,
+    PureRenderWithRedirectedProps({
+      redirect: ['setProps']
+    }),
     FluxMixin,
     ConfigMixin
   ],
@@ -51,7 +53,7 @@ let ListWithActions = React.createClass({
     };
   },
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidMount() {
     if (this.props.initialSearchFocus) {
       this.search.focus();
     }
@@ -66,11 +68,11 @@ let ListWithActions = React.createClass({
   },
 
   handleSelect(selectedPrimKey) {
-    this.props.setProps({selectedPrimKey});
+    this.redirectedProps.setProps({selectedPrimKey});
   },
 
   handleSearchChange(event) {
-    this.props.setProps({search: event.target.value});
+    this.redirectedProps.setProps({search: event.target.value});
   },
 
   handleRowsCountChange(rowsCount) {
@@ -96,7 +98,7 @@ let ListWithActions = React.createClass({
   },
 
   render() {
-    let {table, sidebar, setProps, selectedPrimKey, search} = this.props;
+    let {table, sidebar, selectedPrimKey, search} = this.props;
     let {description} = this.tableConfig();
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
@@ -146,7 +148,7 @@ let ListWithActions = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => setProps({sidebar: !sidebar})}
+                  onClick={() => this.redirectedProps.setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             {selectedPrimKey ?
