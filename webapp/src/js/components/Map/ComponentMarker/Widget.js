@@ -20,7 +20,20 @@ let ComponentMarker = React.createClass({
     onClick: React.PropTypes.func,
     position: React.PropTypes.object,
     title: React.PropTypes.string,
-    alt: React.PropTypes.string
+    alt: React.PropTypes.string,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
   },
 
   // Event handlers

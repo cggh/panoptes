@@ -17,6 +17,10 @@ let Marker = React.createClass({
     FluxMixin
   ],
 
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
   propTypes: {
     alt: React.PropTypes.string,
     children: React.PropTypes.node,
@@ -27,6 +31,17 @@ let Marker = React.createClass({
     zIndexOffset: React.PropTypes.number,
     position: React.PropTypes.object,
     title: React.PropTypes.string
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
   },
 
   render() {
