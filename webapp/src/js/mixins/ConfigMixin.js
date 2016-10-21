@@ -1,6 +1,6 @@
 //This is a special case of StoreWatchMixin, which forces update on config change.
 //As config changes should be rare this simplifies component code as config is kept out of component state.
-//Note that this mixin requires that FluxMixin also be used, unless flux i spassed as a prop.
+//Note that this mixin requires that FluxMixin also be used, unless flux is passed as a prop.
 
 let ConfigMixin = {
   componentWillMount: function() {
