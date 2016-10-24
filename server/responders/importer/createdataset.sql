@@ -23,17 +23,6 @@ CREATE TABLE "storedsubsets" (
   PRIMARY KEY ("subsetid")
 );
 
- CREATE TABLE "graphs" (
-  "graphid" text,
-  "tableid" text,
-  "tpe" text,
-  "dispname" text,
-  "settings" text,
-  "crosslnk" text,
-  "ordr"  int NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY ("ordr")
-);
-
 CREATE TABLE "notes" (
   "id" text,
   "tableid" text,

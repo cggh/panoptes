@@ -25,21 +25,3 @@ let fetchInitialConfig = function(dataset) {
 };
 
 module.exports = fetchInitialConfig;
-
-
-//parse graph info  TREE INFO NEEDS TO COME FROM SERVER
-// fetchedConfig.tables.forEach((tableInfo) => {
-//   tableInfo.trees = [];
-//   tableInfo.treesById = {};
-// });
-// fetchedConfig.graphs.forEach((graphInfo) => {
-//   if (graphInfo.tpe == 'tree') {
-//     const tree = {
-//       id: graphInfo.graphid,
-//       name: graphInfo.dispname,
-//       crossLink: graphInfo.crosslnk
-//     };
-//     fetchedConfig.tablesByID[graphInfo.id].trees.push(tree);
-//     fetchedConfig.tablesByID[graphInfo.id].treesById[ graphInfo.graphid] = tree;
-//   }
-// });

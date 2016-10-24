@@ -53,6 +53,12 @@ def readJSONConfig(datasetId):
 
     except IOError:
         print('Cached data derived config not found - skipping')
+    for tableId, table_config in tables.items():
+        graph_file = join(base_folder, tableId, 'graphConfig.json')
+        if exists(graph_file):
+            with open(graph_file, 'r') as f:
+                tables[tableId]['trees'] = load(f)
+
     twoDTables = readSetOfSettings(join(dataset_folder, '2D_datatables'), Settings2Dtable, settings.get('2D_DataTables'))
     genome = loads(SettingsRefGenome(join(dataset_folder, 'refgenome', 'settings'), validate=True).serialize())
     mapLayers = readSetOfSettings(join(dataset_folder, 'maps'), SettingsMapLayer)
