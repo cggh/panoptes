@@ -10,7 +10,6 @@ import _map from 'lodash/map';
 
 // Panoptes
 import RegionGenesList from 'panoptes/RegionGenesList';
-import Gene from 'containers/Gene';
 
 // Panoptes UI
 import Icon from 'ui/Icon';
