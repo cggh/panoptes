@@ -8,13 +8,14 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
-// Panoptes UI
+// Panoptes
 import TabbedArea from 'ui/TabbedArea';
 import TabPane from 'ui/TabPane';
 import Popups from 'ui/Popups';
 import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
 import Finder from 'containers/Finder';
+import Copy from 'ui/Copy';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -165,20 +166,30 @@ let Header = React.createClass({
     logo: React.PropTypes.string
   },
 
+  handlePageLinkClick() {
+    let introContent = 'Here is the link for this page, which you can copy and paste elsewhere: ';
+    let selectedContent = window.location.href;
+    this.getFlux().actions.session.modalOpen(<Copy title="URL" introContent={introContent} selectedContent={selectedContent}/>);
+  },
+
   render() {
     let {dataset, name, userID, logo} = this.props;
     let actions = this.getFlux().actions;
+    // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
     return (
       <div className="header">
         <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
-        <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
                     onClick={() => actions.session.modalOpen(<Finder />, {})}
         />
-        <IconButton tooltip="Link" iconClassName="fa fa-link"/>
+        <IconButton
+          tooltip="Link"
+          iconClassName="fa fa-link"
+          onClick={() => this.handlePageLinkClick()}
+        />
       </div>
     );
   }
