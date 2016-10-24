@@ -84,7 +84,7 @@ let TreeWithActions = React.createClass({
   render() {
     const {sidebar, table, tree, treeType, setProps} = this.props;
 
-    let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.trees.length > 0),
+    let tableOptions = _map(_filter(this.config.visibleTables, (table) => table.trees),
       (table) => ({
         value: table.id,
         leftIcon: <Icon fixedWidth={true} name={table.icon}/>,
@@ -95,9 +95,9 @@ let TreeWithActions = React.createClass({
     let treeOptions = [];
     if (table) {
       treeOptions = _map(this.config.tablesById[table].trees,
-        (tree) => ({
-          value: tree.id,
-          label: tree.id
+        (tree, id) => ({
+          value: id,
+          label: tree.name
         })
       );
     }
@@ -109,7 +109,7 @@ let TreeWithActions = React.createClass({
       })
     );
 
-    const treeInfo = table && tree && this.config.tablesById[table].treesById[tree];
+    const treeInfo = table && tree && this.config.tablesById[table].trees[tree];
 
     let sidebarContent = (
       <div className="sidebar tree-sidebar">

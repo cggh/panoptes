@@ -107,7 +107,6 @@ const ConfigStore = Fluxxor.createStore({
       });
       if (table.defaultQuery === '')
         table.defaultQuery = SQL.nullQuery;
-      table.trees = table.trees || [];
       this.addPropertyConfig(table);
     };
     config.tables.forEach(processTable);

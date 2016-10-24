@@ -80,25 +80,31 @@ class ImportDataTable(BaseImport):
                 simplejson.dump(data_derived_config, f)
 
     def importGraphs(self, tableid):
+        config = PanoptesConfig(self._calculationObject)
         folder = self._datatablesFolder
+        trees = {}
         with self._logHeader('Importing graphs'):
-            self._dao.deleteGraphsForTable(tableid)
             graphsfolder = os.path.join(folder, tableid, 'graphs')
             if os.path.exists(graphsfolder):
                 for graphid in os.listdir(graphsfolder):
                     if os.path.isdir(os.path.join(graphsfolder, graphid)):
                         print('Importing graph ' + graphid)
                         graphfolder = os.path.join(graphsfolder, graphid)
-                        
-                        graphSettings = SettingsGraph(os.path.join(graphfolder, 'settings'))
-                       
-                        self._dao.insertGraphForTable(tableid, graphid, graphSettings)
+                        trees[graphid] = simplejson.loads(SettingsGraph(os.path.join(graphfolder, 'settings')).serialize())
                         destFolder = os.path.join(self._config.getBaseDir(), 'Graphs', self._datasetId, tableid)
                         if not os.path.exists(destFolder):
                             os.makedirs(destFolder)
                         shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
+        graph_config_file = join(config.getBaseDir(), 'config', self._datasetId, tableid, 'graphConfig.json')
+        try:
+            os.remove(graph_config_file)
+        except OSError:
+            pass
+        if len(trees) > 0:
+            with open(graph_config_file, 'w') as f:
+                print(f)
+                simplejson.dump(trees, f)
 
-    
     def importAllDataTables(self):
         
         datatables = self._getTables()
