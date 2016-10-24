@@ -168,12 +168,12 @@ let Header = React.createClass({
   render() {
     let {dataset, name, userID, logo} = this.props;
     let actions = this.getFlux().actions;
+    // TODO: <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
     return (
       <div className="header">
         <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
-        <IconButton tooltip="Help" iconClassName="fa fa-question-circle"/>
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
                     onClick={() => actions.session.modalOpen(<Finder />, {})}
