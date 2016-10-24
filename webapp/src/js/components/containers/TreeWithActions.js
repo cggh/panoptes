@@ -62,7 +62,7 @@ let TreeWithActions = React.createClass({
   handleCrossLink() {
     const {table, tree} = this.props;
     const actions = this.getFlux().actions.panoptes;
-    const treeInfo = table && tree && this.config.tablesById[table].treesById[tree];
+    const treeInfo = table && tree && this.config.tablesById[table].trees[tree];
     if (treeInfo && treeInfo.crossLink && _has(this.config.tablesById, treeInfo.crossLink.split('::')[0])) {
       const [table, primKey] = treeInfo.crossLink.split('::');
       actions.dataItemPopup({table, primKey});
