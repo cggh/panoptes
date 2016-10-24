@@ -275,17 +275,17 @@ const ConfigStore = Fluxxor.createStore({
       prop.id == table.position ||
       false;
       prop.defaultValue = (prop.distinctValues || {})[0] || {
-          'Text': '',
-          'Float': 0,
-          'Double': 0,
-          'Int8': 0,
-          'Int16': 0,
-          'Int32': 0,
-          'Boolean': true,
-          'GeoLatitude': 0,
-          'GeoLongitude': 0,
-          'Date': 0
-        }[prop.dataType];
+        'Text': '',
+        'Float': 0,
+        'Double': 0,
+        'Int8': 0,
+        'Int16': 0,
+        'Int32': 0,
+        'Boolean': true,
+        'GeoLatitude': 0,
+        'GeoLongitude': 0,
+        'Date': 0
+      }[prop.dataType];
     });
     table.hasGeoCoord = !!(table.longitude && table.latitude);
   }
