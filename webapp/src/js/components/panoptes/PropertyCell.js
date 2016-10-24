@@ -65,6 +65,8 @@ let PropertyCell = React.createClass({
       return <Icon className={(val ? 'prop bool true' : 'prop bool false')}
                    fixedWidth={false}
                    name={val ? 'check' : 'times'} />;
+    } else if (prop.relation) {
+      return <ItemLink table={prop.relation.tableId} primKey={value} />;
     } else if (prop.isPrimKey) {
       return <ItemLink table={prop.tableId} primKey={value} />;
     }
