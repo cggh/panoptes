@@ -153,24 +153,31 @@ let ListView = React.createClass({
         let primKey = row[tableConfig.primKey];
         let className = selectedPrimKey !== primKey ? 'picked' : '';
 
-        let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(
-          <ItemTemplate config={this.config} table={table} primKey={primKey} data={row}>
+        let itemTemplate = (
+          <ItemTemplate
+            flux={this.flux}
+            table={table}
+            primKey={primKey}
+            data={row}
+          >
             {itemTitle}
           </ItemTemplate>
-        )).toLowerCase() : '';
-        if (search && content.indexOf(search) !== -1 || !search) {
+        );
+
+        let content = search ? striptags(ReactDOMServer.renderToStaticMarkup(itemTemplate)).toLowerCase() : '';
+
+        if (search && content.indexOf(search.toLowerCase()) !== -1 || !search) {
           listItems.push(
-            <ListItem className={className}
-                      key={primKey}
-                      primaryText={
-                          <Highlight search={search}>
-                            <ItemTemplate table={table} primKey={primKey} data={row}>
-                              {itemTitle}
-                            </ItemTemplate>
-                          </Highlight>
-                      }
-                      onClick={() => this.handleSelect(primKey)}
-                      leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
+            <ListItem
+              className={className}
+              key={primKey}
+              primaryText={
+                  <Highlight search={search}>
+                    {itemTemplate}
+                  </Highlight>
+              }
+              onClick={() => this.handleSelect(primKey)}
+              leftIcon={<div><Icon fixedWidth={true} name={icon}/></div>}
             />
           );
         }
@@ -189,7 +196,7 @@ let ListView = React.createClass({
 
     } else {
       return (
-        <div style={{position:'relative', height:'30px'}}>
+        <div style={{position: 'relative', height: '30px'}}>
           <Loading status="custom">No rows</Loading>
         </div>
       );

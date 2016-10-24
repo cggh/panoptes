@@ -213,6 +213,7 @@ let TableMarkersLayer = React.createClass({
             position={{lat: marker.lat, lng: marker.lng}}
             title={marker.title}
             onClick={(e) => this.handleClickMarker(e, marker)}
+            zIndexOffset={len}
           />
         );
 
@@ -224,6 +225,7 @@ let TableMarkersLayer = React.createClass({
             position={{lat: marker.lat, lng: marker.lng}}
             title={marker.title}
             onClick={(e) => this.handleClickMarker(e, marker)}
+            zIndexOffset={i}
           >
             <svg height="12" width="12">
               <circle cx="6" cy="6" r="5" stroke="#1E1E1E" strokeWidth="1" fill="#3D8BD5" />

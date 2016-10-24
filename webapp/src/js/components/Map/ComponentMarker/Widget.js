@@ -20,7 +20,21 @@ let ComponentMarker = React.createClass({
     onClick: React.PropTypes.func,
     position: React.PropTypes.object,
     title: React.PropTypes.string,
-    alt: React.PropTypes.string
+    alt: React.PropTypes.string,
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object,
+    zIndexOffset: React.PropTypes.number,
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
   },
 
   // Event handlers
@@ -30,7 +44,7 @@ let ComponentMarker = React.createClass({
 
   render() {
     let {layerContainer, map} = this.context;
-    let {alt, children, onClick, position, title} = this.props;
+    let {alt, children, onClick, position, title, zIndexOffset} = this.props;
 
     if (alt === undefined && title !== undefined) {
       // If not alt has been specified, then use the title.
@@ -47,17 +61,21 @@ let ComponentMarker = React.createClass({
             onClick={(e) => onClick(e, this)}
             position={position}
             title={title}
+            zIndexOffset={zIndexOffset}
           />
       );
     }
 
+    // NB: any className to override the default white squares set by Leaflet CSS.
+
     return (
       <DivIcon
         alt={alt}
-        className="panoptes-map-componentmarker"
+        className={null}
         onClick={(e) => onClick(e, this)}
         position={position}
         title={title}
+        zIndexOffset={zIndexOffset}
       >
         {React.Children.only(children)}
       </DivIcon>

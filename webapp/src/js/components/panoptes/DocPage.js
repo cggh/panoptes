@@ -24,7 +24,7 @@ let DocPage = React.createClass({
     return {
       content: '',
       loadStatus: 'loading'
-    }
+    };
   },
 
   propTypes: {
@@ -34,7 +34,7 @@ let DocPage = React.createClass({
   },
 
   componentWillMount() {
-    this.titleFromHTML = 'Loading...'
+    this.titleFromHTML = 'Loading...';
   },
 
   fetchData(props, requestContext) {
@@ -68,20 +68,20 @@ let DocPage = React.createClass({
       let inTitle = false;
       let title = 'Untitled';
       const parser = new htmlparser.Parser({
-        onopentag: function (tagname, attribs) {
-          if (tagname === "title") {
+        onopentag: function(tagname, attribs) {
+          if (tagname === 'title') {
             inTitle = true;
           }
         },
-        ontext: function(text){
-            if (inTitle) {
-              title = text;
-            }
+        ontext: function(text) {
+          if (inTitle) {
+            title = text;
+          }
         },
-        onclosetag: function(tagname){
-            if(tagname === "title"){
-              inTitle = false;
-            }
+        onclosetag: function(tagname) {
+          if (tagname === 'title') {
+            inTitle = false;
+          }
         }
       }, {decodeEntities: true});
       parser.write(nextState.content);
@@ -89,7 +89,7 @@ let DocPage = React.createClass({
       if (title !== this.titleFromHTML) {
         this.titleFromHTML = title;
         if (nextProps.updateTitleIcon) {
-          nextProps.updateTitleIcon()
+          nextProps.updateTitleIcon();
         }
       }
     }

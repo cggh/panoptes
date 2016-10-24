@@ -39,7 +39,6 @@ let ItemTemplate = React.createClass({
     table: React.PropTypes.string.isRequired,
     primKey: React.PropTypes.string.isRequired,
     data: React.PropTypes.any
-
   },
 
   getInitialState() {

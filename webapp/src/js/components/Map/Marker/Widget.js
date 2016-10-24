@@ -1,6 +1,5 @@
 import React from 'react';
 import {Marker as LeafletMarker} from 'react-leaflet';
-import {DivIcon, Point} from 'leaflet';
 
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
@@ -17,6 +16,10 @@ let Marker = React.createClass({
     FluxMixin
   ],
 
+  contextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
   propTypes: {
     alt: React.PropTypes.string,
     children: React.PropTypes.node,
@@ -27,6 +30,17 @@ let Marker = React.createClass({
     zIndexOffset: React.PropTypes.number,
     position: React.PropTypes.object,
     title: React.PropTypes.string
+  },
+  childContextTypes: {
+    layerContainer: React.PropTypes.object,
+    map: React.PropTypes.object
+  },
+
+  getChildContext() {
+    return {
+      layerContainer: this.props.layerContainer !== undefined ? this.props.layerContainer : this.context.layerContainer,
+      map: this.props.map !== undefined ? this.props.map : this.context.map
+    };
   },
 
   render() {
@@ -39,6 +53,14 @@ let Marker = React.createClass({
       children = React.Children.only(children);
     }
 
+    // FIXME: Works around broken default marker icon in react-leaflet v1.0.0-rc.1
+    let icon = window.L.icon({
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-shadow.png',
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/images/marker-icon-2x.png',
+      iconAnchor: [12.5, 41]
+    });
+
     return (
       <LeafletMarker
         position={position}
@@ -48,6 +70,7 @@ let Marker = React.createClass({
         children={children}
         opacity={opacity}
         zIndexOffset={zIndexOffset}
+        icon={icon}
       />
     );
 

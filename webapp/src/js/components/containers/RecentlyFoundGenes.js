@@ -35,7 +35,8 @@ let RecentlyFoundGenes = React.createClass({
   },
 
   render() {
-    let {foundGenes, onSelect} = this.state;
+    let {onSelect} = this.props;
+    let {foundGenes} = this.state;
 
     let foundGenesList = null;
 

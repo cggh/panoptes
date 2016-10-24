@@ -15,7 +15,7 @@ def response(returndata):
     if 'database' in returndata:
         databaseName = returndata['database']
     with DQXDbTools.DBCursor(returndata, databaseName, read_timeout=config.TIMEOUT) as cur:
-        mypattern=DQXDbTools.ToSafeIdentifier(returndata['pattern'])
+        mypattern=DQXDbTools.ToSafeIdentifier(returndata['pattern']).lower()
 
         names=[]
         chroms=[]
@@ -49,7 +49,7 @@ def response(returndata):
                 patternstr="{0}%".format(mypattern)
                 if trynr==1:
                     patternstr="%{0}%".format(mypattern)
-                statement="SELECT fname, chromid, fstart, fstop,fid,fnames,descr FROM {tablename} WHERE ((ftype='gene') or (ftype='pseudogene')) and ((fname LIKE '{pattern}') or (fnames LIKE '{pattern}') or (descr LIKE '{pattern}') or (fid='{mypattern}') or (fid LIKE '{pattern}')) LIMIT {maxcount}".format(
+                statement="SELECT fname, chromid, fstart, fstop,fid,fnames,descr FROM {tablename} WHERE ((ftype='gene') or (ftype='pseudogene')) and ((lower(fname) LIKE '{pattern}') or (lower(fnames) LIKE '{pattern}') or (lower(descr) LIKE '{pattern}') or (lower(fid)='{mypattern}') or (lower(fid) LIKE '{pattern}')) LIMIT {maxcount}".format(
                     tablename=DQXDbTools.ToSafeIdentifier(returndata['table']),
                     pattern=patternstr,
                     mypattern=mypattern,

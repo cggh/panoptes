@@ -8,6 +8,7 @@ import Template from 'Template/Widget';
 
 function getViews(dataItemViews, hasGeoCoord) {
   /*eslint-disable react/display-name */
+  //TODO: deprecate ItemMap for TableMap
   const viewTypes = {
     Overview: (dataItemView, key) => (<Overview title="Overview" key={key}/>),
     PieChartMap: (dataItemView, key) => (<PieChartMap

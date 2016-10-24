@@ -13,6 +13,7 @@ let DocLink = React.createClass({
   ],
 
   propTypes: {
+    children: React.PropTypes.node,
     href: React.PropTypes.string,
     replaceParent: React.PropTypes.func
   },

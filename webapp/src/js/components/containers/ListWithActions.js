@@ -3,7 +3,7 @@ import scrollbarSize from 'scrollbar-size';
 import Sidebar from 'react-sidebar';
 
 // Mixins
-import PureRenderMixin from 'mixins/PureRenderMixin';
+import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
 
@@ -27,7 +27,9 @@ import DataItemViews from 'panoptes/DataItemViews';
 let ListWithActions = React.createClass({
 
   mixins: [
-    PureRenderMixin,
+    PureRenderWithRedirectedProps({
+      redirect: ['setProps']
+    }),
     FluxMixin,
     ConfigMixin
   ],
@@ -38,26 +40,22 @@ let ListWithActions = React.createClass({
     table: React.PropTypes.string.isRequired,
     selectedPrimKey: React.PropTypes.string,
     sidebar: React.PropTypes.bool,
-    initialSearchFocus: React.PropTypes.bool
+    initialSearchFocus: React.PropTypes.bool,
+    search: React.PropTypes.string
   },
 
   getDefaultProps() {
     return {
       table: null,
       sidebar: true,
-      initialSearchFocus: false
-    };
-  },
-
-  getInitialState() {
-    return {
+      initialSearchFocus: false,
       search: ''
     };
   },
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidMount() {
     if (this.props.initialSearchFocus) {
-      this.refs.search.focus();
+      this.search.focus();
     }
   },
 
@@ -70,11 +68,11 @@ let ListWithActions = React.createClass({
   },
 
   handleSelect(selectedPrimKey) {
-    this.props.setProps({selectedPrimKey});
+    this.redirectedProps.setProps({selectedPrimKey});
   },
 
   handleSearchChange(event) {
-    this.setState({'search': event.target.value});
+    this.redirectedProps.setProps({search: event.target.value});
   },
 
   handleRowsCountChange(rowsCount) {
@@ -100,9 +98,8 @@ let ListWithActions = React.createClass({
   },
 
   render() {
-    let {table, sidebar, setProps, selectedPrimKey} = this.props;
+    let {table, sidebar, selectedPrimKey, search} = this.props;
     let {description} = this.tableConfig();
-    let {search} = this.state;
     let descriptionWithHTML = <HTMLWithComponents>{description}</HTMLWithComponents>;
 
     let sidebarContent = (
@@ -115,7 +112,7 @@ let ListWithActions = React.createClass({
                       icon={<Icon fixedWidth={true} name="download" />}
           />
           <div className="search">
-            <TextField ref="search"
+            <TextField ref={(ref) => this.search = ref}
                        fullWidth={true}
                        floatingLabelText="Search"
                        value={search}
@@ -151,7 +148,7 @@ let ListWithActions = React.createClass({
           <div className="top-bar">
             <Icon className="pointer icon"
                   name={sidebar ? 'arrows-h' : 'bars'}
-                  onClick={() => setProps({sidebar: !sidebar})}
+                  onClick={() => this.redirectedProps.setProps({sidebar: !sidebar})}
                   title={sidebar ? 'Expand' : 'Sidebar'}
             />
             {selectedPrimKey ?
