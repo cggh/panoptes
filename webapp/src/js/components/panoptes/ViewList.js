@@ -39,7 +39,7 @@ let ViewList = React.createClass({
 
   render() {
     const hasShowableTables = _some(this.config.visibleTables);
-    const hasGeo = _some(_filter(this.config.tablesById, {hasGeoCoord: true}));
+    const hasTrees = _some(_filter(this.config.visibleTables, (table) => table.trees));
 
     return (
       <List style={this.props.style}>
@@ -50,34 +50,32 @@ let ViewList = React.createClass({
                     leftIcon={<div><Icon fixedWidth={true} name="database"/></div>}
                     onClick={(e) => this.handleOpen(e, <DatasetManagerActions />)}/>
           : null}
-        {hasShowableTables ?
-          <ListItem primaryText="Genome Browser"
-                    secondaryText="View table data and sequence data on the genome"
-                    leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
-                    onClick={(e) => this.handleOpen(e,
-                      <GenomeBrowserWithActions>
-                        <ReferenceSequence fixed/>
-                        <AnnotationChannel fixed/>
-                      </GenomeBrowserWithActions>
-                        )}/>
-          : null}
-        {hasShowableTables ?
+        <ListItem primaryText="Genome Browser"
+                  secondaryText="View table data and sequence data on the genome"
+                  leftIcon={<div><Icon fixedWidth={true} name="bitmap:genomebrowser.png"/></div>}
+                  onClick={(e) => this.handleOpen(e,
+                    <GenomeBrowserWithActions>
+                      <ReferenceSequence fixed/>
+                      <AnnotationChannel fixed/>
+                    </GenomeBrowserWithActions>
+                      )}/>
           <ListItem primaryText="Table Plotter"
-                    secondaryText="View table data graphically"
+                    disabled={!hasShowableTables}
+                    innerDivStyle={{opacity: hasShowableTables ? 'inherit' :0.5}}
+                    secondaryText={hasShowableTables ? "View table data graphically" : "No table data to plot"}
                     leftIcon={<div><Icon fixedWidth={true} name="area-chart"/></div>}
                     onClick={(e) => this.handleOpen(e, <PlotWithActions />)}/>
-          : null}
           <ListItem primaryText="Map Composer"
                     style={{opacity: 1}}
                     secondaryText={'View data geographically'}
                     leftIcon={<div><Icon fixedWidth={true} name="globe"/></div>}
                     onClick={(e) => this.handleOpen(e, <MapActions />)}/>
-        {hasShowableTables ?
-          <ListItem primaryText="Tree"
-                    secondaryText="View a tree"
+          <ListItem primaryText="Tree Plotter"
+                    disabled={!hasTrees}
+                    innerDivStyle={{opacity: hasTrees ? 'inherit' :0.5}}
+                    secondaryText={hasTrees ? "View a neighbour joining tree" : "No tree data to plot"}
                     leftIcon={<div><Icon fixedWidth={true} name="tree"/></div>}
                     onClick={(e) => this.handleOpen(e, <TreeWithActions />)}/>
-          : null}
       </List>
     );
   }

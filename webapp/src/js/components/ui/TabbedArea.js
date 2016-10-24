@@ -161,7 +161,7 @@ let TabbedArea = React.createClass({
       <div {...divProps} className="tabbed-area">
         <div className="tabs">
           {ValidComponentChildren.map(children, this.renderTab, this)}
-          {this.props.onAddTab ? <Icon name="plus-circle" onClick={this.handleAddTab}/> : null}
+          {this.props.onAddTab ? <Icon className="pointer" name="plus-circle" onClick={this.handleAddTab}/> : null}
         </div>
         <div className="tab-content">
           {ValidComponentChildren.map(children, this.renderPane, this)}

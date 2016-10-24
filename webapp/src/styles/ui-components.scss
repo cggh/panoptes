@@ -91,10 +91,13 @@
   position: relative;
   vertical-align: middle;
   font-size: 22px;
-  cursor: pointer;
   .bitmap {
     height: 22px;
   }
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .icon:hover {
