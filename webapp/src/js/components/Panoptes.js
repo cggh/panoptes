@@ -16,6 +16,7 @@ import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
 import Finder from 'containers/Finder';
 import Copy from 'ui/Copy';
+import Confirm from 'ui/Confirm';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -154,7 +155,7 @@ let Header = React.createClass({
   mixins: [
     PureRenderMixin,
     ConfigMixin,
-    FluxMixin
+    FluxMixin,
   ],
 
   propTypes: {
@@ -168,6 +169,22 @@ let Header = React.createClass({
     let introContent = 'Here is the link for this page, which you can copy and paste elsewhere: ';
     let selectedContent = window.location.href;
     this.getFlux().actions.session.modalOpen(<Copy title="URL" introContent={introContent} selectedContent={selectedContent}/>);
+  },
+
+  handleSaveInitialSession() {
+    let state = this.getFlux().store('SessionStore').getState().toJS();
+    this.getFlux().actions.session.modalOpen(<Confirm
+      title="Initial view"
+      message="Save current app state as initial view for all users?"
+      onConfirm={() => this.getFlux().actions.api.modifyConfig(
+        {
+          dataset: this.config.dataset,
+          path: 'settings.initialSessionState',
+          action: 'replace',
+          content: state,
+        }
+      )}
+    />);
   },
 
   render() {
