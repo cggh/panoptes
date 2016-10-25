@@ -17,6 +17,7 @@ import PureRenderMixin from 'mixins/PureRenderMixin';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import Divider from 'material-ui/Divider';
 
 // Panoptes UI
 import SidebarHeader from 'ui/SidebarHeader';
@@ -325,6 +326,8 @@ let DataTableWithActions = React.createClass({
                     />)}
                     icon={<Icon fixedWidth={true} name="columns" />}
         />
+        {searchGUI}
+        <Divider />
         <FlatButton label="Download data"
                     disabled={columns.size === 0}
                     primary={true}
@@ -336,7 +339,6 @@ let DataTableWithActions = React.createClass({
                     onClick={() => this.flux.actions.session.tabOpen(<PivotTableWithActions table={table} />, true)}
                     icon={<Icon fixedWidth={true} name="table" />}
         />
-        {searchGUI}
       </div>
     );
 

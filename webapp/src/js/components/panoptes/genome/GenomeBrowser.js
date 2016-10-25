@@ -40,8 +40,8 @@ let GenomeBrowser = React.createClass({
   propTypes: {
     setProps: React.PropTypes.func.isRequired,
     chromosome: React.PropTypes.string.isRequired,
-    start: React.PropTypes.number.isRequired,
-    end: React.PropTypes.number.isRequired,
+    start: React.PropTypes.number,
+    end: React.PropTypes.number,
     sideWidth: React.PropTypes.number.isRequired,
     chromPositions: React.PropTypes.object,  //Stores the position on each chrom so you can flick back without losing place
     children: React.PropTypes.node
