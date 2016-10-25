@@ -1,7 +1,7 @@
 import React from  'react';
 import NotificationSystem from 'react-notification-system';
 import deserialiseComponent from 'util/deserialiseComponent';
-
+import {Map} from 'immutable';
 // Mixins
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
@@ -112,18 +112,15 @@ let Panoptes = React.createClass({
               {popups.get('components').map((compId) => {
                 let popup = components.get(compId);
                 let state = popups.getIn(['state', compId]);
-
-                let initialPosition = undefined;
-                let initialSize = undefined;
-                if (state) {
-                  initialPosition = state.get('position');
-                  initialSize = state.get('size');
-                }
+                let {x, y} = state.get('position', Map()).toJS();
+                let {width, height} = state.get('size', Map()).toJS();
 
                 return (
                   <Popup
-                    initialPosition={initialPosition}
-                    initialSize={initialSize}
+                    x={x}
+                    y={y}
+                    width={width}
+                    height={height}
                     compId={compId}
                     key={compId}
                     onMoveStop={actions.popupMove.bind(this, compId)}
