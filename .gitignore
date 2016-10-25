@@ -8,6 +8,7 @@ webapp/bower_components/
 webapp/node_modules/
 webapp/dist/panoptes/Maps
 webapp/dist/panoptes/Docs
+webapp/dist/panoptes/images
 
 settings.gen
 chef-install
