@@ -4,7 +4,6 @@ import React from 'react';
 import PureRenderMixin from 'mixins/PureRenderMixin';
 import FluxMixin from 'mixins/FluxMixin';
 import ConfigMixin from 'mixins/ConfigMixin';
-import StoreWatchMixin from 'mixins/StoreWatchMixin';
 
 // UI components
 import TabbedArea from 'ui/TabbedArea';
@@ -21,8 +20,7 @@ let FindGene = React.createClass({
   mixins: [
     PureRenderMixin,
     FluxMixin,
-    ConfigMixin,
-    StoreWatchMixin('SessionStore')
+    ConfigMixin
   ],
 
   propTypes: {
@@ -40,12 +38,6 @@ let FindGene = React.createClass({
     return {
       activeTab: 'tab_0',
       startPosition: 0
-    };
-  },
-
-  getStateFromFlux() {
-    return {
-      foundGenes: this.getFlux().store('SessionStore').getState().get('foundGenes')
     };
   },
 
@@ -71,7 +63,6 @@ let FindGene = React.createClass({
 
   render() {
     let {setProps, activeTab, search, chromosome, startPosition, endPosition, chromosomeLength} = this.props;
-    let {foundGenes} = this.state;
 
     // Avoid trying to mutate props.
     let setChromosome = chromosome;
@@ -96,14 +87,11 @@ let FindGene = React.createClass({
 
     }
 
-    let recentlyFoundGenes = null;
-    if (foundGenes.size > 0) {
-      recentlyFoundGenes = (
-        <div style={{borderTop: '4px solid #3d8bd5'}}>
-          <RecentlyFoundGenes onSelect={this.handleSelectGene} subheaderText="Recently found genes" />
-        </div>
-      );
-    }
+    let recentlyFoundGenes = (
+      <div style={{borderTop: '4px solid #3d8bd5'}}>
+        <RecentlyFoundGenes onSelect={this.handleSelectGene} subheaderText="Recently found genes" />
+      </div>
+    );
 
     return (
       <TabbedArea activeTab={activeTab}
