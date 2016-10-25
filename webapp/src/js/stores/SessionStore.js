@@ -10,16 +10,16 @@ import _isEqual from 'lodash/isEqual';
 const EMPTY_TAB = 'containers/EmptyTab';
 const START_TAB = 'containers/StartTab';
 
-// TODO: For app config?
 const MIN_POPUP_WIDTH_PIXELS = 200;
 const MIN_POPUP_HEIGHT_PIXELS = 150;
+const CASCADE_OFFSET_PIXELS = 20;
 
 let SessionStore = Fluxxor.createStore({
 
   initialize(state) {
     this.state = Immutable.fromJS(state);
     this.modal = null;
-
+    
     this.bindActions(
       SESSION.COMPONENT_SET_PROPS, this.emitIfNeeded(this.componentSetProps),
       SESSION.COMPONENT_REPLACE, this.emitIfNeeded(this.componentReplace),
@@ -107,13 +107,26 @@ let SessionStore = Fluxxor.createStore({
       this.state = this.state.updateIn(['popups', 'components'],
         (list) => list.filter((popupId) => popupId !== compId).push(compId));
     } else {
-      let id = uid(10);
-      this.state = this.state.setIn(['components', id], component);
-      this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(id));
-
+      compId = uid(10);
+      this.state = this.state.setIn(['components', compId], component);
+      this.state = this.state.updateIn(['popups', 'components'], (list) => list.push(compId));
       if (switchTo) {
-        this.popupFocus({compId: id});
+        this.popupFocus({compId: compId});
       }
+    }
+    //Set an initial position to prevent opening over an existing popup
+    if (!this.state.getIn(['popups', 'state', compId])) {
+      let numPopups = this.state.get('numPopupsOpened') || 0;
+      //150 accommodates header and allows some part of popup to be shown
+      let maxPopupsDown = Math.floor((window.innerHeight  - 200) / CASCADE_OFFSET_PIXELS);
+      let maxPopupsAcross = Math.floor((window.innerWidth  - 200) / CASCADE_OFFSET_PIXELS);
+      this.state = this.state.set('numPopupsOpened', numPopups + 1);
+      this.state = this.state.setIn(['popups', 'state', compId, 'position'], Immutable.Map(
+        {
+          x: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS) + ((Math.floor(numPopups / maxPopupsDown) % maxPopupsAcross) * CASCADE_OFFSET_PIXELS),
+          y: 50 + (numPopups % maxPopupsDown * CASCADE_OFFSET_PIXELS)
+        }
+      ));
     }
 
   },
@@ -200,7 +213,6 @@ let SessionStore = Fluxxor.createStore({
   appResize() {
 
     // Trim popups
-
     let popups = this.state.getIn(['popups', 'components']);
 
     popups.map((compId) => {
@@ -209,7 +221,6 @@ let SessionStore = Fluxxor.createStore({
       let size = this.state.getIn(['popups', 'state', compId, 'size']);
 
       if (position !== undefined && size !== undefined) {
-
         let positionX = position.get('x');
         let positionY = position.get('y');
         let sizeWidth = size.get('width');
