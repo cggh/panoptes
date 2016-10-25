@@ -43,29 +43,7 @@ injectTapEventPlugin();
 
 const HASH_REGEX = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/;
 
-function getAppState(location) {
-  const defaultState = {
-    session: {
-      components: {
-        FirstTab: {
-          type: 'StartTab',
-          props: {}
-        }
-      },
-      tabs: {
-        components: ['FirstTab'],
-        selectedTab: 'FirstTab',
-        unclosableTab: 'FirstTab'
-      },
-      popups: {
-        components: [],
-        state: {}
-      },
-      foundGenes: [],
-      usedTableQueries: []
-    }
-  };
-
+function getDatasetAndStateUID(location) {
   location = location.pathname.split('/');
   location = _filter(location);
   const start = Math.max(0, location.length - 2);
@@ -77,16 +55,16 @@ function getAppState(location) {
   if (location.length === 0)
     return {};
   if (location.length === 1)
-    return {dataset: location[0], state: defaultState};
+    return {dataset: location[0], stateUID: null};
   let match = HASH_REGEX.exec(location[1]);
   if (match) {
-    return {dataset: location[0], state: API.fetchData(match[0]).then((appState) => appState || defaultState)};
+    return {dataset: location[0], stateUID: match[0]};
   } else {
-    return {dataset: location[1], state: defaultState};
+    return {dataset: location[1], stateUID: null};
   }
 }
 
-Promise.prototype.done = function(onFulfilled, onRejected) {
+Promise.prototype.done = function (onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch((e) => {
       setTimeout(() => {
@@ -96,11 +74,41 @@ Promise.prototype.done = function(onFulfilled, onRejected) {
     })
   ;
 };
-const {dataset, state} = getAppState(window.location);
-if (dataset) {  //dataset being "panoptes" means that root URL is being hit
-  ReactDOM.render(<div><Loading status="loading-hide">Loading {dataset}...</Loading></div>, document.getElementById('main'));
-  Promise.all([InitialConfig(dataset), state]) //eslint-disable-line no-undef
+
+const {dataset, stateUID} = getDatasetAndStateUID(window.location);
+if (dataset) {
+  ReactDOM.render(<div><Loading status="loading-hide">Loading {dataset}...</Loading>
+  </div>, document.getElementById('main'));
+  let promises = [InitialConfig(dataset)];
+  if (stateUID) {
+    promises.push(API.fetchData(stateUID))
+  }
+  Promise.all(promises)
     .then(([config, appState]) => {
+      const defaultState = {
+        session: {
+          components: {
+            FirstTab: {
+              type: 'StartTab',
+              props: {}
+            }
+          },
+          tabs: {
+            components: ['FirstTab'],
+            selectedTab: 'FirstTab',
+            unclosableTab: 'FirstTab'
+          },
+          popups: {
+            components: [],
+            state: {}
+          },
+          foundGenes: [],
+          usedTableQueries: []
+        }
+      };
+      appState = appState ? appState : (
+        config.settings.initialSessionState ? {session: config.settings.initialSessionState} : (defaultState));
+
       let stores = {
         PanoptesStore: new PanoptesStore({
           storedSubsets: {}
@@ -141,7 +149,7 @@ if (dataset) {  //dataset being "panoptes" means that root URL is being hit
 
       history.listen((location, action) => {
         if (action === 'POP') {
-          let newState = Immutable.fromJS((location.state ? location.state.session : null) || getAppState(location.pathname).session);
+          let newState = Immutable.fromJS((location.state ? location.state.session : null) || getDatasetAndStateUID(location.pathname).session);
           if (!newState.equals(stores.SessionStore.state)) {
             stores.SessionStore.state = newState;
             backbutton = true;

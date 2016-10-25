@@ -16,6 +16,7 @@ import Popup from 'ui/Popup';
 import Modal from 'ui/Modal';
 import Finder from 'containers/Finder';
 import Copy from 'ui/Copy';
+import Confirm from 'ui/Confirm';
 
 // Material UI
 import IconButton from 'material-ui/IconButton';
@@ -153,7 +154,8 @@ let Panoptes = React.createClass({
 let Header = React.createClass({
   mixins: [
     PureRenderMixin,
-    FluxMixin
+    ConfigMixin,
+    FluxMixin,
   ],
 
   propTypes: {
@@ -169,6 +171,22 @@ let Header = React.createClass({
     this.getFlux().actions.session.modalOpen(<Copy title="URL" introContent={introContent} selectedContent={selectedContent}/>);
   },
 
+  handleSaveInitialSession() {
+    let state = this.getFlux().store('SessionStore').getState().toJS();
+    this.getFlux().actions.session.modalOpen(<Confirm
+      title="Initial view"
+      message="Save current app state as initial view for all users?"
+      onConfirm={() => this.getFlux().actions.api.modifyConfig(
+        {
+          dataset: this.config.dataset,
+          path: 'settings.initialSessionState',
+          action: 'replace',
+          content: state,
+        }
+      )}
+    />);
+  },
+
   render() {
     let {dataset, name, userID, logo} = this.props;
     let actions = this.getFlux().actions;
@@ -178,6 +196,12 @@ let Header = React.createClass({
         <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
+        {this.config.user.isManager ?
+          <IconButton tooltip="Set current state as initial view for all users"
+                      iconClassName="fa fa-floppy-o"
+                      onClick={this.handleSaveInitialSession}
+          /> : null}
+
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
                     onClick={() => actions.session.modalOpen(<Finder />, {})}
@@ -185,7 +209,7 @@ let Header = React.createClass({
         <IconButton
           tooltip="Link"
           iconClassName="fa fa-link"
-          onClick={() => this.handlePageLinkClick()}
+          onClick={this.handlePageLinkClick}
         />
       </div>
     );

@@ -42,8 +42,13 @@ class SettingsDataset(ImportSettings):
                                                             'type': 'Text',
                                                             'required': False,
                                                             'description': ''
-                                                            })
-                                    ))
+                                                            }),
+                                    ('initialSessionState', {
+                                        'type': 'Block',
+                                        'required': False,
+                                        'description': 'The default tabs, popups and recently used genes and queries for a new session. Most easily set by using the save button on the header (only shown to managers)',
+                                    })
+            ))
             return datasetSettings
 
     def _getDocFilename(self):
