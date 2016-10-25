@@ -15,13 +15,13 @@ let PopupButton = React.createClass({
   propTypes: {
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
-    children: React.PropTypes.node
+    children: React.PropTypes.node,
   },
 
   getDefaultProps() {
     return {
       label: 'Untitled',
-      icon: 'circle'
+      icon: 'circle',
     };
   },
 
@@ -32,7 +32,7 @@ let PopupButton = React.createClass({
   },
 
   render() {
-    let {children, label, icon} = this.props;
+    let {children, label, icon, ...others} = this.props;
     children = filterChildren(this, children);
     if (_isArray(children)) {
       throw Error('PopupButton can only have one child');
@@ -48,6 +48,7 @@ let PopupButton = React.createClass({
       icon={icon ? <Icon inverse={true} name={icon} /> : null}
       labelStyle={{textTransform: 'inherit'}}
       onClick={this.handleClick}
+      {...others}
     />;
   }
 

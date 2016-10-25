@@ -76,14 +76,14 @@ const ConfigStore = Fluxxor.createStore({
 
   addTableConfig(config) {
     config.tables = _values(config.tablesById);
-    config.visibleTables = _filter(config.tables, (table) => !table.isHidden);
     _forEach(config.tablesById, (table, id) => table.id = id);
     if (config.settings.dataTables) {
       config.tables = [];
       config.settings.dataTables.forEach((id) => {
         config.tables.push(config.tablesById[id]);
       });
-    }
+    config.visibleTables = _filter(config.tables, (table) => !table.isHidden);
+  }
 
     let processTable = (table) => {
       if (table.primKey === 'AutoKey') {

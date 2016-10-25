@@ -130,8 +130,7 @@
             <PopupButton key={table.id}
                        label={'Show ' + table.namePlural + ' in ' + geneData['fname']}
                        icon={table.icon} >
-            <component setProps={setProps}
-                       table={table.id}
+            <component table={table.id}
                        query={genomePositionTableQuery} />
             </PopupButton>
         );
