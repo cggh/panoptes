@@ -1,3 +1,5 @@
+'use strict';
+
 let path = require('path');
 let webpack = require('webpack');
 let HtmlWebpackPlugin = require('html-webpack-plugin');
