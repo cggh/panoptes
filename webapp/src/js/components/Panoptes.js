@@ -169,7 +169,7 @@ let Header = React.createClass({
   handlePageLinkClick() {
     let introContent = 'Here is the link for this page, which you can copy and paste elsewhere: ';
     let selectedContent = window.location.href;
-    this.getFlux().actions.session.modalOpen(<Copy title="URL" introContent={introContent} selectedContent={selectedContent}/>);
+    this.getFlux().actions.session.modalOpen(<Copy title="Page Link" introContent={introContent} selectedContent={selectedContent}/>);
   },
 
   handleSaveInitialSession() {
@@ -205,7 +205,7 @@ let Header = React.createClass({
 
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
-                    onClick={() => actions.session.modalOpen(<Finder />, {})}
+                    onClick={() => actions.session.modalOpen(<Finder />)}
         />
         <IconButton
           tooltip="Link"

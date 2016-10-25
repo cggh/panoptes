@@ -38,10 +38,9 @@ let Modal = React.createClass({
 
   /*eslint-disable react/no-did-update-set-state */   //It's ok here as it won't lead to thrashing and is the only way to do this
   componentDidUpdate() {
-    let {child} = this.refs;
-    if (child) {
-      child.icon ? this.setState({icon: child.icon()}) : null;
-      child.title ? this.setState({title: child.title()}) : null;
+    if (this.child) {
+      this.child.icon ? this.setState({icon: this.child.icon()}) : null;
+      this.child.title ? this.setState({title: this.child.title()}) : null;
     }
   },
   /*eslint-enable react/no-did-update-set-state */
