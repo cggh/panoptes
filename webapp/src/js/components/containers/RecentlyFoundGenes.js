@@ -20,7 +20,8 @@ let RecentlyFoundGenes = React.createClass({
   ],
 
   propTypes: {
-    onSelect: React.PropTypes.func
+    onSelect: React.PropTypes.func,
+    subheaderText: React.PropTypes.string
   },
 
 
@@ -35,7 +36,7 @@ let RecentlyFoundGenes = React.createClass({
   },
 
   render() {
-    let {onSelect} = this.props;
+    let {onSelect, subheaderText} = this.props;
     let {foundGenes} = this.state;
 
     let foundGenesList = null;
@@ -58,8 +59,14 @@ let RecentlyFoundGenes = React.createClass({
 
       });
 
+      let subheader = undefined;
+      if (subheaderText !== undefined) {
+        subheader = <Subheader>{subheaderText}</Subheader>;
+      }
+
       foundGenesList = (
         <List>
+          {subheader}
           {foundGenesListItems}
         </List>
       );

@@ -183,9 +183,7 @@ let FindGeneByRegion = React.createClass({
 
         </tbody>
         </table>
-        <div style={{position: 'relative', width: '100%', height: '200px'}}>
-          {geneList}
-        </div>
+        {geneList}
       </div>
     );
 
