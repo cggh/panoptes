@@ -153,6 +153,7 @@ let Panoptes = React.createClass({
 let Header = React.createClass({
   mixins: [
     PureRenderMixin,
+    ConfigMixin,
     FluxMixin
   ],
 
@@ -178,6 +179,12 @@ let Header = React.createClass({
         <div className="title"><a href={`/panoptes/${dataset}`}>{name}</a></div>
         <div className="username">{userID}</div>
         <img className="logo" src={logo}/>
+        {this.config.user.isManager ?
+          <IconButton tooltip="Set current state as initial view for all users"
+                      iconClassName="fa fa-floppy-o"
+                      onClick={this.handleSaveInitialSession}
+          /> : null}
+
         <IconButton tooltip="Find"
                     iconClassName="fa fa-search"
                     onClick={() => actions.session.modalOpen(<Finder />, {})}
@@ -185,7 +192,7 @@ let Header = React.createClass({
         <IconButton
           tooltip="Link"
           iconClassName="fa fa-link"
-          onClick={() => this.handlePageLinkClick()}
+          onClick={this.handlePageLinkClick}
         />
       </div>
     );
