@@ -255,7 +255,10 @@ let Criterion = React.createClass({
     onChange();
   },
 
-  handleValueChange(value) {
+  handleValueChange(payload) {
+    if (payload && payload.input) {
+      this[payload.input] = payload.value;
+    }
 
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
@@ -267,27 +270,27 @@ let Criterion = React.createClass({
     }
 
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = Deformatter(property, value);
-      this.setState({CompValue: value});
+      component.CompValue = Deformatter(property, this.value);
+      this.setState({CompValue: this.value});
     } else if (currentOperator.fieldType === 'minMax') {
-      component.CompValueMin = Deformatter(property, this.refs.min.value);
-      component.CompValueMax = Deformatter(property, this.refs.max.value);
+      component.CompValueMin = Deformatter(property, this.min);
+      component.CompValueMax = Deformatter(property, this.max);
       this.setState({
-        CompValueMin: this.refs.min.value,
-        CompValueMax: this.refs.max.value
+        CompValueMin: this.min,
+        CompValueMax: this.max
       });
     } else if (currentOperator.fieldType === 'otherColumn') {
-      component.ColName2 = this.refs.otherColumn.value;
+      component.ColName2 = this.otherColumn;
     } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
-      component.ColName2 = this.refs.otherColumn.value;
-      component.Factor = this.refs.scale.value;
-      component.Offset = this.refs.offset.value;
+      component.ColName2 = this.otherColumn;
+      component.Factor = this.scale;
+      component.Offset = this.offset;
       this.setState({
-        Factor: this.refs.min.value,
-        Offset: this.refs.max.value
+        Factor: this.min,
+        Offset: this.max
       });
     } else if (currentOperator.fieldType === 'subset') {
-      component.Subset = this.refs.subset.value;
+      component.Subset = this.subset;
     }
 
     onChange();
@@ -427,7 +430,7 @@ let Criterion = React.createClass({
                 Formatter(property, component.CompValue)
                 : this.state.CompValue
               }
-              onChange={(value) => this.handleValueChange(value)}
+              onChange={(value) => this.handleValueChange({input: 'value', value})}
             />
           </div>
         );
@@ -435,14 +438,23 @@ let Criterion = React.createClass({
     } else if (currentOperator.fieldType === 'minMax') {
       fields = (
         <div className="fields">
-          <input className="field" ref="min"
-                 value={component.CompValueMin ? Formatter(property, component.CompValueMin) : this.state.CompValueMin}
-                 onChange={this.handleValueChange}/>
-
+             <PropertyInput
+               value={
+                 component.CompValueMin ?
+                 Formatter(property, component.CompValueMin)
+                 : this.state.CompValueMin
+               }
+               onChange={(value) => this.handleValueChange({input: 'min', value})}
+             />
           <div>and</div>
-          <input className="field" ref="max"
-                 value={component.CompValueMax ? Formatter(property, component.CompValueMax) : this.state.CompValueMax}
-                 onChange={this.handleValueChange}/>
+            <PropertyInput
+              value={
+                component.CompValueMax ?
+                Formatter(property, component.CompValueMax)
+                : this.state.CompValueMax
+              }
+              onChange={(value) => this.handleValueChange({input: 'max', value})}
+            />
         </div>
       );
     } else if (currentOperator.fieldType === 'otherColumn') {
