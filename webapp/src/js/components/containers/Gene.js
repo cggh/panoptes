@@ -38,7 +38,6 @@
 
     propTypes: {
       icon: React.PropTypes.string,
-      setProps: React.PropTypes.func, //Optional for buttons to replace this component.
       geneId: React.PropTypes.string.isRequired
     },
 
@@ -103,7 +102,6 @@
     },
 
     render() {
-      const {setProps} = this.props;
       const {geneData, loadStatus} = this.state;
       const {annotation} = this.config.genome;
       if (!geneData) return null;

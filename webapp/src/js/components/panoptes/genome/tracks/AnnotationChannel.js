@@ -4,7 +4,7 @@ import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 import FluxMixin from 'mixins/FluxMixin';
 import DataFetcherMixin from 'mixins/DataFetcherMixin';
-
+import Gene from 'containers/Gene';
 
 import API from 'panoptes/API';
 import LRUCache from 'util/LRUCache';
@@ -12,6 +12,8 @@ import ErrorReport from 'panoptes/ErrorReporter';
 import findBlocks from 'panoptes/FindBlocks';
 
 import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDrawer';
+
+const ROW_HEIGHT = 24;
 
 let AnnotationChannel = React.createClass({
   mixins: [
@@ -163,7 +165,6 @@ let AnnotationChannel = React.createClass({
     ctx.strokeStyle = '#000';
     ctx.fillStyle = '#000';
     ctx.font = '10px monospace';
-    const ROW_HEIGHT = 24;
     let maxRow = 0;
     let scaleFactor = ((width - sideWidth) / (end - start));
     let lastTextAt = [];
@@ -199,11 +200,31 @@ let AnnotationChannel = React.createClass({
         }
       }
     }
-
-
     const desiredHeight = Math.max((maxRow + 1) * ROW_HEIGHT + 10, 40);
     if (desiredHeight !== height)
       this.setState({height: desiredHeight});
+  },
+
+  handleClick(e) {
+    const {width, sideWidth, start, end} = this.props;
+
+    let rect = this.refs.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    if (!(this.data && this.data.starts)) return;
+    const {ids, sizes, starts, types, rows} = this.data;
+    let scaleFactor = ((width - sideWidth) / (end - start));
+    for (let i = 0, l = starts.length; i < l; ++i) {
+      if (types[i] === 'gene') {
+        const x1 = scaleFactor * (starts[i] - start);
+        const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
+        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < (rows[i]+1) * ROW_HEIGHT) {
+          this.flux.actions.session.popupOpen(<Gene geneId={ids[i]} />, false);
+        }
+      }
+    }
+
+
   },
 
   render() {
@@ -223,28 +244,10 @@ let AnnotationChannel = React.createClass({
         legendComponent={<Legend/>}
         onClose={null}
       >
-        <canvas ref="canvas" width={width} height={height}/>
+        <canvas ref="canvas" width={width} height={height} onClick={this.handleClick}/>
       </ChannelWithConfigDrawer>);
   }
 });
-
-//let PerRowIndicatorControls = React.createClass({
-//  mixins: [
-//    PureRenderWithRedirectedProps({
-//      check: [
-//      ],
-//      redirect: ['setProps']
-//    })
-//  ],
-//
-//  render() {
-//    //let {fractional, autoYScale, yMin, yMax} = this.props;
-//    return (
-//      <div className="channel-controls">
-//      </div>
-//    );
-//  }
-//});
 
 let Legend = () =>
     <div className="legend">
@@ -267,6 +270,6 @@ let Legend = () =>
     </div>;
 Legend.shouldComponentUpdate = () => false;
 
-module.exports = AnnotationChannel;
+export default AnnotationChannel;
 
 
