@@ -13,6 +13,7 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import SQL from 'panoptes/SQL';
 import Formatter from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
+import PropertyInput from 'panoptes/PropertyInput';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
@@ -254,7 +255,8 @@ let Criterion = React.createClass({
     onChange();
   },
 
-  handleValueChange() {
+  handleValueChange(value) {
+
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
@@ -265,8 +267,8 @@ let Criterion = React.createClass({
     }
 
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = Deformatter(property, this.refs.value.value);
-      this.setState({CompValue: this.refs.value.value});
+      component.CompValue = Deformatter(property, value);
+      this.setState({CompValue: value});
     } else if (currentOperator.fieldType === 'minMax') {
       component.CompValueMin = Deformatter(property, this.refs.min.value);
       component.CompValueMax = Deformatter(property, this.refs.max.value);
@@ -387,11 +389,11 @@ let Criterion = React.createClass({
         fields = (
           <div className="fields">
             <select className="field" ref="value"
-                    value={Formatter(property,component.CompValue)}
+                    value={Formatter(property, component.CompValue)}
                     onChange={this.handleValueChange}>
               {property.distinctValues.map((cat) =>
-                <option key={cat === null ? 'NULL': cat}
-                        value={Formatter(property,cat)}>
+                <option key={cat === null ? 'NULL' : cat}
+                        value={Formatter(property, cat)}>
                   {Formatter(property, cat)}
                 </option>)
               }
@@ -419,9 +421,14 @@ let Criterion = React.createClass({
       } else {
         fields = (
           <div className="fields">
-            <input className="field" ref="value"
-                   value={component.CompValue ? Formatter(property, component.CompValue) : this.state.CompValue}
-                   onChange={this.handleValueChange}/>
+            <PropertyInput
+              value={
+                component.CompValue ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(value) => this.handleValueChange(value)}
+            />
           </div>
         );
       }
