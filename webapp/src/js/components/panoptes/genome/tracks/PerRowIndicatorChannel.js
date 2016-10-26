@@ -116,12 +116,11 @@ let PerRowIndicatorChannel = React.createClass({
     const {blockLevel, blockIndex, needNext} = findBlock({start, end});
     //If we already at this block then don't change it!
     if (this.props.chromosome !== chromosome ||
-        this.props.table !== table ||
-        this.getDefinedQuery(this.props.query, this.props.table) !== this.getDefinedQuery(query, table) ||
-        this.props.colourProperty !== colourProperty ||
-        !(this.blockLevel === blockLevel
-          && this.blockIndex === blockIndex
-          && this.needNext === needNext)) {
+      this.props.table !== table ||
+      this.getDefinedQuery(this.props.query, this.props.table) !== this.getDefinedQuery(query, table) ||
+      this.props.colourProperty !== colourProperty || !(this.blockLevel === blockLevel
+      && this.blockIndex === blockIndex
+      && this.needNext === needNext)) {
       //Current block was unacceptable so choose best one
       this.blockLevel = blockLevel;
       this.blockIndex = blockIndex;
@@ -175,6 +174,7 @@ let PerRowIndicatorChannel = React.createClass({
   applyData(props, blocks) {
     let {table, colourProperty} = props;
     this.positions = combineBlocks(blocks, this.tableConfig().position);
+    this.primKeys = combineBlocks(blocks, this.tableConfig().primKey);
     if (colourProperty) {
       this.colourData = combineBlocks(blocks, colourProperty);
       this.colourVals = _map(this.colourData,
@@ -204,7 +204,7 @@ let PerRowIndicatorChannel = React.createClass({
     ctx.clip();
     let majorAxis = Math.max(dx, dy);
     ctx.beginPath();
-    for (let n = -1 * (majorAxis) ; n < majorAxis; n += delta) {
+    for (let n = -1 * (majorAxis); n < majorAxis; n += delta) {
       ctx.moveTo(n + x1, y1);
       ctx.lineTo(dy + n + x1, y1 + dy);
     }
@@ -295,6 +295,31 @@ let PerRowIndicatorChannel = React.createClass({
 
   },
 
+  handleClick(e) {
+    let rect = this.refs.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    const {width, sideWidth, start, end} = this.props;
+    const positions = this.positions;
+    const scaleFactor = ((width - sideWidth) / (end - start));
+    //Triangles/Lines
+    let psy = (HEIGHT / 2) - 6;
+    const numPositions = positions.length;
+    const triangleMode = numPositions < (width - sideWidth);
+    for (let i = 0, l = numPositions; i < l; ++i) {
+      const psx = scaleFactor * (positions[i] - start);
+      if (triangleMode) {
+        if (x < psx + 6 && x > psx - 6) {
+          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
+        }
+      } else {
+        if (x < Math.ceil(psx) && x > Math.floor(psx)) {
+          this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
+        }
+      }
+    }
+  },
+
   render() {
     let {width, sideWidth, table, colourProperty, query} = this.props;
     query = this.getDefinedQuery(query);
@@ -307,14 +332,16 @@ let PerRowIndicatorChannel = React.createClass({
         sideComponent={
           <div className="side-name">
             <span>{name || this.config.tablesById[table].capNamePlural}</span>
-            </div>
-            }
+          </div>
+        }
         //Override component update to get latest in case of skipped render
-        configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery()} setProps={this.redirectedProps.setProps} />}
-        legendComponent={colourProperty ? <PropertyLegend table={table} property={colourProperty} knownValues={knownValues} /> : null}
+        configComponent={<PerRowIndicatorControls {...this.props} query={this.getDefinedQuery()}
+                                                  setProps={this.redirectedProps.setProps}/>}
+        legendComponent={colourProperty ?
+          <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <canvas ref="canvas" width={width} height={HEIGHT}/>
+        <canvas ref="canvas" width={width} height={HEIGHT} onClick={this.handleClick}/>
       </ChannelWithConfigDrawer>);
   }
 });
@@ -353,7 +380,7 @@ const PerRowIndicatorControls = React.createClass({
           <div className="label">Colour By:</div>
           <PropertySelector table={table}
                             value={colourProperty}
-                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})} />
+                            onSelect={(colourProperty) => this.redirectedProps.setProps({colourProperty})}/>
         </div>
       </div>
     );

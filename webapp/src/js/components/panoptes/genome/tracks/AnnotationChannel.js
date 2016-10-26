@@ -207,7 +207,6 @@ let AnnotationChannel = React.createClass({
 
   handleClick(e) {
     const {width, sideWidth, start, end} = this.props;
-
     let rect = this.refs.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
@@ -218,7 +217,7 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'gene') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < (rows[i]+1) * ROW_HEIGHT) {
+        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i]+1) * ROW_HEIGHT)) {
           this.flux.actions.session.popupOpen(<Gene geneId={ids[i]} />, false);
         }
       }
