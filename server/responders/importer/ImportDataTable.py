@@ -95,12 +95,18 @@ class ImportDataTable(BaseImport):
                         if not os.path.exists(destFolder):
                             os.makedirs(destFolder)
                         shutil.copyfile(os.path.join(graphfolder, 'data'), os.path.join(destFolder, graphid))
-        graph_config_file = join(config.getBaseDir(), 'config', self._datasetId, tableid, 'graphConfig.json')
+        graph_config_dir = join(config.getBaseDir(), 'config', self._datasetId, tableid)
+        graph_config_file = join(graph_config_dir, 'graphConfig.json')
         try:
             os.remove(graph_config_file)
         except OSError:
             pass
         if len(trees) > 0:
+            try:
+                os.makedirs(graph_config_dir)
+            except OSError as exception:
+                if exception.errno != errno.EEXIST:
+                    raise
             with open(graph_config_file, 'w') as f:
                 print(f)
                 simplejson.dump(trees, f)
