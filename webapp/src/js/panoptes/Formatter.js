@@ -28,7 +28,7 @@ module.exports = function(property, value) {
         + '-' + pad(dt.getUTCDate());
   }
 
-  if (property.isFloat) {
+  if (property.isFloat && value !== '') {
     return value.toFixed(property.decimDigits).toLocaleString();
   }
   return value.toLocaleString();
