@@ -68,9 +68,7 @@ let FindGeneByNameDesc = React.createClass({
                      onChange={this.handleSearchChange}
           />
         </div>
-        <div style={{position: 'relative', width: '100%', height: '200px'}}>
-          {geneList}
-        </div>
+        {geneList}
       </div>
     );
 

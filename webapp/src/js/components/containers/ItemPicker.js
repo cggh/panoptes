@@ -88,7 +88,7 @@ let ItemPicker = React.createClass({
   },
   handleRemove(index) {
     let picked = this.state.picked;
-    picked.splice(index,1);
+    picked.splice(index, 1);
     this.setState({picked: [].concat(picked)});
   },
   handleRemoveAll() {
