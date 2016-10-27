@@ -1,20 +1,19 @@
 import React from 'react';
 
-import 'rc-tooltip/assets/bootstrap.css';
-
 let PropertyInput = React.createClass({
 
-  mixins: [
-
-  ],
-
   propTypes: {
+    onBlur: React.PropTypes.func,
     onChange: React.PropTypes.func,
     value: React.PropTypes.string
   },
 
   handleOnChange() {
     this.props.onChange(this.value.value);
+  },
+
+  handleOnBlur() {
+    this.props.onBlur(this.value.value);
   },
 
   render: function() {
@@ -28,6 +27,7 @@ let PropertyInput = React.createClass({
           ref={(ref) => this.value = ref}
           defaultValue={value}
           onChange={this.handleOnChange}
+          onBlur={this.handleOnBlur}
         />
       </span>
     );
