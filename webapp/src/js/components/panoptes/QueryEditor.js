@@ -397,7 +397,7 @@ let Criterion = React.createClass({
             <select
               className="field"
               value={
-                component.CompValue ?
+                component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
                 : this.state.CompValue
               }
@@ -421,7 +421,7 @@ let Criterion = React.createClass({
             <select
               className="field"
               value={
-                component.CompValue ?
+                component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
                 : this.state.CompValue
               }
@@ -453,7 +453,7 @@ let Criterion = React.createClass({
           <div className="fields">
             <PropertyInput
               value={
-                component.CompValue ?
+                component.CompValue !== undefined ?
                 Formatter(property, component.CompValue)
                 : this.state.CompValue
               }
