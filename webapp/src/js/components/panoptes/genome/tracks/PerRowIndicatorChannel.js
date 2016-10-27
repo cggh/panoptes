@@ -24,6 +24,7 @@ import ChannelWithConfigDrawer from 'panoptes/genome/tracks/ChannelWithConfigDra
 import FilterButton from 'panoptes/FilterButton';
 
 import {propertyColour} from 'util/Colours';
+import Hammer from 'react-hammerjs';
 
 const HEIGHT = 50;
 
@@ -295,10 +296,10 @@ let PerRowIndicatorChannel = React.createClass({
 
   },
 
-  handleClick(e) {
+  handleTap(e) {
     let rect = this.refs.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    let x = e.center.x - rect.left;
+    let y = e.center.y - rect.top;
     const {width, sideWidth, start, end} = this.props;
     const positions = this.positions;
     const scaleFactor = ((width - sideWidth) / (end - start));
@@ -343,7 +344,9 @@ let PerRowIndicatorChannel = React.createClass({
           <PropertyLegend table={table} property={colourProperty} knownValues={knownValues}/> : null}
         onClose={this.redirectedProps.onClose}
       >
-        <canvas ref="canvas" width={width} height={HEIGHT} onClick={this.handleClick}/>
+        <Hammer onTap={this.handleTap}>
+          <canvas ref="canvas" width={width} height={HEIGHT} />
+        </Hammer>
       </ChannelWithConfigDrawer>);
   }
 });
