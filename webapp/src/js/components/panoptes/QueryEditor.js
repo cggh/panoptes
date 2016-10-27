@@ -94,6 +94,7 @@ let Criterion = React.createClass({
   },
 
   handleReplaceTrivial() {
+
     let {component, onChange} = this.props;
 
     // Get the property info for this table's primary key.
@@ -111,13 +112,21 @@ let Criterion = React.createClass({
     // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
     newComponent.isTrivial = false;
 
+    /*
     // Wipe the state clean.
-    // NB: setting to undefined causes warning "changing an uncontrolled input of type undefined to be controlled"
     ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
-      this.setState({[name]: ''});
+      this.setState({[name]: undefined});
     });
+    */
+
     // Swap the specified component for the new component.
     Object.assign(component, newComponent);
+
+    // Set the CompValue to the property's default.
+    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
+    if (currentOperator.fieldType === 'value') {
+      component.CompValue = property.defaultValue;
+    }
 
     onChange();
   },
@@ -225,10 +234,6 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
 
-    //// Update the comparison values to suit the new property type.
-
-    // TODO: Implement peristent values for compatible properties?
-
     component.CompValue = undefined;
     component.CompValue2 = undefined;
     component.CompValueMin = undefined;
@@ -237,16 +242,9 @@ let Criterion = React.createClass({
     component.Offset = undefined;
     component.subset = undefined;
 
-    // TODO: This logic is essentially replicated from render(). Possible to abstract?
+    // Set the CompValue to the property's default.
     if (currentOperator.fieldType === 'value') {
-      if (property.distinctValues) {
-        // If the property type is distinctValues,
-        // then automatically select the first value.
-        component.CompValue = property.distinctValues[0];
-      } else if (property.isBoolean) {
-        component.CompValue = true;
-        // NB: {NULL, true, false} will be available for selection.
-      }
+      component.CompValue = property.defaultValue;
     }
 
     this.validateOperatorAndValues();
@@ -419,6 +417,7 @@ let Criterion = React.createClass({
           </div>
         );
       } else if (property.isBoolean) {
+
         fields = (
           <div className="fields">
             <select
@@ -432,19 +431,19 @@ let Criterion = React.createClass({
             >
               <option
                 key="null"
-                value={null}
+                value={Formatter(property, null)}
               >
                 NULL
               </option>
               <option
                 key="true"
-                value={true}
+                value={Formatter(property, true)}
               >
                 True
               </option>
               <option
                 key="false"
-                value={false}
+                value={Formatter(property, false)}
               >
                 False
               </option>
