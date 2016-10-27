@@ -172,6 +172,7 @@ let Criterion = React.createClass({
   },
 
   validateOperatorAndValues() {
+
     let {component} = this.props;
 
     // Create a new clean component, based on the current component's type.
@@ -207,6 +208,7 @@ let Criterion = React.createClass({
   },
 
   handlePropertyChange() {
+
     let {component, onChange} = this.props;
     component.ColName = this.refs.property.value;
     let property = this.tableConfig().propertiesById[component.ColName];
@@ -238,9 +240,14 @@ let Criterion = React.createClass({
     // TODO: This logic is essentially replicated from render(). Possible to abstract?
     if (currentOperator.fieldType === 'value') {
       if (property.distinctValues) {
+        // If the property type is distinctValues,
+        // then automatically select the first value.
+        // NB: NULL will be added to the options for selection,
+        // if it doesn't already exist as an option.
         component.CompValue = property.distinctValues[0];
       } else if (property.isBoolean) {
         component.CompValue = true;
+        // NB: NULL will be added to the options for selection.
       }
     }
 
@@ -256,6 +263,7 @@ let Criterion = React.createClass({
   },
 
   handleValueChange(payload) {
+
     if (payload && payload.input) {
       this[payload.input] = payload.value;
     }
@@ -361,7 +369,7 @@ let Criterion = React.createClass({
     }
 
     let otherColumnSelect = () =>
-      <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
+      <select className="field" value={component.ColName2} onChange={(value) => this.handleValueChange({input: 'otherColumn', value})}>
           {groups.map((group) => {
             if (group.id === 'other') return null;
             return (
@@ -389,14 +397,23 @@ let Criterion = React.createClass({
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
       if (property.distinctValues && !property.isBoolean) {
+
         fields = (
           <div className="fields">
-            <select className="field" ref="value"
-                    value={Formatter(property, component.CompValue)}
-                    onChange={this.handleValueChange}>
+            <select
+              className="field"
+              value={
+                component.CompValue ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+            >
               {property.distinctValues.map((cat) =>
-                <option key={cat === null ? 'NULL' : cat}
-                        value={Formatter(property, cat)}>
+                <option
+                  key={cat === null ? 'NULL' : cat}
+                  value={Formatter(property, cat)}
+                >
                   {Formatter(property, cat)}
                 </option>)
               }
@@ -406,20 +423,35 @@ let Criterion = React.createClass({
       } else if (property.isBoolean) {
         fields = (
           <div className="fields">
-            <select className="field" ref="value"
-                    value={component.CompValue}
-                    onChange={this.handleValueChange}>
-              <option key="true"
-                      value={true}>
+            <select
+              className="field"
+              value={
+                component.CompValue ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+            >
+              <option
+                key="null"
+                value={null}
+              >
+                NULL
+              </option>
+              <option
+                key="true"
+                value={true}
+              >
                 True
               </option>
-              <option key="false"
-                      value={false}>
+              <option
+                key="false"
+                value={false}
+              >
                 False
               </option>
             </select>
           </div>
-
         );
       } else {
         fields = (
@@ -469,18 +501,18 @@ let Criterion = React.createClass({
         <div className="fields">
           {otherColumnSelect()}
           <div>x</div>
-          <input className="field" ref="scale" value={component.Factor || this.state.Factor}
-                 onChange={this.handleValueChange}/>
+          <input className="field" value={component.Factor || this.state.Factor}
+                 onChange={(value) => this.handleValueChange({input: 'scale', value})}/>
 
           <div>+</div>
-          <input className="field" ref="offset" value={component.Offset || this.state.Offset}
-                 onChange={this.handleValueChange}/>
+          <input className="field" value={component.Offset || this.state.Offset}
+                 onChange={(value) => this.handleValueChange({input: 'offset', value})}/>
         </div>
       );
     } else if (currentOperator.fieldType === 'subset') {
       fields = (
         <div className="fields">
-          <select className="field" ref="subset" value={component.subset} onChange={this.handleValueChange}>
+          <select className="field" value={component.subset} onChange={(event) => this.handleValueChange({input: 'subset', value: event.target.value})}>
             {this.state.subsets.toArray().map((subset) => {
               //TODO CHECK AGAINST ACTUAL SUBSET CONTENT
               let {id, name} = subset;
