@@ -8,7 +8,6 @@ import _some from 'lodash/some';
 import _filter from 'lodash/filter';
 import _sumBy from 'lodash/sumBy';
 import _each from 'lodash/each';
-import _transform from 'lodash/transform';
 import Q from 'q';
 
 const seenBlocks = {};
@@ -161,9 +160,12 @@ export function combineBlocks(blocks, property) {
     });
     return result;
   } else {
-    return _transform(blocks, (sum, block) =>
-        Array.prototype.push.apply(sum, block[property] || []),
-      []);
+    let sum = [];
+    _each(blocks, (block) => {
+        Array.prototype.push.apply(sum, block[property].array || [])
+    });
+
+    return sum;
   }
 }
 

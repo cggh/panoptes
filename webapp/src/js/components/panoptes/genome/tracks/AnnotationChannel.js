@@ -1,4 +1,5 @@
 import React from 'react';
+import Hammer from 'react-hammerjs';
 
 import ConfigMixin from 'mixins/ConfigMixin';
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
@@ -205,12 +206,11 @@ let AnnotationChannel = React.createClass({
       this.setState({height: desiredHeight});
   },
 
-  handleClick(e) {
+  handleTap(e) {
     const {width, sideWidth, start, end} = this.props;
-
     let rect = this.refs.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    let x = e.center.x - rect.left;
+    let y = e.center.y - rect.top;
     if (!(this.data && this.data.starts)) return;
     const {ids, sizes, starts, types, rows} = this.data;
     let scaleFactor = ((width - sideWidth) / (end - start));
@@ -218,7 +218,7 @@ let AnnotationChannel = React.createClass({
       if (types[i] === 'gene') {
         const x1 = scaleFactor * (starts[i] - start);
         const x2 = scaleFactor * ((starts[i] + sizes[i]) - start);
-        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < (rows[i]+1) * ROW_HEIGHT) {
+        if (x2 > x && x1 < x && y > rows[i] * ROW_HEIGHT && y < 5 + ((rows[i]+1) * ROW_HEIGHT)) {
           this.flux.actions.session.popupOpen(<Gene geneId={ids[i]} />, false);
         }
       }
@@ -244,7 +244,9 @@ let AnnotationChannel = React.createClass({
         legendComponent={<Legend/>}
         onClose={null}
       >
-        <canvas ref="canvas" width={width} height={height} onClick={this.handleClick}/>
+        <Hammer onTap={this.handleTap}>
+          <canvas ref="canvas" width={width} height={height} />
+        </Hammer>
       </ChannelWithConfigDrawer>);
   }
 });
