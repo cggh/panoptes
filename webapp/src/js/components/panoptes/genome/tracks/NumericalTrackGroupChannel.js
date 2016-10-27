@@ -200,5 +200,3 @@ let NumericalTrackGroupControls = React.createClass({
 
 
 module.exports = NumericalTrackGroupChannel;
-
-

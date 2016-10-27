@@ -19,7 +19,7 @@ let SessionStore = Fluxxor.createStore({
   initialize(state) {
     this.state = Immutable.fromJS(state);
     this.modal = null;
-    
+
     this.bindActions(
       SESSION.COMPONENT_SET_PROPS, this.emitIfNeeded(this.componentSetProps),
       SESSION.COMPONENT_REPLACE, this.emitIfNeeded(this.componentReplace),
