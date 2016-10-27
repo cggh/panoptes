@@ -49,7 +49,8 @@ let Background = React.createClass({
     const ctx = canvas.getContext('2d', {alpha: false});
     ctx.lineWidth = 0.25;
     ctx.strokeStyle = 'darkgrey';
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     for (let pos = start; pos < end; pos += smallTickWidth) {
       let x = scale(pos);
