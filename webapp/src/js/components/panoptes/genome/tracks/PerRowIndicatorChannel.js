@@ -311,10 +311,12 @@ let PerRowIndicatorChannel = React.createClass({
       if (triangleMode) {
         if (x < psx + 6 && x > psx - 6) {
           this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
+          return;
         }
       } else {
         if (x < Math.ceil(psx) && x > Math.floor(psx)) {
           this.getFlux().actions.panoptes.dataItemPopup({table: this.props.table, primKey: this.primKeys[i]});
+          return;
         }
       }
     }
