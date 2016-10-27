@@ -70,7 +70,7 @@ let Overview = React.createClass({
     .catch((error) => {
       ErrorReport(this.getFlux(), error.message, () => this.fetchData(props, requestContext));
       this.setState({loadStatus: 'error'});
-      console.log(error);
+      console.error(error);
     });
   },
 

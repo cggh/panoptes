@@ -28,8 +28,13 @@ module.exports = function(property, value) {
         + '-' + pad(dt.getUTCDate());
   }
 
-  if (property.isFloat) {
-    return value.toFixed(property.decimDigits).toLocaleString();
+  if (property.isFloat && value !== '') {
+
+    // Try to convert string representations to float, e.g. "1.01" => 1.01
+    // Strings do not have a toFixed() method.
+    let parsedValue = parseFloat(value);
+
+    return parsedValue.toFixed(property.decimDigits).toLocaleString();
   }
   return value.toLocaleString();
 };

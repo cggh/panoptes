@@ -13,6 +13,7 @@ import StoreWatchMixin from 'mixins/StoreWatchMixin';
 import SQL from 'panoptes/SQL';
 import Formatter from 'panoptes/Formatter';
 import Deformatter from 'panoptes/Deformatter';
+import PropertyInput from 'panoptes/PropertyInput';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Icon from 'ui/Icon';
@@ -93,6 +94,7 @@ let Criterion = React.createClass({
   },
 
   handleReplaceTrivial() {
+
     let {component, onChange} = this.props;
 
     // Get the property info for this table's primary key.
@@ -111,12 +113,18 @@ let Criterion = React.createClass({
     newComponent.isTrivial = false;
 
     // Wipe the state clean.
-    // NB: setting to undefined causes warning "changing an uncontrolled input of type undefined to be controlled"
     ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
-      this.setState({[name]: ''});
+      this.setState({[name]: undefined});
     });
+
     // Swap the specified component for the new component.
     Object.assign(component, newComponent);
+
+    // Set the CompValue to the property's default.
+    let currentOperator = validOperators.filter((op) => op.ID === component.type)[0];
+    if (currentOperator.fieldType === 'value') {
+      component.CompValue = property.defaultValue;
+    }
 
     onChange();
   },
@@ -171,6 +179,7 @@ let Criterion = React.createClass({
   },
 
   validateOperatorAndValues() {
+
     let {component} = this.props;
 
     // Create a new clean component, based on the current component's type.
@@ -206,6 +215,7 @@ let Criterion = React.createClass({
   },
 
   handlePropertyChange() {
+
     let {component, onChange} = this.props;
     component.ColName = this.refs.property.value;
     let property = this.tableConfig().propertiesById[component.ColName];
@@ -222,10 +232,6 @@ let Criterion = React.createClass({
     if (!currentOperator)
       throw Error('SQL criterion operator not valid');
 
-    //// Update the comparison values to suit the new property type.
-
-    // TODO: Implement peristent values for compatible properties?
-
     component.CompValue = undefined;
     component.CompValue2 = undefined;
     component.CompValueMin = undefined;
@@ -234,13 +240,9 @@ let Criterion = React.createClass({
     component.Offset = undefined;
     component.subset = undefined;
 
-    // TODO: This logic is essentially replicated from render(). Possible to abstract?
+    // Set the CompValue to the property's default.
     if (currentOperator.fieldType === 'value') {
-      if (property.distinctValues) {
-        component.CompValue = property.distinctValues[0];
-      } else if (property.isBoolean) {
-        component.CompValue = true;
-      }
+      component.CompValue = property.defaultValue;
     }
 
     this.validateOperatorAndValues();
@@ -254,7 +256,12 @@ let Criterion = React.createClass({
     onChange();
   },
 
-  handleValueChange() {
+  handleValueChange(payload) {
+
+    if (payload && payload.input) {
+      this[payload.input] = payload.value;
+    }
+
     let {component, onChange} = this.props;
     let property = this.tableConfig().propertiesById[component.ColName];
     let validOperators = SQL.WhereClause.getCompatibleFieldComparisonOperators(property.encodingType);
@@ -265,27 +272,27 @@ let Criterion = React.createClass({
     }
 
     if (currentOperator.fieldType === 'value') {
-      component.CompValue = Deformatter(property, this.refs.value.value);
-      this.setState({CompValue: this.refs.value.value});
+      component.CompValue = Deformatter(property, this.value);
+      this.setState({CompValue: this.value});
     } else if (currentOperator.fieldType === 'minMax') {
-      component.CompValueMin = Deformatter(property, this.refs.min.value);
-      component.CompValueMax = Deformatter(property, this.refs.max.value);
+      component.CompValueMin = Deformatter(property, this.min);
+      component.CompValueMax = Deformatter(property, this.max);
       this.setState({
-        CompValueMin: this.refs.min.value,
-        CompValueMax: this.refs.max.value
+        CompValueMin: this.min,
+        CompValueMax: this.max
       });
     } else if (currentOperator.fieldType === 'otherColumn') {
-      component.ColName2 = this.refs.otherColumn.value;
+      component.ColName2 = this.otherColumn;
     } else if (currentOperator.fieldType === 'otherColumnWithScaleAndOffset') {
-      component.ColName2 = this.refs.otherColumn.value;
-      component.Factor = this.refs.scale.value;
-      component.Offset = this.refs.offset.value;
+      component.ColName2 = this.otherColumn;
+      component.Factor = this.scale;
+      component.Offset = this.offset;
       this.setState({
-        Factor: this.refs.min.value,
-        Offset: this.refs.max.value
+        Factor: this.min,
+        Offset: this.max
       });
     } else if (currentOperator.fieldType === 'subset') {
-      component.Subset = this.refs.subset.value;
+      component.Subset = this.subset;
     }
 
     onChange();
@@ -356,7 +363,7 @@ let Criterion = React.createClass({
     }
 
     let otherColumnSelect = () =>
-      <select className="field" ref="otherColumn" value={component.ColName2} onChange={this.handleValueChange}>
+      <select className="field" value={component.ColName2} onChange={(value) => this.handleValueChange({input: 'otherColumn', value})}>
           {groups.map((group) => {
             if (group.id === 'other') return null;
             return (
@@ -384,14 +391,23 @@ let Criterion = React.createClass({
       throw Error('SQL criterion operator not valid');
     if (currentOperator.fieldType === 'value') {
       if (property.distinctValues && !property.isBoolean) {
+
         fields = (
           <div className="fields">
-            <select className="field" ref="value"
-                    value={Formatter(property,component.CompValue)}
-                    onChange={this.handleValueChange}>
+            <select
+              className="field"
+              value={
+                component.CompValue !== undefined ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+            >
               {property.distinctValues.map((cat) =>
-                <option key={cat === null ? 'NULL': cat}
-                        value={Formatter(property,cat)}>
+                <option
+                  key={cat === null ? 'NULL' : cat}
+                  value={Formatter(property, cat)}
+                >
                   {Formatter(property, cat)}
                 </option>)
               }
@@ -399,43 +415,76 @@ let Criterion = React.createClass({
           </div>
         );
       } else if (property.isBoolean) {
+
         fields = (
           <div className="fields">
-            <select className="field" ref="value"
-                    value={component.CompValue}
-                    onChange={this.handleValueChange}>
-              <option key="true"
-                      value={true}>
+            <select
+              className="field"
+              value={
+                component.CompValue !== undefined ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(event) => this.handleValueChange({input: 'value', value: event.target.value})}
+            >
+              <option
+                key="null"
+                value={Formatter(property, null)}
+              >
+                NULL
+              </option>
+              <option
+                key="true"
+                value={Formatter(property, true)}
+              >
                 True
               </option>
-              <option key="false"
-                      value={false}>
+              <option
+                key="false"
+                value={Formatter(property, false)}
+              >
                 False
               </option>
             </select>
           </div>
-
         );
       } else {
         fields = (
           <div className="fields">
-            <input className="field" ref="value"
-                   value={component.CompValue ? Formatter(property, component.CompValue) : this.state.CompValue}
-                   onChange={this.handleValueChange}/>
+            <PropertyInput
+              value={
+                component.CompValue !== undefined ?
+                Formatter(property, component.CompValue)
+                : this.state.CompValue
+              }
+              onChange={(value) => this.handleValueChange({input: 'value', value})}
+              onBlur={(value) => this.handleValueChange({input: 'value', value: Formatter(property, value)})}
+            />
           </div>
         );
       }
     } else if (currentOperator.fieldType === 'minMax') {
       fields = (
         <div className="fields">
-          <input className="field" ref="min"
-                 value={component.CompValueMin ? Formatter(property, component.CompValueMin) : this.state.CompValueMin}
-                 onChange={this.handleValueChange}/>
-
+             <PropertyInput
+               value={
+                 component.CompValueMin ?
+                 Formatter(property, component.CompValueMin)
+                 : this.state.CompValueMin
+               }
+               onChange={(value) => this.handleValueChange({input: 'min', value})}
+               onBlur={(value) => this.handleValueChange({input: 'min', value: Formatter(property, value)})}
+             />
           <div>and</div>
-          <input className="field" ref="max"
-                 value={component.CompValueMax ? Formatter(property, component.CompValueMax) : this.state.CompValueMax}
-                 onChange={this.handleValueChange}/>
+            <PropertyInput
+              value={
+                component.CompValueMax ?
+                Formatter(property, component.CompValueMax)
+                : this.state.CompValueMax
+              }
+              onChange={(value) => this.handleValueChange({input: 'max', value})}
+              onBlur={(value) => this.handleValueChange({input: 'max', value: Formatter(property, value)})}
+            />
         </div>
       );
     } else if (currentOperator.fieldType === 'otherColumn') {
@@ -450,18 +499,18 @@ let Criterion = React.createClass({
         <div className="fields">
           {otherColumnSelect()}
           <div>x</div>
-          <input className="field" ref="scale" value={component.Factor || this.state.Factor}
-                 onChange={this.handleValueChange}/>
+          <input className="field" value={component.Factor || this.state.Factor}
+                 onChange={(value) => this.handleValueChange({input: 'scale', value})}/>
 
           <div>+</div>
-          <input className="field" ref="offset" value={component.Offset || this.state.Offset}
-                 onChange={this.handleValueChange}/>
+          <input className="field" value={component.Offset || this.state.Offset}
+                 onChange={(value) => this.handleValueChange({input: 'offset', value})}/>
         </div>
       );
     } else if (currentOperator.fieldType === 'subset') {
       fields = (
         <div className="fields">
-          <select className="field" ref="subset" value={component.subset} onChange={this.handleValueChange}>
+          <select className="field" value={component.subset} onChange={(event) => this.handleValueChange({input: 'subset', value: event.target.value})}>
             {this.state.subsets.toArray().map((subset) => {
               //TODO CHECK AGAINST ACTUAL SUBSET CONTENT
               let {id, name} = subset;
@@ -479,8 +528,21 @@ let Criterion = React.createClass({
       );
     }
 
+    // FIXME: This is a workaround to make sure that the Criterion component is remounted whenever it changes.
+    // The component was not updating when being replaced with a similar component via RecentlyUsedTableQueries.
+
+    let key = [
+      component.CompValue,
+      component.CompValue2,
+      component.CompValueMin,
+      component.CompValueMax,
+      component.Factor,
+      component.Offset,
+      component.subset
+    ];
+
     return (
-      <Paper zDepth={1} className="criterion">
+      <Paper zDepth={1} className="criterion" key={key}>
         <div className="inputs">
           {propertySelect}
           {operatorSelect}
