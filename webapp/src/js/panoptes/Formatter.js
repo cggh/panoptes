@@ -29,7 +29,12 @@ module.exports = function(property, value) {
   }
 
   if (property.isFloat && value !== '') {
-    return value.toFixed(property.decimDigits).toLocaleString();
+
+    // Try to convert string representations to float, e.g. "1.01" => 1.01
+    // Strings do not have a toFixed() method.
+    let parsedValue = parseFloat(value);
+
+    return parsedValue.toFixed(property.decimDigits).toLocaleString();
   }
   return value.toLocaleString();
 };
