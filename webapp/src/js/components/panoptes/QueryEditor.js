@@ -112,12 +112,10 @@ let Criterion = React.createClass({
     // Set the new component's isTrivial to false, i.e. the query will no longer be SELECT * FROM table.
     newComponent.isTrivial = false;
 
-    /*
     // Wipe the state clean.
     ['CompValue', 'CompValueMin', 'CompValueMax', 'Offset', 'Factor'].forEach((name) => {
       this.setState({[name]: undefined});
     });
-    */
 
     // Swap the specified component for the new component.
     Object.assign(component, newComponent);
