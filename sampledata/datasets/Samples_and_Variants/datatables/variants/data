@@ -1,5 +1,5 @@
 chromosome	position	SnpName	HighQuality	Value1	Value2	Value three	Extra 1	NRAF_WAF	NRAF_EAF	NRAF_SAF	int8	int16	int32	boolean
-Pf3D7_01_v3	1	SNP_00001	True		0.55	0.77	A	0	0	0	0	0	0	True
+Pf3D7_01_v3	1	SNP_00001			0.55	0.77	A	0	0	0	0	0	0	True
 Pf3D7_01_v3	10	SNP_00002	True	0.23		0.47	B	0.12	0.23	0.13	1	1	1	False
 Pf3D7_01_v3	20	SNP_00003	False	0.88	0.55		C	0.56	0.21	0.76	2	2	2	True
 Pf3D7_01_v3	30	SNP_00004	True	0.96	0.55	0.75	A	0	0	0.12	3	3	3	False
