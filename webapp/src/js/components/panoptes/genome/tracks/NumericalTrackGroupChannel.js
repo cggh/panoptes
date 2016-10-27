@@ -16,6 +16,10 @@ import NumericalSummaryTrack from 'panoptes/genome/tracks/NumericalSummaryTrack'
 import filterChildren from 'util/filterChildren';
 import ValidComponentChildren from 'util/ValidComponentChildren';
 import ItemPicker from 'containers/ItemPicker';
+import {findBlock} from 'util/PropertyRegionCache';
+import SQL from 'panoptes/SQL';
+import DataTableWithActions from 'containers/DataTableWithActions';
+
 
 const ALLOWED_CHILDREN = [
   'NumericalSummaryTrack'
@@ -24,6 +28,8 @@ const ALLOWED_CHILDREN = [
 
 let NumericalTrackGroupChannel = React.createClass({
   mixins: [
+    FluxMixin,
+    ConfigMixin,
     PureRenderWithRedirectedProps({
       redirect: [
         'setProps',
@@ -49,11 +55,47 @@ let NumericalTrackGroupChannel = React.createClass({
     };
   },
 
+  handleTap(e) {
+    const {width, sideWidth, start, end, chromosome} = this.props;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.center.x - rect.left;
+    const y = e.center.y - rect.top;
+    const scaleFactor = ((width - sideWidth) / (end - start));
+    const windowStart = ((x-3) / scaleFactor) + start;
+    const windowEnd = ((x+3) / scaleFactor) + start;
+    const {summaryWindow} = findBlock({start, end, width});
+    const floor = Math.floor((windowStart+0.5)/summaryWindow) * summaryWindow;
+    const ceil = Math.floor((windowEnd+0.5)/summaryWindow) * summaryWindow;
+    const toOpen = {};
+    React.Children.forEach(this.props.children, (child) => {
+      if (child.props.table && child.props.track) {
+        toOpen[child.props.table] = toOpen[child.props.table] || [];
+        toOpen[child.props.table].push(child.props.track)
+      }
+    });
+
+    _forEach(toOpen, (columns, table) => {
+      const config = this.config.tablesById[table];
+      const query = SQL.WhereClause.encode(SQL.WhereClause.AND([
+        SQL.WhereClause.CompareFixed(config.chromosome, '=', this.props.chromosome),
+        SQL.WhereClause.CompareFixed(config.position, '<=', ceil),
+        SQL.WhereClause.CompareFixed(config.position, '>=', floor)
+      ]));
+      this.flux.actions.session.popupOpen(<DataTableWithActions
+        table={table}
+        columns={[config.primKey].concat(columns)}
+        query={query}
+      />);
+    });
+
+
+  },
+
   render() {
     let {width, sideWidth, children} = this.props;
     children = filterChildren(this, children, ALLOWED_CHILDREN);
     return (
-      <CanvasGroupChannel {...this.props}
+      <CanvasGroupChannel onTap={this.handleTap} {...this.props}
         side={
           <span>
             {ValidComponentChildren.map(children, (track) => track.props.name).join(', ')}

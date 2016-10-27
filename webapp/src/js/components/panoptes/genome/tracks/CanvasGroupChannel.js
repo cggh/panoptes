@@ -1,6 +1,7 @@
 import React from 'react';
 import _isFinite from 'lodash/isFinite';
 import _map from 'lodash/map';
+import Hammer from 'react-hammerjs';
 
 import PureRenderWithRedirectedProps from 'mixins/PureRenderWithRedirectedProps';
 
@@ -33,12 +34,14 @@ let CanvasGroupChannel = React.createClass({
     controls: React.PropTypes.element,
     legend: React.PropTypes.element,
     onClose: React.PropTypes.func,
+    onTap: React.PropTypes.func,
     children: React.PropTypes.node
   },
 
   getDefaultProps() {
     return {
-      height: 100
+      height: 100,
+      onTap: () => null
     };
   },
 
@@ -116,15 +119,17 @@ let CanvasGroupChannel = React.createClass({
           <Motion style={yAxisSpring} defaultStyle={initYAxisSpring}>
             {(interpolated) => {
               let {yMin, yMax} = interpolated;
-              return <div className="numerical-channel-canvas-holder">
-                <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
-                {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
-                  yMin,
-                  yMax,
-                  height,
-                  onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
-                }))}
-              </div>;
+              return <Hammer onTap={this.props.onTap}>
+                <div className="numerical-channel-canvas-holder">
+                  <YScale width={width - sideWidth} height={height} min={yMin} max={yMax} />
+                  {React.Children.map(this.props.children, (child, index) => React.cloneElement(child, {
+                    yMin,
+                    yMax,
+                    height,
+                    onYLimitChange: ({dataYMin, dataYMax}) => this.handleYLimitChange(index, {dataYMin, dataYMax}),
+                  }))}
+                </div>
+              </Hammer>;
             }}
           </Motion>
       </ChannelWithConfigDrawer>);
