@@ -242,12 +242,10 @@ let Criterion = React.createClass({
       if (property.distinctValues) {
         // If the property type is distinctValues,
         // then automatically select the first value.
-        // NB: NULL will be added to the options for selection,
-        // if it doesn't already exist as an option.
         component.CompValue = property.distinctValues[0];
       } else if (property.isBoolean) {
         component.CompValue = true;
-        // NB: NULL will be added to the options for selection.
+        // NB: {NULL, true, false} will be available for selection.
       }
     }
 
