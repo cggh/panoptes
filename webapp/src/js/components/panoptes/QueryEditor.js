@@ -528,8 +528,11 @@ let Criterion = React.createClass({
       );
     }
 
+    // FIXME: This is a workaround to make sure that the Criterion component is remounted whenever it changes.
+    // The component was not updating when being replaced with a similar component via RecentlyUsedTableQueries.
+
     return (
-      <Paper zDepth={1} className="criterion">
+      <Paper zDepth={1} className="criterion" key={JSON.stringify(component)}>
         <div className="inputs">
           {propertySelect}
           {operatorSelect}
