@@ -26,7 +26,7 @@ let PropertyInput = React.createClass({
         <input
           className="field"
           ref={(ref) => this.value = ref}
-          value={value}
+          defaultValue={value}
           onChange={this.handleOnChange}
         />
       </span>
