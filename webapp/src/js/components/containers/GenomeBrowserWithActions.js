@@ -228,10 +228,16 @@ let GenomeBrowserWithActions = React.createClass({
   },
 
   handleDownload() {
+
+    let chromosome = this.props.chromosome || _head(_keys(this.config.chromosomes));
+
     DataDownloader.downloadGenotypeData(
       {
+        chromosome,
         dataset: this.config.dataset,
-        onLimitBreach: this.handleDownloadLimitBreach
+        onLimitBreach: this.handleDownloadLimitBreach,
+        start: this.props.start || 0,
+        end: this.props.end || this.config.chromosomes[chromosome]
       }
     );
   },
