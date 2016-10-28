@@ -53,7 +53,7 @@ def index_table_query(cur, table, fields, query, order, limit, offset, fail_limi
     rows = cur.fetchall()
     result = {}
     for i, (field, desc) in enumerate(zip(fields, cur.description)):
-        dtype = desciptionToDType(desc)
+        dtype = desciptionToDType(desc[1])
         result[field] = np.array([row[i] for row in rows], dtype=dtype)
     return result
 
